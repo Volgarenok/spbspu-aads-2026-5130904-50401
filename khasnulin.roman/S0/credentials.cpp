@@ -4,5 +4,5 @@
 
 std::ostream &khasnulin::out_credentials(std::ostream &out)
 {
-  return out << "khasnulin.romen";
+  return out << "khasnulin.roman";
 }
