@@ -18,4 +18,4 @@ BOOST_AUTO_TEST_CASE(yacredentials_test)
   BOOST_TEST(out.str() == "zubarev.arsenii");
 }
 
-BOOST_AUTO_TEST_SUITE_END(credentials_suite)
+BOOST_AUTO_TEST_SUITE_END()
