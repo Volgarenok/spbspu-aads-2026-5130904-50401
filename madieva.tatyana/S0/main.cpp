@@ -4,4 +4,3 @@ int main()
 {
   madieva::out_credential(std::cout) << "\n";
 }
-
