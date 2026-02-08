@@ -4,7 +4,7 @@
 
 BOOST_AUTO_TEST_CASE(credentials_test)
 {
-    std::ostringstream out;
-    ulanova::out_credentials(out);
-    BOOST_TEST(out.str() == "ulanova.maria");
+  std::ostringstream out;
+  ulanova::out_credentials(out);
+  BOOST_TEST(out.str() == "ulanova.maria");
 }

@@ -3,5 +3,5 @@
 
 int main()
 {
-    ulanova::out_credentials(std::cout) << "\n";
+  ulanova::out_credentials(std::cout) << "\n";
 }
