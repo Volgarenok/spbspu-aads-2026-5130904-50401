@@ -3,7 +3,7 @@
 
 #include <iosfwd>
 
-namespace ulanova 
+namespace ulanova
 {
   std::ostream& out_credentials(std::ostream& out);
 }
