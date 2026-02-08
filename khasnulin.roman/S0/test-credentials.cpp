@@ -1,6 +1,8 @@
-#include "credentials.hpp"
-#include <boost/test/unit_test.hpp>
 #include <sstream>
+
+#include <boost/test/unit_test.hpp>
+
+#include "credentials.hpp"
 
 BOOST_AUTO_TEST_SUITE(credentials_suite)
 
