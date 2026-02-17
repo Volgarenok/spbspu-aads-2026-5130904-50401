@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE S0
+#include <sstream>
 #include <boost/test/included/unit_test.hpp>
 #include "credentials.hpp"
-#include <sstream>
 
 BOOST_AUTO_TEST_CASE(credentials_test)
 {
