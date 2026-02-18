@@ -1,6 +1,6 @@
+#include <sstream>
 #include <boost/test/unit_test.hpp>
 #include "credentials.hpp"
-#include <sstream>
 
 BOOST_AUTO_TEST_CASE(credentials_test)
 {
