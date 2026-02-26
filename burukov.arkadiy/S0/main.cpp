@@ -1,6 +1,7 @@
 #include <iostream>
+#include "credentials.hpp"
 
 int main()
 {
-    std::cout<<"burukov.arkaiy"<<"\n";
+    burukov::out_credentials(std::cout) << '\n';
 }
