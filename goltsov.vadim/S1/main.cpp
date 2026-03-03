@@ -20,4 +20,6 @@ int main()
     ai = ai.next();
   }
   std::cout << *ai << '\n';
+  ai = a.getLast();
+  std::cout << *ai << '\n';
 }
