@@ -152,8 +152,9 @@ namespace goltsov
   {
     fake = createFake();
     fake->next = nullptr;
-    if (!other.fake->next) {
-        return;
+    if (!other.fake->next)
+    {
+      return;
     }
     Node< T >* now_old = other.fake->next;
     Node< T >* now_new = new Node< T >{now_old->value, nullptr};

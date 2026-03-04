@@ -23,10 +23,27 @@ goltsov::List< std::pair< std::string, goltsov::List< size_t > > > getData(std::
         break;
       }
     }
+    if (!in.eof())
+    {
+      in.clear();
+    }
     result.insert(i, {name, numbers});
     i = i.next();
   }
   return result;
+}
+
+void push_back(size_t** sums, size_t& n, size_t a)
+{
+  size_t* new_sums = new size_t[n + 1];
+  for (size_t i = 0; i < n; ++i)
+  {
+    new_sums[i] = sums[0][i];
+  }
+  new_sums[n] = a;
+  delete[] (* sums);
+  sums[0] = new_sums;
+  n += 1;
 }
 
 int main()
@@ -34,20 +51,28 @@ int main()
   size_t size = 0;
   goltsov::List< std::pair< std::string, goltsov::List< size_t > > > data = getData(std::cin, size);
   goltsov::LIter< std::pair< std::string, goltsov::List< size_t > > > it = data.begin();
-  size_t* sums = new size_t[size];
+  size_t* sums = nullptr;
+  size_t n = 0;
   goltsov::LIter< size_t >* its = new goltsov::LIter< size_t >[size];
   for (size_t i = 0; i < size; ++i)
   {
     if (i != size - 1)
     {
-      std::cout << (*it).first << ' ';
+      std::cout << (* it).first << ' ';
     }
     else
     {
-      std::cout << (*it).first << '\n';
+      std::cout << (* it).first << '\n';
     }
-    sums[i] = 0;
-    its[i] = (*it).second.begin();
+    try
+    {
+      its[i] = (* it).second.begin();
+    }
+    catch(...)
+    {
+      delete[] its;
+      delete[] sums;
+    }
     it = it.next();
   }
   it = data.begin();
@@ -56,7 +81,7 @@ int main()
   while (!all)
   {
     all = 1;
-    real_ind = 0;
+    size_t sum = 0;
     for (size_t i = 0; i < size; ++i)
     {
       if (its[i].hasNext())
@@ -64,22 +89,34 @@ int main()
         if (all == 1)
         {
           std::cout << (* its[i]);
+          sum += (* its[i]);
         }
         else
         {
           std::cout << ' ' << (* its[i]);
+          sum += (* its[i]);
         }
         all = 0;
-        sums[real_ind] += (* its[i]);
-        real_ind++;
         its[i] = its[i].next();
       }
     }
-    std::cout << '\n';
+    if (!all)
+    {
+      try
+      {
+        push_back(& sums, n, sum);
+      }
+      catch(...)
+      {
+        delete[] sums;
+        delete[] its;
+      }
+      std::cout << '\n';
+    }
   }
-  for (size_t i = 0; i < size; ++i)
+  for (size_t i = 0; i < n; ++i)
   {
-    if (i != size - 1)
+    if (i != n - 1)
     {
       std::cout << sums[i] << ' ';
     }
