@@ -25,11 +25,11 @@ namespace goltsov
     friend class List< T >;
     Node< T >* ptr;
   public:
-    LIter();
-    LIter(Node< T >* p);
-    bool hasNext() const;
-    LIter< T > next() const;
-    T& operator*() const;
+    LIter() noexcept;
+    LIter(Node< T >* p) noexcept;
+    bool hasNext() const noexcept;
+    LIter< T > next() const noexcept;
+    T& operator*() const noexcept;
   };
 
   template< class T >
@@ -38,11 +38,11 @@ namespace goltsov
     friend class List< T >;
     CNode< T >* ptr;
   public:
-    LCIter();
-    LCIter(CNode< T >* p);
-    bool hasNext() const;
-    LCIter< T > next() const;
-    const T& operator*() const;
+    LCIter() noexcept;
+    LCIter(CNode< T >* p) noexcept;
+    bool hasNext() const noexcept;
+    LCIter< T > next() const noexcept;
+    const T& operator*() const noexcept;
   };
 
   template< class T >
@@ -50,7 +50,7 @@ namespace goltsov
   {
     Node< T >* fake;
     Node< T >* createFake();
-    void rmFake();
+    void rmFake() noexcept;
   public:
     List();
     ~List();
@@ -59,67 +59,67 @@ namespace goltsov
     List< T >& operator=(const List< T >& other);
     List< T >& operator=(List< T >&& other);
 
-    LIter< T > begin();
-    LCIter< T > begin() const;
-    LIter< T > end();
-    LCIter< T > end() const;
-    LIter< T > getLast();
-    LCIter< T > getLast() const;
+    LIter< T > begin() noexcept;
+    LCIter< T > begin() const noexcept;
+    LIter< T > end() noexcept;
+    LCIter< T > end() const noexcept;
+    LIter< T > getLast() noexcept;
+    LCIter< T > getLast() const noexcept;
     void push_start(const T& a);
-    void pop_start();
-    void pop_end();
+    void pop_start() noexcept;
+    void pop_end() noexcept;
     void insert(LIter< T >& i, const T& a);
     void insert(LIter< T >& i, const T&& a);
-    void clear();
+    void clear() noexcept;
   };
 }
 
 namespace goltsov
 {
   template< class T >
-  LIter< T >::LIter():
+  LIter< T >::LIter() noexcept:
     ptr(nullptr)
   {}
   template< class T >
-  LIter< T >::LIter(Node< T >* p):
+  LIter< T >::LIter(Node< T >* p) noexcept:
     ptr(p)
   {}
   template< class T >
-  bool LIter< T >::hasNext() const
+  bool LIter< T >::hasNext() const noexcept
   {
     return ptr != nullptr;
   }
   template< class T >
-  LIter< T > LIter< T >::next() const
+  LIter< T > LIter< T >::next() const noexcept
   {
     return {ptr->next};
   }
   template< class T >
-  T& LIter< T >::operator*() const
+  T& LIter< T >::operator*() const noexcept
   {
     return ptr->value;
   }
 
   template< class T >
-  LCIter< T >::LCIter():
+  LCIter< T >::LCIter() noexcept:
     ptr(nullptr)
   {}
   template< class T >
-  LCIter< T >::LCIter(CNode< T >* p):
+  LCIter< T >::LCIter(CNode< T >* p) noexcept:
     ptr(p)
   {}
   template< class T >
-  bool LCIter< T >::hasNext() const
+  bool LCIter< T >::hasNext() const noexcept
   {
     return ptr != nullptr;
   }
   template< class T >
-  LCIter< T > LCIter< T >::next() const
+  LCIter< T > LCIter< T >::next() const noexcept
   {
     return {ptr->next};
   }
   template< class T >
-  const T& LCIter< T >::operator*() const
+  const T& LCIter< T >::operator*() const noexcept
   {
     return {ptr->value};
   }
@@ -131,7 +131,7 @@ namespace goltsov
     return el;
   }
   template< class T >
-  void List< T >::rmFake()
+  void List< T >::rmFake() noexcept
   {
     delete fake;
   }
@@ -209,27 +209,27 @@ namespace goltsov
     return * this;
   }
   template< class T >
-  LIter< T > List< T >::begin()
+  LIter< T > List< T >::begin() noexcept
   {
     return {fake->next};
   }
   template< class T >
-  LCIter< T > List< T >::begin() const
+  LCIter< T > List< T >::begin() const noexcept
   {
     return {const_cast< const Node< T >* >(fake->next)};
   }
   template< class T >
-  LIter< T > List< T >::end()
+  LIter< T > List< T >::end() noexcept
   {
     return {nullptr};
   }
   template< class T >
-  LCIter< T > List< T >::end() const
+  LCIter< T > List< T >::end() const noexcept
   {
     return {nullptr};
   }
   template< class T >
-  LIter< T > List< T >::getLast()
+  LIter< T > List< T >::getLast() noexcept
   {
     LIter< T > now = this->begin();
     while(now.hasNext() && now.next() != nullptr)
@@ -239,7 +239,7 @@ namespace goltsov
     return now;
   }
   template< class T >
-  LCIter< T > List< T >::getLast() const
+  LCIter< T > List< T >::getLast() const noexcept
   {
     LCIter< T > now = this->begin();
     while(now.hasNext() && now.next() != nullptr)
@@ -255,14 +255,14 @@ namespace goltsov
     fake->next = new_el;
   }
   template< class T >
-  void List< T >::pop_start()
+  void List< T >::pop_start() noexcept
   {
     Node< T >* n = fake->next->next;
     delete fake->next;
     fake->next = n;
   }
   template< class T >
-  void List< T >::pop_end()
+  void List< T >::pop_end() noexcept
   {
     Node< T >* now = fake;
     if (now->next == nullptr)
@@ -305,7 +305,7 @@ namespace goltsov
     }
   }
   template< class T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (fake->next != nullptr)
     {

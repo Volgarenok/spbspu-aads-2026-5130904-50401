@@ -1,0 +1,11 @@
+#ifndef FUNCTIONS_HPP
+#define FUNCTIONS_HPP
+#include "mylist.hpp"
+#include <string>
+namespace goltsov
+{
+  goltsov::List< std::pair< std::string, goltsov::List< size_t > > > getData(std::istream& in, size_t& size);
+  void push_back(size_t** sums, size_t& n, size_t a);
+  void printResult(std::ostream& a, goltsov::List< std::pair< std::string, goltsov::List< size_t > > >& data, size_t size);
+}
+#endif
