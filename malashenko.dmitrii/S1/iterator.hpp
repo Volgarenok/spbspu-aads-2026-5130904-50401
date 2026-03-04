@@ -1,17 +1,17 @@
-#ifndef ITERATOR
-#define ITERATOR
-#include "list.hpp"
+// #ifndef ITERATOR
+// #define ITERATOR
+// #include "list.hpp"
 
-namespace malashenko {
-  template< class T >
-  class LIter {
-    friend class List< T >;
-  };
+// namespace malashenko {
+//   template< class T >
+//   class LIter {
+//     friend class List< T >;
+//   };
 
-  template< class T >
-  class LCIter {
-    friend class List< T >;
-  };
-}
+//   template< class T >
+//   class LCIter {
+//     friend class List< T >;
+//   };
+// }
 
-#endif
+// #endif
