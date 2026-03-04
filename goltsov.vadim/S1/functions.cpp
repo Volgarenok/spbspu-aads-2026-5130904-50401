@@ -45,7 +45,7 @@ namespace goltsov
     n += 1;
   }
 
-  void printResult(std::ostream& a, List< std::pair< std::string, List< size_t > > >& data, size_t size)
+  std::ostream& printResult(std::ostream& out, List< std::pair< std::string, List< size_t > > >& data, size_t size)
   {
     LIter< std::pair< std::string, List< size_t > > > it = data.begin();
     size_t* sums = nullptr;
@@ -55,11 +55,11 @@ namespace goltsov
     {
       if (i != size - 1)
       {
-        std::cout << (* it).first << ' ';
+        out << (* it).first << ' ';
       }
       else
       {
-        std::cout << (* it).first << '\n';
+        out << (* it).first << '\n';
       }
       try
       {
@@ -85,12 +85,12 @@ namespace goltsov
         {
           if (all == 1)
           {
-            std::cout << (* its[i]);
+            out << (* its[i]);
             sum += (* its[i]);
           }
           else
           {
-            std::cout << ' ' << (* its[i]);
+            out << ' ' << (* its[i]);
             sum += (* its[i]);
           }
           all = 0;
@@ -108,18 +108,18 @@ namespace goltsov
           delete[] sums;
           delete[] its;
         }
-        std::cout << '\n';
+        out << '\n';
       }
     }
     for (size_t i = 0; i < n; ++i)
     {
       if (i != n - 1)
       {
-        std::cout << sums[i] << ' ';
+        out << sums[i] << ' ';
       }
       else
       {
-        std::cout << sums[i] << '\n';
+        out << sums[i] << '\n';
       }
     }
   }
