@@ -24,6 +24,7 @@ goltsov::List< std::pair< std::string, goltsov::List< size_t > > > getData(std::
       }
     }
     result.insert(i, {name, numbers});
+    i = i.next();
   }
   return result;
 }

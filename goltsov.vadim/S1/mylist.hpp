@@ -68,8 +68,8 @@ namespace goltsov
     void push_start(const T& a);
     void pop_start();
     void pop_end();
-    void insert(LIter< T > i, const T& a);
-    void insert(LIter< T > i, const T&& a);
+    void insert(LIter< T >& i, const T& a);
+    void insert(LIter< T >& i, const T&& a);
     void clear();
   };
 }
@@ -127,30 +127,32 @@ namespace goltsov
   template< class T >
   Node< T >* List< T >::createFake()
   {
-    Node< T >* el = reinterpret_cast< Node< T >* >(::operator new(sizeof(Node< T >*)));
+    Node< T >* el = new Node< T > {T(), nullptr};
     return el;
   }
   template< class T >
   void List< T >::rmFake()
   {
-    ::operator delete(fake);
+    delete fake;
   }
   template< class T >
   List< T >::List()
   {
     fake = createFake();
+    fake->next = nullptr;
   }
   template< class T >
   List< T >::~List()
   {
     clear();
+    rmFake();
   }
   template< class T >
   List< T >::List(const List< T >& other)
   {
     fake = createFake();
+    fake->next = nullptr;
     if (!other.fake->next) {
-        fake->next = nullptr;
         return;
     }
     Node< T >* now_old = other.fake->next;
@@ -177,17 +179,16 @@ namespace goltsov
     if (this != &other)
     {
       clear();
-      fake = createFake();
+      fake->next = nullptr;
       if (other.fake->next)
       {
         Node< T >* now_old = other.fake->next;
-        Node< T >* now_new = new Node< T >{now_old->value, nullptr};
+        Node< T >* now_new = new Node< T > {now_old->value, nullptr};
         fake->next = now_new;
         now_old = now_old->next;
-        
         while(now_old != nullptr)
         {
-          now_new->next = new Node< T >{now_old->value, nullptr};
+          now_new->next = new Node< T > {now_old->value, nullptr};
           now_new = now_new->next;
           now_old = now_old->next;
         }
@@ -198,9 +199,12 @@ namespace goltsov
   template< class T >
   List< T >& List< T >::operator=(List< T >&& other)
   {
-    fake = createFake();
-    fake->next = other.fake->next;
-    other.fake->next = nullptr;
+    if (this != & other)
+    {
+      clear();
+      fake->next = other.fake->next;
+      other.fake->next = nullptr;
+    }
     return * this;
   }
   template< class T >
@@ -246,7 +250,7 @@ namespace goltsov
   template< class T >
   void List< T >::push_start(const T& a)
   {
-    Node< T >* new_el = new Node< T >{a, fake->next};
+    Node< T >* new_el = new Node< T > {a, fake->next};
     fake->next = new_el;
   }
   template< class T >
@@ -272,12 +276,12 @@ namespace goltsov
     now->next = nullptr;
   }
   template< class T >
-  void List< T >::insert(LIter< T > i, const T& a)
+  void List< T >::insert(LIter< T >& i, const T& a)
   {
     if (i.ptr == nullptr)
     {
-      i.ptr = new Node< T > {a, nullptr};
-      fake->next = i.ptr;
+      push_start(a);
+      i = {fake};
     }
     else
     {
@@ -286,12 +290,12 @@ namespace goltsov
     }
   }
   template< class T >
-  void List< T >::insert(LIter< T > i, const T&& a)
+  void List< T >::insert(LIter< T >& i, const T&& a)
   {
     if (i.ptr == nullptr)
     {
-      i.ptr = new Node< T > {a, nullptr};
-      fake->next = i.ptr;
+      push_start(a);
+      i = {fake};
     }
     else
     {
@@ -308,7 +312,6 @@ namespace goltsov
       fake->next = temp->next;
       delete temp;
     }
-    rmFake();
   }
 }
 #endif
