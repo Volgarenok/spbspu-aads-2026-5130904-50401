@@ -1,6 +1,7 @@
 #ifndef LIST
 #define LIST
 #include "iterator.hpp"
+#include "const-iterator.hpp"
 #include "node.hpp"
 #include <iostream>
 #include <cstddef>
@@ -25,20 +26,26 @@ namespace malashenko {
     List& operator=(const List< T >& other);
     List& operator=(List< T >&& other);
 
-    // LIter< T > begin();
-    // LIter< T > end();
+    LIter< T > begin() const;
+    LIter< T > end() const;
+    LCIter< T > cbegin() const;
+    LCIter< T > cend() const;
 
     T& front();
     T& back();
 
     void push_back(const T& value);
     void push_front(const T& value);
+    LIter< T > add(LIter< T > pos, const T& value);
+    LIter< T > insert(LIter< T > pos, const T& value);
+    
 
     void pop_back() noexcept;
     void pop_front() noexcept;
-
+    LIter< T > cut(LIter< T > pos);
+    LIter< T > erase(LIter< T > pos);
     void clear();
-    void swap(const List< T >& other);
+    // void swap(const List< T >& other);
     ~List();
   private:
     Node< T >* head_;
@@ -58,47 +65,57 @@ namespace malashenko {
   template< class T >
   List< T >::List(const List< T >& other)
   {
+    for (LCIter< T > start = other.cbegin(), finish = other.cend(); start != finish; ++start)
+    {
+      this->push_back(*start);
+    }
   }
 
 
   template< class T >
   List< T >& List< T >::operator=(const List< T >& other)
   {
-    if (this == &other)
-    {
-      return *this;
-    }
 
-    List< T > temp(other);
-    std::swap(temp);
-
-    return *this;
   }
 
 
   template< class T >
   List< T >& List< T >::operator=(List< T >&& other)
   {
-    if (this == &other)
-    {
-      return *this;
-    }
 
-    delete head_;
-    delete tail_;
-
-    head_ = std::move(other.head_);
-    tail_ = std::move(other.tail_);
-
-    return *this;
   }
 
   template< class T >
-  void List< T >::swap(const List< T >& other)
+  LIter< T > List< T >::begin() const
   {
-    using std::swap;
-    swap(head_, other.head_);
-    swap(tail_, other.tail_);
+    assert(head_ != nullptr && "List is empty" );
+    LIter< T > iter(head_);
+    return iter;
+  }
+
+  template< class T >
+  LIter< T > List< T >::end() const
+  {
+    assert(tail_ != nullptr && "List is empty" );
+    LIter< T > iter(tail_);
+    return iter;
+  }
+
+
+  template< class T >
+  LCIter< T > List< T >::cbegin() const
+  {
+    assert(head_ != nullptr && "List is empty" );
+    LCIter< T > iter(head_);
+    return iter;
+  }
+
+  template< class T >
+  LCIter< T > List< T >::cend() const
+  {
+    assert(tail_ != nullptr && "List is empty" );
+    LCIter< T > iter(tail_);
+    return iter;
   }
 
   template< class T >
@@ -217,7 +234,6 @@ namespace malashenko {
     while (fake_->next != nullptr)
     {
       pop_back();
-      // ::operator delete(fake_);
     }
   }
 
@@ -228,6 +244,5 @@ namespace malashenko {
   }
 
 };
-
 
 #endif

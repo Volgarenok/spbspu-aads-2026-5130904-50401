@@ -1,5 +1,5 @@
-#ifndef ITERATOR
-#define ITERATOR
+#ifndef CONSTITERATOR
+#define CONSTITERATOR
 #include "list.hpp"
 #include "node.hpp"
 #include <memory>
@@ -10,38 +10,38 @@ namespace malashenko {
   template< class T > class Node;
 
   template< class T >
-  class LIter {
+  class LCIter {
   public:
-    LIter();
-    LIter(Node< T >* other);
-    LIter< T >& operator++();
-    LIter< T > operator++(int);
+    LCIter();
+    LCIter(Node< T >* other);
+    LCIter< T >& operator++();
+    LCIter< T > operator++(int);
 
-    LIter< T >& operator--();
-    LIter< T > operator--(int);
+    LCIter< T >& operator--();
+    LCIter< T > operator--(int);
 
-    T& operator*();
-    T* operator->();
+    const T& operator*();
+    const T* operator->();
 
-    bool operator!=(const LIter< T >& other) const;
-    bool operator==(const LIter< T >& other) const;
+    bool operator!=(const LCIter< T >& other) const;
+    bool operator==(const LCIter< T >& other) const;
   private:
-    friend class List< T >;
     Node< T >* node_;
+    friend class List< T >;
   };
 
   template< class T >
-  LIter< T >::LIter():
+  LCIter< T >::LCIter():
     node_(nullptr)
   {}
 
   template< class T >
-  LIter< T >::LIter(Node< T >* other):
+  LCIter< T >::LCIter(Node< T >* other):
     node_(other)
   {}
 
   template< class T >
-  LIter< T >& LIter< T >::operator++()
+  LCIter< T >& LCIter< T >::operator++()
   {
     assert(node_ != nullptr && "There is no node to gain access");
     node_ = node_->next;
@@ -49,16 +49,16 @@ namespace malashenko {
   }
 
   template< class T >
-  LIter< T > LIter< T >::operator++(int)
+  LCIter< T > LCIter< T >::operator++(int)
   {
     assert(node_ != nullptr && "There is no node to gain access");
-    LIter< T > tmp{*this};
+    LCIter< T > tmp{*this};
     ++(*this);
     return tmp;
   }
 
   template< class T >
-  LIter< T >& LIter< T >::operator--()
+  LCIter< T >& LCIter< T >::operator--()
   {
     assert(node_ != nullptr && "There is no node to gain access");
     node_ = node_->prev;
@@ -66,35 +66,35 @@ namespace malashenko {
   }
 
   template< class T >
-  LIter< T > LIter< T >::operator--(int)
+  LCIter< T > LCIter< T >::operator--(int)
   {
     assert(node_ != nullptr && "There is no node to gain access");
-    LIter< T > tmp{*this};
+    LCIter< T > tmp{*this};
     --(*this);
     return tmp;
   }
 
   template< class T >
-  bool LIter< T >::operator==(const LIter< T >& other) const
+  bool LCIter< T >::operator==(const LCIter< T >& other) const
   {
     return node_ == other.node_;
   }
   
   template< class T >
-  bool LIter< T >::operator!=(const LIter< T >& other) const
+  bool LCIter< T >::operator!=(const LCIter< T >& other) const
   {
     return !(other == *this);
   }
 
   template< class T >
-  T& LIter< T >::operator*()
+  const T& LCIter< T >::operator*()
   {
     assert(node_ != nullptr && "There is no node to gain access");
     return node_ ->value_;
   }
 
   template< class T >
-  T* LIter< T >::operator->()
+  const T* LCIter< T >::operator->()
   {
     assert(node_ != nullptr && "There is no node to gain access");
     return std::addressof(node_->value_);
