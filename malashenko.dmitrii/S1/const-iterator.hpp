@@ -13,7 +13,6 @@ namespace malashenko {
   class LCIter {
   public:
     LCIter();
-    LCIter(Node< T >* other);
     LCIter< T >& operator++();
     LCIter< T > operator++(int);
 
@@ -27,6 +26,7 @@ namespace malashenko {
     bool operator==(const LCIter< T >& other) const;
   private:
     Node< T >* node_;
+    LCIter(Node< T >* other);
     friend class List< T >;
   };
 

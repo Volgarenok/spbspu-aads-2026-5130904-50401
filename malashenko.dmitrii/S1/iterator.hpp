@@ -13,7 +13,6 @@ namespace malashenko {
   class LIter {
   public:
     LIter();
-    LIter(Node< T >* other);
     LIter< T >& operator++();
     LIter< T > operator++(int);
 
@@ -27,6 +26,7 @@ namespace malashenko {
     bool operator==(const LIter< T >& other) const;
   private:
     friend class List< T >;
+    LIter(Node< T >* other);
     Node< T >* node_;
   };
 

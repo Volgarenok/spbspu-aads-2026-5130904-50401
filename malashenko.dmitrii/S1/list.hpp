@@ -31,8 +31,8 @@ namespace malashenko {
     LCIter< T > cbegin() const;
     LCIter< T > cend() const;
 
-    T& front();
-    T& back();
+    T& front() const;
+    T& back() const;
 
     void push_back(const T& value);
     void push_front(const T& value);
@@ -63,14 +63,32 @@ namespace malashenko {
   }
 
   template< class T >
-  List< T >::List(const List< T >& other)
+  List< T >::List(const List< T >& other):
+    head_(nullptr),
+    tail_(nullptr)
   {
-    for (LCIter< T > start = other.cbegin(), finish = other.cend(); start != finish; ++start)
+    fake_ = static_cast< Node< T >* >(::operator new (sizeof(List< T >*)));
+    for (LIter< T > start = other.begin(), finish = other.end(); start != finish; ++start)
     {
-      this->push_back(*start);
+      try
+      {
+        push_back(*start);
+      }
+      catch(...)
+      {
+        clear();
+        throw;
+      }
     }
   }
 
+  template< class T >
+  List< T >::List(List< T >&& other):
+    fake_(std::move(other.fake_)),
+    head_(std::move(other.head_)),
+    tail_(std::move(other.tail_))
+  {
+  }
 
   template< class T >
   List< T >& List< T >::operator=(const List< T >& other)
@@ -88,7 +106,7 @@ namespace malashenko {
   template< class T >
   LIter< T > List< T >::begin() const
   {
-    assert(head_ != nullptr && "List is empty" );
+    assert(head_ != nullptr && "List is empty");
     LIter< T > iter(head_);
     return iter;
   }
@@ -96,7 +114,7 @@ namespace malashenko {
   template< class T >
   LIter< T > List< T >::end() const
   {
-    assert(tail_ != nullptr && "List is empty" );
+    assert(tail_ != nullptr && "List is empty");
     LIter< T > iter(tail_);
     return iter;
   }
@@ -105,7 +123,7 @@ namespace malashenko {
   template< class T >
   LCIter< T > List< T >::cbegin() const
   {
-    assert(head_ != nullptr && "List is empty" );
+    assert(head_ != nullptr && "List is empty");
     LCIter< T > iter(head_);
     return iter;
   }
@@ -113,29 +131,23 @@ namespace malashenko {
   template< class T >
   LCIter< T > List< T >::cend() const
   {
-    assert(tail_ != nullptr && "List is empty" );
+    assert(tail_ != nullptr && "List is empty");
     LCIter< T > iter(tail_);
     return iter;
   }
 
   template< class T >
-  T& List< T >::front()
+  T& List< T >::front() const
   {
-    if (!head_)
-    {
-      throw std::invalid_argument("List is empty");
-    }
+    assert(head_ != nullptr && "List is empty");
     return head_->value_;
   }
 
 
   template< class T >
-  T& List< T >::back()
+  T& List< T >::back() const
   {
-    if (!tail_)
-    {
-      throw std::invalid_argument("List is empty");
-    }
+    assert(tail_ != nullptr && "List is empty");
     return tail_->value_;
   }
 
@@ -160,7 +172,7 @@ namespace malashenko {
   void List< T >::push_front(const T& value)
   {
     Node< T >* newNode = new Node< T >{value, head_, tail_};
-
+    
     if (!head_)
     {
       head_ = newNode;
@@ -178,10 +190,7 @@ namespace malashenko {
   template< class T >
   void List< T >::pop_back() noexcept
   {
-    if (!tail_)
-    {
-      return;
-    }
+    assert(tail_ != nullptr && "List is empty");
 
     if(head_ == tail_)
     {
@@ -204,10 +213,7 @@ namespace malashenko {
   template< class T >
   void List< T >::pop_front() noexcept
   {
-    if(!head_)
-    {
-      return;
-    }
+    assert(head_ != nullptr && "List is empty");
 
     if(head_ == tail_)
     {
@@ -241,6 +247,7 @@ namespace malashenko {
   List< T >::~List()
   {
     clear();
+    ::operator delete(fake_);
   }
 
 };

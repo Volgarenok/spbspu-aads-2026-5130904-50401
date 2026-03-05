@@ -8,7 +8,11 @@ int main()
   l.push_back(2);
   l.push_back(3);
 
-  List< int > k(l);
+  using pair_t = std::pair<std::string, List< int > >;
+
+  List< pair_t > k;
+  
+  std::cout << l.front() << '\n';
   
 
 }
