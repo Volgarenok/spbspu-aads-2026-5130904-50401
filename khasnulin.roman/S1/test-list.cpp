@@ -158,4 +158,18 @@ BOOST_AUTO_TEST_CASE(test_arrow_operator_iterator_on_the_end)
   BOOST_CHECK_THROW(iter->clear(), std::out_of_range);
 }
 
+BOOST_AUTO_TEST_CASE(test_multiple_iterators_and_not_equal_operation)
+{
+  BiList< int > list;
+  list.push_back(1);
+  list.push_back(2);
+
+  auto it1 = list.begin();
+  auto it2 = list.begin();
+
+  BOOST_CHECK(it1 == it2);
+  it2++;
+  BOOST_CHECK(it1 != it2);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
