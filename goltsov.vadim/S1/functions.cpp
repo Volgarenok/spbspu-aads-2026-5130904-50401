@@ -1,8 +1,33 @@
 #include "functions.hpp"
 #include <iostream>
+#include <limits>
 
 namespace goltsov
 {
+  bool isCorrectNumber(const std::string& num)
+  {
+    std::string max_num = std::to_string(std::numeric_limits< size_t >::max());
+    if (max_num.size() < num.size())
+    {
+      return false;
+    }
+    if (max_num.size() > num.size())
+    {
+      return true;
+    }
+    return num <= max_num;
+  }
+
+  size_t fromStringToSizeT(const std::string& num)
+  {
+    size_t result = 0;
+    for (size_t i = 0; i < num.size(); ++i)
+    {
+      result = result * 10 + (num[i] - '0');
+    }
+    return result;
+  }
+
   List< std::pair< std::string, List< size_t > > > getData(std::istream& in, size_t& size)
   {
     List< std::pair< std::string, List< size_t > > > result;
@@ -12,11 +37,27 @@ namespace goltsov
     {
       size += 1;
       List< size_t > numbers;
-      size_t number;
+      std::string number;
+      char next = in.peek();
+      if (next == '\n')
+      {
+        i = result.insert(i, {name, numbers});
+        continue;
+      }
+      if (next == EOF)
+      {
+        i = result.insert(i, {name, numbers});
+        break;
+      }
       LIter< size_t > j (nullptr);
       while (in >> number)
       {
-        j = numbers.insert(j, number);
+        if (!isCorrectNumber(number))
+        {
+          throw std::overflow_error("The number is too big");
+        }
+        size_t real_number = fromStringToSizeT(number);
+        j = numbers.insert(j, real_number);
         char next = in.peek();
         if (next == '\n' || next == EOF)
         {
@@ -121,6 +162,11 @@ namespace goltsov
         out << sums[i] << '\n';
       }
     }
+    if (n == 0)
+    {
+      std::cout << 0 << '\n';
+    }
+    delete[] its;
     return out;
   }
 }
