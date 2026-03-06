@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(test_list_copy_constructor)
   list.push_back(1);
   list.push_back(2);
 
-  BiList listCP(list);
+  BiList< int > listCP(list);
 
   BOOST_CHECK_EQUAL(listCP.front(), 1);
   BOOST_CHECK_EQUAL(listCP.back(), 2);
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(test_list_move_constructor)
   list.push_back(1);
   list.push_back(2);
 
-  BiList listCP(std::move(list));
+  BiList< int > listCP(std::move(list));
 
   BOOST_CHECK_EQUAL(listCP.front(), 1);
   BOOST_CHECK_EQUAL(listCP.back(), 2);
