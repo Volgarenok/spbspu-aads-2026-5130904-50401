@@ -15,9 +15,12 @@ namespace malashenko {
     LIter();
     LIter< T >& operator++();
     LIter< T > operator++(int);
+    LIter< T >& operator+(size_t s);
+
 
     LIter< T >& operator--();
     LIter< T > operator--(int);
+    LIter< T >& operator-(size_t s);
 
     T& operator*();
     T* operator->();
@@ -58,6 +61,16 @@ namespace malashenko {
   }
 
   template< class T >
+  LIter< T >& LIter< T >::operator+(size_t s)
+  {
+    for (size_t i = 0; i < s; ++i)
+    {
+      ++node_;
+    }
+  }
+
+
+  template< class T >
   LIter< T >& LIter< T >::operator--()
   {
     assert(node_ != nullptr && "There is no node to gain access");
@@ -72,6 +85,16 @@ namespace malashenko {
     LIter< T > tmp{*this};
     --(*this);
     return tmp;
+  }
+
+
+  template< class T >
+  LIter< T >& LIter< T >::operator-(size_t s)
+  {
+    for (size_t i = 0; i < s; ++i)
+    {
+      --node_;
+    }
   }
 
   template< class T >

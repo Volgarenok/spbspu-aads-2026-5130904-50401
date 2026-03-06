@@ -31,21 +31,18 @@ namespace malashenko {
     LCIter< T > cbegin() const;
     LCIter< T > cend() const;
 
-    T& front() const;
-    T& back() const;
+    T& front() const noexcept;
+    T& back() const noexcept;
+    LIter< T > getFake() const;
 
     void push_back(const T& value);
     void push_front(const T& value);
-    LIter< T > add(LIter< T > pos, const T& value);
-    LIter< T > insert(LIter< T > pos, const T& value);
-    
 
     void pop_back() noexcept;
     void pop_front() noexcept;
-    LIter< T > cut(LIter< T > pos);
-    LIter< T > erase(LIter< T > pos);
-    void clear();
-    // void swap(const List< T >& other);
+
+    void clear() noexcept;
+    void swap(List< T >& other);
     ~List();
   private:
     Node< T >* head_;
@@ -91,16 +88,36 @@ namespace malashenko {
   }
 
   template< class T >
-  List< T >& List< T >::operator=(const List< T >& other)
-  {
-
-  }
-
-
-  template< class T >
   List< T >& List< T >::operator=(List< T >&& other)
   {
+    if (this = &other)
+    {
+      return *this;
+    }
 
+    fake_ = std::move(other.fake_);
+    head_ = std::move(other.head_);
+    tail_ = std::move(other.tail_);
+
+    return *this;
+  }
+
+  template< class T >
+  List< T >& List< T >::operator=(const List< T >& other)
+  {
+    List< T > temp(other);
+    swap(temp);
+
+    return *this;
+  }
+
+  template< class T >
+  void List< T >::swap(List< T >& other)
+  {
+    using std::swap;
+    swap(fake_, other.fake_);
+    swap(tail_, other.tail_);
+    swap(head_, other.head_);
   }
 
   template< class T >
@@ -137,7 +154,7 @@ namespace malashenko {
   }
 
   template< class T >
-  T& List< T >::front() const
+  T& List< T >::front() const noexcept
   {
     assert(head_ != nullptr && "List is empty");
     return head_->value_;
@@ -145,10 +162,17 @@ namespace malashenko {
 
 
   template< class T >
-  T& List< T >::back() const
+  T& List< T >::back() const noexcept
   {
     assert(tail_ != nullptr && "List is empty");
     return tail_->value_;
+  }
+
+  template< class T >
+  LIter< T > List< T >::getFake() const
+  {
+    LIter< T > iter(fake_);
+    return iter;
   }
 
   template< class T >
@@ -235,7 +259,7 @@ namespace malashenko {
   }
 
   template< class T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (fake_->next != nullptr)
     {
@@ -250,6 +274,15 @@ namespace malashenko {
     ::operator delete(fake_);
   }
 
+};
+
+namespace std {
+  using namespace malashenko;
+  template<class T>
+  void swap(List< T >& a, List< T >& b)
+  {
+    a.swap(b);
+  }
 };
 
 #endif

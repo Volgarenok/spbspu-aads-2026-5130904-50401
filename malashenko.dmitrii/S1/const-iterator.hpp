@@ -15,9 +15,13 @@ namespace malashenko {
     LCIter();
     LCIter< T >& operator++();
     LCIter< T > operator++(int);
+    LCIter< T >& LCIter< T >::operator+(size_t s);
+
 
     LCIter< T >& operator--();
     LCIter< T > operator--(int);
+    LCIter< T >& LCIter< T >::operator-(size_t s);
+
 
     const T& operator*();
     const T* operator->();
@@ -58,6 +62,15 @@ namespace malashenko {
   }
 
   template< class T >
+  LCIter< T >& LCIter< T >::operator+(size_t s)
+  {
+    for (size_t i = 0; i < s; ++i)
+    {
+      ++node_;
+    }
+  }
+
+  template< class T >
   LCIter< T >& LCIter< T >::operator--()
   {
     assert(node_ != nullptr && "There is no node to gain access");
@@ -72,6 +85,15 @@ namespace malashenko {
     LCIter< T > tmp{*this};
     --(*this);
     return tmp;
+  }
+
+  template< class T >
+  LCIter< T >& LCIter< T >::operator-(size_t s)
+  {
+    for (size_t i = 0; i < s; ++i)
+    {
+      --node_;
+    }
   }
 
   template< class T >
