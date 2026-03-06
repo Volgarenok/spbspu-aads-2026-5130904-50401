@@ -6,7 +6,7 @@ namespace goltsov
 {
   bool isCorrectNumber(const std::string& num)
   {
-    std::string max_num = std::to_string(std::numeric_limits< size_t >::max());
+    std::string max_num = std::to_string(std::numeric_limits< int >::max());
     if (max_num.size() < num.size())
     {
       return false;
@@ -18,9 +18,9 @@ namespace goltsov
     return num <= max_num;
   }
 
-  size_t fromStringToSizeT(const std::string& num)
+  int fromStringToSizeT(const std::string& num)
   {
-    size_t result = 0;
+    int result = 0;
     for (size_t i = 0; i < num.size(); ++i)
     {
       result = result * 10 + (num[i] - '0');
@@ -28,15 +28,15 @@ namespace goltsov
     return result;
   }
 
-  List< std::pair< std::string, List< size_t > > > getData(std::istream& in, size_t& size)
+  List< std::pair< std::string, List< int > > > getData(std::istream& in, size_t& size)
   {
-    List< std::pair< std::string, List< size_t > > > result;
-    LIter< std::pair< std::string, List< size_t > > > i (nullptr);
+    List< std::pair< std::string, List< int > > > result;
+    LIter< std::pair< std::string, List< int > > > i (nullptr);
     std::string name;
     while (in >> name)
     {
       size += 1;
-      List< size_t > numbers;
+      List< int > numbers;
       std::string number;
       char next = in.peek();
       if (next == '\n')
@@ -49,7 +49,7 @@ namespace goltsov
         i = result.insert(i, {name, numbers});
         break;
       }
-      LIter< size_t > j (nullptr);
+      LIter< int > j (nullptr);
       while (in >> number)
       {
         if (!isCorrectNumber(number))
@@ -73,9 +73,9 @@ namespace goltsov
     return result;
   }
 
-  void push_back(size_t** sums, size_t& n, size_t a)
+  void push_back(int** sums, size_t& n, size_t a)
   {
-    size_t* new_sums = new size_t[n + 1];
+    int* new_sums = new int[n + 1];
     for (size_t i = 0; i < n; ++i)
     {
       new_sums[i] = sums[0][i];
@@ -86,12 +86,12 @@ namespace goltsov
     n += 1;
   }
 
-  std::ostream& printResult(std::ostream& out, List< std::pair< std::string, List< size_t > > >& data, size_t size)
+  std::ostream& printResult(std::ostream& out, List< std::pair< std::string, List< int > > >& data, size_t size)
   {
-    LIter< std::pair< std::string, List< size_t > > > it = data.begin();
-    size_t* sums = nullptr;
+    LIter< std::pair< std::string, List< int > > > it = data.begin();
+    int* sums = nullptr;
     size_t n = 0;
-    LIter< size_t >* its = new LIter< size_t >[size];
+    LIter< int >* its = new LIter< int >[size];
     for (size_t i = 0; i < size; ++i)
     {
       if (i != size - 1)
@@ -119,7 +119,7 @@ namespace goltsov
     while (!all)
     {
       all = 1;
-      size_t sum = 0;
+      int sum = 0;
       for (size_t i = 0; i < size; ++i)
       {
         if (its[i].hasNext())

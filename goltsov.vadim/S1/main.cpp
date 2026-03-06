@@ -6,7 +6,7 @@
 int main()
 {
   size_t size = 0;
-  goltsov::List< std::pair< std::string, goltsov::List< size_t > > > data;
+  goltsov::List< std::pair< std::string, goltsov::List< int > > > data;
   try
   {
     data = goltsov::getData(std::cin, size);
