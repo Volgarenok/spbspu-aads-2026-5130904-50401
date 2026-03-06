@@ -6,16 +6,58 @@
 namespace khasnulin
 {
 
-  template < class T > class List;
+  template < class T > class BiList;
+
+  template < class T > struct LNode;
 
   template < class T > class LIter
   {
-    friend class List< T >;
+  public:
+    LIter< T >() noexcept;
+
+    LIter< T > &operator++();
+    LIter< T > operator++(int);
+
+    LIter< T > &operator--();
+    LIter< T > operator--(int);
+
+    bool operator==(const LIter< T > &it) const noexcept;
+    bool operator!=(const LIter< T > &it) const noexcept;
+
+    T &operator*();
+    T *operator->();
+    friend class BiList< T >;
+
+  private:
+    LIter< T >(const LNode< T > *node);
+
+    LNode< T > *curr_;
   };
 
   template < class T > class LCIter
   {
-    friend class List< T >;
+  public:
+    LCIter< T >() noexcept;
+    explicit LCIter< T >(LIter< T > it) noexcept;
+
+    LCIter< T > &operator++();
+    LCIter< T > operator++(int);
+
+    LCIter< T > &operator--();
+    LCIter< T > operator--(int);
+
+    bool operator==(const LCIter< T > &it) const noexcept;
+    bool operator!=(const LCIter< T > &it) const noexcept;
+
+    const T &operator*();
+    const T *operator->();
+
+    friend class BiList< T >;
+
+  private:
+    LCIter< T >(const LNode< T > *node);
+
+    const LNode< T > *curr_;
   };
 
   template < class T > class BiList
@@ -26,17 +68,17 @@ namespace khasnulin
     BiList< T >(const BiList< T > &list);
     BiList< T >(BiList< T > &&list) noexcept;
 
-    ~BiList< T >() noexcept;
+    ~BiList() noexcept;
 
     BiList< T > &operator=(const BiList< T > &list);
     BiList< T > &operator=(BiList< T > &&list) noexcept;
 
     LIter< T > begin() noexcept;
-    LIter< T > begin() const noexcept;
+    LCIter< T > begin() const noexcept;
     LCIter< T > cbegin() const noexcept;
 
     LIter< T > end() noexcept;
-    LIter< T > end() const noexcept;
+    LCIter< T > end() const noexcept;
     LCIter< T > cend() noexcept;
 
     bool empty() const noexcept;
@@ -61,9 +103,18 @@ namespace khasnulin
     // TODO: to the future version
     template < class... Args > LIter< T > emplace(LCIter< T > pos, Args &&...args);
 
+    friend class LIter< T >;
+    friend class LCIter< T >;
+
   private:
-    List< T > *h_;
-    List< T > *t_;
+    template < class K > struct LNode
+    {
+      K val;
+      LNode< K > *next;
+      LNode< K > *prev;
+    };
+    LNode< T > *h_;
+    LNode< T > *t_;
     size_t s_;
   };
 }
