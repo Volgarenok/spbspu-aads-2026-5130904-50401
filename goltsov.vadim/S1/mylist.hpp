@@ -1,5 +1,6 @@
 #ifndef MYLIST_HPP
 #define MYLIST_HPP
+#include <stdexcept>
 namespace goltsov
 {
   template< class T >
@@ -23,6 +24,8 @@ namespace goltsov
     bool hasNext() const noexcept;
     LIter< T > next() const;
     T& operator*() const;
+    bool operator==(const LIter< T >& other) const noexcept;
+    bool operator!=(const LIter< T >& other) const noexcept;
   };
 
   template< class T >
@@ -36,6 +39,8 @@ namespace goltsov
     bool hasNext() const noexcept;
     LCIter< T > next() const;
     const T& operator*() const;
+    bool operator==(const LCIter< T >& other) const noexcept;
+    bool operator!=(const LCIter< T >& other) const noexcept;
   };
 
   template< class T >
@@ -85,12 +90,36 @@ namespace goltsov
   template< class T >
   LIter< T > LIter< T >::next() const
   {
-    return {ptr->next};
+    if (ptr)
+    {
+      return {ptr->next};
+    }
+    else
+    {
+      throw std::runtime_error("Null pointer dereference");
+    }
   }
   template< class T >
   T& LIter< T >::operator*() const
   {
-    return ptr->value;
+    if (ptr)
+    {
+      return ptr->value;
+    }
+    else
+    {
+      throw std::runtime_error("Null pointer dereference");
+    }
+  }
+  template< class T >
+  bool LIter< T >::operator==(const LIter< T >& other) const noexcept
+  {
+    return ptr == other.ptr;
+  }
+  template< class T >
+  bool LIter< T >::operator!=(const LIter< T >& other) const noexcept
+  {
+    return !((* this) == other);
   }
 
   template< class T >
@@ -109,12 +138,36 @@ namespace goltsov
   template< class T >
   LCIter< T > LCIter< T >::next() const
   {
-    return {ptr->next};
+    if (ptr)
+    {
+      return {ptr->next};
+    }
+    else
+    {
+      throw std::runtime_error("Null pointer dereference");
+    }
   }
   template< class T >
   const T& LCIter< T >::operator*() const
   {
-    return {ptr->value};
+    if (ptr)
+    {
+      return ptr->value;
+    }
+    else
+    {
+      throw std::runtime_error("Null pointer dereference");
+    }
+  }
+  template< class T >
+  bool LCIter< T >::operator==(const LCIter< T >& other) const noexcept
+  {
+    return ptr == other.ptr;
+  }
+  template< class T >
+  bool LCIter< T >::operator!=(const LCIter< T >& other) const noexcept
+  {
+    return !((* this) == other);
   }
 
   template< class T >
@@ -214,12 +267,12 @@ namespace goltsov
   template< class T >
   LIter< T > List< T >::end() noexcept
   {
-    return {nullptr};
+    return LIter< T > (nullptr);
   }
   template< class T >
   LCIter< T > List< T >::end() const noexcept
   {
-    return {nullptr};
+    return LCIter< T > (nullptr);
   }
   template< class T >
   LIter< T > List< T >::getLast() noexcept
@@ -251,9 +304,16 @@ namespace goltsov
   template< class T >
   void List< T >::pop_start() noexcept
   {
-    Node< T >* n = fake->next->next;
-    delete fake->next;
-    fake->next = n;
+    if (begin() != LIter< int > (nullptr))
+    {
+      Node< T >* n = fake->next->next;
+      delete fake->next;
+      fake->next = n;
+    }
+    else
+    {
+      return;
+    }
   }
   template< class T >
   void List< T >::pop_end() noexcept
