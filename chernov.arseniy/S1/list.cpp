@@ -74,9 +74,33 @@ chernov::List< T > & chernov::List< T >::operator=(List< T > && list)
 }
 
 template< class T >
-size_t chernov::List< T >::size() noexcept
+size_t chernov::List< T >::size() const noexcept
 {
   return size_;
+}
+
+template< class T >
+chernov::LIter< T > chernov::List< T >::before_begin() const noexcept
+{
+  return {fake_};
+}
+
+template< class T >
+chernov::LCIter< T > chernov::List< T >::cbefore_begin() const noexcept
+{
+  return {fake_};
+}
+
+template< class T >
+chernov::LIter< T > chernov::List< T >::begin() const noexcept
+{
+  return {fake_->next};
+}
+
+template< class T >
+chernov::LCIter< T > chernov::List< T >::cbegin() const noexcept
+{
+  return {fake_->next};
 }
 
 template< class T >

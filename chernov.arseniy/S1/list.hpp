@@ -3,6 +3,9 @@
 
 #include <cstddef>
 
+#include "liter.hpp"
+#include "lciter.hpp"
+
 namespace chernov {
   template< class T >
   class Node {
@@ -23,8 +26,12 @@ namespace chernov {
     List(List< T > && list);
     List< T > & operator=(const List< T > & list);
     List< T > & operator=(List< T > && list);
-
-    size_t size() noexcept;
+    
+    size_t size() const noexcept;
+    LIter< T > before_begin() const noexcept;
+    LCIter< T > cbefore_begin() const noexcept;
+    LIter< T > begin() const noexcept;
+    LCIter< T > cbegin() const noexcept;
     void clear() noexcept;
   };
 }
