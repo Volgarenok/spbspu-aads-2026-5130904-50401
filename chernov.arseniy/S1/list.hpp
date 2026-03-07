@@ -19,6 +19,11 @@ namespace chernov {
   public:
     List();
     ~List() noexcept;
+    List(const List< T > & list);
+    List(List< T > && list);
+    List< T > & operator=(const List< T > & list);
+    List< T > & operator=(List< T > && list);
+
     size_t size() noexcept;
   };
 }

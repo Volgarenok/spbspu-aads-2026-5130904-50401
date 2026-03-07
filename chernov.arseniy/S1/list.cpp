@@ -24,7 +24,51 @@ chernov::List< T >::List():
 template< class T >
 chernov::List< T >::~List() noexcept
 {
+  // ...
   removeFake();
+}
+
+template< class T >
+chernov::List< T >::List(const List< T > & list):
+  fake_(nullptr),
+  size_(list.size_)
+{
+  createFake();
+  // ...
+}
+
+template< class T >
+chernov::List< T >::List(List< T > && list):
+  fake_(list.fake_),
+  size_(list.size_)
+{
+  list.fake_ = nullptr;
+}
+
+template< class T >
+chernov::List< T > & chernov::List< T >::operator=(const List< T > & list)
+{
+  if (this == &list) {
+    return *this;
+  }
+  // ...
+  removeFake();
+  // ...
+  size_ = list.size_;
+  return *this;
+}
+
+template< class T >
+chernov::List< T > & chernov::List< T >::operator=(List< T > && list)
+{
+  if (this == &list) {
+    return *this;
+  }
+  // destroy...
+  fake_ = list.fake_;
+  size_ = list.size_;
+  list.fake_ = nullptr;
+  return *this;
 }
 
 template< class T >
