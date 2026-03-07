@@ -25,6 +25,7 @@ namespace chernov {
     List< T > & operator=(List< T > && list);
 
     size_t size() noexcept;
+    void clear() noexcept;
   };
 }
 
