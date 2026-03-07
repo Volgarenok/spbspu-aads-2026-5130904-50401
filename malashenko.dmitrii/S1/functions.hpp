@@ -42,7 +42,56 @@ namespace malashenko {
     }
     return res;
   }
-}
 
+  size_t maxSeqSize(const List< pair_t >& list)
+  {
+    size_t maxSize = 0;
+    for (LIter< pair_t > s = list.begin(), f = list.end(); s != f; ++s)
+    {
+      maxSize = std::max(maxSize, (*s).second.size());
+    }
+    maxSize = std::max(maxSize, list.back().second.size());
+
+    return maxSize;
+  }
+
+  void printNames(const List< pair_t >& list)
+  {
+    for (LIter< pair_t > s = list.begin(), f = list.end(); s != f; ++s)
+    {
+      std::cout << (*s).first << ' ';
+    }
+    std::cout << list.back().first << '\n';
+  }
+
+  void printSeqs(const List< pair_t >& list)
+  {
+    size_t maxSize = maxSeqSize(list);
+    // List< List< int > > res;
+    for (size_t curSize = 1; curSize != maxSize + 1; ++curSize)
+    {
+      // List< int > seq;
+      for (LIter< pair_t > s = list.begin(), f = list.end(); s != f; ++s)
+      {
+        if ((*s).second.size() < curSize)
+        {
+          continue;
+        }
+
+        LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
+        std::cout << *valNode << ' ';
+      }
+
+      if (list.back().second.size() < curSize)
+      {
+        std::cout << '\n';
+        continue;
+      }
+      LIter< int > valNode = list.back().second.begin() + (curSize - 1);
+      std::cout << *valNode << '\n';
+    }
+
+  }
+}
 
 #endif

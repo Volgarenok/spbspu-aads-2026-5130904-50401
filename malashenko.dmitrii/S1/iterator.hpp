@@ -67,6 +67,7 @@ namespace malashenko {
     {
       ++node_;
     }
+    return *this;
   }
 
 
@@ -95,6 +96,7 @@ namespace malashenko {
     {
       --node_;
     }
+    return *this;
   }
 
   template< class T >

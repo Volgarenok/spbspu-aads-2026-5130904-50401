@@ -24,16 +24,20 @@ int main()
 
   List< pair_t > res = getSequences(std::cin);
   std::cout << "func is done\n";
-  for (LIter< pair_t > s = res.begin(), f = res.end(); s != f; ++s)
-  {
-    std::cout << (*s).first << '\n';
-    if ((*s).second.size())
-    {
-      std::cout << (*s).second.front() << '\n';
-    }
-  // std::cout << (*s).second.front() << '\n';
-  }
-  std::cout << res.back().first <<'\n';
-  std::cout << res.back().second.front() << '\n';
+  std::cout << maxSeqSize(res) << '\n';
+  printNames(res);
+  printSeqs(res);
+
+  // for (LIter< pair_t > s = res.begin(), f = res.end(); s != f; ++s)
+  // {
+  //   std::cout << (*s).first << '\n';
+  //   if ((*s).second.size())
+  //   {
+  //     std::cout << (*s).second.back() << '\n';
+  //   }
+  // // std::cout << (*s).second.front() << '\n';
+  // }
+  // std::cout << res.back().first <<'\n';
+  // std::cout << res.back().second.back() << '\n';
 
 }
