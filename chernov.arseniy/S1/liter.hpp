@@ -15,6 +15,9 @@ namespace chernov {
     LIter< T > next() const;
     T & value() const;
     T & operator*() const;
+    T * operator->() const;
+    LIter< T > & operator++();
+    LIter< T > operator++(int);
     bool operator==(const LIter< T > & other) const noexcept;
     bool operator!=(const LIter< T > & other) const noexcept;
   };

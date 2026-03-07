@@ -35,6 +35,27 @@ T & chernov::LIter< T >::operator*() const
 }
 
 template< class T >
+T * chernov::LIter< T >::operator->() const
+{
+  return &(ptr->data);
+}
+
+template< class T >
+chernov::LIter< T > & chernov::LIter< T >::operator++()
+{
+  ptr = ptr->next;
+  return *this;
+}
+
+template< class T >
+chernov::LIter< T > chernov::LIter< T >::operator++(int)
+{
+  LIter old = *this;
+  ++(*this);
+  return old;
+}
+
+template< class T >
 bool chernov::LIter< T >::operator==(const LIter< T > & other) const noexcept
 {
   return ptr == other.ptr;
