@@ -128,6 +128,7 @@ namespace goltsov
     }
     it = data.begin();
     bool all = 0;
+    bool without_overflows = 1;
     while (!all)
     {
       all = 1;
@@ -145,9 +146,7 @@ namespace goltsov
             }
             catch(...)
             {
-              delete[] its;
-              delete[] sums;
-              throw;
+              without_overflows = 0;
             }
           }
           else
@@ -159,9 +158,7 @@ namespace goltsov
             }
             catch(...)
             {
-              delete[] its;
-              delete[] sums;
-              throw;
+              without_overflows = 0;
             }
           }
           all = 0;
@@ -191,6 +188,12 @@ namespace goltsov
         }
         out << '\n';
       }
+    }
+    if (!without_overflows)
+    {
+      delete[] its;
+      delete[] sums;
+      throw(std::overflow_error("The sum is too big"));
     }
     for (size_t i = 0; i < n; ++i)
     {
