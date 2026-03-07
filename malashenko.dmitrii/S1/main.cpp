@@ -1,18 +1,33 @@
 #include "list.hpp"
-
+#include "functions.hpp"
 int main()
 {
   using namespace malashenko;
-  List< int > l;
-  l.push_back(1);
-  l.push_back(2);
-  l.push_back(3);
 
   using pair_t = std::pair<std::string, List< int > >;
 
-  List< pair_t > k;
-  
-  std::cout << l.front() << '\n';
-  
+  List< pair_t > res;
+  std::string name1 = "aaa";
+  List< int > nums;
+  nums.push_back(1);
+  nums.push_back(2);
+  nums.push_back(3);
 
+  res.push_back({name1, nums});
+
+
+  std::string name2 = "B";
+  List< int > nums2;
+
+  res.push_back({name2, nums2});
+
+
+  // List< pair_t > res = getSequences(std::cin);
+  // std::cout << "func is done\n";
+  // for (LIter< pair_t > s = res.begin(), f = res.end(); s != f; ++s)
+  // {
+  //   std::cout << (*s).first << '\n';
+  //   std::cout << (*s).second.front() << '\n';
+
+  // }
 }

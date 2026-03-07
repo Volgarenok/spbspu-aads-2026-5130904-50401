@@ -42,18 +42,21 @@ namespace malashenko {
     void pop_front() noexcept;
 
     void clear() noexcept;
+    size_t size() const;
     void swap(List< T >& other);
     ~List();
   private:
     Node< T >* head_;
     Node< T >* tail_;
     Node< T >* fake_;
+    size_t s_;
   };
   
   template< class T >
   List< T >::List():
     head_(nullptr),
-    tail_(nullptr)
+    tail_(nullptr),
+    s_(0)
   {
     fake_ = static_cast< Node< T >* >(::operator new (sizeof(List< T >*)));
     fake_->next = nullptr;
@@ -62,7 +65,8 @@ namespace malashenko {
   template< class T >
   List< T >::List(const List< T >& other):
     head_(nullptr),
-    tail_(nullptr)
+    tail_(nullptr),
+    s_(0)
   {
     fake_ = static_cast< Node< T >* >(::operator new (sizeof(List< T >*)));
     for (LIter< T > start = other.begin(), finish = other.end(); start != finish; ++start)
@@ -77,13 +81,15 @@ namespace malashenko {
         throw;
       }
     }
+    push_back(other.back());
   }
 
   template< class T >
   List< T >::List(List< T >&& other):
     fake_(std::move(other.fake_)),
     head_(std::move(other.head_)),
-    tail_(std::move(other.tail_))
+    tail_(std::move(other.tail_)),
+    s_(std::move(other.s_))
   {
   }
 
@@ -94,11 +100,11 @@ namespace malashenko {
     {
       return *this;
     }
-
+    clear();
     fake_ = std::move(other.fake_);
     head_ = std::move(other.head_);
     tail_ = std::move(other.tail_);
-
+    s_ = std::move(other.s_);
     return *this;
   }
 
@@ -107,7 +113,7 @@ namespace malashenko {
   {
     List< T > temp(other);
     swap(temp);
-
+    
     return *this;
   }
 
@@ -190,6 +196,7 @@ namespace malashenko {
       head_->prev = newNode;
       tail_ = tail_->next;
     }
+    s_++;
   }
 
   template< class T >
@@ -209,6 +216,7 @@ namespace malashenko {
       head_ = head_->prev;
       fake_->next = head_;
     }
+    s_++;
   }
 
   template< class T >
@@ -222,6 +230,7 @@ namespace malashenko {
       head_ = nullptr;
       tail_ = nullptr;
       fake_->next = nullptr;
+      s_ = 0;
       return;
     }
 
@@ -232,6 +241,7 @@ namespace malashenko {
 
     delete tail_;
     tail_ = tmpNode;
+    s_--;
   }
 
   template< class T >
@@ -245,8 +255,10 @@ namespace malashenko {
       head_ = nullptr;
       tail_ = nullptr;
       fake_->next = nullptr;
+      s_ = 0;
       return;
     }
+    
 
     Node< T >* tmpNode = head_->next;
 
@@ -256,6 +268,7 @@ namespace malashenko {
 
     delete tail_;
     tail_ = tmpNode;
+    s_--;
   }
 
   template< class T >
@@ -265,6 +278,13 @@ namespace malashenko {
     {
       pop_back();
     }
+    s_ = 0;
+  }
+
+  template< class T >
+  size_t List< T >::size() const
+  {
+    return s_;
   }
 
   template< class T >
