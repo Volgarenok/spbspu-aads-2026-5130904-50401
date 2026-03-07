@@ -33,11 +33,11 @@ namespace petrov
   class LCIter
   {
     friend class List< T >;
-    Node< T >* nd;
+    const Node< T >* nd;
 
     public:
       LCIter();
-      LCIter(Node< T >* p);
+      LCIter(const Node< T >* p);
       bool hasNext() const;
       LCIter< T > next() const;
       const T& operator*() const;
@@ -66,13 +66,11 @@ namespace petrov
       LIter< T > end();
       LCIter< T > end() const;
 
-      Node< T > getLast();
-      Node< T > getLast() const;
-      Node< T > getFirst();
-      Node< T > getFirst() const;
+      LIter< T > getLast();
+      LCIter< T > getLast() const;
 
       LIter< T > addStart(const T& a);
-      LCIter< T > popStart();
+      void popStart();
 
       LIter< T > insert(LIter< T > id, const T& a);
       LIter< T > insert(LIter< T > id, const T&& a);
