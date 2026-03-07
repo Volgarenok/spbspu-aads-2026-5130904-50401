@@ -69,19 +69,26 @@ namespace malashenko {
     s_(0)
   {
     fake_ = static_cast< Node< T >* >(::operator new (sizeof(List< T >*)));
-    for (LIter< T > start = other.begin(), finish = other.end(); start != finish; ++start)
+    try
     {
-      try
+      if (!(other.head_))
+      {
+        return;
+      }
+
+      for (LCIter< T > start = other.cbegin(); start != other.cend(); ++start)
       {
         push_back(*start);
       }
-      catch(...)
-      {
-        clear();
-        throw;
-      }
+      push_back(other.back());
+
+    } catch(...)
+    {
+      clear();
+      throw;
     }
-    push_back(other.back());
+
+
   }
 
   template< class T >
@@ -129,48 +136,51 @@ namespace malashenko {
   template< class T >
   LIter< T > List< T >::begin() const
   {
-    assert(head_ != nullptr && "List is empty");
-    LIter< T > iter(head_);
-    return iter;
+    // assert(head_ != nullptr && "List is empty");
+    // LIter< T > iter(head_);
+    return LIter(head_);
   }
 
   template< class T >
   LIter< T > List< T >::end() const
   {
-    assert(tail_ != nullptr && "List is empty");
-    LIter< T > iter(tail_);
-    return iter;
+    // assert(tail_ != nullptr && "List is empty");
+    // LIter< T > iter(tail_);
+    return LIter(tail_);
   }
 
 
   template< class T >
   LCIter< T > List< T >::cbegin() const
   {
-    assert(head_ != nullptr && "List is empty");
-    LCIter< T > iter(head_);
-    return iter;
+    // assert(head_ != nullptr && "List is empty");
+    // LCIter< T > iter(head_);
+    return LCIter(head_);
   }
 
   template< class T >
   LCIter< T > List< T >::cend() const
   {
-    assert(tail_ != nullptr && "List is empty");
-    LCIter< T > iter(tail_);
-    return iter;
+    // assert(tail_ != nullptr && "List is empty");
+    // LCIter< T > iter(tail_);
+    return LCIter(tail_);
   }
 
   template< class T >
   T& List< T >::front() const noexcept
   {
-    assert(head_ != nullptr && "List is empty");
+    // assert(head_ != nullptr && "List is empty");
+
     return head_->value_;
+
   }
 
 
   template< class T >
   T& List< T >::back() const noexcept
   {
-    assert(tail_ != nullptr && "List is empty");
+    // assert(tail_ != nullptr && "List is empty");
+
     return tail_->value_;
   }
 
@@ -266,7 +276,7 @@ namespace malashenko {
     tmpNode->prev = tail_;
     fake_->next = tmpNode;
 
-    delete tail_;
+    delete head_;
     tail_ = tmpNode;
     s_--;
   }

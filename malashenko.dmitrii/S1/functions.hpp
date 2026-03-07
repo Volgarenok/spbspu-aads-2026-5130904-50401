@@ -22,7 +22,6 @@ namespace malashenko {
     while (!in.eof())
     {
       in >> name;
-      std::cout << "created seq " << name << '\n';
       List< int > nums;
       size_t num;
       if (!(in >> num))
@@ -32,12 +31,10 @@ namespace malashenko {
         continue;
       }
       nums.push_back(num);
-      std::cout << "Pushed value " << num << '\n';
-
       while ((in >> num))
       {
         nums.push_back(num);
-        std::cout << "Pushed value " << num << '\n';
+
       }
       pair_t p(name, nums);
       res.push_back(p);
