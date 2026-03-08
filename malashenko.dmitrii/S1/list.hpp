@@ -8,7 +8,6 @@
 #include <utility>
 #include <string>
 
-
 namespace malashenko {
   template< class T > class LIter;
   template< class T > class LCIter;
@@ -47,7 +46,7 @@ namespace malashenko {
     Node< T >* fake_;
     size_t s_;
   };
-  
+
   template< class T >
   List< T >::List():
     head_(nullptr),
