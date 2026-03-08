@@ -5,7 +5,8 @@
 #include <memory>
 #include <cassert>
 
-namespace malashenko {
+namespace malashenko
+{
   template< class T > class List;
   template< class T > class Node;
 
@@ -16,7 +17,6 @@ namespace malashenko {
     LIter< T >& operator++();
     LIter< T > operator++(int);
     LIter< T > operator+(size_t s);
-
 
     LIter< T >& operator--();
     LIter< T > operator--(int);
@@ -89,7 +89,6 @@ namespace malashenko {
     return tmp;
   }
 
-
   template< class T >
   LIter< T > LIter< T >::operator-(size_t s)
   {
@@ -106,7 +105,7 @@ namespace malashenko {
   {
     return node_ == other.node_;
   }
-  
+
   template< class T >
   bool LIter< T >::operator!=(const LIter< T >& other) const
   {

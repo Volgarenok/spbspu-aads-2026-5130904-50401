@@ -1,20 +1,16 @@
-
 #include <utility>
 #include <string>
 #include <iostream>
 #include "list.hpp"
 #include "functions.hpp"
-#include "iterator.hpp"
-namespace malashenko {
-  template< class T >
-  class LIter;
-  template< class T >
-  class LCIter;
-  template< class T >
-  class List;
+namespace malashenko
+{
+  template< class T > class LIter;
+  template< class T > class LCIter;
+  template< class T > class List;
 
-  using pair_t = std::pair<std::string, List< int > >;
-  
+  using pair_t = std::pair< std::string, List< int > >;
+
   void getData(std::istream& in, List< pair_t >& res)
   {
     std::string name;
@@ -43,18 +39,17 @@ namespace malashenko {
   size_t getMaxSeqSize(const List< pair_t >& list)
   {
     size_t maxSize = 0;
-    for (LIter< pair_t > s = list.begin(), f = list.end(); s != f; ++s)
+    for (LIter< pair_t > s = list.begin(); s != list.end(); ++s)
     {
       maxSize = std::max(maxSize, (*s).second.size());
     }
     maxSize = std::max(maxSize, list.back().second.size());
-
     return maxSize;
   }
 
   void printSeqNames(std::ostream& out, const List< pair_t >& list)
   {
-    for (LIter< pair_t > s = list.begin(), f = list.end(); s != f; ++s)
+    for (LIter< pair_t > s = list.begin(); s != list.end(); ++s)
     {
       out << (*s).first << ' ';
     }
@@ -67,7 +62,7 @@ namespace malashenko {
     for (size_t curSize = 1; curSize != maxSize + 1; ++curSize)
     {
       size_t sum = 0;
-      for (LIter< pair_t > s = list.begin(), f = list.end(); s != f; ++s)
+      for (LIter< pair_t > s = list.begin(); s != list.end(); ++s)
       {
         if ((*s).second.size() < curSize)
         {
@@ -100,7 +95,7 @@ namespace malashenko {
       return;
     }
 
-    for (LIter< int > s = sums.begin(), f = sums.end(); s != f; ++s)
+    for (LIter< int > s = sums.begin(); s != sums.end(); ++s)
     {
       out << *s << ' ';
     }

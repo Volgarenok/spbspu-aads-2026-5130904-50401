@@ -6,12 +6,10 @@
 #include "iterator.hpp"
 int main()
 {
-  
   namespace mal = malashenko;
   using pair_t = std::pair<std::string, mal::List< int > >;
 
   mal::List< pair_t > data;
-  
   try
   {
     mal::getData(std::cin, data);
@@ -43,8 +41,7 @@ int main()
     std::cerr << e.what() << '\n';
     return 1;
   }
-  
+
   printSums(std::cout, sums);
   return 0;
-
 }
