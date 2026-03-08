@@ -4,6 +4,32 @@ struct Node
   T data;
   Node* next;
 };
+template <class T>
+class List;
+
+template<class T>
+class LIter
+{
+  friend class List<T>;
+  private:
+    Node<T>* node;
+  public:
+    LIter(Node<T>* n = nullptr) : node(n) {}
+    T& operator*()
+    {
+      return node -> data;
+    }
+    LIter& operator++()
+    {
+      node = node -> next;
+      return *this;
+    }
+    bool operator!=(const LIter& other) const
+    {
+      return node != other.node;
+    }
+};
+
 
 template <class T>
 class List
