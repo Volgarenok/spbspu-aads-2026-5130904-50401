@@ -3,6 +3,7 @@
 #include <iostream>
 #include "list.hpp"
 #include "functions.hpp"
+#include <limits>
 namespace malashenko
 {
   template< class T > class LIter;
@@ -25,12 +26,20 @@ namespace malashenko
         in.clear(in.rdstate() ^ std::ios_base::failbit);
         continue;
       }
+
+      if (num < std::numeric_limits<int>::max())
+      {
+        std::cerr << "Overflow detected for " << name << "\n";
+        throw;
+      }
+
       nums.push_back(num);
       while ((in >> num))
       {
-        if (!num)
+        if (num < std::numeric_limits<int>::max())
         {
-          throw std::overflow_error("Too big number");
+          std::cerr << "Overflow detected for " << name << "\n";
+          throw;
         }
         nums.push_back(num);
       }
@@ -66,13 +75,18 @@ namespace malashenko
     for (size_t curSize = 1; curSize != maxSize + 1; ++curSize)
     {
       size_t sum = 0;
-      for (LIter< pair_t > s = list.begin(); s != list.end(); ++s)
+      LIter< pair_t > s = list.begin();
+      if ((*s).second.size() < curSize)
       {
-        if (s != list.begin())
-        {
-          out << ' ';
-        }
+        continue;
+      }
+      LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
+      sum += *valNode;
+      out << *valNode;
+      ++s;
 
+      for (; s != list.end(); ++s)
+      {
         if ((*s).second.size() < curSize)
         {
           continue;
@@ -80,8 +94,7 @@ namespace malashenko
 
         LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
         sum += *valNode;
-        out << *valNode;
-
+        out << ' ' << *valNode;
       }
 
       if (list.back().second.size() < curSize)
@@ -91,8 +104,8 @@ namespace malashenko
         continue;
       }
 
-      LIter< int > valNode = list.back().second.begin() + (curSize - 1);
-      out << *valNode << '\n';
+      valNode = list.back().second.begin() + (curSize - 1);
+      out << ' ' << *valNode << '\n';
       sum += *valNode;
       sums.push_back(sum);
     }

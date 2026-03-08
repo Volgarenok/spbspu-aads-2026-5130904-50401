@@ -13,6 +13,11 @@ int main()
   try
   {
     mal::getData(std::cin, data);
+    if (data.front().first.empty())
+    {
+      std::cout << "0\n";
+      return 0;
+    }
   }
   catch(const std::exception& e)
   {
