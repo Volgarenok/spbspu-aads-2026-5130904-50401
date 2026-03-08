@@ -46,6 +46,7 @@ namespace chernov {
     LIter< T > erase_after(LIter< T > first, LIter< T > last);
     void push_front(const T & value);
     void push_front(T && value);
+    void pop_front();
   };
 
   template< class T >
@@ -246,6 +247,12 @@ namespace chernov {
   void List< T >::push_front(T && value)
   {
     insert_after(fake_, std::move(value));
+  }
+
+  template< class T >
+  void List< T >::pop_front()
+  {
+    erase_after(before_begin());
   }
 }
 
