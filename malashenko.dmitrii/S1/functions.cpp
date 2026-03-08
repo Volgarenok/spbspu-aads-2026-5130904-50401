@@ -27,20 +27,9 @@ namespace malashenko
         continue;
       }
 
-      if (num < std::numeric_limits<int>::max())
-      {
-        std::cerr << "Overflow detected for " << name << "\n";
-        throw;
-      }
-
       nums.push_back(num);
       while ((in >> num))
       {
-        if (num < std::numeric_limits<int>::max())
-        {
-          std::cerr << "Overflow detected for " << name << "\n";
-          throw;
-        }
         nums.push_back(num);
       }
       pair_t p(name, nums);
@@ -81,6 +70,7 @@ namespace malashenko
         continue;
       }
       LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
+
       sum += *valNode;
       out << *valNode;
       ++s;

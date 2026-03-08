@@ -25,14 +25,11 @@ int main()
     return 1;
   }
 
-  try
+  mal::printSeqNames(std::cout, data);
+  if (mal::getMaxSeqSize(data) == 0)
   {
-    mal::printSeqNames(std::cout, data);
-  }
-  catch(const std::exception& e)
-  {
-    std::cerr << e.what() << '\n';
-    return 1;
+    std::cout << "0\n";
+    return 0;
   }
 
   mal::List< int > sums;
