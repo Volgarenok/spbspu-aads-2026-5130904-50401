@@ -1,9 +1,13 @@
 #ifndef LITER_HPP
 #define LITER_HPP
 
-#include "list.hpp"
-
 namespace chernov {
+  template< class T >
+  class Node;
+
+  template< class T >
+  class List;
+
   template< class T >
   class LIter {
     friend class List< T >;
@@ -22,6 +26,82 @@ namespace chernov {
     bool operator==(const LIter< T > & other) const noexcept;
     bool operator!=(const LIter< T > & other) const noexcept;
   };
+
+  template< class T >
+  LIter< T >::LIter(Node< T > * node, Node< T > * fake):
+    ptr(node),
+    fake_(fake)
+  {}
+
+  template< class T >
+  LIter< T >::LIter():
+    ptr(nullptr),
+    fake_(nullptr)
+  {}
+
+  template< class T >
+  bool LIter< T >::hasNext() const noexcept
+  {
+    return ptr != nullptr && ptr != fake_;
+  }
+
+  template< class T >
+  LIter< T > LIter< T >::next() const
+  {
+    Node< T > * next = ptr->next;
+    if (next == fake_) {
+      next = fake_->next;
+    }
+    return {next, fake_};
+  }
+
+  template< class T >
+  T & LIter< T >::value() const
+  {
+    return ptr->data;
+  }
+
+  template< class T >
+  T & LIter< T >::operator*() const
+  {
+    return ptr->data;
+  }
+
+  template< class T >
+  T * LIter< T >::operator->() const
+  {
+    return &(ptr->data);
+  }
+
+  template< class T >
+  LIter< T > & LIter< T >::operator++()
+  {
+    ptr = ptr->next;
+    if (ptr == fake_) {
+      ptr = fake_->next;
+    }
+    return *this;
+  }
+
+  template< class T >
+  LIter< T > LIter< T >::operator++(int)
+  {
+    LIter old = *this;
+    ++(*this);
+    return old;
+  }
+
+  template< class T >
+  bool LIter< T >::operator==(const LIter< T > & other) const noexcept
+  {
+    return ptr == other.ptr;
+  }
+
+  template< class T >
+  bool LIter< T >::operator!=(const LIter< T > & other) const noexcept
+  {
+    return !(*this == other);
+  }
 }
 
 #endif
