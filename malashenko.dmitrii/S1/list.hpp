@@ -259,7 +259,7 @@ namespace malashenko {
   template< class T >
   void List< T >::clear()
   {
-    while (fake_->next != nullptr)
+    while (head_)
     {
       pop_back();
     }

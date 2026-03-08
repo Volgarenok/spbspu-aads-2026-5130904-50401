@@ -28,6 +28,10 @@ namespace malashenko
       nums.push_back(num);
       while ((in >> num))
       {
+        if (!num)
+        {
+          throw std::overflow_error("Too big number");
+        }
         nums.push_back(num);
       }
       pair_t p(name, nums);
@@ -64,6 +68,11 @@ namespace malashenko
       size_t sum = 0;
       for (LIter< pair_t > s = list.begin(); s != list.end(); ++s)
       {
+        if (s != list.begin())
+        {
+          out << ' ';
+        }
+
         if ((*s).second.size() < curSize)
         {
           continue;
@@ -71,7 +80,8 @@ namespace malashenko
 
         LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
         sum += *valNode;
-        out << *valNode << ' ';
+        out << *valNode;
+
       }
 
       if (list.back().second.size() < curSize)
