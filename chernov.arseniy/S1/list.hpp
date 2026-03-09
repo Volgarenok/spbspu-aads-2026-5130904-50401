@@ -4,15 +4,12 @@
 #include <cstddef>
 #include <utility>
 
+#include "liter.hpp"
+#include "lciter.hpp"
+
 namespace chernov {
   template< class T >
-  class LIter;
-
-  template< class T >
-  class LCIter;
-
-  template< class T >
-  class Node {
+  struct Node {
     T data;
     Node< T > * next;
   };
@@ -52,7 +49,7 @@ namespace chernov {
   template< class T >
   Node< T > * List< T >::createFake()
   {
-    fake_ = static_cast< Node< T > * >(::operator new (sizeof(Node< T > *)));
+    fake_ = new Node<T>();
     return fake_;
   }
 
