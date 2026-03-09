@@ -6,13 +6,15 @@ namespace zubarev
   template < class T >
   class List;
   template < class T >
+  struct Node;
+  template < class T >
   class LIter
   {
     friend class List< T >;
 
   private:
-    typename List< T >::Node* ptr;
-    LIter(typename List< T >::Node* p);
+    Node< T >* ptr;
+    LIter(Node< T >* p);
 
   public:
     T& operator*();
@@ -21,7 +23,7 @@ namespace zubarev
     bool operator==(const LIter&) const;
   };
   template < class T >
-  LIter< T >::LIter(typename List< T >::Node* p) :
+  LIter< T >::LIter(Node< T >* p) :
     ptr(p)
   {}
 

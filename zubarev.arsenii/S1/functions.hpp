@@ -1,9 +1,10 @@
 #ifndef FUNC_HPP
 #define FUNC_HPP
 #include <iosfwd>
+#include "data.hpp"
 namespace zubarev
 {
-  void input(std::istream& in);
+  List< Data > input(std::istream& in);
 }
 
 #endif

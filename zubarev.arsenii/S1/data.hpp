@@ -1,15 +1,17 @@
 #ifndef DATA_HPP
 #define DATA_HPP
-
+#include "list.hpp"
 #include <string>
 
-template < class T >
-class List;
-
-struct Data
+namespace zubarev
 {
-  std::string name;
-  List< int >* numbers;
-};
+  // class List;
+
+  struct Data
+  {
+    std::string name;
+    List< int > numbers;
+  };
+}
 
 #endif
