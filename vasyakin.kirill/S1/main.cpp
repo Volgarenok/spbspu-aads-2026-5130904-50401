@@ -2,18 +2,19 @@
 #include <string>
 #include <utility>
 #include <stdexcept>
+#include <cstddef>
 #include "list.hpp"
 
 int main()
 {
-  vasyakin::List< std::pair< std::string, vasyakin::List< int > > > sequences;
+  vasyakin::List< std::pair< std::string, vasyakin::List< size_t > > > sequences;
   std::string name;
 
   while (std::cin >> name)
   {
-    vasyakin::List< int > numbers;
-    int num = 0;
-    vasyakin::Node< int >* last_num = nullptr;
+    vasyakin::List< size_t > numbers;
+    size_t num = 0;
+    vasyakin::Node< size_t >* last_num = nullptr;
 
     while (std::cin >> num)
     {
@@ -61,13 +62,13 @@ int main()
     }
   }
 
-  vasyakin::List< vasyakin::List< int > > transposed;
-  vasyakin::Node< vasyakin::List< int > >* last_trans = nullptr;
+  vasyakin::List< vasyakin::List< size_t > > transposed;
+  vasyakin::Node< vasyakin::List< size_t > >* last_trans = nullptr;
   bool hasNumbers = false;
 
   for (size_t pos = 0; pos < max_len; ++pos)
   {
-    vasyakin::List< int > new_seq;
+    vasyakin::List< size_t > new_seq;
 
     for (auto sit = sequences.cbegin(); sit != sequences.cend(); ++sit)
     {
@@ -116,10 +117,10 @@ int main()
       std::cout << '\n';
     }
 
-    vasyakin::List< int > sums;
+    vasyakin::List< size_t > sums;
     for (auto tit = transposed.cbegin(); tit != transposed.cend(); ++tit)
     {
-      int sum = 0;
+      size_t sum = 0;
       try
       {
         for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)

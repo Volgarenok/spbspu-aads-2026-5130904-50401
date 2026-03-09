@@ -9,7 +9,7 @@ namespace vasyakin
 {
   template< class T > class Node;
   template< class T > class List;
-  const int MAX = std::numeric_limits< int >::max();
+  const int MAX = std::numeric_limits< size_t >::max();
 
   template< class T >
   class LIter
