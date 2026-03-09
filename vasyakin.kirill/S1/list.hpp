@@ -157,6 +157,18 @@ namespace vasyakin
     ptr(it.ptr)
   {}
 
+  template< class T >
+  const T& LCIter< T >::operator*() const
+  {
+    return ptr->val;
+  }
+
+  template< class T >
+  const T* LCIter< T >::operator->() const
+  {
+    return &(ptr->val);
+  }
+
 }
 
 #endif
