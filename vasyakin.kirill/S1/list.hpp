@@ -340,7 +340,7 @@ namespace vasyakin
   template< class T >
   Node< T >* List< T >::erase(Node< T >* h)
   {
-    if (!fake_node || h == fake_node || h->next == fake_node)
+    if (!fake_node || h->next == fake_node)
     {
       return fake_node;
     }
