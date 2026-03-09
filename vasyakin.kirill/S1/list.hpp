@@ -287,6 +287,27 @@ namespace vasyakin
     other.size = 0;
   }
 
+  template< class T >
+  List< T >& List< T >::operator=(const List& other)
+  {
+    if (this != &other)
+    {
+      List tmp(other);
+      swap(tmp);
+    }
+    return *this;
+  }
+
+  template< class T >
+  List< T >& List< T >::operator=(List&& other) noexcept
+  {
+    if (this != &other)
+    {
+      List tmp(std::move(other));
+      swap(tmp);
+    }
+    return *this;
+  }
 
 }
 
