@@ -88,4 +88,33 @@ BOOST_AUTO_TEST_CASE(MoveConstruct)
   BOOST_CHECK_EQUAL(moved.get_size(), 3);
 }
 
+BOOST_AUTO_TEST_CASE(CopyAssign)
+{
+  vasyakin::List< int > list1;
+  list1.push_back(1);
+  list1.push_back(2);
+  vasyakin::List< int > list2;
+  list2.push_back(10);
+  list2 = list1;
+  BOOST_CHECK_EQUAL(list2.get_size(), 2);
+  auto it = list2.begin();
+  BOOST_CHECK_EQUAL(*it, 1);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 2);
+  list1 = list1;
+  BOOST_CHECK_EQUAL(list1.get_size(), 2);
+}
+BOOST_AUTO_TEST_CASE(MoveAssign)
+{
+  vasyakin::List< int > list;
+  list.push_back(1);
+  list.push_back(2);
+  vasyakin::List< int > moved;
+  moved = std::move(list);
+  BOOST_CHECK_EQUAL(list.get_size(), 0);
+  BOOST_CHECK_EQUAL(moved.get_size(), 2);
+  moved = std::move(moved);
+  BOOST_CHECK_EQUAL(moved.get_size(), 2);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
