@@ -75,6 +75,7 @@ int main()
   petrov::List<std::pair<std::string, petrov::List<int>*>>* data_ptr = &data;
   std::string string_to_record;
   petrov::List<int>* numbers_ptr = nullptr;
+  size_t count_elements = 0, count = 0;
   while (std::cin >> string_to_record)
   {
      if (!(string_to_record[0] > 47 && string_to_record[0] < 59))
@@ -86,6 +87,7 @@ int main()
       data_ptr->next = new_data_ptr;
       data_ptr = new_data_ptr;
       numbers_ptr = nullptr; 
+      count_elements++;
     }
     else
     {
@@ -106,14 +108,36 @@ int main()
   petrov::List<std::pair<std::string, petrov::List<int>*>>* data_ptr_2 = &data;
   while (data_ptr_2 != nullptr)
   {
-    std::cout << data_ptr_2->val.first << "\n";
-    petrov::List<int>* numbers_ptr_2 = data_ptr_2->val.second;
-    while (numbers_ptr_2 != nullptr)
-    {
-      std::cout << numbers_ptr_2->val << "\n";
-      numbers_ptr_2 = numbers_ptr_2->next;
-    }
+    std::cout << data_ptr_2->val.first << " ";
     data_ptr_2 = data_ptr_2->next;
+  }
+  std::cout << '\n';
+  petrov::List<std::pair<std::string, petrov::List<int>*>> data_ptr_3 = data;
+  while (count < count_elements)
+  {
+    count = 0;
+    petrov::List<std::pair<std::string, petrov::List<int>*>>* data_ptr_4 = &data_ptr_3;
+    while (data_ptr_4 != nullptr)
+    {
+      if (data_ptr_4->val.second != nullptr)
+      {
+        std::cout << data_ptr_4->val.second->val << " ";
+        if (data_ptr_4->val.second->next == nullptr)
+        {
+          data_ptr_4->val.second = nullptr;
+        }
+        else
+        {
+          data_ptr_4->val.second = data_ptr_4->val.second->next;
+        }
+      }
+      else
+      {
+        count++;
+      }
+      data_ptr_4 = data_ptr_4->next;
+    }
+    std::cout << '\n';
   }
 }
 
