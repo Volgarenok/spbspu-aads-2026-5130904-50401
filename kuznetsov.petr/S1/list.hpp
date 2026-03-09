@@ -149,9 +149,74 @@ namespace kuznetsov {
     List(): head_(nullptr), size_(0)
     {}
 
+    List(const List& other): head_(nullptr), size_(0) {
+      if (other.empty()) {
+        return;
+      }
+
+      Node<T>* current = other.head_;
+      do {
+        try {
+          insert(end(), current->val_);
+          size_++;
+          current = current->next_;
+        } catch (...) {
+          std::cerr << "Copy construct error\n";
+          clear();
+          throw;
+        }
+      } while (current != other.head_);
+    }
+
+    List(List&& other) noexcept : head_(other.head_), size_(other.size_) {
+      other.head_ = nullptr;
+      other.size_ = 0;
+    }
+
     ~List()
     {
       clear();
+    }
+
+    List& operator=(const List& other) {
+      if (this == &other) {
+        return *this;
+      }
+
+      clear();
+
+      if (other.empty()) {
+        return *this;
+      }
+
+      Node<T>* current = other.head_;
+      do {
+        try {
+          insert(end(), current->val_);
+          current = current->next_;
+        } catch (...) {
+          std::cerr << "Copy = error\n";
+          clear();
+          throw;
+        }
+      } while (current != other.head_);
+
+      return *this;
+    }
+
+    List& operator=(List&& other) noexcept {
+      if (this == &other) {
+        return *this;
+      }
+
+      clear();
+
+      head_ = other.head_;
+      size_ = other.size_;
+
+      other.head_ = nullptr;
+      other.size_ = 0;
+      return *this;
     }
 
     LIter< T > insert(LCIter< T > it, const T& val) {
@@ -289,7 +354,7 @@ namespace kuznetsov {
 
     LRIter< T > rbegin()
     {
-      return LRIter< T >(head_);
+      return LRIter< T >(head_->prev_);
     }
 
     LRIter< T > rend()
@@ -299,7 +364,7 @@ namespace kuznetsov {
 
     LRCIter< T > rcbegin() const
     {
-      return LRCIter< T >(head_);
+      return LRCIter< T >(head_->prev_);
     }
 
     LRCIter< T > rcend() const
