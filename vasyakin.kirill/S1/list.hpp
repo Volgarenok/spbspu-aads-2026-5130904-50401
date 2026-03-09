@@ -184,6 +184,18 @@ namespace vasyakin
     return tmp;
   }
 
+  template< class T >
+  bool LCIter< T >::operator==(const LCIter& other) const
+  {
+    return ptr == other.ptr;
+  }
+
+  template< class T >
+  bool LCIter< T >::operator!=(const LCIter& other) const 
+  {
+    return ptr != other.ptr;
+  }
+
 }
 
 #endif
