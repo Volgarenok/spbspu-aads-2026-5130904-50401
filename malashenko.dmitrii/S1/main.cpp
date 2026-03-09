@@ -6,44 +6,32 @@
 #include "iterator.hpp"
 int main()
 {
-  namespace mal = malashenko;
-  using pair_t = std::pair<std::string, mal::List< int > >;
+  using namespace malashenko;
+  List< int > l;
+  std::cout << l.size() << '\n';
 
-  mal::List< pair_t > data;
-  try
+  l.push_back(1);
+  
+  l.push_back(2);
+  l.push_front(3);
+  // std::cout << l.size() << '\n';
+
+  for (LIter< int > s = l.begin(); s != l.end(); ++s)
   {
-    mal::getData(std::cin, data);
-    if (data.front().first.empty())
-    {
-      std::cout << "0\n";
-      return 0;
-    }
-  }
-  catch(const std::exception& e)
-  {
-    std::cerr << e.what() << '\n';
-    return 1;
+    std::cout << *s << '\n';
   }
 
-  mal::printSeqNames(std::cout, data);
-  if (mal::getMaxSeqSize(data) == 0)
-  {
-    std::cout << "0\n";
-    return 0;
-  }
+  std::cout << '\n';
+  // l.erase(l.begin());
+  // l.erase(l.begin());
+  // l.erase(l.begin());
 
-  mal::List< int > sums;
-
-  try
+  // l.pop_front();
+  // l.clear();
+  List< int > k = l;
+  k.push_back(4);
+  for (LIter< int > s = k.begin(); s != k.end(); ++s)
   {
-    printSeqsAndGetSums(std::cout, data, sums);
+    std::cout << *s << '\n';
   }
-  catch(const std::exception& e)
-  {
-    std::cerr << e.what() << '\n';
-    return 1;
-  }
-
-  printSums(std::cout, sums);
-  return 0;
 }

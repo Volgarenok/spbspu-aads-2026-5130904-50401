@@ -30,65 +30,65 @@ namespace malashenko {
     T& back() const;
     LIter< T > getFake() const;
 
+    LIter< T > insert(LIter< T > h, const T& value);
     void push_back(const T& value);
     void push_front(const T& value);
 
+    LIter< T > cut(LIter< T > h);
+    LIter< T > erase(LIter< T > h);
     void pop_back();
     void pop_front();
+
 
     void clear();
     size_t size() const;
     void swap(List< T >& other);
     ~List();
+    bool empty() const;
   private:
-    Node< T >* head_;
-    Node< T >* tail_;
+    void rmFake();
     Node< T >* fake_;
     size_t s_;
   };
 
   template< class T >
+  void List< T >::rmFake()
+  {
+    ::operator delete(fake_);
+  }
+  template< class T >
   List< T >::List():
-    head_(nullptr),
-    tail_(nullptr),
     s_(0)
   {
     fake_ = static_cast< Node< T >* >(::operator new (sizeof(Node< T >)));
-    fake_->next = nullptr;
+    fake_->next = fake_;
+    fake_->prev = fake_;
   }
 
   template< class T >
   List< T >::List(const List< T >& other):
-    head_(nullptr),
-    tail_(nullptr),
     s_(0)
   {
     fake_ = static_cast< Node< T >* >(::operator new (sizeof(Node< T >)));
-    try
+    fake_->next = fake_;
+    fake_->prev = fake_;
+    for (LIter< T > start = other.begin(); start != other.end(); ++start)
     {
-      if (!(other.head_))
-      {
-        return;
-      }
-
-      for (LCIter< T > start = other.cbegin(); start != other.cend(); ++start)
+      try
       {
         push_back(*start);
       }
-
-      push_back(other.back());
-    } catch(...)
-    {
-      clear();
-      throw;
+      catch(...)
+      {
+        clear();
+        throw;
+      }
     }
   }
 
   template< class T >
   List< T >::List(List< T >&& other):
     fake_(std::move(other.fake_)),
-    head_(std::move(other.head_)),
-    tail_(std::move(other.tail_)),
     s_(std::move(other.s_))
   {}
 
@@ -99,10 +99,8 @@ namespace malashenko {
     {
       return *this;
     }
-    clear();
+
     fake_ = std::move(other.fake_);
-    head_ = std::move(other.head_);
-    tail_ = std::move(other.tail_);
     s_ = std::move(other.s_);
     return *this;
   }
@@ -120,50 +118,45 @@ namespace malashenko {
   {
     using std::swap;
     swap(fake_, other.fake_);
-    swap(tail_, other.tail_);
-    swap(head_, other.head_);
+    swap(s_, other.s_);
   }
 
   template< class T >
   LIter< T > List< T >::begin() const
   {
-    assert(head_ != nullptr && "List is empty");
-    return LIter< T >(head_);
+    return LIter< T >(fake_->next);
   }
 
   template< class T >
   LIter< T > List< T >::end() const
   {
-    assert(tail_ != nullptr && "List is empty");
-    return LIter< T >(tail_);
+    return LIter< T >(fake_);
   }
 
   template< class T >
   LCIter< T > List< T >::cbegin() const
   {
-    assert(head_ != nullptr && "List is empty");
-    return LCIter< T >(head_);
+    return LCIter< T >(fake_->next);
   }
 
   template< class T >
   LCIter< T > List< T >::cend() const
   {
-    assert(tail_ != nullptr && "List is empty");
-    return LCIter< T >(tail_);
+    return LCIter< T >(fake_);
   }
 
   template< class T >
   T& List< T >::front() const
   {
-    assert(head_ != nullptr && "List is empty");
-    return head_->value_;
+    return fake_->next->value_;
   }
 
   template< class T >
   T& List< T >::back() const
   {
-    assert(tail_ != nullptr && "List is empty");
-    return tail_->value_;
+    LIter< T > it(fake_->next);
+    it = it + s_;
+    return *it;
   }
 
   template< class T >
@@ -173,93 +166,73 @@ namespace malashenko {
   }
 
   template< class T >
+  LIter< T > List< T >::insert(LIter< T > h, const T& value)
+  {
+    Node< T >* newNode = new Node< T >{value, h.node_->next, h.node_};
+    h.node_->next = newNode;
+    newNode->next->prev = newNode;
+    ++s_;
+    return {newNode};
+  }
+
+  template< class T >
   void List< T >::push_back(const T& value)
   {
-    Node< T >* newNode = new Node< T >{value, head_, tail_};
-    if (!tail_)
-    {
-      head_ = newNode;
-      tail_ = newNode;
-      fake_->next = head_;
-    } else
-    {
-      tail_->next = newNode;
-      head_->prev = newNode;
-      tail_ = tail_->next;
-    }
-    s_++;
+    LIter< T > itBack = end().node_->prev;
+    insert(itBack, value);
   }
 
   template< class T >
   void List< T >::push_front(const T& value)
   {
-    Node< T >* newNode = new Node< T >{value, head_, tail_};
-    if (!head_)
+    insert(fake_, value);
+  }
+
+  template< class T >
+  LIter< T > List< T >::cut(LIter< T > h)
+  {
+    if (empty())
     {
-      head_ = newNode;
-      tail_ = newNode;
-      fake_->next = head_;
-    } else
-    {
-      tail_->next = newNode;
-      head_->prev = newNode;
-      head_ = head_->prev;
-      fake_->next = head_;
+      return end();
     }
-    s_++;
+    LIter< T > ret = h + 1;
+    h.node_->prev->next = ret.node_;
+    ret.node_->prev = h.node_->prev;
+    delete h.node_;
+    s_--;
+    return ret;
+  }
+
+  template< class T >
+  LIter< T > List< T >::erase(LIter< T > h)
+  {
+    if (s_ == 1)
+    {
+      cut(h);
+    }
+    return cut(h + 1);
   }
 
   template< class T >
   void List< T >::pop_back()
   {
-    if (head_ == tail_)
-    {
-      delete head_;
-      head_ = nullptr;
-      tail_ = nullptr;
-      fake_->next = nullptr;
-      s_ = 0;
-      return;
-    }
-
-    Node< T >* tmpNode = tail_->prev;
-
-    head_->prev = tmpNode;
-    tmpNode->next = head_;
-
-    delete tail_;
-    tail_ = tmpNode;
-    s_--;
+    cut(fake_->prev);
   }
 
   template< class T >
   void List< T >::pop_front()
   {
-    if (head_ == tail_)
+    if (s_ == 1)
     {
-      delete head_;
-      head_ = nullptr;
-      tail_ = nullptr;
-      fake_->next = nullptr;
-      s_ = 0;
-      return;
+      pop_back();
     }
-
-    Node< T >* tmpNode = head_->next;
-
-    tail_->next = tmpNode;
-    tmpNode->prev = tail_;
-    fake_->next = tmpNode;
-
-    delete head_;
-    tail_ = tmpNode;
-    s_--;
+    erase(fake_);
   }
 
   template< class T >
   void List< T >::clear()
   {
-    while (head_)
+    while (!empty())
     {
       pop_back();
     }
@@ -273,10 +246,16 @@ namespace malashenko {
   }
 
   template< class T >
+  bool List< T >::empty() const
+  {
+    return s_ == 0;
+  }
+
+  template< class T >
   List< T >::~List()
   {
     clear();
-    ::operator delete(fake_);
+    rmFake();
   }
 };
 
@@ -286,6 +265,6 @@ namespace std {
   {
     a.swap(b);
   }
-};
+}
 
 #endif
