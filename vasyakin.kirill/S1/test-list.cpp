@@ -156,4 +156,39 @@ BOOST_AUTO_TEST_CASE(ClearTest)
   BOOST_CHECK_EQUAL(*list.begin(), 42);
 }
 
+BOOST_AUTO_TEST_CASE(PushBackTest)
+{
+  vasyakin::List< int > list;
+  list.push_back(10);
+  BOOST_CHECK_EQUAL(list.get_size(), 1);
+  BOOST_CHECK_EQUAL(*list.begin(), 10);
+  list.push_back(20);
+  list.push_back(30);
+  BOOST_CHECK_EQUAL(list.get_size(), 3);
+  auto it = list.begin();
+  BOOST_CHECK_EQUAL(*it, 10);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 20);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 30);
+  ++it;
+  BOOST_CHECK(it == list.end());
+  list.clear();
+  list.push_back(42);
+  BOOST_CHECK_EQUAL(list.get_size(), 1);
+  BOOST_CHECK_EQUAL(*list.begin(), 42);
+}
+BOOST_AUTO_TEST_CASE(InsertTest)
+{
+  vasyakin::List< int > list;
+  list.insert(list.get_fake(), 1);
+  BOOST_CHECK_EQUAL(*list.begin(), 1);
+  list.insert(list.get_fake(), 0);
+  BOOST_CHECK_EQUAL(*list.begin(), 0);
+  auto it = list.begin();
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 1);
+  BOOST_CHECK_EQUAL(list.get_size(), 2);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
