@@ -217,6 +217,18 @@ namespace vasyakin
     fake_node->next = fake_node;
   }
 
+  template< class T >
+  List< T >::~List()
+  {
+    if (!fake_node)
+    {
+      return;
+    }
+    clear();
+    delete fake_node;
+    fake_node = nullptr;
+  }
+
 }
 
 #endif
