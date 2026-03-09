@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 #include <cstddef>
+#include <iostream>
 namespace kuznetsov {
 
   namespace {
@@ -22,10 +23,12 @@ namespace kuznetsov {
 
     LCIter& operator++()
     {
-      this->curr_ = this->curr_->next_;
-      return this;
+      if (curr_) {
+        curr_ = curr_->next_;
+      }
+      return *this;
     }
-    LCIter& operator++(int)
+    LCIter operator++(int)
     {
       LCIter temp(*this);
       ++(*this);
@@ -33,137 +36,243 @@ namespace kuznetsov {
     }
     LCIter& operator--()
     {
-      this->curr_ = this->curr_->prev_;
-      return this;
+      if (curr_) {
+        curr_ = curr_->prev_;
+      }
+      return *this;
     }
-    LCIter& operator--(int)
+    LCIter operator--(int)
     {
       LCIter temp(*this);
       --(*this);
       return temp;
     }
-    const T& operator*()
+    const T& operator*() const
     {
-      return curr_->val;
+      if (!curr_) throw std::logic_error("Dereferencing null iterator");
+      return curr_->val_;
     }
-    bool operator==(const LCIter& y)
+    bool operator==(const LCIter& y) const
     {
       return this->curr_ == y.curr_;
     }
 
-    bool operator!=(const LCIter& y)
+    bool operator!=(const LCIter& y) const
     {
-      return !(this == y);
+      return !(*this == y);
     }
-  private:
+  protected:
     friend class List< T >;
     Node< T >* curr_;
   };
 
   template< class T >
-  class LIter : LCIter< T > {
+  class LIter : public LCIter< T > {
   public:
-    LIter(Node< T >* pn): LCIter< T >(pn) {}
+    LIter(Node< T >* pn): LCIter< T >(pn)
+    {}
 
     T& operator*()
     {
-      return curr_->val;
+      return this->curr_->val_;
     }
   };
 
   template< class T >
   class List {
   public:
-    List(): head_(nullptr), size_(0) {}
+    List(): head_(nullptr), size_(0)
+    {}
+
     ~List()
     {
       clear();
     }
-    LIter< T > insert(LCIter< T > it, T& val)
-    {
-      try {
-        Node< T >* n = new Node< T > {val, nullptr, nullptr};
-        if (head_ == nullptr) {
+
+    LIter< T > insert(LCIter< T > it, const T& val) {
+      Node< T >* n = new Node< T >{val, nullptr, nullptr};
+
+      if (head_ == nullptr) {
+        head_ = n;
+        n->next_ = n;
+        n->prev_ = n;
+      } else if (!it.curr_) {
+        Node< T >* tail = head_->prev_;
+
+        n->next_ = head_;
+        n->prev_ = tail;
+        tail->next_ = n;
+        head_->prev_ = n;
+      } else {
+        Node< T >* current = it.curr_;
+        Node< T >* prev = current->prev_;
+
+        n->next_ = current;
+        n->prev_ = prev;
+        prev->next_ = n;
+        current->prev_ = n;
+        
+        if (current == head_) {
           head_ = n;
-          n->next_ = n;
-          n->prev_ = n;
         }
-        n->next_ = it.curr_->next_;
-        n->prev_ = it.curr_->prev_;
-        it.curr_->prev_->next_ = n;
-        it.curr_->next_->prev_ = n;
-        return LIter< T >(n);
-      } catch (...) {
-        std::cerr << "Insert error\n";
-        return LIter< T >(it.curr_);
       }
+
+      size_++;
+      return LIter< T >(n);
+    }
+
+    LIter< T > insert(LCIter< T > it, T&& val)
+    {
+      Node< T >* n = new Node< T >{std::move(val), nullptr, nullptr};
+
+      if (head_ == nullptr) {
+        head_ = n;
+        n->next_ = n;
+        n->prev_ = n;
+      } else if (!it.curr_) {
+        Node< T >* tail = head_->prev_;
+
+        n->next_ = head_;
+        n->prev_ = tail;
+        tail->next_ = n;
+        head_->prev_ = n;
+      } else {
+        Node< T >* current = it.curr_;
+        Node< T >* prev = current->prev_;
+
+        n->next_ = current;
+        n->prev_ = prev;
+        prev->next_ = n;
+        current->prev_ = n;
+        
+        if (current == head_) {
+          head_ = n;
+        }
+      }
+
+      size_++;
+      return LIter< T >(n);
     }
 
     T& front()
     {
+      if (!head_) {
+        throw std::logic_error("Empty list");
+      }
       return head_->val_;
     }
+
     T& back()
     {
+      if (!head_) {
+        throw std::logic_error("Empty list");
+      }
       return head_->prev_->val_;
     }
-    const T& front()
+
+    const T& front() const
     {
+      if (!head_) {
+        throw std::logic_error("Empty list");
+      }
       return head_->val_;
     }
-    const T& back()
+
+    const T& back() const
     {
+      if (!head_) {
+        throw std::logic_error("Empty list");
+      }
       return head_->prev_->val_;
     }
 
     void popFront()
     {
+      if (!head_) {
+        throw std::logic_error("Empty list");
+      }
       erase(cbegin());
     }
+
     void popBack()
     {
-      erase(cend());
+      if (!head_) {
+        throw std::logic_error("Empty list");
+      }
+      erase(LCIter< T >(head_->prev_));
     }
+
     LIter< T > begin()
     {
       return LIter< T >(head_);
     }
+
     LIter< T > end()
     {
-      return LIter< T >(head_);
+      return LIter< T >(nullptr);
     }
-    LCIter< T > cbegin()
-    {
-      return LCIter< T >(head_);
-    }
-    LCIter< T > cend()
+
+    LCIter< T > cbegin() const
     {
       return LCIter< T >(head_);
     }
 
+    LCIter< T > cend() const
+    {
+      return LCIter< T >(nullptr);
+    }
+
     void clear()
     {
-      Node< T >* t = nullptr;
-      for (size_t i = 0; i < size_; ++i) {
-        t = head_->next_;
-        delete head_;
-        head_ = t;
+      if (!head_) {
+        return;
       }
+      Node< T >* curr = head_;
+      do {
+        Node< T >* next = curr->next_;
+        delete curr;
+        curr = next;
+      } while (curr != head_);
       size_ = 0;
       head_ = nullptr;
     }
 
     LIter< T > erase(LCIter< T > it)
     {
-      LIter< T > t(it.curr_->next_);
-      bool f = it.curr_ == head_;
+      if (!head_ || !it.curr_) {
+        throw std::logic_error("Empty list or iterator");
+      }
+      Node< T >* nextNode = it.curr_->next_;
+      bool f = (it.curr_ == head_);
+
+      if (size_ == 1) {
+        delete it.curr_;
+        head_ = nullptr;
+        size_ = 0;
+        return LIter< T >(nullptr);
+      }
+
       it.curr_->prev_->next_ = it.curr_->next_;
       it.curr_->next_->prev_ = it.curr_->prev_;
+
       delete it.curr_;
+      --size_;
+
       if (f) {
-        head_ = t.curr_;
+        head_ = nextNode;
       }
-      return t;
+
+      return LIter< T >(nextNode);
+    }
+
+    size_t size() const
+    {
+      return size_;
+    }
+
+    bool empty() const
+    {
+      return !size_;
     }
 
   private:
