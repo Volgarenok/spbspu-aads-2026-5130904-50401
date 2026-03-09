@@ -278,6 +278,16 @@ namespace vasyakin
     prev->next = fake_node;
   }
 
+  template< class T >
+  List< T >::List(List&& other) noexcept:
+    fake_node(other.fake_node),
+    size(other.size)
+  {
+    other.fake_node = nullptr;
+    other.size = 0;
+  }
+
+
 }
 
 #endif
