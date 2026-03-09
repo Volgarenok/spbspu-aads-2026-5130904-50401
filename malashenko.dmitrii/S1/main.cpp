@@ -20,7 +20,7 @@ int main()
     }
   } catch(const std::exception& e)
   {
-    std::cerr << e.what() << '\n';
+    std::cerr << e.what() << '\n';;
     return 1;
   }
   printSeqNames(std::cout, data);
@@ -34,8 +34,7 @@ int main()
       std::cout << "0\n";
       return 0;
     }
-  }
-  catch(const std::exception& e)
+  } catch(const std::exception& e)
   {
     std::cerr << e.what() << '\n';
     return 1;

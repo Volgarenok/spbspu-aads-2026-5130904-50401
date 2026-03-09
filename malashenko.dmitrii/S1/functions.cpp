@@ -19,24 +19,37 @@ namespace malashenko
     {
       in >> name;
       List< int > nums;
-      size_t num;
+      unsigned long long num;
 
-      if (in.eof())
-      {
-        break;
-      }
+
 
       if (!(in >> num))
       {
+        if (in.eof())
+        {
+          break;
+        }
+        if (num > std::numeric_limits< int >::max())
+        {
+          throw std::overflow_error("Too big number");
+        }
         res.push_back({name, nums});
         in.clear(in.rdstate() ^ std::ios_base::failbit);
         continue;
       }
 
-      nums.push_back(num);
+      nums.push_back(static_cast< size_t >(num));
       while ((in >> num))
       {
-        nums.push_back(num);
+        if (num > std::numeric_limits< int >::max())
+        {
+          throw std::overflow_error("Too big number");
+        }
+        nums.push_back(static_cast< size_t >(num));
+      }
+      if (num > std::numeric_limits< int >::max())
+      {
+        throw std::overflow_error("Too big number");
       }
       pair_t p(name, nums);
       res.push_back(p);
