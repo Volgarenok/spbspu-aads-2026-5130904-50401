@@ -18,6 +18,8 @@ namespace kuznetsov {
   template< class T >
   class LCIter {
   public:
+    LCIter(Node< T >* pn): curr_(pn) {}
+
     LCIter& operator++()
     {
       this->curr_ = this->curr_->next_;
@@ -60,6 +62,9 @@ namespace kuznetsov {
 
   template< class T >
   class LIter : LCIter< T > {
+  public:
+    LIter(Node< T >* pn): LCIter< T >(pn) {}
+
     T& operator*()
     {
       return curr_->val;
@@ -74,16 +79,56 @@ namespace kuznetsov {
     {
       clear();
     }
-    LIter< T > insert(LCIter< T > it, T& val);
-    T& front();
-    T& back();
-    void popFront();
-    void popBack();
-    void pop(LIter< T > it);
+    LIter< T > insert(LCIter< T > it, T& val)
+    {
+      try {
+        Node< T >* n = new Node< T > {val, nullptr, nullptr};
+        if (head_ == nullptr) {
+          head_ = n;
+          n->next_ = n;
+          n->prev_ = n;
+        }
+        n->next_ = it.curr_->next_;
+        n->prev_ = it.curr_->prev_;
+        it.curr_->prev_->next_ = n;
+        it.curr_->next_->prev_ = n;
+        return LIter< T >(n);
+      } catch (...) {
+        std::cerr << "Insert error\n";
+        return LIter< T >(it.curr_);
+      }
+    }
+
+    T& front()
+    {
+      return head_->val_;
+    }
+    T& back()
+    {
+      return head_->prev_->val_;
+    }
+    const T& front()
+    {
+      return head_->val_;
+    }
+    const T& back()
+    {
+      return head_->prev_->val_;
+    }
+
+    void popFront()
+    {
+      erase(cbegin());
+    }
+    void popBack()
+    {
+      erase(cend());
+    }
     LIter< T > begin();
     LIter< T > end();
     LCIter< T > cbegin();
     LCIter< T > cend();
+
     void clear()
     {
       Node< T >* t = nullptr;
@@ -95,12 +140,17 @@ namespace kuznetsov {
       size_ = 0;
       head_ = nullptr;
     }
+
     LIter< T > erase(LCIter< T > it)
     {
       LIter< T > t(it.curr_->next_);
+      bool f = it.curr_ == head_;
       it.curr_->prev_->next_ = it.curr_->next_;
       it.curr_->next_->prev_ = it.curr_->prev_;
       delete it.curr_;
+      if (f) {
+        head_ = t.curr_;
+      }
       return t;
     }
 
