@@ -69,20 +69,18 @@ namespace malashenko
   void printSeqsAndGetSums(std::ostream& out, const List< pair_t >& list, List< int >& sums)
   {
     size_t maxSize = getMaxSeqSize(list);
-    for (size_t curSize = 1; curSize != maxSize + 1; ++curSize)
+    for (size_t curSize = 1; curSize < maxSize + 1; ++curSize)
     {
       size_t sum = 0;
       LIter< pair_t > s = list.begin();
-      if ((*s).second.size() < curSize)
+      if ((*s).second.size() >= curSize)
       {
-        continue;
+        LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
+
+        sum += *valNode;
+        out << *valNode;
+        ++s;
       }
-
-      LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
-
-      sum += *valNode;
-      out << *valNode;
-      ++s;
 
       for (; s != list.end(); ++s)
       {
@@ -93,7 +91,11 @@ namespace malashenko
 
         LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
         sum += *valNode;
-        out << ' ' << *valNode;
+        if (curSize != maxSize)
+        {
+          out << ' ';
+        }
+        out << *valNode;
       }
       out << '\n';
       sums.push_back(sum);

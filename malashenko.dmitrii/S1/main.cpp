@@ -24,7 +24,22 @@ int main()
     return 1;
   }
   printSeqNames(std::cout, data);
+
   List< int > sums;
-  printSeqsAndGetSums(std::cout, data, sums);
+  try
+  {
+    printSeqsAndGetSums(std::cout, data, sums);
+    if (sums.empty())
+    {
+      std::cout << "0\n";
+      return 0;
+    }
+  }
+  catch(const std::exception& e)
+  {
+    std::cerr << e.what() << '\n';
+    return 1;
+  }
+
   printSums(std::cout, sums);
 }
