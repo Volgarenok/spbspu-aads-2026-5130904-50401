@@ -124,10 +124,22 @@ namespace kuznetsov {
     {
       erase(cend());
     }
-    LIter< T > begin();
-    LIter< T > end();
-    LCIter< T > cbegin();
-    LCIter< T > cend();
+    LIter< T > begin()
+    {
+      return LIter< T >(head_);
+    }
+    LIter< T > end()
+    {
+      return LIter< T >(head_);
+    }
+    LCIter< T > cbegin()
+    {
+      return LCIter< T >(head_);
+    }
+    LCIter< T > cend()
+    {
+      return LCIter< T >(head_);
+    }
 
     void clear()
     {
