@@ -16,47 +16,54 @@ namespace kuznetsov {
   class List;
 
   template< class T >
-  class LIter {
+  class LCIter {
     friend class List< T >;
     Node< T >* curr;
   public:
-    LIter& operator++()
+    LCIter& operator++()
     {
       this->curr = this->curr->next;
       return this;
     }
-    LIter& operator++(int)
+    LCIter& operator++(int)
     {
-      LIter temp(*this);
+      LCIter temp(*this);
       ++(*this);
       return temp;
     }
-    LIter& operator--()
+    LCIter& operator--()
     {
       this->curr = this->curr->prev;
       return this;
     }
-    LIter& operator--(int)
+    LCIter& operator--(int)
     {
-      LIter temp(*this);
+      LCIter temp(*this);
       --(*this);
       return temp;
     }
-    T& operator*()
+    const T& operator*()
     {
       return curr->val;
     }
-    bool operator==(const LIter& y)
+    bool operator==(const LCIter& y)
     {
       return this->curr == y.curr;
     }
 
-    bool operator!=(const LIter& y)
+    bool operator!=(const LCIter& y)
     {
       return !(this == y);
     }
   };
 
+  template< class T >
+  class LIter : LCIter< T > {
+    T& operator*()
+    {
+      return curr->val;
+    }
+  };
 
 }
 
