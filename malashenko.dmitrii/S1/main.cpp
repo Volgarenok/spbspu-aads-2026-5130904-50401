@@ -7,31 +7,24 @@
 int main()
 {
   using namespace malashenko;
-  List< int > l;
-  std::cout << l.size() << '\n';
+  using pair_t = std::pair< std::string, List< int > >;
 
-  l.push_back(1);
-  
-  l.push_back(2);
-  l.push_front(3);
-  // std::cout << l.size() << '\n';
-
-  for (LIter< int > s = l.begin(); s != l.end(); ++s)
+  List< pair_t > data;
+  try
   {
-    std::cout << *s << '\n';
-  }
-
-  std::cout << '\n';
-  // l.erase(l.begin());
-  // l.erase(l.begin());
-  // l.erase(l.begin());
-
-  // l.pop_front();
-  // l.clear();
-  List< int > k = l;
-  k.push_back(4);
-  for (LIter< int > s = k.begin(); s != k.end(); ++s)
+    getData(std::cin, data);
+    if (data.empty())
+    {
+      std::cout << "0\n";
+      return 0;
+    }
+  } catch(const std::exception& e)
   {
-    std::cout << *s << '\n';
+    std::cerr << e.what() << '\n';
+    return 1;
   }
+  printSeqNames(std::cout, data);
+  List< int > sums;
+  printSeqsAndGetSums(std::cout, data, sums);
+  printSums(std::cout, sums);
 }

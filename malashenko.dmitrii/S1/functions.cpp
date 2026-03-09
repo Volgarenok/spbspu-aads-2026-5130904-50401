@@ -20,6 +20,12 @@ namespace malashenko
       in >> name;
       List< int > nums;
       size_t num;
+
+      if (in.eof())
+      {
+        break;
+      }
+
       if (!(in >> num))
       {
         res.push_back({name, nums});
@@ -45,17 +51,19 @@ namespace malashenko
     {
       maxSize = std::max(maxSize, (*s).second.size());
     }
-    maxSize = std::max(maxSize, list.back().second.size());
     return maxSize;
   }
 
   void printSeqNames(std::ostream& out, const List< pair_t >& list)
   {
-    for (LIter< pair_t > s = list.begin(); s != list.end(); ++s)
+    LIter< pair_t > s = list.begin();
+    out << (*s).first;
+    ++s;
+    for (; s != list.end(); ++s)
     {
-      out << (*s).first << ' ';
+      out << ' ' << (*s).first;
     }
-    out << list.back().first << '\n';
+    out << '\n';
   }
 
   void printSeqsAndGetSums(std::ostream& out, const List< pair_t >& list, List< int >& sums)
@@ -69,6 +77,7 @@ namespace malashenko
       {
         continue;
       }
+
       LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
 
       sum += *valNode;
@@ -86,32 +95,25 @@ namespace malashenko
         sum += *valNode;
         out << ' ' << *valNode;
       }
-
-      if (list.back().second.size() < curSize)
-      {
-        out << '\n';
-        sums.push_back(sum);
-        continue;
-      }
-
-      valNode = list.back().second.begin() + (curSize - 1);
-      out << ' ' << *valNode << '\n';
-      sum += *valNode;
+      out << '\n';
       sums.push_back(sum);
     }
   }
 
   void printSums(std::ostream& out, const List< int >& sums)
   {
-    if (!sums.size())
+    if (sums.empty())
     {
       return;
     }
 
-    for (LIter< int > s = sums.begin(); s != sums.end(); ++s)
+    LIter< int > s = sums.begin();
+    out << *s;
+    ++s;
+    for (; s != sums.end(); ++s)
     {
-      out << *s << ' ';
+      out << ' ' << *s;
     }
-    out << sums.back() << '\n';
+    out << '\n';
   }
 }
