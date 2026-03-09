@@ -275,7 +275,7 @@ namespace petrov
     }
     else
     {
-      throw;
+      return addStart(a);
     }
   }
 
@@ -291,7 +291,7 @@ namespace petrov
     }
     else
     {
-      throw;
+      return addStart(a);
     }
   }
 }
