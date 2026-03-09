@@ -319,6 +319,40 @@ namespace vasyakin
     fake_node->next = head;
   }
 
+  template< class T >
+  Node< T >* List< T >::insert(Node< T >* h, const T& value)
+  {
+    Node< T >* newNode = new Node< T >(value);
+    
+    if (fake_node->next == fake_node)
+    {
+      newNode->next = fake_node;
+      fake_node->next = newNode;
+    }
+    else
+    {
+      newNode->next = h->next;
+      h->next = newNode;
+    }
+    ++size;
+    return newNode;
+  }
+
+  template< class T >
+  Node< T >* List< T >::erase(Node< T >* h)
+  {
+    if (!fake_node || h == fake_node || h->next == fake_node)
+    {
+      return fake_node;
+    }
+    Node< T >* to_delete = h->next;
+    h->next = to_delete->next;
+    delete to_delete;
+    --size;
+    return h;
+  }
+
+
 }
 
 #endif
