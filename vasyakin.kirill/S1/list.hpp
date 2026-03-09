@@ -102,6 +102,18 @@ namespace vasyakin
     ptr(p)
   {}
 
+  template< class T >
+  T& LIter< T >::operator*() const
+  {
+    return ptr->val;
+  }
+
+  template< class T >
+  T* LIter< T >::operator->() const
+  {
+    return &(ptr->val);
+  }
+
 }
 
 #endif
