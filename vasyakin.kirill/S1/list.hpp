@@ -169,6 +169,21 @@ namespace vasyakin
     return &(ptr->val);
   }
 
+  template< class T >
+  LCIter< T >& LCIter< T >::operator++()
+  {
+    ptr = ptr->next;
+    return *this;
+  }
+
+  template< class T >
+  LCIter< T > LCIter< T >::operator++(int)
+  {
+    LCIter< T > tmp = *this;
+    ptr = ptr->next;
+    return tmp;
+  }
+
 }
 
 #endif
