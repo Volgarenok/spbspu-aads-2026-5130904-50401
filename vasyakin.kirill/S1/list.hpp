@@ -63,6 +63,40 @@ namespace vasyakin
     explicit Node(const T& value);
   };
 
+  template< class T >
+  class List
+  {
+  private:
+    Node< T >* fake_node;
+    size_t size;
+
+  public:
+    List();
+    ~List();
+    List(const List& other);
+    List(List&& other) noexcept;
+    List& operator=(const List& other);
+    List& operator=(List&& other) noexcept;
+    explicit List(const T& value);
+    
+    Node< T >* insert(Node< T >* h, const T& value);
+    Node< T >* erase(Node< T >* h);
+    Node< T >* push_back(const T& value);
+    
+    LIter< T > begin();
+    LIter< T > end();
+    LCIter< T > begin() const;
+    LCIter< T > end() const;
+    LCIter< T > cbegin() const;
+    LCIter< T > cend() const;
+    
+    void swap(List& other) noexcept;
+    size_t get_size() const;
+    Node< T >* get_fake();
+    Node< T >* get_first() const;
+    void clear();
+  };
+  
 }
 
 #endif
