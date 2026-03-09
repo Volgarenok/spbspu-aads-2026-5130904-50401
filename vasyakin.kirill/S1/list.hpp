@@ -141,6 +141,12 @@ namespace vasyakin
     return ptr != other.ptr;
   }
 
+  template< class T >
+  Node< T >* LIter< T >::get_ptr() const
+  {
+    return ptr;
+  }
+
 }
 
 #endif
