@@ -3,7 +3,6 @@
 
 #include <cstddef>
 #include <utility>
-#include <stdexcept>
 #include <limits>
 
 namespace vasyakin
@@ -78,25 +77,25 @@ namespace vasyakin
     List& operator=(const List& other);
     List& operator=(List&& other) noexcept;
     explicit List(const T& value);
-    
+
     Node< T >* insert(Node< T >* h, const T& value);
     Node< T >* erase(Node< T >* h);
     Node< T >* push_back(const T& value);
-    
+
     LIter< T > begin();
     LIter< T > end();
     LCIter< T > begin() const;
     LCIter< T > end() const;
     LCIter< T > cbegin() const;
     LCIter< T > cend() const;
-    
+
     void swap(List& other) noexcept;
     size_t get_size() const;
     Node< T >* get_fake();
     Node< T >* get_first() const;
     void clear();
   };
-  
+
   template< class T >
   LIter< T >::LIter(Node< T >* p):
     ptr(p)
@@ -113,7 +112,7 @@ namespace vasyakin
   {
     return &(ptr->val);
   }
-  
+
   template< class T >
   LIter< T >& LIter< T >::operator++()
   {
@@ -191,7 +190,7 @@ namespace vasyakin
   }
 
   template< class T >
-  bool LCIter< T >::operator!=(const LCIter& other) const 
+  bool LCIter< T >::operator!=(const LCIter& other) const
   {
     return ptr != other.ptr;
   }
@@ -207,7 +206,6 @@ namespace vasyakin
     val(value),
     next(nullptr)
   {}
-
 
   template< class T >
   List< T >::List():
@@ -228,6 +226,7 @@ namespace vasyakin
     delete fake_node;
     fake_node = nullptr;
   }
+
   template< class T >
   void List< T >::clear()
   {
@@ -240,7 +239,7 @@ namespace vasyakin
       size = 0;
       return;
     }
-    
+
     Node< T >* current = fake_node->next;
     while (current != fake_node)
     {
@@ -258,15 +257,15 @@ namespace vasyakin
   {
     fake_node = new Node< T >(T{});
     fake_node->next = fake_node;
-    
+
     if (other.fake_node->next == other.fake_node)
     {
       return;
     }
-    
+
     Node< T >* other_cur = other.fake_node->next;
     Node< T >* prev = fake_node;
-    
+
     while (other_cur != other.fake_node)
     {
       Node< T >* new_node = new Node< T >(other_cur->val);
@@ -323,7 +322,7 @@ namespace vasyakin
   Node< T >* List< T >::insert(Node< T >* h, const T& value)
   {
     Node< T >* newNode = new Node< T >(value);
-    
+
     if (fake_node->next == fake_node)
     {
       newNode->next = fake_node;

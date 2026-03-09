@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include <stdexcept>
 #include "list.hpp"
 
 int main()

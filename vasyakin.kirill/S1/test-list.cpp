@@ -17,18 +17,18 @@ BOOST_AUTO_TEST_CASE(ValConstructTest)
   BOOST_CHECK_EQUAL(*list.begin(), 52);
 }
 
-BOOST_AUTO_TEST_CASE(DestructEmptyList)
+BOOST_AUTO_TEST_CASE(DestructEmptyListTest)
 {
   vasyakin::List< int > list;
 }
 
-BOOST_AUTO_TEST_CASE(DestructSingleElem)
+BOOST_AUTO_TEST_CASE(DestructSingleElemTest)
 {
   vasyakin::List< int > list(52);
   BOOST_CHECK_EQUAL(list.get_size(), 1);
 }
 
-BOOST_AUTO_TEST_CASE(DestructMultElem)
+BOOST_AUTO_TEST_CASE(DestructMultElemTest)
 {
   vasyakin::List< int > list;
   for (size_t i = 0; i < 10; ++i)
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(DestructMultElem)
   BOOST_CHECK_EQUAL(list.get_size(), 10);
 }
 
-BOOST_AUTO_TEST_CASE(DestructAfterCopy)
+BOOST_AUTO_TEST_CASE(DestructAfterCopyTest)
 {
   vasyakin::List< int > list;
   list.push_back(1);
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(DestructAfterCopy)
   BOOST_CHECK_EQUAL(copy.get_size(), 2);
 }
 
-BOOST_AUTO_TEST_CASE(DestructAfterMove)
+BOOST_AUTO_TEST_CASE(DestructAfterMoveTest)
 {
   vasyakin::List< int > list;
   list.push_back(52);
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(DestructAfterMove)
   BOOST_CHECK_EQUAL(moved.get_size(), 1);
 }
 
-BOOST_AUTO_TEST_CASE(CopyConstruct)
+BOOST_AUTO_TEST_CASE(CopyConstructTest)
 {
   vasyakin::List< int > list;
   list.push_back(1);
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(CopyConstruct)
   BOOST_CHECK_EQUAL(*it, 52);
 }
 
-BOOST_AUTO_TEST_CASE(MoveConstruct)
+BOOST_AUTO_TEST_CASE(MoveConstructTest)
 {
   vasyakin::List< int > list;
   list.push_back(1);
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(MoveConstruct)
   BOOST_CHECK_EQUAL(moved.get_size(), 3);
 }
 
-BOOST_AUTO_TEST_CASE(CopyAssign)
+BOOST_AUTO_TEST_CASE(CopyAssignTest)
 {
   vasyakin::List< int > list1;
   list1.push_back(1);
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(CopyAssign)
   BOOST_CHECK_EQUAL(list1.get_size(), 2);
 }
 
-BOOST_AUTO_TEST_CASE(MoveAssign)
+BOOST_AUTO_TEST_CASE(MoveAssignTest)
 {
   vasyakin::List< int > list;
   list.push_back(1);
