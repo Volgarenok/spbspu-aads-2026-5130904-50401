@@ -308,8 +308,12 @@ namespace petrov
   template< class T >
   LIter< T > List< T >::getLast() noexcept
   {
+    if (fake->next == nullptr)
+    {
+      return end();
+    }
     LIter< T > it = begin();
-    while (it.hasNext())
+    while (it.next().nd != nullptr)
     {
       it = it.next();
     }
@@ -319,8 +323,12 @@ namespace petrov
   template< class T >
   LCIter< T > List< T >::getLast() const noexcept
   {
+    if (fake->next == nullptr)
+    {
+      return end();
+    }
     LCIter< T > it = begin();
-    while (it.hasNext())
+    while (it.next().nd != nullptr)
     {
       it = it.next();
     }
