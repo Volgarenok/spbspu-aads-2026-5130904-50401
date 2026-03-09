@@ -61,7 +61,7 @@ private:
 public:
   List();
   ~List();
-    
+
   void push_front(const T& value) noexcept;
   void pop_front() noexcept;
 
