@@ -202,6 +202,13 @@ namespace vasyakin
     return ptr;
   }
 
+  template< class T >
+  Node< T >::Node(const T& value):
+    val(value),
+    next(nullptr)
+  {}
+
+
 }
 
 #endif
