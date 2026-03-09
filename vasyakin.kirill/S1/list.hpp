@@ -403,6 +403,30 @@ namespace vasyakin
     return LCIter< T >(fake_node);
   }
 
+  template< class T >
+  void List< T >::swap(List& other) noexcept
+  {
+    std::swap(fake_node, other.fake_node);
+    std::swap(size, other.size);
+  }
+
+  template< class T >
+  size_t List< T >::get_size() const
+  {
+    return size;
+  }
+
+  template< class T >
+  Node< T >* List< T >::get_fake()
+  {
+    return fake_node;
+  }
+
+  template< class T >
+  Node< T >* List< T >::get_first() const
+  {
+    return fake_node->next;
+  }
 }
 
 #endif
