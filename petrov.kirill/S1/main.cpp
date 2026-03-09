@@ -94,7 +94,7 @@ int main()
       new_numbers_ptr->next = nullptr;
       if (data_ptr->val.second == nullptr)
       {
-        data_ptr->val.second->next = new_numbers_ptr;
+        data_ptr->val.second = new_numbers_ptr;
       }
       else
       {
@@ -102,6 +102,18 @@ int main()
       }
       numbers_ptr = new_numbers_ptr;
     }
+  }
+  petrov::List<std::pair<std::string, petrov::List<int>*>>* data_ptr_2 = &data;
+  while (data_ptr_2 != nullptr)
+  {
+    std::cout << data_ptr_2->val.first << "\n";
+    petrov::List<int>* numbers_ptr_2 = data_ptr_2->val.second;
+    while (numbers_ptr_2 != nullptr)
+    {
+      std::cout << numbers_ptr_2->val << "\n";
+      numbers_ptr_2 = numbers_ptr_2->next;
+    }
+    data_ptr_2 = data_ptr_2->next;
   }
 }
 
