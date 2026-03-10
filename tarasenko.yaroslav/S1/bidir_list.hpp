@@ -60,7 +60,7 @@ namespace tarasenko
   BidirList< T >::BidirList() :
     _head(nullptr),
     _tail(nullptr),
-    _size(1)
+    _size(0)
   {}
 
   template< class T >
@@ -122,13 +122,13 @@ namespace tarasenko
   template< class T >
   bool ListIter< T >::operator==(const ListIter< T >& it) const
   {
-    return ptr != it.ptr;
+    return ptr == it.ptr;
   }
 
   template< class T >
   bool ListConstIter< T >::operator==(const ListConstIter< T >& it) const
   {
-    return ptr != it.ptr;
+    return ptr == it.ptr;
   }
 }
 
