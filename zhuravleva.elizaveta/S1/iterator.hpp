@@ -62,4 +62,58 @@ public:
 
 
 
+template<class T>
+class LCIter
+{
+  friend class List<T>;
+
+private:
+  const Node<T>* current;
+
+public:
+
+  LCIter() noexcept:
+    current(nullptr)
+  {}
+
+  LCIter(const Node<T>* ptr) noexcept:
+    current(ptr)
+  {}
+
+  bool hasNext() const noexcept
+  {
+    return current != nullptr;
+  }
+
+  LCIter next() const
+  {
+    if(!current)
+    {
+      throw std::runtime_error("null iterator");
+    }
+    return LCIter(current->next);
+  }
+
+  const T& operator*() const
+  {
+    if(!current)
+    {
+      throw std::runtime_error("null iterator");
+    }
+    return current->data;
+  }
+
+  bool operator==(const LCIter& other) const noexcept
+  {
+    return current == other.current;
+  }
+
+  bool operator!=(const LCIter& other) const noexcept
+  {
+    return current != other.current;
+  }
+};
+
+
+
 #endif
