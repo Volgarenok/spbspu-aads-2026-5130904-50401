@@ -28,8 +28,8 @@ namespace malashenko
     bool operator!=(const LIter< T >& other) const;
     bool operator==(const LIter< T >& other) const;
   private:
-    friend class List< T >;
     LIter(Node< T >* other);
+    friend class List< T >;
     Node< T >* node_;
   };
 

@@ -154,9 +154,7 @@ namespace malashenko {
   template< class T >
   T& List< T >::back() const
   {
-    LIter< T > it(fake_->next);
-    it = it + s_;
-    return *it;
+    return fake_->prev->value_;
   }
 
   template< class T >
