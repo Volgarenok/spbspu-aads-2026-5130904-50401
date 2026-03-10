@@ -16,9 +16,6 @@ namespace chernov {
     LCIter(const Node< T > * node, const Node< T > * fake);
   public:
     LCIter();
-    bool hasNext() const noexcept;
-    LCIter< T > next() const;
-    const T & value() const;
     const T & operator*() const;
     const T * operator->() const;
     LCIter< T > & operator++();

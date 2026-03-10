@@ -16,9 +16,6 @@ namespace chernov {
     LIter(Node< T > * node, Node< T > * fake);
   public:
     LIter();
-    bool hasNext() const noexcept;
-    LIter< T > next() const;
-    T & value() const;
     T & operator*() const;
     T * operator->() const;
     LIter< T > & operator++();
