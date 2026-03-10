@@ -25,6 +25,8 @@ namespace tarasenko
     ListIter();
     bool operator==(const ListIter< T >& it) const;
     bool operator!=(const ListIter< T >& it) const;
+    T& operator*() const;
+    T* operator->() const;
   private:
     ListIter(Node< T >* node);
   };
@@ -38,6 +40,8 @@ namespace tarasenko
     ListConstIter();
     bool operator==(const ListConstIter< T >& it) const;
     bool operator!=(const ListConstIter< T >& it) const;
+    const T& operator*() const;
+    const T* operator->() const;
   private:
     ListConstIter(Node< T >* node);
   };
@@ -168,6 +172,30 @@ namespace tarasenko
       _tail = elem;
     }
     _size++;
+  }
+
+  template< class T >
+  T& ListIter< T >::operator*() const
+  {
+    return ptr->_val;
+  }
+
+  template< class T >
+  const T& ListConstIter< T >::operator*() const
+  {
+    return ptr->_val;
+  }
+
+  template< class T >
+  T* ListIter< T >:: operator->() const
+  {
+    return &ptr->_val;
+  }
+
+  template< class T >
+  const T* ListConstIter< T >:: operator->() const
+  {
+    return &ptr->_val;
   }
 }
 

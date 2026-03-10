@@ -21,3 +21,23 @@ BOOST_AUTO_TEST_CASE(adding_elems)
   BOOST_CHECK(list.begin() != list.end());
   BOOST_CHECK(list.cbegin() != list.cend());
 }
+
+BOOST_AUTO_TEST_CASE(dereference)
+{
+  tarasenko::BidirList< int > list;
+  list.push_back(5);
+  BOOST_CHECK(*(list.begin()) == 5);
+  BOOST_CHECK(*(list.cbegin()) == 5);
+}
+
+BOOST_AUTO_TEST_CASE(accessing_fields)
+{
+  struct Int
+  {
+    int a;
+  };
+  tarasenko::BidirList< Int > list;
+  list.push_back(Int{5});
+  BOOST_CHECK(list.begin()->a == 5);
+  BOOST_CHECK(list.cbegin()->a == 5);
+}
