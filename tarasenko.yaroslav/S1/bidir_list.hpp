@@ -24,6 +24,7 @@ namespace tarasenko
   public:
     ListIter();
     bool operator==(const ListIter< T >& it) const;
+    bool operator!=(const ListIter< T >& it) const;
   private:
     ListIter(Node< T >* node);
   };
@@ -36,6 +37,7 @@ namespace tarasenko
   public:
     ListConstIter();
     bool operator==(const ListConstIter< T >& it) const;
+    bool operator!=(const ListConstIter< T >& it) const;
   private:
     ListConstIter(Node< T >* node);
   };
@@ -54,6 +56,7 @@ namespace tarasenko
     ListConstIter< T > cbegin() const;
     ListIter< T > end();
     ListConstIter< T > cend() const;
+    void push_back(const T& val);
   };
 
   template< class T >
@@ -66,7 +69,13 @@ namespace tarasenko
   template< class T >
   BidirList< T >::~BidirList()
   {
-
+    Node< T >* current = _head;
+    while(current)
+    {
+      Node< T >* next = current->_next;
+      delete current;
+      current = next;
+    }
   }
 
   template< class T >
@@ -90,13 +99,13 @@ namespace tarasenko
    template< class T >
   ListIter< T > BidirList< T >::end()
   {
-    return ListIter< T >(_tail);
+    return ListIter< T >(nullptr);
   }
 
   template< class T >
   ListConstIter< T > BidirList< T >::cend() const
   {
-    return ListConstIter< T >(_tail);
+    return ListConstIter< T >(nullptr);
   }
 
   template< class T >
@@ -126,9 +135,39 @@ namespace tarasenko
   }
 
   template< class T >
+  bool ListIter< T >::operator!=(const ListIter< T >& it) const
+  {
+    return !(ptr == it.ptr);
+  }
+
+  template< class T >
   bool ListConstIter< T >::operator==(const ListConstIter< T >& it) const
   {
     return ptr == it.ptr;
+  }
+
+  template< class T >
+  bool ListConstIter< T >::operator!=(const ListConstIter< T >& it) const
+  {
+    return !(ptr == it.ptr);
+  }
+
+  template< class T >
+  void BidirList< T >::push_back(const T& val)
+  {
+    if (_size)
+    {
+      Node< T >* elem = new Node< T >{val, nullptr, _tail};
+      _tail->_next = elem;
+      _tail = elem;
+    }
+    else
+    {
+      Node< T >* elem = new Node< T >{val, nullptr, nullptr};
+      _head = elem;
+      _tail = elem;
+    }
+    _size++;
   }
 }
 
