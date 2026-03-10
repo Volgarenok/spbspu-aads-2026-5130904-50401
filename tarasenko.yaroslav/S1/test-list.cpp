@@ -59,3 +59,21 @@ BOOST_AUTO_TEST_CASE(increment)
   BOOST_CHECK(*(++cit) == 3);
   BOOST_CHECK(++cit == list.cend());
 }
+
+BOOST_AUTO_TEST_CASE(decrement)
+{
+  tarasenko::BidirList< int > list;
+  list.push_back(5);
+  list.push_back(2);
+  list.push_back(3);
+  tarasenko::ListIter< int > it = list.end();
+  tarasenko::ListConstIter< int > cit = list.cend();
+  BOOST_CHECK(*(--it) == 3);
+  BOOST_CHECK(*(it--) == 3);
+  BOOST_CHECK(*(it--) == 2);
+  BOOST_CHECK(it == list.begin());
+  BOOST_CHECK(*(--cit) == 3);
+  BOOST_CHECK(*(cit--) == 3);
+  BOOST_CHECK(*(cit--) == 2);
+  BOOST_CHECK(cit == list.cbegin());
+}
