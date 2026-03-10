@@ -1,8 +1,3 @@
 #include <iostream>
-#include "credentials.hpp"
 
-
-int main()
-{
-  levkin::out_credentials(std::cout) << "\n";
-}
+int main() { std::cout << "levkin dima" << "\n"; }
