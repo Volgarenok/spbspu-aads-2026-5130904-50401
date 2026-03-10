@@ -40,28 +40,6 @@ namespace chernov {
   {}
 
   template< class T >
-  bool LIter< T >::hasNext() const noexcept
-  {
-    return ptr != nullptr && ptr != fake_;
-  }
-
-  template< class T >
-  LIter< T > LIter< T >::next() const
-  {
-    Node< T > * next = ptr->next;
-    if (next == fake_) {
-      next = fake_->next;
-    }
-    return {next, fake_};
-  }
-
-  template< class T >
-  T & LIter< T >::value() const
-  {
-    return ptr->data;
-  }
-
-  template< class T >
   T & LIter< T >::operator*() const
   {
     return ptr->data;
