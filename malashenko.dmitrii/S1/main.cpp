@@ -7,7 +7,7 @@
 int main()
 {
   using namespace malashenko;
-  using pair_t = std::pair< std::string, List< int > >;
+  using pair_t = std::pair< std::string, List< size_t > >;
   List< pair_t > data;
   try
   {
@@ -24,12 +24,12 @@ int main()
   }
   printSeqNames(std::cout, data);
 
-  List< List< int > > res;
+  List< List< size_t > > res;
   try
   {
     getTransedSeq(res, data);
     printNewSeqs(std::cout, res);
-    List< int > sums;
+    List< size_t > sums;
     countSums(res, sums);
     if (sums.empty())
     {

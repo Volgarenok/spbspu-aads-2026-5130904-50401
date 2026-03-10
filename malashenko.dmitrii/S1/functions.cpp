@@ -10,15 +10,15 @@ namespace malashenko
   template< class T > class LCIter;
   template< class T > class List;
 
-  using pair_t = std::pair< std::string, List< int > >;
+  using pair_t = std::pair< std::string, List< size_t > >;
 
   void getData(std::istream& in, List< pair_t >& res)
   {
     std::string name;
     while ((in >> name))
     {
-      List< int > nums;
-      unsigned long long num;
+      List< size_t > nums;
+      size_t num;
       if (in.eof())
       {
         break;
@@ -65,30 +65,30 @@ namespace malashenko
     out << '\n';
   }
 
-  void getTransedSeq(List< List< int > >& res, const List< pair_t >& list)
+  void getTransedSeq(List< List< size_t > >& res, const List< pair_t >& list)
   {
     size_t maxSize = getMaxSeqSize(list);
     for (size_t curSize = 1; curSize < maxSize + 1; ++curSize)
     {
-      List< int > newSeq;
+      List< size_t > newSeq;
       for (LIter< pair_t > s = list.begin(); s != list.end(); ++s)
       {
         if ((*s).second.size() < curSize)
         {
           continue;
         }
-        LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
+        LIter< size_t > valNode = ((*s).second.begin()) + (curSize - 1);
         newSeq.push_back(*valNode);
       }
       res.push_back(newSeq);
     }
   }
 
-  void printNewSeqs(std::ostream& out, const List< List< int > >& list)
+  void printNewSeqs(std::ostream& out, const List< List< size_t > >& list)
   {
-    for (LIter< List< int > > outStart = list.begin(); outStart != list.end(); ++outStart)
+    for (LIter< List< size_t > > outStart = list.begin(); outStart != list.end(); ++outStart)
     {
-      LIter< int > inStart = (*outStart).begin();
+      LIter< size_t > inStart = (*outStart).begin();
       out << *inStart;
       ++inStart;
       for (; inStart != (*outStart).end(); ++inStart)
@@ -99,12 +99,12 @@ namespace malashenko
     }
   }
 
-  void countSums(const List< List< int > >& list, List< int >& sums)
+  void countSums(const List< List< size_t > >& list, List< size_t >& sums)
   {
-    for (LIter< List< int > > outStart = list.begin(); outStart != list.end(); ++outStart)
+    for (LIter< List< size_t > > outStart = list.begin(); outStart != list.end(); ++outStart)
     {
       size_t sum = 0;
-      for (LIter< int > inStart = (*outStart).begin(); inStart != (*outStart).end(); ++inStart)
+      for (LIter< size_t > inStart = (*outStart).begin(); inStart != (*outStart).end(); ++inStart)
       {
         sum = getCheckedSum(sum, *inStart);
       }
@@ -112,14 +112,14 @@ namespace malashenko
     }
   }
 
-  void printSums(std::ostream& out, const List< int >& sums)
+  void printSums(std::ostream& out, const List< size_t >& sums)
   {
     if (sums.empty())
     {
       return;
     }
 
-    LIter< int > s = sums.begin();
+    LIter< size_t > s = sums.begin();
     out << *s;
     ++s;
     for (; s != sums.end(); ++s)
