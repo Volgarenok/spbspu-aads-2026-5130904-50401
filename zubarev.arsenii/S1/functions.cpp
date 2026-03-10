@@ -46,7 +46,7 @@ namespace zubarev
 
   void output_names(List< Data >* list)
   {
-    LIter< Data > it = list->before_begin();
+    LIter< Data > it = list->begin();
     while (it != list->end()) {
       std::cout << (*it).name << ' ';
       ++it;
@@ -78,10 +78,18 @@ namespace zubarev
       LIter< Data > itList = list->begin();
       while (itList != list->end()) {
         LIter< int > itNums = (*itList).numbers.begin();
+        bool flag = true;
         for (size_t j = 0; j < i; ++j) {
-          ++itNums;
+          if (itNums != (*itList).numbers.end()) {
+            ++itNums;
+          } else {
+            flag = false;
+            break;
+          }
         }
-        std::cout << (*itNums) << " ";
+        if (flag && itNums != (*itList).numbers.end()) {
+          std::cout << (*itNums) << " ";
+        }
         ++itList;
       }
       std::cout << '\n';
@@ -95,10 +103,13 @@ namespace zubarev
       LIter< Data > itList = list->begin();
       while (itList != list->end()) {
         LIter< int > itNums = (*itList).numbers.begin();
-        for (size_t j = 0; j < i; ++j) {
+        for (size_t j = 0; j < i && itNums != (*itList).numbers.end(); ++j) {
           ++itNums;
         }
-        sum += (*itNums);
+        // sum += (*itNums);
+        if (itNums != (*itList).numbers.end()) {
+          sum += (*itNums);
+        }
         ++itList;
       }
 
