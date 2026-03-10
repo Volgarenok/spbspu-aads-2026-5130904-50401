@@ -138,6 +138,90 @@ namespace sedov
         return !(ptr_ == other.ptr_);
     }
   };
+
+  template< class T >
+  class List
+  {
+    Node< T > * head_;
+    Node< T > * tail_;
+    size_t size_;
+  public:
+    List():
+      head_(nullptr), tail_(nullptr), size_(0)
+    {}
+
+    List(const List & h):
+      List()
+    {
+      for (Node< T > * cur = h.head_; cur != nullptr; cur = cur->next_)
+      {
+        push_back(cur->val_);
+      }
+    }
+
+    List(List && h) noexcept:
+      head_(h.head_), tail_(h.tail_), size_(h.size_)
+    {
+      h.head_ = nullptr;
+      h.tail_ = nullptr;
+      h.size_ = 0;
+    }
+
+    ~List()
+    {
+      clear();
+    }
+
+    List & operator=(const List & h)
+    {
+      if (this != &h)
+      {
+        List temp(h);
+        swap(temp);
+      }
+      return *this;
+    }
+
+    LIter< T > begin()
+    {
+      return LIter< T >(head_);
+    }
+
+    LIter< T > end()
+    {
+      return LIter< T >(nullptr);
+    }
+
+    LCIter< T > cbegin() const
+    {
+      return LCIter< T >(head_);
+    }
+
+    LCIter< T > cend() const
+    {
+      return LCIter< T >(nullptr);
+    }
+
+    T & front()
+    {
+      return head_->val_;
+    }
+
+    const T & front() const
+    {
+      return head_->val_;
+    }
+
+    T & back()
+    {
+      return tail_->val_;
+    }
+
+    const T & back() const
+    {
+      return tail_->val_;
+    }
+  };
 }
 
 #endif
