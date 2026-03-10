@@ -51,7 +51,6 @@ namespace zhuravleva
 
 
 
-
   template<class T>
   Node<T>* List<T>::createFake()
   {
