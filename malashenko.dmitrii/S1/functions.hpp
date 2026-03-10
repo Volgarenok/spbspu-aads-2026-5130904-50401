@@ -16,7 +16,9 @@ namespace malashenko
   void getData(std::istream& in, List< pair_t >& res);
   size_t getMaxSeqSize(const List< pair_t >& list);
   void printSeqNames(std::ostream& out, const List< pair_t >& list);
-  void printSeqsAndGetSums(std::ostream& out, const List< pair_t >& list, List< int >& sums);
+  void getTransedSeq(List< List< int > >& res, const List< pair_t >& list);
+  void printNewSeqs(std::ostream& out, const List< List< int > >& list);
+  void countSums(const List< List< int > >& list, List< int >& sums);
   void printSums(std::ostream& out, const List< int >& sums);
 }
 

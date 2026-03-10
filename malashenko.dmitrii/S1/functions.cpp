@@ -15,46 +15,32 @@ namespace malashenko
   void getData(std::istream& in, List< pair_t >& res)
   {
     std::string name;
-    while (!in.eof())
+    while ((in >> name))
     {
-      in >> name;
       List< int > nums;
       unsigned long long num;
-
-
-
-      if (!(in >> num))
+      if (in.eof())
       {
-        if (in.eof())
-        {
-          break;
-        }
-        if (num > std::numeric_limits< int >::max())
-        {
-          throw std::overflow_error("Too big number");
-        }
-        res.push_back({name, nums});
-        in.clear(in.rdstate() ^ std::ios_base::failbit);
-        continue;
+        break;
       }
-
-      nums.push_back(static_cast< size_t >(num));
       while ((in >> num))
       {
-        if (num > std::numeric_limits< int >::max())
-        {
-          throw std::overflow_error("Too big number");
-        }
-        nums.push_back(static_cast< size_t >(num));
-      }
-      if (num > std::numeric_limits< int >::max())
-      {
-        throw std::overflow_error("Too big number");
+        nums.push_back(num);
       }
       pair_t p(name, nums);
       res.push_back(p);
-      in.clear(in.rdstate() ^ std::ios_base::failbit);
+      in.clear();
     }
+  }
+
+  size_t getCheckedSum(size_t a, size_t b)
+  {
+    const size_t max_st = std::numeric_limits< size_t >::max();
+    if (max_st - a > b)
+    {
+      return a + b;
+    }
+    throw std::overflow_error("overflow");
   }
 
   size_t getMaxSeqSize(const List< pair_t >& list)
@@ -79,38 +65,49 @@ namespace malashenko
     out << '\n';
   }
 
-  void printSeqsAndGetSums(std::ostream& out, const List< pair_t >& list, List< int >& sums)
+  void getTransedSeq(List< List< int > >& res, const List< pair_t >& list)
   {
     size_t maxSize = getMaxSeqSize(list);
     for (size_t curSize = 1; curSize < maxSize + 1; ++curSize)
     {
-      size_t sum = 0;
-      LIter< pair_t > s = list.begin();
-      if ((*s).second.size() >= curSize)
-      {
-        LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
-
-        sum += *valNode;
-        out << *valNode;
-        ++s;
-      }
-
-      for (; s != list.end(); ++s)
+      List< int > newSeq;
+      for (LIter< pair_t > s = list.begin(); s != list.end(); ++s)
       {
         if ((*s).second.size() < curSize)
         {
           continue;
         }
-
         LIter< int > valNode = ((*s).second.begin()) + (curSize - 1);
-        sum += *valNode;
-        if (curSize != maxSize)
-        {
-          out << ' ';
-        }
-        out << *valNode;
+        newSeq.push_back(*valNode);
+      }
+      res.push_back(newSeq);
+    }
+  }
+
+  void printNewSeqs(std::ostream& out, const List< List< int > >& list)
+  {
+    for (LIter< List< int > > outStart = list.begin(); outStart != list.end(); ++outStart)
+    {
+      LIter< int > inStart = (*outStart).begin();
+      out << *inStart;
+      ++inStart;
+      for (; inStart != (*outStart).end(); ++inStart)
+      {
+        out << ' ' << *inStart;
       }
       out << '\n';
+    }
+  }
+
+  void countSums(const List< List< int > >& list, List< int >& sums)
+  {
+    for (LIter< List< int > > outStart = list.begin(); outStart != list.end(); ++outStart)
+    {
+      size_t sum = 0;
+      for (LIter< int > inStart = (*outStart).begin(); inStart != (*outStart).end(); ++inStart)
+      {
+        sum = getCheckedSum(sum, *inStart);
+      }
       sums.push_back(sum);
     }
   }

@@ -8,7 +8,6 @@ int main()
 {
   using namespace malashenko;
   using pair_t = std::pair< std::string, List< int > >;
-
   List< pair_t > data;
   try
   {
@@ -20,25 +19,28 @@ int main()
     }
   } catch(const std::exception& e)
   {
-    std::cerr << e.what() << '\n';;
+    std::cerr << e.what() << '\n';
     return 1;
   }
   printSeqNames(std::cout, data);
 
-  List< int > sums;
+  List< List< int > > res;
   try
   {
-    printSeqsAndGetSums(std::cout, data, sums);
+    getTransedSeq(res, data);
+    printNewSeqs(std::cout, res);
+    List< int > sums;
+    countSums(res, sums);
     if (sums.empty())
     {
       std::cout << "0\n";
       return 0;
     }
+    printSums(std::cout, sums);
   } catch(const std::exception& e)
   {
     std::cerr << e.what() << '\n';
     return 1;
   }
-
-  printSums(std::cout, sums);
+  return 0;
 }
