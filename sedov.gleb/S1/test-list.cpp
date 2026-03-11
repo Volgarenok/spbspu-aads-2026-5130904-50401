@@ -6,7 +6,7 @@ BOOST_AUTO_TEST_SUITE(ListTests)
 BOOST_AUTO_TEST_CASE(DefConstructorTest)
 {
   sedov::List< int > list;
-  BOOST_CHECK_EQUAL(h.size(), 0);
+  BOOST_CHECK_EQUAL(list.size(), 0);
   BOOST_CHECK(list.begin() == list.end());
 }
 
@@ -68,8 +68,8 @@ BOOST_AUTO_TEST_CASE(DestructMultElemTest)
 BOOST_AUTO_TEST_CASE(DestructAfterCopyTest)
 {
   sedov::List< int > list1;
-  list.pushBack(1);
-  list.pushBack(2);
+  list1.pushBack(1);
+  list1.pushBack(2);
   sedov::List< int > list2(list);
   BOOST_CHECK_EQUAL(list1.size(), 2);
   BOOST_CHECK_EQUAL(list2.size(), 2);
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(DestructAfterCopyTest)
 BOOST_AUTO_TEST_CASE(DestructAfterMoveTest)
 {
   sedov::List< int > list1;
-  list.pushBack(52);
+  list1.pushBack(52);
   sedov::List< int > list2(std::move(list));
   BOOST_CHECK_EQUAL(list1.size(), 0);
   BOOST_CHECK_EQUAL(list2.size(), 1);
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(CopyAssignTest)
   list1.pushBack(1);
   list1.pushBack(2);
   sedov::List< int > list2;
-  lsit2.pushBack(3);
+  list2.pushBack(3);
   list2 = list1;
   BOOST_CHECK_EQUAL(list2.size(), 2);
   auto it = list2.begin();
@@ -135,11 +135,11 @@ BOOST_AUTO_TEST_CASE(PushFrontTest)
 BOOST_AUTO_TEST_CASE(PushBackTest)
 {
   sedov::List< int > list;
-  list.push_back(1);
+  list.pushBack(1);
   BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(*list.begin(), 1);
-  list.push_back(2);
-  list.push_back(3);
+  list.pushBack(2);
+  list.pushBack(3);
   BOOST_CHECK_EQUAL(list.size(), 3);
   auto it = list.begin();
   BOOST_CHECK_EQUAL(*it, 1);
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(PushBackTest)
   ++it;
   BOOST_CHECK(it == list.end());
   list.clear();
-  list.push_back(4);
+  list.pushBack(4);
   BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(*list.begin(), 4);
 }
@@ -287,8 +287,8 @@ BOOST_AUTO_TEST_CASE(SwapTest)
 BOOST_AUTO_TEST_CASE(ConstIterTest)
 {
   sedov::List< int > list;
-  list.push_back(1);
-  list.push_back(2);
+  list.pushBack(1);
+  list.pushBack(2);
   const sedov::List< int > & constList = list;
   auto cit = constList.cbegin();
   BOOST_CHECK_EQUAL(*cit, 1);
