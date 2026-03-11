@@ -10,7 +10,7 @@ namespace zubarev
   struct Data
   {
     std::string name;
-    List< int > numbers;
+    List< size_t > numbers;
   };
 }
 
