@@ -30,30 +30,40 @@ namespace zubarev
         }
 
         if (in >> num) {
-          if (num.size() < std::to_string(std::numeric_limits< size_t >::max()).size()) {
+          if (isdigit(num)) {
+            std::string maxStr = std::to_string(std::numeric_limits< size_t >::max());
 
-            if (isdigit(num)) {
+            if (num.size() < maxStr.size()) {
+
               nums.insert_after(itNum, to_size_t(num));
               ++itNum;
+            } else if (num.size() == maxStr.size()) {
+
+              if (num <= maxStr) {
+                nums.insert_after(itNum, to_size_t(num));
+                ++itNum;
+              } else {
+                error = true;
+                std::cerr << "input: number overflow" << '\n';
+                return List< Data >{};
+              }
             } else {
 
               error = true;
-              std::cerr << "input: incorrect input" << '\n';
+              std::cerr << "input: number overflow" << '\n';
               return List< Data >{};
             }
           } else {
             error = true;
-            std::cerr << "input: number overflow" << '\n';
+            std::cerr << "input: incorrect input" << '\n';
             return List< Data >{};
           }
-
         } else {
           error = true;
           std::cerr << "input: bad input" << '\n';
           return List< Data >{};
         }
       }
-
       value.numbers = nums;
       list.insert_after(itList, value);
       ++itList;
@@ -151,7 +161,7 @@ namespace zubarev
     const size_t maxSeq = max_sequences(list);
 
     if (maxSeq == 0) {
-      std::cout << "0\n";
+      std::cout << "0" << '\n';
       return 0;
     }
 
@@ -165,7 +175,11 @@ namespace zubarev
           ++itNums;
         }
         if (itNums != (*itList).numbers.end()) {
-          sum += (*itNums);
+          size_t value = (*itNums);
+          if (sum > std::numeric_limits< size_t >::max() - value) {
+            return 1;
+          }
+          sum += value;
         }
         ++itList;
       }
