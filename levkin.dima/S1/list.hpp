@@ -7,19 +7,28 @@ namespace levkin
     Node< T >*prev, *next;
   };
 
-  
-  
   template < class T > class List
   {
-    
+
   public:
-    Node<T> * begin(){
+    Node< T >* begin()
+    {
       return pseudo->next;
     }
-    Node <T> * end(){
+    
+    Node< T >* end()
+    {
       return pseudo;
     }
-    
+
+    void insertBack(T val)
+    {
+      Node< T >* lst = pseudo->prev;
+      Node< T >* newLst = new Node< T >{val, lst, pseudo};
+      lst->next = newLst;
+      pseudo->prev = newLst;
+    }
+
     List() : pseudo(new Node< T >())
     {
       pseudo->next = pseudo;
@@ -30,8 +39,7 @@ namespace levkin
     //   pseudo->next = pseudo;
     //   pseudo->prev = pseudo;
     // constructor through insertafter
-      
-      
+
     // }
 
   private:
