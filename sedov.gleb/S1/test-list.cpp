@@ -173,11 +173,11 @@ BOOST_AUTO_TEST_CASE(InsertTest)
   BOOST_CHECK_EQUAL(list.size(), 3);
   BOOST_CHECK_EQUAL(*it, 3);
   auto check = list.begin();
-  BOOST_CHECK_EQUAL(*it, 2);
-  ++it;
-  BOOST_CHECK_EQUAL(*it, 3);
-  ++it;
-  BOOST_CHECK_EQUAL(*it, 1);
+  BOOST_CHECK_EQUAL(*check, 2);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 3);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 1);
 }
 
 BOOST_AUTO_TEST_CASE(PopFrontTest)
