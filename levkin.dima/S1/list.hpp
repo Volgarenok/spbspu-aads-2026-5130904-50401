@@ -1,15 +1,26 @@
 template < class T > class List;
-namespace levkin {
+namespace levkin
+{
 
   template < class T > struct Node {
     T val;
     Node< T >*prev, *next;
   };
 
+  
+  
   template < class T > class List
   {
+    
+  public:
+    List() : pseudo(new Node< T >())
+    {
+      pseudo->next = pseudo;
+      pseudo->prev = pseudo;
+    }
+
   private:
-    Node< T >*head, *tail;
+    Node< T >* pseudo;
   };
 }
 
@@ -19,7 +30,6 @@ template < class T > class LIter
 
 public:
 };
-
 
 template < class T > class LCIter
 {
