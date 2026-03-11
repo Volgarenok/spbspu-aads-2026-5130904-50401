@@ -4,7 +4,7 @@
 
 namespace zubarev
 {
-  List< Data > input(std::istream& in)
+  List< Data > input(std::istream& in,bool& error)
   {
     List< Data > list;
     LIter< Data > itList = list.before_begin();
@@ -31,56 +31,61 @@ namespace zubarev
         if (in >> num) {
           nums.insert_after(itNum, num);
           ++itNum;
+
         } else {
-          throw std::runtime_error("input: invalid number format");
+          error=true;
+          std::cerr<<"input: bad input"<<'\n';
+          return List<Data>{};
         }
+
       }
 
       value.numbers = nums;
       list.insert_after(itList, value);
       ++itList;
     }
-
     return list;
   }
-  template <class T>
-  void output(std::ostream &out, T el, bool is_first)
+  template < class T >
+  void output(std::ostream& out, T el, bool is_first)
   {
-    if (is_first)
-    {
+    if (is_first) {
       out << el;
-    }
-    else
-    {
+    } else {
       out << " " << el;
     }
+
   }
 
-  void output_names(List< Data >* list)
+  int output_names(List< Data >* list)
   {
     if (!list) {
-      throw std::invalid_argument("outout_names: list pointer is nullptr");
-      ;
+      std::cerr<<"output_names: list pointer is nullptr"<<'\n';
+      return 1;
     }
     LIter< Data > it = list->begin();
-    bool is_first=true;
+    bool is_first = true;
     while (it != list->end()) {
-      output<std::string>(std::cout, (*it).name,is_first);
-      //std::cout<< (*it).name << ' ';
+      output< std::string >(std::cout, (*it).name, is_first);
+      is_first = false;
+      // std::cout<< (*it).name << ' ';
       ++it;
     }
     std::cout << '\n';
+
+    return 0;
   }
   size_t max_sequences(List< Data >* list)
   {
     if (!list) {
-      throw std::invalid_argument("max_sequences: list pointer is nullptr");
+      std::cerr<<"max_sequences: list pointer is nullptr";
+      return 0;
     }
     size_t maxNum = 0;
     LIter< Data > itList = list->begin();
     while (itList != list->end()) {
-      List< int > nums = (*itList).numbers;
-      LIter< int > itNums = nums.begin();
+      const List< int >& nums = (*itList).numbers;
+      LCIter< int > itNums = nums.begin();
       size_t count = 0;
       while (itNums != nums.end()) {
         count++;
@@ -91,13 +96,14 @@ namespace zubarev
     }
     return maxNum;
   }
-  void output_sequences(List< Data >* list)
+  int output_sequences(List< Data >* list)
   {
     if (!list) {
-      throw std::invalid_argument("output_sequences: list pointer is nullptr");
+      std::cerr<<"output_sequences: list pointer is nullptr";
+      return 1;
     }
     for (size_t i = 0; i < max_sequences(list); ++i) {
-      bool is_first=true;
+      bool is_first = true;
       LIter< Data > itList = list->begin();
       while (itList != list->end()) {
         LIter< int > itNums = (*itList).numbers.begin();
@@ -111,19 +117,25 @@ namespace zubarev
           }
         }
         if (flag && itNums != (*itList).numbers.end()) {
-          output<int>(std::cout,(*itNums),is_first);
-          is_first=false;
-          // std::cout << (*itNums) << " ";
+          output< int >(std::cout, (*itNums), is_first);
+          is_first = false;
+
         }
         ++itList;
       }
       std::cout << '\n';
+
     }
+    return 0;
   }
 
-  void output_sums(List< Data >* list)
+  int output_sums(List< Data >* list)
   {
-    bool has_value = false;
+    if (!list) {
+      std::cerr<<"output_sums: list pointer is nullptr";
+      return 1;
+    }
+
     for (size_t i = 0; i < max_sequences(list); ++i) {
       size_t sum = 0;
       LIter< Data > itList = list->begin();
@@ -135,18 +147,16 @@ namespace zubarev
         }
         if (itNums != (*itList).numbers.end()) {
           sum += (*itNums);
-          has_value=true;
+
         }
         ++itList;
       }
-    if (has_value) {
-      output<size_t>(std::cout,sum,i>0);
-    }
-    }
-    if (!has_value) {
-      std::cout << 0;
+
+      output< size_t >(std::cout, sum, i == 0);
 
     }
+    std::cout<<'\n';
+    return 0;
   }
 
 }

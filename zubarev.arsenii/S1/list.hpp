@@ -2,6 +2,7 @@
 #define LIST_HPP
 // #include "all.hpp"
 #include "iter.hpp"
+#include "c-iter.hpp"
 namespace zubarev
 {
   // template <class T>
@@ -43,8 +44,17 @@ namespace zubarev
 
     LIter< T > begin();
     LIter< T > before_begin();
-    void clear();
     LIter< T > end();
+
+    LCIter< T > begin() const;
+    LCIter< T > before_begin() const;
+    LCIter< T > end() const;
+
+    LCIter< T > cbegin() const;
+    LCIter< T > cbefore_begin() const;
+    LCIter< T > cend() const;
+
+    void clear();
     bool empty() const;
     void pop_front();
     void push_front(const T&);
@@ -83,14 +93,15 @@ namespace zubarev
       tmp = tmp->next;
       curOld = curOld->next;
     }
+    tmp->next=nullptr;
+
   }
 
   template < class T >
   List< T >::List(List< T >&& other) noexcept :
     head_(other.head_)
   {
-    other.head_->next = nullptr;
-  }
+  other.head_ = ctFake();  }
   template < class T >
   List< T >& List< T >::operator=(const List& other)
   {
@@ -106,6 +117,7 @@ namespace zubarev
       tmp = tmp->next;
       curOld = curOld->next;
     }
+    tmp->next=nullptr;
     return *this;
   }
 
@@ -138,6 +150,41 @@ namespace zubarev
   {
     return LIter< T >(nullptr);
   }
+
+  template < class T >
+  LCIter< T > List< T >::before_begin() const
+  {
+    return LCIter< T >(head_);
+  }
+  template < class T >
+  LCIter< T > List< T >::begin() const
+  {
+    return LCIter< T >(head_->next);
+  }
+
+  template < class T >
+  LCIter< T > List< T >::end() const
+  {
+    return LCIter< T >(nullptr);
+  }
+
+  template < class T >
+  LCIter< T > List< T >::cbefore_begin() const
+  {
+    return before_begin();
+  }
+  template < class T >
+  LCIter< T > List< T >::cbegin() const
+  {
+    return begin();
+  }
+
+  template < class T >
+  LCIter< T > List< T >::cend() const
+  {
+    return end();
+  }
+
 
   template < class T >
   void List< T >::clear()
@@ -186,7 +233,7 @@ namespace zubarev
   void List< T >::erase_after(LIter< T > it)
   {
     Node< T >* itNext = it.ptr->next;
-    it.ptr->next = itNext;
+    it.ptr->next = itNext->next;
     delete itNext;
   }
 }

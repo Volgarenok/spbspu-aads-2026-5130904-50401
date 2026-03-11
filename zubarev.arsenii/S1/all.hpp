@@ -2,6 +2,7 @@
 #define ALL_HPP
 
 #include "iter.hpp"
+#include "c-iter.hpp"
 #include "list.hpp"
 #include "functions.hpp"
 #include "data.hpp"
