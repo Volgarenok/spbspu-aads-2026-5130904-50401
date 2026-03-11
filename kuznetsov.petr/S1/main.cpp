@@ -24,6 +24,10 @@ int main()
     std::cin.clear();
   }
 
+  if (list.empty()) {
+    return 0;
+  }
+
   auto listBegin = list.cbegin();
   std::cout << (*listBegin).first;
   listBegin++;
@@ -42,7 +46,7 @@ int main()
   } while (listBegin != list.cbegin());
 
   if (countRows == 0) {
-    std::cerr << "0\n";
+    std::cout << "0\n";
     return 0;
   }
 
