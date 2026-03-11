@@ -72,6 +72,7 @@ int main()
         }
         std::cout << *it;
         if (MAX - *it < + *sumIt) {
+          std::cout << '\n';
           std::cerr << "Overflow\n";
           return 1;
         }
