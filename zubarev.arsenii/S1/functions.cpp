@@ -34,7 +34,7 @@ namespace zubarev
 
         } else {
           error=true;
-          std::cerr<<"input: bad input"<<'\n';
+          std::cerr<<"input: number overflow"<<'\n';
           return List<Data>{};
         }
 
@@ -68,7 +68,6 @@ namespace zubarev
     while (it != list->end()) {
       output< std::string >(std::cout, (*it).name, is_first);
       is_first = false;
-      // std::cout<< (*it).name << ' ';
       ++it;
     }
     std::cout << '\n';
@@ -136,7 +135,15 @@ namespace zubarev
       return 1;
     }
 
-    for (size_t i = 0; i < max_sequences(list); ++i) {
+
+    const size_t maxSeq = max_sequences(list);
+
+  if (maxSeq == 0) {
+    std::cout << "0\n";
+    return 0;
+  }
+
+  for (size_t i = 0; i < maxSeq; ++i) {
       size_t sum = 0;
       LIter< Data > itList = list->begin();
 
