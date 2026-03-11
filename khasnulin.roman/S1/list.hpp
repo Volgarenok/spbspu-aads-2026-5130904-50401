@@ -118,102 +118,39 @@ namespace khasnulin
   template < class T > class BiList
   {
   public:
-    BiList() noexcept
-    {
-    }
+    BiList() noexcept;
 
-    BiList(const BiList< T > &list)
-    {
-    }
-    BiList(BiList< T > &&list) noexcept
-    {
-    }
+    BiList(const BiList< T > &list);
+    BiList(BiList< T > &&list) noexcept;
 
-    ~BiList() noexcept
-    {
-    }
+    ~BiList() noexcept;
 
-    BiList< T > &operator=(const BiList< T > &list)
-    {
-      return *(new BiList< T >());
-    }
-    BiList< T > &operator=(BiList< T > &&list) noexcept
-    {
-      return *(new BiList< T >());
-    }
+    BiList< T > &operator=(const BiList< T > &list);
+    BiList< T > &operator=(BiList< T > &&list) noexcept;
+    LIter< T > begin() noexcept;
+    LCIter< T > begin() const noexcept;
+    LCIter< T > cbegin() const noexcept;
 
-    LIter< T > begin() noexcept
-    {
-      return LIter< T >();
-    }
-    LCIter< T > begin() const noexcept
-    {
-      return LCIter< T >();
-    }
-    LCIter< T > cbegin() const noexcept
-    {
-      return LCIter< T >();
-    }
+    LIter< T > end() noexcept;
+    LCIter< T > end() const noexcept;
+    LCIter< T > cend() noexcept;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
-    LIter< T > end() noexcept
-    {
-      return LIter< T >();
-    }
-    LCIter< T > end() const noexcept
-    {
-      return LCIter< T >();
-    }
-    LCIter< T > cend() noexcept
-    {
-      return LCIter< T >();
-    }
+    LIter< T > insert(LCIter< T > pos, const T &val);
+    LIter< T > insert(LCIter< T > pos, T &&val);
 
-    bool empty() const noexcept
-    {
-      return false;
-    }
-    size_t size() const noexcept
-    {
-      return -1;
-    }
+    void push_back(const T &val);
+    void push_back(T &&val);
 
-    LIter< T > insert(LCIter< T > pos, const T &val)
-    {
-    }
-    LIter< T > insert(LCIter< T > pos, T &&val)
-    {
-    }
-
-    void push_back(const T &val)
-    {
-    }
-    void push_back(T &&val)
-    {
-    }
-
-    void clear() noexcept
-    {
-    }
+    void clear() noexcept;
     void erase(LCIter< T > pos);
     void erase(LCIter< T > begin, LCIter< T > end);
 
-    T &front()
-    {
-      return *(new T());
-    }
-    const T &front() const
-    {
-      return T();
-    }
-
-    T &back()
-    {
-      return *(new T());
-    }
-    const T &back() const
-    {
-      return T();
-    }
+    T &front();
+    const T &front() const;
+    T &back();
+    const T &back() const;
 
     // TODO: to the future version
     template < class... Args > LIter< T > emplace(LCIter< T > pos, Args &&...args);
@@ -229,7 +166,6 @@ namespace khasnulin
       LNode< K > *prev;
     };
     LNode< T > *h_;
-    LNode< T > *t_;
     size_t s_;
   };
 
@@ -237,6 +173,107 @@ namespace khasnulin
   {
     return os << "LIter";
   }
+}
+template < class T > khasnulin::BiList< T >::BiList() noexcept
+{
+}
+
+template < class T > khasnulin::BiList< T >::BiList(const BiList< T > &list)
+{
+}
+template < class T > khasnulin::BiList< T >::BiList(BiList< T > &&list) noexcept
+{
+}
+
+template < class T > khasnulin::BiList< T >::~BiList() noexcept
+{
+}
+
+template < class T > khasnulin::BiList< T > &khasnulin::BiList< T >::operator=(const BiList< T > &list)
+{
+  return *(new BiList< T >());
+}
+
+template < class T > khasnulin::BiList< T > &khasnulin::BiList< T >::operator=(BiList< T > &&list) noexcept
+{
+  return *(new BiList< T >());
+}
+
+template < class T > khasnulin::LIter< T > khasnulin::BiList< T >::begin() noexcept
+{
+  return LIter< T >();
+}
+template < class T > khasnulin::LCIter< T > khasnulin::BiList< T >::begin() const noexcept
+{
+  return LCIter< T >();
+}
+template < class T > khasnulin::LCIter< T > khasnulin::BiList< T >::cbegin() const noexcept
+{
+  return LCIter< T >();
+}
+
+template < class T > khasnulin::LIter< T > khasnulin::BiList< T >::end() noexcept
+{
+  return LIter< T >();
+}
+template < class T > khasnulin::LCIter< T > khasnulin::BiList< T >::end() const noexcept
+{
+  return LCIter< T >();
+}
+template < class T > khasnulin::LCIter< T > khasnulin::BiList< T >::cend() noexcept
+{
+  return LCIter< T >();
+}
+
+template < class T > bool khasnulin::BiList< T >::empty() const noexcept
+{
+  return false;
+}
+template < class T > size_t khasnulin::BiList< T >::size() const noexcept
+{
+  return -1;
+}
+
+template < class T > khasnulin::LIter< T > khasnulin::BiList< T >::insert(LCIter< T > pos, const T &val)
+{
+}
+template < class T > khasnulin::LIter< T > khasnulin::BiList< T >::insert(LCIter< T > pos, T &&val)
+{
+}
+
+template < class T > void khasnulin::BiList< T >::push_back(const T &val)
+{
+}
+template < class T > void khasnulin::BiList< T >::push_back(T &&val)
+{
+}
+
+template < class T > void khasnulin::BiList< T >::clear() noexcept
+{
+}
+template < class T > void khasnulin::BiList< T >::erase(LCIter< T > pos)
+{
+}
+template < class T > void khasnulin::BiList< T >::erase(LCIter< T > begin, LCIter< T > end)
+{
+}
+
+template < class T > T &khasnulin::BiList< T >::front()
+{
+  return *(new T());
+}
+template < class T > const T &khasnulin::BiList< T >::front() const
+{
+  return T();
+}
+
+template < class T > T &khasnulin::BiList< T >::back()
+{
+  return *(new T());
+}
+template < class T > const T &khasnulin::BiList< T >::back() const
+{
+  return T();
 }
 
 #endif
