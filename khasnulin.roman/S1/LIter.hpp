@@ -27,8 +27,8 @@ namespace khasnulin
 
   private:
     LIter(const LNode< T > *node);
-
     LNode< T > *curr_;
+    bool is_end_;
   };
 
   template < class T > LIter< T >::LIter() noexcept

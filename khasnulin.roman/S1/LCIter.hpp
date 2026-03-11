@@ -29,8 +29,8 @@ namespace khasnulin
 
   private:
     LCIter(const LNode< T > *node);
-
     const LNode< T > *curr_;
+    bool is_end_;
   };
 
   template < class T > LCIter< T >::LCIter() noexcept
