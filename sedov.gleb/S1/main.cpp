@@ -77,4 +77,62 @@ int main()
       transpose.pushBack(std::move(newSeq));
     }
   }
+
+  if (hasNum)
+  {
+    for (auto tit = transpose.begin(); tit != transpose.end(); ++tit)
+    {
+      bool f = true;
+      for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)
+      {
+        if (!f)
+        {
+          std::cout << " ";
+        }
+        std::cout << *nit;
+        f = false;
+      }
+      std::cout << "\n";
+    }
+
+    sedov::List< size_t > sums;
+    for (auto tit = transpose.cbegin(); tit != transpose.cend(); ++tit)
+    {
+      size_t sum = 0;
+      try
+      {
+        for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)
+        {
+          if (sum > sedov::MAX - *nit)
+          {
+            throw std::overflow_error("Sum overflow");
+          }
+          sum += *nit;
+        }
+      }
+      catch (const std::overflow_error & e)
+      {
+        std::cerr << e.what() << "\n";
+        return 1;
+      }
+      sums.pushBack(sum);
+    }
+
+    bool f = true;
+    for (auto sit = sums.begin(); sit != sums.end(); ++sit)
+    {
+      if (!f)
+      {
+        std::cout << " ";
+      }
+      std::cout << *sit;
+      f = false;
+    }
+    std::cout << "\n";
+  }
+  else
+  {
+    std::cout << "0\n";
+  }
+  return 0;
 }
