@@ -43,6 +43,18 @@ namespace zubarev
 
     return list;
   }
+  template <class T>
+  void output(std::ostream &out, T el, bool is_first)
+  {
+    if (is_first)
+    {
+      out << el;
+    }
+    else
+    {
+      out << " " << el;
+    }
+  }
 
   void output_names(List< Data >* list)
   {
@@ -51,8 +63,10 @@ namespace zubarev
       ;
     }
     LIter< Data > it = list->begin();
+    bool is_first=true;
     while (it != list->end()) {
-      std::cout << (*it).name << ' ';
+      output<std::string>(std::cout, (*it).name,is_first);
+      //std::cout<< (*it).name << ' ';
       ++it;
     }
     std::cout << '\n';
@@ -83,7 +97,7 @@ namespace zubarev
       throw std::invalid_argument("output_sequences: list pointer is nullptr");
     }
     for (size_t i = 0; i < max_sequences(list); ++i) {
-
+      bool is_first=true;
       LIter< Data > itList = list->begin();
       while (itList != list->end()) {
         LIter< int > itNums = (*itList).numbers.begin();
@@ -97,7 +111,9 @@ namespace zubarev
           }
         }
         if (flag && itNums != (*itList).numbers.end()) {
-          std::cout << (*itNums) << " ";
+          output<int>(std::cout,(*itNums),is_first);
+          is_first=false;
+          // std::cout << (*itNums) << " ";
         }
         ++itList;
       }
@@ -123,13 +139,12 @@ namespace zubarev
         }
         ++itList;
       }
-    if (has_value)
-    {
-      std::cout<< sum << " ";
+    if (has_value) {
+      output<size_t>(std::cout,sum,i>0);
     }
     }
     if (!has_value) {
-      std::cout << 0 << " ";
+      std::cout << 0;
 
     }
   }
