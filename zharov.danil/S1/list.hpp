@@ -75,6 +75,123 @@ namespace zharov {
     size_t size();
   };
 
+  template< class T >
+  LIter< T >::LIter(Node< T > * node):
+    curr_(node)
+  {}
+
+  template< class T >
+  T & LIter< T >::operator*() const
+  {
+    return curr_->val_;
+  }
+
+  template< class T >
+  T * LIter< T >::operator->() const
+  {
+    return std::addressof(curr_->val_);
+  }
+
+  template< class T >
+  LIter< T > & LIter< T >::operator++()
+  {
+    curr_ = curr_->next_;
+    return *this;
+  }
+
+  template< class T >
+  LIter< T >  LIter< T >::operator++(int)
+  {
+    LIter< T > temp = *this;
+    curr_ = curr_->next_;
+    return temp;
+  }
+
+  template< class T >
+  LIter< T > & LIter< T >::operator--()
+  {
+    curr_ = curr_->prev_;
+    return *this;
+  }
+
+  template< class T >
+  LIter< T > LIter< T >::operator--(int)
+  {
+    LIter< T > temp = *this;
+    curr_ = curr_->prev_;
+    return temp;
+  }
+
+  template< class T >
+  bool LIter< T >::operator==(const LIter & it) const
+  {
+    return curr_ == it.curr_;
+  }
+
+  template< class T >
+  bool LIter< T >::operator!=(const LIter & it) const
+  {
+    return curr_ != it.curr_;
+  }
+
+    template< class T >
+  LCIter< T >::LCIter(const Node< T > * node):
+    curr_(node)
+  {}
+
+  template< class T >
+  const T & LCIter< T >::operator*() const
+  {
+    return curr_->val_;
+  }
+
+  template< class T >
+  const T * LCIter< T >::operator->() const
+  {
+    return std::addressof(curr_->val_);
+  }
+
+  template< class T >
+  LCIter< T > & LCIter< T >::operator++()
+  {
+    curr_ = curr_->next_;
+    return *this;
+  }
+
+  template< class T >
+  LCIter< T >  LCIter< T >::operator++(int)
+  {
+    LCIter< T > temp = *this;
+    curr_ = curr_->next_;
+    return temp;
+  }
+
+  template< class T >
+  LCIter< T > & LCIter< T >::operator--()
+  {
+    curr_ = curr_->prev_;
+    return *this;
+  }
+
+  template< class T >
+  LCIter< T > LCIter< T >::operator--(int)
+  {
+    LCIter< T > temp = *this;
+    curr_ = curr_->prev_;
+    return temp;
+  }
+
+  template< class T >
+  bool LCIter< T >::operator==(const LCIter & it) const
+  {
+    return curr_ == it.curr_;
+  }
+
+  template< class T >
+  bool LCIter< T >::operator!=(const LCIter & it) const
+  {
+    return curr_ != it.curr_;
+  }
 }
 
 #endif
