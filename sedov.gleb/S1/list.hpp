@@ -51,7 +51,7 @@ namespace sedov
       return *this;
     }
 
-    LIter operator++()
+    LIter operator++(int)
     {
       LIter temp = *this;
       ptr_ = ptr_->next_;
@@ -64,7 +64,7 @@ namespace sedov
       return *this;
     }
 
-    LIter operator--()
+    LIter operator--(int)
     {
       LIter temp = *this;
       ptr_ = ptr_->prev_;
