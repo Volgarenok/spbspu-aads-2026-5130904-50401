@@ -37,4 +37,44 @@ int main()
     ++seq_it;
   }
   std::cout << "\n";
+
+  size_t maxLen = 0;
+  for (auto it = sequnces.cbegin(); it != sequnces.cend(); ++it)
+  {
+    size_t len = 0;
+    for (auto nit = it->second.cbegin(); nit != it->second.cend(); ++nit)
+    {
+      ++len;
+    }
+    if (len > maxLen)
+    {
+      maxLen = len;
+    }
+  }
+
+  sedov::List< sedov::List< size_t > > transpose;
+  bool hasNum = false;
+  for (size_t pos = 0; pos < maxLen; ++pos)
+  {
+    sedov::List< size_t > newSeq;
+    for (auto sit = sequnces.cbegin(); sit != sequnces.cend(); ++sit)
+    {
+      auto nit = sit->second.cbegin();
+      size_t cur = 0;
+      while (cur < pos && nit != sit->second.cend())
+      {
+        ++cur;
+        ++nit;
+      }
+      if (nit != sit->second.cend())
+      {
+        newSeq.pushBack(*nit);
+        hasNum = true;
+      }
+    }
+    if (newSeq.begin() != newSeq.end())
+    {
+      transpose.pushBack(std::move(newSeq));
+    }
+  }
 }
