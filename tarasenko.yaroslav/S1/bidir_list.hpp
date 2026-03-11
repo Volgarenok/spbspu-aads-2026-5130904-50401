@@ -75,6 +75,8 @@ namespace tarasenko
     void push_back(const T& val);
     void push_front(const T& val);
     bool empty();
+    T& front();
+    T& back();
   };
 
   template< class T >
@@ -318,6 +320,17 @@ namespace tarasenko
   bool BidirList< T >::empty()
   {
     return !_size;
+  }
+
+  template< class T >
+  T& BidirList< T >::front()
+  {
+    return _head->_val;
+  }
+  template< class T >
+  T& BidirList< T >::back()
+  {
+    return _tail->_val;
   }
 }
 

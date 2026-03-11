@@ -106,3 +106,14 @@ BOOST_AUTO_TEST_CASE(empty)
   list.push_front(5);
   BOOST_CHECK(list.empty() == false);
 }
+
+BOOST_AUTO_TEST_CASE(accessint_edge_elems)
+{
+  tarasenko::BidirList< int > list;
+  list.push_back(5);
+  BOOST_CHECK(list.front() == 5);
+  BOOST_CHECK(list.back() == 5);
+  list.push_back(2);
+  BOOST_CHECK(list.front() == 5);
+  BOOST_CHECK(list.back() == 2);
+}
