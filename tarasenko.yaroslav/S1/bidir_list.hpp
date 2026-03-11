@@ -73,6 +73,8 @@ namespace tarasenko
     ListIter< T > end();
     ListConstIter< T > cend() const;
     void push_back(const T& val);
+    void push_front(const T& val);
+    bool empty();
   };
 
   template< class T >
@@ -292,6 +294,30 @@ namespace tarasenko
     ListConstIter< T > copy(*this);
     ptr = ptr->_prev;
     return copy;
+  }
+
+  template< class T >
+  void BidirList< T >::push_front(const T& val)
+  {
+    if (_size)
+    {
+      Node< T >* elem = new Node< T >{val, _head, nullptr};
+      _head->_prev = elem;
+      _head = elem;
+    }
+    else
+    {
+      Node< T >* elem = new Node< T >{val, nullptr, nullptr};
+      _head = elem;
+      _tail = elem;
+    }
+    _size++;
+  }
+
+  template< class T >
+  bool BidirList< T >::empty()
+  {
+    return !_size;
   }
 }
 
