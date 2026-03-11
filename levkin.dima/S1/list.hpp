@@ -34,12 +34,21 @@ namespace levkin
       pseudo->next = pseudo;
       pseudo->prev = pseudo;
     }
-    
+
     List(T val) : List()
     {
       insertBack(val);
     }
-
+    
+    ~List() {
+      Node<T> * curr = pseudo->next;
+      while (curr != pseudo) {
+        Node<T>* nxt = curr -> next;
+        delete curr;
+        curr = nxt;
+      }
+      delete pseudo;
+    }
   private:
     Node< T >* pseudo;
   };
