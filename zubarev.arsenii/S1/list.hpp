@@ -93,15 +93,15 @@ namespace zubarev
       tmp = tmp->next;
       curOld = curOld->next;
     }
-    tmp->next=nullptr;
-
+    tmp->next = nullptr;
   }
 
   template < class T >
   List< T >::List(List< T >&& other) noexcept :
     head_(other.head_)
   {
-  other.head_ = ctFake();  }
+    other.head_ = ctFake();
+  }
   template < class T >
   List< T >& List< T >::operator=(const List& other)
   {
@@ -117,7 +117,7 @@ namespace zubarev
       tmp = tmp->next;
       curOld = curOld->next;
     }
-    tmp->next=nullptr;
+    tmp->next = nullptr;
     return *this;
   }
 
@@ -184,7 +184,6 @@ namespace zubarev
   {
     return end();
   }
-
 
   template < class T >
   void List< T >::clear()

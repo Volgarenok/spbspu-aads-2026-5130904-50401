@@ -5,7 +5,7 @@
 
 namespace zubarev
 {
-  List< Data > input(std::istream& in,bool& error)
+  List< Data > input(std::istream& in, bool& error)
   {
     List< Data > list;
     LIter< Data > itList = list.before_begin();
@@ -14,7 +14,7 @@ namespace zubarev
     while (in >> value.name) {
       List< int > nums;
       LIter< int > itNum = nums.before_begin();
-      size_t num;
+      std::string num;
 
       while (true) {
 
@@ -30,20 +30,26 @@ namespace zubarev
         }
 
         if (in >> num) {
-          if (num>std::numeric_limits<int>::max()) {
-            error=true;
-            std::cerr<<"input: number overflow"<<'\n';
-            return List<Data>{};
+          if (num.size() <= std::to_string(std::numeric_limits< size_t >::max()).size()) {
+            if (isdigit(num)) {
+              nums.insert_after(itNum, to_size_t(num));
+              ++itNum;
+            } else {
+              error = true;
+              std::cerr << "input: incorrect input" << '\n';
+              return List< Data >{};
+            }
+          } else {
+            error = true;
+            std::cerr << "input: number overflow" << '\n';
+            return List< Data >{};
           }
-          nums.insert_after(itNum, num);
-          ++itNum;
 
         } else {
-          error=true;
-          std::cerr<<"input: number overflow"<<'\n';
-          return List<Data>{};
+          error = true;
+          std::cerr << "input: bad input" << '\n';
+          return List< Data >{};
         }
-
       }
 
       value.numbers = nums;
@@ -60,13 +66,12 @@ namespace zubarev
     } else {
       out << " " << el;
     }
-
   }
 
   int output_names(List< Data >* list)
   {
     if (!list) {
-      std::cerr<<"output_names: list pointer is nullptr"<<'\n';
+      std::cerr << "output_names: list pointer is nullptr" << '\n';
       return 1;
     }
     LIter< Data > it = list->begin();
@@ -77,8 +82,7 @@ namespace zubarev
       ++it;
     }
     if (!list->empty()) {
-          std::cout << '\n';
-
+      std::cout << '\n';
     }
 
     return 0;
@@ -86,7 +90,7 @@ namespace zubarev
   size_t max_sequences(List< Data >* list)
   {
     if (!list) {
-      std::cerr<<"max_sequences: list pointer is nullptr";
+      std::cerr << "max_sequences: list pointer is nullptr";
       return 0;
     }
     size_t maxNum = 0;
@@ -107,7 +111,7 @@ namespace zubarev
   int output_sequences(List< Data >* list)
   {
     if (!list) {
-      std::cerr<<"output_sequences: list pointer is nullptr";
+      std::cerr << "output_sequences: list pointer is nullptr";
       return 1;
     }
     for (size_t i = 0; i < max_sequences(list); ++i) {
@@ -127,12 +131,10 @@ namespace zubarev
         if (flag && itNums != (*itList).numbers.end()) {
           output< int >(std::cout, (*itNums), is_first);
           is_first = false;
-
         }
         ++itList;
       }
       std::cout << '\n';
-
     }
     return 0;
   }
@@ -140,19 +142,18 @@ namespace zubarev
   int output_sums(List< Data >* list)
   {
     if (!list) {
-      std::cerr<<"output_sums: list pointer is nullptr";
+      std::cerr << "output_sums: list pointer is nullptr";
       return 1;
     }
 
-
     const size_t maxSeq = max_sequences(list);
 
-  if (maxSeq == 0) {
-    std::cout << "0\n";
-    return 0;
-  }
+    if (maxSeq == 0) {
+      std::cout << "0\n";
+      return 0;
+    }
 
-  for (size_t i = 0; i < maxSeq; ++i) {
+    for (size_t i = 0; i < maxSeq; ++i) {
       size_t sum = 0;
       LIter< Data > itList = list->begin();
 
@@ -163,16 +164,36 @@ namespace zubarev
         }
         if (itNums != (*itList).numbers.end()) {
           sum += (*itNums);
-
         }
         ++itList;
       }
 
       output< size_t >(std::cout, sum, i == 0);
-
     }
-    std::cout<<'\n';
+    std::cout << '\n';
     return 0;
   }
+  size_t to_size_t(const std::string& num)
+  {
+    size_t res = 0;
+    for (size_t i = 0; i < num.size(); ++i) {
 
+      res = res * 10 + static_cast< size_t >(num[i] - '0');
+    }
+    return res;
+  }
+  bool isdigit(const std::string& str)
+  {
+    if (str.empty()) {
+      return false;
+    }
+
+    for (size_t i = 0; i < str.size(); ++i) {
+      if (!std::isdigit(str[i])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
