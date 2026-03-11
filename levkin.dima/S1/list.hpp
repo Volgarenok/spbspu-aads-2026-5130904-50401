@@ -13,12 +13,26 @@ namespace levkin
   {
     
   public:
+    Node<T> * begin(){
+      return pseudo->next;
+    }
+    Node <T> * end(){
+      return pseudo;
+    }
+    
     List() : pseudo(new Node< T >())
     {
       pseudo->next = pseudo;
       pseudo->prev = pseudo;
     }
-    
+    // List(T val) : pseudo(new Node< T >())
+    // {
+    //   pseudo->next = pseudo;
+    //   pseudo->prev = pseudo;
+    // constructor through insertafter
+      
+      
+    // }
 
   private:
     Node< T >* pseudo;
