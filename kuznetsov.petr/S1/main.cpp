@@ -48,6 +48,12 @@ int main()
     return 1;
   }
 
+  auto sums = kuz::List<size_t>();
+  for (size_t i = 0; i < countRows; ++i) {
+    sums.insert(sums.end(), 0);
+  }
+
+  auto sumIt = sums.begin();
   for (size_t row = 0; row < countRows; ++row) {
     bool first = true;
     listBegin = list.cbegin();
@@ -62,14 +68,26 @@ int main()
           std::cout << ' ';
         }
         std::cout << *it;
+        *sumIt += *it;
         first = false;
       }
       listBegin++;
-    } while (listBegin != list.begin());
+    } while (listBegin != list.cbegin());
     std::cout << '\n';
+    ++sumIt;
   }
 
-
-
+  sumIt = sums.begin();
+  bool first = true;
+  do {
+    if (!first) {
+      std::cout << ' ';
+    }
+    std::cout << *sumIt;
+    first = false;
+    ++sumIt;
+  } while (sumIt != sums.begin());
+  std::cout << '\n';
+  return 0;
 }
 
