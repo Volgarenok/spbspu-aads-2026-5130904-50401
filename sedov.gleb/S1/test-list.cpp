@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(DestructAfterCopyTest)
   sedov::List< int > list1;
   list1.pushBack(1);
   list1.pushBack(2);
-  sedov::List< int > list2(list);
+  sedov::List< int > list2(list1);
   BOOST_CHECK_EQUAL(list1.size(), 2);
   BOOST_CHECK_EQUAL(list2.size(), 2);
 }
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(DestructAfterMoveTest)
 {
   sedov::List< int > list1;
   list1.pushBack(52);
-  sedov::List< int > list2(std::move(list));
+  sedov::List< int > list2(std::move(list1));
   BOOST_CHECK_EQUAL(list1.size(), 0);
   BOOST_CHECK_EQUAL(list2.size(), 1);
 }
@@ -297,7 +297,7 @@ BOOST_AUTO_TEST_CASE(ConstIterTest)
   ++cit;
   BOOST_CHECK(cit == constList.cend());
   BOOST_CHECK(constList.cbegin() != constList.cend());
-  auto cit2 = constList.begin();
+  auto cit2 = constList.cbegin();
   BOOST_CHECK_EQUAL(*cit2, 1);
   sedov::List< int > empty;
   BOOST_CHECK(empty.cbegin() == empty.cend());
