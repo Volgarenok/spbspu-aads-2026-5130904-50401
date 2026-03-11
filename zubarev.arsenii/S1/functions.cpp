@@ -1,6 +1,7 @@
 #include "all.hpp"
 #include <string>
 #include <iostream>
+#include <limits>
 
 namespace zubarev
 {
@@ -13,7 +14,7 @@ namespace zubarev
     while (in >> value.name) {
       List< int > nums;
       LIter< int > itNum = nums.before_begin();
-      int num;
+      size_t num;
 
       while (true) {
 
@@ -29,6 +30,11 @@ namespace zubarev
         }
 
         if (in >> num) {
+          if (num>std::numeric_limits<int>::max()) {
+            error=true;
+            std::cerr<<"input: number overflow"<<'\n';
+            return List<Data>{};
+          }
           nums.insert_after(itNum, num);
           ++itNum;
 
@@ -70,7 +76,10 @@ namespace zubarev
       is_first = false;
       ++it;
     }
-    std::cout << '\n';
+    if (!list->empty()) {
+          std::cout << '\n';
+
+    }
 
     return 0;
   }
