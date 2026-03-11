@@ -15,7 +15,7 @@ namespace levkin
     {
       return pseudo->next;
     }
-    
+
     Node< T >* end()
     {
       return pseudo;
@@ -34,13 +34,11 @@ namespace levkin
       pseudo->next = pseudo;
       pseudo->prev = pseudo;
     }
-    // List(T val) : pseudo(new Node< T >())
-    // {
-    //   pseudo->next = pseudo;
-    //   pseudo->prev = pseudo;
-    // constructor through insertafter
-
-    // }
+    
+    List(T val) : List()
+    {
+      insertBack(val);
+    }
 
   private:
     Node< T >* pseudo;
