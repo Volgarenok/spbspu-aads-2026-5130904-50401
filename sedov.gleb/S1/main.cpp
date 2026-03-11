@@ -21,4 +21,20 @@ int main()
     std::cin.clear();
     sequnces.pushBack(std::make_pair(str, std::move(numbers)));
   }
+
+  if (sequnces.begin() == sequnces.end())
+  {
+    std::cout << "0\n";
+    return 0;
+  }
+
+  auto seq_it = sequnces.begin();
+  std::cout << seq_it->first;
+  ++seq_it;
+  while (seq_it != sequnces.end())
+  {
+    std::cout << " " << seq_it->first;
+    ++seq_it;
+  }
+  std::cout << "\n";
 }
