@@ -38,7 +38,7 @@ namespace zhuravleva
 
     LIter< T > beforeStart();
 
-    void empty();
+    bool empty() const noexcept;
 
     void deleteStart() noexcept;
     void deleteEnd() noexcept;
@@ -49,6 +49,12 @@ namespace zhuravleva
     void clear() noexcept;
   };
 
+
+  template< class T >
+  bool List< T >::empty() const noexcept
+  {
+    return fake -> next == fake;
+  }
 
 
   template<class T>
@@ -75,7 +81,7 @@ namespace zhuravleva
   }
 
 
-    template<class T>
+  template<class T>
   List<T>::List(const List& other)
   {
     fake = createFake();
@@ -132,7 +138,7 @@ namespace zhuravleva
       delete fake;
 
       fake = other.fake;
-      other.fake = nullptr;
+      other.fake = createFake();
     }
 
     return *this;
@@ -201,16 +207,14 @@ namespace zhuravleva
   }
 
   template< class T >
-  void deleteAfter(LIter< T > pos)
+  void List<T>::deleteAfter(LIter< T > pos)
   {
-    Node< T >* head = fake;
-    if(head->next == pos)
+    if(pos.current && pos.current -> next != fake)
     {
-      Node< T >* tmp = head -> next;
-      head -> next = tmp -> next;
+      Node< T >* tmp = pos.current -> next;
+      pos.current -> next = tmp -> next;
       delete tmp;
     }
-    head = head -> next;
   }
 
   template<class T>
@@ -236,9 +240,9 @@ namespace zhuravleva
   template<class T>
   LIter<T> List<T>::addAfter(LIter<T> pos, const T& value)
   {
-    if(pos == end())
+    if(!pos.current)
     {
-      return AddStart(value);
+      throw std::runtime_error("invalid iterator");
     }
 
     Node<T>* node = new Node<T>(value, pos.current->next);
@@ -247,6 +251,11 @@ namespace zhuravleva
     return LIter<T>(node);
   }
 
+  template< class T >
+  LIter< T > List< T >::beforeStart()
+  {
+    return LIter< T >(fake);
+  }
 
   template<class T>
   void List<T>::clear() noexcept
