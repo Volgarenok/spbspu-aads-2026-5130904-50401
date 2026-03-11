@@ -1,65 +1,13 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
-#include <cstddef>
 #include <iostream>
+
+#include "LCIter.hpp"
+#include "LIter.hpp"
 
 namespace khasnulin
 {
-
-  template < class T > class BiList;
-
-  template < class T > struct LNode;
-
-  template < class T > class LIter
-  {
-  public:
-    LIter() noexcept;
-
-    LIter< T > &operator++();
-    LIter< T > operator++(int);
-
-    LIter< T > &operator--();
-    LIter< T > operator--(int);
-
-    bool operator==(const LIter< T > &it) const noexcept;
-    bool operator!=(const LIter< T > &it) const noexcept;
-
-    T &operator*();
-    T *operator->();
-    friend class BiList< T >;
-
-  private:
-    LIter(const LNode< T > *node);
-
-    LNode< T > *curr_;
-  };
-
-  template < class T > class LCIter
-  {
-  public:
-    LCIter() noexcept;
-    LCIter(const LIter< T > &it) noexcept;
-
-    LCIter< T > &operator++();
-    LCIter< T > operator++(int);
-
-    LCIter< T > &operator--();
-    LCIter< T > operator--(int);
-
-    bool operator==(const LCIter< T > &it) const noexcept;
-    bool operator!=(const LCIter< T > &it) const noexcept;
-
-    const T &operator*();
-    const T *operator->();
-
-    friend class BiList< T >;
-
-  private:
-    LCIter(const LNode< T > *node);
-
-    const LNode< T > *curr_;
-  };
 
   template < class T > class BiList
   {
@@ -222,90 +170,6 @@ namespace khasnulin
     return T();
   }
 
-  template < class T > LCIter< T >::LCIter() noexcept
-  {
-  }
-
-  template < class T > LCIter< T >::LCIter(const LIter< T > &it) noexcept
-  {
-  }
-
-  template < class T > LCIter< T > &LCIter< T >::operator++()
-  {
-    return *this;
-  }
-  template < class T > LCIter< T > LCIter< T >::operator++(int)
-  {
-    return *this;
-  }
-
-  template < class T > LCIter< T > &LCIter< T >::operator--()
-  {
-    return *this;
-  }
-
-  template < class T > LCIter< T > LCIter< T >::operator--(int)
-  {
-    return *this;
-  }
-
-  template < class T > bool LCIter< T >::operator==(const LCIter< T > &it) const noexcept
-  {
-    return false;
-  }
-  template < class T > bool LCIter< T >::operator!=(const LCIter< T > &it) const noexcept
-  {
-    return false;
-  }
-
-  template < class T > const T &LCIter< T >::operator*()
-  {
-    return *(new T());
-  }
-  template < class T > const T *LCIter< T >::operator->()
-  {
-    return new T();
-  }
-
-  template < class T > LIter< T >::LIter() noexcept
-  {
-  }
-
-  template < class T > LIter< T > &LIter< T >::operator++()
-  {
-    return *this;
-  }
-  template < class T > LIter< T > LIter< T >::operator++(int)
-  {
-    return *this;
-  }
-
-  template < class T > LIter< T > &LIter< T >::operator--()
-  {
-    return *this;
-  }
-  template < class T > LIter< T > LIter< T >::operator--(int)
-  {
-    return *this;
-  }
-
-  template < class T > bool LIter< T >::operator==(const LIter< T > &it) const noexcept
-  {
-    return false;
-  }
-  template < class T > bool LIter< T >::operator!=(const LIter< T > &it) const noexcept
-  {
-    return false;
-  }
-
-  template < class T > T &LIter< T >::operator*()
-  {
-    return *(new T());
-  }
-  template < class T > T *LIter< T >::operator->()
-  {
-    return new T();
-  }
 }
 
 #endif
