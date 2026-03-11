@@ -61,15 +61,18 @@ namespace zharov {
     LIter< T > end();
     LCIter< T > constBegin();
     LCIter< T > constEnd();
-    T & head();
-    const T & head() const;
-    T & tail();
-    const T & tail() const;
+    T & front();
+    const T & front() const;
+    T & back();
+    const T & back() const;
     void pushFront(const T & v);
     void pushBack(const T & v);
-
-
-
+    LIter< T > insert(LIter< T > pos, const T & v);
+    void popFront();
+    void popBack();
+    LIter< T > erase(LIter< T > pos);
+    void clear();
+    size_t size();
   };
 
 }
