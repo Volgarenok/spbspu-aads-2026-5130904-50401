@@ -5,7 +5,7 @@ BOOST_AUTO_TEST_SUITE(ListTests)
 
 BOOST_AUTO_TEST_CASE(DefConstructorTest)
 {
-  sedov::List< int > h;
+  sedov::List< int > list;
   BOOST_CHECK_EQUAL(h.size(), 0);
   BOOST_CHECK(list.begin() == list.end());
 }
@@ -50,8 +50,9 @@ BOOST_AUTO_TEST_CASE(DestructEmptyListTest)
 
 BOOST_AUTO_TEST_CASE(DestructSingleElemTest)
 {
-  sedov::List< int > list(1);
-  BOOST_CHECK_EQUAL(list.get_size(), 1);
+  sedov::List< int > list;
+  list.pushBack(1);
+  BOOST_CHECK_EQUAL(list.size(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(DestructMultElemTest)
@@ -59,28 +60,28 @@ BOOST_AUTO_TEST_CASE(DestructMultElemTest)
   sedov::List< int > list;
   for (size_t i = 0; i < 10; ++i)
   {
-    list.push_back(i);
+    list.pushBack(i);
   }
-  BOOST_CHECK_EQUAL(list.get_size(), 10);
+  BOOST_CHECK_EQUAL(list.size(), 10);
 }
 
 BOOST_AUTO_TEST_CASE(DestructAfterCopyTest)
 {
   sedov::List< int > list1;
-  list.push_back(1);
-  list.push_back(2);
+  list.pushBack(1);
+  list.pushBack(2);
   sedov::List< int > list2(list);
-  BOOST_CHECK_EQUAL(list1.get_size(), 2);
-  BOOST_CHECK_EQUAL(list2.get_size(), 2);
+  BOOST_CHECK_EQUAL(list1.size(), 2);
+  BOOST_CHECK_EQUAL(list2.size(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(DestructAfterMoveTest)
 {
   sedov::List< int > list1;
-  list.push_back(52);
+  list.pushBack(52);
   sedov::List< int > list2(std::move(list));
-  BOOST_CHECK_EQUAL(list1.get_size(), 0);
-  BOOST_CHECK_EQUAL(list2.get_size(), 1);
+  BOOST_CHECK_EQUAL(list1.size(), 0);
+  BOOST_CHECK_EQUAL(list2.size(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(CopyAssignTest)
@@ -288,15 +289,15 @@ BOOST_AUTO_TEST_CASE(ConstIterTest)
   sedov::List< int > list;
   list.push_back(1);
   list.push_back(2);
-  const sedov::List< int > & const_list = list;
-  auto cit = const_list.cbegin();
+  const sedov::List< int > & constList = list;
+  auto cit = constList.cbegin();
   BOOST_CHECK_EQUAL(*cit, 1);
   ++cit;
   BOOST_CHECK_EQUAL(*cit, 2);
   ++cit;
-  BOOST_CHECK(cit == const_list.cend());
-  BOOST_CHECK(const_list.cbegin() != const_list.cend());
-  auto cit2 = const_list.begin();
+  BOOST_CHECK(cit == constList.cend());
+  BOOST_CHECK(constList.cbegin() != constList.cend());
+  auto cit2 = constList.begin();
   BOOST_CHECK_EQUAL(*cit2, 1);
   sedov::List< int > empty;
   BOOST_CHECK(empty.cbegin() == empty.cend());
