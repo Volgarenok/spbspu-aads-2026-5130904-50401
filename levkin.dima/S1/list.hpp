@@ -18,6 +18,7 @@ namespace levkin
       pseudo->next = pseudo;
       pseudo->prev = pseudo;
     }
+    
 
   private:
     Node< T >* pseudo;
