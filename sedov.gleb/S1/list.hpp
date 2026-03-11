@@ -258,12 +258,12 @@ namespace sedov
     {
       if (!p.ptr_)
       {
-        push_back(v);
+        pushBack(v);
         return LIter< T >(tail_);
       }
       if (p.ptr_ == head_)
       {
-        push_front(v);
+        pushFront(v);
         return LIter< T >(head_);
       }
       Node< T > * newNode = new Node< T >(v);
