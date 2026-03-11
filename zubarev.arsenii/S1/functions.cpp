@@ -83,7 +83,7 @@ namespace zubarev
   size_t output_names(List< Data >* list)
   {
     if (!list) {
-      std::cerr << "output_names: list posize_ter is nullptr" << '\n';
+      std::cerr << "output_names: list pointer is nullptr" << '\n';
       return 1;
     }
     LIter< Data > it = list->begin();
@@ -102,7 +102,7 @@ namespace zubarev
   size_t max_sequences(List< Data >* list)
   {
     if (!list) {
-      std::cerr << "max_sequences: list posize_ter is nullptr";
+      std::cerr << "max_sequences: list pointer is nullptr";
       return 0;
     }
     size_t maxNum = 0;
@@ -123,7 +123,7 @@ namespace zubarev
   size_t output_sequences(List< Data >* list)
   {
     if (!list) {
-      std::cerr << "output_sequences: list posize_ter is nullptr";
+      std::cerr << "output_sequences: list pointer is nullptr";
       return 1;
     }
     for (size_t i = 0; i < max_sequences(list); ++i) {
@@ -154,16 +154,20 @@ namespace zubarev
   size_t output_sums(List< Data >* list)
   {
     if (!list) {
-      std::cerr << "output_sums: list posize_ter is nullptr";
+      std::cerr << "output_sums: list pointer is nullptr" << '\n';
       return 1;
     }
 
     const size_t maxSeq = max_sequences(list);
 
     if (maxSeq == 0) {
-      std::cout << "0" << '\n';
+      std::cout << "0\n";
       return 0;
     }
+
+    List< size_t > sums;
+    LIter< size_t > itSum = sums.before_begin();
+    bool overflow = false;
 
     for (size_t i = 0; i < maxSeq; ++i) {
       size_t sum = 0;
@@ -177,16 +181,36 @@ namespace zubarev
         if (itNums != (*itList).numbers.end()) {
           size_t value = (*itNums);
           if (sum > std::numeric_limits< size_t >::max() - value) {
-            return 1;
+            overflow = true;
+            break;
           }
           sum += value;
         }
         ++itList;
       }
 
-      output< size_t >(std::cout, sum, i == 0);
+      if (overflow) {
+        break;
+      }
+
+      sums.insert_after(itSum, sum);
+      ++itSum;
+    }
+
+    if (overflow) {
+      std::cerr << "output_sums: sum overflow" << '\n';
+      return 1;
+    }
+
+    LIter< size_t > it = sums.begin();
+    bool is_first = true;
+    while (it != sums.end()) {
+      output< size_t >(std::cout, (*it), is_first);
+      is_first = false;
+      ++it;
     }
     std::cout << '\n';
+
     return 0;
   }
   size_t to_size_t(const std::string& num)
