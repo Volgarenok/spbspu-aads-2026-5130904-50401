@@ -37,31 +37,40 @@ namespace levkin
 
     List(T val) : List()
     {
+
       insertBack(val);
     }
-    
-    ~List() {
-      Node<T> * curr = pseudo->next;
+
+    ~List()
+    {
+      Node< T >* curr = pseudo->next;
       while (curr != pseudo) {
-        Node<T>* nxt = curr -> next;
+        Node< T >* nxt = curr->next;
         delete curr;
         curr = nxt;
       }
       delete pseudo;
     }
+    
+    
+    List(const List<T>& a) = delete; 
+    List(List<T>&& a) = delete; 
+    List<T>& operator=(const List<T>& a) = delete; 
+    List<T>& operator=(List<T>&& a) = delete;
+
   private:
     Node< T >* pseudo;
   };
+  
+  template < class T > class LIter
+  {
+    friend class List< T >;
+
+  public:
+  };
+
+  template < class T > class LCIter
+  {
+    friend class List< T >;
+  };
 }
-
-template < class T > class LIter
-{
-  friend class List< T >;
-
-public:
-};
-
-template < class T > class LCIter
-{
-  friend class List< T >;
-};
