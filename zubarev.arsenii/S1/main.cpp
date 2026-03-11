@@ -16,7 +16,7 @@ int main()
           zubarev::output_sums(&list);
 
   if (error) {
-    return 2;
+    return 1;
   }
 
   return 0;
