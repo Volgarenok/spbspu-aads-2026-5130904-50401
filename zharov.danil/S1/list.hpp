@@ -45,6 +45,33 @@ namespace zharov {
     bool operator!=(const LCIter & it) const;
   };
 
+  template< class T >
+  class List {
+    Node< T > * head_;
+    Node< T > * tail_;
+    size_t size_;
+  public:
+    List();
+    List(const List & h);
+    List(List && h) noexcept;
+    ~List();
+    List & operator=(const List & h);
+    List & operator=(List && h) noexcept;
+    LIter< T > begin();
+    LIter< T > end();
+    LCIter< T > constBegin();
+    LCIter< T > constEnd();
+    T & head();
+    const T & head() const;
+    T & tail();
+    const T & tail() const;
+    void pushFront(const T & v);
+    void pushBack(const T & v);
+
+
+
+  };
+
 }
 
 #endif
