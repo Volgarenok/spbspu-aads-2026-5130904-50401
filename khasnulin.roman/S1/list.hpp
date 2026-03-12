@@ -59,8 +59,8 @@ namespace khasnulin
     template < class K > struct LNode
     {
       K val;
-      LNode< K > *next;
       LNode< K > *prev;
+      LNode< K > *next;
     };
     LNode< T > *h_;
     size_t s_;
@@ -88,12 +88,13 @@ namespace khasnulin
     if (h)
     {
       LNode< T > *item = h;
-      do
+      h->prev->next = nullptr;
+      while (item != nullptr)
       {
         LNode< T > *n = item->next;
         delete item;
         item = n;
-      } while (item != h);
+      }
     }
   }
 
@@ -200,28 +201,28 @@ namespace khasnulin
 
   template < class T > LIter< T > BiList< T >::begin() noexcept
   {
-    return LIter< T >(h_, h_ == nullptr);
+    return LIter< T >(this, h_, h_ == nullptr);
   }
   template < class T > LCIter< T > BiList< T >::begin() const noexcept
   {
-    return LCIter< T >(h_, h_ == nullptr);
+    return LCIter< T >(this, h_, h_ == nullptr);
   }
   template < class T > LCIter< T > BiList< T >::cbegin() const noexcept
   {
-    return LCIter< T >(h_, h_ == nullptr);
+    return LCIter< T >(this, h_, h_ == nullptr);
   }
 
   template < class T > LIter< T > BiList< T >::end() noexcept
   {
-    return LIter< T >(h_ ? h_->prev : nullptr, true);
+    return LIter< T >(this, h_ ? h_->prev : nullptr, true);
   }
   template < class T > LCIter< T > BiList< T >::end() const noexcept
   {
-    return LCIter< T >(h_ ? h_->prev : nullptr, true);
+    return LCIter< T >(this, h_ ? h_->prev : nullptr, true);
   }
   template < class T > LCIter< T > BiList< T >::cend() noexcept
   {
-    return LCIter< T >(h_ ? h_->prev : nullptr, true);
+    return LCIter< T >(this, h_ ? h_->prev : nullptr, true);
   }
 
   template < class T > bool BiList< T >::empty() const noexcept
@@ -241,7 +242,7 @@ namespace khasnulin
       h_ = item;
     }
     s_++;
-    return LIter< T >(item, false);
+    return LIter< T >(this, item, false);
   }
 
   template < class T > LIter< T > BiList< T >::insert(LCIter< T > pos, T &&val)
@@ -252,7 +253,7 @@ namespace khasnulin
       h_ = item;
     }
     s_++;
-    return LIter< T >(item, false);
+    return LIter< T >(this, item, false);
   }
 
   template < class T > void BiList< T >::push_back(const T &val)
@@ -284,6 +285,7 @@ namespace khasnulin
   template < class T > void BiList< T >::clear() noexcept
   {
     clear(h_);
+    h_ = nullptr;
     s_ = 0;
   }
 
@@ -294,9 +296,17 @@ namespace khasnulin
       throw std::runtime_error("can't erase iterator to the end");
     }
     LNode< T > *curr = pos.curr_;
+    if (s_ == 1)
+    {
+      delete curr;
+      h_ = nullptr;
+      s_ = 0;
+      return end();
+    }
     LNode< T > *next = curr->next;
-    curr->prev->next = next;
-    next->prev = curr->prev;
+    LNode< T > *prev = curr->prev;
+    next->prev = prev;
+    prev->next = next;
     bool at_start = false;
     if (curr == h_)
     {
@@ -305,15 +315,15 @@ namespace khasnulin
     }
     delete curr;
     --s_;
-    if (!s_)
-    {
-      return end();
-    }
     if (at_start)
     {
-      return LIter< T >(next, false);
+      return LIter< T >(this, next, false);
     }
-    return LIter< T >(next, next == h_);
+    if (next == h_)
+    {
+      return LIter< T >(this, next->prev, true);
+    }
+    return LIter< T >(this, next, false);
   }
 
   template < class T > LIter< T > BiList< T >::erase(LIter< T > begin, LIter< T > end)

@@ -58,16 +58,17 @@ namespace khasnulin
 
   template < class T > LCIter< T > &LCIter< T >::operator++()
   {
-    if (is_end_ || !curr_)
-    {
-      throw std::out_of_range("iterator can't move to next from end");
-    }
+
     if (curr_->next == list_->h_)
     {
       is_end_ = true;
     }
     else
     {
+      if (is_end_ || !curr_)
+      {
+        throw std::out_of_range("iterator can't move to next from end");
+      }
       curr_ = curr_->next;
     }
     return *this;
