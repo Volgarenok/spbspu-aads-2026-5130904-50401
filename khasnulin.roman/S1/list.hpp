@@ -41,8 +41,8 @@ namespace khasnulin
     void push_back(T &&val);
 
     void clear() noexcept;
-    LIter< T > erase(LCIter< T > pos);
-    LIter< T > erase(LCIter< T > begin, LCIter< T > end);
+    LIter< T > erase(LIter< T > pos);
+    LIter< T > erase(LIter< T > begin, LIter< T > end);
 
     T &front();
     const T &front() const;
@@ -128,7 +128,7 @@ namespace khasnulin
   template < class... Args >
   typename BiList< T >::template LNode< T > *BiList< T >::createNew(Args... args)
   {
-    LNode< T > *head = new LNode< T >{std::forward< T >(args)..., nullptr, nullptr};
+    LNode< T > *head = new LNode< T >{T(std::forward< T >(args)...), nullptr, nullptr};
     head->next = head;
     head->prev = head;
     return head;
@@ -144,7 +144,7 @@ namespace khasnulin
     }
     LNode< T > *prev = currNode->prev;
     LNode< T > *curr = currNode;
-    prev->next = new LNode< T >{std::forward< T >(args)..., prev, curr};
+    prev->next = new LNode< T >{T(std::forward< T >(args)...), prev, curr};
     curr->prev = prev->next;
     return curr->prev;
   }
@@ -213,15 +213,15 @@ namespace khasnulin
 
   template < class T > LIter< T > BiList< T >::end() noexcept
   {
-    return LIter< T >(h_->prev, true);
+    return LIter< T >(h_ ? h_->prev : nullptr, true);
   }
   template < class T > LCIter< T > BiList< T >::end() const noexcept
   {
-    return LCIter< T >(h_->prev, true);
+    return LCIter< T >(h_ ? h_->prev : nullptr, true);
   }
   template < class T > LCIter< T > BiList< T >::cend() noexcept
   {
-    return LCIter< T >(h_->prev, true);
+    return LCIter< T >(h_ ? h_->prev : nullptr, true);
   }
 
   template < class T > bool BiList< T >::empty() const noexcept
@@ -287,13 +287,47 @@ namespace khasnulin
     s_ = 0;
   }
 
-  template < class T > LIter< T > BiList< T >::erase(LCIter< T > pos)
+  template < class T > LIter< T > BiList< T >::erase(LIter< T > pos)
   {
-    return LIter< T >();
+    if (!pos.curr_ || pos.is_end_)
+    {
+      throw std::runtime_error("can't erase iterator to the end");
+    }
+    LNode< T > *curr = pos.curr_;
+    LNode< T > *next = curr->next;
+    curr->prev->next = next;
+    next->prev = curr->prev;
+    bool at_start = false;
+    if (curr == h_)
+    {
+      h_ = next;
+      at_start = true;
+    }
+    delete curr;
+    --s_;
+    if (!s_)
+    {
+      return end();
+    }
+    if (at_start)
+    {
+      return LIter< T >(next, false);
+    }
+    return LIter< T >(next, next == h_);
   }
-  template < class T > LIter< T > BiList< T >::erase(LCIter< T > begin, LCIter< T > end)
+
+  template < class T > LIter< T > BiList< T >::erase(LIter< T > begin, LIter< T > end)
   {
-    return LIter< T >();
+    if (!begin.curr_ || begin.is_end_)
+    {
+      throw std::runtime_error("can't erase iterator to the end");
+    }
+
+    while (!begin.is_end_ && begin != end)
+    {
+      begin = erase(begin);
+    }
+    return begin;
   }
 
   template < class T > T &BiList< T >::front()

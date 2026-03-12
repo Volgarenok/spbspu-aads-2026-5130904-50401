@@ -169,4 +169,70 @@ BOOST_AUTO_TEST_CASE(test_erase_single_element)
   BOOST_CHECK(list.begin() == list.end());
 }
 
+BOOST_AUTO_TEST_CASE(test_erase_range_middle)
+{
+  BiList< int > list;
+  for (int i = 1; i <= 5; ++i)
+  {
+    list.push_back(i);
+  }
+
+  auto it1 = list.begin();
+  ++it1;
+  ++it1;
+
+  auto it2 = it1;
+  ++it2;
+  ++it2;
+
+  auto next_it = list.erase(it1, it2);
+
+  BOOST_CHECK_EQUAL(list.size(), 3);
+  BOOST_CHECK_EQUAL(*next_it, 5);
+  BOOST_CHECK_EQUAL(list.front(), 1);
+  BOOST_CHECK_EQUAL(list.back(), 5);
+}
+
+BOOST_AUTO_TEST_CASE(test_erase_range_full)
+{
+  BiList< int > list;
+  list.push_back(10);
+  list.push_back(20);
+
+  auto it = list.erase(list.begin(), list.end());
+
+  BOOST_CHECK(list.empty());
+  BOOST_CHECK_EQUAL(list.size(), 0);
+  BOOST_CHECK(it == list.end());
+}
+
+BOOST_AUTO_TEST_CASE(test_erase_range_at_start)
+{
+  BiList< int > list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+
+  auto it_end = list.begin();
+  ++it_end;
+  ++it_end;
+
+  auto it = list.erase(list.begin(), it_end);
+
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.front(), 3);
+  BOOST_CHECK_EQUAL(*it, 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_erase_range_empty)
+{
+  khasnulin::BiList< int > list;
+  list.push_back(1);
+
+  auto it = list.erase(list.begin(), list.begin());
+
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK(it == list.begin());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
