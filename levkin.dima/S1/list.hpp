@@ -1,6 +1,7 @@
-template < class T > class List;
 namespace levkin
 {
+  template < class T > class List;
+  template < class T > class LIter;
 
   template < class T > struct Node {
     T val;
@@ -11,15 +12,9 @@ namespace levkin
   {
 
   public:
-    Node< T >* begin()
-    {
-      return pseudo->next;
-    }
+    LIter< T > begin() { return LIter< T >(pseudo->next); }
 
-    Node< T >* end()
-    {
-      return pseudo;
-    }
+    LIter< T > end() { return LIter< T >(pseudo); }
 
     void insertBack(T val)
     {
@@ -35,11 +30,7 @@ namespace levkin
       pseudo->prev = pseudo;
     }
 
-    List(T val) : List()
-    {
-
-      insertBack(val);
-    }
+    List(T val) : List() { insertBack(val); }
 
     ~List()
     {
@@ -51,22 +42,45 @@ namespace levkin
       }
       delete pseudo;
     }
-    
-    
-    List(const List<T>& a) = delete; 
-    List(List<T>&& a) = delete; 
-    List<T>& operator=(const List<T>& a) = delete; 
-    List<T>& operator=(List<T>&& a) = delete;
+
+    List(const List< T >& a) = delete;
+    List(List< T >&& a) = delete;
+    List< T >& operator=(const List< T >& a) = delete;
+    List< T >& operator=(List< T >&& a) = delete;
 
   private:
     Node< T >* pseudo;
   };
-  
+
   template < class T > class LIter
   {
     friend class List< T >;
 
   public:
+    LIter< T >(Node< T >* node) : curr(node) {}
+
+    T& operator*() { return curr->val; }
+
+    LIter& operator++()
+    {
+      if (curr)
+        curr = curr->next;
+      return *this;
+    }
+
+    T* operator->() { return &(curr->val); }
+    LIter operator++(int)
+    {
+      LIter temp = *this;
+      ++(*this);
+      return temp;
+    }
+
+    bool operator==(const LIter& other) { return curr == other.curr; }
+    bool operator!=(const LIter& other) { return !(this == other); }
+
+  private:
+    Node< T >* curr = nullptr;
   };
 
   template < class T > class LCIter
