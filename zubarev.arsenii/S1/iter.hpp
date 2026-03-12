@@ -23,7 +23,7 @@ namespace zubarev
     bool operator==(const LIter&) const;
   };
   template < class T >
-  LIter< T >::LIter(Node< T >* p) :
+  LIter< T >::LIter(Node< T >* p):
     ptr(p)
   {}
 

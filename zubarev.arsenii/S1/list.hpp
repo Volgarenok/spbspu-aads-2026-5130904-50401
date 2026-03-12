@@ -1,7 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
-#include "iter.hpp"
 #include "c-iter.hpp"
+#include "iter.hpp"
 namespace zubarev
 {
   template < class T >
@@ -10,7 +10,7 @@ namespace zubarev
     T val;
     Node* next;
 
-    Node(const T& v, Node* n = nullptr) :
+    Node(const T& v, Node* n = nullptr):
       val(v),
       next(n) {};
   };
@@ -94,7 +94,7 @@ namespace zubarev
   }
 
   template < class T >
-  List< T >::List(List< T >&& other) noexcept :
+  List< T >::List(List< T >&& other) noexcept:
     head_(other.head_)
   {
     other.head_ = ctFake();

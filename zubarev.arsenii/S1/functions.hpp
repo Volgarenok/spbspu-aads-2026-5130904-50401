@@ -1,7 +1,7 @@
 #ifndef FUNC_HPP
 #define FUNC_HPP
-#include <iosfwd>
 #include "data.hpp"
+#include <iosfwd>
 namespace zubarev
 {
   List< Data > input(std::istream& in, bool& error);
