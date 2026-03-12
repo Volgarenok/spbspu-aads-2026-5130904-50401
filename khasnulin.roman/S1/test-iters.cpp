@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(test_empty_iterator_dereferencing_error)
 
   BOOST_CHECK_EQUAL(iter, list.end());
 
-  BOOST_CHECK_THROW(*iter, std::out_of_range);
+  BOOST_CHECK_THROW(*iter, std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_arrow_operator_iterator_on_the_end)
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(test_arrow_operator_iterator_on_the_end)
   auto iter = list.begin();
   BOOST_CHECK_EQUAL(*iter, "Ivan");
   ++iter;
-  BOOST_CHECK_THROW(iter->clear(), std::out_of_range);
+  BOOST_CHECK_THROW(iter->clear(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_multiple_iterators_and_not_equal_operation)
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(test_reaching_end_iterator)
   ++it;
 
   BOOST_CHECK(it == list.end());
-  BOOST_CHECK_THROW(*it, std::out_of_range);
+  BOOST_CHECK_THROW(*it, std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_back_from_end)
