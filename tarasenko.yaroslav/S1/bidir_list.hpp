@@ -1,6 +1,7 @@
 #ifndef BIDIR_LIST_HPP
 #define BIDIR_LIST_HPP
 
+#include <utility>
 #include <cstddef>
 
 namespace tarasenko
@@ -67,10 +68,16 @@ namespace tarasenko
   public:
     BidirList();
     ~BidirList();
+    BidirList(const BidirList< T >& list);
+    BidirList(BidirList< T >&& list);
+    BidirList< T >& operator=(const BidirList< T >& list);
+    BidirList< T >& operator=(BidirList< T >&& list);
     size_t size() const;
     ListIter< T > begin();
+    ListConstIter< T > begin() const;
     ListConstIter< T > cbegin() const;
     ListIter< T > end();
+    ListConstIter< T > end() const;
     ListConstIter< T > cend() const;
     void push_back(const T& val);
     void push_front(const T& val);
@@ -114,6 +121,12 @@ namespace tarasenko
   }
 
   template< class T >
+  ListConstIter< T > BidirList< T >::begin() const
+  {
+    return ListConstIter< T >(_head, this);
+  }
+
+  template< class T >
   ListConstIter< T > BidirList< T >::cbegin() const
   {
     return ListConstIter< T >(_head, this);
@@ -123,6 +136,12 @@ namespace tarasenko
   ListIter< T > BidirList< T >::end()
   {
     return ListIter< T >(nullptr, this);
+  }
+
+  template< class T >
+  ListConstIter< T > BidirList< T >::end() const
+  {
+    return ListConstIter< T >(nullptr, this);
   }
 
   template< class T >
@@ -446,6 +465,37 @@ namespace tarasenko
   void BidirList< T >::clear()
   {
     erase(begin(), end());
+  }
+
+  template< class T >
+  BidirList< T >::BidirList(const BidirList< T >& list) :
+    _head(nullptr),
+    _tail(nullptr),
+    _size(0)
+  {
+    try
+    {
+      for(ListConstIter< T > it = list.begin(); it != list.end(); ++it)
+      {
+        push_back(*it);
+      }
+    }
+    catch (...)
+    {
+      clear();
+      throw;
+    }
+  }
+
+  template< class T >
+  BidirList< T >::BidirList(BidirList< T >&& list) :
+    _head(list._head),
+    _tail(list._tail),
+    _size(list._size)
+  {
+    list._head = nullptr;
+    list._tail = nullptr;
+    list._size = 0;
   }
 }
 

@@ -231,3 +231,35 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK(list.begin() == list.end());
   BOOST_CHECK(list.cbegin() == list.cend());
 }
+
+BOOST_AUTO_TEST_CASE(copy_constructor)
+{
+  tarasenko::BidirList< int > list;
+  for (size_t i = 0; i < 10; ++i)
+  {
+    list.push_back(i);
+  }
+  tarasenko::BidirList< int > copy = list;
+  auto lit = list.begin();
+  BOOST_CHECK(copy.size() == 10);
+  for (auto it = copy.begin(); it != copy.end(); ++it, ++lit)
+  {
+    BOOST_CHECK(*it == *lit);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(move_constructor)
+{
+  tarasenko::BidirList< int > list;
+  for (size_t i = 0; i < 10; ++i)
+  {
+    list.push_back(i);
+  }
+  auto lit = list.begin();
+  tarasenko::BidirList< int > copy = std::move(list);
+  BOOST_CHECK(copy.size() == 10);
+  for (auto it = copy.begin(); it != copy.end(); ++it, ++lit)
+  {
+    BOOST_CHECK(*it == *lit);
+  }
+}
