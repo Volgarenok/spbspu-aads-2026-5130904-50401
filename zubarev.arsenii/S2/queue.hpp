@@ -1,16 +1,16 @@
 #include "node.hpp"
 namespace zubarev
 {
-  template <typename T>
+  template < typename T >
 
   class Queue
   {
   private:
-    Node *head_;
-    Node *tail_;
+    Node* head_;
+    Node* tail_;
 
   public:
-    void push(const T &rhs);
+    void push(const T& rhs);
     T drop();
   };
 

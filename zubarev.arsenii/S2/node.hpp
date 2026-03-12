@@ -1,12 +1,13 @@
 namespace zubarev
 {
-  template <typename T>
+  template < typename T >
   struct Node
   {
     T data;
-    Node *next;
+    Node* next;
 
-    Node(const T &v, Node *n = nullptr) : val(v),
-                                          next(n) {};
+    Node(const T& v, Node* n = nullptr):
+      val(v),
+      next(n) {};
   };
 }

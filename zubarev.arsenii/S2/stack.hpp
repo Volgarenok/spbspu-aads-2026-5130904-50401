@@ -1,12 +1,15 @@
-#include <vector>
-#include <string>
+#include "node.hpp"
 #include <iostream>
-template <typename T>
+#include <string>
+#include <vector>
+
+template < typename T >
 class Stack
 {
 private:
-  T* data;
-  
+  Node* head_;
+  // Node* tail_;
+
 public:
   void push(const T& rhs);
   T drop();
