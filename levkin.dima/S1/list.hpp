@@ -1,5 +1,4 @@
-namespace levkin
-{
+namespace levkin {
   template < class T > class List;
   template < class T > class LIter;
 
@@ -29,17 +28,26 @@ namespace levkin
       pseudo->next = pseudo;
       pseudo->prev = pseudo;
     }
+    void erase(LIter< T > from, LIter< T > to)
+    {
+      if (from == pseudo)
+        return;
+      while (from != to) {
+        Node< T >* nxt = from->next;
+        delete from;
+        from = nxt;
+      }
+    }
 
+    void erase(LIter< T > from) { erase(from, pseudo); }
+
+    void clear() { erase(pseudo->next, pseudo); }
     List(T val) : List() { insertBack(val); }
 
     ~List()
     {
       Node< T >* curr = pseudo->next;
-      while (curr != pseudo) {
-        Node< T >* nxt = curr->next;
-        delete curr;
-        curr = nxt;
-      }
+
       delete pseudo;
     }
 
@@ -76,7 +84,7 @@ namespace levkin
       return temp;
     }
 
-    bool operator==(const LIter& other) { return curr == other.curr; }
+    bool operator==(const LIter& other) const { return curr == other.curr; }
     bool operator!=(const LIter& other) const { return !(*this == other); }
 
   private:
