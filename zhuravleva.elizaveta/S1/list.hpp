@@ -251,8 +251,8 @@ namespace zhuravleva
     return LIter<T>(node);
   }
 
-  template< class T >
-  LIter< T > List< T >::beforeStart()
+  template<class T>
+  LIter<T> List<T>::beforeStart()
   {
     return LIter< T >(fake);
   }
