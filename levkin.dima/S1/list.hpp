@@ -1,3 +1,7 @@
+#ifndef LIST
+#define LIST
+#include <utility>
+
 namespace levkin {
   template < class T > class List;
   template < class T > class LIter;
@@ -76,6 +80,7 @@ namespace levkin {
     List< T >& operator=(List< T >&& a) = delete;
 
   private:
+    void swap(List< T >& a) { std::swap(a.pseudo, this); }
     List(Node< T >* pseudo_node) : pseudo(pseudo_node) {}
     void __eraseFast(LIter< T > pos)
     {
@@ -200,3 +205,6 @@ namespace levkin {
   };
 
 }
+
+
+#endif
