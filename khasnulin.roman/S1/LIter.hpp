@@ -27,9 +27,9 @@ namespace khasnulin
   private:
     using LNode = typename BiList< T >::template LNode< T >;
 
-    LIter(LNode *node):
+    LIter(LNode *node, bool is_end):
         curr_(node),
-        is_end_(false) {};
+        is_end_(is_end) {};
 
     LNode *curr_;
     bool is_end_;

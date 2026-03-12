@@ -29,9 +29,9 @@ namespace khasnulin
   private:
     using LNode = typename BiList< T >::template LNode< T >;
 
-    LCIter(const LNode *node):
+    LCIter(const LNode *node, bool is_end):
         curr_(node),
-        is_end_(false) {};
+        is_end_(is_end) {};
 
     const LNode *curr_;
     bool is_end_;

@@ -200,28 +200,28 @@ namespace khasnulin
 
   template < class T > LIter< T > BiList< T >::begin() noexcept
   {
-    return LIter< T >(h_);
+    return LIter< T >(h_, h_ == nullptr);
   }
   template < class T > LCIter< T > BiList< T >::begin() const noexcept
   {
-    return LCIter< T >(h_);
+    return LCIter< T >(h_, h_ == nullptr);
   }
   template < class T > LCIter< T > BiList< T >::cbegin() const noexcept
   {
-    return LCIter< T >(h_);
+    return LCIter< T >(h_, h_ == nullptr);
   }
 
   template < class T > LIter< T > BiList< T >::end() noexcept
   {
-    return LIter< T >(h_->prev);
+    return LIter< T >(h_->prev, true);
   }
   template < class T > LCIter< T > BiList< T >::end() const noexcept
   {
-    return LCIter< T >(h_->prev);
+    return LCIter< T >(h_->prev, true);
   }
   template < class T > LCIter< T > BiList< T >::cend() noexcept
   {
-    return LCIter< T >(h_->prev);
+    return LCIter< T >(h_->prev, true);
   }
 
   template < class T > bool BiList< T >::empty() const noexcept
