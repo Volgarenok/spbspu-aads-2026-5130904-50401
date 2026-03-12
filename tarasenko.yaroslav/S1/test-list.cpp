@@ -255,11 +255,47 @@ BOOST_AUTO_TEST_CASE(move_constructor)
   {
     list.push_back(i);
   }
-  auto lit = list.begin();
   tarasenko::BidirList< int > copy = std::move(list);
+  BOOST_CHECK(copy.size() == 10);
+  int i = 0;
+  for (auto it = copy.begin(); it != copy.end(); ++it, ++i)
+  {
+    BOOST_CHECK(*it == i);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(copy_assignment_operator)
+{
+  tarasenko::BidirList< int > list;
+  for (size_t i = 0; i < 10; ++i)
+  {
+    list.push_back(i);
+  }
+  tarasenko::BidirList< int > copy;
+  copy = list;
+  auto lit = list.begin();
   BOOST_CHECK(copy.size() == 10);
   for (auto it = copy.begin(); it != copy.end(); ++it, ++lit)
   {
     BOOST_CHECK(*it == *lit);
   }
+}
+
+BOOST_AUTO_TEST_CASE(move_assignment_operator)
+{
+  tarasenko::BidirList< int > list;
+  for (size_t i = 0; i < 10; ++i)
+  {
+    list.push_back(i);
+  }
+  tarasenko::BidirList< int > copy;
+  copy = std::move(list);
+  BOOST_CHECK(copy.size() == 10);
+  int i = 0;
+  for (auto it = copy.begin(); it != copy.end(); ++it, ++i)
+  {
+    BOOST_CHECK(*it == i);
+  }
+  BOOST_CHECK(list.empty());
+  BOOST_CHECK(list.begin() == list.end());
 }

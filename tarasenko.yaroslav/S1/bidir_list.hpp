@@ -93,6 +93,7 @@ namespace tarasenko
     ListIter< T > insert(ListIter< T > it, const T& val);
     ListIter< T > insert(ListIter< T > it, T&& val);
     void clear();
+    void swap(BidirList< T >& list1, BidirList< T >& list2);
   };
 
   template< class T >
@@ -496,6 +497,39 @@ namespace tarasenko
     list._head = nullptr;
     list._tail = nullptr;
     list._size = 0;
+  }
+
+  template< class T >
+  void BidirList< T >::swap(BidirList< T >& list1, BidirList< T >& list2)
+  {
+    std::swap(list1._head, list2._head);
+    std::swap(list1._tail, list2._tail);
+    std::swap(list1._size, list2._size);
+  }
+
+  template< class T >
+  BidirList< T >& BidirList< T >::operator=(const BidirList< T >& list)
+  {
+    BidirList< T > temp(list);
+    swap(*this, temp);
+    return *this;
+  }
+
+  template< class T >
+  BidirList< T >& BidirList< T >::operator=(BidirList< T >&& list)
+  {
+    if (this == std::addressof(list))
+    {
+      return *this;
+    }
+    clear();
+    _head = list._head;
+    _tail = list._tail;
+    _size = list._size;
+    list._head = nullptr;
+    list._tail = nullptr;
+    list._size = 0;
+    return *this;
   }
 }
 
