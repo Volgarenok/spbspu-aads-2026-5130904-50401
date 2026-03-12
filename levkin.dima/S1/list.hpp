@@ -85,7 +85,6 @@ namespace levkin {
       return *this;
     }
 
-    T* operator->() { return &(curr->val); }
     LIter operator++(int)
     {
       LIter temp = *this;
@@ -93,6 +92,21 @@ namespace levkin {
       return temp;
     }
 
+    LIter& operator--()
+    {
+      if (curr)
+        curr = curr->prev;
+      return *this;
+    }
+
+    LIter operator--(int)
+    {
+      LIter temp = *this;
+      --(*this);
+      return temp;
+    }
+
+    T* operator->() { return &(curr->val); }
     bool operator==(const LIter& other) const { return curr == other.curr; }
     bool operator!=(const LIter& other) const { return !(*this == other); }
 
