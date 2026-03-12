@@ -76,8 +76,11 @@ namespace levkin {
     };
 
     List(List< T >&& a) noexcept : List(a.pseudo) { a.pseudo = nullptr; };
-    List< T >& operator=(const List< T >& a);
-    List< T >& operator=(List< T >&& a);
+    List< T >& operator=(List< T > a)
+    {
+      a.swap(*this);
+      return *this;
+    }
 
   private:
     void swap(List< T >& a) { std::swap(a.pseudo, this->pseudo); }

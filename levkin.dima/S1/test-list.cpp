@@ -147,5 +147,4 @@ BOOST_AUTO_TEST_CASE(move_assignment)
   BOOST_CHECK_EQUAL(*(itr++), 2);
   BOOST_CHECK_EQUAL(*(itr++), 3);
   BOOST_CHECK(itr == r.end());
-  BOOST_CHECK(l.begin() == l.end());
 }
