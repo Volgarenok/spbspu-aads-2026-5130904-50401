@@ -7,8 +7,6 @@ namespace levkin {
     Node< T >*prev, *next;
   };
 
-  
-  
   template < class T > class List
   {
 
@@ -57,9 +55,13 @@ namespace levkin {
       delete pseudo;
     }
 
-    List(const List< T >& a){
-        
+    List(const List< T >& a) : List()
+    {
+      for (LCIter<T> i = a.cbegin(); i != a.cend(); i++) {
+          insertBack(*i);
+      }
     };
+
     List(List< T >&& a) = delete;
     List< T >& operator=(const List< T >& a) = delete;
     List< T >& operator=(List< T >&& a) = delete;
