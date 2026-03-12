@@ -76,11 +76,11 @@ namespace levkin {
     };
 
     List(List< T >&& a) noexcept : List(a.pseudo) { a.pseudo = nullptr; };
-    List< T >& operator=(const List< T >& a) = delete;
-    List< T >& operator=(List< T >&& a) = delete;
+    List< T >& operator=(const List< T >& a);
+    List< T >& operator=(List< T >&& a);
 
   private:
-    void swap(List< T >& a) { std::swap(a.pseudo, this); }
+    void swap(List< T >& a) { std::swap(a.pseudo, this->pseudo); }
     List(Node< T >* pseudo_node) : pseudo(pseudo_node) {}
     void __eraseFast(LIter< T > pos)
     {
@@ -205,6 +205,5 @@ namespace levkin {
   };
 
 }
-
 
 #endif
