@@ -92,3 +92,23 @@ BOOST_AUTO_TEST_CASE(copying_constructor)
   BOOST_CHECK(itl == l.end());
   BOOST_CHECK(itr == r.end());
 }
+
+BOOST_AUTO_TEST_CASE(move_constructor)
+{
+  List< int > l;
+  l.insertBack(1);
+  l.insertBack(2);
+  l.insertBack(3);
+
+  List<int> r = std::move(l);
+  
+  auto itl = l.begin();
+  auto itr = r.begin();
+  
+  for (size_t i = 0; i < 3; ++i) {
+      BOOST_CHECK_EQUAL(*(itl++), *(itr++)); 
+  }
+  
+  BOOST_CHECK(itl == l.end());
+  BOOST_CHECK(itr == r.end());
+}

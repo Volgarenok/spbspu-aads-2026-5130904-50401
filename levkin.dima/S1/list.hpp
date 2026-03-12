@@ -68,7 +68,7 @@ namespace levkin {
       }
     };
 
-    List(List< T >&& a) = delete;
+    List(List< T >&& a);
     List< T >& operator=(const List< T >& a) = delete;
     List< T >& operator=(List< T >&& a) = delete;
 
