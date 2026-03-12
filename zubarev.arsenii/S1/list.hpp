@@ -1,12 +1,9 @@
 #ifndef LIST_HPP
 #define LIST_HPP
-// #include "all.hpp"
 #include "iter.hpp"
 #include "c-iter.hpp"
 namespace zubarev
 {
-  // template <class T>
-  // class LIter;
   template < class T >
   struct Node
   {
