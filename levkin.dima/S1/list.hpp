@@ -1,7 +1,7 @@
 namespace levkin {
   template < class T > class List;
   template < class T > class LIter;
-
+  template < class T > class LCIter;
   template < class T > struct Node {
     T val;
     Node< T >*prev, *next;
@@ -12,8 +12,12 @@ namespace levkin {
 
   public:
     LIter< T > begin() { return LIter< T >(pseudo->next); }
+    LCIter< T > begin() const { return cbegin(); }
+    LCIter< T > cbegin() const { return LCIter< T >(pseudo->next); }
 
     LIter< T > end() { return LIter< T >(pseudo); }
+    LCIter< T > end() const { return cend(); }
+    LCIter< T > cend() const { return LCIter< T >(pseudo); }
 
     void insertBack(T val)
     {
@@ -69,9 +73,59 @@ namespace levkin {
     Node< T >* pseudo;
   };
 
+  template < class T > class LCIter
+  {
+    friend class List< T >;
+    friend class LIter< T >;
+
+  public:
+    LCIter< T >(Node< T >* node) : curr(node) {}
+    LCIter< T >(LIter< T > it) : curr(it.curr) {}
+
+    const T& operator*() const { return curr->val; }
+
+    LCIter& operator++()
+    {
+      if (curr)
+        curr = curr->next;
+      return *this;
+    }
+
+    LCIter operator++(int)
+    {
+      LCIter temp = *this;
+      ++(*this);
+      return temp;
+    }
+
+    LCIter& operator--()
+    {
+      if (curr)
+        curr = curr->prev;
+      return *this;
+    }
+
+    LCIter operator--(int)
+    {
+      LCIter temp = *this;
+      --(*this);
+      return temp;
+    }
+
+    T const* operator->() const { return &(curr->val); }
+    bool operator==(const LCIter& other) const { return curr == other.curr; }
+    bool operator!=(const LCIter& other) const { return !(*this == other); }
+
+    bool operator==(const LIter<T>& other) const { return curr == other.curr; }
+    bool operator!=(const LIter<T>& other) const { return curr != other.curr; }
+    
+  private:
+    Node< T >* curr = nullptr;
+  };
   template < class T > class LIter
   {
     friend class List< T >;
+    friend class LCIter< T >;
 
   public:
     LIter< T >(Node< T >* node) : curr(node) {}
@@ -110,12 +164,11 @@ namespace levkin {
     bool operator==(const LIter& other) const { return curr == other.curr; }
     bool operator!=(const LIter& other) const { return !(*this == other); }
 
+    
+    bool operator==(const LCIter<T>& other) const { return curr == other.curr; }
+    bool operator!=(const LCIter<T>& other) const { return curr != other.curr; }
   private:
     Node< T >* curr = nullptr;
   };
 
-  template < class T > class LCIter
-  {
-    friend class List< T >;
-  };
 }
