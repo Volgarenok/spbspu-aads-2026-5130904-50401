@@ -7,6 +7,8 @@ namespace levkin {
     Node< T >*prev, *next;
   };
 
+  
+  
   template < class T > class List
   {
 
@@ -55,7 +57,9 @@ namespace levkin {
       delete pseudo;
     }
 
-    List(const List< T >& a) = delete;
+    List(const List< T >& a){
+        
+    };
     List(List< T >&& a) = delete;
     List< T >& operator=(const List< T >& a) = delete;
     List< T >& operator=(List< T >&& a) = delete;
@@ -116,9 +120,15 @@ namespace levkin {
     bool operator==(const LCIter& other) const { return curr == other.curr; }
     bool operator!=(const LCIter& other) const { return !(*this == other); }
 
-    bool operator==(const LIter<T>& other) const { return curr == other.curr; }
-    bool operator!=(const LIter<T>& other) const { return curr != other.curr; }
-    
+    bool operator==(const LIter< T >& other) const
+    {
+      return curr == other.curr;
+    }
+    bool operator!=(const LIter< T >& other) const
+    {
+      return curr != other.curr;
+    }
+
   private:
     Node< T >* curr = nullptr;
   };
@@ -164,9 +174,15 @@ namespace levkin {
     bool operator==(const LIter& other) const { return curr == other.curr; }
     bool operator!=(const LIter& other) const { return !(*this == other); }
 
-    
-    bool operator==(const LCIter<T>& other) const { return curr == other.curr; }
-    bool operator!=(const LCIter<T>& other) const { return curr != other.curr; }
+    bool operator==(const LCIter< T >& other) const
+    {
+      return curr == other.curr;
+    }
+    bool operator!=(const LCIter< T >& other) const
+    {
+      return curr != other.curr;
+    }
+
   private:
     Node< T >* curr = nullptr;
   };
