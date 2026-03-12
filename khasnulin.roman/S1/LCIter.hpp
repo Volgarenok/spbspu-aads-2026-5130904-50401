@@ -5,7 +5,6 @@ namespace khasnulin
 {
   template < class T > class BiList;
   template < class T > class LIter;
-  template < class T > struct LNode;
 
   template < class T > class LCIter
   {
@@ -28,8 +27,13 @@ namespace khasnulin
     friend class BiList< T >;
 
   private:
-    LCIter(const LNode< T > *node);
-    const LNode< T > *curr_;
+    using LNode = typename BiList< T >::template LNode< T >;
+
+    LCIter(const LNode *node):
+        curr_(node),
+        is_end_(false) {};
+
+    const LNode *curr_;
     bool is_end_;
   };
 

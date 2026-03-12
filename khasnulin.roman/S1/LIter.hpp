@@ -4,8 +4,6 @@
 namespace khasnulin
 {
   template < class T > class BiList;
-  template < class T > class LIter;
-  template < class T > struct LNode;
 
   template < class T > class LIter
   {
@@ -23,11 +21,17 @@ namespace khasnulin
 
     T &operator*();
     T *operator->();
+
     friend class BiList< T >;
 
   private:
-    LIter(const LNode< T > *node);
-    LNode< T > *curr_;
+    using LNode = typename BiList< T >::template LNode< T >;
+
+    LIter(LNode *node):
+        curr_(node),
+        is_end_(false) {};
+
+    LNode *curr_;
     bool is_end_;
   };
 
