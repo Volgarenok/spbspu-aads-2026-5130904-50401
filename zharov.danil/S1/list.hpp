@@ -337,7 +337,7 @@ namespace zharov {
     if (!pos.curr_) {
       pushBack(v);
       return LIter< T >(tail_);
-    } else if (pos_.curr_ == head_) {
+    } else if (pos.curr_ == head_) {
       pushFront(v);
       return LIter< T >(head_);
     }
