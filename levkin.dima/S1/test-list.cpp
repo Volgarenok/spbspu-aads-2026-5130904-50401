@@ -31,13 +31,12 @@ BOOST_AUTO_TEST_CASE(comp_iters)
   List< int > l;
   l.insertBack(10);
 
-  auto it1 = l.begin();  
+  auto it1 = l.begin();
   auto it2 = l.cbegin();
-  
+
   BOOST_CHECK(it1 == it2);
   BOOST_CHECK_EQUAL(*it1, *it2);
 }
-
 
 BOOST_AUTO_TEST_CASE(citer_test)
 {
@@ -80,15 +79,15 @@ BOOST_AUTO_TEST_CASE(copying_constructor)
   l.insertBack(2);
   l.insertBack(3);
 
-  List<int> r = l;
-  
+  List< int > r = l;
+
   auto itl = l.begin();
   auto itr = r.begin();
-  
+
   for (size_t i = 0; i < 3; ++i) {
-      BOOST_CHECK_EQUAL(*(itl++), *(itr++)); 
+    BOOST_CHECK_EQUAL(*(itl++), *(itr++));
   }
-  
+
   BOOST_CHECK(itl == l.end());
   BOOST_CHECK(itr == r.end());
 }
@@ -100,15 +99,11 @@ BOOST_AUTO_TEST_CASE(move_constructor)
   l.insertBack(2);
   l.insertBack(3);
 
-  List<int> r = std::move(l);
-  
-  auto itl = l.begin();
+  List< int > r = std::move(l);
+
   auto itr = r.begin();
-  
-  for (size_t i = 0; i < 3; ++i) {
-      BOOST_CHECK_EQUAL(*(itl++), *(itr++)); 
-  }
-  
-  BOOST_CHECK(itl == l.end());
+  BOOST_CHECK_EQUAL(*(itr++), 1);
+  BOOST_CHECK_EQUAL(*(itr++), 2);
+  BOOST_CHECK_EQUAL(*(itr++), 3);
   BOOST_CHECK(itr == r.end());
 }

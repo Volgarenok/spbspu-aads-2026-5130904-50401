@@ -51,6 +51,9 @@ namespace levkin {
 
     ~List()
     {
+      if (pseudo == nullptr) {
+        return;
+      }
       clear();
       delete pseudo;
     }
@@ -68,11 +71,12 @@ namespace levkin {
       }
     };
 
-    List(List< T >&& a);
+    List(List< T >&& a) noexcept : List(a.pseudo) { a.pseudo = nullptr; };
     List< T >& operator=(const List< T >& a) = delete;
     List< T >& operator=(List< T >&& a) = delete;
 
   private:
+    List(Node< T >* pseudo_node) : pseudo(pseudo_node) {}
     void __eraseFast(LIter< T > pos)
     {
       Node< T >* toDelete = pos.curr;
