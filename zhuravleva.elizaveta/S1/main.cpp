@@ -4,6 +4,7 @@
 #include <limits>
 #include "list.hpp"
 
+
 int main()
 {
   zhuravleva::List< std::pair<std::string, zhuravleva::List<size_t > > > sequences;
@@ -27,6 +28,46 @@ int main()
   {
     std::cout << "0\n";
     return 0;
+  }
+
+  auto sit = sequences.begin();
+
+  while(sit.hasNext())
+  {
+    std::cout << (*sit).first;
+
+    sit = sit.next();
+
+    if(sit.hasNext())
+    {
+      std::cout << " ";
+    }
+  }
+
+  std::cout << "\n";
+
+  size_t maxLen = 0;
+
+  auto it = sequences.cbegin();
+
+  while(it.hasNext())
+  {
+    size_t len = 0;
+
+    auto nit = (*it).second.cbegin();
+
+    while(nit.hasNext())
+    {
+      len++;
+      nit = nit.next();
+    }
+
+    if(len > maxLen)
+    {
+      maxLen = len;
+    }
+
+    it = it.next();
   }
 
   return 0;
