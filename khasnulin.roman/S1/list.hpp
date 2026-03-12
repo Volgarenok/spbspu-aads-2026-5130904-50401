@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 
 #include "LCIter.hpp"
 #include "LIter.hpp"
@@ -221,7 +222,10 @@ namespace khasnulin
 
   template < class T > void BiList< T >::clear() noexcept
   {
+    clear(h_);
+    s_ = 0;
   }
+
   template < class T > void BiList< T >::erase(LCIter< T > pos)
   {
   }
@@ -231,20 +235,29 @@ namespace khasnulin
 
   template < class T > T &BiList< T >::front()
   {
-    return *(new T());
+    if (s_ == 0)
+    {
+      throw std::runtime_error("list is empty, can't get front element");
+    }
+    return h_->val;
   }
   template < class T > const T &BiList< T >::front() const
   {
-    return T();
+    return front();
   }
 
   template < class T > T &BiList< T >::back()
   {
-    return *(new T());
+    if (s_ == 0)
+    {
+      throw std::runtime_error("list is empty, can't get front element");
+    }
+    return h_->prev->val;
   }
+
   template < class T > const T &BiList< T >::back() const
   {
-    return T();
+    return back();
   }
 }
 
