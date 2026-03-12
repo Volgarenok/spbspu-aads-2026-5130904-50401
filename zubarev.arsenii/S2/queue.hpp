@@ -6,8 +6,7 @@ namespace zubarev
   class Queue
   {
   private:
-    Node* head_;
-    Node* tail_;
+    
 
   public:
     void push(const T& rhs);
