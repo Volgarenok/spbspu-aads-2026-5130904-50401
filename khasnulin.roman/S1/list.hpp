@@ -198,11 +198,11 @@ namespace khasnulin
 
   template < class T > bool BiList< T >::empty() const noexcept
   {
-    return false;
+    return s_ == 0;
   }
   template < class T > size_t BiList< T >::size() const noexcept
   {
-    return -1;
+    return s_;
   }
 
   template < class T > LIter< T > BiList< T >::insert(LCIter< T > pos, const T &val)
