@@ -77,7 +77,7 @@ namespace levkin
     }
 
     bool operator==(const LIter& other) { return curr == other.curr; }
-    bool operator!=(const LIter& other) { return !(this == other); }
+    bool operator!=(const LIter& other) const { return !(*this == other); }
 
   private:
     Node< T >* curr = nullptr;
