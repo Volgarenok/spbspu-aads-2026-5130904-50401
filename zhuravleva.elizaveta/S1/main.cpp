@@ -70,5 +70,42 @@ int main()
     it = it.next();
   }
 
+  zhuravleva::List< zhuravleva::List<size_t> > transposed;
+  auto tpos = transposed.beforeStart();
+
+  for(size_t column = 0; column < maxLen; column++)
+  {
+    zhuravleva::List<size_t> newRow;
+
+    auto insertPos = newRow.beforeStart();
+
+    auto sit = sequences.cbegin();
+
+    while(sit.hasNext())
+    {
+      auto nit = (*sit).second.cbegin();
+
+      size_t index = 0;
+
+      while(index < column && nit.hasNext())
+      {
+        nit = nit.next();
+        index++;
+      }
+
+      if(nit.hasNext())
+      {
+        insertPos = newRow.addAfter(insertPos, *nit);
+      }
+
+      sit = sit.next();
+    }
+
+    if(!newRow.empty())
+    {
+      tpos = transposed.addAfter(tpos, newRow);
+    }
+  }
+
   return 0;
 }
