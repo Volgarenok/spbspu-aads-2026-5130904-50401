@@ -25,16 +25,16 @@ namespace tarasenko
     const BidirList< T >* _owner;
   public:
     ListIter();
-    bool operator==(const ListIter< T >& it) const;
-    bool operator!=(const ListIter< T >& it) const;
+    bool operator==(const ListIter< T >& it) const noexcept;
+    bool operator!=(const ListIter< T >& it) const noexcept;
     T& operator*() const;
     T* operator->() const;
-    ListIter< T >& operator++();
-    ListIter< T > operator++(int);
-    ListIter< T >& operator--();
-    ListIter< T > operator--(int);
+    ListIter< T >& operator++() noexcept;
+    ListIter< T > operator++(int) noexcept;
+    ListIter< T >& operator--() noexcept;
+    ListIter< T > operator--(int) noexcept;
   private:
-    ListIter(Node< T >* node, const BidirList< T >* list);
+    ListIter(Node< T >* node, const BidirList< T >* list) noexcept;
   };
 
   template< class T >
@@ -45,16 +45,16 @@ namespace tarasenko
     const BidirList< T >* _owner;
   public:
     ListConstIter();
-    bool operator==(const ListConstIter< T >& it) const;
-    bool operator!=(const ListConstIter< T >& it) const;
+    bool operator==(const ListConstIter< T >& it) const noexcept;
+    bool operator!=(const ListConstIter< T >& it) const noexcept;
     const T& operator*() const;
     const T* operator->() const;
-    ListConstIter< T >& operator++();
-    ListConstIter< T > operator++(int);
-    ListConstIter< T >& operator--();
-    ListConstIter< T > operator--(int);
+    ListConstIter< T >& operator++() noexcept;
+    ListConstIter< T > operator++(int) noexcept;
+    ListConstIter< T >& operator--() noexcept;
+    ListConstIter< T > operator--(int) noexcept;
   private:
-    ListConstIter(Node< T >* node, const BidirList< T >* list);
+    ListConstIter(Node< T >* node, const BidirList< T >* list) noexcept;
   };
 
   template< class T >
@@ -69,31 +69,31 @@ namespace tarasenko
     BidirList();
     ~BidirList();
     BidirList(const BidirList< T >& list);
-    BidirList(BidirList< T >&& list);
+    BidirList(BidirList< T >&& list) noexcept;
     BidirList< T >& operator=(const BidirList< T >& list);
-    BidirList< T >& operator=(BidirList< T >&& list);
-    size_t size() const;
-    ListIter< T > begin();
-    ListConstIter< T > begin() const;
-    ListConstIter< T > cbegin() const;
-    ListIter< T > end();
-    ListConstIter< T > end() const;
-    ListConstIter< T > cend() const;
+    BidirList< T >& operator=(BidirList< T >&& list) noexcept;
+    size_t size() const noexcept;
+    ListIter< T > begin() noexcept;
+    ListConstIter< T > begin() const noexcept;
+    ListConstIter< T > cbegin() const noexcept;
+    ListIter< T > end() noexcept;
+    ListConstIter< T > end() const noexcept;
+    ListConstIter< T > cend() const noexcept;
     void push_back(const T& val);
     void push_front(const T& val);
     void push_back(T&& val);
     void push_front(T&& val);
-    bool empty();
-    T& front();
-    T& back();
-    ListIter< T > erase(ListIter< T > it);
-    ListIter< T > erase(ListIter< T > start, ListIter< T > end);
-    void pop_front();
-    void pop_back();
+    bool empty() const noexcept;
+    T& front() const;
+    T& back() const;
+    ListIter< T > erase(ListIter< T > it) noexcept;
+    ListIter< T > erase(ListIter< T > start, ListIter< T > end) noexcept;
+    void pop_front() noexcept;
+    void pop_back() noexcept;
     ListIter< T > insert(ListIter< T > it, const T& val);
     ListIter< T > insert(ListIter< T > it, T&& val);
-    void clear();
-    void swap(BidirList< T >& list1, BidirList< T >& list2);
+    void clear() noexcept;
+    void swap(BidirList< T >& list1, BidirList< T >& list2) noexcept;
   };
 
   template< class T >
@@ -110,43 +110,43 @@ namespace tarasenko
   }
 
   template< class T >
-  size_t BidirList< T >::size() const
+  size_t BidirList< T >::size() const noexcept
   {
     return _size;
   }
 
   template< class T >
-  ListIter< T > BidirList< T >::begin()
+  ListIter< T > BidirList< T >::begin() noexcept
   {
     return ListIter< T >(_head, this);
   }
 
   template< class T >
-  ListConstIter< T > BidirList< T >::begin() const
+  ListConstIter< T > BidirList< T >::begin() const noexcept
   {
     return ListConstIter< T >(_head, this);
   }
 
   template< class T >
-  ListConstIter< T > BidirList< T >::cbegin() const
+  ListConstIter< T > BidirList< T >::cbegin() const noexcept
   {
     return ListConstIter< T >(_head, this);
   }
 
    template< class T >
-  ListIter< T > BidirList< T >::end()
+  ListIter< T > BidirList< T >::end() noexcept
   {
     return ListIter< T >(nullptr, this);
   }
 
   template< class T >
-  ListConstIter< T > BidirList< T >::end() const
+  ListConstIter< T > BidirList< T >::end() const noexcept
   {
     return ListConstIter< T >(nullptr, this);
   }
 
   template< class T >
-  ListConstIter< T > BidirList< T >::cend() const
+  ListConstIter< T > BidirList< T >::cend() const noexcept
   {
     return ListConstIter< T >(nullptr, this);
   }
@@ -164,37 +164,37 @@ namespace tarasenko
   {}
 
   template< class T >
-  ListIter< T >::ListIter(Node< T >* node, const BidirList< T >* list) :
+  ListIter< T >::ListIter(Node< T >* node, const BidirList< T >* list) noexcept :
     _ptr(node),
     _owner(list)
   {}
 
   template< class T >
-  ListConstIter< T >::ListConstIter(Node< T >* node, const BidirList< T >* list) :
+  ListConstIter< T >::ListConstIter(Node< T >* node, const BidirList< T >* list) noexcept :
     _ptr(node),
     _owner(list)
   {}
 
   template< class T >
-  bool ListIter< T >::operator==(const ListIter< T >& it) const
+  bool ListIter< T >::operator==(const ListIter< T >& it) const noexcept
   {
     return _ptr == it._ptr;
   }
 
   template< class T >
-  bool ListIter< T >::operator!=(const ListIter< T >& it) const
+  bool ListIter< T >::operator!=(const ListIter< T >& it) const noexcept
   {
     return !(_ptr == it._ptr);
   }
 
   template< class T >
-  bool ListConstIter< T >::operator==(const ListConstIter< T >& it) const
+  bool ListConstIter< T >::operator==(const ListConstIter< T >& it) const noexcept
   {
     return _ptr == it._ptr;
   }
 
   template< class T >
-  bool ListConstIter< T >::operator!=(const ListConstIter< T >& it) const
+  bool ListConstIter< T >::operator!=(const ListConstIter< T >& it) const noexcept
   {
     return !(_ptr == it._ptr);
   }
@@ -248,21 +248,21 @@ namespace tarasenko
   }
 
   template< class T >
-  ListIter< T >& ListIter< T >::operator++()
+  ListIter< T >& ListIter< T >::operator++() noexcept
   {
     _ptr = _ptr->_next;
     return *this;
   }
 
   template< class T >
-  ListConstIter< T >& ListConstIter< T >::operator++()
+  ListConstIter< T >& ListConstIter< T >::operator++() noexcept
   {
     _ptr = _ptr->_next;
     return *this;
   }
 
   template< class T >
-  ListIter< T > ListIter< T >::operator++(int)
+  ListIter< T > ListIter< T >::operator++(int) noexcept
   {
     ListIter< T > copy(*this);
     _ptr = _ptr->_next;
@@ -270,7 +270,7 @@ namespace tarasenko
   }
 
   template< class T >
-  ListConstIter< T > ListConstIter< T >::operator++(int)
+  ListConstIter< T > ListConstIter< T >::operator++(int) noexcept
   {
     ListConstIter< T > copy(*this);
     _ptr = _ptr->_next;
@@ -278,7 +278,7 @@ namespace tarasenko
   }
 
   template< class T >
-  ListIter< T >& ListIter< T >::operator--()
+  ListIter< T >& ListIter< T >::operator--() noexcept
   {
     if (_ptr == nullptr)
     {
@@ -290,7 +290,7 @@ namespace tarasenko
   }
 
   template< class T >
-  ListConstIter< T >& ListConstIter< T >::operator--()
+  ListConstIter< T >& ListConstIter< T >::operator--() noexcept
   {
     if (_ptr == nullptr)
     {
@@ -302,7 +302,7 @@ namespace tarasenko
   }
 
   template< class T >
-  ListIter< T > ListIter< T >::operator--(int)
+  ListIter< T > ListIter< T >::operator--(int) noexcept
   {
     if (_ptr == nullptr)
     {
@@ -315,7 +315,7 @@ namespace tarasenko
   }
 
   template< class T >
-  ListConstIter< T > ListConstIter< T >::operator--(int)
+  ListConstIter< T > ListConstIter< T >::operator--(int) noexcept
   {
     if (_ptr == nullptr)
     {
@@ -328,24 +328,24 @@ namespace tarasenko
   }
 
   template< class T >
-  bool BidirList< T >::empty()
+  bool BidirList< T >::empty() const noexcept
   {
     return !_size;
   }
 
   template< class T >
-  T& BidirList< T >::front()
+  T& BidirList< T >::front() const
   {
     return _head->_val;
   }
   template< class T >
-  T& BidirList< T >::back()
+  T& BidirList< T >::back() const
   {
     return _tail->_val;
   }
 
   template< class T >
-  ListIter< T > BidirList< T >::erase(ListIter< T > it)
+  ListIter< T > BidirList< T >::erase(ListIter< T > it) noexcept
   {
     Node< T >* next = it._ptr->_next;
     Node< T >* prev = it._ptr->_prev;
@@ -373,7 +373,7 @@ namespace tarasenko
   }
 
   template< class T >
-  ListIter< T > BidirList< T >::erase(ListIter< T > first, ListIter< T > last)
+  ListIter< T > BidirList< T >::erase(ListIter< T > first, ListIter< T > last) noexcept
   {
     while(first != last)
     {
@@ -383,13 +383,13 @@ namespace tarasenko
   }
 
   template< class T >
-  void BidirList< T >::pop_front()
+  void BidirList< T >::pop_front() noexcept
   {
     erase(begin());
   }
 
   template< class T >
-  void BidirList< T >::pop_back()
+  void BidirList< T >::pop_back() noexcept
   {
     erase(--end());
   }
@@ -463,7 +463,7 @@ namespace tarasenko
   }
 
   template< class T >
-  void BidirList< T >::clear()
+  void BidirList< T >::clear() noexcept
   {
     erase(begin(), end());
   }
@@ -489,7 +489,7 @@ namespace tarasenko
   }
 
   template< class T >
-  BidirList< T >::BidirList(BidirList< T >&& list) :
+  BidirList< T >::BidirList(BidirList< T >&& list) noexcept :
     _head(list._head),
     _tail(list._tail),
     _size(list._size)
@@ -500,7 +500,7 @@ namespace tarasenko
   }
 
   template< class T >
-  void BidirList< T >::swap(BidirList< T >& list1, BidirList< T >& list2)
+  void BidirList< T >::swap(BidirList< T >& list1, BidirList< T >& list2) noexcept
   {
     std::swap(list1._head, list2._head);
     std::swap(list1._tail, list2._tail);
@@ -516,7 +516,7 @@ namespace tarasenko
   }
 
   template< class T >
-  BidirList< T >& BidirList< T >::operator=(BidirList< T >&& list)
+  BidirList< T >& BidirList< T >::operator=(BidirList< T >&& list) noexcept
   {
     if (this == std::addressof(list))
     {
