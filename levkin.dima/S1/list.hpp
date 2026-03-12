@@ -57,8 +57,14 @@ namespace levkin {
 
     List(const List< T >& a) : List()
     {
-      for (LCIter<T> i = a.cbegin(); i != a.cend(); i++) {
+      try {
+
+        for (LCIter< T > i = a.cbegin(); i != a.cend(); i++) {
           insertBack(*i);
+        }
+      } catch (...) {
+        clear();
+        throw;
       }
     };
 
