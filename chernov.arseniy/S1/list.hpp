@@ -225,7 +225,7 @@ namespace chernov {
   template< class T >
   LIter< T > List< T >::erase_after(LIter< T > pos)
   {
-    if (pos.ptr == nullptr || pos.ptr == fake_ && fake_->next == fake_) {
+    if (pos.ptr == nullptr || (pos.ptr == fake_ && fake_->next == fake_)) {
       return end();
     }
     Node< T > * del_node = pos.ptr->next;
@@ -245,8 +245,29 @@ namespace chernov {
   template< class T >
   LIter< T > List< T >::erase_after(LIter< T > first, LIter< T > last)
   {
-    while (!empty() && first.ptr->next != last.ptr) {
-      erase_after(first);
+    if (first == last) {
+      return last;
+    }
+    Node< T > * prev = first.ptr;
+    Node< T > * curr = prev->next;
+    bool crossed_fake = false;
+    while (curr != last.ptr) {
+      if (curr == fake_) {
+        crossed_fake = true;
+        curr = fake_->next;
+        if (curr == last.ptr) {
+          break;
+        }
+      }
+      Node< T > * next = curr->next;
+      delete curr;
+      --size_;
+      curr = next;
+    }
+    prev->next = last.ptr;
+    if (crossed_fake) {
+      last.ptr->next = fake_;
+      fake_->next = first.ptr;
     }
     return last;
   }
