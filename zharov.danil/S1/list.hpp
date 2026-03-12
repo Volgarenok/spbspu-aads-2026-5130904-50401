@@ -339,12 +339,21 @@ namespace zharov {
       pushFront(v);
       return LIter< T >(head_);
     }
-
+    Node< T > * new_node = new Node< T > {v, nullptr, nullptr};
+    Node< T > * next = pos.curr_;
+    Node< T > * prev = next->prev_;
+    new_node->next_ = next;
+    new_node->prev_ = prev;
+    prev->next_ = new_node;
+    next->prev_ = new_node;
+    ++size_;
+    return LIter< T >(new_node);
   }
 
   template< class T >
   void List< T >::popFront()
-  {}
+  {
+  }
 
   template< class T >
   void List< T >::popBack()
