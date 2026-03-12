@@ -2,6 +2,7 @@
 #define LIST_HPP
 
 #include <iostream>
+#include <memory>
 
 #include "LCIter.hpp"
 #include "LIter.hpp"
@@ -61,6 +62,9 @@ namespace khasnulin
     };
     LNode< T > *h_;
     size_t s_;
+
+    static LNode< T > *copy(const LNode< T > *h);
+    static void clear(LNode< T > *h) noexcept;
   };
 
   template < typename T > std::ostream &operator<<(std::ostream &os, const LIter< T > &it)
@@ -68,29 +72,102 @@ namespace khasnulin
     return os << "LIter";
   }
 
-  template < class T > BiList< T >::BiList() noexcept
+  template < class T >
+  BiList< T >::BiList() noexcept:
+      h_(nullptr),
+      s_(0)
   {
   }
 
-  template < class T > BiList< T >::BiList(const BiList< T > &list)
+  template < class T > void BiList< T >::clear(LNode< T > *h) noexcept
   {
+    if (h)
+    {
+      LNode< T > *item = h;
+      do
+      {
+        LNode< T > *n = item->next;
+        delete item;
+        item = n;
+      } while (item != h);
+    }
   }
-  template < class T > BiList< T >::BiList(BiList< T > &&list) noexcept
+
+  template < class T > typename BiList< T >::template LNode< T > *BiList< T >::copy(const LNode< T > *h)
   {
+    LNode< T > *new_h = nullptr;
+    if (h)
+    {
+      new_h = new LNode< T >{h->val, nullptr, nullptr};
+      new_h->next = new_h;
+      LNode< T > *tail = new_h;
+      LNode< T > *Ltail = h->next;
+      try
+      {
+        while (Ltail != h)
+        {
+          tail->next = new LNode< T >{Ltail->val, tail, new_h};
+          tail = tail->next;
+          Ltail = Ltail->next;
+        }
+        new_h->prev = tail;
+      }
+      catch (...)
+      {
+        clear(new_h);
+        throw;
+      }
+    }
+    return new_h;
+  }
+
+  template < class T >
+  BiList< T >::BiList(const BiList< T > &list):
+      h_(nullptr),
+      s_(0)
+  {
+    h_ = copy(list.h_);
+    s_ = list.s_;
+  }
+
+  template < class T >
+  BiList< T >::BiList(BiList< T > &&list) noexcept:
+      h_(list.h_),
+      s_(list.s_)
+  {
+    list.h_ = nullptr;
+    list.s_ = 0;
   }
 
   template < class T > BiList< T >::~BiList() noexcept
   {
+    clear(h_);
   }
 
   template < class T > BiList< T > &BiList< T >::operator=(const BiList< T > &list)
   {
-    return *(new BiList< T >());
+    if (this == std::addressof(list))
+    {
+      return *this;
+    }
+
+    LNode< T > *new_h = copy(list.h_);
+    clear(h_);
+    h_ = new_h;
+    s_ = list.s_;
+
+    return *this;
   }
 
   template < class T > BiList< T > &BiList< T >::operator=(BiList< T > &&list) noexcept
   {
-    return *(new BiList< T >());
+    if (this == std::addressof(list))
+    {
+      return *this;
+    }
+    std::swap(h_, list.h_);
+    std::swap(s_, list.s_);
+    return *this;
   }
 
   template < class T > LIter< T > BiList< T >::begin() noexcept
@@ -169,7 +246,6 @@ namespace khasnulin
   {
     return T();
   }
-
 }
 
 #endif
