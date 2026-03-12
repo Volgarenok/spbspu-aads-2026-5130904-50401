@@ -1,6 +1,7 @@
 #include <boost/test/tools/old/interface.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
+#include <stdexcept>
 
 #include "list.hpp"
 
@@ -95,6 +96,77 @@ BOOST_AUTO_TEST_CASE(test_list_self_assignment)
 
   BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(list.front(), 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_item_erase)
+{
+  BiList< int > list;
+  list.push_back(1);
+
+  list.push_back(3);
+
+  auto it = list.begin();
+  it++;
+  it = list.insert(it, 2);
+
+  BOOST_CHECK_EQUAL(list.front(), 1);
+  BOOST_CHECK_EQUAL(list.back(), 3);
+
+  it = list.erase(it);
+  BOOST_CHECK_EQUAL(*it, 3);
+  BOOST_CHECK_EQUAL(list.size(), 2);
+  BOOST_CHECK_EQUAL(list.front(), 1);
+  BOOST_CHECK_EQUAL(list.back(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_list_clear)
+{
+  BiList< int > list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+
+  BOOST_CHECK_EQUAL(list.size(), 3);
+  BOOST_CHECK_EQUAL(list.front(), 1);
+  BOOST_CHECK_EQUAL(list.back(), 3);
+
+  list.clear();
+
+  BOOST_CHECK_EQUAL(list.size(), 0);
+  BOOST_CHECK(list.empty());
+  BOOST_CHECK(list.begin() == list.end());
+  BOOST_CHECK_THROW(list.front(), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_erase_all_from_end)
+{
+  BiList< int > list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+
+  auto it = list.end();
+  --it;
+  it = list.erase(it);
+  BOOST_CHECK_EQUAL(it, list.end());
+  --it;
+  it = list.erase(it);
+  BOOST_CHECK_EQUAL(it, list.end());
+  --it;
+  it = list.erase(it);
+  BOOST_CHECK_EQUAL(it, list.end());
+
+  BOOST_CHECK_THROW(list.erase(it), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_erase_single_element)
+{
+  BiList< int > list;
+  list.push_back(10);
+  list.erase(list.begin());
+
+  BOOST_CHECK_EQUAL(list.size(), 0);
+  BOOST_CHECK(list.begin() == list.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -41,8 +41,8 @@ namespace khasnulin
     void push_back(T &&val);
 
     void clear() noexcept;
-    void erase(LCIter< T > pos);
-    void erase(LCIter< T > begin, LCIter< T > end);
+    LIter< T > erase(LCIter< T > pos);
+    LIter< T > erase(LCIter< T > begin, LCIter< T > end);
 
     T &front();
     const T &front() const;
@@ -235,16 +235,24 @@ namespace khasnulin
 
   template < class T > LIter< T > BiList< T >::insert(LCIter< T > pos, const T &val)
   {
-    LIter< T > item = LIter< T >(insert_before(pos.curr_, val));
+    LNode< T > *item = insert_before(pos.curr_, val);
+    if (pos.curr_ == h_)
+    {
+      h_ = item;
+    }
     s_++;
-    return item;
+    return LIter< T >(item, false);
   }
 
   template < class T > LIter< T > BiList< T >::insert(LCIter< T > pos, T &&val)
   {
-    LIter< T > item = LIter< T >(insert_before(pos.curr_, std::forward< T >(val)));
+    LNode< T > *item = insert_before(pos.curr_, std::forward< T >(val));
+    if (pos.curr_ == h_)
+    {
+      h_ = item;
+    }
     s_++;
-    return item;
+    return LIter< T >(item, false);
   }
 
   template < class T > void BiList< T >::push_back(const T &val)
@@ -279,11 +287,13 @@ namespace khasnulin
     s_ = 0;
   }
 
-  template < class T > void BiList< T >::erase(LCIter< T > pos)
+  template < class T > LIter< T > BiList< T >::erase(LCIter< T > pos)
   {
+    return LIter< T >();
   }
-  template < class T > void BiList< T >::erase(LCIter< T > begin, LCIter< T > end)
+  template < class T > LIter< T > BiList< T >::erase(LCIter< T > begin, LCIter< T > end)
   {
+    return LIter< T >();
   }
 
   template < class T > T &BiList< T >::front()
