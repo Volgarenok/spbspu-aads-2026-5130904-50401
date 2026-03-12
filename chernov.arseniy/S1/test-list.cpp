@@ -277,4 +277,51 @@ BOOST_AUTO_TEST_CASE(test_many_erase_after_iterator_through_fake)
   BOOST_CHECK_EQUAL(*(++list.begin()), 4);
 }
 
-BOOST_AUTO_TEST_SUITE_END();
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(list_capacity_tests)
+
+BOOST_AUTO_TEST_CASE(test_first)
+{
+  chernov::List< int > list;
+  list.push_front(1);
+  BOOST_CHECK_EQUAL(list.first(), 1);
+
+  list.push_front(2);
+  list.push_front(3);
+  BOOST_CHECK_EQUAL(list.first(), 3);
+
+  list.pop_front();
+  BOOST_CHECK_EQUAL(list.first(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_size)
+{
+  chernov::List< int > list;
+  BOOST_CHECK_EQUAL(list.size(), 0);
+
+  list.push_front(1);
+  BOOST_CHECK_EQUAL(list.size(), 1);
+
+  list.pop_front();
+  BOOST_CHECK_EQUAL(list.size(), 0);
+
+  list.push_front(2);
+  list.push_front(3);
+  BOOST_CHECK_EQUAL(list.size(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_empty)
+{
+  chernov::List< int > list;
+  BOOST_CHECK(list.empty());
+
+  list.push_front(1);
+  BOOST_CHECK(!list.empty());
+
+  list.push_front(2);
+  list.clear();
+  BOOST_CHECK(list.empty());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
