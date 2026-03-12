@@ -1,9 +1,9 @@
 #include <utility>
 #include <string>
 #include <iostream>
-#include "list.hpp"
+#include <list/list.hpp>
 #include "functions.hpp"
-#include "iterator.hpp"
+#include <list/iterator.hpp>
 int main()
 {
   using namespace malashenko;

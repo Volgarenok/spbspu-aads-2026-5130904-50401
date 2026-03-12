@@ -3,8 +3,8 @@
 #include <utility>
 #include <string>
 #include <iostream>
-#include "list.hpp"
-#include "iterator.hpp"
+#include <list/list.hpp>
+#include <list/iterator.hpp>
 namespace malashenko
 {
   template< class T > class LIter;
