@@ -30,24 +30,24 @@ namespace levkin {
     }
     void erase(LIter< T > from, LIter< T > to)
     {
-      if (from == pseudo)
-        return;
       while (from != to) {
-        Node< T >* nxt = from->next;
-        delete from;
-        from = nxt;
+        erase(from++);
       }
     }
 
-    void erase(LIter< T > from) { erase(from, pseudo); }
+    void erase(LIter< T > pos)
+    {
+      if (pos == end())
+        return;
+      __eraseFast(pos);
+    }
 
-    void clear() { erase(pseudo->next, pseudo); }
+    void clear() { erase(begin(), end()); }
     List(T val) : List() { insertBack(val); }
 
     ~List()
     {
-      Node< T >* curr = pseudo->next;
-
+      clear();
       delete pseudo;
     }
 
@@ -57,6 +57,15 @@ namespace levkin {
     List< T >& operator=(List< T >&& a) = delete;
 
   private:
+    void __eraseFast(LIter< T > pos)
+    {
+      Node< T >* toDelete = pos.curr;
+      toDelete->prev->next = toDelete->next;
+      toDelete->next->prev = toDelete->prev;
+
+      delete toDelete;
+    }
+
     Node< T >* pseudo;
   };
 

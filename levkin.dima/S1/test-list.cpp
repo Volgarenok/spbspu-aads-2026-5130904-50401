@@ -1,6 +1,5 @@
 #include "list.hpp"
 #include <boost/test/unit_test.hpp>
-#include <sstream>
 
 using namespace levkin;
 BOOST_AUTO_TEST_CASE(constructor_test)
@@ -16,5 +15,27 @@ BOOST_AUTO_TEST_CASE(iter_test)
   l.insertBack(1);
   l.insertBack(2);
   l.insertBack(3);
-  BOOST_CHECK_EQUAL(*(l.begin()++++), 3);
+
+  auto it2 = l.begin();
+  BOOST_CHECK_EQUAL(*it2, 1);
+  BOOST_CHECK_EQUAL(*(++it2), 2);
+  BOOST_CHECK_EQUAL(*(++it2), 3);
+  BOOST_CHECK(++it2 == l.end());
+}
+
+BOOST_AUTO_TEST_CASE(erase_test)
+{
+  List<int> l;
+  l.insertBack(1);
+  l.insertBack(2);
+  l.insertBack(3);
+
+  l.erase(++l.begin());
+  
+  auto it = l.begin();
+  BOOST_CHECK_EQUAL(*it, 1);
+  BOOST_CHECK_EQUAL(*(++it), 3);
+  
+  l.clear();
+  BOOST_CHECK(l.begin() == l.end());
 }
