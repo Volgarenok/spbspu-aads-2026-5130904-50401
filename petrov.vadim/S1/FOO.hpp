@@ -6,7 +6,7 @@ namespace petrov
 {
   void mkData(std::istream& input, List< std::pair< std::string, List< size_t > > >& data);
   void printAllList(List< std::pair< std::string, List< size_t > > >& data);
-  bool canShow(const List< size_t >& nums, size_t MAX);
+  bool canShowItem(const List< size_t >& nums, size_t istr);
   size_t maxLen(const List< std::pair< std::string, List< size_t > > >& data);
 }
 #endif

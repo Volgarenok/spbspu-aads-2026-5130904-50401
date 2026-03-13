@@ -41,6 +41,11 @@ namespace petrov
     return max;
   }
 
+  bool canShowItem(const List< size_t >& nums, size_t istr)
+  {
+    return nums.size() >= istr;
+  }
+
   void printAllList(List< std::pair< std::string, List< size_t > > >& data)
   {
     LIter< std::pair< std::string, List< size_t > > > outIt = data.begin();
