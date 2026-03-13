@@ -1,6 +1,7 @@
 #include <iostream>
-#include "list.hpp"
+#include <limits>
 #include <string>
+#include "list.hpp"
 
 namespace zharov {
   std::istream & getData(std::istream & in,
@@ -10,15 +11,30 @@ namespace zharov {
     List< int > > > data);
   List< List< int> > transposeNums(List< std::pair< std::string, List< int > > > data);
   size_t getSize(List< std::pair< std::string, List< int > > > data);
+  std::ostream & printSums(std::ostream & out, List< List < int > > nums);
 }
 
 int main()
 {
   zharov::List< std::pair< std::string, zharov::List< int > > > data;
   zharov::getData(std::cin, data);
+  if (data.constBegin() == data.constEnd()) {
+    std::cout << "0\n";
+    return 0;
+  }
   zharov::printNames(std::cout, data);
+  if (zharov::getSize(data) == 0) {
+    std::cout << "0\n";
+    return 1;
+  }
   auto transpose_nums = zharov::transposeNums(data);
   zharov::printNums(std::cout, transpose_nums);
+  try {
+    zharov::printSums(std::cout, transpose_nums);
+  } catch (const std::overflow_error & e) {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
 }
 
 std::istream & zharov::getData(std::istream & in,
@@ -41,9 +57,9 @@ std::ostream & zharov::printNums(std::ostream & out, List< List< int> > nums)
 {
   for (auto it = nums.constBegin(); it != nums.constEnd(); ++it) {
     for (auto inner_it = it->constBegin(); inner_it != it->constEnd(); ++inner_it) {
-      std::cout << *inner_it << ' ';
+      out << *inner_it << ' ';
     }
-    std::cout << "\n";
+    out << "\n";
   }
   return out;
 }
@@ -85,4 +101,21 @@ zharov::List< zharov::List< int> > zharov::transposeNums(
     res.pushBack(inner);
   }
   return res;
+}
+
+std::ostream & zharov::printSums(std::ostream & out, List< List < int > > nums)
+{
+  constexpr int MAX = std::numeric_limits< int >::max();
+  for (auto it = nums.constBegin(); it != nums.constEnd(); ++it) {
+    int sum = 0;
+    for (auto inner_it = it->constBegin(); inner_it != it->constEnd(); ++inner_it) {
+      if (MAX - *inner_it < sum) {
+        throw std::overflow_error("Overflow");
+      }
+      sum += *inner_it;
+    }
+    out << sum << ' ';
+  }
+  out << "\n";
+  return out;
 }
