@@ -53,7 +53,7 @@ namespace levkin
     }
     void popFront();
     void popBack();
-
+    LIter<T> insertAfter(LIter<T> it, const T& val);
     void clear() { erase(begin(), end()); }
     List(T val) : List() { pushBack(val); }
 

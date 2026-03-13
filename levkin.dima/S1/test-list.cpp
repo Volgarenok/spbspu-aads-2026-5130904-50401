@@ -69,25 +69,32 @@ BOOST_AUTO_TEST_CASE(erase_test)
   BOOST_CHECK_EQUAL(*(++it), 3);
 
   l.clear();
-  
 }
-  BOOST_AUTO_TEST_CASE(push_list_test)
-  {
-    List< int > l;
-    l.pushBack(2);
-    l.pushFront(1);
-    l.pushBack(3);
-    l.pushBack(3);
-    l.pushFront(3);
-  
-    l.popFront();
-    l.popBack();
-    
-    auto it = l.begin();
-    BOOST_CHECK_EQUAL(*it, 1);
-    BOOST_CHECK_EQUAL(*(++it), 2);
-    BOOST_CHECK_EQUAL(*(++it), 3);  
-  
+BOOST_AUTO_TEST_CASE(push_and_insert_test)
+{
+  List< int > l;
+
+  l.pushBack(2);
+  l.pushFront(1);
+  l.pushBack(3);
+  l.pushBack(3);
+  l.pushFront(3);
+
+  l.popFront();
+  l.popBack();
+
+  auto it = l.begin();
+
+  auto inserted_it = l.insertAfter(it, 10);
+  BOOST_CHECK_EQUAL(*inserted_it, 10);
+
+  auto check_it = l.begin();
+  BOOST_CHECK_EQUAL(*check_it, 1);
+  BOOST_CHECK_EQUAL(*(++check_it), 10);
+  BOOST_CHECK_EQUAL(*(++check_it), 2);
+  BOOST_CHECK_EQUAL(*(++check_it), 3);
+
+  BOOST_CHECK(++check_it == l.end());
 }
 
 BOOST_AUTO_TEST_CASE(copying_constructor)
