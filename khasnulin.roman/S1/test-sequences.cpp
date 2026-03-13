@@ -119,14 +119,54 @@ BOOST_AUTO_TEST_CASE(test_printSequencesNumsByPlace)
 
   BiList< Row > result = khasnulin::readAll(ss);
 
+  BiList< BiList< int > > new_lists = getTransosedNumsSequences(result);
+
   std::stringstream res_ss;
 
-  printSequencesNumsByPlace(res_ss, result);
+  printSequencesNumsByPlace(res_ss, new_lists);
 
   std::string expected = "1 2 4\n"
                          "1 2 4\n"
                          "1 2\n"
                          "2\n";
+
+  BOOST_CHECK_EQUAL(res_ss.str(), expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_printSums_standard)
+{
+  std::stringstream ss("first 1 1 1\n"
+                       "second 2 2 2 2\n"
+                       "third\n"
+                       "fourth 4 4\n");
+
+  BiList< Row > result = khasnulin::readAll(ss);
+
+  BiList< BiList< int > > new_lists = getTransosedNumsSequences(result);
+
+  std::stringstream res_ss;
+
+  printSumsOfSequences(res_ss, new_lists);
+
+  std::string expected = "7 7 3 2\n";
+
+  BOOST_CHECK_EQUAL(res_ss.str(), expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_printSums_with_zeros)
+{
+  std::stringstream ss("first 0 5\n"
+                       "second -1 1\n");
+
+  BiList< Row > result = khasnulin::readAll(ss);
+
+  BiList< BiList< int > > new_lists = getTransosedNumsSequences(result);
+
+  std::stringstream res_ss;
+
+  printSumsOfSequences(res_ss, new_lists);
+
+  std::string expected = "-1 6\n";
 
   BOOST_CHECK_EQUAL(res_ss.str(), expected);
 }

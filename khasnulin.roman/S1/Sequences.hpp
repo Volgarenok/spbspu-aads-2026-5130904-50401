@@ -12,7 +12,11 @@ namespace khasnulin
 
   void printSequenceNames(std::ostream &out, const bilist_row_pairs &sequence);
 
-  void printSequencesNumsByPlace(std::ostream &out, const bilist_row_pairs &sequence);
+  BiList< BiList< int > > getTransosedNumsSequences(const bilist_row_pairs &sequence);
+
+  void printSequencesNumsByPlace(std::ostream &out, const BiList< BiList< int > > &sequence);
+
+  void printSumsOfSequences(std::ostream &out, const BiList< BiList< int > > &sequence);
 }
 
 #endif
