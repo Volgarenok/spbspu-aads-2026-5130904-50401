@@ -47,6 +47,19 @@ namespace levkin
     }
     return in;
   }
-  Out& printTransposed(Out& out, const Data& data);
+  Out& printNames(Out& out, const Data& data)
+  {
+    LCIter< Pair > pairIt = data.cbegin();
+    for (; pairIt != data.cend(); ++pairIt) {
+      if (pairIt != data.cbegin()) {
+        out << " ";
+      }
+      out << pairIt->first;
+    }
+    out << '\n';
+
+    return out;
+  }
+  Out& printTransposed(Out& out, const Data& data) { return out; }
   Out& printSums(Out&, const Data& data) {}
 }
