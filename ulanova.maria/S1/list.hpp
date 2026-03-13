@@ -13,8 +13,9 @@ class LIter
   friend class List<T>;
 private:
   Node<T>* node;
+  Node<T>* head;
 public:
-  LIter(Node<T>* n = nullptr) : node(n) {}
+  LIter(Node<T>* n = nullptr, Node<T>* h = nullptr) : node(n), head(h) {}
   T& operator*() noexcept
   {
     return node -> data;
@@ -22,11 +23,19 @@ public:
   LIter& operator++() noexcept
   {
     node = node -> next;
+    if (node == head)
+    {
+      node = nullptr;
+    }
     return *this;
   }
   bool operator!=(const LIter& other) const noexcept
   {
     return node != other.node;
+  }
+  T* operator->() noexcept
+  {
+    return &(node->data);
   }
 };
 
@@ -36,8 +45,9 @@ class LCIter
   friend class List<T>;
 private:
   Node<T>* node;
+  Node<T>* head;
 public:
-  LCIter(Node<T>* n = nullptr) : node(n) {}
+  LCIter(Node<T>* n = nullptr, Node<T>* h = nullptr) : node(n), head(h) {}
   const T& operator*() const noexcept
   {
     return node -> data;
@@ -45,11 +55,19 @@ public:
   LCIter& operator++() noexcept
   {
     node = node -> next;
+    if (node == head)
+    {
+      node = nullptr;
+    }
     return *this;
   }
   bool operator!=(const LCIter& other) const noexcept
   {
     return node != other.node;
+  }
+  T* operator->() const noexcept
+  {
+    return &(node->data);
   }
 };
 
@@ -71,8 +89,8 @@ public:
   LIter<T> begin() noexcept;
   LIter<T> end() noexcept;
 
-  LCIter<T> begin() const noexcept;
-  LCIter<T> end() const noexcept;
+  LCIter<T> cbegin() const noexcept;
+  LCIter<T> cend() const noexcept;
 
   void clear();
 
@@ -135,23 +153,23 @@ T& List<T>::front()
 template <class T>
 LIter<T> List<T>::begin() noexcept
 {
-  return LIter<T>(head);
+  return LIter<T>(head,head);
 }
 template <class T>
 LIter<T> List<T>::end() noexcept
 {
-  return LIter<T>(nullptr);
+  return LIter<T>(nullptr,head);
 }
 
 template <class T>
-LCIter<T> List<T>::begin() const noexcept
+LCIter<T> List<T>::cbegin() const noexcept
 {
-  return LCIter<T>(head);
+  return LCIter<T>(head,head);
 }
 template <class T>
-LCIter<T> List<T>::end() const noexcept
+LCIter<T> List<T>::cend() const noexcept
 {
-  return LCIter<T>(nullptr);
+  return LCIter<T>(nullptr,head);
 }
 
 template <class T>

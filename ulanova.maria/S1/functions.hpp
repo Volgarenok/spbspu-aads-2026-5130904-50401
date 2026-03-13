@@ -10,6 +10,7 @@ struct Sequence
   List<int> values;
 };
 List<Sequence> read_sequences(std::istream& in);
+List<List<int>> transpose_sequences(const List<Sequence>& seqs);
 
 
 #endif
