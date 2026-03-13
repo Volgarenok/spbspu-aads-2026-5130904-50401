@@ -1,3 +1,11 @@
+#include "io.hpp"
 #include <iostream>
 
-int main() { std::cout << "levkin dima" << "\n"; }
+using namespace levkin;
+int main()
+{
+  Data data;
+  readData(std::cin, data);
+  printNames(std::cout, data);
+  printTransposed(std::cout, data);
+}
