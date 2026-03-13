@@ -145,6 +145,7 @@ namespace levkin {
         }
       } catch (...) {
         clear();
+        delete pseudo;
         throw;
       }
     };
