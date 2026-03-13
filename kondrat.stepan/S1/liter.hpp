@@ -9,7 +9,7 @@ namespace kondrat
   template< class T >
   class Node;
 
-  template< class  >
+  template< class T>
   class List;
 
   template< class T >
@@ -22,10 +22,10 @@ namespace kondrat
       LIter< T > operator++(int);
       LIter< T > & operator--();
       LIter< T > operator--(int);
-      bool operator==(LIter< T > rhs) const;
-      bool operator!=(LIter< T > rhs) const;
-      T & operator*();
-      T * operator->();
+      bool operator==(const LIter< T > & rhs) const;
+      bool operator!=(const LIter< T > & rhs) const;
+      T & operator*() const;
+      T * operator->() const;
     private:
       LIter(Node< T > * node) : node_(node) {}
       Node< T > * node_;
@@ -38,6 +38,7 @@ namespace kondrat
   template< class T >
   LIter< T > & LIter< T >::operator++()
   {
+    assert(node_ != nullptr);
     node_ = node_->next;
     return *this;
   }
@@ -53,6 +54,7 @@ namespace kondrat
   template< class T >
   LIter< T > & LIter< T >::operator--()
   {
+    assert(node_ != nullptr);
     node_ = node_->prev;
     return *this;
   }
@@ -66,29 +68,29 @@ namespace kondrat
   }
 
   template< class T >
-  bool LIter< T >::operator==(LIter< T > rhs) const
+  bool LIter< T >::operator==(const LIter< T > & rhs) const
   {
     return node_ == rhs.node_;
   }
 
   template< class T >
-  bool LIter< T >::operator!=(LIter< T > rhs) const
+  bool LIter< T >::operator!=(const LIter< T > & rhs) const
   {
     return !(node_ == rhs.node_);
   }
 
   template< class T >
-  T & LIter< T >::operator*()
+  T & LIter< T >::operator*() const
   {
     assert(node_ != nullptr);
     return node_->val;
   }
 
   template< class T >
-  T * LIter< T >::operator->()
+  T * LIter< T >::operator->() const
   {
     assert(node_ != nullptr);
-    return std::adressof(node_->val);
+    return std::addressof(node_->val);
   }
 }
 
