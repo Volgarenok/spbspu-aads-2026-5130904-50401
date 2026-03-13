@@ -203,5 +203,5 @@ BOOST_AUTO_TEST_CASE(get_len_test)
   l.pushBack(2);
   l.pushBack(3);
 
-  BOOST_CHECK_EQUAL(3, l.size()));
+  BOOST_CHECK_EQUAL(3, l.size());
 }

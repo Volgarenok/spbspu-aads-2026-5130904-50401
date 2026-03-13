@@ -34,6 +34,16 @@ namespace levkin
       pseudo->prev = pseudo;
     }
 
+    size_t size()
+    {
+      auto it = cbegin();
+      size_t count = 0;
+      for (; it != cend(); ++it) {
+        count++;
+      }
+      return count;
+    }
+
     void clearAndInit(size_t size, T val)
     {
       clear();
