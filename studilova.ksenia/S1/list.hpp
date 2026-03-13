@@ -29,6 +29,8 @@ namespace studilova
 
       void pop_front();
       void pop_back();
+      void push_front(const T& value);
+      void push_back(const T& value);
   };
 
   template< class T >
@@ -108,6 +110,52 @@ namespace studilova
       delete tail;
       size_--;
     }
+  }
+
+  template< class T >
+  void List< T >::push_front(const T& value)
+  {
+    Node< T >* node = new Node< T >{value, nullptr, nullptr};
+
+    if(empty())
+    {
+      node->next = node;
+      node->prev = node;
+      head_ = node;
+    } else {
+      Node< T >* tail = head_->prev;
+      
+      node->next = head_;
+      node->prev = tail;
+
+      tail->next = node;
+      head_->prev = node;
+
+      head_ = node;
+    }
+    ++size_;
+  }
+
+  template< class T >
+  void List< T >::push_back(const T& value)
+  {
+    Node< T >* node = new Node< T >{value, nullptr, nullptr};
+
+    if(empty())
+    {
+      node->next = node;
+      node->prev = node;
+      head_ = node;
+    } else {
+      Node< T >* tail = head_->prev;
+      
+      node->next = head_;
+      node->prev = tail;
+
+      tail->next = node;
+      head_->prev = node;
+    }
+    size_++;
   }
 
   template< class T >
