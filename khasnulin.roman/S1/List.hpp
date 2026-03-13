@@ -1,10 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
-#include <iostream>
-#include <memory>
 #include <stdexcept>
-#include <utility>
 
 #include "LCIter.hpp"
 #include "LIter.hpp"
@@ -70,11 +67,6 @@ namespace khasnulin
     template < class... Args > static LNode< T > *createNew(Args &&...args);
     template < class... Args > static LNode< T > *insert_before(LNode< T > *currNode, Args &&...args);
   };
-
-  template < typename T > std::ostream &operator<<(std::ostream &os, const LIter< T > &it)
-  {
-    return os << "LIter";
-  }
 
   template < class T >
   BiList< T >::BiList() noexcept:
