@@ -196,12 +196,18 @@ BOOST_AUTO_TEST_CASE(clear_and_init_test)
   BOOST_CHECK(l.begin() == l.end());
 }
 
-BOOST_AUTO_TEST_CASE(get_len_test)
+BOOST_AUTO_TEST_CASE(size_test)
 {
   List< int > l;
-  l.pushBack(1);
-  l.pushBack(2);
-  l.pushBack(3);
+  BOOST_CHECK_EQUAL(l.size(), 0);
 
-  BOOST_CHECK_EQUAL(3, l.size());
+  l.pushBack(10);
+  l.pushBack(20);
+  BOOST_CHECK_EQUAL(l.size(), 2);
+
+  l.popFront();
+  BOOST_CHECK_EQUAL(l.size(), 1);
+
+  l.clear();
+  BOOST_CHECK_EQUAL(l.size(), 0);
 }
