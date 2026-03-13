@@ -1,4 +1,5 @@
 #include "list.hpp"
+#include <boost/test/tools/old/interface.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace levkin;
@@ -193,4 +194,14 @@ BOOST_AUTO_TEST_CASE(clear_and_init_test)
 
   l.clearAndInit(0, 100);
   BOOST_CHECK(l.begin() == l.end());
+}
+
+BOOST_AUTO_TEST_CASE(get_len_test)
+{
+  List< int > l;
+  l.pushBack(1);
+  l.pushBack(2);
+  l.pushBack(3);
+
+  BOOST_CHECK_EQUAL(3, l.size()));
 }
