@@ -1,4 +1,3 @@
-#include "node.hpp"
 namespace zubarev
 {
   template < typename T >

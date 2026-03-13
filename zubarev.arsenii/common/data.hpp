@@ -5,7 +5,6 @@
 
 namespace zubarev
 {
-  // class List;
 
   struct Data
   {

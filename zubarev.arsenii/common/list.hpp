@@ -21,6 +21,7 @@ namespace zubarev
 
   private:
     Node< T >* head_;
+    Node< T>* tail_;
     Node< T >* ctFake()
     {
       Node< T >* el = new Node< T >{T(), nullptr};
@@ -63,6 +64,7 @@ namespace zubarev
   List< T >::List()
   {
     head_ = ctFake();
+    tail_ = head_;
     head_->next = nullptr;
   }
 
@@ -81,6 +83,7 @@ namespace zubarev
       return;
     }
     head_ = ctFake();
+    tail_ = head_;
 
     Node< T >* tmp = head_;
 
@@ -91,13 +94,16 @@ namespace zubarev
       curOld = curOld->next;
     }
     tmp->next = nullptr;
+    tail_=tmp;
   }
 
   template < class T >
   List< T >::List(List< T >&& other) noexcept :
-    head_(other.head_)
+    head_(other.head_),
+    tail_(other.tail_)
   {
     other.head_ = ctFake();
+    other.tail_=other.head_;
   }
   template < class T >
   List< T >& List< T >::operator=(const List& other)
@@ -115,6 +121,7 @@ namespace zubarev
       curOld = curOld->next;
     }
     tmp->next = nullptr;
+    tail_=tmp;
     return *this;
   }
 
@@ -127,8 +134,10 @@ namespace zubarev
     clear();
     rmFake();
     head_ = other.head_;
+    tail_ = other.tail_;
+    tail_=
     other.head_ = ctFake();
-
+    other.tail_=other.head_;
     return *this;
   }
   template < class T >
@@ -193,6 +202,7 @@ namespace zubarev
     }
 
     head_->next = nullptr;
+    tail_=head_;
   }
 
   template < class T >
