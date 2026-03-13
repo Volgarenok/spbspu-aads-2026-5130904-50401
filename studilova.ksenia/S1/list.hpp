@@ -26,6 +26,9 @@ namespace studilova
       bool empty() const;
 
       void clear();
+
+      void pop_front();
+      void pop_back();
   };
 
   template< class T >
@@ -50,22 +53,60 @@ namespace studilova
   {
     while(!empty())
     {
-      Node< T >* temp = head_;
-      if (size_ == 1)
-      {
-        delete temp;
-        head_ = nullptr;
-        size_ = 0;
-      } else {
-        Node< T >* tail = head_->prev;
-        head_ = head_->next;
+      pop_front();
+    }
+  }
 
-        head_->prev = tail;
-        tail->next = head_;
+  template< class T >
+  void List< T >::pop_front()
+  {
+    if (empty())
+    {
+      return;
+    }
 
-        delete temp;
-        size_--;
-      }
+    Node< T >* temp = head_;
+
+    if (size_ == 1)
+    {
+      delete temp;
+      head_ = nullptr;
+      size_ = 0;
+    } else {
+      Node< T >* tail = head_->prev;
+
+      head_ = head_->next;
+
+      head_->prev = tail;
+      tail->next = head_;
+
+      delete temp;
+      size_--;
+    }
+  }
+
+  template< class T >
+  void List< T >::pop_back()
+  {
+    if (empty())
+    {
+      return;
+    }
+
+    if (size_ == 1)
+    {
+      delete head_;
+      head_ = nullptr;
+      size_ = 0;
+    } else {
+      Node< T >* tail = head_->prev;
+      Node< T >* new_tail = tail->prev;
+
+      new_tail->next = head_;
+      head_->prev = new_tail;
+
+      delete tail;
+      size_--;
     }
   }
 
