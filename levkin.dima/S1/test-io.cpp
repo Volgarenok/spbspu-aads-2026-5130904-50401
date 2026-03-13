@@ -1,9 +1,8 @@
+#include "io.hpp"
 #include <boost/test/unit_test.hpp>
-
 using namespace levkin;
 
-BOOST_AUTO_TEST_CASE(read_data_test)
-{
+BOOST_AUTO_TEST_CASE(read_data_test) {
   std::stringstream input("first 1 1 1\nsecond 2 2 2 2\nthird\nfourth 4 4");
   Data data;
 
@@ -19,8 +18,7 @@ BOOST_AUTO_TEST_CASE(read_data_test)
   BOOST_CHECK(it->second.cbegin() == it->second.cend());
 }
 
-BOOST_AUTO_TEST_CASE(output_simulator_test)
-{
+BOOST_AUTO_TEST_CASE(output_simulator_test) {
   Data data;
 
   Lst l1;
@@ -56,8 +54,7 @@ BOOST_AUTO_TEST_CASE(output_simulator_test)
   BOOST_CHECK_EQUAL(out.str(), expectedOutput);
 }
 
-BOOST_AUTO_TEST_CASE(empty_data_test)
-{
+BOOST_AUTO_TEST_CASE(empty_data_test) {
   Data data;
   std::stringstream out;
 
