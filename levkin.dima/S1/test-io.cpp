@@ -63,10 +63,14 @@ BOOST_AUTO_TEST_CASE(empty_data_test) {
 
 BOOST_AUTO_TEST_CASE(overflow_test) {
   Data data;
-  Lst l1;
-  l1.pushBack(std::numeric_limits<size_t>::max());
-  l1.pushBack(1);
-  data.pushBack({"overflow", l1});
+  Lst l1, l2;
+  size_t max = std::numeric_limits<size_t>::max();
+
+  l1.pushBack(max);
+  l2.pushBack(1);
+
+  data.pushBack({"list1", l1});
+  data.pushBack({"list2", l2});
 
   std::stringstream out;
   BOOST_CHECK_THROW(printTransposed(out, data), std::overflow_error);

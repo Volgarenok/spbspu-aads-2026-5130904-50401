@@ -81,17 +81,17 @@ namespace levkin {
 
       for (; iterIter != iters.end(); ++iterIter, ++dataIter) {
         if (*iterIter != dataIter->second.cend()) {
+          size_t val = **iterIter;
+          if (std::numeric_limits< size_t >::max() - rowSum < val) {
+            throw std::overflow_error("can't fit sum in size_t");
+          }
           if (!firstInRow) {
             out << " ";
           }
 
-          out << **iterIter;
           firstInRow = false;
 
-          size_t val = **iterIter;
-          if (std::numeric_limits< size_t >::max() - rowSum <= val) {
-            throw std::overflow_error("can't fit sum in size_t");
-          }
+          out << **iterIter;
           rowSum += val;
           ++(*iterIter);
 
