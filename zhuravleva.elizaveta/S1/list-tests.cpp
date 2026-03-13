@@ -69,4 +69,3 @@ BOOST_AUTO_TEST_CASE(clear_test)
   BOOST_CHECK(a.empty());
 }
 
-BOOST_AUTO_TEST_SUITE_END()
