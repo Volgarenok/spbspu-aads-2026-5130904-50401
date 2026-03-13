@@ -1,9 +1,10 @@
 #include "io.hpp"
 #include "list.hpp"
 #include <cstdio>
+#include <limits>
+#include <stdexcept>
 namespace levkin
 {
-  using IterList = List< LCIter< size_t > >;
 
   IterList getIters(const Data& data)
   {
@@ -60,6 +61,58 @@ namespace levkin
 
     return out;
   }
-  Out& printTransposed(Out& out, const Data& data) { return out; }
-  Out& printSums(Out&, const Data& data) {}
+  Out& printTransposed(Out& out, const Data& data)
+  {
+    if (data.cbegin() == data.cend()) {
+      return out;
+    }
+    IterList iters = getIters(data);
+    List< size_t > sums;
+    bool oneMoreFlag = true;
+
+    while (oneMoreFlag) {
+      oneMoreFlag = false;
+      size_t rowSum = 0;
+      bool firstInRow = true;
+
+      IterIter iterIter = iters.begin();
+      LCIter< Pair > dataIter = data.cbegin();
+
+      for (; iterIter != iters.end(); ++iterIter, ++dataIter) {
+        if (*iterIter != dataIter->second.cend()) {
+          if (!firstInRow) {
+            out << " ";
+          }
+
+          out << **iterIter;
+          firstInRow = false;
+
+          size_t val = **iterIter;
+          if (std::numeric_limits< size_t >::max() - rowSum < val) {
+            throw std::overflow_error("can't fit sum in size_t");
+          }
+          rowSum += val;
+          ++(*iterIter);
+
+          oneMoreFlag = true;
+        }
+      }
+      if (oneMoreFlag) {
+        sums.pushBack(rowSum);
+        out << "\n";
+      }
+    }
+
+    if (sums.size() > 0) {
+      LCIter< size_t > sumIt = sums.cbegin();
+      out << *sumIt;
+      ++sumIt;
+      for (; sumIt != sums.cend(); ++sumIt) {
+        out << " " << *sumIt;
+      }
+      out << "\n";
+    }
+    return out;
+  }
+
 }
