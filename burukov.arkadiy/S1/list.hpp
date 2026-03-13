@@ -2,6 +2,7 @@
 #define LIST_HPP
 
 #include <cstddef>
+#include <utility>
 
 namespace burukov
 {
@@ -15,6 +16,10 @@ namespace burukov
     Node< T > *next_;
     Node(const T &value, Node< T > *next):
       val_(value),
+      next_(next)
+    {}
+    Node(T &&value, Node< T > *next):
+      val_(std::move(value)),
       next_(next)
     {}
   };
@@ -197,6 +202,11 @@ namespace burukov
       head_ = new Node< T >(val, head_);
       ++size_;
     }
+    void pushFront(T &&val)
+    {
+      head_ = new Node< T >(std::move(val), head_);
+      ++size_;
+    }
     void popFront()
     {
       Node< T > *old = head_;
@@ -207,6 +217,14 @@ namespace burukov
     LIter< T > insertAfter(LIter< T > pos, const T &val)
     {
       Node< T > *created = new Node< T >(val, pos.ptr_->next_);
+      pos.ptr_->next_ = created;
+      ++size_;
+      return LIter< T >(created);
+    }
+    LIter< T > insertAfter(LIter< T > pos, T &&val)
+    {
+      Node< T > *created =
+          new Node< T >(std::move(val), pos.ptr_->next_);
       pos.ptr_->next_ = created;
       ++size_;
       return LIter< T >(created);
