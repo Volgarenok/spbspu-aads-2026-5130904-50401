@@ -33,8 +33,22 @@ List<List<int>> transpose_sequences(const List<Sequence>& seqs)
   while (!done)
   {
     done = true;
+    List<int> row;
     LCIter<Sequence> seq_it = seqs.cbegin();
     LIter<LCIter<int>> iter_it = iters.begin();
-    for (; seq)
+    for (; seq_it != seqs.cend();++seq_it,++iter_it)
+    {
+      if(*iter_it != seq_it->values.cend())
+      {
+        row.push_front(**iter_it);
+        ++(*iter_it);
+        done = false;
+      }
+    }
+    if(!done)
+    {
+      result.push_front(row);
+    }
+    return result;
   }
 }
