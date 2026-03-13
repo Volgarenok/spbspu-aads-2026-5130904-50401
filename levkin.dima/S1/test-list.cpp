@@ -1,6 +1,6 @@
-#include "list.hpp"
 #include <boost/test/tools/old/interface.hpp>
 #include <boost/test/unit_test.hpp>
+#include "list.hpp"
 
 using namespace levkin;
 BOOST_AUTO_TEST_CASE(constructor_test)

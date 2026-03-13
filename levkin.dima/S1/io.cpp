@@ -3,8 +3,8 @@
 #include <cstdio>
 #include <limits>
 #include <stdexcept>
-namespace levkin
-{
+
+namespace levkin {
 
   IterList getIters(const Data& data)
   {

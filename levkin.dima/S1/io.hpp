@@ -7,8 +7,7 @@
 #include <string>
 #include <utility>
 
-namespace levkin
-{
+namespace levkin {
   using String = std::string;
   using Lst = List< size_t >;
   using Pair = std::pair< String, Lst >;

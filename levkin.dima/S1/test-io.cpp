@@ -1,6 +1,6 @@
-#include "io.hpp"
-#include <boost/test/unit_test.hpp>
 #include <sstream>
+#include <boost/test/unit_test.hpp>
+#include "io.hpp"
 
 using namespace levkin;
 
