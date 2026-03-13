@@ -1,7 +1,6 @@
 #ifndef LIST
 #define LIST
 #include <cstddef>
-#include <exception>
 #include <stdexcept>
 #include <utility>
 
