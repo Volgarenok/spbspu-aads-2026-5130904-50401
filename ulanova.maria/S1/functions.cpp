@@ -49,6 +49,6 @@ List<List<int>> transpose_sequences(const List<Sequence>& seqs)
     {
       result.push_front(row);
     }
-    return result;
   }
+  return result;
 }
