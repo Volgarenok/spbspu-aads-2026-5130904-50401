@@ -10,5 +10,17 @@ class LIter
   friend class List< T >;
   Node< T >* n;
 
+  LIter();
+  ~LIter();
+
+  LIter< T >& operator++();
+  LIter< T > operator++(int);
+
+  T& operator*();
+  T* operator ->();
+
+  bool operator==(LIter< T >) const;
+  bool operator!=(LIter< T >) const;
+
 };
 #endif
