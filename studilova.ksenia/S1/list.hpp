@@ -14,23 +14,29 @@ namespace studilova
   };
 
   template< class T >
+  class LIter;
+
+  template< class T >
   class List
   {
     private:
       Node< T >* head_;
       size_t size_;
+
     public:
       List();
       ~List();
 
       bool empty() const;
-
       void clear();
 
       void pop_front();
       void pop_back();
       void push_front(const T& value);
       void push_back(const T& value);
+
+      LIter< T > begin();
+      LIter< T > end();
   };
 
   template< class T >
@@ -174,7 +180,6 @@ namespace studilova
 
     bool operator==(const LIter& other) const;
     bool operator!=(const LIter& other) const;
-
   };
 
   template< class T >
@@ -212,6 +217,18 @@ namespace studilova
   bool LIter< T >::operator!=(const LIter& other) const
   {
     return !(*this == other);
+  }
+
+  template< class T >
+  LIter< T > List< T >::begin()
+  {
+    return LIter< T >(head_);
+  }
+
+  template< class T >
+  LIter< T > List< T >::end()
+  {
+    return LIter< T >(nullptr);
   }
 
   template< class T >
