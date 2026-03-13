@@ -173,3 +173,24 @@ BOOST_AUTO_TEST_CASE(move_assignment)
   BOOST_CHECK_EQUAL(*(itr++), 3);
   BOOST_CHECK(itr == r.end());
 }
+
+BOOST_AUTO_TEST_CASE(clear_and_init_test)
+{
+  List< int > l;
+  l.pushBack(1);
+  l.pushBack(2);
+  l.pushBack(3);
+
+  l.clearAndInit(5, 42);
+
+  size_t count = 0;
+  for (auto it = l.begin(); it != l.end(); ++it) {
+    BOOST_CHECK_EQUAL(*it, 42);
+    count++;
+  }
+
+  BOOST_CHECK_EQUAL(count, 5);
+
+  l.clearAndInit(0, 100);
+  BOOST_CHECK(l.begin() == l.end());
+}
