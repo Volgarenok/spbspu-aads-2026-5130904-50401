@@ -178,6 +178,43 @@ namespace studilova
   };
 
   template< class T >
+  LIter< T >::LIter(Node< T >* node)
+    : node_(node)
+  {}
+
+  template< class T >
+  T& LIter< T >::operator*() const
+  {
+    return node_->data;
+  }
+
+  template< class T >
+  LIter< T >& LIter< T >::operator++()
+  {
+    node_ = node_->next;
+    return *this;
+  }
+
+  template< class T >
+  LIter< T >& LIter< T >::operator--()
+  {
+    node_ = node_->prev;
+    return *this;
+  }
+
+  template< class T >
+  bool LIter< T >::operator==(const LIter& other) const
+  {
+    return node_ == other.node_;
+  }
+
+  template< class T >
+  bool LIter< T >::operator!=(const LIter& other) const
+  {
+    return !(*this == other);
+  }
+
+  template< class T >
   class CLIter;
 }
 
