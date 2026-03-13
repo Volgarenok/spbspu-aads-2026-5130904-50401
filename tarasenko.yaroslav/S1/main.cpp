@@ -84,7 +84,8 @@ int main()
         }
         else
         {
-          std::cerr << "\n" << "addition overflow\n";
+          std::cout << "\n";
+          std::cerr << "addition overflow\n";
           return 1;
         }
         ++((*it).first);
