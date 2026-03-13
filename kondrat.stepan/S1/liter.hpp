@@ -9,7 +9,7 @@ namespace kondrat
   template< class T >
   class Node;
 
-  template< class T>
+  template< class T >
   class List;
 
   template< class T >
