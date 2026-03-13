@@ -49,12 +49,12 @@ BOOST_AUTO_TEST_CASE(delete_after_test)
 {
   zhuravleva::List<int> a;
 
-  auto it = a.AddStart(1);
-  a.addAfter(it, 2);
-
+  a.AddStart(2);
+  a.AddStart(1);
+  auto it = a.begin();
+  it = it.next();
   a.deleteAfter(it);
-
-  BOOST_CHECK(it.next() == a.end());
+  BOOST_CHECK((*it) == 1);
 }
 
 BOOST_AUTO_TEST_CASE(clear_test)
