@@ -41,6 +41,9 @@ class List {
   size_t size_;
   public:
   List();
+  ~List();
+  List(const List& a);
+  List& operator=(const List& a);
   void clear();
   void push_front(T a);
   void push_back(T a);
@@ -134,6 +137,38 @@ const T& LCIter< T >::operator*() const
 template< class T >
 List< T >::List() : head(nullptr), size_(0)
 {}
+
+template< class T >
+List< T >::~List()
+{
+  clear();
+}
+
+template< class T >
+List< T >::List(const List< T > & a) : head(nullptr), size_(0)
+{
+  Node< T > * temp = a.head;
+  for (size_t i = 0; i < a.size_; ++i) {
+    this->push_back(temp->val);
+    temp = temp->next;
+  }
+}
+
+template< class T >
+List< T > & List< T >::operator=(const List< T > & a)
+{
+  if(this == &a) {
+    return *(this);
+  }
+  this->clear();
+  Node< T > * temp = a.head;
+  for (size_t i = 0; i < a.size_; ++i) {
+    this->push_back(temp->val);
+    temp = temp->next;
+  }
+  return *(this);
+}
+
 
 template< class T >
 void List< T >::clear()
