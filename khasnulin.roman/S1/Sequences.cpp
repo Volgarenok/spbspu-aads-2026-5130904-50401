@@ -1,4 +1,5 @@
 #include "Sequences.hpp"
+#include "List.hpp"
 
 #include <iostream>
 
@@ -48,7 +49,8 @@ void khasnulin::printSequenceNames(std::ostream &out, const bilist_row_pairs &se
   out << "\n";
 }
 
-void khasnulin::printSequencesNumsByPlace(std::ostream &out, const bilist_row_pairs &sequence)
+khasnulin::BiList< khasnulin::BiList< int > >
+khasnulin::getTransosedNumsSequences(const bilist_row_pairs &sequence)
 {
   BiList< LCIter< int > > it_list;
   for (const auto &item : sequence)
@@ -56,30 +58,65 @@ void khasnulin::printSequencesNumsByPlace(std::ostream &out, const bilist_row_pa
     it_list.push_back(item.second.begin());
   }
 
+  BiList< BiList< int > > answer;
   bool all_empty = false;
   while (!all_empty)
   {
     all_empty = true;
-    bool first = true;
     auto curr_it = it_list.begin();
+    BiList< int > current_layer;
     for (const auto &curr_seq : sequence)
     {
       if (*curr_it != curr_seq.second.end())
       {
-        if (!first)
-        {
-          out << " ";
-        }
-        out << *(*curr_it);
+        current_layer.push_back(*(*curr_it));
         ++(*curr_it);
         all_empty = false;
-        first = false;
       }
       ++curr_it;
     }
     if (!all_empty)
     {
-      out << "\n";
+      answer.push_back(std::move(current_layer));
     }
   }
+  return answer;
+}
+
+void khasnulin::printSequencesNumsByPlace(std::ostream &out, const BiList< BiList< int > > &sequence)
+{
+  for (const BiList< int > &seq : sequence)
+  {
+    bool first = true;
+    for (const int num : seq)
+    {
+      if (!first)
+      {
+        out << " ";
+      }
+      out << num;
+      first = false;
+    }
+    out << "\n";
+  }
+}
+
+void khasnulin::printSumsOfSequences(std::ostream &out, const BiList< BiList< int > > &sequence)
+{
+  bool first = true;
+  for (const BiList< int > &seq : sequence)
+  {
+    int sum = 0;
+    for (int num : seq)
+    {
+      sum += num;
+    }
+    if (!first)
+    {
+      out << " ";
+    }
+    out << sum;
+    first = false;
+  }
+  out << "\n";
 }
