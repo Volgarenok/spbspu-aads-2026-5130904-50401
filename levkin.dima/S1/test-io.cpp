@@ -60,3 +60,62 @@ BOOST_AUTO_TEST_CASE(empty_data_test) {
 
   printTransposed(out, data);
 }
+
+BOOST_AUTO_TEST_CASE(overflow_test) {
+  Data data;
+  Lst l1;
+  l1.pushBack(std::numeric_limits<size_t>::max());
+  l1.pushBack(1);
+  data.pushBack({"overflow", l1});
+
+  std::stringstream out;
+  BOOST_CHECK_THROW(printTransposed(out, data), std::overflow_error);
+}
+
+BOOST_AUTO_TEST_CASE(completely_empty_input_test) {
+  Data data;
+  std::stringstream out;
+
+  if (data.cbegin() == data.cend()) {
+    out << "0\n";
+  } else {
+    printTransposed(printNames(out, data), data);
+  }
+
+  BOOST_CHECK_EQUAL(out.str(), "0\n");
+}
+
+BOOST_AUTO_TEST_CASE(list_with_no_numbers_test) {
+  Data data;
+  Lst emptyList;
+  data.pushBack({"empty_list", emptyList});
+
+  std::stringstream out;
+  printNames(out, data);
+  printTransposed(out, data);
+
+  std::string expected = "empty_list\n0\n";
+  BOOST_CHECK_EQUAL(out.str(), expected);
+}
+
+BOOST_AUTO_TEST_CASE(mixed_empty_and_full_test) {
+  Data data;
+  Lst l1;
+  l1.pushBack(10);
+  Lst l2;
+  Lst l3;
+  l3.pushBack(20);
+
+  data.pushBack({"first", l1});
+  data.pushBack({"second", l2});
+  data.pushBack({"third", l3});
+
+  std::stringstream out;
+  printTransposed(printNames(out, data), data);
+
+  std::string expected = "first second third\n"
+                         "10 20\n"
+                         "30\n";
+
+  BOOST_CHECK_EQUAL(out.str(), expected);
+}

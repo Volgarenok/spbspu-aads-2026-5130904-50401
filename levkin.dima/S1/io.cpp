@@ -68,9 +68,9 @@ namespace levkin {
     }
     IterList iters = getIters(data);
     List< size_t > sums;
-    
+
     bool rollOneMoreTime = true;
-    
+
     while (rollOneMoreTime) {
       rollOneMoreTime = false;
       size_t rowSum = 0;
@@ -89,7 +89,7 @@ namespace levkin {
           firstInRow = false;
 
           size_t val = **iterIter;
-          if (std::numeric_limits< size_t >::max() - rowSum < val) {
+          if (std::numeric_limits< size_t >::max() - rowSum <= val) {
             throw std::overflow_error("can't fit sum in size_t");
           }
           rowSum += val;
