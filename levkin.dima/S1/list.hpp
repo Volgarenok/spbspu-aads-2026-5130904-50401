@@ -1,6 +1,8 @@
 #ifndef LIST
 #define LIST
 #include <cstddef>
+#include <exception>
+#include <stdexcept>
 #include <utility>
 
 namespace levkin
@@ -8,9 +10,11 @@ namespace levkin
   template < class T > class List;
   template < class T > class LIter;
   template < class T > class LCIter;
-  template < class T > struct Node {
+  struct NodeBase {
+    NodeBase *prev, *next;
+  };
+  template < class T > struct Node : public NodeBase {
     T val;
-    Node< T >*prev, *next;
   };
 
   template < class T > class List
@@ -28,13 +32,13 @@ namespace levkin
     void pushFront(T val) { insertAfter(LIter< T >(pseudo), val); }
     void pushBack(T val) { insertAfter(LIter< T >(pseudo->prev), val); }
 
-    List() : pseudo(new Node< T >())
+    List() : pseudo(new NodeBase())
     {
       pseudo->next = pseudo;
       pseudo->prev = pseudo;
     }
 
-    size_t size()
+    size_t size() const
     {
       auto it = cbegin();
       size_t count = 0;
@@ -67,17 +71,35 @@ namespace levkin
     }
     void popFront()
     {
-      erase(LIter< T >(pseudo->next), LIter< T >(pseudo->next->next));
+      if (begin() != end()) {
+        erase(begin());
+      }
     };
-    void popBack() { erase(LIter< T >(pseudo->prev), LIter< T >(pseudo)); };
+    void popBack()
+    {
+      if (begin() != end()) {
+        erase(LIter< T >(pseudo->prev));
+      }
+    };
     LIter< T > insertAfter(LIter< T > it, const T& val)
     {
-      Node< T >* newLst = new Node< T >{val, it.curr, it.curr->next};
-      newLst->next->prev = newLst;
-      it.curr->next = newLst;
-      return LIter< T >(newLst);
+      if (it.curr == nullptr)
+        throw std::out_of_range("out of bounds or null. wierd");
+      Node< T >* newNode = new Node< T >();
+      newNode->val = val;
+      newNode->prev = it.curr;
+      newNode->next = it.curr->next;
+
+      newNode->next->prev = newNode;
+      it.curr->next = newNode;
+      return LIter< T >(newNode);
     }
-    void clear() { erase(begin(), end()); }
+    void clear()
+    {
+      while (pseudo->next != pseudo) {
+        __eraseFast(LIter< T >(pseudo->next));
+      }
+    }
     List(T val) : List() { pushBack(val); }
 
     ~List()
@@ -111,19 +133,19 @@ namespace levkin
 
   private:
     void swap(List< T >& a) { std::swap(a.pseudo, this->pseudo); }
-    List(Node< T >* pseudo_node) : pseudo(pseudo_node) {}
+    List(NodeBase* pseudo_node) : pseudo(pseudo_node) {}
     LIter< T > __eraseFast(LIter< T > pos)
     {
-      Node< T >* toDelete = pos.curr;
+      NodeBase* toDelete = pos.curr;
       toDelete->prev->next = toDelete->next;
       toDelete->next->prev = toDelete->prev;
 
-      LIter< T > nxt = toDelete->next;
-      delete toDelete;
-      return nxt;
+      NodeBase* nxt = toDelete->next;
+      delete static_cast< Node< T >* >(toDelete);
+      return LIter< T >(nxt);
     }
 
-    Node< T >* pseudo;
+    NodeBase* pseudo;
   };
 
   template < class T > class LCIter
@@ -132,15 +154,13 @@ namespace levkin
     friend class LIter< T >;
 
   public:
-    LCIter< T >(Node< T >* node) : curr(node) {}
+    LCIter(NodeBase* node = nullptr) : curr(node) {}
     LCIter< T >(LIter< T > it) : curr(it.curr) {}
-
-    const T& operator*() const { return curr->val; }
+    const T& operator*() const { return static_cast< Node< T >* >(curr)->val; }
 
     LCIter& operator++()
     {
-      if (curr)
-        curr = curr->next;
+      curr = curr->next;
       return *this;
     }
 
@@ -153,8 +173,7 @@ namespace levkin
 
     LCIter& operator--()
     {
-      if (curr)
-        curr = curr->prev;
+      curr = curr->prev;
       return *this;
     }
 
@@ -165,7 +184,10 @@ namespace levkin
       return temp;
     }
 
-    T const* operator->() const { return &(curr->val); }
+    T const* operator->() const
+    {
+      return &static_cast< Node< T >* >(curr)->val;
+    }
     bool operator==(const LCIter& other) const { return curr == other.curr; }
     bool operator!=(const LCIter& other) const { return !(*this == other); }
 
@@ -179,7 +201,7 @@ namespace levkin
     }
 
   private:
-    Node< T >* curr = nullptr;
+    NodeBase* curr = nullptr;
   };
   template < class T > class LIter
   {
@@ -187,14 +209,12 @@ namespace levkin
     friend class LCIter< T >;
 
   public:
-    LIter< T >(Node< T >* node) : curr(node) {}
-
-    T& operator*() { return curr->val; }
+    LIter(NodeBase* node) : curr(node) {}
+    T& operator*() { return static_cast< Node< T >* >(curr)->val; }
 
     LIter& operator++()
     {
-      if (curr)
-        curr = curr->next;
+      curr = curr->next;
       return *this;
     }
 
@@ -207,8 +227,7 @@ namespace levkin
 
     LIter& operator--()
     {
-      if (curr)
-        curr = curr->prev;
+      curr = curr->prev;
       return *this;
     }
 
@@ -219,7 +238,7 @@ namespace levkin
       return temp;
     }
 
-    T* operator->() { return &(curr->val); }
+    T* operator->() { return &(static_cast< Node< T >* >(curr)->val); }
     bool operator==(const LIter& other) const { return curr == other.curr; }
     bool operator!=(const LIter& other) const { return !(*this == other); }
 
@@ -233,7 +252,7 @@ namespace levkin
     }
 
   private:
-    Node< T >* curr = nullptr;
+    NodeBase* curr = nullptr;
   };
 
 }
