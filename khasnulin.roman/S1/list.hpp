@@ -67,8 +67,8 @@ namespace khasnulin
 
     static LNode< T > *copy(const LNode< T > *h);
     static void clear(LNode< T > *h) noexcept;
-    template < class... Args > static LNode< T > *createNew(Args... args);
-    template < class... Args > static LNode< T > *insert_before(LNode< T > *currNode, Args... args);
+    template < class... Args > static LNode< T > *createNew(Args &&...args);
+    template < class... Args > static LNode< T > *insert_before(LNode< T > *currNode, Args &&...args);
   };
 
   template < typename T > std::ostream &operator<<(std::ostream &os, const LIter< T > &it)
@@ -127,9 +127,9 @@ namespace khasnulin
 
   template < class T >
   template < class... Args >
-  typename BiList< T >::template LNode< T > *BiList< T >::createNew(Args... args)
+  typename BiList< T >::template LNode< T > *BiList< T >::createNew(Args &&...args)
   {
-    LNode< T > *head = new LNode< T >{T(std::forward< T >(args)...), nullptr, nullptr};
+    LNode< T > *head = new LNode< T >{T(std::forward< Args >(args)...), nullptr, nullptr};
     head->next = head;
     head->prev = head;
     return head;
@@ -137,15 +137,15 @@ namespace khasnulin
 
   template < class T >
   template < class... Args >
-  typename BiList< T >::template LNode< T > *BiList< T >::insert_before(LNode< T > *currNode, Args... args)
+  typename BiList< T >::template LNode< T > *BiList< T >::insert_before(LNode< T > *currNode, Args &&...args)
   {
     if (!currNode)
     {
-      return createNew(std::forward< T >(args)...);
+      return createNew(std::forward< Args >(args)...);
     }
     LNode< T > *prev = currNode->prev;
     LNode< T > *curr = currNode;
-    prev->next = new LNode< T >{T(std::forward< T >(args)...), prev, curr};
+    prev->next = new LNode< T >{T(std::forward< Args >(args)...), prev, curr};
     curr->prev = prev->next;
     return curr->prev;
   }
@@ -236,8 +236,8 @@ namespace khasnulin
 
   template < class T > LIter< T > BiList< T >::insert(LCIter< T > pos, const T &val)
   {
-    LNode< T > *item = insert_before(pos.curr_, val);
-    if (pos.curr_ == h_)
+    LNode< T > *item = insert_before(pos.it_.curr_, val);
+    if (pos.it_.curr_ == h_)
     {
       h_ = item;
     }
@@ -350,7 +350,11 @@ namespace khasnulin
   }
   template < class T > const T &BiList< T >::front() const
   {
-    return front();
+    if (empty())
+    {
+      throw std::runtime_error("list is empty, can't get front element");
+    }
+    return h_->val;
   }
 
   template < class T > T &BiList< T >::back()
@@ -364,7 +368,11 @@ namespace khasnulin
 
   template < class T > const T &BiList< T >::back() const
   {
-    return back();
+    if (empty())
+    {
+      throw std::runtime_error("list is empty, can't get back element");
+    }
+    return h_->prev->val;
   }
 }
 
