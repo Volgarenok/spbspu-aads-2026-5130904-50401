@@ -11,7 +11,8 @@ namespace zharov {
     List< size_t > > > data);
   List< List< size_t> > transposeNums(List< std::pair< std::string, List< size_t > > > data);
   size_t getSize(List< std::pair< std::string, List< size_t > > > data);
-  std::ostream & printSums(std::ostream & out, List< List < size_t > > nums);
+  List< size_t> getSums(List< List < size_t > > nums);
+  std::ostream & printSums(std::ostream & out, List< size_t > sums);
 }
 
 int main()
@@ -30,7 +31,8 @@ int main()
   auto transpose_nums = zharov::transposeNums(data);
   zharov::printNums(std::cout, transpose_nums);
   try {
-    zharov::printSums(std::cout, transpose_nums);
+    auto sums_list = zharov::getSums(transpose_nums);
+    zharov::printSums(std::cout, sums_list);
   } catch (const std::overflow_error & e) {
     std::cerr << e.what() << "\n";
     return 1;
@@ -64,6 +66,7 @@ std::ostream & zharov::printNums(std::ostream & out, List< List< size_t > > nums
       out << *inner_it;
       first = false;
     }
+    first = true;
     out << "\n";
   }
   return out;
@@ -113,10 +116,10 @@ zharov::List< zharov::List< size_t> > zharov::transposeNums(
   return res;
 }
 
-std::ostream & zharov::printSums(std::ostream & out, List< List < size_t > > nums)
+zharov::List< size_t> zharov::getSums(List< List < size_t > > nums)
 {
+  List< size_t > res;
   constexpr size_t MAX = std::numeric_limits< size_t >::max();
-  bool first = true;
   for (auto it = nums.constBegin(); it != nums.constEnd(); ++it) {
     size_t sum = 0;
     for (auto inner_it = it->constBegin(); inner_it != it->constEnd(); ++inner_it) {
@@ -125,12 +128,20 @@ std::ostream & zharov::printSums(std::ostream & out, List< List < size_t > > num
       }
       sum += *inner_it;
     }
+    res.pushBack(sum);
+  }
+  return res;
+}
+
+std::ostream & zharov::printSums(std::ostream & out, List< size_t > sums)
+{
+  bool first = true;
+  for (auto it = sums.constBegin(); it != sums.constEnd(); ++it) {
     if (!first) {
       out << ' ';
     }
-    out << sum;
-    first = false;
+    out << *it;
   }
-  out << "\n";
+  out << '\n';
   return out;
 }
