@@ -23,15 +23,9 @@ namespace levkin
     LIter< T > end() { return LIter< T >(pseudo); }
     LCIter< T > end() const { return cend(); }
     LCIter< T > cend() const { return LCIter< T >(pseudo); }
-    
-    void pushFront(T val);
-    void pushBack(T val)
-    {
-      Node< T >* lst = pseudo->prev;
-      Node< T >* newLst = new Node< T >{val, lst, pseudo};
-      lst->next = newLst;
-      pseudo->prev = newLst;
-    }
+
+    void pushFront(T val) { insertAfter(LIter< T >(pseudo), val); }
+    void pushBack(T val) { insertAfter(LIter< T >(pseudo->prev), val); }
 
     List() : pseudo(new Node< T >())
     {
@@ -51,9 +45,18 @@ namespace levkin
         return pos;
       return __eraseFast(pos);
     }
-    void popFront();
-    void popBack();
-    LIter<T> insertAfter(LIter<T> it, const T& val);
+    void popFront()
+    {
+      erase(LIter< T >(pseudo->next), LIter< T >(pseudo->next->next));
+    };
+    void popBack() { erase(LIter< T >(pseudo->prev), LIter< T >(pseudo)); };
+    LIter< T > insertAfter(LIter< T > it, const T& val)
+    {
+      Node< T >* newLst = new Node< T >{val, it.curr, it.curr->next};
+      newLst->next->prev = newLst;
+      it.curr->next = newLst;
+      return LIter< T >(newLst);
+    }
     void clear() { erase(begin(), end()); }
     List(T val) : List() { pushBack(val); }
 
