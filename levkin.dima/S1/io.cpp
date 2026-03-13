@@ -68,10 +68,11 @@ namespace levkin {
     }
     IterList iters = getIters(data);
     List< size_t > sums;
-    bool oneMoreFlag = true;
-
-    while (oneMoreFlag) {
-      oneMoreFlag = false;
+    
+    bool rollOneMoreTime = true;
+    
+    while (rollOneMoreTime) {
+      rollOneMoreTime = false;
       size_t rowSum = 0;
       bool firstInRow = true;
 
@@ -94,10 +95,10 @@ namespace levkin {
           rowSum += val;
           ++(*iterIter);
 
-          oneMoreFlag = true;
+          rollOneMoreTime = true;
         }
       }
-      if (oneMoreFlag) {
+      if (rollOneMoreTime) {
         sums.pushBack(rowSum);
         out << "\n";
       }
@@ -111,6 +112,8 @@ namespace levkin {
         out << " " << *sumIt;
       }
       out << "\n";
+    } else {
+      out << "0\n";
     }
     return out;
   }
