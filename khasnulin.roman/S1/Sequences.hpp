@@ -24,8 +24,12 @@ namespace khasnulin
     return std::pair< std::string, BiList< int > >{name, list};
   }
 
-  BiList< std::pair< std::string, BiList< int > > > readAll(std::istream &in)
+  using bilist_row_pairs = BiList< std::pair< std::string, BiList< int > > >;
+  bilist_row_pairs readAll(std::istream &in)
   {
+    std::string s;
+    in >> s;
+    return bilist_row_pairs();
   }
 }
 
