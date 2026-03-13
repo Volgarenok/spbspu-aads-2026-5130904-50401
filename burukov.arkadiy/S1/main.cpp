@@ -239,6 +239,7 @@ int main()
   const size_t maxLen = burukov::getMaxLen(seqs);
   if (maxLen == 0)
   {
+    std::cout << 0 << "\n";
     return 0;
   }
   return burukov::buildAndPrint(std::cout, std::cerr, seqs, maxLen);
