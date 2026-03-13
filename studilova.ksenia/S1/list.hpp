@@ -124,7 +124,7 @@ namespace studilova
       head_ = node;
     } else {
       Node< T >* tail = head_->prev;
-      
+
       node->next = head_;
       node->prev = tail;
 
@@ -148,7 +148,7 @@ namespace studilova
       head_ = node;
     } else {
       Node< T >* tail = head_->prev;
-      
+
       node->next = head_;
       node->prev = tail;
 
@@ -159,7 +159,23 @@ namespace studilova
   }
 
   template< class T >
-  class LIter;
+  class LIter
+  {
+    friend class List< T >;
+  private:
+    Node< T >* node_;
+  public:
+    LIter(Node< T >* node = nullptr);
+
+    T& operator*() const;
+
+    LIter& operator++();
+    LIter& operator--();
+
+    bool operator==(const LIter& other) const;
+    bool operator!=(const LIter& other) const;
+
+  };
 
   template< class T >
   class CLIter;
