@@ -190,7 +190,7 @@ namespace levkin {
     LCIter(NodeBase* node = nullptr) : curr(node)
     {
     }
-    LCIter< T >(LIter< T > it) : curr(it.curr)
+    LCIter(LIter< T > it) : curr(it.curr)
     {
     }
     const T& operator*() const
