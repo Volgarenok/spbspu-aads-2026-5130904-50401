@@ -19,8 +19,7 @@ std::pair< std::string, khasnulin::BiList< int > > khasnulin::readRow(std::istre
   return std::pair< std::string, BiList< int > >{name, list};
 }
 
-using bilist_row_pairs = khasnulin::BiList< std::pair< std::string, khasnulin::BiList< int > > >;
-bilist_row_pairs khasnulin::readAll(std::istream &in)
+khasnulin::bilist_row_pairs khasnulin::readAll(std::istream &in)
 {
   bilist_row_pairs result;
   while (!in.eof() && !in.fail())
@@ -34,7 +33,7 @@ bilist_row_pairs khasnulin::readAll(std::istream &in)
   return result;
 }
 
-void khasnulin::printSequenceNames(std::ostream &out, bilist_row_pairs &sequence)
+void khasnulin::printSequenceNames(std::ostream &out, const bilist_row_pairs &sequence)
 {
   bool first = true;
   for (const auto &item : sequence)
@@ -47,4 +46,40 @@ void khasnulin::printSequenceNames(std::ostream &out, bilist_row_pairs &sequence
     out << item.first;
   }
   out << "\n";
+}
+
+void khasnulin::printSequencesNumsByPlace(std::ostream &out, const bilist_row_pairs &sequence)
+{
+  BiList< LCIter< int > > it_list;
+  for (const auto &item : sequence)
+  {
+    it_list.push_back(item.second.begin());
+  }
+
+  bool all_empty = false;
+  while (!all_empty)
+  {
+    all_empty = true;
+    bool first = true;
+    auto curr_it = it_list.begin();
+    for (const auto &curr_seq : sequence)
+    {
+      if (*curr_it != curr_seq.second.end())
+      {
+        if (!first)
+        {
+          out << " ";
+        }
+        out << *(*curr_it);
+        ++(*curr_it);
+        all_empty = false;
+        first = false;
+      }
+      ++curr_it;
+    }
+    if (!all_empty)
+    {
+      out << "\n";
+    }
+  }
 }
