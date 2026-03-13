@@ -1,6 +1,4 @@
 #include "list.hpp"
-#include "iterator.hpp"
-#include "node.hpp"
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(list_tests)
