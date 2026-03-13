@@ -8,8 +8,8 @@ int main()
 {
   using namespace chernov;
   using pStrList = std::pair< std::string, List< size_t > >;
-  List< pStrList > lines;
-  LIter< pStrList > lines_iter = lines.before_begin();
+  List< pStrList > sequences;
+  LIter< pStrList > seqs_iter = sequences.before_begin();
 
   std::string name;
   while (std::cin >> name) {
@@ -21,7 +21,7 @@ int main()
       seq_iter = sequence.insert_after(seq_iter, num);
     }
 
-    lines_iter = lines.insert_after(lines_iter, {name, sequence});
+    seqs_iter = sequences.insert_after(seqs_iter, {name, sequence});
     if (std::cin.bad()) {
       std::cerr << "bad input\n";
       return 1;
@@ -29,19 +29,22 @@ int main()
     std::cin.clear();
   }
 
-  if (!lines.empty()) {
-    lines_iter = lines.begin();
-    do {
-      pStrList line = *lines_iter;
-      std::cout << line.first << "\n";
-      List< size_t > sequence = line.second;
-      if (!sequence.empty()) {
-        LIter< size_t > seq_iter = sequence.begin();
-        do {
-          std::cout << *seq_iter << " ";
-        } while (++seq_iter != sequence.begin());
-        std::cout << "\n";
-      }
-    } while (++lines_iter != lines.begin());
+  if (!std::cin.eof()) {
+    std::cerr << "bad input\n";
+    return 1;
   }
+
+  if (sequences.empty()) {
+    std::cout << 0 << "\n";
+    return 0;
+  }
+
+  seqs_iter = sequences.begin();
+  std::cout << seqs_iter->first;
+  ++seqs_iter;
+  while (seqs_iter != sequences.begin()) {
+    std::cout << " " << seqs_iter->first;
+    ++seqs_iter;
+  }
+  std::cout << "\n";
 }
