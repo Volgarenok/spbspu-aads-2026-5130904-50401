@@ -113,9 +113,68 @@ namespace burukov
       head_(nullptr),
       size_(0)
     {}
+    List(const List< T > &other):
+      head_(nullptr),
+      size_(0)
+    {
+      Node< T > *src = other.head_;
+      Node< T > *dst = nullptr;
+      while (src)
+      {
+        Node< T > *created = nullptr;
+        try
+        {
+          created = new Node< T >(src->val_, nullptr);
+        }
+        catch (...)
+        {
+          clear();
+          throw;
+        }
+        if (!head_)
+        {
+          head_ = created;
+        }
+        else
+        {
+          dst->next_ = created;
+        }
+        dst = created;
+        ++size_;
+        src = src->next_;
+      }
+    }
+    List(List< T > &&other):
+      head_(other.head_),
+      size_(other.size_)
+    {
+      other.head_ = nullptr;
+      other.size_ = 0;
+    }
     ~List()
     {
       clear();
+    }
+    List< T > &operator=(const List< T > &other)
+    {
+      if (this != &other)
+      {
+        List< T > temp(other);
+        swap(temp);
+      }
+      return *this;
+    }
+    List< T > &operator=(List< T > &&other)
+    {
+      if (this != &other)
+      {
+        clear();
+        head_ = other.head_;
+        size_ = other.size_;
+        other.head_ = nullptr;
+        other.size_ = 0;
+      }
+      return *this;
     }
     bool empty() const
     {
