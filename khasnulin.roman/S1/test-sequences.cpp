@@ -94,20 +94,41 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(OutputDataByInputTests)
 
 using namespace khasnulin;
+using Row = std::pair< std::string, BiList< int > >;
 
 BOOST_AUTO_TEST_CASE(test_printSequenceNames)
 {
-  using Row = std::pair< std::string, BiList< int > >;
   BiList< Row > data;
 
   data.push_back({"first", {}});
   data.push_back({"second", {}});
 
   std::stringstream ss;
-  khasnulin::printSequenceNames(ss, data);
+  printSequenceNames(ss, data);
 
   std::string output = ss.str();
   BOOST_CHECK_EQUAL(output, "first second\n");
+}
+
+BOOST_AUTO_TEST_CASE(test_printSequencesNumsByPlace)
+{
+  std::stringstream ss("first 1 1 1\n"
+                       "second 2 2 2 2\n"
+                       "third\n"
+                       "fourth 4 4\n");
+
+  BiList< Row > result = khasnulin::readAll(ss);
+
+  std::stringstream res_ss;
+
+  printSequencesNumsByPlace(res_ss, result);
+
+  std::string expected = "1 2 4\n"
+                         "1 2 4\n"
+                         "1 2\n"
+                         "2\n";
+
+  BOOST_CHECK_EQUAL(res_ss.str(), expected);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
