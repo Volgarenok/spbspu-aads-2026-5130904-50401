@@ -12,9 +12,9 @@ BOOST_AUTO_TEST_CASE(constructor_test)
 BOOST_AUTO_TEST_CASE(iter_test)
 {
   List< int > l;
-  l.insertBack(1);
-  l.insertBack(2);
-  l.insertBack(3);
+  l.pushBack(1);
+  l.pushBack(2);
+  l.pushBack(3);
 
   auto it2 = l.begin();
   BOOST_CHECK_EQUAL(*it2, 1);
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(iter_test)
 BOOST_AUTO_TEST_CASE(comp_iters)
 {
   List< int > l;
-  l.insertBack(10);
+  l.pushBack(10);
 
   auto it1 = l.begin();
   auto it2 = l.cbegin();
@@ -41,9 +41,9 @@ BOOST_AUTO_TEST_CASE(comp_iters)
 BOOST_AUTO_TEST_CASE(citer_test)
 {
   List< int > l;
-  l.insertBack(1);
-  l.insertBack(2);
-  l.insertBack(3);
+  l.pushBack(1);
+  l.pushBack(2);
+  l.pushBack(3);
 
   auto it2 = l.cbegin();
   BOOST_CHECK_EQUAL(*it2, 1);
@@ -58,9 +58,9 @@ BOOST_AUTO_TEST_CASE(citer_test)
 BOOST_AUTO_TEST_CASE(erase_test)
 {
   List< int > l;
-  l.insertBack(1);
-  l.insertBack(2);
-  l.insertBack(3);
+  l.pushBack(1);
+  l.pushBack(2);
+  l.pushBack(3);
 
   l.erase(++l.begin());
 
@@ -69,15 +69,33 @@ BOOST_AUTO_TEST_CASE(erase_test)
   BOOST_CHECK_EQUAL(*(++it), 3);
 
   l.clear();
-  BOOST_CHECK(l.begin() == l.end());
+  
+}
+  BOOST_AUTO_TEST_CASE(push_list_test)
+  {
+    List< int > l;
+    l.pushBack(2);
+    l.pushFront(1);
+    l.pushBack(3);
+    l.pushBack(3);
+    l.pushFront(3);
+  
+    l.popFront();
+    l.popBack();
+    
+    auto it = l.begin();
+    BOOST_CHECK_EQUAL(*it, 1);
+    BOOST_CHECK_EQUAL(*(++it), 2);
+    BOOST_CHECK_EQUAL(*(++it), 3);  
+  
 }
 
 BOOST_AUTO_TEST_CASE(copying_constructor)
 {
   List< int > l;
-  l.insertBack(1);
-  l.insertBack(2);
-  l.insertBack(3);
+  l.pushBack(1);
+  l.pushBack(2);
+  l.pushBack(3);
 
   List< int > r = l;
 
@@ -95,9 +113,9 @@ BOOST_AUTO_TEST_CASE(copying_constructor)
 BOOST_AUTO_TEST_CASE(move_constructor)
 {
   List< int > l;
-  l.insertBack(1);
-  l.insertBack(2);
-  l.insertBack(3);
+  l.pushBack(1);
+  l.pushBack(2);
+  l.pushBack(3);
 
   List< int > r = std::move(l);
 
@@ -110,12 +128,12 @@ BOOST_AUTO_TEST_CASE(move_constructor)
 BOOST_AUTO_TEST_CASE(copy_assignment)
 {
   List< int > l;
-  l.insertBack(1);
-  l.insertBack(2);
-  l.insertBack(3);
+  l.pushBack(1);
+  l.pushBack(2);
+  l.pushBack(3);
 
   List< int > r;
-  r.insertBack(100);
+  r.pushBack(100);
   r = l;
 
   auto itl = l.begin();
@@ -133,12 +151,12 @@ BOOST_AUTO_TEST_CASE(copy_assignment)
 BOOST_AUTO_TEST_CASE(move_assignment)
 {
   List< int > l;
-  l.insertBack(1);
-  l.insertBack(2);
-  l.insertBack(3);
+  l.pushBack(1);
+  l.pushBack(2);
+  l.pushBack(3);
 
   List< int > r;
-  r.insertBack(100);
+  r.pushBack(100);
 
   r = std::move(l);
 

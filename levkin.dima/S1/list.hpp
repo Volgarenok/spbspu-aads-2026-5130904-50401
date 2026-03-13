@@ -2,7 +2,8 @@
 #define LIST
 #include <utility>
 
-namespace levkin {
+namespace levkin
+{
   template < class T > class List;
   template < class T > class LIter;
   template < class T > class LCIter;
@@ -22,8 +23,9 @@ namespace levkin {
     LIter< T > end() { return LIter< T >(pseudo); }
     LCIter< T > end() const { return cend(); }
     LCIter< T > cend() const { return LCIter< T >(pseudo); }
-
-    void insertBack(T val)
+    
+    void pushFront(T val);
+    void pushBack(T val)
     {
       Node< T >* lst = pseudo->prev;
       Node< T >* newLst = new Node< T >{val, lst, pseudo};
@@ -43,15 +45,17 @@ namespace levkin {
       }
     }
 
-    void erase(LIter< T > pos)
+    LIter< T > erase(LIter< T > pos)
     {
       if (pos == end())
-        return;
-      __eraseFast(pos);
+        return pos;
+      return __eraseFast(pos);
     }
+    void popFront();
+    void popBack();
 
     void clear() { erase(begin(), end()); }
-    List(T val) : List() { insertBack(val); }
+    List(T val) : List() { pushBack(val); }
 
     ~List()
     {
@@ -67,7 +71,7 @@ namespace levkin {
       try {
 
         for (LCIter< T > i = a.cbegin(); i != a.cend(); i++) {
-          insertBack(*i);
+          pushBack(*i);
         }
       } catch (...) {
         clear();
@@ -85,13 +89,15 @@ namespace levkin {
   private:
     void swap(List< T >& a) { std::swap(a.pseudo, this->pseudo); }
     List(Node< T >* pseudo_node) : pseudo(pseudo_node) {}
-    void __eraseFast(LIter< T > pos)
+    LIter< T > __eraseFast(LIter< T > pos)
     {
       Node< T >* toDelete = pos.curr;
       toDelete->prev->next = toDelete->next;
       toDelete->next->prev = toDelete->prev;
 
+      LIter< T > nxt = toDelete->next;
       delete toDelete;
+      return nxt;
     }
 
     Node< T >* pseudo;
