@@ -84,10 +84,30 @@ BOOST_AUTO_TEST_CASE(test_readAll_multiple_sequences)
 
 BOOST_AUTO_TEST_CASE(test_readAll_empty_input)
 {
-  std::stringstream ss("");
+  std::stringstream ss("\n");
   auto result = khasnulin::readAll(ss);
-
   BOOST_CHECK(result.empty());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(OutputDataByInputTests)
+
+using namespace khasnulin;
+
+BOOST_AUTO_TEST_CASE(test_printSequenceNames)
+{
+  using Row = std::pair< std::string, BiList< int > >;
+  BiList< Row > data;
+
+  data.push_back({"first", {}});
+  data.push_back({"second", {}});
+
+  std::stringstream ss;
+  khasnulin::printSequenceNames(ss, data);
+
+  std::string output = ss.str();
+  BOOST_CHECK_EQUAL(output, "first second\n");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
