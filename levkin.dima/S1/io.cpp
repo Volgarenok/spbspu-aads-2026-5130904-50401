@@ -1,7 +1,20 @@
 #include "io.hpp"
+#include "list.hpp"
 #include <cstdio>
 namespace levkin
 {
+  using IterList = List< LCIter< size_t > >;
+
+  IterList getIters(const Data& data)
+  {
+    IterList res;
+
+    for (LCIter< Pair > it = data.cbegin(); it != data.cend(); ++it) {
+      res.pushBack(it->second.cbegin());
+    }
+    return res;
+  }
+
   In& readData(In& in, Data& data)
   {
     while (in) {
@@ -34,6 +47,6 @@ namespace levkin
     }
     return in;
   }
-  Out& printTransposed(Out&, const Data& data);
-  Out& printSums(Out&, const Data& data);
+  Out& printTransposed(Out& out, const Data& data);
+  Out& printSums(Out&, const Data& data) {}
 }
