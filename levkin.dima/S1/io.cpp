@@ -1,8 +1,8 @@
 #include "io.hpp"
-#include "list.hpp"
 #include <cstdio>
 #include <limits>
 #include <stdexcept>
+#include "list.hpp"
 
 namespace levkin {
 

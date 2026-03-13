@@ -1,11 +1,11 @@
 #ifndef IO
 #define IO
 
-#include "list.hpp"
 #include <istream>
 #include <ostream>
 #include <string>
 #include <utility>
+#include "list.hpp"
 
 namespace levkin {
   using String = std::string;
