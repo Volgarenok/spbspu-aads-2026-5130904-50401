@@ -247,8 +247,8 @@ namespace khasnulin
 
   template < class T > LIter< T > BiList< T >::insert(LCIter< T > pos, T &&val)
   {
-    LNode< T > *item = insert_before(pos.curr_, std::forward< T >(val));
-    if (pos.curr_ == h_)
+    LNode< T > *item = insert_before(pos.it_.curr_, std::forward< T >(val));
+    if (pos.it_.curr_ == h_)
     {
       h_ = item;
     }

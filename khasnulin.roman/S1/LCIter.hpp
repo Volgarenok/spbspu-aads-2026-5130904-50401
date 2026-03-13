@@ -1,7 +1,6 @@
 #ifndef LCITER_HPP
 #define LCITER_HPP
 
-#include <stdexcept>
 namespace khasnulin
 {
   template < class T > class BiList;
@@ -31,83 +30,48 @@ namespace khasnulin
     using LNode = typename BiList< T >::template LNode< T >;
 
     LCIter(const BiList< T > *list, LNode *node, bool is_end):
-        list_(list),
-        curr_(node),
-        is_end_(is_end) {};
+        it_(list, node, is_end) {};
 
-    const BiList< T > *list_;
-    LNode *curr_;
-    bool is_end_;
+    LIter< T > it_;
   };
 
   template < class T >
   LCIter< T >::LCIter() noexcept:
-      list_(nullptr),
-      curr_(nullptr),
-      is_end_(true)
+      it_()
   {
   }
 
   template < class T >
   LCIter< T >::LCIter(const LIter< T > &it) noexcept:
-      list_(it.list_),
-      curr_(it.curr_),
-      is_end_(it.is_end_)
+      it_(it)
   {
   }
 
   template < class T > LCIter< T > &LCIter< T >::operator++()
   {
-
-    if (curr_->next == list_->h_)
-    {
-      is_end_ = true;
-    }
-    else
-    {
-      if (is_end_ || !curr_)
-      {
-        throw std::out_of_range("iterator can't move to next from end");
-      }
-      curr_ = curr_->next;
-    }
+    ++it_;
     return *this;
   }
 
   template < class T > LCIter< T > LCIter< T >::operator++(int)
   {
-    LCIter< T > it(*this);
-    this->operator++();
-    return it;
+    return it_++;
   }
 
   template < class T > LCIter< T > &LCIter< T >::operator--()
   {
-    if (curr_ == list_->h_ || !curr_)
-    {
-      throw std::out_of_range("iterator can't move to previous from begin");
-    }
-    if (is_end_)
-    {
-      is_end_ = false;
-    }
-    else
-    {
-      curr_ = curr_->prev;
-    }
+    --it_;
     return *this;
   }
 
   template < class T > LCIter< T > LCIter< T >::operator--(int)
   {
-    LCIter< T > it(*this);
-    this->operator--();
-    return it;
+    return it_--;
   }
 
   template < class T > bool LCIter< T >::operator==(const LCIter< T > &it) const noexcept
   {
-    return (list_ == it.list_ && is_end_ == it.is_end_ && curr_ == it.curr_);
+    return it_ == it.it_;
   }
 
   template < class T > bool LCIter< T >::operator!=(const LCIter< T > &it) const noexcept
@@ -117,20 +81,12 @@ namespace khasnulin
 
   template < class T > const T &LCIter< T >::operator*()
   {
-    if (is_end_ || !curr_)
-    {
-      throw std::runtime_error("can't get value of the iterator end element");
-    }
-    return curr_->val;
+    return *it_;
   }
 
   template < class T > const T *LCIter< T >::operator->()
   {
-    if (is_end_ || !curr_)
-    {
-      throw std::runtime_error("can't use arrow operator of the iterator end element");
-    }
-    return &(curr_->val);
+    return it_.operator->();
   }
 }
 

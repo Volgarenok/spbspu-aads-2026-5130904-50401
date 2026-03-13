@@ -1,7 +1,6 @@
 #ifndef LITER_HPP
 #define LITER_HPP
 
-#include <iostream>
 #include <stdexcept>
 
 #include "LCIter.hpp"
@@ -58,7 +57,6 @@ namespace khasnulin
     {
       throw std::out_of_range("iterator can't move to next from end");
     }
-    std::cout << "Node: " << this->operator*() << " is_end: " << is_end_ << std::endl;
     if (curr_->next == list_->h_)
     {
       is_end_ = true;
@@ -82,7 +80,6 @@ namespace khasnulin
     if (is_end_)
     {
       is_end_ = false;
-      std::cout << "Node: " << this->operator*() << " is_end: " << is_end_ << std::endl;
     }
     else
     {
@@ -90,7 +87,6 @@ namespace khasnulin
       {
         throw std::out_of_range("iterator can't move to previous from begin");
       }
-      std::cout << "Node: " << this->operator*() << " is_end: " << is_end_ << std::endl;
       curr_ = curr_->prev;
     }
     return *this;
