@@ -27,9 +27,16 @@ namespace khasnulin
   using bilist_row_pairs = BiList< std::pair< std::string, BiList< int > > >;
   bilist_row_pairs readAll(std::istream &in)
   {
-    std::string s;
-    in >> s;
-    return bilist_row_pairs();
+    bilist_row_pairs result;
+    while (!in.eof() && !in.fail())
+    {
+      std::pair< std::string, BiList< int > > row = readRow(in);
+      if (row.first != "")
+      {
+        result.push_back(row);
+      }
+    }
+    return result;
   }
 }
 
