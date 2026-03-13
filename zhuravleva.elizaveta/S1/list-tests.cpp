@@ -1,7 +1,6 @@
 #include "list.hpp"
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(list_tests)
 BOOST_AUTO_TEST_CASE(empty_test)
 {
   zhuravleva::List<int> a;
