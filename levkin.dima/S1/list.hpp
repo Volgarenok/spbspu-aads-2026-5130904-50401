@@ -1,5 +1,6 @@
 #ifndef LIST
 #define LIST
+#include <cstddef>
 #include <utility>
 
 namespace levkin
@@ -32,6 +33,15 @@ namespace levkin
       pseudo->next = pseudo;
       pseudo->prev = pseudo;
     }
+
+    void clearAndInit(size_t size, T val)
+    {
+      clear();
+      for (size_t i = 0; i < size; ++i) {
+        this->pushBack(val);
+      }
+    }
+
     void erase(LIter< T > from, LIter< T > to)
     {
       while (from != to) {
