@@ -1,5 +1,6 @@
 #include "list.hpp"
 #include <boost/test/unit_test.hpp>
+#include <iostream>
 
 BOOST_AUTO_TEST_CASE(empty_test)
 {
@@ -52,7 +53,6 @@ BOOST_AUTO_TEST_CASE(delete_after_test)
   a.AddStart(2);
   a.AddStart(1);
   auto it = a.begin();
-  it = it.next();
   a.deleteAfter(it);
   BOOST_CHECK((*it) == 1);
 }
