@@ -34,6 +34,7 @@ namespace studilova
       void pop_back();
       void push_front(const T& value);
       void push_back(const T& value);
+      void insert(LIter< T > pos, const T& value);
 
       LIter< T > begin();
       LIter< T > end();
@@ -162,6 +163,30 @@ namespace studilova
       head_->prev = node;
     }
     size_++;
+  }
+
+  template< class T >
+  void List< T >::insert(LIter< T > pos, const T& value)
+  {
+    if (pos.node_ == nullptr)
+    {
+      push_back(value);
+      return;
+    }
+    if (pos.node_ == head_)
+    {
+      push_front(value);
+      return;
+    }
+    Node< T >* curr = pos.node_;
+    Node< T >* prev = curr->prev;
+
+    Node< T >* node = new Node< T >{value, curr, prev};
+
+    prev->next = node;
+    curr->prev = node;
+
+    ++size;
   }
 
   template< class T >
