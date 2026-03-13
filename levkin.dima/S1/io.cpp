@@ -61,6 +61,7 @@ namespace levkin {
 
     return out;
   }
+
   Out& printTransposed(Out& out, const Data& data)
   {
     if (data.cbegin() == data.cend()) {
@@ -70,6 +71,7 @@ namespace levkin {
     List< size_t > sums;
 
     bool rollOneMoreTime = true;
+    bool overflowed = false;
 
     while (rollOneMoreTime) {
       rollOneMoreTime = false;
@@ -82,9 +84,15 @@ namespace levkin {
       for (; iterIter != iters.end(); ++iterIter, ++dataIter) {
         if (*iterIter != dataIter->second.cend()) {
           size_t val = **iterIter;
-          if (std::numeric_limits< size_t >::max() - rowSum < val) {
-            throw std::overflow_error("can't fit sum in size_t");
+
+          if (!overflowed) {
+            if (std::numeric_limits< size_t >::max() - rowSum < val) {
+              overflowed = true;
+            } else {
+              rowSum += val;
+            }
           }
+
           if (!firstInRow) {
             out << " ";
           }
@@ -92,16 +100,21 @@ namespace levkin {
           firstInRow = false;
 
           out << **iterIter;
-          rowSum += val;
           ++(*iterIter);
 
           rollOneMoreTime = true;
         }
       }
       if (rollOneMoreTime) {
-        sums.pushBack(rowSum);
+        if (!overflowed) {
+          sums.pushBack(rowSum);
+        }
         out << "\n";
       }
+    }
+
+    if (overflowed) {
+      throw std::overflow_error("can't fit sum in size_t. wierd");
     }
 
     if (sums.size() > 0) {

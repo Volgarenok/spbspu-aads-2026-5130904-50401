@@ -12,8 +12,8 @@ int main()
     readData(std::cin, data);
 
     if (data.cbegin() != data.cend()) {
-      levkin::printNames(std::cout, data);
-      levkin::printTransposed(std::cout, data);
+      printNames(std::cout, data);
+      printTransposed(std::cout, data);
     } else {
       std::cout << "0\n";
     }
