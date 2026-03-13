@@ -12,7 +12,7 @@ namespace malashenko
 
     Stack& operator=(const Stack& other);
     Stack& operator=(Stack&& other);
-
+  
     T& top() const;
 
     bool empty() const;
@@ -103,9 +103,7 @@ namespace malashenko
   Stack< T >::~Stack()
   {
     list_.clear();
-    list_.rmFake();
   }
-
 }
 
 #endif

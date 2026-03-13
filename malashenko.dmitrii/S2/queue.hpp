@@ -110,7 +110,6 @@ namespace malashenko
   Queue< T >::~Queue()
   {
     list_.clear();
-    list_.rmFake();
   }
 
 }
