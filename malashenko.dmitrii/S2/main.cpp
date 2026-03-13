@@ -7,5 +7,7 @@ int main()
   
   Queue< std::string > infixData;
   getInfixData(std::cin, infixData);
-  std::cout << infixData.front() << ' ' << infixData.back() << '\n';
+  Queue< std::string > postfixData;
+  converInfixToPostfix(infixData, postfixData);
+  postfixData.show();  
 }

@@ -22,6 +22,8 @@ namespace malashenko
     void pop();
     void swap(Stack& other);
 
+    void show() const;
+
     ~Stack();
   private:
     List< T > list_;
@@ -85,6 +87,17 @@ namespace malashenko
   void Stack< T >::pop()
   {
     list_.pop_back();
+  }
+  
+
+  template< class T >
+  void Stack< T >::show() const
+  {
+    for (LIter< T > it = list_.begin(); it != list_.end(); ++it)
+    {
+      std::cout << *it << ' ';
+    }
+    std::cout << '\n';
   }
 
   template< class T >

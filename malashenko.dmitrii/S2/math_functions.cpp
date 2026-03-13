@@ -50,11 +50,16 @@ namespace malashenko
       if (symbol == "(")
       {
         stack.push(symbol);
+        // std::cout << "pushed (\n";
+        // std::cout << "stack: ";
+        // stack.show();
         continue;
       }
 
       if (symbol == ")")
       {
+        // std::cout << "stack: ";
+        // stack.show();
         while (stack.top() != "(")
         {
           PostfixData.push(stack.top());
@@ -67,22 +72,28 @@ namespace malashenko
       if (isOperand(symbol))
       {
         PostfixData.push(symbol);
-        continue;
+        // std::cout << "pushed " << symbol << "\n";
       } else 
       {
-        if (stack.top() != "(" || stack.top() != ")")
+        if (stack.empty() || stack.top() == "(" || stack.top() == ")")
         {
-          if (getPriority(stack.top()) <= getPriority(symbol))
-          {
-            PostfixData.push(stack.top());
-            stack.pop();
-            continue;
-          }
+          stack.push(symbol);
+          continue;
         }
-        stack.push(symbol);
+        if (getPriority(stack.top()) >= getPriority(symbol))
+        {
+
+          PostfixData.push(stack.top());
+          stack.pop();
+          // std::cout << "queue: ";
+          // PostfixData.show();
+          stack.push(symbol);
+
+          continue;
+        }
+
       }
     }
-
     while (!stack.empty())
     {
       PostfixData.push(stack.top());
@@ -90,4 +101,12 @@ namespace malashenko
     }
   }
 
+  lli_t calculate(const Queue< std::string >& PostfixData)
+  {
+    
+  }
+
+
+
 }
+

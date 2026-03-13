@@ -12,7 +12,9 @@ namespace malashenko
     Queue(Queue< T >&& other);
 
     Queue& operator=(const Queue< T >& other);
-    Queue& operator=(Queue< T >&& other); 
+    Queue& operator=(Queue< T >&& other);
+
+    void show() const;
 
     T& front() const;
     T& back() const;
@@ -104,6 +106,16 @@ namespace malashenko
   void Queue< T >::swap(Queue< T >& other)
   {
     list_.swap(other.list_);
+  }
+
+  template< class T >
+  void Queue< T >::show() const
+  {
+    for (LIter< T > it = list_.begin(); it != list_.end(); ++it)
+    {
+      std::cout << *it << ' ';
+    }
+    std::cout << '\n';
   }
 
   template< class T >
