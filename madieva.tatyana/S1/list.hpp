@@ -1,3 +1,5 @@
+#ifndef LIST_HPP
+#define LIST_HPP
 #include <iostream>
 #include <cassert>
 namespace madieva {
@@ -277,3 +279,4 @@ namespace madieva {
     return size_;
   }
 }
+#endif
