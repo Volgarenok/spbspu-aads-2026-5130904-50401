@@ -3,8 +3,8 @@
 #include <boost/test/unit_test_suite.hpp>
 #include <utility>
 
-#include "List.hpp"
 #include "Sequences.hpp"
+#include <List.hpp>
 
 BOOST_AUTO_TEST_SUITE(SequencesTestSuite)
 

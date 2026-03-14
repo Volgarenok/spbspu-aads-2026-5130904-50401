@@ -1,7 +1,7 @@
 #ifndef SEQUENCES_HPP
 #define SEQUENCES_HPP
 
-#include "List.hpp"
+#include <List.hpp>
 
 namespace khasnulin
 {
