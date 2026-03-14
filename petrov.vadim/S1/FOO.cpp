@@ -59,11 +59,11 @@ namespace petrov
       bool first = true;
       for(; outIt != data.end(); outIt = outIt.next())
       {
-        out << (*outIt).first;
         if(!first)
         {
           out << " ";
         }
+        out << (*outIt).first;
         first = false;
       }
       out << "\n";
