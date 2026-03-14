@@ -97,11 +97,20 @@ namespace petrov
         }
         s = sums.insert(s, sum);
       }
+      showSums(sums, out);
     }
   }
 
-  LIter< size_t > showSums(List< size_t >& sums, std::istream& out)
+  void showSums(List< size_t >& sums, std::ostream& out)
   {
-    
+    LIter< size_t > it = sums.begin();
+    out << *it;
+    it = it.next();
+    while (it.hasNext())
+    {
+      out << " " << *it;
+      it = it.next();
+    }
+    out << "\n";
   }
 }

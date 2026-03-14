@@ -215,7 +215,7 @@ namespace petrov
         {
           tail = n;
         }
-      } 
+      }
     }
   }
 
