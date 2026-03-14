@@ -1,6 +1,7 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
+#include <initializer_list>
 #include <stdexcept>
 #include <utility>
 
@@ -19,6 +20,8 @@ namespace khasnulin
 
     BiList(const BiList< T > &list);
     BiList(BiList< T > &&list) noexcept;
+
+    BiList(std::initializer_list< T > init);
 
     ~BiList() noexcept;
 
@@ -68,6 +71,8 @@ namespace khasnulin
     void swap(BiList< T > &other) noexcept;
 
     template < class... Args > LIter< T > emplace(LCIter< T > pos, Args &&...args);
+
+    void assign(std::initializer_list< T > ilist);
 
     friend class LIter< T >;
     friend class LCIter< T >;
@@ -468,6 +473,16 @@ namespace khasnulin
     }
     s_++;
     return LIter< T >{this, node, false};
+  }
+
+  template < class T >
+  BiList< T >::BiList(std::initializer_list< T > init):
+      BiList()
+  {
+    for (const T &item : init)
+    {
+      push_back(item);
+    }
   }
 }
 
