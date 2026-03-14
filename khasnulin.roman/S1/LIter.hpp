@@ -37,7 +37,9 @@ namespace khasnulin
     LIter(const BiList< T > *list, LNode *node, bool is_end):
         list_(list),
         curr_(node),
-        is_end_(is_end) {};
+        is_end_(is_end)
+    {
+    }
 
     const BiList< T > *list_;
     LNode *curr_;
@@ -114,7 +116,7 @@ namespace khasnulin
   {
     if (is_end_ || !curr_)
     {
-      throw std::runtime_error("can't get value of the iterator end element");
+      throw std::runtime_error("can't get value of the iterator end or empty element");
     }
     return curr_->val;
   }
@@ -122,7 +124,7 @@ namespace khasnulin
   {
     if (is_end_ || !curr_)
     {
-      throw std::runtime_error("can't use arrow operator of the iterator end element");
+      throw std::runtime_error("can't use arrow operator of the iterator end or empty element");
     }
     return &(curr_->val);
   }
