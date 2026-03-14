@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(test_readAll_multiple_sequences)
                        "third\n"
                        "fourth 4 4\n");
 
-  khasnulin::BiList< std::pair< std::string, khasnulin::BiList< int > > > result = khasnulin::readAll(ss);
+  khasnulin::BiList< std::pair< std::string, khasnulin::BiList< size_t > > > result = khasnulin::readAll(ss);
 
   BOOST_CHECK_EQUAL(result.size(), 4);
 
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_SUITE(OutputDataByInputTests)
 
 using namespace khasnulin;
-using Row = std::pair< std::string, BiList< int > >;
+using Row = std::pair< std::string, BiList< size_t > >;
 
 BOOST_AUTO_TEST_CASE(test_printSequenceNames)
 {
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(test_printSequencesNumsByPlace)
 
   BiList< Row > result = khasnulin::readAll(ss);
 
-  BiList< BiList< int > > new_lists = getTransosedNumsSequences(result);
+  BiList< BiList< size_t > > new_lists = getTransosedNumsSequences(result);
 
   std::stringstream res_ss;
 
@@ -142,31 +142,13 @@ BOOST_AUTO_TEST_CASE(test_printSums_standard)
 
   BiList< Row > result = khasnulin::readAll(ss);
 
-  BiList< BiList< int > > new_lists = getTransosedNumsSequences(result);
+  BiList< BiList< size_t > > new_lists = getTransosedNumsSequences(result);
 
   std::stringstream res_ss;
 
   printSumsOfSequences(res_ss, new_lists);
 
   std::string expected = "7 7 3 2\n";
-
-  BOOST_CHECK_EQUAL(res_ss.str(), expected);
-}
-
-BOOST_AUTO_TEST_CASE(test_printSums_with_zeros)
-{
-  std::stringstream ss("first 0 5\n"
-                       "second -1 1\n");
-
-  BiList< Row > result = khasnulin::readAll(ss);
-
-  BiList< BiList< int > > new_lists = getTransosedNumsSequences(result);
-
-  std::stringstream res_ss;
-
-  printSumsOfSequences(res_ss, new_lists);
-
-  std::string expected = "-1 6\n";
 
   BOOST_CHECK_EQUAL(res_ss.str(), expected);
 }
@@ -192,12 +174,11 @@ BOOST_AUTO_TEST_CASE(test_readAll_only_names)
 
 BOOST_AUTO_TEST_CASE(test_transpose_no_numbers)
 {
-  using Row = std::pair< std::string, BiList< int > >;
   BiList< Row > data;
   data.push_back({"first", {}});
   data.push_back({"second", {}});
 
-  BiList< BiList< int > > result = khasnulin::getTransosedNumsSequences(data);
+  BiList< BiList< size_t > > result = khasnulin::getTransosedNumsSequences(data);
 
   BOOST_CHECK(result.empty());
   BOOST_CHECK_EQUAL(result.size(), 0);
@@ -237,10 +218,10 @@ BOOST_AUTO_TEST_CASE(test_printSums_overflow)
 {
   using namespace khasnulin;
 
-  BiList< BiList< int > > data;
-  BiList< int > big_numbers;
+  BiList< BiList< size_t > > data;
+  BiList< size_t > big_numbers;
 
-  int max_val = std::numeric_limits< int >::max();
+  size_t max_val = std::numeric_limits< size_t >::max();
   big_numbers.push_back(max_val);
   big_numbers.push_back(1);
 
@@ -253,8 +234,11 @@ BOOST_AUTO_TEST_CASE(test_printSums_overflow)
 
 BOOST_AUTO_TEST_CASE(test_safeSum_equal_large_numbers)
 {
-  int large = 1500000000;
-  BOOST_CHECK_THROW(safeSum(large, large), std::overflow_error);
+  std::stringstream ss("first 18446744073709551615 18446744073709551615");
+
+  auto data = khasnulin::readAll(ss);
+
+  BOOST_CHECK_THROW(safeSum(data.front().second.front(), data.front().second.back()), std::overflow_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
