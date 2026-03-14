@@ -74,10 +74,11 @@ namespace kondrat
 
   bool printOneRow(List< pairN > & data, size_t & sum)
   {
+    List< size_t > row;
+
     LIter< pairN > it = data.begin();
     LIter< pairN > end = data.end();
 
-    bool first = true;
     sum = 0;
 
     while (it != end)
@@ -91,22 +92,41 @@ namespace kondrat
           return false;
         }
 
-        if (!first)
-        {
-          std::cout << ' ';
-        }
-
-        std::cout << value;
+        row.pushBack(value);
         sum += value;
-
-        (*it).second.popFront();
-        first = false;
       }
 
       ++it;
     }
 
+    bool first = true;
+    LIter< size_t > rowIt = row.begin();
+    LIter< size_t > rowEnd = row.end();
+
+    while (rowIt != rowEnd)
+    {
+      if (!first)
+      {
+        std::cout << ' ';
+      }
+
+      std::cout << *rowIt;
+      first = false;
+      ++rowIt;
+    }
+
     std::cout << '\n';
+
+    it = data.begin();
+
+    while (it != end)
+    {
+      if (!((*it).second.empty()))
+      {
+        (*it).second.popFront();
+      }
+      ++it;
+    }
     return true;
   }
 
