@@ -23,7 +23,7 @@ namespace madieva {
     friend class List< T >;
     Node< T > * it;
   public:
-    LIter< T >(Node< T > * a);
+    LIter(Node< T > * a);
     void operator++();
     void operator--();
     bool operator==(LIter< T > & a) const;
@@ -36,7 +36,7 @@ namespace madieva {
     friend class List< T >;
     const Node< T > * it;
   public:
-    LCIter< T >(const Node< T > * a);
+    LCIter(const Node< T > * a);
     void operator++();
     void operator--();
     bool operator==(LCIter< T > & a) const;
