@@ -1,6 +1,7 @@
 #ifndef LITER_HPP
 #define LITER_HPP
 
+#include <ostream>
 #include <stdexcept>
 
 #include "LCIter.hpp"
@@ -28,6 +29,7 @@ namespace khasnulin
 
     friend class BiList< T >;
     friend class LCIter< T >;
+    template < class K > friend std::ostream &operator<<(std::ostream &out, LIter< K > it);
 
   private:
     using LNode = typename BiList< T >::template LNode< T >;
@@ -123,6 +125,11 @@ namespace khasnulin
       throw std::runtime_error("can't use arrow operator of the iterator end element");
     }
     return &(curr_->val);
+  }
+
+  template < class T > std::ostream &operator<<(std::ostream &out, LIter< T > it)
+  {
+    return out << it.curr_ << "\n";
   }
 }
 
