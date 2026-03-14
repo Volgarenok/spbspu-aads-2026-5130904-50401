@@ -65,7 +65,7 @@ public:
   {
     return node != other.node;
   }
-  T* operator->() const noexcept
+  const T* operator->() const noexcept
   {
     return &(node->data);
   }
@@ -195,11 +195,15 @@ LIter<T> List<T>::insert_after(LIter<T> pos, const T& value) noexcept
   }
   Node<T>* new_node = new Node<T>{value, pos.node -> next};
   pos.node -> next = new_node;
-  return LIter<T>(new_node);
+  return LIter<T>(new_node, head);
 }
 template <class T>
 void List<T>::erase_after(LIter<T> pos) noexcept
 {
+  if (!pos.node)
+  {
+    return;
+  }
   Node<T>* temp = pos.node -> next;
   if (!temp)
   {
