@@ -104,7 +104,7 @@ int main()
         std::cout << value;
 
         sum += value;
-        needSpace;
+        needSpace = true;
       }
       ++it;
     }
