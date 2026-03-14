@@ -60,3 +60,46 @@ BOOST_AUTO_TEST_CASE(InsertAtBegin)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(EraseSuite)
+
+BOOST_AUTO_TEST_CASE(PopFront)
+{
+  studilova::List< int > list;
+
+  list.insert(list.end(), 1);
+  list.insert(list.end(), 2);
+
+  list.popFront();
+
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.front(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(PopBack)
+{
+  studilova::List< int > list;
+
+  list.insert(list.end(), 1);
+  list.insert(list.end(), 2);
+
+  list.popBack();
+
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.back(), 1);
+}
+
+BOOST_AUTO_TEST_CASE(Clear)
+{
+  studilova::List< int > list;
+
+  list.insert(list.end(), 1);
+  list.insert(list.end(), 2);
+
+  list.clear();
+
+  BOOST_CHECK(list.empty());
+  BOOST_CHECK_EQUAL(list.size(), 0);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
