@@ -40,10 +40,10 @@ namespace studilova
       T& back();
       const T& back() const;
 
-      void pop_front();
-      void pop_back();
-      void push_front(const T& value);
-      void push_back(const T& value);
+      void popFront();
+      void popBack();
+      void pushFront(const T& value);
+      void pushBack(const T& value);
       void insert(LIter< T > pos, const T& value);
 
       LIter< T > begin();
@@ -75,7 +75,7 @@ namespace studilova
   {
     while(!empty())
     {
-      pop_front();
+      popFront();
     }
   }
 
@@ -126,7 +126,7 @@ namespace studilova
   }
 
   template< class T >
-  void List< T >::pop_front()
+  void List< T >::popFront()
   {
     if (empty())
     {
@@ -154,7 +154,7 @@ namespace studilova
   }
 
   template< class T >
-  void List< T >::pop_back()
+  void List< T >::popBack()
   {
     if (empty())
     {
@@ -179,7 +179,7 @@ namespace studilova
   }
 
   template< class T >
-  void List< T >::push_front(const T& value)
+  void List< T >::pushFront(const T& value)
   {
     Node< T >* node = new Node< T >{value, nullptr, nullptr};
 
@@ -203,7 +203,7 @@ namespace studilova
   }
 
   template< class T >
-  void List< T >::push_back(const T& value)
+  void List< T >::pushBack(const T& value)
   {
     Node< T >* node = new Node< T >{value, nullptr, nullptr};
 
@@ -229,12 +229,12 @@ namespace studilova
   {
     if (pos.node_ == nullptr)
     {
-      push_back(value);
+      pushBack(value);
       return;
     }
     if (pos.node_ == head_)
     {
-      push_front(value);
+      pushFront(value);
       return;
     }
 
