@@ -233,4 +233,22 @@ BOOST_AUTO_TEST_CASE(test_output_names_but_no_numbers)
   BOOST_CHECK_EQUAL(output.str(), expected);
 }
 
+BOOST_AUTO_TEST_CASE(test_printSums_overflow)
+{
+  using namespace khasnulin;
+
+  BiList< BiList< int > > data;
+  BiList< int > big_numbers;
+
+  int max_val = std::numeric_limits< int >::max();
+  big_numbers.push_back(max_val);
+  big_numbers.push_back(1);
+
+  data.push_back(std::move(big_numbers));
+
+  std::stringstream ss;
+
+  BOOST_CHECK_THROW(printSumsOfSequences(ss, data), std::overflow_error);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
