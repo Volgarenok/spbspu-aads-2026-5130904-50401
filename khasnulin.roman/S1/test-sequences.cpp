@@ -251,4 +251,10 @@ BOOST_AUTO_TEST_CASE(test_printSums_overflow)
   BOOST_CHECK_THROW(printSumsOfSequences(ss, data), std::overflow_error);
 }
 
+BOOST_AUTO_TEST_CASE(test_safeSum_equal_large_numbers)
+{
+  int large = 1500000000;
+  BOOST_CHECK_THROW(safeSum(large, large), std::overflow_error);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
