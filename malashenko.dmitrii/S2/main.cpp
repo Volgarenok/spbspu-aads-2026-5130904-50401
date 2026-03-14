@@ -9,5 +9,7 @@ int main()
   getInfixData(std::cin, infixData);
   Queue< std::string > postfixData;
   converInfixToPostfix(infixData, postfixData);
-  postfixData.show();  
+  postfixData.show();
+  lli_t res = calculate(postfixData);
+  std::cout << res << '\n';
 }
