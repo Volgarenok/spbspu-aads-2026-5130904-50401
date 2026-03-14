@@ -44,7 +44,7 @@ namespace madieva {
     const T& operator*() const;
   };
 
-  template< class T > 
+  template< class T >
   class List {
     Node< T > * head;
     size_t size_;
@@ -140,7 +140,6 @@ namespace madieva {
     assert(it);
     return it->val;
   }
-
 
   template< class T >
   List< T >::List() : head(nullptr), size_(0)
