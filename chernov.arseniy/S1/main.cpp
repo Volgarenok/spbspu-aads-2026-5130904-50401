@@ -59,10 +59,15 @@ int main()
   } while (++seqs_iter != sequences.begin());
   std::cout << "\n";
 
+  List< size_t > sums;
+  LIter< size_t > sums_iter = sums.before_begin();
+
   bool exist_nums = true;
+  bool exist_lines = false;
   while (exist_nums) {
     iters_iter = iters.begin();
     bool first_num = true;
+    size_t sum = 0;
     do {
       pLCIterSize & pair = *iters_iter;
 
@@ -74,6 +79,7 @@ int main()
         }
 
         std::cout << *pair.first;
+        sum += *pair.first;
         ++pair.first;
         --pair.second;
       }
@@ -82,7 +88,27 @@ int main()
     if (first_num) {
       exist_nums = false;
     } else {
+      exist_lines = true;
+      sums_iter = sums.insert_after(sums_iter, sum);
       std::cout << "\n";
     }
   }
+
+  if (!exist_lines) {
+    std::cout << 0 << "\n";
+    return 0;
+  }
+
+  sums_iter = sums.begin();
+  bool first_num = true;
+  do {
+    if (!first_num) {
+      std::cout << " ";
+    } else {
+      first_num = false;
+    }
+
+    std::cout << *sums_iter;
+  } while (++sums_iter != sums.begin());
+  std::cout << "\n";
 }
