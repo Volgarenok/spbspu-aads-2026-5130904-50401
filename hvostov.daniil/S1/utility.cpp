@@ -60,7 +60,7 @@ hvostov::List< std::pair< std::string, hvostov::List< size_t > > > hvostov::getD
   return list;
 }
 
-void hvostov::printResult(std::ostream& out, const List< std::pair< std::string, List< size_t > > >& list)
+void hvostov::printInfo(std::ostream& out, const List< std::pair< std::string, List< size_t > > >& list)
 {
   Liter< std::pair< std::string, List< size_t > > > it = list.begin();
   out << (*it).first;
@@ -75,20 +75,13 @@ void hvostov::printResult(std::ostream& out, const List< std::pair< std::string,
     lit = list_it.insertAfter(lit, (*it).second.begin());
   }
   bool F = true;
-  bool first = true; List< size_t > result;
-  Liter< size_t > result_it = result.begin();
+  bool first = true;
   while (F) {
     F = false;
     first = true;
-    size_t sum = 0;
     for (Liter< Liter< size_t > > it = list_it.begin(); it != list_it.end(); it++) {
       if (*(*(it))) {
         size_t value = *(*(it));
-        try {
-          sum += value;
-        } catch (const std::overflow_error &e) {
-          throw;
-        }
         if (first) {
           out << value;
           first = false;
@@ -100,8 +93,38 @@ void hvostov::printResult(std::ostream& out, const List< std::pair< std::string,
       }
     }
     if (F) {
-      result_it = result.insertAfter(result_it, sum);
       out << "\n";
+    }
+  }
+}
+
+void hvostov::printResult(std::ostream& out, const List< std::pair< std::string, List< size_t > > >& list)
+{
+  List< Liter< size_t > > list_it;
+  Liter< Liter< size_t > > lit = list_it.begin();
+  for (Liter< std::pair< std::string, List< size_t > > > it = list.begin(); it != list.end(); it++) {
+    lit = list_it.insertAfter(lit, (*it).second.begin());
+  }
+  bool F = true;
+  List< size_t > result;
+  Liter< size_t > result_it = result.begin();
+  while (F) {
+    F = false;
+    size_t sum = 0;
+    for (Liter< Liter< size_t > > it = list_it.begin(); it != list_it.end(); it++) {
+      if (*(*(it))) {
+        size_t value = *(*(it));
+        try {
+          sum += value;
+        } catch (const std::overflow_error &e) {
+          throw;
+        }
+        F = true;
+        (*it)++;
+      }
+    }
+    if (F) {
+      result_it = result.insertAfter(result_it, sum);
     }
   }
   result_it = result.begin();
