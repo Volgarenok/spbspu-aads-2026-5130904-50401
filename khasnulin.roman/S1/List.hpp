@@ -65,6 +65,8 @@ namespace khasnulin
     T &back();
     const T &back() const;
 
+    void swap(BiList< T > &other) noexcept;
+
     // TODO: to the future version
     template < class... Args > LIter< T > emplace(LCIter< T > pos, Args &&...args);
 
@@ -453,6 +455,12 @@ namespace khasnulin
       throw std::runtime_error("can't pop back, list is empty");
     }
     erase(h_);
+  }
+
+  template < class T > void BiList< T >::swap(BiList< T > &other) noexcept
+  {
+    std::swap(h_, other.h_);
+    std::swap(s_, other.s_);
   }
 }
 
