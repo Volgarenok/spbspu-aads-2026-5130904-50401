@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE(test_push_front_multiple)
 
 BOOST_AUTO_TEST_CASE(test_push_front_rvalue_move)
 {
-  khasnulin::BiList< std::string > list;
+  BiList< std::string > list;
   std::string s = "hello";
   list.push_front(std::move(s));
 
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE(test_push_front_rvalue_move)
 
 BOOST_AUTO_TEST_CASE(test_pop_front_single)
 {
-  khasnulin::BiList< int > list;
+  BiList< int > list;
   list.push_back(10);
   list.pop_front();
 
@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_CASE(test_pop_front_single)
 
 BOOST_AUTO_TEST_CASE(test_pop_back_multiple)
 {
-  khasnulin::BiList< int > list;
+  BiList< int > list;
   list.push_back(1);
   list.push_back(2);
   list.push_back(3);
@@ -310,7 +310,7 @@ BOOST_AUTO_TEST_CASE(test_pop_back_multiple)
 
 BOOST_AUTO_TEST_CASE(test_pop_mixed)
 {
-  khasnulin::BiList< int > list;
+  BiList< int > list;
   list.push_back(1);
   list.push_back(2);
 
@@ -323,22 +323,22 @@ BOOST_AUTO_TEST_CASE(test_pop_mixed)
 
 BOOST_AUTO_TEST_CASE(test_pop_back_empty_list)
 {
-  khasnulin::BiList< int > list;
+  BiList< int > list;
 
   BOOST_CHECK_THROW(list.pop_back(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_pop_front_empty_list)
 {
-  khasnulin::BiList< int > list;
+  BiList< int > list;
 
   BOOST_CHECK_THROW(list.pop_front(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_lists_swap)
 {
-  khasnulin::BiList< int > list1;
-  khasnulin::BiList< int > list2;
+  BiList< int > list1;
+  BiList< int > list2;
   list1.push_back(1);
   list1.push_back(2);
 
@@ -375,7 +375,7 @@ struct Person
 
 BOOST_AUTO_TEST_CASE(test_emplacing_object)
 {
-  khasnulin::BiList< Person > list;
+  BiList< Person > list;
   auto it = list.begin();
   it = list.emplace(it, Person{1, "Andrey"});
   it = list.emplace(it, 28, "Vasiliy");
@@ -390,6 +390,22 @@ BOOST_AUTO_TEST_CASE(test_emplacing_object)
 
   BOOST_CHECK_EQUAL(it->age, 0);
   BOOST_CHECK_EQUAL(it->name, "Dmitriy");
+}
+
+BOOST_AUTO_TEST_CASE(test_initializer_list_constructing)
+{
+  khasnulin::BiList< int > list = {1, 2, 3, 4, 5, 6};
+
+  BOOST_CHECK_EQUAL(list.size(), 6);
+  BOOST_CHECK_EQUAL(list.front(), 1);
+  BOOST_CHECK_EQUAL(list.back(), 6);
+}
+
+BOOST_AUTO_TEST_CASE(test_empty_initializer_list_constructing)
+{
+  khasnulin::BiList< int > list = {};
+
+  BOOST_CHECK(list.empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
