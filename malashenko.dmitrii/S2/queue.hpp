@@ -22,9 +22,11 @@ namespace malashenko
     bool empty() const;
     size_t size() const;
 
+
     void push(const T& value);
     void pop();
     void swap(Queue< T >& other);
+    void clear();
 
     ~Queue();
   private:
@@ -117,6 +119,12 @@ namespace malashenko
     }
     std::cout << '\n';
   }
+
+  template< class T >
+  void Queue< T >::clear()
+  {
+    list_.clear();
+  } 
 
   template< class T >
   Queue< T >::~Queue()

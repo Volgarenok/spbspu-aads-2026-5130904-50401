@@ -30,12 +30,49 @@ namespace malashenko
   }
 
 
-  void getInfixData(std::istream& in, Queue< std::string >& infixData)
+  void getInfixData(std::istream& in, Stack< Queue< std::string > >& infixData)
   {
-    std::string symbol;
-    while ((in >> symbol) && !in.eof())
+    char ch;
+    std::string currentToken;
+    malashenko::Queue<std::string> equation;
+
+    while (in.get(ch))
     {
-      infixData.push(symbol);
+        if (ch == '\n')
+        {
+            if (!currentToken.empty())
+            {
+                equation.push(currentToken);
+                currentToken.clear();
+            }
+
+            if (!equation.empty())
+            {
+                infixData.push(equation);
+                equation.clear();
+            }
+        }
+        else if (ch == ' ' || ch == '\t')
+        {
+            if (!currentToken.empty())
+            {
+                equation.push(currentToken);
+                currentToken.clear();
+            }
+        }
+        else
+        {
+            currentToken += ch;
+        }
+    }
+
+    if (!currentToken.empty())
+    {
+        equation.push(currentToken);
+    }
+    if (!equation.empty())
+    {
+        infixData.push(equation);
     }
   }
 
@@ -50,16 +87,12 @@ namespace malashenko
       if (symbol == "(")
       {
         stack.push(symbol);
-        // std::cout << "pushed (\n";
-        // std::cout << "stack: ";
-        // stack.show();
         continue;
       }
 
       if (symbol == ")")
       {
-        // std::cout << "stack: ";
-        // stack.show();
+
         while (stack.top() != "(")
         {
           PostfixData.push(stack.top());
@@ -72,7 +105,6 @@ namespace malashenko
       if (isOperand(symbol))
       {
         PostfixData.push(symbol);
-        // std::cout << "pushed " << symbol << "\n";
       } else 
       {
         if (stack.empty() || stack.top() == "(" || stack.top() == ")")
@@ -85,8 +117,6 @@ namespace malashenko
 
           PostfixData.push(stack.top());
           stack.pop();
-          // std::cout << "queue: ";
-          // PostfixData.show();
           stack.push(symbol);
 
           continue;
@@ -284,20 +314,8 @@ namespace malashenko
   }
 
 
-  void pushAndMove(Queue< std::string >& data, const std::string& value)
-  {
-    data.push(value);
-
-    for (size_t i = 0; i < data.size(); ++i)
-    {
-      data.push(data.front());
-      data.pop();
-    }
-    
-  }
-
 #if 1
-  lli_t calculate(const Queue< std::string >& PostfixData)
+  std::string calculate(Queue< std::string > PostfixData)
   {
     List< std::string > funcNames;
     try
@@ -332,93 +350,56 @@ namespace malashenko
       throw;
     }
 
-    Queue< std::string > res = PostfixData;
+    Stack< std::string > nums;
 
-    while (res.size() != 1)
+    while (!PostfixData.empty())
     {
-      std::string num1 = res.front();
-      res.pop();
-      std::cout << "num1: " << num1 << '\n';
-      std::string num2 = res.front();
-      res.pop();
-
-      std::cout << "num2: " << num2 << '\n';
-
-      std::string operation = res.front();
-      res.pop();
-
-      std::cout << "op: " << operation << '\n';
-
-      if (!isOperand(num1))
+      std::string symbol = PostfixData.front();
+      PostfixData.pop();
+      if (isOperand(symbol))
       {
-        pushAndMove(res, num1);
-        continue;
-      }
-
-      if (!isOperand(num2))
+        nums.push(symbol);
+      } else
       {
-        
-        res.push(num1);
-        res.push(operation);
-        res.push(num2);
-        // res.show();
-        continue;
+        size_t ind = getIndex(symbol, funcNames);
+
+        lli_t num1_lli;
+        try
+        {
+          num1_lli = std::stoll(nums.top());
+          nums.pop();
+        }
+        catch(const std::invalid_argument&)
+        {
+          funcNames.clear();
+          funcs.clear();
+          throw std::invalid_argument("Input error. Wrong operand");
+        }
+
+        lli_t num2_lli;
+        try
+        {
+          num2_lli = std::stoll(nums.top());
+          nums.pop();
+        }
+        catch(const std::invalid_argument&)
+        {
+          funcNames.clear();
+          funcs.clear();
+          throw std::invalid_argument("Input error. Wrong operand");
+        }
+
+        lli_t newNum = (*(funcs.begin() + ind))(num2_lli, num1_lli);
+        nums.push(std::to_string(newNum));
       }
-
-
-      if (isOperand(operation))
-      {
-        pushAndMove(res, num1);
-        num1 = num2;
-        num2 = operation;
-        operation = res.front();
-        res.pop();
-      }
-
-
-
-      lli_t num1_lli;
-      try
-      {
-        num1_lli = std::stoll(num1);
-      }
-      catch(const std::invalid_argument&)
-      {
-        funcNames.clear();
-        funcs.clear();
-        throw std::invalid_argument("Input error");
-      }
-
-      lli_t num2_lli;
-      try
-      {
-        num2_lli = std::stoll(num2);
-      }
-      catch(const std::invalid_argument&)
-      {
-        funcNames.clear();
-        funcs.clear();
-        throw std::invalid_argument("Input error");
-      }
-
-      size_t ind = getIndex(operation, funcNames);
-      if (ind == funcNames.size())
-      {
-        funcNames.clear();
-        funcs.clear();
-        throw std::invalid_argument("Unknown operation");
-      }
-
-      lli_t newNum = (*(funcs.begin() + ind))(num1_lli, num2_lli);
-
-      std::string newNumStr = std::to_string(newNum);
-      pushAndMove(res, newNumStr);
-
-
-      res.show();
     }
-
-    return std::stoll(res.front());
+    if (nums.size() != 1)
+    {
+      funcNames.clear();
+      funcs.clear();
+      throw std::invalid_argument("Input error. Wrong operation");
+    }
+    return nums.top();
   }
 #endif
 

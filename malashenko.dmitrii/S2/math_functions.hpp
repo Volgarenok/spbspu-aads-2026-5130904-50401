@@ -9,9 +9,9 @@ namespace malashenko
 {
   using lli_t = long long int;
   using func_t = lli_t(*)(const lli_t&, const lli_t&);
-  void getInfixData(std::istream& in, Queue< std::string >& infixData);
+  void getInfixData(std::istream& in, Stack< Queue< std::string > >& infixData);
   void converInfixToPostfix(Queue< std::string > infixData, Queue< std::string >& PostfixData);
-  lli_t calculate(const Queue< std::string >& PostfixData);
+  std::string calculate(Queue< std::string > PostfixData);
   bool isOperand(const std::string& symbol);
 
   size_t getPriority(const std::string& symbol);
@@ -23,8 +23,6 @@ namespace malashenko
   lli_t modulo(const lli_t & a, const lli_t &b);
 
   size_t getIndex(const std::string& sign, const List< std::string >& funcs);
-
-  void pushAndMove(Queue< std::string >& data, const std::string& value);
 }
 
 #endif

@@ -21,6 +21,7 @@ namespace malashenko
     void push(const T& value);
     void pop();
     void swap(Stack& other);
+    void clear();
 
     void show() const;
 
@@ -74,7 +75,7 @@ namespace malashenko
   template< class T >
   size_t Stack< T >::size() const
   {
-    return list_.size;
+    return list_.size();
   }
 
   template< class T >
@@ -110,6 +111,13 @@ namespace malashenko
   void Stack< T >::swap(Stack< T >& other)
   {
     list_.swap(other.list_);
+  }
+
+
+  template< class T >
+  void Stack< T >::clear()
+  {
+    list_.clear();
   }
 
   template< class T >
