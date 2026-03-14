@@ -75,6 +75,8 @@ int main()
 
   const size_t MAX = std::numeric_limits< size_t >::max();
 
+  studilova::List< size_t > sums;
+
   for(size_t row = 0; row < maxLen; ++row)
   {
     size_t sum = 0;
@@ -117,7 +119,19 @@ int main()
       ++rIt;
     }
     std::cout << "\n";
+    sums.pushBack(sum);
   }
 
+  auto sIt = sums.begin();
+  for (size_t i = 0; i < sums.size(); ++i)
+  {
+    if (i > 0)
+    {
+      std::cout << " ";
+    }
+    std::cout << *sIt;
+    ++sIt;
+  }
+  std::cout << "\n";
   return 0;
 }
