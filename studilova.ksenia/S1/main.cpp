@@ -39,5 +39,17 @@ int main()
   }
   std::cout << "\n";
 
+  size_t max_len = 0;
+  it = sequences.begin();
+  for (size_t i = 0; i < sequences.size(); ++i)
+  {
+    size_t len = (*it).second.size();
+    if (len > max_len)
+    {
+      max_len = len;
+    }
+    ++it;
+  }
+
   return 0;
 }
