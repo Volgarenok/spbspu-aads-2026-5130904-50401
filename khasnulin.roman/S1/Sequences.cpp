@@ -1,31 +1,27 @@
 #include "Sequences.hpp"
 
+#include <cstddef>
 #include <fcntl.h>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
 
-int khasnulin::safeSum(int a, int b)
+size_t khasnulin::safeSum(size_t a, size_t b)
 {
-  static constexpr int maxInt = std::numeric_limits< int >::max();
-  static constexpr int minInt = std::numeric_limits< int >::min();
+  static constexpr size_t maxInt = std::numeric_limits< size_t >::max();
   if (b > 0 && a > maxInt - b)
   {
     throw std::overflow_error("numers sum overflow");
   }
-  if (b < 0 && a < minInt - b)
-  {
-    throw std::underflow_error("numers sum underflow");
-  }
   return a + b;
 }
 
-std::pair< std::string, khasnulin::BiList< int > > khasnulin::readRow(std::istream &in)
+std::pair< std::string, khasnulin::BiList< size_t > > khasnulin::readRow(std::istream &in)
 {
   std::string name;
-  BiList< int > list;
+  BiList< size_t > list;
   in >> name;
-  int curr_value = 0;
+  size_t curr_value = 0;
   while (in >> curr_value)
   {
     list.push_back(curr_value);
@@ -34,7 +30,7 @@ std::pair< std::string, khasnulin::BiList< int > > khasnulin::readRow(std::istre
   {
     in.clear();
   }
-  return std::pair< std::string, BiList< int > >{name, list};
+  return std::pair< std::string, BiList< size_t > >{name, list};
 }
 
 khasnulin::bilist_row_pairs khasnulin::readAll(std::istream &in)
@@ -42,7 +38,7 @@ khasnulin::bilist_row_pairs khasnulin::readAll(std::istream &in)
   bilist_row_pairs result;
   while (!in.eof() && !in.fail())
   {
-    std::pair< std::string, BiList< int > > row = readRow(in);
+    std::pair< std::string, BiList< size_t > > row = readRow(in);
     if (row.first != "")
     {
       result.push_back(row);
@@ -66,22 +62,22 @@ void khasnulin::printSequenceNames(std::ostream &out, const bilist_row_pairs &se
   out << "\n";
 }
 
-khasnulin::BiList< khasnulin::BiList< int > >
+khasnulin::BiList< khasnulin::BiList< size_t > >
 khasnulin::getTransosedNumsSequences(const bilist_row_pairs &sequence)
 {
-  BiList< LCIter< int > > it_list;
+  BiList< LCIter< size_t > > it_list;
   for (const auto &item : sequence)
   {
     it_list.push_back(item.second.begin());
   }
 
-  BiList< BiList< int > > answer;
+  BiList< BiList< size_t > > answer;
   bool all_empty = false;
   while (!all_empty)
   {
     all_empty = true;
     auto curr_it = it_list.begin();
-    BiList< int > current_layer;
+    BiList< size_t > current_layer;
     for (const auto &curr_seq : sequence)
     {
       if (*curr_it != curr_seq.second.end())
@@ -100,12 +96,12 @@ khasnulin::getTransosedNumsSequences(const bilist_row_pairs &sequence)
   return answer;
 }
 
-void khasnulin::printSequencesNumsByPlace(std::ostream &out, const BiList< BiList< int > > &sequence)
+void khasnulin::printSequencesNumsByPlace(std::ostream &out, const BiList< BiList< size_t > > &sequence)
 {
-  for (const BiList< int > &seq : sequence)
+  for (const BiList< size_t > &seq : sequence)
   {
     bool first = true;
-    for (const int num : seq)
+    for (const size_t num : seq)
     {
       if (!first)
       {
@@ -118,13 +114,13 @@ void khasnulin::printSequencesNumsByPlace(std::ostream &out, const BiList< BiLis
   }
 }
 
-void khasnulin::printSumsOfSequences(std::ostream &out, const BiList< BiList< int > > &sequence)
+void khasnulin::printSumsOfSequences(std::ostream &out, const BiList< BiList< size_t > > &sequence)
 {
   bool first = true;
-  for (const BiList< int > &seq : sequence)
+  for (const BiList< size_t > &seq : sequence)
   {
-    int sum = 0;
-    for (int num : seq)
+    size_t sum = 0;
+    for (size_t num : seq)
     {
       sum = safeSum(sum, num);
     }

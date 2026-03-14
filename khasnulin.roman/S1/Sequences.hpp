@@ -5,20 +5,20 @@
 
 namespace khasnulin
 {
-  std::pair< std::string, BiList< int > > readRow(std::istream &in);
+  std::pair< std::string, BiList< size_t > > readRow(std::istream &in);
 
-  using bilist_row_pairs = khasnulin::BiList< std::pair< std::string, khasnulin::BiList< int > > >;
+  using bilist_row_pairs = khasnulin::BiList< std::pair< std::string, khasnulin::BiList< size_t > > >;
   bilist_row_pairs readAll(std::istream &in);
 
   void printSequenceNames(std::ostream &out, const bilist_row_pairs &sequence);
 
-  BiList< BiList< int > > getTransosedNumsSequences(const bilist_row_pairs &sequence);
+  BiList< BiList< size_t > > getTransosedNumsSequences(const bilist_row_pairs &sequence);
 
-  void printSequencesNumsByPlace(std::ostream &out, const BiList< BiList< int > > &sequence);
+  void printSequencesNumsByPlace(std::ostream &out, const BiList< BiList< size_t > > &sequence);
 
-  void printSumsOfSequences(std::ostream &out, const BiList< BiList< int > > &sequence);
+  void printSumsOfSequences(std::ostream &out, const BiList< BiList< size_t > > &sequence);
 
-  int safeSum(int a, int b);
+  size_t safeSum(size_t a, size_t b);
 }
 
 #endif

@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <exception>
 #include <iostream>
 #include <stdexcept>
@@ -17,7 +18,7 @@ int main()
 
   printSequenceNames(std::cout, allPairs);
 
-  BiList< BiList< int > > transposed = getTransosedNumsSequences(allPairs);
+  BiList< BiList< size_t > > transposed = getTransosedNumsSequences(allPairs);
 
   if (transposed.empty())
   {
@@ -33,12 +34,12 @@ int main()
   }
   catch (const std::overflow_error &e)
   {
-    std::cout << e.what() << "\n";
+    std::cerr << e.what() << "\n";
     return 1;
   }
   catch (const std::exception &e)
   {
-    std::cout << "Unknown error: " << e.what() << "\n";
+    std::cerr << "Unknown error: " << e.what() << "\n";
     return 1;
   }
 }
