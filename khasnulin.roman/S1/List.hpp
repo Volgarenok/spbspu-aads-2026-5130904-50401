@@ -2,6 +2,7 @@
 #define LIST_HPP
 
 #include <initializer_list>
+#include <ostream>
 #include <stdexcept>
 #include <utility>
 
@@ -30,6 +31,9 @@ namespace khasnulin
 
     BiList< T > &operator=(std::initializer_list< T > ilist);
 
+    template < class K > friend bool operator==(const BiList< K > &lhs, const BiList< K > &rhs);
+    template < class K > friend bool operator!=(const BiList< K > &lhs, const BiList< K > &rhs);
+
     LIter< T > begin() noexcept;
     LCIter< T > begin() const noexcept;
     LCIter< T > cbegin() const noexcept;
@@ -51,6 +55,8 @@ namespace khasnulin
 
     LIter< T > insert(LCIter< T > pos, const T &val);
     LIter< T > insert(LCIter< T > pos, T &&val);
+
+    LIter< T > insert(LCIter< T > pos, LIter< T > begin, LIter< T > end);
 
     void push_back(const T &val);
     void push_back(T &&val);
@@ -75,8 +81,6 @@ namespace khasnulin
     template < class... Args > LIter< T > emplace(LCIter< T > pos, Args &&...args);
     template < class... Args > void emplace_back(Args &&...args);
     template < class... Args > void emplace_front(Args &&...args);
-
-    void assign(std::initializer_list< T > ilist);
 
     friend class LIter< T >;
     friend class LCIter< T >;
@@ -539,6 +543,85 @@ namespace khasnulin
     }
     swap(new_list);
     return *this;
+  }
+
+  template < class T > LIter< T > BiList< T >::insert(LCIter< T > pos, LIter< T > begin, LIter< T > end)
+  {
+    LNode< T > *new_list = nullptr;
+    LNode< T > *tail = new_list;
+    size_t new_s = 0;
+    try
+    {
+      for (; begin != end; ++begin)
+      {
+        if (!new_list)
+        {
+          new_list = insert_before(new_list, *begin);
+          tail = new_list;
+        }
+        else
+        {
+          tail = insert_before(new_list, *begin);
+        }
+        new_s++;
+      }
+    }
+    catch (...)
+    {
+      clear(new_list);
+      throw;
+    }
+
+    if (h_ && pos.it_.is_end_)
+    {
+      h_->prev->next = new_list;
+      new_list->prev = h_->prev;
+      h_->prev = tail;
+      tail->next = h_;
+    }
+    else if (!h_)
+    {
+      h_ = new_list;
+    }
+    else if (!pos.it_.is_end_)
+    {
+      LNode< T > *curr = pos.it_.curr_;
+      LNode< T > *prev = curr->prev;
+      prev->next = new_list;
+      curr->prev = tail;
+      new_list->prev = prev;
+      tail->next = curr;
+    }
+    s_ += new_s;
+    return LIter< T >{this, new_list, new_list == nullptr};
+  }
+
+  template < class T > bool operator==(const BiList< T > &lhs, const BiList< T > &rhs)
+  {
+    if (lhs.size() != rhs.size())
+    {
+      return false;
+    }
+    auto it1 = lhs.cbegin();
+    auto it2 = rhs.cbegin();
+    for (; it1 != lhs.cend() && it2 != rhs.cend(); ++it1, ++it2)
+    {
+      if ((*it1) != (*it2))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template < class T > bool operator!=(const BiList< T > &lhs, const BiList< T > &rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  template < class T > std::ostream &operator<<(std::ostream &out, BiList< T > list)
+  {
+    return out << list.size() << "\n";
   }
 }
 
