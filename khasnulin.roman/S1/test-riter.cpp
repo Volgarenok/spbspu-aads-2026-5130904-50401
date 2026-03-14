@@ -3,6 +3,7 @@
 #include <boost/test/unit_test_suite.hpp>
 
 #include "List.hpp"
+#include "RLCIter.hpp"
 
 BOOST_AUTO_TEST_SUITE(reverseIteratorSuite)
 
@@ -55,6 +56,22 @@ BOOST_AUTO_TEST_CASE(test_decrement_reverse)
   --it;
   BOOST_CHECK(*it == 2);
   BOOST_CHECK(it == list.rbegin());
+}
+
+BOOST_AUTO_TEST_CASE(test_const_reverse_conversion)
+{
+  khasnulin::BiList< int > list;
+  list.push_back(10);
+
+  auto rit = list.rbegin();
+
+  auto rcit = list.crbegin();
+
+  BOOST_CHECK(rcit == rit);
+
+  RLCIter< int > rcit2 = rit;
+
+  BOOST_CHECK(rcit2 == rcit);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
