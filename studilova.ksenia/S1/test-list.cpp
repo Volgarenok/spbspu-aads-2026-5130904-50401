@@ -122,3 +122,56 @@ BOOST_AUTO_TEST_CASE(BackEmpty)
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(IteratorSuite)
+
+BOOST_AUTO_TEST_CASE(IteratorIncrement)
+{
+  studilova::List< int > list;
+
+  list.insert(list.end(), 1);
+  list.insert(list.end(), 2);
+  list.insert(list.end(), 3);
+
+  auto it = list.begin();
+
+  BOOST_CHECK_EQUAL(*it, 1);
+
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 2);
+
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 3);
+}
+
+BOOST_AUTO_TEST_CASE(IteratorDecrement)
+{
+  studilova::List< int > list;
+
+  list.insert(list.end(), 1);
+  list.insert(list.end(), 2);
+  list.insert(list.end(), 3);
+
+  auto it = list.begin();
+
+  --it;
+  BOOST_CHECK_EQUAL(*it, 3);
+}
+
+BOOST_AUTO_TEST_CASE(IteratorComparison)
+{
+  studilova::List< int > list;
+
+  list.insert(list.end(), 1);
+  list.insert(list.end(), 2);
+
+  auto it1 = list.begin();
+  auto it2 = list.begin();
+
+  BOOST_CHECK(it1 == it2);
+
+  ++it2;
+
+  BOOST_CHECK(it1 != it2);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
