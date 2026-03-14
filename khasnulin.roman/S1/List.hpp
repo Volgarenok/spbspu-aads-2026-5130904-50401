@@ -28,6 +28,8 @@ namespace khasnulin
     BiList< T > &operator=(const BiList< T > &list);
     BiList< T > &operator=(BiList< T > &&list) noexcept;
 
+    BiList< T > &operator=(std::initializer_list< T > ilist);
+
     LIter< T > begin() noexcept;
     LCIter< T > begin() const noexcept;
     LCIter< T > cbegin() const noexcept;
@@ -479,10 +481,47 @@ namespace khasnulin
   BiList< T >::BiList(std::initializer_list< T > init):
       BiList()
   {
-    for (const T &item : init)
+    try
     {
-      push_back(item);
+      for (const T &item : init)
+      {
+        push_back(item);
+      }
     }
+    catch (...)
+    {
+      clear();
+      throw;
+    }
+  }
+  template < class T > BiList< T > &BiList< T >::operator=(std::initializer_list< T > ilist)
+  {
+    auto listIt = ilist.begin();
+    auto listEnd = ilist.end();
+
+    BiList< T > new_list(*this);
+    auto it = new_list.begin();
+    auto lend = new_list.end();
+    try
+    {
+      for (; listIt != listEnd && it != lend; ++it, ++listIt)
+      {
+        *it = *listIt; // T::operator=();
+      }
+
+      while (listIt != listEnd)
+      {
+        new_list.push_back(*listIt);
+        listIt++;
+      }
+    }
+    catch (...)
+    {
+      new_list.clear();
+      throw;
+    }
+    swap(new_list);
+    return *this;
   }
 }
 
