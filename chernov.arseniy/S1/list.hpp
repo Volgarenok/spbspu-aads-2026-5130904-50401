@@ -56,7 +56,7 @@ namespace chernov {
   template< class T >
   void List< T >::removeFake() noexcept
   {
-    ::operator delete(fake_);
+    delete fake_;
   }
 
   template< class T >
