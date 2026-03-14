@@ -141,6 +141,10 @@ int main()
     tit2 = tit2.next();
   }
 
+  if (transposed.empty())
+  {
+    sums.addEnd(0);
+  }
   auto sit2 = sums.begin();
   while(sit2 != sums.end())
   {
