@@ -30,6 +30,8 @@ namespace studilova
     public:
       List();
       ~List();
+      List(const List& other);
+      List& operator=(const List& other);
 
       bool empty() const;
       void clear();
@@ -62,6 +64,44 @@ namespace studilova
   List< T >::~List()
   {
     clear();
+  }
+
+  template< class T >
+  List< T >::List(const List& other)
+    : head_(nullptr), size_(0)
+  {
+    if (other.empty())
+    {
+      return;
+    }
+    Node< T >*curr = other.head_;
+
+    for (size_t i = 0; i < other.size_; ++i)
+    {
+      pushBack(curr->data);
+      curr = curr->next;
+    }
+  }
+
+  template< class T >
+  List< T >& List< T >::operator=(const List& other)
+  {
+    if (this == &other)
+    {
+      return *this;
+    }
+    if (other.empty())
+    {
+      return *this;
+    }
+
+    Node< T >* curr = other.head_;
+    for (size_t i = 0; i < other.size_; ++i)
+    {
+      pushBack(curr->data);
+      curr = curr->next;
+    }
+    return *this;
   }
 
   template< class T >
