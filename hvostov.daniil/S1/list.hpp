@@ -27,7 +27,7 @@ namespace hvostov {
     T* operator->() const noexcept;
     bool operator==(const Liter< T >& liter) const noexcept;
     bool operator!=(const Liter< T >& liter) const noexcept;
-    
+
   private:
     friend class List< T >;
     Node< T >* curr_;
@@ -48,7 +48,7 @@ namespace hvostov {
     const T* operator->() const noexcept;
     bool operator==(const LCiter< T >& lciter) const noexcept;
     bool operator!=(const LCiter< T >& lciter) const noexcept;
-    
+
   private:
     friend class List< T >;
     Node< T >* curr_;
@@ -137,7 +137,6 @@ hvostov::List< T >::~List()
 template< class T >
 hvostov::List< T >& hvostov::List< T >::operator=(const List< T >& list)
 {
-  
   if (this == &list) {
     return *this;
   }
