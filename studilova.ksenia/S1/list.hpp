@@ -17,6 +17,9 @@ namespace studilova
   class LIter;
 
   template< class T >
+  class CLIter;
+
+  template< class T >
   class List
   {
     private:
@@ -29,6 +32,7 @@ namespace studilova
 
       bool empty() const;
       void clear();
+      size_t size() const;
 
       void pop_front();
       void pop_back();
@@ -38,6 +42,9 @@ namespace studilova
 
       LIter< T > begin();
       LIter< T > end();
+
+      CLIter< T > begin() const;
+      CLIter< T > end() const;
   };
 
   template< class T >
@@ -64,6 +71,12 @@ namespace studilova
     {
       pop_front();
     }
+  }
+
+  template< class T >
+  size_t List< T >::size()const
+  {
+    return size_;
   }
 
   template< class T >
@@ -178,6 +191,7 @@ namespace studilova
       push_front(value);
       return;
     }
+
     Node< T >* curr = pos.node_;
     Node< T >* prev = curr->prev;
 
@@ -186,15 +200,17 @@ namespace studilova
     prev->next = node;
     curr->prev = node;
 
-    ++size;
+    ++size_;
   }
 
   template< class T >
   class LIter
   {
     friend class List< T >;
+  
   private:
     Node< T >* node_;
+  
   public:
     LIter(Node< T >* node = nullptr);
 
@@ -257,7 +273,73 @@ namespace studilova
   }
 
   template< class T >
-  class CLIter;
+  class CLIter
+  {
+    friend class List< T >;
+  
+  private:
+    Node< T >* node_;
+  
+  public:
+    CLIter(Node< T >* node = nullptr);
+
+    const T& operator*() const;
+
+    CLIter& operator++();
+    CLIter& operator--();
+
+    bool operator==(const CLIter& other) const;
+    bool operator!=(const CLIter& other) const;
+  };
+
+  template< class T >
+  CLIter< T >::CLIter(Node< T >* node)
+    : node_(node)
+  {}
+
+  template< class T >
+  const T& CLIter< T >::operator*() const
+  {
+    return node_->data;
+  }
+
+  template< class T >
+  CLIter< T >& CLIter< T >::operator++()
+  {
+    node_ = node_->next;
+    return *this;
+  }
+
+  template< class T >
+  CLIter< T >& CLIter< T >::operator--()
+  {
+    node_ = node_->prev;
+    return *this;
+  }
+
+  template< class T >
+  bool CLIter< T >::operator==(const CLIter& other) const
+  {
+    return node_ == other.node_;
+  }
+
+  template< class T >
+  bool CLIter< T >::operator!=(const CLIter& other) const
+  {
+    return !(*this == other);
+  }
+
+  template< class T >
+  CLIter< T > List< T >::begin() const
+  {
+    return CLIter< T >(head_);
+  }
+
+  template< class T >
+  CLIter< T > List< T >::end() const
+  {
+    return CLIter< T >(nullptr);
+  }
 }
 
 #endif
