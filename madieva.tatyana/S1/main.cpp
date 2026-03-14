@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include <limits>
 #include"list.hpp"
 
 void read(madieva::List<std::pair<std::string, madieva::List<int>>> & list)
@@ -60,13 +61,19 @@ void transposition(madieva::List<madieva::List<int>> & t_list,
 
 void sum_num(const madieva::List< madieva::List< int >> & t_list, madieva::List< int > & sum)
 {
+  using lim_int = std::numeric_limits< int >;
+  const int max_int = lim_int::max();
   madieva::LCIter<madieva::List < int >> l_it = t_list.begin();
   for(size_t i = 0; i < t_list.size(); ++i) {
     int s = 0;
     madieva::LCIter<int> n_it = (*l_it).begin();
     for (size_t j = 0; j < (*l_it).size(); ++j) {
-      s += (*n_it);
-      ++n_it;
+        if((*n_it) < max_int - s) {
+        s += (*n_it);
+        ++n_it;
+      } else {
+        throw std::overflow_error("Error");
+      }
     }
     sum.push_back(s);
     ++l_it;
@@ -75,22 +82,25 @@ void sum_num(const madieva::List< madieva::List< int >> & t_list, madieva::List<
 
 void print(const madieva::List< madieva::List< int >> & t_list, const madieva::List<std::pair<std::string, madieva::List<int>>> & list, const madieva::List< int > & sum)
 {
-  madieva::LCIter<std::pair<std::string, madieva::List<int>>> it = list.begin();
-  std::cout << (*it).first;
-  ++it;
+  madieva::LCIter<std::pair<std::string, madieva::List<int>>> p_it = list.begin();
+  std::cout << (*p_it).first;
+  ++p_it;
   for(size_t i = 1; i < list.size(); ++i) {
-    std::cout << " " << (*it).first;
-    ++it;
+    std::cout << " " << (*p_it).first;
+    ++p_it;
   }
   std::cout << "\n";
 
+  madieva::LCIter< madieva::List< int >> l_it = t_list.begin();
   for (size_t i = 0; i < t_list.size(); ++i) {
-    madieva::LCIter< int > it_num = (*it).second.begin();
+    madieva::LCIter< int > it_num = (*l_it).begin();
     std::cout << (*it_num);
     ++it_num;
-    for(size_t j = 1; j < (*it).second.size();++j) {
+    for(size_t j = 1; j < (*l_it).size();++j) {
       std::cout << " " << (*it_num);
+      ++it_num;
     }
+    ++l_it;
     std::cout << "\n";
   }
 
@@ -99,6 +109,7 @@ void print(const madieva::List< madieva::List< int >> & t_list, const madieva::L
   ++s_it;
   for(size_t i = 1; i < sum.size(); ++i) {
     std::cout << " " << (*s_it);
+    ++s_it;
   }
   std::cout << "\n";
 }
@@ -108,9 +119,25 @@ int main()
   namespace mad =  madieva;
   mad::List<std::pair<std::string, mad::List<int>>> list;
   read(list);
+  if (list.size() == 0) {
+    std::cout << "0\n";
+    return 0;
+  }
   mad::List<mad::List<int>> t_list;
   transposition(t_list, list);
   mad::List< int > sum;
+  try {
+    sum_num(t_list, sum);
+  } catch (const std::overflow_error & e) {
+    std::cerr << e.what() << "\n";
+    t_list.clear();
+    list.clear();
+    sum.clear();
+    return 1;
+  }
   print(t_list, list, sum);
+  t_list.clear();
+  list.clear();
+  sum.clear();
   return 0;
 }

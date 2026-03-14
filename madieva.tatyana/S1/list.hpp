@@ -1,10 +1,15 @@
 #include <iostream>
+#include <cassert>
 namespace madieva {
   template< class T > class List;
+  template< class T > class LIter;
+  template< class T > class LCIter;
 
   template< class T >
   class Node {
     friend class List< T >;
+    friend class LIter< T >;
+    friend class LCIter< T >;
     T val;
     Node< T > * next;
     Node< T > * prev;
