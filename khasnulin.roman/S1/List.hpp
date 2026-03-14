@@ -67,7 +67,6 @@ namespace khasnulin
 
     void swap(BiList< T > &other) noexcept;
 
-    // TODO: to the future version
     template < class... Args > LIter< T > emplace(LCIter< T > pos, Args &&...args);
 
     friend class LIter< T >;
@@ -274,26 +273,21 @@ namespace khasnulin
 
   template < class T > void BiList< T >::push_back(const T &val)
   {
-    if (h_)
+
+    LNode< T > *node = insert_before(h_, val);
+    if (!h_)
     {
-      insert_before(h_, val);
-    }
-    else
-    {
-      h_ = createNew(val);
+      h_ = node;
     }
     s_++;
   }
 
   template < class T > void BiList< T >::push_back(T &&val)
   {
-    if (h_)
+    LNode< T > *node = insert_before(h_, std::forward< T >(val));
+    if (!h_)
     {
-      insert_before(h_, std::forward< T >(val));
-    }
-    else
-    {
-      h_ = createNew(std::forward< T >(val));
+      h_ = node;
     }
     s_++;
   }
@@ -461,6 +455,19 @@ namespace khasnulin
   {
     std::swap(h_, other.h_);
     std::swap(s_, other.s_);
+  }
+
+  template < class T >
+  template < class... Args >
+  LIter< T > BiList< T >::emplace(LCIter< T > pos, Args &&...args)
+  {
+    LNode< T > *node = insert_before(pos.it_.curr_, std::forward< Args >(args)...);
+    if (!h_)
+    {
+      h_ = node;
+    }
+    s_++;
+    return LIter< T >{this, node, false};
   }
 }
 
