@@ -1,143 +1,16 @@
 #include <iostream>
 #include <string>
+#include "list.hpp"
 
-namespace petrov
-{
-  template<class T>
-  class List;
-  template<class T>
-  class LIter
-  {
-    List<T>* curr;
-    LIter(List<T>* p) : curr(p)
-    {}  
-  public:
-    T& operator*()
-    {
-      return curr->val;
-    }
-    LIter& operator++()
-    {
-      curr = curr->next;
-      return *this;
-    }
-    bool operator==(const LIter& LIt) const
-    {
-      return curr == LIt.curr;
-    }
-    bool operator!=(const LIter& LIt) const
-    {
-      return curr != LIt.curr;
-    }
-    bool operator!=(LIter& LIt)
-    {
-      return curr != LIt.curr;
-    }
-    bool operator==(LIter& LIt)
-    {
-      return curr == LIt.curr;
-    }
-    friend class List<T>;
-  };
-    template<class T>
-  class List
-  {
-    public:
-      T val;
-      List<T>* next;
-      LIter<T> begin()
-      {
-        return LIter<T>(this);
-      }
-      LIter<T> end()
-      {
-        return LIter<T>(static_cast<List<T>*>(nullptr));
-      }
-  };
+int main() {
+  petrov::List<std::string> raw_data;
+  std::string token;
+  while (std::cin >> token) {
+    raw_data.push_back(token);
+  }
+
+  for (auto* n = raw_data.head; n; n = n->next) {
+    std::cout << n->data << " ";
+  }
+  return 0;
 }
-
-int string_to_int(std::string string_to_record)
-{
-  int c = 0;
-  size_t i = 0;
-  while (string_to_record[i] != '\0')
-  {
-    c = c*10 + (string_to_record[i] - 48);
-    i++;
-  }
-  return c;
-}
-
-int main()
-{
-  petrov::List<std::pair<std::string, petrov::List<int>*>> data;
-  data.next = nullptr;
-  petrov::List<std::pair<std::string, petrov::List<int>*>>* data_ptr = &data;
-  std::string string_to_record;
-  petrov::List<int>* numbers_ptr = nullptr;
-  size_t count_elements = 0, count = 0;
-  while (std::cin >> string_to_record)
-  {
-     if (!(string_to_record[0] > 47 && string_to_record[0] < 59))
-    {
-      petrov::List<std::pair<std::string, petrov::List<int>*>>* new_data_ptr = new petrov::List<std::pair<std::string, petrov::List<int>*>>;
-      new_data_ptr->next = nullptr;
-      new_data_ptr->val.first = string_to_record;
-      new_data_ptr->val.second = nullptr;
-      data_ptr->next = new_data_ptr;
-      data_ptr = new_data_ptr;
-      numbers_ptr = nullptr; 
-      count_elements++;
-    }
-    else
-    {
-      petrov::List<int>* new_numbers_ptr = new petrov::List<int>;
-      new_numbers_ptr->val = string_to_int(string_to_record);
-      new_numbers_ptr->next = nullptr;
-      if (data_ptr->val.second == nullptr)
-      {
-        data_ptr->val.second = new_numbers_ptr;
-      }
-      else
-      {
-        numbers_ptr->next = new_numbers_ptr;
-      }
-      numbers_ptr = new_numbers_ptr;
-    }
-  }
-  petrov::List<std::pair<std::string, petrov::List<int>*>>* data_ptr_2 = &data;
-  while (data_ptr_2 != nullptr)
-  {
-    std::cout << data_ptr_2->val.first << " ";
-    data_ptr_2 = data_ptr_2->next;
-  }
-  std::cout << '\n';
-  petrov::List<std::pair<std::string, petrov::List<int>*>> data_ptr_3 = data;
-  while (count < count_elements)
-  {
-    count = 0;
-    petrov::List<std::pair<std::string, petrov::List<int>*>>* data_ptr_4 = &data_ptr_3;
-    while (data_ptr_4 != nullptr)
-    {
-      if (data_ptr_4->val.second != nullptr)
-      {
-        std::cout << data_ptr_4->val.second->val << " ";
-        if (data_ptr_4->val.second->next == nullptr)
-        {
-          data_ptr_4->val.second = nullptr;
-        }
-        else
-        {
-          data_ptr_4->val.second = data_ptr_4->val.second->next;
-        }
-      }
-      else
-      {
-        count++;
-      }
-      data_ptr_4 = data_ptr_4->next;
-    }
-    std::cout << '\n';
-  }
-}
-
