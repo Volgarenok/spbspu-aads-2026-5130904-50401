@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <stdexcept>
 #include <limits>
 #include <utility>
 #include "list.hpp"
@@ -72,14 +73,14 @@ namespace kondrat
     return false;
   }
 
-  bool printOneRow(List< pairN > & data, size_t & sum)
+  size_t printOneRow(List< pairN > & data)
   {
     List< size_t > row;
 
     LIter< pairN > it = data.begin();
     LIter< pairN > end = data.end();
 
-    sum = 0;
+    size_t sum = 0;
 
     while (it != end)
     {
@@ -87,9 +88,9 @@ namespace kondrat
       {
         size_t value = (*it).second.front();
 
-        if (sum > std::numeric_limits< size_t >::max() - value)
+        if (sum > std::numeric_limits<size_t>::max() - value)
         {
-          return false;
+          throw std::overflow_error("overflow");
         }
 
         row.pushBack(value);
@@ -127,24 +128,16 @@ namespace kondrat
       }
       ++it;
     }
-    return true;
+    return sum;
   }
 
-  bool printRowsAndSums(List< pairN > & data, List< size_t > & sums)
+  void printRowsAndSums(List< pairN > & data, List< size_t > & sums)
   {
     while (hasNumbers(data))
     {
-      size_t sum = 0;
-
-      if (!printOneRow(data, sum))
-      {
-        return false;
-      }
-
+      size_t sum = printOneRow(data);
       sums.pushBack(sum);
     }
-
-    return true;
   }
 
   void printSums(const List< size_t > & sums)
@@ -194,9 +187,13 @@ int main()
   kondrat::List< kondrat::pairN > copy(data);
   kondrat::List< size_t > sums;
 
-  if (!kondrat::printRowsAndSums(copy, sums))
+  try
   {
-    std::cerr << "Error: sum overflow\n";
+    kondrat::printRowsAndSums(copy, sums);
+  }
+  catch (const std::overflow_error &)
+  {
+    std::cerr << "overflow";
     return 1;
   }
 
