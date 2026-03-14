@@ -86,8 +86,7 @@ namespace madieva{
     }
   }
 
-  void print_str_list(const List< List< size_t >> & t_list,
-    const List<std::pair<std::string, List<size_t>>> & list)
+  void print_str(const List<std::pair<std::string, List<size_t>>> & list)
   {
     LCIter<std::pair<std::string, List<size_t>>> p_it = list.begin();
     std::cout << (*p_it).first;
@@ -97,7 +96,10 @@ namespace madieva{
       ++p_it;
     }
     std::cout << "\n";
+  }
 
+  void print_list(const List< List< size_t >> & t_list)
+  {
     if (t_list.size() == 0) {
       std::cout << "0\n";
       return;
@@ -147,18 +149,25 @@ int main()
   }
   mad::List<mad::List<size_t>> t_list;
   mad::transposition(t_list, list);
+  if (t_list.size() == 0) {
+    mad::print_str(list);
+    std::cout << "0\n";
+    return 0;
+  }
   mad::List< size_t > sum;
   try {
     mad::sum_num(t_list, sum);
   } catch (const std::overflow_error & e) {
-    mad::print_str_list(t_list, list);
+    mad::print_str(list);
+    mad::print_list(t_list);
     std::cerr << e.what() << "\n";
     t_list.clear();
     list.clear();
     sum.clear();
     return 1;
   }
-  mad::print_str_list(t_list, list);
+  mad::print_str(list);
+  mad::print_list(t_list);
   mad::print_sum(sum);
   t_list.clear();
   list.clear();
