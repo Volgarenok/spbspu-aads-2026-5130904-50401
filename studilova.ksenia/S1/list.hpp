@@ -2,6 +2,7 @@
 #define LIST_HPP
 
 #include <cstddef>
+#include<stdexcept>
 
 namespace studilova
 {
@@ -33,6 +34,11 @@ namespace studilova
       bool empty() const;
       void clear();
       size_t size() const;
+
+      T& front();
+      const T& front() const;
+      T& back();
+      const T& back() const;
 
       void pop_front();
       void pop_back();
@@ -77,6 +83,46 @@ namespace studilova
   size_t List< T >::size()const
   {
     return size_;
+  }
+
+  template< class T >
+  T& List< T >::front()
+  {
+    if(empty())
+    {
+      throw std::out_of_range("List is empty");
+    }
+    return head_->data;
+  }
+
+  template< class T >
+  const T& List< T >::front() const
+  {
+    if(empty())
+    {
+      throw std::out_of_range("List is empty");
+    }
+    return head_->data;
+  }
+
+  template< class T >
+  T& List< T >::back()
+  {
+    if(empty())
+    {
+      throw std::out_of_range("List is empty");
+    }
+    return head_->prev->data;
+  }
+
+  template< class T >
+  const T& List< T >::back() const
+  {
+    if(empty())
+    {
+      throw std::out_of_range("List is empty");
+    }
+    return head_->prev->data;
   }
 
   template< class T >
@@ -207,10 +253,10 @@ namespace studilova
   class LIter
   {
     friend class List< T >;
-  
+
   private:
     Node< T >* node_;
-  
+
   public:
     LIter(Node< T >* node = nullptr);
 
@@ -276,10 +322,10 @@ namespace studilova
   class CLIter
   {
     friend class List< T >;
-  
+
   private:
     Node< T >* node_;
-  
+
   public:
     CLIter(Node< T >* node = nullptr);
 
