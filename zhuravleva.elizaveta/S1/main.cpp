@@ -31,11 +31,11 @@ int main()
   }
 
   auto sit = sequences.begin();
-  while(sit.hasNext())
+  while(sit != sequences.end())
   {
     std::cout << (*sit).first;
     sit = sit.next();
-    if(sit.hasNext())
+    if(sit != sequences.end())
     {
       std::cout << " ";
     }
