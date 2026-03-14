@@ -91,7 +91,7 @@ int main()
       if (row < seq.size())
       {
         size_t value = **iterIt;
-        
+
         if(MAX - value < sum)
         {
           std::cerr << "Overflow" << "\n";
