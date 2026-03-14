@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 template <class T>
 struct Node
 {
