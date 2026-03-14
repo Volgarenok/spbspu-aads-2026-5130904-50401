@@ -45,7 +45,7 @@ namespace zhuravleva
     void deleteAfter(LIter< T > pos);
 
     LIter< T > addAfter(LIter< T > pos, const T& value);
-
+    LIter< T > addEnd(const T& value);
     void clear() noexcept;
   };
 
@@ -148,41 +148,27 @@ namespace zhuravleva
   template<class T>
   LIter<T> List<T>::begin() noexcept
   {
-    if(fake->next == fake)
-    {
-      return LIter<T>(nullptr);
-    }
-    else
-    {
-      return LIter<T>(fake->next);
-    }
+    return LIter<T>(fake->next);
   }
 
 
   template<class T>
   LCIter<T> List<T>::cbegin() const noexcept
   {
-    if(fake->next == fake)
-    {
-      return LCIter<T>(nullptr);
-    }
-    else
-    {
-      return LCIter<T>(fake->next);
-    }
+    return LCIter<T>(fake->next);
   }
 
 
   template<class T>
   LIter<T> List<T>::end() noexcept
   {
-    return LIter<T>(nullptr);
+    return LIter<T>(fake);
   }
 
   template<class T>
   LCIter<T> List<T>::cend() const noexcept
   {
-    return LCIter<T>(nullptr);
+    return LCIter<T>(fake);
   }
 
 
@@ -249,6 +235,20 @@ namespace zhuravleva
     pos.current->next = node;
 
     return LIter<T>(node);
+  }
+
+  template <class T>
+  LIter< T > List< T >::addEnd(const T& value)
+  {
+    Node< T >* cur = fake;
+    while(cur -> next != fake)
+    {
+      cur = cur -> next;
+    }
+    Node< T >* node = new Node< T >(value, fake);
+    cur-> next = node;
+    return LIter< T >(node);
+
   }
 
   template<class T>

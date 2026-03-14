@@ -8,25 +8,35 @@
 int main()
 {
   zhuravleva::List< std::pair<std::string, zhuravleva::List<size_t > > > sequences;
-
   std::string name;
 
   while(std::cin >> name)
   {
     zhuravleva::List< size_t > numbers;
     size_t value = 0;
-    auto pos = numbers.beforeStart();
     while(std::cin >> value)
     {
-      pos = numbers.addAfter(pos, value);
+      numbers.addEnd(value);
+    }
+    if(std::cin.fail())
+    {
+      std::cin.clear();
+    }
+    sequences.addEnd(std::make_pair(name, numbers));
+    if (std::cin.bad()) {
+      std::cerr << "bad input\n";
+      return 1;
     }
     std::cin.clear();
-    sequences.AddStart(std::make_pair(name, numbers));
   }
 
-  if(sequences.empty())
-  {
-    std::cout << "0\n";
+  if (!std::cin.eof()) {
+    std::cerr << "bad input\n";
+    return 1;
+  }
+
+  if (sequences.empty()) {
+    std::cout << 0 << "\n";
     return 0;
   }
 
@@ -44,11 +54,11 @@ int main()
 
   size_t maxLen = 0;
   auto it = sequences.cbegin();
-  while(it.hasNext())
+  while(it != sequences.cend())
   {
     size_t len = 0;
     auto nit = (*it).second.cbegin();
-    while(nit.hasNext())
+    while(nit != (*it).second.cend())
     {
       len++;
       nit = nit.next();
@@ -69,16 +79,16 @@ int main()
     auto insertPos = newRow.beforeStart();
     auto sit = sequences.cbegin();
 
-    while(sit.hasNext())
+    while(sit != sequences.cend())
     {
       auto nit = (*sit).second.cbegin();
       size_t index = 0;
-      while(index < column && nit.hasNext())
+      while(index < column && nit != (*sit).second.cend())
       {
         nit = nit.next();
         index++;
       }
-      if(nit.hasNext())
+      if(nit != (*sit).second.cend())
       {
         insertPos = newRow.addAfter(insertPos, *nit);
       }
@@ -91,14 +101,14 @@ int main()
   }
 
  auto tit = transposed.cbegin();
-  while(tit.hasNext())
+  while(tit != transposed.cend())
   {
     auto nit = (*tit).cbegin();
-    while(nit.hasNext())
+    while(nit != (*tit).cend())
     {
       std::cout << *nit;
       nit = nit.next();
-      if(nit.hasNext())
+      if(nit != (*tit).cend())
       {
         std::cout << " ";
       }
@@ -111,11 +121,11 @@ int main()
   auto spos = sums.beforeStart();
   auto tit2 = transposed.cbegin();
 
-  while(tit2.hasNext())
+  while(tit2 != transposed.cend())
   {
     size_t sum = 0;
     auto nit = (*tit2).cbegin();
-    while(nit.hasNext())
+    while(nit != (*tit2).cend())
     {
       if(sum > std::numeric_limits<size_t>::max() - *nit)
       {
@@ -132,11 +142,11 @@ int main()
   }
 
   auto sit2 = sums.begin();
-  while(sit2.hasNext())
+  while(sit2 != sums.end())
   {
     std::cout << *sit2;
     sit2 = sit2.next();
-    if(sit2.hasNext())
+    if(sit2 != sums.end())
     {
       std::cout << " ";
     }
