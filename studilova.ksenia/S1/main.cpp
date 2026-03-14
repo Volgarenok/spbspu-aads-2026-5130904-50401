@@ -28,12 +28,24 @@ int main()
 
   if (sequences.empty())
   {
-    std::cout << "0" << "\n";
+    std::cout << "0\n";
     return 0;
   }
 
-  size_t maxLen = 0;
   auto it = sequences.begin();
+  for (size_t i = 0; i < sequences.size(); ++i)
+  {
+    if (i > 0)
+    {
+      std::cout << " ";
+    }
+    std::cout << (*it).first;
+    ++it;
+  }
+  std::cout << "\n";
+
+  size_t maxLen = 0;
+  it = sequences.begin();
   for (size_t i = 0; i < sequences.size(); ++i)
   {
     size_t len = (*it).second.size();
@@ -46,107 +58,75 @@ int main()
 
   if (maxLen == 0)
   {
-    auto it2 = sequences.begin();
-    for (size_t i = 0; i < sequences.size(); ++i)
-    {
-      if (i > 0)
-      {
-        std::cout << " ";
-      }
-      std::cout << (*it2).first;
-      ++it2;
-    }
-    std::cout << "\n";
-    std::cout << "0" << "\n";
-    return 0;
-  }
-
-  studilova::List< studilova::LIter< size_t > > iters;
-
-  it = sequences.begin();
-  for (size_t i = 0; i < sequences.size(); ++i)
-  {
-    iters.pushBack((*it).second.begin());
-    ++it;
+   std::cout << "0\n";
+   return 0;
   }
 
   const size_t MAX = std::numeric_limits< size_t >::max();
-
-  studilova::List< studilova::List< size_t > > rows;
   studilova::List< size_t > sums;
+  for (size_t i = 0; i < maxLen; ++i)
+  {
+    sums.pushBack(0);
+  }
 
   for(size_t row = 0; row < maxLen; ++row)
   {
+    bool first = 0;
     size_t sum = 0;
 
-    auto seqIt = sequences.begin();
-    auto iterIt = iters.begin();
-
-    studilova::List< size_t> rowValues;
+    it = sequences.begin();
 
     for (size_t i = 0; i < sequences.size(); ++i)
     {
-      auto& seq = (*seqIt).second;
+      auto& seq = (*it).second;
 
       if (row < seq.size())
       {
-        size_t value = **iterIt;
+        auto numIt = seq.begin();
+
+        for (size_t j = 0; j < row; ++j)
+        {
+          ++numIt;
+        }
+
+        size_t value = *numIt;
 
         if(MAX - value < sum)
         {
-          std::cerr << "Overflow" << "\n";
+          std::cerr << "Overflow\n";
           return 1;
         }
+
+        if(!first)
+        {
+          std::cout << " ";
+        }
+        std::cout << value;
+
         sum += value;
-        rowValues.pushBack(value);
-
-        ++(*iterIt);
+        first = false;
       }
-      ++seqIt;
-      ++iterIt;
+      ++it;
     }
-    rows.pushBack(rowValues);
-    sums.pushBack(sum);
-  }
 
-  auto nameIt = sequences.begin();
-  for (size_t i = 0; i < sequences.size(); ++i)
-  {
-    if (i > 0)
+    auto sumIt = sums.begin();
+    for (size_t k = 0; k < row; ++k)
     {
-      std::cout << " ";
+      ++sumIt;
     }
-    std::cout << (*nameIt).first;
-    ++nameIt;
-  }
-  std::cout << std::endl;
-
-  auto rowIt = rows.begin();
-  for (size_t i = 0; i < rows.size(); ++i)
-  {
-    auto valIt = (*rowIt).begin();
-    for (size_t j = 0; j < (*rowIt).size(); ++j)
-    {
-      if (j > 0)
-      {
-        std::cout << " ";
-      }
-      std::cout << *valIt;
-      ++valIt;
-    }
+    *sumIt = sum;
     std::cout << "\n";
-    ++rowIt;
   }
 
-  auto sIt = sums.begin();
+  auto sumIt = sums.begin();
   for (size_t i = 0; i < sums.size(); ++i)
   {
     if (i > 0)
     {
       std::cout << " ";
     }
-    std::cout << *sIt;
-    ++sIt;
+    std::cout << *sumIt;
+    ++sumIt;
   }
   std::cout << "\n";
   return 0;
