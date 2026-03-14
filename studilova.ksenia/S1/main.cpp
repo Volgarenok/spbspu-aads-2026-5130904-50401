@@ -51,5 +51,14 @@ int main()
     ++it;
   }
 
+  studilova::List< studilova::LIter< int > > iters;
+
+  auto seq_it = sequences.begin();
+  for (size_t i = 0; i < sequences.size(); ++i)
+  {
+    iters.push_back((*seq_it).second.begin());
+    ++seq_it;
+  }
+
   return 0;
 }
