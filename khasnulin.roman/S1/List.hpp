@@ -5,6 +5,7 @@
 
 #include "LCIter.hpp"
 #include "LIter.hpp"
+#include "RLIter.hpp"
 
 namespace khasnulin
 {
@@ -30,6 +31,14 @@ namespace khasnulin
     LCIter< T > end() const noexcept;
     LCIter< T > cend() noexcept;
 
+    RLIter< T > rbegin() noexcept;
+    LCIter< T > rbegin() const noexcept;
+    LCIter< T > crbegin() noexcept;
+
+    RLIter< T > rend() noexcept;
+    LCIter< T > rend() const noexcept;
+    LCIter< T > crend() noexcept;
+
     bool empty() const noexcept;
     size_t size() const noexcept;
 
@@ -53,6 +62,7 @@ namespace khasnulin
 
     friend class LIter< T >;
     friend class LCIter< T >;
+    friend class RLIter< T >;
 
   private:
     template < class K > struct LNode
@@ -367,6 +377,16 @@ namespace khasnulin
       throw std::runtime_error("list is empty, can't get back element");
     }
     return h_->prev->val;
+  }
+
+  template < class T > RLIter< T > BiList< T >::rbegin() noexcept
+  {
+    return RLIter< T >(this, h_ ? h_->prev : nullptr, h_ == nullptr);
+  }
+
+  template < class T > RLIter< T > BiList< T >::rend() noexcept
+  {
+    return RLIter< T >(this, h_, true);
   }
 }
 
