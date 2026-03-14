@@ -2,6 +2,7 @@
 #define LIST_HPP
 #include "c-iter.hpp"
 #include "iter.hpp"
+#include <utility>
 namespace zubarev
 {
   template < class T >
@@ -93,7 +94,7 @@ namespace zubarev
       tmp = tmp->next;
       curOld = curOld->next;
     }
-    std::swap(tempList, other.head_)
+    std::swap(head_, tempList.head_);
   }
 
   template < class T >
@@ -119,7 +120,7 @@ namespace zubarev
       curOld = curOld->next;
     }
 
-    std::swap(tempList, head_);
+    std::swap(head_, tempList.head_);
     return *this;
   }
 
