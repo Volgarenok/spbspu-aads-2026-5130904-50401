@@ -2,6 +2,7 @@
 #define LIST_HPP
 
 #include <stdexcept>
+#include <utility>
 
 #include "LCIter.hpp"
 #include "LIter.hpp"
@@ -48,6 +49,9 @@ namespace khasnulin
 
     void push_back(const T &val);
     void push_back(T &&val);
+
+    void push_front(const T &val);
+    void push_front(T &&val);
 
     void clear() noexcept;
     LIter< T > erase(LIter< T > pos);
@@ -150,10 +154,10 @@ namespace khasnulin
       return createNew(std::forward< Args >(args)...);
     }
     LNode< T > *prev = currNode->prev;
-    LNode< T > *curr = currNode;
-    prev->next = new LNode< T >{T(std::forward< Args >(args)...), prev, curr};
-    curr->prev = prev->next;
-    return curr->prev;
+    LNode< T > *node = new LNode< T >{T(std::forward< Args >(args)...), prev, currNode};
+    prev->next = node;
+    currNode->prev = node;
+    return node;
   }
 
   template < class T >
@@ -409,6 +413,17 @@ namespace khasnulin
   template < class T > RLCIter< T > BiList< T >::crend() const noexcept
   {
     return RLCIter< T >(this, h_, true);
+  }
+
+  template < class T > void BiList< T >::push_front(const T &val)
+  {
+    h_ = insert_before(h_, val);
+    s_++;
+  }
+  template < class T > void BiList< T >::push_front(T &&val)
+  {
+    h_ = insert_before(h_, std::forward< T >(val));
+    s_++;
   }
 }
 
