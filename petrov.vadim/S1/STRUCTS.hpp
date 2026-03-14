@@ -295,7 +295,7 @@ namespace petrov
   template< class T >
   LCIter< T > List< T >::begin() const noexcept
   {
-    return LIter< T >(head);
+    return LCIter< T >(head);
   }
 
   template< class T >

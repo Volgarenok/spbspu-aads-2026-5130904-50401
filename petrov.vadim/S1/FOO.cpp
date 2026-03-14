@@ -48,22 +48,46 @@ namespace petrov
 
   void printAllList(List< std::pair< std::string, List< size_t > > >& data)
   {
-    LIter< std::pair< std::string, List< size_t > > > outIt = data.begin();
-    while (outIt.hasNext())
+    if(data.size() < 1)
     {
-      std::cout << (*outIt).first << " ";
-      outIt = outIt.next();
+      std::cout << "0\n";
     }
-    std::cout << "\n";
-
-    LIter< size_t > last = (*data.end()).second.end();
-    LIter< size_t > now = (*data.begin()).second.begin();
-    
-    while (now != last)
+    else
     {
+      LIter< std::pair< std::string, List< size_t > > > outIt = data.begin();
+      for(; outIt != data.end(); outIt.next())
+      {
+        std::cout << (*outIt).first;
+        if(outIt.hasNext())
+        {
+          std::cout << " ";
+        }
+      }
+      std::cout << "\n";
+
       outIt = data.begin();
-
+      size_t maxListLen = maxLen(data);
+      for(size_t i = 0; i < maxListLen; i++)
+      {
+        while (outIt.hasNext())
+        {
+          if(canShowItem((*outIt).second, i + 1))
+          {
+            LIter< size_t > n = (*outIt).second.begin();
+            for(size_t j = 0; j < i; ++i)
+            {
+              n = n.next();
+            }
+            std::cout << *n;
+          }
+          outIt = outIt.next();
+          if(outIt.hasNext())
+          {
+            std::cout << " ";
+          }
+        }
+        std::cout << "\n";
+      }
     }
-    
   }
 }
