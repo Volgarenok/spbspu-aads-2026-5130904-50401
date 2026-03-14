@@ -131,14 +131,6 @@ int main()
   namespace mad =  madieva;
   mad::List<std::pair<std::string, mad::List<size_t>>> list;
   mad::read(list);
-
-  // mad::LIter<std::pair<std::string, mad::List<size_t>>> a = list.begin();
-  // ++a;
-  // mad::LIter<size_t> b = (*a).second.begin();
-  // ++b;
-  // std::cout << (*b);
-
-
   if (list.size() == 0) {
     std::cout << "0\n";
     return 0;
@@ -150,9 +142,6 @@ int main()
     mad::sum_num(t_list, sum);
   } catch (const std::overflow_error & e) {
     std::cerr << e.what() << "\n";
-    t_list.clear();
-    list.clear();
-    sum.clear();
     return 1;
   }
   mad::print(t_list, list, sum);
