@@ -1,4 +1,6 @@
+#include <exception>
 #include <iostream>
+#include <stdexcept>
 
 #include "Sequences.hpp"
 
@@ -25,5 +27,18 @@ int main()
 
   printSequencesNumsByPlace(std::cout, transposed);
 
-  printSumsOfSequences(std::cout, transposed);
+  try
+  {
+    printSumsOfSequences(std::cout, transposed);
+  }
+  catch (const std::overflow_error &e)
+  {
+    std::cout << e.what() << "\n";
+    return 1;
+  }
+  catch (const std::exception &e)
+  {
+    std::cout << "Unknown error: " << e.what() << "\n";
+    return 1;
+  }
 }

@@ -1,7 +1,24 @@
 #include "Sequences.hpp"
-#include "List.hpp"
 
+#include <fcntl.h>
 #include <iostream>
+#include <limits>
+#include <stdexcept>
+
+int khasnulin::safeSum(int a, int b)
+{
+  static constexpr int maxInt = std::numeric_limits< int >::max();
+  static constexpr int minInt = std::numeric_limits< int >::min();
+  if (b > 0 && a > maxInt - b)
+  {
+    throw std::overflow_error("numers sum overflow");
+  }
+  if (b < 0 && a < minInt - b)
+  {
+    throw std::underflow_error("numers sum underflow");
+  }
+  return a + b;
+}
 
 std::pair< std::string, khasnulin::BiList< int > > khasnulin::readRow(std::istream &in)
 {
@@ -109,7 +126,7 @@ void khasnulin::printSumsOfSequences(std::ostream &out, const BiList< BiList< in
     int sum = 0;
     for (int num : seq)
     {
-      sum += num;
+      sum = safeSum(sum, num);
     }
     if (!first)
     {
