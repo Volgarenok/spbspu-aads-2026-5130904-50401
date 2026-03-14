@@ -87,6 +87,7 @@ private:
 public:
   List();
   ~List();
+  List(const List& other); 
 
   void push_front(const T& value) noexcept;
   void pop_front() noexcept;
@@ -107,6 +108,15 @@ public:
 
 template<class T>
 List<T>::List() : head(nullptr) {}
+template<class T>
+List<T>::List(const List& other) : head(nullptr)
+{
+  for (LCIter<T> it = other.cbegin(); it != other.cend(); ++it)
+  {
+    push_front(*it);
+  }
+}
+
 
 template <class T>
 void List<T>::push_front(const T& value) noexcept
@@ -155,6 +165,10 @@ void List<T>::pop_front() noexcept
 template <class T>
 T& List<T>::front()
 {
+  if (!head)
+  {
+    throw std::logic_error("empty list");
+  }
   return head -> data;
 }
 
@@ -219,6 +233,12 @@ void List<T>::erase_after(LIter<T> pos) noexcept
   }
   if (temp == head)
   {
+    if (head->next == head)
+    {
+      delete head;
+      head = nullptr;
+      return;
+    }
     head = head -> next;
   }
   pos.node -> next = temp -> next;

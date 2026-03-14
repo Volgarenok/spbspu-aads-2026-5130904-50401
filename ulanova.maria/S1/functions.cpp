@@ -1,6 +1,8 @@
 #include "functions.hpp"
 #include <cstddef>
 #include <cctype>
+#include <limits>
+
 
 List<Sequence> read_sequences(std::istream& in)
 {
@@ -16,7 +18,7 @@ List<Sequence> read_sequences(std::istream& in)
     {
       int c = in.peek();
 
-      if (c == EOF)
+      if (c == EOF || c == '\n')
       {
         break;
       }
@@ -29,7 +31,7 @@ List<Sequence> read_sequences(std::istream& in)
       }
       else
       {
-        break;
+        in.get();
       }
     }
 
@@ -104,6 +106,11 @@ List<size_t> calculate_sums(const List<List<size_t>>& seqs)
 
     for (LCIter<size_t> jt = it->cbegin(); jt != it->cend(); ++jt)
     {
+      if (sum > std::numeric_limits<size_t>::max() - *jt)
+      {
+        std::cerr << "overflow\n";
+        std::exit(1);
+      }
       sum += *jt;
     }
 
