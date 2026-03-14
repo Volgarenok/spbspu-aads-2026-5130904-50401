@@ -110,7 +110,7 @@ int main()
   }
 
   if (is_overflow) {
-    std::cout << "overflow error\n";
+    std::cerr << "overflow error\n";
     return 1;
   }
 
