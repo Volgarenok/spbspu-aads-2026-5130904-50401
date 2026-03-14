@@ -10,7 +10,7 @@ namespace madieva{
     std::string name;
     while (std::cin >> name) {
       List<size_t> numbers;
-      size_t num;
+      size_t num = 0;
       while (std::cin >> num) {
         numbers.push_back(num);
       }
@@ -19,6 +19,8 @@ namespace madieva{
       list.push_back(p);
       if (std::cin.eof()) {
         return;
+      } else if (std::cin.bad()) {
+        throw std::overflow_error("overflow");
       } else if (std::cin.fail()) {
         std::cin.clear();
       }
@@ -130,7 +132,13 @@ int main()
 {
   namespace mad =  madieva;
   mad::List<std::pair<std::string, mad::List<size_t>>> list;
-  mad::read(list);
+  try {
+    mad::read(list);
+  } catch (const std::overflow_error & e) {
+    std::cerr << e.what() << "\n";
+    list.clear();
+    return 1;
+  }
   if (list.size() == 0) {
     std::cout << "0\n";
     return 0;
@@ -142,6 +150,9 @@ int main()
     mad::sum_num(t_list, sum);
   } catch (const std::overflow_error & e) {
     std::cerr << e.what() << "\n";
+    t_list.clear();
+    list.clear();
+    sum.clear();
     return 1;
   }
   mad::print(t_list, list, sum);
