@@ -13,17 +13,26 @@ int main()
     studilova::List< size_t > numbers;
     size_t value = 0;
 
-    while(std::cin >> value)
+    while (true)
     {
-      numbers.pushBack(value);
-    }
-    sequences.pushBack({ name, numbers });
+      if (std::cin >> value)
+      {
+        numbers.pushBack(value);
+      } else {
+        if (std::cin.eof())
+        {
+          break;
+        }
 
-    if (std::cin.bad())
-    {
-      return 1;
+        if (std::cin.fail())
+        {
+          std::cerr << "Overflow\n";
+          return 1;
+        }
+      }
     }
-    std::cin.clear();
+
+    sequences.pushBack({ name, numbers });
   }
 
   if (sequences.empty())
@@ -93,6 +102,7 @@ int main()
 
         if(MAX - value < sum)
         {
+          std::cout << "\n";
           std::cerr << "Overflow\n";
           return 1;
         }
