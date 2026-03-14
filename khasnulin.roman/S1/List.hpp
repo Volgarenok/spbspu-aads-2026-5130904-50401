@@ -21,6 +21,7 @@ namespace khasnulin
 
     BiList< T > &operator=(const BiList< T > &list);
     BiList< T > &operator=(BiList< T > &&list) noexcept;
+
     LIter< T > begin() noexcept;
     LCIter< T > begin() const noexcept;
     LCIter< T > cbegin() const noexcept;
@@ -28,6 +29,7 @@ namespace khasnulin
     LIter< T > end() noexcept;
     LCIter< T > end() const noexcept;
     LCIter< T > cend() noexcept;
+
     bool empty() const noexcept;
     size_t size() const noexcept;
 

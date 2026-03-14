@@ -16,6 +16,8 @@ namespace khasnulin
 
   void printSequencesNumsByPlace(std::ostream &out, const BiList< BiList< size_t > > &sequence);
 
+  BiList< size_t > getListOfSums(const BiList< BiList< size_t > > &sequence);
+
   void printSumsOfSequences(std::ostream &out, const BiList< BiList< size_t > > &sequence);
 
   size_t safeSum(size_t a, size_t b);

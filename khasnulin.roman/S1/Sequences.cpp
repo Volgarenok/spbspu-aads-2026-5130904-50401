@@ -1,4 +1,5 @@
 #include "Sequences.hpp"
+#include "List.hpp"
 
 #include <cstddef>
 #include <fcntl.h>
@@ -11,7 +12,7 @@ size_t khasnulin::safeSum(size_t a, size_t b)
   static constexpr size_t maxInt = std::numeric_limits< size_t >::max();
   if (b > 0 && a > maxInt - b)
   {
-    throw std::overflow_error("numers sum overflow");
+    throw std::overflow_error("numbers sum overflow");
   }
   return a + b;
 }
@@ -114,9 +115,9 @@ void khasnulin::printSequencesNumsByPlace(std::ostream &out, const BiList< BiLis
   }
 }
 
-void khasnulin::printSumsOfSequences(std::ostream &out, const BiList< BiList< size_t > > &sequence)
+khasnulin::BiList< size_t > khasnulin::getListOfSums(const BiList< BiList< size_t > > &sequence)
 {
-  bool first = true;
+  BiList< size_t > sums;
   for (const BiList< size_t > &seq : sequence)
   {
     size_t sum = 0;
@@ -124,6 +125,17 @@ void khasnulin::printSumsOfSequences(std::ostream &out, const BiList< BiList< si
     {
       sum = safeSum(sum, num);
     }
+    sums.push_back(sum);
+  }
+  return sums;
+}
+
+void khasnulin::printSumsOfSequences(std::ostream &out, const BiList< BiList< size_t > > &sequence)
+{
+  BiList< size_t > sums = getListOfSums(sequence);
+  bool first = true;
+  for (const size_t &sum : sums)
+  {
     if (!first)
     {
       out << " ";
