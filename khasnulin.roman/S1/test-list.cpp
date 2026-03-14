@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 #include <stdexcept>
+#include <utility>
 
 #include "List.hpp"
 
@@ -354,6 +355,41 @@ BOOST_AUTO_TEST_CASE(test_lists_swap)
   BOOST_CHECK_EQUAL(list2.front(), 1);
   BOOST_CHECK_EQUAL(list2.back(), 2);
   BOOST_CHECK_EQUAL(list2.size(), 2);
+}
+
+struct Person
+{
+  int age;
+  std::string name;
+  Person(int a, std::string b):
+      age(a),
+      name(std::move(b))
+  {
+  }
+  Person(std::string b):
+      age(0),
+      name(std::move(b))
+  {
+  }
+};
+
+BOOST_AUTO_TEST_CASE(test_emplacing_object)
+{
+  khasnulin::BiList< Person > list;
+  auto it = list.begin();
+  it = list.emplace(it, Person{1, "Andrey"});
+  it = list.emplace(it, 28, "Vasiliy");
+  it = list.emplace(it, "Dmitriy");
+
+  BOOST_CHECK_EQUAL(list.size(), 3);
+  BOOST_CHECK_EQUAL(list.front().age, 1);
+  BOOST_CHECK_EQUAL(list.front().name, "Andrey");
+
+  BOOST_CHECK_EQUAL(list.back().age, 28);
+  BOOST_CHECK_EQUAL(list.back().name, "Vasiliy");
+
+  BOOST_CHECK_EQUAL(it->age, 0);
+  BOOST_CHECK_EQUAL(it->name, "Dmitriy");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
