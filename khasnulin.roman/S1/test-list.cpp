@@ -414,7 +414,7 @@ BOOST_AUTO_TEST_CASE(test_emplacing_back_front)
 
 BOOST_AUTO_TEST_CASE(test_initializer_list_constructing)
 {
-  khasnulin::BiList< int > list = {1, 2, 3, 4, 5, 6};
+  BiList< int > list = {1, 2, 3, 4, 5, 6};
 
   BOOST_CHECK_EQUAL(list.size(), 6);
   BOOST_CHECK_EQUAL(list.front(), 1);
@@ -423,20 +423,87 @@ BOOST_AUTO_TEST_CASE(test_initializer_list_constructing)
 
 BOOST_AUTO_TEST_CASE(test_empty_initializer_list_constructing)
 {
-  khasnulin::BiList< int > list = {};
+  BiList< int > list = {};
 
   BOOST_CHECK(list.empty());
 }
 
 BOOST_AUTO_TEST_CASE(test_operator_assing_initializer_list)
 {
-  khasnulin::BiList< int > list = {1, 2, 3};
+  BiList< int > list = {1, 2, 3};
 
   list = {4, 5, 6, 7, 8};
 
   BOOST_CHECK_EQUAL(list.size(), 5);
   BOOST_CHECK_EQUAL(list.front(), 4);
   BOOST_CHECK_EQUAL(list.back(), 8);
+}
+
+BOOST_AUTO_TEST_CASE(test_equal_operator)
+{
+  BiList< int > list = {1, 2, 3};
+  BiList< int > list2 = {1, 2, 3};
+
+  BOOST_CHECK(list == list2);
+}
+
+BOOST_AUTO_TEST_CASE(test_not_equal_operator)
+{
+  BiList< int > list = {1, 2, 3};
+  BiList< int > list2 = {1, 2};
+
+  BOOST_CHECK(list != list2);
+}
+
+BOOST_AUTO_TEST_CASE(test_not_equal_operator_same_size)
+{
+  BiList< int > list = {1, 2, 3, 4};
+  BiList< int > list2 = {1, 2, 3, 5};
+
+  BOOST_CHECK(list != list2);
+}
+
+BOOST_AUTO_TEST_CASE(test_insert_range_to_back)
+{
+  BiList< int > list = {1, 2, 3};
+
+  BiList< int > list2 = {4, 5, 6};
+
+  list.insert(list.end(), list2.begin(), list2.end());
+
+  BOOST_REQUIRE(list.size() == 6);
+
+  BiList< int > list3 = {1, 2, 3, 4, 5, 6};
+  BOOST_CHECK(list == list3);
+}
+
+BOOST_AUTO_TEST_CASE(test_insert_range_to_middle)
+{
+  BiList< int > list = {1, 2, 8};
+  auto it = list.begin();
+  ++it;
+  ++it;
+  BiList< int > list2 = {3, 4, 5, 6, 7};
+
+  list.insert(it, list2.begin(), list2.end());
+
+  BOOST_REQUIRE(list.size() == 8);
+
+  BiList< int > list3 = {1, 2, 3, 4, 5, 6, 7, 8};
+  BOOST_CHECK(list == list3);
+}
+
+BOOST_AUTO_TEST_CASE(test_insert_range_to_empty_list)
+{
+  BiList< int > list;
+
+  BiList< int > list2 = {3, 4, 5, 6, 7};
+
+  list.insert(list.begin(), list2.begin(), list2.end());
+
+  BOOST_REQUIRE(list.size() == 5);
+
+  BOOST_CHECK(list == list2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
