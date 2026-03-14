@@ -57,6 +57,9 @@ namespace khasnulin
     LIter< T > erase(LIter< T > pos);
     LIter< T > erase(LIter< T > begin, LIter< T > end);
 
+    void pop_front();
+    void pop_back();
+
     T &front();
     const T &front() const;
     T &back();
@@ -82,6 +85,7 @@ namespace khasnulin
 
     static LNode< T > *copy(const LNode< T > *h);
     static void clear(LNode< T > *h) noexcept;
+    LNode< T > *erase(const LNode< T > *node);
     template < class... Args > static LNode< T > *createNew(Args &&...args);
     template < class... Args > static LNode< T > *insert_before(LNode< T > *currNode, Args &&...args);
   };
@@ -299,41 +303,48 @@ namespace khasnulin
     s_ = 0;
   }
 
+  template < class T > typename BiList< T >::template LNode< T > *BiList< T >::erase(const LNode< T > *node)
+  {
+    LNode< T > *next = node->next;
+    LNode< T > *prev = node->prev;
+
+    if (node == h_)
+    {
+      h_ = h_->next;
+    }
+
+    delete node;
+    --s_;
+
+    if (s_ == 0)
+    {
+      h_ = nullptr;
+      return nullptr;
+    }
+
+    next->prev = prev;
+    prev->next = next;
+    return next;
+  }
+
   template < class T > LIter< T > BiList< T >::erase(LIter< T > pos)
   {
     if (!pos.curr_ || pos.is_end_)
     {
       throw std::runtime_error("can't erase iterator to the end");
     }
-    LNode< T > *curr = pos.curr_;
-    if (s_ == 1)
+    LNode< T > *node = pos.curr_;
+    bool is_head = node == h_;
+
+    LNode< T > *next = erase(node);
+
+    if (!next)
     {
-      delete curr;
-      h_ = nullptr;
-      s_ = 0;
-      return end();
+      return LIter< T >{this, nullptr, true};
     }
-    LNode< T > *next = curr->next;
-    LNode< T > *prev = curr->prev;
-    next->prev = prev;
-    prev->next = next;
-    bool at_start = false;
-    if (curr == h_)
-    {
-      h_ = next;
-      at_start = true;
-    }
-    delete curr;
-    --s_;
-    if (at_start)
-    {
-      return LIter< T >(this, next, false);
-    }
-    if (next == h_)
-    {
-      return LIter< T >(this, next->prev, true);
-    }
-    return LIter< T >(this, next, false);
+
+    bool is_tail = (next == h_) && !is_head;
+    return LIter< T >{this, is_tail ? next->prev : next, is_tail};
   }
 
   template < class T > LIter< T > BiList< T >::erase(LIter< T > begin, LIter< T > end)
