@@ -1,3 +1,4 @@
+#include <iostream>
 namespace madieva {
   template< class T > class List;
 
@@ -52,6 +53,7 @@ namespace madieva {
     void pop_back();
     LIter< T > begin();
     LCIter< T > begin() const;
+    size_t size() const;
   };
 
   template< class T >
@@ -262,5 +264,11 @@ namespace madieva {
         size_--;
       }
     }
+  }
+
+  template< class T >
+  size_t List< T >::size() const
+  {
+    return size_;
   }
 }
