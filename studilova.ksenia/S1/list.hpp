@@ -90,6 +90,7 @@ namespace studilova
     {
       return *this;
     }
+    clear();
     if (other.empty())
     {
       return *this;
@@ -317,6 +318,10 @@ namespace studilova
   template< class T >
   T& LIter< T >::operator*() const
   {
+    if (node_ = nullptr)
+    {
+      throw std::out_of_range("Iterator dereference error");
+    }
     return node_->data;
   }
 
@@ -386,6 +391,10 @@ namespace studilova
   template< class T >
   const T& CLIter< T >::operator*() const
   {
+    if (node_ = nullptr)
+    {
+      throw std::out_of_range("Iterator dereference error");
+    }
     return node_->data;
   }
 
