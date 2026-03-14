@@ -103,3 +103,22 @@ BOOST_AUTO_TEST_CASE(Clear)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(ExceptionSuite)
+
+BOOST_AUTO_TEST_CASE(FrontEmpty)
+{
+  studilova::List< int > list;
+
+  BOOST_CHECK_THROW(list.front(), std::out_of_range);
+}
+
+BOOST_AUTO_TEST_CASE(BackEmpty)
+{
+  studilova::List< int > list;
+
+  BOOST_CHECK_THROW(list.back(), std::out_of_range);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
