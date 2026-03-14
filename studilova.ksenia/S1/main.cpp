@@ -71,7 +71,7 @@ int main()
 
   for(size_t row = 0; row < maxLen; ++row)
   {
-    bool first = 0;
+    bool needSpace = false;
     size_t sum = 0;
 
     it = sequences.begin();
@@ -97,14 +97,14 @@ int main()
           return 1;
         }
 
-        if(!first)
+        if(needSpace)
         {
           std::cout << " ";
         }
         std::cout << value;
 
         sum += value;
-        first = false;
+        needSpace;
       }
       ++it;
     }
