@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <limits>
 #include <utility>
 #include "list.hpp"
 
@@ -54,10 +55,10 @@ namespace kondrat
     std::cout << '\n';
   }
 
-  bool hasNumbers(List< pairN > & data)
+  bool hasNumbers(const List< pairN > & data)
   {
-    LIter< pairN > it = data.begin();
-    LIter< pairN > end = data.end();
+    LCIter< pairN > it = data.begin();
+    LCIter< pairN > end = data.end();
 
     while (it != end)
     {
@@ -71,19 +72,24 @@ namespace kondrat
     return false;
   }
 
-  size_t printOneRow(List< pairN > & data)
+  bool printOneRow(List< pairN > & data, size_t & sum)
   {
     LIter< pairN > it = data.begin();
     LIter< pairN > end = data.end();
 
     bool first = true;
-    size_t sum = 0;
+    sum = 0;
 
     while (it != end)
     {
       if (!((*it).second.empty()))
       {
         size_t value = (*it).second.front();
+
+        if (sum > std::numeric_limits< size_t >::max() - value)
+        {
+          return false;
+        }
 
         if (!first)
         {
@@ -92,14 +98,83 @@ namespace kondrat
 
         std::cout << value;
         sum += value;
-        (*it).second.popFront();
 
+        (*it).second.popFront();
         first = false;
       }
+
       ++it;
     }
 
     std::cout << '\n';
-    return sum;
+    return true;
   }
+
+  bool printRowsAndSums(List< pairN > & data, List< size_t > & sums)
+  {
+    while (hasNumbers(data))
+    {
+      size_t sum = 0;
+
+      if (!printOneRow(data, sum))
+      {
+        return false;
+      }
+
+      sums.pushBack(sum);
+    }
+
+    return true;
+  }
+
+
+  void printSums(const List< size_t > & sums)
+  {
+    bool first = true;
+
+    LCIter< size_t > it = sums.begin();
+    LCIter< size_t > end = sums.end();
+
+    while (it != end)
+    {
+      if (!first)
+      {
+        std::cout << ' ';
+      }
+
+      std::cout << *it;
+
+      first = false;
+      ++it;
+    }
+
+    std::cout << '\n';
+  }
+}
+
+int main()
+{
+  kondrat::List< kondrat::pairN > data;
+
+  kondrat::getData(std::cin, data);
+
+  if (data.empty())
+  {
+    std::cout << 0 << '\n';
+    return 0;
+  }
+
+  kondrat::printNames(data);
+
+  kondrat::List< kondrat::pairN > copy(data);
+  kondrat::List< size_t > sums;
+
+  if (!kondrat::printRowsAndSums(copy, sums))
+  {
+    return 1;
+  }
+
+  kondrat::printSums(sums);
+
+  return 0;
 }
