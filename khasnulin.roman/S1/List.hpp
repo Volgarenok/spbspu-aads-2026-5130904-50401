@@ -73,6 +73,8 @@ namespace khasnulin
     void swap(BiList< T > &other) noexcept;
 
     template < class... Args > LIter< T > emplace(LCIter< T > pos, Args &&...args);
+    template < class... Args > void emplace_back(Args &&...args);
+    template < class... Args > void emplace_front(Args &&...args);
 
     void assign(std::initializer_list< T > ilist);
 
@@ -280,7 +282,6 @@ namespace khasnulin
 
   template < class T > void BiList< T >::push_back(const T &val)
   {
-
     LNode< T > *node = insert_before(h_, val);
     if (!h_)
     {
@@ -475,6 +476,22 @@ namespace khasnulin
     }
     s_++;
     return LIter< T >{this, node, false};
+  }
+
+  template < class T > template < class... Args > void BiList< T >::emplace_back(Args &&...args)
+  {
+    LNode< T > *node = insert_before(h_, std::forward< Args >(args)...);
+    if (!h_)
+    {
+      h_ = node;
+    }
+    s_++;
+  }
+
+  template < class T > template < class... Args > void BiList< T >::emplace_front(Args &&...args)
+  {
+    h_ = insert_before(h_, std::forward< Args >(args)...);
+    s_++;
   }
 
   template < class T >
