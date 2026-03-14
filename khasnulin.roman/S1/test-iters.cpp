@@ -5,8 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "LIter.hpp"
-#include "list.hpp"
+#include "List.hpp"
 
 BOOST_AUTO_TEST_SUITE(iterators_suite)
 

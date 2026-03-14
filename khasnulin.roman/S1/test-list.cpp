@@ -3,7 +3,7 @@
 #include <boost/test/unit_test_suite.hpp>
 #include <stdexcept>
 
-#include "list.hpp"
+#include "List.hpp"
 
 BOOST_AUTO_TEST_SUITE(list_suite)
 
