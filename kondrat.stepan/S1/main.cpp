@@ -75,10 +75,11 @@ namespace kondrat
 
   size_t printOneRow(List< pairN > & data)
   {
-    List< size_t > row;
-
     LIter< pairN > it = data.begin();
     LIter< pairN > end = data.end();
+
+    bool first = true;
+    bool overflow = false;
 
     size_t sum = 0;
 
@@ -88,46 +89,39 @@ namespace kondrat
       {
         size_t value = (*it).second.front();
 
-        if (sum > std::numeric_limits<size_t>::max() - value)
+        if (!first)
         {
-          throw std::overflow_error("overflow");
+          std::cout << ' ';
         }
 
-        row.pushBack(value);
-        sum += value;
+        std::cout << value;
+
+        if (!overflow)
+        {
+          if (sum > std::numeric_limits<size_t>::max() - value)
+          {
+            overflow = true;
+          }
+          else
+          {
+            sum += value;
+          }
+        }
+
+        (*it).second.popFront();
+        first = false;
       }
 
       ++it;
-    }
-
-    bool first = true;
-    LIter< size_t > rowIt = row.begin();
-    LIter< size_t > rowEnd = row.end();
-
-    while (rowIt != rowEnd)
-    {
-      if (!first)
-      {
-        std::cout << ' ';
-      }
-
-      std::cout << *rowIt;
-      first = false;
-      ++rowIt;
     }
 
     std::cout << '\n';
 
-    it = data.begin();
-
-    while (it != end)
+    if (overflow)
     {
-      if (!((*it).second.empty()))
-      {
-        (*it).second.popFront();
-      }
-      ++it;
+      throw std::overflow_error("overflow");
     }
+
     return sum;
   }
 
@@ -193,7 +187,7 @@ int main()
   }
   catch (const std::overflow_error &)
   {
-    std::cerr << "overflow";
+    std::cerr << "ERROR\n";
     return 1;
   }
 
