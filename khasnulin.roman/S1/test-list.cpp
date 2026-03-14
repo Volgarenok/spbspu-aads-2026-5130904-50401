@@ -392,6 +392,26 @@ BOOST_AUTO_TEST_CASE(test_emplacing_object)
   BOOST_CHECK_EQUAL(it->name, "Dmitriy");
 }
 
+BOOST_AUTO_TEST_CASE(test_emplacing_back_front)
+{
+  BiList< Person > list;
+  list.emplace(list.begin(), Person{1, "Andrey"});
+  list.emplace_back(28, "Arseniy");
+  list.emplace_front("Dmitriy");
+
+  BOOST_CHECK_EQUAL(list.size(), 3);
+  BOOST_CHECK_EQUAL(list.front().age, 0);
+  BOOST_CHECK_EQUAL(list.front().name, "Dmitriy");
+
+  BOOST_CHECK_EQUAL(list.back().age, 28);
+  BOOST_CHECK_EQUAL(list.back().name, "Arseniy");
+
+  auto it = list.begin();
+  ++it;
+  BOOST_CHECK_EQUAL(it->age, 1);
+  BOOST_CHECK_EQUAL(it->name, "Andrey");
+}
+
 BOOST_AUTO_TEST_CASE(test_initializer_list_constructing)
 {
   khasnulin::BiList< int > list = {1, 2, 3, 4, 5, 6};
