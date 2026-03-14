@@ -76,7 +76,7 @@ namespace madieva{
           s += (*n_it);
           ++n_it;
         } else {
-          throw std::overflow_error("Error");
+          throw std::overflow_error("overflow");
         }
       }
       sum.push_back(s);

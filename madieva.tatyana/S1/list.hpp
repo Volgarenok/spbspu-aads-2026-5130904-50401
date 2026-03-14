@@ -189,6 +189,7 @@ namespace madieva {
       }
       delete head;
       head = nullptr;
+      size_ = 0;
     }
   }
 
