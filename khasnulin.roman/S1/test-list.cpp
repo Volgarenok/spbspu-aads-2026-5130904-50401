@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE(test_erase_range_empty)
   BOOST_CHECK(it == list.begin());
 }
 
-BOOST_AUTO_TEST_CASE(push_front_empty)
+BOOST_AUTO_TEST_CASE(test_push_front_empty)
 {
   BiList< int > list;
   list.push_front(10);
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE(push_front_empty)
   BOOST_CHECK_EQUAL(list.back(), 10);
 }
 
-BOOST_AUTO_TEST_CASE(push_front_multiple)
+BOOST_AUTO_TEST_CASE(test_push_front_multiple)
 {
   BiList< int > list;
   list.push_front(10);
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE(push_front_multiple)
   BOOST_CHECK_EQUAL(*it, 10);
 }
 
-BOOST_AUTO_TEST_CASE(push_front_rvalue_move)
+BOOST_AUTO_TEST_CASE(test_push_front_rvalue_move)
 {
   khasnulin::BiList< std::string > list;
   std::string s = "hello";
@@ -277,6 +277,61 @@ BOOST_AUTO_TEST_CASE(push_front_rvalue_move)
 
   BOOST_CHECK_EQUAL(list.front(), "hello");
   BOOST_CHECK(s.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_pop_front_single)
+{
+  khasnulin::BiList< int > list;
+  list.push_back(10);
+  list.pop_front();
+
+  BOOST_CHECK(list.empty());
+  BOOST_CHECK_EQUAL(list.size(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_pop_back_multiple)
+{
+  khasnulin::BiList< int > list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+
+  list.pop_back();
+  BOOST_CHECK_EQUAL(list.size(), 2);
+  BOOST_CHECK_EQUAL(list.back(), 2);
+
+  list.pop_back();
+  BOOST_CHECK_EQUAL(list.back(), 1);
+
+  list.pop_back();
+  BOOST_CHECK(list.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_pop_mixed)
+{
+  khasnulin::BiList< int > list;
+  list.push_back(1);
+  list.push_back(2);
+
+  list.pop_front();
+  BOOST_CHECK_EQUAL(list.front(), 2);
+
+  list.pop_back();
+  BOOST_CHECK(list.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_pop_back_empty_list)
+{
+  khasnulin::BiList< int > list;
+
+  BOOST_CHECK_THROW(list.pop_back(), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_pop_front_empty_list)
+{
+  khasnulin::BiList< int > list;
+
+  BOOST_CHECK_THROW(list.pop_front(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
