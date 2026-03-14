@@ -22,6 +22,10 @@ public:
   }
   LIter& operator++() noexcept
   {
+    if (!node)
+    {
+      return *this;
+    }
     node = node -> next;
     if (node == head)
     {
@@ -54,6 +58,10 @@ public:
   }
   LCIter& operator++() noexcept
   {
+    if (!node)
+    {
+      return *this;
+    }
     node = node -> next;
     if (node == head)
     {
@@ -208,6 +216,10 @@ void List<T>::erase_after(LIter<T> pos) noexcept
   if (!temp)
   {
     return;
+  }
+  if (temp == head)
+  {
+    head = head -> next;
   }
   pos.node -> next = temp -> next;
   delete temp;
