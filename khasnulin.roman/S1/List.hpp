@@ -85,7 +85,7 @@ namespace khasnulin
 
     static LNode< T > *copy(const LNode< T > *h);
     static void clear(LNode< T > *h) noexcept;
-    LNode< T > *erase(const LNode< T > *node);
+    LNode< T > *erase(LNode< T > *node);
     template < class... Args > static LNode< T > *createNew(Args &&...args);
     template < class... Args > static LNode< T > *insert_before(LNode< T > *currNode, Args &&...args);
   };
@@ -303,7 +303,7 @@ namespace khasnulin
     s_ = 0;
   }
 
-  template < class T > typename BiList< T >::template LNode< T > *BiList< T >::erase(const LNode< T > *node)
+  template < class T > typename BiList< T >::template LNode< T > *BiList< T >::erase(LNode< T > *node)
   {
     LNode< T > *next = node->next;
     LNode< T > *prev = node->prev;
@@ -435,6 +435,24 @@ namespace khasnulin
   {
     h_ = insert_before(h_, std::forward< T >(val));
     s_++;
+  }
+
+  template < class T > void BiList< T >::pop_back()
+  {
+    if (!h_)
+    {
+      throw std::runtime_error("can't pop back, list is empty");
+    }
+    erase(h_->prev);
+  }
+
+  template < class T > void BiList< T >::pop_front()
+  {
+    if (!h_)
+    {
+      throw std::runtime_error("can't pop back, list is empty");
+    }
+    erase(h_);
   }
 }
 
