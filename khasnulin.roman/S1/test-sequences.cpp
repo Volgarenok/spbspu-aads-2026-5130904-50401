@@ -171,4 +171,66 @@ BOOST_AUTO_TEST_CASE(test_printSums_with_zeros)
   BOOST_CHECK_EQUAL(res_ss.str(), expected);
 }
 
+BOOST_AUTO_TEST_CASE(test_readAll_only_names)
+{
+  std::stringstream ss("first\n"
+                       "second\n"
+                       "third\n");
+
+  auto result = khasnulin::readAll(ss);
+
+  BOOST_CHECK_EQUAL(result.size(), 3);
+
+  auto it = result.begin();
+  BOOST_CHECK_EQUAL(it->first, "first");
+  BOOST_CHECK(it->second.empty());
+
+  ++it;
+  BOOST_CHECK_EQUAL(it->first, "second");
+  BOOST_CHECK(it->second.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_transpose_no_numbers)
+{
+  using Row = std::pair< std::string, BiList< int > >;
+  BiList< Row > data;
+  data.push_back({"first", {}});
+  data.push_back({"second", {}});
+
+  BiList< BiList< int > > result = khasnulin::getTransosedNumsSequences(data);
+
+  BOOST_CHECK(result.empty());
+  BOOST_CHECK_EQUAL(result.size(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_output_names_but_no_numbers)
+{
+  std::stringstream input("first\nsecond\n");
+  std::stringstream output;
+
+  auto data = khasnulin::readAll(input);
+
+  if (data.empty())
+  {
+    output << "0\n";
+  }
+  else
+  {
+    khasnulin::printSequenceNames(output, data);
+    auto transposed = khasnulin::getTransosedNumsSequences(data);
+    if (transposed.empty())
+    {
+      output << "0\n";
+    }
+    else
+    {
+      khasnulin::printSequencesNumsByPlace(output, transposed);
+      khasnulin::printSumsOfSequences(output, transposed);
+    }
+  }
+
+  std::string expected = "first second\n0\n";
+  BOOST_CHECK_EQUAL(output.str(), expected);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
