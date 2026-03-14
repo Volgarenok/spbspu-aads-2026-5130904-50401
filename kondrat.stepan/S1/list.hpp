@@ -3,6 +3,8 @@
 
 #include <cstddef>
 #include <cassert>
+#include "liter.hpp"
+#include "lciter.hpp"
 
 namespace kondrat
 {

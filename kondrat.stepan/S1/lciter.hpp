@@ -15,7 +15,7 @@ namespace kondrat
   template< class T >
   class LCIter
   {
-    friend class List;
+    friend class List< T >;
     public:
       LCIter();
       LCIter< T > & operator++();
