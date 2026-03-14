@@ -31,14 +31,14 @@ namespace khasnulin
   private:
     using LNode = typename BiList< T >::template LNode< T >;
 
-    RLIter(BiList< T > *list, LNode *node, bool is_begin) noexcept:
+    RLIter(const BiList< T > *list, LNode *node, bool is_begin) noexcept:
         list_(list),
         curr_(node),
         is_begin_(is_begin)
     {
     }
 
-    BiList< T > *list_;
+    const BiList< T > *list_;
     LNode *curr_;
     bool is_begin_;
   };

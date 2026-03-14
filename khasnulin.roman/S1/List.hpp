@@ -5,6 +5,7 @@
 
 #include "LCIter.hpp"
 #include "LIter.hpp"
+#include "RLCIter.hpp"
 #include "RLIter.hpp"
 
 namespace khasnulin
@@ -29,15 +30,15 @@ namespace khasnulin
 
     LIter< T > end() noexcept;
     LCIter< T > end() const noexcept;
-    LCIter< T > cend() noexcept;
+    LCIter< T > cend() const noexcept;
 
     RLIter< T > rbegin() noexcept;
-    LCIter< T > rbegin() const noexcept;
-    LCIter< T > crbegin() noexcept;
+    RLCIter< T > rbegin() const noexcept;
+    RLCIter< T > crbegin() const noexcept;
 
     RLIter< T > rend() noexcept;
-    LCIter< T > rend() const noexcept;
-    LCIter< T > crend() noexcept;
+    RLCIter< T > rend() const noexcept;
+    RLCIter< T > crend() const noexcept;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
@@ -63,6 +64,7 @@ namespace khasnulin
     friend class LIter< T >;
     friend class LCIter< T >;
     friend class RLIter< T >;
+    friend class RLCIter< T >;
 
   private:
     template < class K > struct LNode
@@ -224,7 +226,7 @@ namespace khasnulin
   {
     return LCIter< T >(this, h_ ? h_->prev : nullptr, true);
   }
-  template < class T > LCIter< T > BiList< T >::cend() noexcept
+  template < class T > LCIter< T > BiList< T >::cend() const noexcept
   {
     return LCIter< T >(this, h_ ? h_->prev : nullptr, true);
   }
@@ -384,9 +386,29 @@ namespace khasnulin
     return RLIter< T >(this, h_ ? h_->prev : nullptr, h_ == nullptr);
   }
 
+  template < class T > RLCIter< T > BiList< T >::rbegin() const noexcept
+  {
+    return RLCIter< T >(this, h_ ? h_->prev : nullptr, h_ == nullptr);
+  }
+
+  template < class T > RLCIter< T > BiList< T >::crbegin() const noexcept
+  {
+    return RLCIter< T >(this, h_ ? h_->prev : nullptr, h_ == nullptr);
+  }
+
   template < class T > RLIter< T > BiList< T >::rend() noexcept
   {
     return RLIter< T >(this, h_, true);
+  }
+
+  template < class T > RLCIter< T > BiList< T >::rend() const noexcept
+  {
+    return RLCIter< T >(this, h_, true);
+  }
+
+  template < class T > RLCIter< T > BiList< T >::crend() const noexcept
+  {
+    return RLCIter< T >(this, h_, true);
   }
 }
 
