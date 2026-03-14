@@ -408,4 +408,15 @@ BOOST_AUTO_TEST_CASE(test_empty_initializer_list_constructing)
   BOOST_CHECK(list.empty());
 }
 
+BOOST_AUTO_TEST_CASE(test_operator_assing_initializer_list)
+{
+  khasnulin::BiList< int > list = {1, 2, 3};
+
+  list = {4, 5, 6, 7, 8};
+
+  BOOST_CHECK_EQUAL(list.size(), 5);
+  BOOST_CHECK_EQUAL(list.front(), 4);
+  BOOST_CHECK_EQUAL(list.back(), 8);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
