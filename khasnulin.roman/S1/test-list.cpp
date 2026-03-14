@@ -226,13 +226,57 @@ BOOST_AUTO_TEST_CASE(test_erase_range_at_start)
 
 BOOST_AUTO_TEST_CASE(test_erase_range_empty)
 {
-  khasnulin::BiList< int > list;
+  BiList< int > list;
   list.push_back(1);
 
   auto it = list.erase(list.begin(), list.begin());
 
   BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK(it == list.begin());
+}
+
+BOOST_AUTO_TEST_CASE(push_front_empty)
+{
+  BiList< int > list;
+  list.push_front(10);
+
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.front(), 10);
+  BOOST_CHECK_EQUAL(list.back(), 10);
+}
+
+BOOST_AUTO_TEST_CASE(push_front_multiple)
+{
+  BiList< int > list;
+  list.push_front(10);
+  list.push_front(20);
+
+  BOOST_CHECK_EQUAL(list.size(), 2);
+  BOOST_CHECK_EQUAL(list.front(), 20);
+  BOOST_CHECK_EQUAL(list.back(), 10);
+
+  list.push_front(30);
+
+  BOOST_CHECK_EQUAL(list.size(), 3);
+  BOOST_CHECK_EQUAL(list.front(), 30);
+  BOOST_CHECK_EQUAL(list.back(), 10);
+
+  auto it = list.begin();
+  BOOST_CHECK_EQUAL(*it, 30);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 20);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 10);
+}
+
+BOOST_AUTO_TEST_CASE(push_front_rvalue_move)
+{
+  khasnulin::BiList< std::string > list;
+  std::string s = "hello";
+  list.push_front(std::move(s));
+
+  BOOST_CHECK_EQUAL(list.front(), "hello");
+  BOOST_CHECK(s.empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
