@@ -155,7 +155,7 @@ namespace kondrat
 
     std::cout << '\n';
   }
-
+}
 
 int main()
 {
