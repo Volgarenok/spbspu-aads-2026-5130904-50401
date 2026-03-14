@@ -56,6 +56,7 @@ int main()
       std::cout << (*it2).first;
       ++it2;
     }
+    std::cout << "\n";
     std::cout << "0" << "\n";
     return 0;
   }
@@ -118,6 +119,7 @@ int main()
     std::cout << (*nameIt).first;
     ++nameIt;
   }
+  std::cout << std::endl;
 
   auto rowIt = rows.begin();
   for (size_t i = 0; i < rows.size(); ++i)
