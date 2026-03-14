@@ -46,24 +46,24 @@ namespace petrov
     return nums.size() >= istr;
   }
 
-  void printAllList(List< std::pair< std::string, List< size_t > > >& data)
+  void printAllList(List< std::pair< std::string, List< size_t > > >& data, std::ostream& out)
   {
     if(data.size() < 1)
     {
-      std::cout << "0\n";
+      out << "0\n";
     }
     else
     {
       LIter< std::pair< std::string, List< size_t > > > outIt = data.begin();
       for(; outIt != data.end(); outIt.next())
       {
-        std::cout << (*outIt).first;
+        out << (*outIt).first;
         if(outIt.hasNext())
         {
-          std::cout << " ";
+          out << " ";
         }
       }
-      std::cout << "\n";
+      out << "\n";
 
       outIt = data.begin();
       size_t maxListLen = maxLen(data);
@@ -78,15 +78,15 @@ namespace petrov
             {
               n = n.next();
             }
-            std::cout << *n;
+            out << *n;
           }
           outIt = outIt.next();
           if(outIt.hasNext())
           {
-            std::cout << " ";
+            out << " ";
           }
         }
-        std::cout << "\n";
+        out << "\n";
       }
     }
   }
