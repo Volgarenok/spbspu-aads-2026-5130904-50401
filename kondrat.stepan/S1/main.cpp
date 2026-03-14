@@ -127,9 +127,14 @@ namespace kondrat
     return true;
   }
 
-
   void printSums(const List< size_t > & sums)
   {
+    if (sums.empty())
+    {
+      std::cout << 0 << '\n';
+      return;
+    }
+
     bool first = true;
 
     LCIter< size_t > it = sums.begin();
@@ -150,7 +155,7 @@ namespace kondrat
 
     std::cout << '\n';
   }
-}
+
 
 int main()
 {
@@ -171,6 +176,7 @@ int main()
 
   if (!kondrat::printRowsAndSums(copy, sums))
   {
+    std::cerr << "Error: sum overflow\n";
     return 1;
   }
 
