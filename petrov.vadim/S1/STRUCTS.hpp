@@ -213,7 +213,6 @@ namespace petrov
       }
       tail = n;
     }
-    
   }
 
   template< class T >
