@@ -85,6 +85,9 @@ namespace khasnulin
     template < class... Args > void emplace_front(Args &&...args);
 
     void splice(LCIter< T > pos, BiList< T > &other);
+    void splice(LCIter< T > pos, BiList< T > &&other);
+
+    void splice(LCIter< T > pos, BiList< T > &other, LCIter< T > it);
 
     friend class LIter< T >;
     friend class LCIter< T >;
@@ -651,6 +654,11 @@ namespace khasnulin
       other.s_ = 0;
       s_ += new_s;
     }
+  }
+
+  template < class T > void BiList< T >::splice(LCIter< T > pos, BiList< T > &&other)
+  {
+    splice(pos, other);
   }
 
 }

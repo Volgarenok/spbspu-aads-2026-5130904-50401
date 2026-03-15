@@ -592,4 +592,17 @@ BOOST_AUTO_TEST_CASE(test_splice_at_begin_updates_head)
   BOOST_CHECK(list == expected);
 }
 
+BOOST_AUTO_TEST_CASE(test_splice_with_rvalue)
+{
+  BiList< int > list = {10, 11};
+
+  list.splice(list.begin(), BiList< int >{1, 2, 3, 4, 5});
+
+  BOOST_CHECK_EQUAL(list.front(), 1);
+  BOOST_CHECK_EQUAL(list.size(), 7);
+
+  BiList< int > expected = {1, 2, 3, 4, 5, 10, 11};
+  BOOST_CHECK(list == expected);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
