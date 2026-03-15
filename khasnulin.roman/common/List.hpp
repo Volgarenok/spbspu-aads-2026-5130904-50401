@@ -661,5 +661,35 @@ namespace khasnulin
     splice(pos, other);
   }
 
+  template < class T > void BiList< T >::splice(LCIter< T > pos, BiList< T > &other, LCIter< T > it)
+  {
+    if (other.h_ && !it.it_.is_end_ && !it.it_.is_end_)
+    {
+      LNode< T > *new_elem = it.it_.curr_;
+      LNode< T > *prev_elem = new_elem->prev;
+      LNode< T > *next_elem = new_elem->next;
+      if (std::addressof(other) != this)
+      {
+        s_++;
+        other.s_--;
+        if (other.h_ == new_elem)
+        {
+          if (other.size() > 1)
+          {
+            other.h_ = next_elem;
+          }
+          else
+          {
+            other.h_ = nullptr;
+          }
+        }
+      }
+      prev_elem->next = next_elem;
+      next_elem->prev = prev_elem;
+      new_elem->next = new_elem;
+      new_elem->prev = new_elem;
+      insertNodesBefore(pos, new_elem);
+    }
+  }
 }
 #endif
