@@ -13,24 +13,17 @@ int main()
     studilova::List< size_t > numbers;
     size_t value = 0;
 
-    while (true)
+    while (std::cin >> value)
     {
-      if (std::cin >> value)
-      {
-        numbers.pushBack(value);
-      } else {
-        if (std::cin.eof())
-        {
-          break;
-        }
-
-        if (std::cin.fail())
-        {
-          std::cerr << "Overflow\n";
-          return 1;
-        }
-      }
+      numbers.pushBack(value);
     }
+
+    if (std::cin.bad())
+    {
+      std::cerr << "Overflow\n";
+      return 1;
+    }
+    std::cin.clear();
 
     sequences.pushBack({ name, numbers });
   }
