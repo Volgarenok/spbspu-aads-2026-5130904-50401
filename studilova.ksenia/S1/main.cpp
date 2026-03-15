@@ -18,13 +18,12 @@ int main()
       numbers.pushBack(value);
     }
 
-    if (std::cin.bad())
+    if (std::cin.fail() && !std::cin.eof())
     {
       std::cerr << "Overflow\n";
       return 1;
     }
     std::cin.clear();
-
     sequences.pushBack({ name, numbers });
   }
 
@@ -83,12 +82,10 @@ int main()
       if (row < seq.size())
       {
         auto numIt = seq.begin();
-
         for (size_t j = 0; j < row; ++j)
         {
           ++numIt;
         }
-
         size_t value = *numIt;
 
         if(MAX - value < sum)
@@ -107,7 +104,6 @@ int main()
       ++sumIt;
     }
     *sumIt = sum;
-    std::cout << "\n";
   }
 
   for (size_t row = 0; row < maxLen; ++row)
@@ -118,7 +114,6 @@ int main()
     for (size_t i = 0; i < sequences.size(); ++i)
     {
       auto& seq = (*it).second;
-
       if (row < seq.size())
       {
         auto numIt = seq.begin();
