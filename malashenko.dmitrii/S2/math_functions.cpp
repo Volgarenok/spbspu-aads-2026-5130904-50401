@@ -295,7 +295,9 @@ namespace malashenko
       throw std::overflow_error("Modulo overflow");
     }
 
-    return a % b;
+    lli_t res = a % b;
+    res += (res < 0) ? std::abs(b) : 0;
+    return res;
   }
 
   size_t getIndex(const std::string& sign, const List< std::string >& funcs)

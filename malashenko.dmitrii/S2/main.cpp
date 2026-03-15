@@ -25,7 +25,6 @@ int main(int argc, char ** argv)
       std::cerr << "Problem with input file opening\n";
       return 1;
     }
-    std::cout << "file opened\n";
     try
     {
       getInfixData(input, infixAllData);
