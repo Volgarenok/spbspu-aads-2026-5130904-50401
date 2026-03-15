@@ -506,4 +506,90 @@ BOOST_AUTO_TEST_CASE(test_insert_range_to_empty_list)
   BOOST_CHECK(list == list2);
 }
 
+BOOST_AUTO_TEST_CASE(test_insert_range_to_begin)
+{
+  BiList< int > list = {1, 2};
+
+  BiList< int > list2 = {3, 4, 5, 6, 7};
+
+  list.insert(list.begin(), list2.begin(), list2.end());
+
+  BOOST_REQUIRE(list.size() == 7);
+
+  BiList< int > expect = {3, 4, 5, 6, 7, 1, 2};
+
+  BOOST_CHECK(list == expect);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_to_middle)
+{
+  BiList< int > list = {1, 2, 8};
+  BiList< int > other = {3, 4, 5, 6, 7};
+
+  auto it = list.begin();
+  ++it;
+  ++it;
+
+  list.splice(it, other);
+
+  BOOST_CHECK_EQUAL(list.size(), 8);
+  BOOST_CHECK_EQUAL(other.size(), 0);
+  BOOST_CHECK_EQUAL(list.front(), 1);
+  BOOST_CHECK_EQUAL(list.back(), 8);
+  BOOST_CHECK(other.empty());
+
+  BiList< int > expected = {1, 2, 3, 4, 5, 6, 7, 8};
+  BOOST_CHECK(list == expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_to_empty)
+{
+  BiList< int > list;
+  BiList< int > other = {10, 20, 30};
+
+  list.splice(list.begin(), other);
+
+  BOOST_CHECK_EQUAL(list.size(), 3);
+  BOOST_CHECK(other.empty());
+  BOOST_CHECK(list.front() == 10);
+  BOOST_CHECK(list.back() == 30);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_to_end)
+{
+  BiList< int > list = {1, 2};
+  BiList< int > other = {3, 4};
+
+  list.splice(list.end(), other);
+
+  BiList< int > expected = {1, 2, 3, 4};
+  BOOST_CHECK(list == expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_empty_list)
+{
+  BiList< int > list = {1, 2, 3};
+  BiList< int > other;
+
+  list.splice(list.end(), other);
+
+  BiList< int > expected = {1, 2, 3};
+  BOOST_CHECK(list == expected);
+  BOOST_CHECK_EQUAL(list.size(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_at_begin_updates_head)
+{
+  BiList< int > list = {10, 11};
+  BiList< int > other = {1, 2};
+
+  list.splice(list.begin(), other);
+
+  BOOST_CHECK_EQUAL(list.front(), 1);
+  BOOST_CHECK_EQUAL(list.size(), 4);
+
+  BiList< int > expected = {1, 2, 10, 11};
+  BOOST_CHECK(list == expected);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

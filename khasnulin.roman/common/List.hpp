@@ -2,6 +2,8 @@
 #define LIST_HPP
 
 #include <initializer_list>
+#include <iostream>
+#include <memory>
 #include <ostream>
 #include <stdexcept>
 #include <utility>
@@ -82,6 +84,8 @@ namespace khasnulin
     template < class... Args > void emplace_back(Args &&...args);
     template < class... Args > void emplace_front(Args &&...args);
 
+    void splice(LCIter< T > pos, BiList< T > &other);
+
     friend class LIter< T >;
     friend class LCIter< T >;
     friend class RLIter< T >;
@@ -100,6 +104,10 @@ namespace khasnulin
     static LNode< T > *copy(const LNode< T > *h);
     static void clear(LNode< T > *h) noexcept;
     LNode< T > *erase(LNode< T > *node);
+    static LNode< T > *sliceNodes(LNode< T > *pos, LNode< T > *newNodes);
+
+    void insertNodesBefore(LCIter< T > pos, LNode< T > *newNodes);
+
     template < class... Args > static LNode< T > *createNew(Args &&...args);
     template < class... Args > static LNode< T > *insert_before(LNode< T > *currNode, Args &&...args);
   };
@@ -548,7 +556,6 @@ namespace khasnulin
   template < class T > LIter< T > BiList< T >::insert(LCIter< T > pos, LIter< T > begin, LIter< T > end)
   {
     LNode< T > *new_list = nullptr;
-    LNode< T > *tail = new_list;
     size_t new_s = 0;
     try
     {
@@ -557,11 +564,10 @@ namespace khasnulin
         if (!new_list)
         {
           new_list = insert_before(new_list, *begin);
-          tail = new_list;
         }
         else
         {
-          tail = insert_before(new_list, *begin);
+          insert_before(new_list, *begin);
         }
         new_s++;
       }
@@ -572,26 +578,7 @@ namespace khasnulin
       throw;
     }
 
-    if (h_ && pos.it_.is_end_)
-    {
-      h_->prev->next = new_list;
-      new_list->prev = h_->prev;
-      h_->prev = tail;
-      tail->next = h_;
-    }
-    else if (!h_)
-    {
-      h_ = new_list;
-    }
-    else if (!pos.it_.is_end_)
-    {
-      LNode< T > *curr = pos.it_.curr_;
-      LNode< T > *prev = curr->prev;
-      prev->next = new_list;
-      curr->prev = tail;
-      new_list->prev = prev;
-      tail->next = curr;
-    }
+    insertNodesBefore(pos, new_list);
     s_ += new_s;
     return LIter< T >{this, new_list, new_list == nullptr};
   }
@@ -623,6 +610,48 @@ namespace khasnulin
   {
     return out << list.size() << "\n";
   }
-}
 
+  template < class T >
+  typename BiList< T >::template LNode< T > *BiList< T >::sliceNodes(LNode< T > *pos, LNode< T > *newNodes)
+  {
+    LNode< T > *end = pos;
+    LNode< T > *start = end->prev;
+    LNode< T > *new_last = newNodes->prev;
+    start->next = newNodes;
+    end->prev = new_last;
+    newNodes->prev = start;
+    new_last->next = end;
+    return newNodes;
+  }
+
+  template < class T > void BiList< T >::insertNodesBefore(LCIter< T > pos, LNode< T > *newNodes)
+  {
+    if (!h_)
+    {
+      h_ = newNodes;
+    }
+    else
+    {
+      LNode< T > *currPos = pos.it_.is_end_ ? h_ : pos.it_.curr_;
+      sliceNodes(currPos, newNodes);
+      if (pos == begin())
+      {
+        h_ = newNodes;
+      }
+    }
+  }
+
+  template < class T > void BiList< T >::splice(LCIter< T > pos, BiList< T > &other)
+  {
+    if (this != std::addressof(other) && other.h_)
+    {
+      size_t new_s = other.size();
+      insertNodesBefore(pos, other.h_);
+      other.h_ = nullptr;
+      other.s_ = 0;
+      s_ += new_s;
+    }
+  }
+
+}
 #endif
