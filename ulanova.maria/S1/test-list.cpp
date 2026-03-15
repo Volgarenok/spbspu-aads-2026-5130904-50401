@@ -60,6 +60,17 @@ BOOST_AUTO_TEST_CASE(pop_front)
   ulanova::LIter<int> it = list.begin();
   BOOST_CHECK(*it == 2);
 }
+BOOST_AUTO_TEST_CASE(push_back_basic_test)
+{
+  ulanova::List<int> list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+  ulanova::LIter<int> it = list.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+}
 BOOST_AUTO_TEST_CASE(insert_after_test)
 {
   ulanova::List<int> list;
