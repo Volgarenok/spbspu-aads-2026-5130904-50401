@@ -25,8 +25,8 @@ namespace goltsov
     const T& front() const;
     T& back();
     const T& back() const;
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
     void clear();
   };
 }
