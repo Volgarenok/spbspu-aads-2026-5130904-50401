@@ -4,7 +4,7 @@
 
 namespace goltsov
 {
-  template< typename T >
+  template< class T >
   class Queue
   {
     List< T > dates_;
@@ -27,16 +27,17 @@ namespace goltsov
     const T& back() const;
     bool empty() const;
     size_t size() const;
+    void clear();
   };
 }
 
 namespace goltsov
 {
-  template< typename T >
+  template< class T >
   Queue< T >::Queue():
     size_(0)
   {}
-  template< typename T >
+  template< class T >
   Queue< T >::Queue(const Queue< T >& other):
     dates_(other.dates_),
     size_(other.size_)
@@ -47,7 +48,7 @@ namespace goltsov
       tail_ = tail_.next();
     }
   }
-  template< typename T >
+  template< class T >
   Queue< T >::Queue(Queue< T >&& other):
     dates_(std::move(other.dates_)),
     size_(other.size_)
@@ -58,7 +59,7 @@ namespace goltsov
       tail_ = tail_.next();
     }
   }
-  template< typename T >
+  template< class T >
   Queue< T >& Queue< T >::operator=(const Queue< T >& other)
   {
     dates_ = other.dates_;
@@ -70,7 +71,7 @@ namespace goltsov
     }
     return * this;
   }
-  template< typename T >
+  template< class T >
   Queue< T >& Queue< T >::operator=(Queue< T >&& other)
   {
     dates_ = std::move(other.dates_);
@@ -83,19 +84,19 @@ namespace goltsov
     return * this;
   }
 
-  template< typename T >
+  template< class T >
   void Queue< T >::push(const T& rhs)
   {
     tail_ = dates_.insert(tail_, rhs);
     size_ += 1;
   }
-  template< typename T >
+  template< class T >
   void Queue< T >::push(T&& rhs)
   {
     tail_ = dates_.insert(tail_, std::move(rhs));
     size_ += 1;
   }
-  template< typename T >
+  template< class T >
   void Queue< T >::drop()
   {
     if (empty())
@@ -109,7 +110,7 @@ namespace goltsov
       tail_ = LIter< T >();
     }
   }
-  template< typename T >
+  template< class T >
   T& Queue< T >::front()
   {
     if (empty())
@@ -118,7 +119,7 @@ namespace goltsov
     }
     return (* dates_.begin());
   }
-  template< typename T >
+  template< class T >
   const T& Queue< T >::front() const
   {
     if (empty())
@@ -127,7 +128,7 @@ namespace goltsov
     }
     return (* dates_.begin());
   }
-  template< typename T >
+  template< class T >
   T& Queue< T >::back()
   {
     if (empty())
@@ -136,7 +137,7 @@ namespace goltsov
     }
     return (* tail_);
   }
-  template< typename T >
+  template< class T >
   const T& Queue< T >::back() const
   {
     if (empty())
@@ -145,15 +146,22 @@ namespace goltsov
     }
     return (* tail_);
   }
-  template< typename T >
+  template< class T >
   bool Queue< T >::empty() const noexcept
   {
     return size_ == 0;
   }
-  template< typename T >
+  template< class T >
   size_t Queue< T >::size() const noexcept
   {
     return size_;
+  }
+  template< class T >
+  void Queue< T >::clear()
+  {
+    dates_.clear();
+    size_ = 0;
+    tail_ = LIter< T >();
   }
 }
 #endif

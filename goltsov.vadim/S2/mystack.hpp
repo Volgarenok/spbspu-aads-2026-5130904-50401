@@ -4,7 +4,7 @@
 
 namespace goltsov
 {
-  template< typename T >
+  template< class T >
   class Stack
   {
     List< T > dates_;
@@ -24,33 +24,34 @@ namespace goltsov
     const T& front() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
+    void clear();
   };
 }
 
 namespace goltsov
 {
-  template< typename T >
+  template< class T >
   Stack< T >::Stack():
     size_(0)
   {}
-  template< typename T >
+  template< class T >
   Stack< T >::Stack(const Stack< T >& other):
     dates_(other.dates_),
     size_(other.size_)
   {}
-  template< typename T >
+  template< class T >
   Stack< T >::Stack(Stack< T >&& other):
     dates_(std::move(other.dates_)),
     size_(other.size_)
   {}
-  template< typename T >
+  template< class T >
   Stack< T >& Stack< T >::operator=(const Stack< T >& other)
   {
     dates_ = other.dates_;
     size_ = other.size_;
     return * this;
   }
-  template< typename T >
+  template< class T >
   Stack< T >& Stack< T >::operator=(Stack< T >&& other)
   {
     dates_ = std::move(other.dates_);
@@ -58,19 +59,19 @@ namespace goltsov
     return * this;
   }
 
-  template< typename T >
+  template< class T >
   void Stack< T >::push(const T& rhs)
   {
     dates_.push_start(rhs);
     size_ += 1;
   }
-  template< typename T >
+  template< class T >
   void Stack< T >::push(T&& rhs)
   {
     dates_.push_start(std::move(rhs));
     size_ += 1;
   }
-  template< typename T >
+  template< class T >
   void Stack< T >::drop()
   {
     if (empty())
@@ -80,7 +81,7 @@ namespace goltsov
     dates_.pop_start();
     size_--;
   }
-  template< typename T >
+  template< class T >
   T& Stack< T >::front()
   {
     if (empty())
@@ -89,7 +90,7 @@ namespace goltsov
     }
     return (* dates_.begin());
   }
-  template< typename T >
+  template< class T >
   const T& Stack< T >::front() const
   {
     if (empty())
@@ -98,15 +99,21 @@ namespace goltsov
     }
     return (* dates_.begin());
   }
-  template< typename T >
+  template< class T >
   bool Stack< T >::empty() const noexcept
   {
     return size_ == 0;
   }
-  template< typename T >
+  template< class T >
   size_t Stack< T >::size() const noexcept
   {
     return size_;
+  }
+  template< class T >
+  void Stack< T >::clear()
+  {
+    dates_.clear();
+    size_ = 0;
   }
 }
 #endif
