@@ -1,7 +1,6 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 
-#include "list.hpp"
 #include "node.hpp"
 #include <memory>
 
@@ -18,12 +17,14 @@ namespace donkeev
   public:
     LIter();
     LIter(const LIter&);
+    LIter(Node< T >*);
 
     LIter< T >& operator++() noexcept;
     LIter< T > operator++(int) noexcept;
+    LIter< T >& operator+=(int) noexcept;
 
-    T& operator*() const noexcept;
-    T* operator ->() const noexcept;
+    T& operator*() noexcept;
+    T* operator->() noexcept;
 
     bool operator==(const LIter< T >&) const noexcept;
     bool operator!=(const LIter< T >&) const noexcept;
@@ -38,9 +39,11 @@ namespace donkeev
   public:
     LCIter();
     LCIter(const LCIter&);
+    LCIter(const Node< T >*);
 
     LCIter< T >& operator++() noexcept;
     LCIter< T > operator++(int) noexcept;
+    LCIter< T >& operator+=(int) noexcept;
 
     const T& operator*() const noexcept;
     const T* operator ->() const noexcept;
@@ -57,6 +60,10 @@ namespace donkeev
   LIter< T >::LIter(const LIter< T >& yaLIter):
     n(yaLIter.n)
   {}
+  template< class T >
+  LIter< T >::LIter(Node< T >* node):
+    n(node)
+  {}
 
   template< class T >
   LIter< T >& LIter< T >::operator++() noexcept
@@ -71,15 +78,24 @@ namespace donkeev
     n = n->next;
     return tmp;
   }
+  template< class T >
+  LIter< T >& LIter< T >::operator+=(int k) noexcept
+  {
+    for (size_t i = 0; i < k; ++i)
+    {
+      n = n->next;
+    }
+    return *this;
+  }
 
   template< class T >
-  T& LIter< T >::operator*() const noexcept
+  T& LIter< T >::operator*() noexcept
   {
     assert(n != nullptr);
     return n->val;
   }
   template< class T >
-  T* LIter< T >::operator->() const noexcept
+  T* LIter< T >::operator->() noexcept
   {
     assert(n != nullptr);
     return std::addressof(n->val);
@@ -95,7 +111,7 @@ namespace donkeev
   {
     return !(*this == yaLIter);
   }
-//-----------------------------------
+
   template< class T >
   LCIter< T >::LCIter():
     n(nullptr)
@@ -103,6 +119,10 @@ namespace donkeev
   template< class T >
   LCIter< T >::LCIter(const LCIter< T >& yaLCIter):
     n(yaLCIter.n)
+  {}
+  template< class T >
+  LCIter< T >::LCIter(const Node< T >* node):
+    n(node)
   {}
 
   template< class T >
@@ -117,6 +137,15 @@ namespace donkeev
     LCIter< T > tmp = *this;
     n = n->next;
     return tmp;
+  }
+  template< class T >
+  LCIter< T >& LCIter< T >::operator+=(int j) noexcept
+  {
+    for (size_t i = 0; i < j; ++i)
+    {
+      n = n->next;
+    }
+    return *this;
   }
 
   template< class T >
