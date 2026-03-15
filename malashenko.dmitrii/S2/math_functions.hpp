@@ -10,8 +10,8 @@ namespace malashenko
   using lli_t = long long int;
   using func_t = lli_t(*)(const lli_t&, const lli_t&);
   void getInfixData(std::istream& in, Stack< Queue< std::string > >& infixData);
-  void converInfixToPostfix(Queue< std::string > infixData, Queue< std::string >& PostfixData);
-  std::string calculate(Queue< std::string > PostfixData);
+  void converInfixToPostfix(const Queue< std::string >& infixDataOriginal, Queue< std::string >& PostfixData);
+  std::string calculate(const Queue< std::string >& PostfixDataOriginal);
   bool isOperand(const std::string& symbol);
 
   size_t getPriority(const std::string& symbol);

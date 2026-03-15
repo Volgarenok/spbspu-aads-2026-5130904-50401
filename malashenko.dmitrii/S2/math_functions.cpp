@@ -75,8 +75,9 @@ namespace malashenko
     }
   }
 
-  void converInfixToPostfix(Queue< std::string > infixData, Queue< std::string >& PostfixData)
+  void converInfixToPostfix(const Queue< std::string >& infixDataOriginal, Queue< std::string >& PostfixData)
   {
+    Queue< std::string > infixData = infixDataOriginal;
     Stack< std::string > stack;
     while (!infixData.empty())
     {
@@ -310,8 +311,9 @@ namespace malashenko
     return funcs.size();
   }
 
-  std::string calculate(Queue< std::string > PostfixData)
+  std::string calculate(const Queue< std::string >& PostfixDataOriginal)
   {
+    Queue< std::string > PostfixData = PostfixDataOriginal;
     List< std::string > funcNames;
     try
     {
