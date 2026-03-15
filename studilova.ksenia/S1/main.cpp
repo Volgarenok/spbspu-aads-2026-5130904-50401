@@ -1,145 +1,120 @@
 #include <iostream>
 #include <string>
 #include <limits>
-#include <cstdlib>
+#include <utility>
 #include"list.hpp"
 
 int main()
 {
-  studilova::List< std::pair< std::string, studilova::List< size_t > > > sequences;
+  studilova::List< std::pair< std::string, studilova::List< size_t > > > list;
 
   std::string name;
   while(std::cin >> name)
   {
-    studilova::List< size_t > numbers;
+    studilova::List< size_t > seq;
     size_t value = 0;
 
     while (std::cin >> value)
     {
-      numbers.pushBack(value);
+      seq.pushBack(value);
     }
 
+    list.pushBack({ name, seq });
+
+    if (std::cin.bad())
+    {
+      return 1;
+    }
     std::cin.clear();
-    sequences.pushBack({ name, numbers });
   }
 
-  if (sequences.empty())
+  if (list.empty())
   {
     std::cout << "0\n";
     return 0;
   }
 
-  size_t maxLen = 0;
-  auto it = sequences.begin();
-  for (size_t i = 0; i < sequences.size(); ++i)
-  {
-    size_t len = (*it).second.size();
-    if (len > maxLen)
-    {
-      maxLen = len;
-    }
-    ++it;
-  }
-
-  const size_t MAX = std::numeric_limits< size_t >::max();
-  studilova::List< size_t > sums;
-  for (size_t i = 0; i < maxLen; ++i)
-  {
-    sums.pushBack(0);
-  }
-
-  for(size_t row = 0; row < maxLen; ++row)
-  {
-    size_t sum = 0;
-    it = sequences.begin();
-
-    for (size_t i = 0; i < sequences.size(); ++i)
-    {
-      auto& seq = (*it).second;
-
-      if (row < seq.size())
-      {
-        auto numIt = seq.begin();
-        for (size_t j = 0; j < row; ++j)
-        {
-          ++numIt;
-        }
-        size_t value = *numIt;
-
-        if(MAX - value < sum)
-        {
-          std::cerr << "Overflow\n";
-          std::exit(1);
-        }
-        sum += value;
-      }
-      ++it;
-    }
-
-    auto sumIt = sums.begin();
-    for (size_t k = 0; k < row; ++k)
-    {
-      ++sumIt;
-    }
-    *sumIt = sum;
-  }
-
-  it = sequences.begin();
-  for (size_t i = 0; i < sequences.size(); ++i)
+  auto it = list.begin();
+  for (size_t i = 0; i < list.size(); ++i, ++it)
   {
     if (i > 0)
     {
       std::cout << " ";
     }
     std::cout << (*it).first;
-    ++it;
   }
   std::cout << "\n";
 
+  size_t maxLen = 0;
+  it = list.begin();
+  for (size_t i = 0; i < list.size(); ++i, ++it)
+  {
+    size_t currLen = (*it).second.size();
+    if (currLen > maxLen)
+    {
+      maxLen = currLen;
+    }
+  }
 
   if (maxLen == 0)
   {
-   std::cout << "0\n";
-   return 0;
+    std::cout << "0\n";
+    return 0;
   }
 
-  for (size_t row = 0; row < maxLen; ++row)
+  studilova::List< size_t > sums;
+  for (size_t i = 0; i < maxLen; ++i)
   {
-    bool needSpace = false;
-    it = sequences.begin();
+    sums.pushBack(0);
+  }
 
-    for (size_t i = 0; i < sequences.size(); ++i)
+  const size_t MAX = std::numeric_limits< size_t >::max();
+
+  auto sumIt = sums.begin();
+  for(size_t row = 0; row < maxLen; ++row, ++sumIt)
+  {
+    bool first = true;
+    it = list.begin();
+
+    for (size_t i = 0; i < list.size(); ++i, ++it)
     {
       auto& seq = (*it).second;
+
       if (row < seq.size())
       {
-        auto numIt = seq.begin();
+        auto sit = seq.begin();
         for (size_t j = 0; j < row; ++j)
         {
-          ++numIt;
+          ++sit;
         }
 
-        if (needSpace)
+        if(!first)
         {
           std::cout << " ";
         }
-        std::cout << *numIt;
-        needSpace = true;
+        std::cout << *sit;
+
+        if(MAX - *sit < *sumIt)
+        {
+          std::cout << "\n";
+          std::cerr << "Overflow\n";
+          return 1;
+        }
+        *sumIt += *sit;
+        first = false;
       }
-      ++it;
     }
     std::cout << "\n";
   }
 
-  auto sumIt = sums.begin();
-  for (size_t i = 0; i < sums.size(); ++i)
+  sumIt = sums.begin();
+  for (size_t i = 0; i < sums.size(); ++i, ++sumIt)
   {
-    if (i > 0)
+    if (i != 0)
     {
       std::cout << " ";
     }
     std::cout << *sumIt;
-    ++sumIt;
   }
   std::cout << "\n";
   return 0;
