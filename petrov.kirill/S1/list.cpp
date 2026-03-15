@@ -85,7 +85,7 @@
 
   template< typename T >
   petrov::List< T >::List(const petrov::List< T > & other):
-    petrov::List()
+    head_(nullptr), tail_(nullptr), size_(0)
   {
     for (Node< T > * curr = other.head_; curr != nullptr; curr = curr->next_) {
       pushBack(curr->data_);
