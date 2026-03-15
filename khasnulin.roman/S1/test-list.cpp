@@ -605,4 +605,77 @@ BOOST_AUTO_TEST_CASE(test_splice_with_rvalue)
   BOOST_CHECK(list == expected);
 }
 
+BOOST_AUTO_TEST_CASE(test_splice_single_element_same_list)
+{
+  BiList< int > list = {1, 2, 3, 4};
+
+  auto it = ++list.begin();
+  auto pos = --list.end();
+
+  list.splice(pos, list, it);
+
+  BiList< int > expected = {1, 3, 2, 4};
+  BOOST_CHECK(list == expected);
+  BOOST_CHECK_EQUAL(list.size(), 4);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_single_element_no_effect)
+{
+  BiList< int > list = {1, 2, 3};
+  auto it = list.begin();
+
+  list.splice(list.begin(), list, it);
+
+  BiList< int > expected = {1, 2, 3};
+  BOOST_CHECK(list == expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_single_element_between_lists)
+{
+  BiList< int > list1 = {1, 2, 3};
+  BiList< int > list2 = {10, 20};
+
+  auto it = ++list1.begin();
+  auto pos = ++list2.begin();
+
+  list2.splice(pos, list1, it);
+
+  BOOST_CHECK_EQUAL(list1.size(), 2);
+  BOOST_CHECK_EQUAL(list2.size(), 3);
+
+  BiList< int > expected1 = {1, 3};
+  BiList< int > expected2 = {10, 2, 20};
+
+  BOOST_CHECK(list1 == expected1);
+  BOOST_CHECK(list2 == expected2);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_single_list_to_begin)
+{
+  BiList< int > list1 = {1};
+  BiList< int > list2 = {10, 20};
+
+  list2.splice(list2.begin(), list1, list1.begin());
+
+  BOOST_CHECK_EQUAL(list1.size(), 0);
+  BOOST_CHECK_EQUAL(list2.size(), 3);
+
+  BiList< int > expected1;
+  BiList< int > expected2 = {1, 10, 20};
+
+  BOOST_CHECK(list1 == expected1);
+  BOOST_CHECK(list2 == expected2);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_single_to_end)
+{
+  BiList< int > list1 = {5};
+  BiList< int > list2 = {10, 20};
+
+  list2.splice(list2.end(), list1, list1.begin());
+
+  BOOST_CHECK_EQUAL(list2.back(), 5);
+  BOOST_CHECK_EQUAL(list2.size(), 3);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
