@@ -692,4 +692,88 @@ BOOST_AUTO_TEST_CASE(test_splice_single_to_end)
   BOOST_CHECK_EQUAL(list2.size(), 3);
 }
 
+BOOST_AUTO_TEST_CASE(test_splice_range_between_lists)
+{
+  BiList< int > list1 = {1, 2, 3, 4, 5};
+  BiList< int > list2 = {10, 20};
+
+  auto first = ++list1.begin();
+  auto last = --list1.end();
+
+  list2.splice(list2.end(), list1, first, last);
+
+  BOOST_CHECK_EQUAL(list1.size(), 2);
+  BOOST_CHECK_EQUAL(list2.size(), 5);
+
+  BiList< int > expected1 = {1, 5};
+  BiList< int > expected2 = {10, 20, 2, 3, 4};
+
+  BOOST_CHECK(list1 == expected1);
+  BOOST_CHECK(list2 == expected2);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_range_same_list_to_begin)
+{
+  BiList< int > list = {1, 2, 3, 4, 5};
+
+  auto first = list.begin();
+  ++(++first);
+  auto last = --list.end();
+
+  list.splice(list.begin(), list, first, last);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_empty_range)
+{
+  BiList< int > list = {1, 2, 3};
+  auto it = list.begin();
+
+  list.splice(list.end(), list, it, it);
+
+  BOOST_CHECK_EQUAL(list.size(), 3);
+  BiList< int > expected = {1, 2, 3};
+  BOOST_CHECK(list == expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_whole_list_transfer)
+{
+  BiList< int > list1 = {10, 20};
+  BiList< int > list2 = {1, 2, 3};
+
+  list2.splice(list2.end(), list1, list1.begin(), list1.end());
+
+  BOOST_CHECK(list1.empty());
+  BOOST_CHECK_EQUAL(list1.size(), 0);
+  BOOST_CHECK_EQUAL(list2.size(), 5);
+
+  BiList< int > expected = {1, 2, 3, 10, 20};
+  BOOST_CHECK(list2 == expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_range_self_middle_to_end)
+{
+  BiList< int > list = {1, 2, 3, 4, 5};
+  auto first = ++list.begin();
+  auto last = ++(++(++list.begin()));
+
+  list.splice(list.end(), list, first, last);
+
+  BiList< int > expected = {1, 4, 5, 2, 3};
+  BOOST_CHECK(list == expected);
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_single_element_as_range)
+{
+  BiList< int > list1 = {100};
+  BiList< int > list2 = {1, 2};
+
+  list2.splice(list2.begin(), list1, list1.begin(), list1.end());
+
+  BOOST_CHECK_EQUAL(list2.size(), 3);
+
+  BiList< int > expected = {100, 1, 2};
+
+  BOOST_CHECK(list2 == expected);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
