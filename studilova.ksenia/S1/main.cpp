@@ -18,11 +18,6 @@ int main()
       numbers.pushBack(value);
     }
 
-    if (std::cin.fail() && !std::cin.eof())
-    {
-      std::cerr << "Overflow\n";
-      return 1;
-    }
     std::cin.clear();
     sequences.pushBack({ name, numbers });
   }
