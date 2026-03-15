@@ -40,12 +40,6 @@ int main()
     ++it;
   }
 
-  if (maxLen == 0)
-  {
-   std::cout << "0\n";
-   return 0;
-  }
-
   const size_t MAX = std::numeric_limits< size_t >::max();
   studilova::List< size_t > sums;
   for (size_t i = 0; i < maxLen; ++i)
@@ -101,6 +95,12 @@ int main()
   }
   std::cout << "\n";
 
+
+  if (maxLen == 0)
+  {
+   std::cout << "0\n";
+   return 0;
+  }
 
   for (size_t row = 0; row < maxLen; ++row)
   {
