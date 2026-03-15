@@ -391,7 +391,7 @@ namespace studilova
   template< class T >
   const T& CLIter< T >::operator*() const
   {
-    if (node_ = nullptr)
+    if (node_ == nullptr)
     {
       throw std::out_of_range("Iterator dereference error");
     }
