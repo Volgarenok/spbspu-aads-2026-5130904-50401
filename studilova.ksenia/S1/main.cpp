@@ -28,20 +28,8 @@ int main()
     return 0;
   }
 
-  auto it = sequences.begin();
-  for (size_t i = 0; i < sequences.size(); ++i)
-  {
-    if (i > 0)
-    {
-      std::cout << " ";
-    }
-    std::cout << (*it).first;
-    ++it;
-  }
-  std::cout << "\n";
-
   size_t maxLen = 0;
-  it = sequences.begin();
+  auto it = sequences.begin();
   for (size_t i = 0; i < sequences.size(); ++i)
   {
     size_t len = (*it).second.size();
@@ -100,6 +88,19 @@ int main()
     }
     *sumIt = sum;
   }
+
+  it = sequences.begin();
+  for (size_t i = 0; i < sequences.size(); ++i)
+  {
+    if (i > 0)
+    {
+      std::cout << " ";
+    }
+    std::cout << (*it).first;
+    ++it;
+  }
+  std::cout << "\n";
+
 
   for (size_t row = 0; row < maxLen; ++row)
   {
