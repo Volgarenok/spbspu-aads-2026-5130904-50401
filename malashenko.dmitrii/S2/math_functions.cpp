@@ -104,7 +104,7 @@ namespace malashenko
       if (isOperand(symbol))
       {
         PostfixData.push(symbol);
-      } else 
+      } else
       {
         if (stack.empty() || stack.top() == "(" || stack.top() == ")")
         {

@@ -112,7 +112,7 @@ namespace malashenko
   void Queue< T >::clear()
   {
     list_.clear();
-  } 
+  }
 
   template< class T >
   Queue< T >::~Queue()
