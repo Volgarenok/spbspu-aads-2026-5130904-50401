@@ -25,6 +25,7 @@ int main(int argc, char ** argv)
       std::cerr << "Problem with input file opening\n";
       return 1;
     }
+    std::cout << "file opened\n";
     try
     {
       getInfixData(input, infixAllData);
@@ -34,6 +35,11 @@ int main(int argc, char ** argv)
       return 1;
     }
     input.close();
+  }
+
+  if (infixAllData.empty())
+  {
+    return 0;
   }
   List< std::string > out;
 

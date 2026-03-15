@@ -12,7 +12,7 @@ namespace malashenko
 
     Stack& operator=(const Stack& other);
     Stack& operator=(Stack&& other);
-  
+
     T& top() const;
 
     bool empty() const;
@@ -22,8 +22,6 @@ namespace malashenko
     void pop();
     void swap(Stack& other);
     void clear();
-
-    void show() const;
 
     ~Stack();
   private:
@@ -71,7 +69,6 @@ namespace malashenko
     return list_.empty();
   }
 
-
   template< class T >
   size_t Stack< T >::size() const
   {
@@ -89,17 +86,6 @@ namespace malashenko
   {
     list_.pop_back();
   }
-  
-
-  template< class T >
-  void Stack< T >::show() const
-  {
-    for (LIter< T > it = list_.begin(); it != list_.end(); ++it)
-    {
-      std::cout << *it << ' ';
-    }
-    std::cout << '\n';
-  }
 
   template< class T >
   T& Stack< T >::top() const
@@ -112,7 +98,6 @@ namespace malashenko
   {
     list_.swap(other.list_);
   }
-
 
   template< class T >
   void Stack< T >::clear()

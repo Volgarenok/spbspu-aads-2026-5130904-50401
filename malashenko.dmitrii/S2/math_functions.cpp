@@ -29,7 +29,6 @@ namespace malashenko
     }
   }
 
-
   void getInfixData(std::istream& in, Stack< Queue< std::string > >& infixData)
   {
     char ch;
@@ -118,7 +117,6 @@ namespace malashenko
           PostfixData.push(stack.top());
           stack.pop();
           stack.push(symbol);
-
           continue;
         }
 
@@ -140,7 +138,7 @@ namespace malashenko
     {
       throw std::overflow_error("Addition overflow");
     }
-    
+
     return a + b;
   }
 
@@ -299,7 +297,6 @@ namespace malashenko
     return a % b;
   }
 
-
   size_t getIndex(const std::string& sign, const List< std::string >& funcs)
   {
     size_t ind = 0;
@@ -313,8 +310,6 @@ namespace malashenko
     return funcs.size();
   }
 
-
-#if 1
   std::string calculate(Queue< std::string > PostfixData)
   {
     List< std::string > funcNames;
@@ -332,7 +327,6 @@ namespace malashenko
       funcNames.clear();
       throw;
     }
-    
 
     List< func_t > funcs;
     try
@@ -347,6 +341,7 @@ namespace malashenko
     catch(...)
     {
       funcs.clear();
+      funcNames.clear();
       throw;
     }
 
@@ -373,6 +368,7 @@ namespace malashenko
         {
           funcNames.clear();
           funcs.clear();
+          nums.clear();
           throw std::invalid_argument("Input error. Wrong operand");
         }
 
@@ -386,6 +382,7 @@ namespace malashenko
         {
           funcNames.clear();
           funcs.clear();
+          nums.clear();
           throw std::invalid_argument("Input error. Wrong operand");
         }
 
@@ -397,11 +394,9 @@ namespace malashenko
     {
       funcNames.clear();
       funcs.clear();
+      nums.clear();
       throw std::invalid_argument("Input error. Wrong operation");
     }
     return nums.top();
   }
-#endif
-
 }
-
