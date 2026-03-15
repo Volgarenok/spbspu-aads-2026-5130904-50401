@@ -5,7 +5,7 @@ namespace malashenko
   bool isOperand(const std::string& symbol)
   {
     std::string notOperands[6] = {"+", "-", "/", "*", "%", "##"};
-    for (size_t i = 0; i < 7; ++i)
+    for (size_t i = 0; i < 6; ++i)
     {
       if (symbol == notOperands[i])
       {
