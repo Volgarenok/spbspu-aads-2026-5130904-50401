@@ -88,30 +88,30 @@ int main()
     bool is_first_in_row = true;
     size_t current_row_sum = 0;
     bool has_overflow = false;
-    
+
     auto iter_it = iterators.begin();
     auto data_it = data.begin();
-    
+
     for (; iter_it != iterators.end(); ++iter_it, ++data_it) {
       if (* iter_it != data_it->second.end()) {
         size_t value = ** iter_it;
-        
+
         if (! is_first_in_row) {
           std::cout << " ";
         }
         std::cout << value;
-        
+
         if (std::numeric_limits< size_t >::max() - value < current_row_sum) {
           has_overflow = true;
         }
         current_row_sum += value;
-        
+
         ++(* iter_it);
         has_active_elements = true;
         is_first_in_row = false;
       }
     }
-    
+
     if (has_active_elements) {
       std::cout << "\n";
       if (has_overflow) {
