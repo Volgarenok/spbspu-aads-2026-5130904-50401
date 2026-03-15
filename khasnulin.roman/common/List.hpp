@@ -89,6 +89,8 @@ namespace khasnulin
 
     void splice(LCIter< T > pos, BiList< T > &other, LCIter< T > it);
 
+    void splice(LCIter< T > pos, BiList< T > &other, LCIter< T > first, LCIter< T > last);
+
     friend class LIter< T >;
     friend class LCIter< T >;
     friend class RLIter< T >;
@@ -110,6 +112,8 @@ namespace khasnulin
     static LNode< T > *sliceNodes(LNode< T > *pos, LNode< T > *newNodes);
 
     void insertNodesBefore(LCIter< T > pos, LNode< T > *newNodes);
+
+    void insertInterval(LCIter< T > pos, BiList< T > &other, LCIter< T > first, LCIter< T > last);
 
     template < class... Args > static LNode< T > *createNew(Args &&...args);
     template < class... Args > static LNode< T > *insert_before(LNode< T > *currNode, Args &&...args);
@@ -665,29 +669,60 @@ namespace khasnulin
   {
     if (other.h_ && !it.it_.is_end_ && pos != it)
     {
-      LNode< T > *new_elem = it.it_.curr_;
-      LNode< T > *prev_elem = new_elem->prev;
-      LNode< T > *next_elem = new_elem->next;
-      if (other.h_ == new_elem)
-      {
-        if (other.size() > 1)
-        {
-          other.h_ = next_elem;
-        }
-        else
-        {
-          other.h_ = nullptr;
-        }
-      }
-      prev_elem->next = next_elem;
-      next_elem->prev = prev_elem;
-      new_elem->next = new_elem;
-      new_elem->prev = new_elem;
-      insertNodesBefore(pos, new_elem);
+      auto next_it = it;
+      ++next_it;
+      insertInterval(pos, other, it, next_it);
       if (std::addressof(other) != this)
       {
         s_++;
         other.s_--;
+      }
+    }
+  }
+
+  template < class T >
+  void BiList< T >::insertInterval(LCIter< T > pos, BiList< T > &other, LCIter< T > first, LCIter< T > last)
+  {
+    LNode< T > *start = first.it_.curr_;
+    LNode< T > *end = (--last).it_.curr_;
+
+    LNode< T > *prev_elem = start->prev;
+    LNode< T > *next_elem = end->next;
+
+    if (other.h_ == start)
+    {
+      if (other.h_ == next_elem)
+      {
+        other.h_ = nullptr;
+      }
+      else
+      {
+        other.h_ = next_elem;
+      }
+    }
+
+    prev_elem->next = next_elem;
+    next_elem->prev = prev_elem;
+    start->prev = end;
+    end->next = start;
+    insertNodesBefore(pos, start);
+  }
+
+  template < class T >
+  void BiList< T >::splice(LCIter< T > pos, BiList< T > &other, LCIter< T > first, LCIter< T > last)
+  {
+    if (other.h_ && !first.it_.is_end_ && first != last)
+    {
+      size_t new_s = 0;
+      for (auto it = first; it != last; ++it)
+      {
+        new_s++;
+      }
+      insertInterval(pos, other, first, last);
+      if (std::addressof(other) != this)
+      {
+        s_ += new_s;
+        other.s_ -= new_s;
       }
     }
   }
