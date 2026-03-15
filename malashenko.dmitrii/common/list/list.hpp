@@ -95,7 +95,7 @@ namespace malashenko {
   template< class T >
   List< T >& List< T >::operator=(List< T >&& other)
   {
-    if (this = &other)
+    if (this == &other)
     {
       return *this;
     }
