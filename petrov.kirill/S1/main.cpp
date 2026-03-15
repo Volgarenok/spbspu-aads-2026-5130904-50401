@@ -59,9 +59,6 @@ int main()
     }
   }
   if (data.isEmpty()) {
-
-  }
-  if (data.isEmpty()) {
     std::cout << "0\n";
     return 0;
   }
@@ -123,16 +120,20 @@ int main()
     }
   }
 
-  bool is_first_sum = 1;
-  for (auto it = row_sums.begin(); it != row_sums.end(); ++it) {
-    if (!is_first_sum) {
-      std::cout << " ";
+  if (row_sums.isEmpty()) {
+    std::cout << "0\n";
+  } else {
+    bool is_first_sum = 1;
+    for (auto it = row_sums.begin(); it != row_sums.end(); ++it) {
+      if (!is_first_sum) {
+        std::cout << " ";
+      }
+      std::cout << * it;
+      is_first_sum = 0;
     }
-    std::cout << * it;
-    is_first_sum = 0;
-  }
-  if (!row_sums.isEmpty()) {
-    std::cout << "\n";
+    if (!row_sums.isEmpty()) {
+      std::cout << "\n";
+    }
   }
 
   return 0;
