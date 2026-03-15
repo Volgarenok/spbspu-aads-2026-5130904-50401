@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <limits>
+#include <cstdlib>
 #include"list.hpp"
 
 int main()
@@ -68,7 +69,7 @@ int main()
         if(MAX - value < sum)
         {
           std::cerr << "Overflow\n";
-          return 1;
+          std::exit(1);
         }
         sum += value;
       }
