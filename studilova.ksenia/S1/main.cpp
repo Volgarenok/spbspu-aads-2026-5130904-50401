@@ -73,9 +73,7 @@ int main()
 
   for(size_t row = 0; row < maxLen; ++row)
   {
-    bool needSpace = false;
     size_t sum = 0;
-
     it = sequences.begin();
 
     for (size_t i = 0; i < sequences.size(); ++i)
@@ -98,15 +96,7 @@ int main()
           std::cerr << "Overflow\n";
           return 1;
         }
-
-        if(needSpace)
-        {
-          std::cout << " ";
-        }
-        std::cout << value;
-
         sum += value;
-        needSpace = true;
       }
       ++it;
     }
@@ -117,6 +107,35 @@ int main()
       ++sumIt;
     }
     *sumIt = sum;
+    std::cout << "\n";
+  }
+
+  for (size_t row = 0; row < maxLen; ++row)
+  {
+    bool needSpace = false;
+    it = sequences.begin();
+
+    for (size_t i = 0; i < sequences.size(); ++i)
+    {
+      auto& seq = (*it).second;
+
+      if (row < seq.size())
+      {
+        auto numIt = seq.begin();
+        for (size_t j = 0; j < row; ++j)
+        {
+          ++numIt;
+        }
+
+        if (needSpace)
+        {
+          std::cout << " ";
+        }
+        std::cout << *numIt;
+        needSpace = true;
+      }
+      ++it;
+    }
     std::cout << "\n";
   }
 
