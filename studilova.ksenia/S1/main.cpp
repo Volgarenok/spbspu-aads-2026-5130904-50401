@@ -95,7 +95,6 @@ int main()
 
         if(MAX - value < sum)
         {
-          std::cout << "\n";
           std::cerr << "Overflow\n";
           return 1;
         }
