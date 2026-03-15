@@ -630,6 +630,20 @@ BOOST_AUTO_TEST_CASE(test_splice_single_element_no_effect)
   BOOST_CHECK(list == expected);
 }
 
+BOOST_AUTO_TEST_CASE(test_splice_single_element_from_begin)
+{
+  BiList< int > list = {1, 2, 3};
+  auto it = list.begin();
+  ++it;
+  ++it;
+
+  list.splice(it, list, list.begin());
+
+  BiList< int > expected = {2, 1, 3};
+  BOOST_CHECK(list == expected);
+  BOOST_CHECK_EQUAL(list.size(), 3);
+}
+
 BOOST_AUTO_TEST_CASE(test_splice_single_element_between_lists)
 {
   BiList< int > list1 = {1, 2, 3};
