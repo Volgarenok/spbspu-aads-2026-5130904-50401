@@ -27,7 +27,7 @@ List<Sequence> read_sequences(std::istream& in)
       {
         size_t value;
         in >> value;
-        seq.values.push_front(value);
+        seq.values.push_back(value);
       }
       else
       {
@@ -35,7 +35,7 @@ List<Sequence> read_sequences(std::istream& in)
       }
     }
 
-    sequences.push_front(seq);
+    sequences.push_back(seq);
   }
 
   return sequences;
@@ -45,7 +45,7 @@ List<List<size_t>> transpose_sequences(const List<Sequence>& seqs)
 {
   List<List<size_t>> result;
 
-  if (!(seqs.cbegin() != seqs.cend()))
+  if (seqs.cbegin() == seqs.cend())
   {
     return result;
   }
@@ -54,7 +54,7 @@ List<List<size_t>> transpose_sequences(const List<Sequence>& seqs)
 
   for (LCIter<Sequence> it = seqs.cbegin(); it != seqs.cend(); ++it)
   {
-    iters.push_front(it->values.cbegin());
+    iters.push_back(it->values.cbegin());
   }
 
   bool done = false;
@@ -68,28 +68,21 @@ List<List<size_t>> transpose_sequences(const List<Sequence>& seqs)
     LCIter<Sequence> seq_it = seqs.cbegin();
     LIter<LCIter<size_t>> iter_it = iters.begin();
 
-    for (; seq_it != seqs.cend() && iter_it != iters.end(); ++seq_it, ++iter_it)
+    for (; seq_it != seqs.cend(); ++seq_it, ++iter_it)
     {
-      LCIter<size_t> cur = *iter_it;
+      LCIter<size_t>& cur = *iter_it;
 
       if (cur != seq_it->values.cend())
       {
-        row.push_front(*cur);
-        ++(*iter_it);
+        row.push_back(*cur);
+        ++cur;
         done = false;
       }
     }
 
     if (row.cbegin() != row.cend())
     {
-      List<size_t> new_row;
-
-      for (LCIter<size_t> it = row.cbegin(); it != row.cend(); ++it)
-      {
-        new_row.push_front(*it);
-      }
-
-      result.push_front(new_row);
+      result.push_back(row);
     }
   }
 
@@ -106,15 +99,16 @@ List<size_t> calculate_sums(const List<List<size_t>>& seqs)
 
     for (LCIter<size_t> jt = it->cbegin(); jt != it->cend(); ++jt)
     {
-      if (sum > std::numeric_limits<size_t>::max() - *jt)
+      size_t value = *jt;
+      if (sum > std::numeric_limits<size_t>::max() - value)
       {
         std::cerr << "overflow\n";
         std::exit(1);
       }
-      sum += *jt;
+      sum += value;
     }
 
-    sums.push_front(sum);
+    sums.push_back(sum);
   }
 
   return sums;
@@ -124,19 +118,36 @@ void print_sequences(const List<List<size_t>>& seqs)
 {
   for (LCIter<List<size_t>> it = seqs.cbegin(); it != seqs.cend(); ++it)
   {
+    bool first = true;
+
     for (LCIter<size_t> jt = it->cbegin(); jt != it->cend(); ++jt)
     {
-      std::cout << *jt << " ";
+      if (!first)
+      {
+        std::cout << " ";
+      }
+
+      std::cout << *jt;
+      first = false;
     }
+
     std::cout << "\n";
   }
 }
-
 void print_sums(const List<size_t>& sums)
 {
+  bool first = true;
+
   for (LCIter<size_t> it = sums.cbegin(); it != sums.cend(); ++it)
   {
-    std::cout << *it << " ";
+    if (!first)
+    {
+      std::cout << " ";
+    }
+
+    std::cout << *it;
+    first = false;
   }
+
   std::cout << "\n";
 }

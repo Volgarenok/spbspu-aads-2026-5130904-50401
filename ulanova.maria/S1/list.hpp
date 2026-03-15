@@ -39,6 +39,10 @@ public:
   {
     return node != other.node;
   }
+  bool operator==(const LIter& other) const noexcept
+  {
+    return node == other.node;
+  }
   T* operator->() noexcept
   {
     return &(node->data);
@@ -75,6 +79,10 @@ public:
   {
     return node != other.node;
   }
+  bool operator==(const LCIter& other) const noexcept
+  {
+    return node == other.node;
+  }
   const T* operator->() const noexcept
   {
     return &(node->data);
@@ -92,6 +100,7 @@ public:
   List(const List& other);
 
   void push_front(const T& value) noexcept;
+  void push_back(const T& value) noexcept;
   void pop_front() noexcept;
 
   LIter<T> insert_after(LIter<T> pos, const T& value) noexcept;
@@ -115,7 +124,7 @@ List<T>::List(const List& other) : head(nullptr)
 {
   for (LCIter<T> it = other.cbegin(); it != other.cend(); ++it)
   {
-    push_front(*it);
+    push_back(*it);
   }
 }
 
@@ -139,7 +148,24 @@ void List<T>::push_front(const T& value) noexcept
   last -> next = new_node;
   head = new_node;
 }
-
+template <class T>
+void List<T>::push_back(const T& value) noexcept
+{
+  Node<T>* new_node = new Node<T>{value,nullptr};
+  if(!head)
+  {
+    head = new_node;
+    head->next = head;
+    return;
+  }
+  Node<T>* last = head;
+  while (last ->next != head)
+  {
+    last = last -> next;
+  }
+  last -> next = new_node;
+  new_node -> next = head;
+}
 template <class T>
 void List<T>::pop_front() noexcept
 {
