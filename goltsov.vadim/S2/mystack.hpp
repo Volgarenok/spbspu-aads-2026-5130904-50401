@@ -19,8 +19,9 @@ namespace goltsov
 
     void push(const T& rhs);
     void push(T&& rhs);
-    T drop();
-    T front() const;
+    void drop();
+    T& front();
+    const T& front() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
   };
@@ -70,19 +71,26 @@ namespace goltsov
     size_ += 1;
   }
   template< typename T >
-  T Stack< T >::drop()
+  void Stack< T >::drop()
   {
     if (empty())
     {
       throw std::runtime_error("Stack is empty");
     }
-    T a = std::move(* dates_.begin());
     dates_.pop_start();
     size_--;
-    return a;
   }
   template< typename T >
-  T Stack< T >::front() const
+  T& Stack< T >::front()
+  {
+    if (empty())
+    {
+      throw std::runtime_error("Stack is empty");
+    }
+    return (* dates_.begin());
+  }
+  template< typename T >
+  const T& Stack< T >::front() const
   {
     if (empty())
     {
