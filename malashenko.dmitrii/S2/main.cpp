@@ -38,6 +38,7 @@ int main(int argc, char ** argv)
 
   if (infixAllData.empty())
   {
+    std::cout << '\n';
     return 0;
   }
   List< std::string > out;
