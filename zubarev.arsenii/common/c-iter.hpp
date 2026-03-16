@@ -25,7 +25,7 @@ namespace zubarev
   };
 
   template < class T >
-  LCIter< T >::LCIter(const Node< T >* p) :
+  LCIter< T >::LCIter(const Node< T >* p):
     ptr(p)
   {}
 

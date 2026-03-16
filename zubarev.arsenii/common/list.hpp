@@ -1,7 +1,8 @@
 #ifndef LIST_HPP
 #define LIST_HPP
-#include "iter.hpp"
 #include "c-iter.hpp"
+#include "iter.hpp"
+#include <utility>
 namespace zubarev
 {
   template < class T >
@@ -10,7 +11,7 @@ namespace zubarev
     T val;
     Node* next;
 
-    Node(const T& v, Node* n = nullptr) :
+    Node(const T& v, Node* n = nullptr):
       val(v),
       next(n) {};
   };
@@ -21,7 +22,8 @@ namespace zubarev
 
   private:
     Node< T >* head_;
-    Node< T>* tail_;
+    Node< T >* tail_;
+
     Node< T >* ctFake()
     {
       Node< T >* el = new Node< T >{T(), nullptr};
@@ -43,19 +45,23 @@ namespace zubarev
     LIter< T > begin();
     LIter< T > before_begin();
     LIter< T > end();
+    LIter< T > back();
 
     LCIter< T > begin() const;
     LCIter< T > before_begin() const;
     LCIter< T > end() const;
+    LCIter< T > back() const;
 
     LCIter< T > cbegin() const;
     LCIter< T > cbefore_begin() const;
     LCIter< T > cend() const;
+    LCIter< T > cback() const;
 
     void clear();
     bool empty() const;
     void pop_front();
     void push_front(const T&);
+    void push_back(const T&);
     void insert_after(LIter< T >, const T&);
     void erase_after(LIter< T >);
   };
@@ -72,7 +78,9 @@ namespace zubarev
   List< T >::~List()
   {
     clear();
-    rmFake();
+    if (head_) {
+      rmFake();
+    }
   }
 
   template < class T >
@@ -84,8 +92,8 @@ namespace zubarev
     }
     head_ = ctFake();
     tail_ = head_;
-
-    Node< T >* tmp = head_;
+    List< T > tempList;
+    Node< T >* tmp = tempList.head_;
 
     Node< T >* curOld = other.head_->next;
     while (curOld != nullptr) {
@@ -93,17 +101,16 @@ namespace zubarev
       tmp = tmp->next;
       curOld = curOld->next;
     }
-    tmp->next = nullptr;
-    tail_=tmp;
+    std::swap(head_, tempList.head_);
+    tail_ = tmp;
   }
 
   template < class T >
-  List< T >::List(List< T >&& other) noexcept :
-    head_(other.head_),
-    tail_(other.tail_)
+  List< T >::List(List< T >&& other) noexcept:
+    head_(other.head_) tail_(other.tail_)
   {
-    other.head_ = ctFake();
-    other.tail_=other.head_;
+    other.head_ = nullptr;
+    other.tail_ = other.head_;
   }
   template < class T >
   List< T >& List< T >::operator=(const List& other)
@@ -112,7 +119,8 @@ namespace zubarev
       return *this;
     }
     clear();
-    Node< T >* tmp = head_;
+    List< T > tempList;
+    Node< T >* tmp = tempList.head_;
 
     Node< T >* curOld = other.head_->next;
     while (curOld != nullptr) {
@@ -120,8 +128,9 @@ namespace zubarev
       tmp = tmp->next;
       curOld = curOld->next;
     }
-    tmp->next = nullptr;
-    tail_=tmp;
+
+    std::swap(head_, tempList.head_);
+    tail_ = tmp;
     return *this;
   }
 
@@ -132,22 +141,29 @@ namespace zubarev
       return *this;
     }
     clear();
-    rmFake();
+    if (head_) {
+      rmFake();
+    }
     head_ = other.head_;
     tail_ = other.tail_;
-    tail_=
-    other.head_ = ctFake();
-    other.tail_=other.head_;
+    other.head_ = nullptr;
+
     return *this;
   }
   template < class T >
   LIter< T > List< T >::before_begin()
   {
+    if (!head_) {
+      return end();
+    }
     return LIter< T >(head_);
   }
   template < class T >
   LIter< T > List< T >::begin()
   {
+    if (!head_) {
+      return end();
+    }
     return LIter< T >(head_->next);
   }
 
@@ -155,6 +171,11 @@ namespace zubarev
   LIter< T > List< T >::end()
   {
     return LIter< T >(nullptr);
+  }
+  template < class T >
+  LIter< T > List< T >::back()
+  {
+    return Liter< T >(tail_);
   }
 
   template < class T >
@@ -173,6 +194,11 @@ namespace zubarev
   {
     return LCIter< T >(nullptr);
   }
+  template < class T >
+  LCIter< T > List< T >::back() const
+  {
+    return LCiter< T >(tail_);
+  }
 
   template < class T >
   LCIter< T > List< T >::cbefore_begin() const
@@ -190,10 +216,18 @@ namespace zubarev
   {
     return end();
   }
+  template < class T >
+  LCIter< T > List< T >::cback() const
+  {
+    return back();
+  }
 
   template < class T >
   void List< T >::clear()
   {
+    if (!head_) {
+      return;
+    }
     Node< T >* cur = begin().ptr;
     while (cur != end().ptr) {
       Node< T >* curNext = cur->next;
@@ -202,46 +236,83 @@ namespace zubarev
     }
 
     head_->next = nullptr;
-    tail_=head_;
+    tail_ = head_;
   }
 
   template < class T >
   bool List< T >::empty() const
   {
+    if (!head_) {
+      return true;
+    }
     return head_->next == nullptr;
   }
 
   template < class T >
   void List< T >::push_front(const T& val)
   {
-    head_->next = new Node< T >(val, head_->next);
+    if (!head_) {
+      head_ = ctFake();
+      tail_ = head_;
+    }
+    Node< T >* newNode = new Node< T >(val, head_->next);
+    head_->next = newNode;
+    if (tail_ == head_) {
+      tail_ = newNode;
+    }
+  }
+
+  template < class T >
+  void List< T >::push_back(const T& val)
+  {
+    Node< T >* newNode = new Node< T >{val, nullptr};
+    if (!head_) {
+      head_ = ctFake();
+      tail_ = head_;
+    }
+    tail_->next = newNode;
+    tail_ = newNode;
   }
 
   template < class T >
   void List< T >::pop_front()
   {
-    if (empty()) {
+    if (empty() || !head_) {
       return;
     }
     Node< T >* toDel = head_->next;
     head_->next = toDel->next;
+    if (tail_ == toDel) {
+      tail_ = head_;
+    }
     delete toDel;
   }
 
   template < class T >
   void List< T >::insert_after(LIter< T > it, const T& val)
   {
+    if (!it.ptr) {
+      return;
+    }
     Node< T >* itNext = it.ptr->next;
     it.ptr->next = new Node< T >(val, itNext);
+    if (it.ptr == tail_) {
+      tail_ = it.ptr->next;
+    }
   }
 
   template < class T >
   void List< T >::erase_after(LIter< T > it)
   {
+    if (!it.ptr || !it.ptr->next) {
+      return;
+    }
     Node< T >* itNext = it.ptr->next;
+    if (tail_ == itNext) {
+      tail_ = it.ptr;
+    }
     it.ptr->next = itNext->next;
     delete itNext;
   }
 }
-
 #endif
