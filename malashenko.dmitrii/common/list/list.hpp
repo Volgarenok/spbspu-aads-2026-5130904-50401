@@ -90,7 +90,10 @@ namespace malashenko {
   List< T >::List(List< T >&& other):
     fake_(std::move(other.fake_)),
     s_(std::move(other.s_))
-  {}
+  {
+    other.fake_ = nullptr;
+    other.s_ = 0;
+  }
 
   template< class T >
   List< T >& List< T >::operator=(List< T >&& other)
@@ -102,6 +105,8 @@ namespace malashenko {
 
     fake_ = std::move(other.fake_);
     s_ = std::move(other.s_);
+    other.fake_ = nullptr;
+    other.s_ = 0;
     return *this;
   }
 

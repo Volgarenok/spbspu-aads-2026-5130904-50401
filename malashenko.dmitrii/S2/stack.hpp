@@ -23,7 +23,7 @@ namespace malashenko
     void swap(Stack& other);
     void clear();
 
-    ~Stack();
+    ~Stack() = default;
   private:
     List< T > list_;
   };
@@ -101,12 +101,6 @@ namespace malashenko
 
   template< class T >
   void Stack< T >::clear()
-  {
-    list_.clear();
-  }
-
-  template< class T >
-  Stack< T >::~Stack()
   {
     list_.clear();
   }

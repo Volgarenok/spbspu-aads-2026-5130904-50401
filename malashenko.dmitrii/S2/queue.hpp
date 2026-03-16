@@ -26,7 +26,7 @@ namespace malashenko
     void swap(Queue< T >& other);
     void clear();
 
-    ~Queue();
+    ~Queue() = default;
   private:
     List< T > list_;
   };
@@ -113,13 +113,6 @@ namespace malashenko
   {
     list_.clear();
   }
-
-  template< class T >
-  Queue< T >::~Queue()
-  {
-    list_.clear();
-  }
-
 }
 
 #endif
