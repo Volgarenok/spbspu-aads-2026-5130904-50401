@@ -304,7 +304,7 @@ namespace goltsov
   template< class T >
   void List< T >::pop_start() noexcept
   {
-    if (begin() != LIter< int > (nullptr))
+    if (begin() != LIter< T > (nullptr))
     {
       Node< T >* n = fake->next->next;
       delete fake->next;
