@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(TestConstIterator)
   const petrov::List< int > & const_list = list;
 
   petrov::List< int >::ConstIterator i = const_list.begin();
-  
+
   BOOST_CHECK_EQUAL(*i, 1);
 }
 
