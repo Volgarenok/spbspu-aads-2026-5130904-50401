@@ -1,7 +1,7 @@
 #include "all.hpp"
-#include <string>
 #include <iostream>
 #include <limits>
+#include <string>
 
 namespace zubarev
 {
