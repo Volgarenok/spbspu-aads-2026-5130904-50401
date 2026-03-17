@@ -46,7 +46,7 @@ goltsov::Queue< std::string > converToPostfix(goltsov::Queue< std::string > a)
     }
     else if (a.front() == "(")
     {
-      if (prev != " " && !isdigit(prev[0]))
+      if (prev != " " && (isdigit(prev[0]) || prev == ")"))
       {
         throw std::logic_error("Bad input expression");
       }
@@ -71,7 +71,7 @@ goltsov::Queue< std::string > converToPostfix(goltsov::Queue< std::string > a)
     }
     else
     {
-      if (prev != " " && !isdigit(prev[0]))
+      if (prev != " " && !isdigit(prev[0]) && prev != ")")
       {
         throw std::logic_error("Bad input expression");
       }
@@ -111,40 +111,67 @@ long long int convertStringToLLI(std::string a)
 
 long long int eval(goltsov::Queue< std::string > postfix)
 {
-  long long int res = convertStringToLLI(postfix.front());
-  postfix.drop();
+  goltsov::Stack< long long int > result;
   while (!postfix.empty())
   {
-    long long int operand = convertStringToLLI(postfix.front());
+    long long int a, b;
+    std::string operation;
+    std::string op1 = postfix.front();
     postfix.drop();
-    std::string operation = postfix.front();
-    postfix.drop();
+    if (!isdigit(op1[0]))
+    {
+      a = result.front();
+      result.drop();
+      b = result.front();
+      result.drop();
+      operation = op1;
+    }
+    else
+    {
+      std::string op2 = postfix.front();
+      postfix.drop();
+      if (!isdigit(op2[0]))
+      {
+        a = convertStringToLLI(op2);
+        b = result.front();
+        result.drop();
+        operation = op2;
+      }
+      else
+      {
+        std::string op3 = postfix.front();
+        postfix.drop();
+        a = convertStringToLLI(op1);
+        b = convertStringToLLI(op2);
+        operation = op3;
+      }
+    }
     if (operation == "+")
     {
-      res = goltsov::addition(res, operand);
+      result.push(goltsov::addition(a, b));
     }
     else if (operation == "-")
     {
-      res = goltsov::subtraction(res, operand);
+      result.push(goltsov::subtraction(a, b));
     }
     else if (operation == "*")
     {
-      res = goltsov::multiplication(res, operand);
+      result.push(goltsov::multiplication(a, b));
     }
     else if (operation == "/")
     {
-      res = goltsov::division(res, operand);
+      result.push(goltsov::division(a, b));
     }
     else if (operation == "%")
     {
-      res = goltsov::remOfDiv(res, operand);
+      result.push(goltsov::remOfDiv(a, b));
     }
     else if (operation == "##")
     {
-      res = goltsov::concatenation(res, operand);
+      result.push(goltsov::concatenation(a, b));
     }
   }
-  return res;
+  return result.front();
 }
 
 goltsov::Queue< std::string > getLine(std::istream& input)
@@ -181,4 +208,5 @@ int main(int argc, char** argv)
     input_file.open(argv[1]);
     input = & input_file;
   }
+  std::cout << eval(converToPostfix(getLine(* input)));
 }
