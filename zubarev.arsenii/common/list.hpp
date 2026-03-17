@@ -107,7 +107,8 @@ namespace zubarev
 
   template < class T >
   List< T >::List(List< T >&& other) noexcept:
-    head_(other.head_) tail_(other.tail_)
+    head_(other.head_),
+    tail_(other.tail_)
   {
     other.head_ = nullptr;
     other.tail_ = other.head_;
@@ -175,7 +176,7 @@ namespace zubarev
   template < class T >
   LIter< T > List< T >::back()
   {
-    return Liter< T >(tail_);
+    return LIter< T >(tail_);
   }
 
   template < class T >
@@ -197,7 +198,7 @@ namespace zubarev
   template < class T >
   LCIter< T > List< T >::back() const
   {
-    return LCiter< T >(tail_);
+    return LCIter< T >(tail_);
   }
 
   template < class T >
