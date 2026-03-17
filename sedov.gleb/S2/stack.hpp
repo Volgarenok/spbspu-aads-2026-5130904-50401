@@ -1,50 +1,45 @@
-#ifndef QUEUE_HPP
-#define QUEUE_HPP
+#ifndef STACK_HPP
+#define STACK_HPP
 #include <S1/list.hpp>
 
 namespace sedov
 {
   template< class T >
-  class Queue
+  class Stack
   {
   public:
-    Queue():
+    Stack():
       list_()
     {}
 
-    Queue(const Queue< T > & q):
-      list_(q.list_)
+    Stack(const Stack & s):
+      list_(s.list_)
     {}
 
-    Queue(Queue< T > && q):
-      list_(std::move(q.list_))
+    Stack(Stack< T > && s):
+      list_(std::move(s.list_))
     {}
 
-    ~Queue() = default;
+    ~Stack() = default;
 
-    Queue & operator=(const Queue< T > & q)
+    Stack & operator=(const Stack< T > & s)
     {
-      Queue< T > temp(q);
+      Stack< T > temp(s);
       swap(temp);
       return *this;
     }
 
-    Queue & operator=(Queue< T > && q)
+    Stack 7 operator=(Stack< T > && s)
     {
-      if (this == &q)
+      if (this == &s)
       {
         return *this;
       }
-      list_ = std::move(q.list_);
+      list_ = std::move(s.list_);
       return *this;
     }
 
-    T & front() const
-    {
-      return list_.front();
-    }
-
-    T & back() const
+    T & top() const
     {
       return list_.back();
     }
@@ -59,19 +54,19 @@ namespace sedov
       return list_.size();
     }
 
-    void push(const T& v)
+    void push(const T & v)
     {
       list_.pushBack(v);
     }
 
     void pop()
     {
-      list_.popFront();
+      list_.popBack();
     }
 
-    void swap(Queue< T > & q)
+    void swap(Stack & s)
     {
-      list_.swap(q.list_);
+      list_.swap(s.list_);
     }
 
     void clear()
@@ -82,4 +77,5 @@ namespace sedov
     List< T > list_;
   };
 }
+
 #endif
