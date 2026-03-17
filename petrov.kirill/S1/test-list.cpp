@@ -45,4 +45,40 @@ BOOST_AUTO_TEST_CASE(TestClear)
   BOOST_CHECK_EQUAL(list.getSize(), 0);
   BOOST_CHECK(list.begin() == list.end());
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(ListIteratorTests)
+
+BOOST_AUTO_TEST_CASE(TestIncrement)
+{
+  petrov::List< int > list;
+  list.pushBack(1);
+  list.pushBack(2);
+
+  petrov::List< int >::Iterator i = list.begin();
+
+  BOOST_REQUIRE(i != list.end());
+  BOOST_CHECK_EQUAL(*i, 1);
+
+  ++i;
+  BOOST_REQUIRE(i != list.end());
+  BOOST_CHECK_EQUAL(*i, 2);
+
+  ++i;
+  BOOST_CHECK(i == list.end());
+}
+
+BOOST_AUTO_TEST_CASE(TestConstIterator)
+{
+  petrov::List< int > list;
+  list.pushBack(1);
+
+  const petrov::List< int > & const_list = list;
+
+  petrov::List< int >::ConstIterator i = const_list.begin();
+  
+  BOOST_CHECK_EQUAL(*i, 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
