@@ -29,7 +29,7 @@ namespace goltsov
     {
       input.get();
     }
-
+    
     return inf;
   }
 }
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
     }
     try
     {
-      auto infix = goltsov::getLine(*input);
+      goltsov::Queue< std::string > infix = goltsov::getLine(* input);
       if (infix.empty())
       {
         continue;
@@ -71,11 +71,14 @@ int main(int argc, char** argv)
       return 1;
     }
   }
-  while (result.size() > 1)
+  if (!result.empty())
   {
-    std::cout << result.front() << ' ';
+    while (result.size() > 1)
+    {
+      std::cout << result.front() << ' ';
+      result.drop();
+    }
+    std::cout << result.front() << '\n';
     result.drop();
   }
-  std::cout << result.front() << '\n';
-  result.drop();
 }

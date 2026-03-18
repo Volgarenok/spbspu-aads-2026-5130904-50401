@@ -77,14 +77,14 @@ namespace goltsov
         {
           throw std::logic_error("Bad input expression");
         }
-        if (op_and_br.empty() || priority(a.front()) >= priority(op_and_br.front()))
+        if (op_and_br.empty() || priority(a.front()) > priority(op_and_br.front()))
         {
           op_and_br.push(a.front());
         }
         else
         {
           while (!op_and_br.empty()
-            && priority(a.front()) <= priority(op_and_br.front()) && op_and_br.front() != "(")
+            && (priority(a.front()) <= priority(op_and_br.front())) && op_and_br.front() != "(")
           {
             postfix.push(op_and_br.front());
             op_and_br.drop();
@@ -100,6 +100,7 @@ namespace goltsov
       postfix.push(op_and_br.front());
       op_and_br.drop();
     }
+
     return postfix;
   }
 
@@ -120,13 +121,27 @@ namespace goltsov
     {
       long long int a, b;
       std::string operation;
-      while (isdigit(postfix.front()[0]))
+      while (!postfix.empty() && isdigit(postfix.front()[0]))
       {
         result.push(convertStringToLLI(postfix.front()));
         postfix.drop();
       }
-      operation = postfix.front();
-      postfix.drop();
+      try
+      {
+        operation = postfix.front();
+        postfix.drop();
+      }
+      catch (...)
+      {
+        if (result.size() != 1)
+        {
+          throw;
+        }
+        else
+        {
+          return result.front();
+        }
+      }
       a = result.front();
       result.drop();
       b = result.front();

@@ -49,6 +49,10 @@ namespace goltsov
   }
   lli remOfDiv(lli a, lli b)
   {
+    if (a % b < 0)
+    {
+      return a % b + b;
+    }
     return a % b;
   }
   lli concatenation(lli a, lli b)
