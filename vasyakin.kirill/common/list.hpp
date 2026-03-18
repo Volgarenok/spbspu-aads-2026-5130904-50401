@@ -264,5 +264,4 @@ namespace vasyakin
     return fake_node->next;
   }
 }
-
 #endif
