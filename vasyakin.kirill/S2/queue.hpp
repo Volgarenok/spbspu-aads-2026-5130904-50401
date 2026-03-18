@@ -3,6 +3,7 @@
 #include <list.hpp>
 #include <cstddef>
 #include <cctype>
+#include <stdexcept>
 
 namespace vasyakin
 {

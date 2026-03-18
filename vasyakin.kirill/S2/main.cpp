@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     }
     input = &file;
   }
-  Stack< long long > results;
+  vasyakin::Stack< long long > results;
   std::string line;
 
   try
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
         continue;
       }
 
-      long long res = evaluateExpression(line);
+      long long res = vasyakin::evaluateExpression(line);
       results.push(res);
     }
   }

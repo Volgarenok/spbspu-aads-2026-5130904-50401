@@ -6,9 +6,6 @@
 #include <string>
 #include <cmath>
 
-const long long MAX = std::numeric_limits< long long >::max();
-const long long MIN = std::numeric_limits< long long >::min();
-
 bool vasyakin::isNumber(const std::string& s)
 {
   if (s.empty())
@@ -80,7 +77,7 @@ int vasyakin::getPrecedence(const std::string& op)
   return 0;
 }
 
-long long gcd(long long a, long long b)
+long long vasyakin::gcd(long long a, long long b)
 {
   a = std::abs(a);
   b = std::abs(b);
@@ -93,7 +90,7 @@ long long gcd(long long a, long long b)
   return a;
 }
 
-long long lcm(long long a, long long b)
+long long vasyakin::lcm(long long a, long long b)
 {
   if (a == 0 || b == 0)
   {
@@ -110,7 +107,7 @@ long long lcm(long long a, long long b)
   return (abs_a / g) * abs_b;
 }
 
-long long sum(long long a, long long b)
+long long vasyakin::sum(long long a, long long b)
 {
   if (b > 0 && a > vasyakin::MAX - b)
   {
@@ -123,7 +120,7 @@ long long sum(long long a, long long b)
   return a + b;
 }
 
-long long subtract(long long a, long long b)
+long long vasyakin::subtract(long long a, long long b)
 {
   if (b > 0 && a < vasyakin::MIN + b)
   {
@@ -136,7 +133,7 @@ long long subtract(long long a, long long b)
   return a - b;
 }
 
-long long multiply(long long a, long long b)
+long long vasyakin::multiply(long long a, long long b)
 {
   if (a == 0 || b == 0)
   {
@@ -168,7 +165,7 @@ long long multiply(long long a, long long b)
   return a * b;
 }
 
-long long divide(long long a, long long b)
+long long vasyakin::divide(long long a, long long b)
 {
   if (b == 0)
   {
@@ -182,7 +179,7 @@ long long divide(long long a, long long b)
   return a / b;
 }
 
-long long mod(long long a, long long b)
+long long vasyakin::mod(long long a, long long b)
 {
   if (b == 0)
   {
@@ -198,35 +195,35 @@ long long vasyakin::calculate(long long a, long long b, const std::string& op)
 {
   if (op == "+")
   {
-    return sum(a, b);
+    return vasyakin::sum(a, b);
   }
   if (op == "-")
   {
-    return subtract(a, b);
+    return vasyakin::subtract(a, b);
   }
   if (op == "*")
   {
-    return multiply(a, b);
+    return vasyakin::multiply(a, b);
   }
   if (op == "/")
   {
-    return divide(a, b);
+    return vasyakin::divide(a, b);
   }
   if (op == "%")
   {
-    return mod(a, b);
+    return vasyakin::mod(a, b);
   }
   if (op == "lcm")
   {
-    return lcm(a, b);
+    return vasyakin::lcm(a, b);
   }
   throw std::runtime_error("Unknown operator: " + op);
 }
 
-Queue< std::string > infixToPostfix(const std::string& line)
+vasyakin::Queue< std::string > vasyakin::infixToPostfix(const std::string& line)
 {
-  Stack< std::string > opStack;
-  Queue< std::string > postfix;
+  vasyakin::Stack< std::string > opStack;
+  vasyakin::Queue< std::string > postfix;
 
   std::string token;
 
@@ -236,7 +233,7 @@ Queue< std::string > infixToPostfix(const std::string& line)
     {
       if (!token.empty())
       {
-        if (isNumber(token))
+        if (vasyakin::isNumber(token))
         {
           postfix.push(token);
         }
@@ -256,9 +253,9 @@ Queue< std::string > infixToPostfix(const std::string& line)
           }
           opStack.drop();
         }
-        else if (isOperator(token))
+        else if (vasyakin::isOperator(token))
         {
-          while (!opStack.empty() && opStack.peek() != "(" && getPrecedence(opStack.peek()) >= getPrecedence(token))
+          while (!opStack.empty() && opStack.peek() != "(" && vasyakin::getPrecedence(opStack.peek()) >= vasyakin::getPrecedence(token))
           {
             postfix.push(opStack.drop());
           }
@@ -279,7 +276,7 @@ Queue< std::string > infixToPostfix(const std::string& line)
 
   if (!token.empty())
   {
-    if (isNumber(token))
+    if (vasyakin::isNumber(token))
     {
       postfix.push(token);
     }
@@ -299,9 +296,9 @@ Queue< std::string > infixToPostfix(const std::string& line)
       }
       opStack.drop();
     }
-    else if (isOperator(token))
+    else if (vasyakin::isOperator(token))
     {
-      while (!opStack.empty() && opStack.peek() != "(" && getPrecedence(opStack.peek()) >= getPrecedence(token))
+      while (!opStack.empty() && opStack.peek() != "(" && vasyakin::getPrecedence(opStack.peek()) >= vasyakin::getPrecedence(token))
       {
         postfix.push(opStack.drop());
       }
@@ -324,19 +321,19 @@ Queue< std::string > infixToPostfix(const std::string& line)
   return postfix;
 }
 
-long long evaluatePostfix(Queue< std::string >& postfix)
+long long vasyakin::evaluatePostfix(vasyakin::Queue< std::string >& postfix)
 {
-  Stack< long long > temp;
+  vasyakin::Stack< long long > temp;
 
   while (!postfix.empty())
   {
     std::string token = postfix.drop();
 
-    if (isNumber(token))
+    if (vasyakin::isNumber(token))
     {
       temp.push(std::stoll(token));
     }
-    else if (isOperator(token))
+    else if (vasyakin::isOperator(token))
     {
       if (temp.size() < 2)
       {
@@ -345,7 +342,7 @@ long long evaluatePostfix(Queue< std::string >& postfix)
 
       long long b = temp.drop();
       long long a = temp.drop();
-      long long res = calculate(a, b, token);
+      long long res = vasyakin::calculate(a, b, token);
       temp.push(res);
     }
     else
@@ -362,8 +359,8 @@ long long evaluatePostfix(Queue< std::string >& postfix)
   return temp.drop();
 }
 
-long long evaluateExpression(const std::string& line)
+long long vasyakin::evaluateExpression(const std::string& line)
 {
-  Queue< std::string > postfix = infixToPostfix(line);
-  return evaluatePostfix(postfix);
+  vasyakin::Queue< std::string > postfix = vasyakin::infixToPostfix(line);
+  return vasyakin::evaluatePostfix(postfix);
 }

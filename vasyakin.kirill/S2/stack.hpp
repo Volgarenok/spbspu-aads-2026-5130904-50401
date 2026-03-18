@@ -2,6 +2,7 @@
 #define STACK_HPP
 #include <list.hpp>
 #include <cstddef>
+#include <stdexcept>
 
 namespace vasyakin
 {
