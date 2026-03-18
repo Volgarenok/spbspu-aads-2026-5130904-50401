@@ -58,11 +58,6 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  if (results.empty())
-  {
-    return 0;
-  }
-
   bool first = true;
   while (!results.empty())
   {
