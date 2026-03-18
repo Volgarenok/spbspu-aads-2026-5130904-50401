@@ -25,11 +25,22 @@ namespace goltsov
   }
   lli multiplication(lli a, lli b)
   {
-    if ((a > 0 && b > 0 || a < 0 && b < 0) && a > MAX_LLI / b
-      || (a < 0 && b > 0 || a > 0 && b < 0) && a < MIN_LLI / b)
+    if (b > 0 && a > MAX_LLI / b)
     {
       throw std::overflow_error("Overflow multiplication");
     }
+    if (b < 0 && a < MAX_LLI / b)
+    {
+      throw std::overflow_error("Overflow multiplication");
+    }
+    if (a > 0 && b < 0 && b < MIN_LLI / a)
+    {
+      throw std::overflow_error("Overflow multiplication");
+    }
+    if (a < 0 && b > 0 && a < MIN_LLI / b)
+    {
+      throw std::overflow_error("Overflow multiplication");
+    }  
     return a * b;
   }
   lli division(lli a, lli b)
