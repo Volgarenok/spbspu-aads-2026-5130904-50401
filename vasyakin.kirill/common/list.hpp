@@ -7,7 +7,8 @@
 
 namespace vasyakin
 {
-
+  const long long MAX = std::numeric_limits< long long >::max();
+  
   template< class T >
   class List
   {

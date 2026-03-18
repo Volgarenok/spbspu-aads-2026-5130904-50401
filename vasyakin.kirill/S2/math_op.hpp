@@ -19,7 +19,6 @@ namespace vasyakin
   Queue< std::string > infixToPostfix(const std::string& line);
   long long evaluatePostfix(Queue< std::string >& postfix);
   long long evaluateExpression(const std::string& line);
-  const long long MAX = std::numeric_limits< long long >::max();
   const long long MIN = std::numeric_limits< long long >::min();
 }
 
