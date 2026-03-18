@@ -9,7 +9,7 @@ namespace goltsov
   lli MIN_LLI = std::numeric_limits< lli >::min();
   lli addition(lli a, lli b)
   {
-    if (a > 0 && b > 0 && a > MAX_LLI - b || a < 0 && b < 0 && a < MIN_LLI - b)
+    if ((a > 0 && b > 0 && a > MAX_LLI - b) || (a < 0 && b < 0 && a < MIN_LLI - b))
     {
       throw std::overflow_error("Overflow addition");
     }
@@ -17,7 +17,7 @@ namespace goltsov
   }
   lli subtraction(lli a, lli b)
   {
-    if (a < 0 && b > 0 && a < MIN_LLI + b || a > 0 && b < 0 && a > MAX_LLI + b)
+    if ((a < 0 && b > 0 && a < MIN_LLI + b) || (a > 0 && b < 0 && a > MAX_LLI + b))
     {
       throw std::overflow_error("Overflow subtraction");
     }
@@ -60,7 +60,7 @@ namespace goltsov
     }
     catch(...)
     {
-      throw std::overflow_error("Overflow addition");
+      throw std::overflow_error("Overflow concatenation");
     }
     return res;
   }

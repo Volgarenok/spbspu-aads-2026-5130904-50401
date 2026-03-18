@@ -56,7 +56,7 @@ namespace goltsov
       }
       else if (a.front() == ")")
       {
-        if (prev != " " && !isdigit(prev[0]) || prev == "(")
+        if ((prev != " " && !isdigit(prev[0])) || prev == "(")
         {
           throw std::logic_error("Bad input expression");
         }
@@ -83,7 +83,8 @@ namespace goltsov
         }
         else
         {
-          while (!op_and_br.empty() && priority(a.front()) <= priority(op_and_br.front()) && op_and_br.front() != "(")
+          while (!op_and_br.empty()
+            && priority(a.front()) <= priority(op_and_br.front()) && op_and_br.front() != "(")
           {
             postfix.push(op_and_br.front());
             op_and_br.drop();
