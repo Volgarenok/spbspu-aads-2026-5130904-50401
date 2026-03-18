@@ -81,4 +81,8 @@ int main(int argc, char** argv)
     std::cout << result.front() << '\n';
     result.drop();
   }
+  else
+  {
+    std::cout << '\n';
+  }
 }
