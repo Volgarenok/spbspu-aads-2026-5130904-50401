@@ -5,7 +5,11 @@
 namespace zubarev
 {
   std::string input(std::istream& in, bool& error);
-  Queue<std::string> fromStrToQueue(std::string str);
+  Queue< std::string > fromStrToQueue(std::string str);
+  bool isdigit(const std::string& str);
+  size_t getPriority(const std::string& oper);
+  Queue< std::string > fromInfixToPostfix(Queue< std::string > infixQ);
+
 }
 
 #endif

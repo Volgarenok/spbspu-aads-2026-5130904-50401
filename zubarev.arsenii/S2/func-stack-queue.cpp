@@ -17,10 +17,9 @@ namespace zubarev
           str += ch;
         } else {
           error = true;
-            std::cerr << "input: incorrect input" << '\n';
-            return "";
+          std::cerr << "input: incorrect input" << '\n';
+          return "";
         }
-
       }
     }
     if (in.peek() == '\n') {
@@ -32,23 +31,43 @@ namespace zubarev
     } else {
       error = false;
     }
-
     return str;
   }
 
-  Queue<std::string> fromStrToQueue(std::string str)
+  Queue< std::string > fromStrToQueue(std::string str)
   {
-    Queue<std::string> infixQ;
-    size_t num=0;
-    while (num<str.size()) {
-      std::string container="";
-      while (std::isdigit(str[num])) {
-        container+=str[num];
+    Queue< std::string > infixQ;
+    size_t num = 0;
+    while (num < str.size()) {
+      if (std::isdigit(str[num])) {
+        std::string container = "";
+        while (num < str.size() && std::isdigit(str[num])) {
+          container += str[num];
+          num++;
+        }
+        infixQ.push(container);
+      } else if (str[num] == '#') {
+
+        std::string container = "";
+        if (num + 2 < str.size() && str[num + 1] == '#') {
+          container += 2 * str[num];
+          num += 2;
+          infixQ.push(container);
+        } else {
+          num++;
+        }
+
+      } else if (str[num] == '+' || str[num] == '-' || str[num] == '*' || str[num] == '/' || str[num] == '(' ||
+                 str[num] == ')') {
+        infixQ.push(std::string(1, str[num]));
         num++;
       }
-      infixQ.push(container);
-    }
 
+      else {
+
+        num++;
+      }
+    }
     return infixQ;
   }
   bool isdigit(const std::string& str)
@@ -65,24 +84,58 @@ namespace zubarev
 
     return true;
   }
-  Queue<char> fromInfixToPostfix(Queue<std::string> infixQ)
+  size_t getPriority(const std::string& oper)
   {
-    Stack<std::string> stack;
-    Queue<std::string> postfixQ;
-    bool isSign=false;
+
+    if (oper == "##") {
+      return 3;
+    }
+
+    if (oper == "*" || oper == "/" || oper == "%") {
+      return 2;
+    }
+
+    if (oper == "+" || oper == "-") {
+      return 1;
+    }
+    return 0;
+  }
+  Queue< std::string > fromInfixToPostfix(Queue< std::string > infixQ)
+  {
+    Stack< std::string > stack;
+    Queue< std::string > postfixQ;
+
     while (!infixQ.empty()) {
-      std::string el=infixQ.top();
+      std::string el = infixQ.top();
       if (isdigit(el)) {
         postfixQ.push(el);
       } else {
-        if (el!="(" && el != ")") {
-          isSign=true;
+        if (el != "(" && el != ")") {
+          while (!stack.empty() && getPriority(stack.top()) >= getPriority(el)) {
+            postfixQ.push(stack.top());
+            stack.drop();
+          }
+          stack.push(el);
+        } else {
+          if (el == ")") {
+            while (stack.top() != "(") {
+              postfixQ.push(stack.top());
+              stack.drop();
+            }
+            stack.drop();
+          } else {
+            stack.push(el);
+          }
         }
-        stack.push(el);
       }
 
       infixQ.drop();
     }
-    return
+
+    while (!stack.empty()) {
+      postfixQ.push(stack.top());
+      stack.drop();
+    }
+    return postfixQ;
   }
 }

@@ -1,4 +1,7 @@
+#ifndef QUEUE_HPP
+#define QUEUE_HPP
 #include "list.hpp"
+#include <iostream>
 #include <stdexcept>
 namespace zubarev
 {
@@ -17,6 +20,7 @@ namespace zubarev
     const T& last() const;
     bool empty() const;
     size_t size() const;
+    void print(std::ostream& out = std::cout) const;
   };
   template < class T >
   void Queue< T >::push(const T& rhs)
@@ -61,4 +65,16 @@ namespace zubarev
   {
     return size_;
   }
+  template < class T >
+  void Queue< T >::print(std::ostream& out) const
+  {
+    out << "Queue[ size = " << size_ << " ]: < ";
+
+    for (auto it = list_.begin(); it != list_.end(); ++it) {
+      out << *it << " ";
+    }
+    out << ">" << '\n';
+  }
 }
+
+#endif
