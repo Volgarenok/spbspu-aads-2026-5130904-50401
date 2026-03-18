@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "list.hpp"
+#include "../common/list.hpp"
 
 BOOST_AUTO_TEST_SUITE(ListTests)
 BOOST_AUTO_TEST_CASE(DefConstructTest)
