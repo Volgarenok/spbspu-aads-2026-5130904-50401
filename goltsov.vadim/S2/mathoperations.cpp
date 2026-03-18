@@ -40,7 +40,7 @@ namespace goltsov
     if (a < 0 && b > 0 && a < MIN_LLI / b)
     {
       throw std::overflow_error("Overflow multiplication");
-    }  
+    }
     return a * b;
   }
   lli division(lli a, lli b)
