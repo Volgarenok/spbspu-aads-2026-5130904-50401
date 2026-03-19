@@ -1,5 +1,6 @@
 #include "all.hpp"
 #include <iostream>
+#include <limits>
 namespace zubarev
 {
   using ll_int = long long int;
@@ -26,15 +27,15 @@ namespace zubarev
       in.get();
     }
 
-    if (str == "") {
-      error = true;
-    } else {
-      error = false;
-    }
+    // if (str == "") {
+    //   error = true;
+    // } else {
+    //   error = false;
+    // }
     return str;
   }
 
-  Queue< std::string > fromStrToQueue(std::string str)
+  Queue< std::string > fromStrToQueue(std::string& str)
   {
     Queue< std::string > infixQ;
     size_t num = 0;
@@ -50,7 +51,8 @@ namespace zubarev
 
         std::string container = "";
         if (num + 2 < str.size() && str[num + 1] == '#') {
-          container += 2 * str[num];
+          container += str[num];
+          container += str[num];
           num += 2;
           infixQ.push(container);
         } else {
@@ -100,7 +102,7 @@ namespace zubarev
     }
     return 0;
   }
-  Queue< std::string > fromInfixToPostfix(Queue< std::string > infixQ)
+  Queue< std::string > fromInfixToPostfix(Queue< std::string >& infixQ)
   {
     Stack< std::string > stack;
     Queue< std::string > postfixQ;
@@ -121,6 +123,10 @@ namespace zubarev
             while (stack.top() != "(") {
               postfixQ.push(stack.top());
               stack.drop();
+              if (stack.empty()) {
+                throw std::runtime_error("Unbalanced parentheses: missing '('");
+                ;
+              }
             }
             stack.drop();
           } else {
@@ -139,56 +145,133 @@ namespace zubarev
     return postfixQ;
   }
 
-  ll_int summation(size_t oper1, size_t oper2)
+  ll_int summation(ll_int oper1, ll_int oper2)
   {
+    if (oper2 > 0 && oper1 > std::numeric_limits< ll_int >::max() - oper2) {
+      throw std::overflow_error("Addition overflow: positive");
+    }
+    if (oper2 < 0 && oper1 < std::numeric_limits< ll_int >::min() - oper2) {
+      throw std::overflow_error("Addition overflow: negative");
+    }
     return oper1 + oper2;
   }
-  ll_int subtraction(size_t oper1, size_t oper2)
+  ll_int subtraction(ll_int oper1, ll_int oper2)
   {
-    return oper1 - oper2;
+    if (oper1 > std::numeric_limits< ll_int >::min() + oper2) {
+      return oper1 - oper2;
+    } else {
+      throw std::overflow_error("Subtraction overflow");
+      ;
+    }
   }
-  ll_int multiplication(size_t oper1, size_t oper2)
+  ll_int multiplication(ll_int oper1, ll_int oper2)
   {
+    if (oper1 == 0 || oper2 == 0) {
+      return 0;
+    }
+
+    if (oper1 == std::numeric_limits< ll_int >::min() && oper2 == -1) {
+      throw std::overflow_error("Multiplication overflow: MIN * -1");
+    }
+    if (oper2 == std::numeric_limits< ll_int >::min() && oper1 == -1) {
+      throw std::overflow_error("Multiplication overflow: MIN * -1");
+    }
+
+    if (oper1 > 0) {
+      if (oper2 > 0) {
+
+        if (oper1 > std::numeric_limits< ll_int >::max() / oper2) {
+          throw std::overflow_error("Multiplication overflow: (+)*(+)");
+        }
+      } else {
+
+        if (oper2 < std::numeric_limits< ll_int >::min() / oper1) {
+          throw std::overflow_error("Multiplication overflow: (+)*(-)");
+        }
+      }
+    } else {
+      if (oper2 > 0) {
+        if (oper1 < std::numeric_limits< ll_int >::min() / oper2) {
+          throw std::overflow_error("Multiplication overflow: (-)*(+)");
+        }
+      } else {
+        if (oper1 != 0 && oper2 < std::numeric_limits< ll_int >::max() / oper1) {
+          throw std::overflow_error("Multiplication overflow: (-)*(-)");
+        }
+      }
+    }
+
     return oper1 * oper2;
   }
-  ll_int division(size_t oper1, size_t oper2)
+  ll_int division(ll_int oper1, ll_int oper2)
   {
+    if (oper2 == 0) {
+      throw std::runtime_error("Division by zero");
+    }
+    if (oper1 == std::numeric_limits< ll_int >::min() && oper2 == -1) {
+      throw std::overflow_error("Division overflow: MIN / -1");
+    }
     return oper1 / oper2;
   }
-  ll_int remainder(size_t oper1, size_t oper2)
+  ll_int remainder(ll_int oper1, ll_int oper2)
   {
-    return oper1 % oper2;
+    if (oper2 != 0) {
+      return oper1 % oper2;
+    } else {
+      throw std::runtime_error("Modulo by zero");
+      ;
+    }
   }
-  ll_int concatenation(size_t oper1, size_t oper2)
+  ll_int concatenation(ll_int oper1, ll_int oper2)
   {
-    return oper1 + oper2;
+    ll_int res;
+    if (oper2 < 0) {
+      oper2 = -1 * oper2;
+    }
+    res = multiplication(oper1, pow(10, ceil(log10(oper2))));
+
+    res = summation(res, oper2);
+    return res;
   }
-  size_t fromStrToNum(std::string str)
+
+  ll_int fromStrToNum(std::string str)
   {
-    size_t num = 0;
+    ll_int num = 0;
     for (size_t i = 0; i < str.size(); ++i) {
-      num = num * 10 + (str[i] - '0');
+      ll_int digit = (str[i] - '0');
+      if (num < (std::numeric_limits< ll_int >::max() - digit) / 10) {
+        num = num * 10 + digit;
+      } else {
+        throw std::overflow_error("Number parsing overflow");
+        ;
+      }
     }
     return num;
   }
-  ll_int evil(Queue< std::string > postfixQ)
+  ll_int eval(Queue< std::string >& postfixQ)
   {
     const std::string symbols[] = {"+", "-", "*", "/", "%", "##"};
 
-    ll_int (*functions[])(size_t,
-                          size_t) = {summation, subtraction, multiplication, division, remainder, concatenation};
+    ll_int (*functions[])(ll_int,
+                          ll_int) = {summation, subtraction, multiplication, division, remainder, concatenation};
     Stack< ll_int > res;
+    ll_int oper1, oper2;
+    std::string operation;
     while (!postfixQ.empty()) {
       while (!postfixQ.empty() && isdigit(postfixQ.top())) {
         res.push(fromStrToNum(postfixQ.top()));
         postfixQ.drop();
       }
-      ll_int a = res.top();
-      res.drop();
-      ll_int b = res.top();
-      res.drop();
-      std::string operation = postfixQ.top();
-      postfixQ.drop();
+      if (!res.empty() && !postfixQ.empty()) {
+        oper1 = res.top();
+        res.drop();
+        oper2 = res.top();
+        res.drop();
+        operation = postfixQ.top();
+        postfixQ.drop();
+      } else {
+        throw std::runtime_error("Invalid expression: not enough operands");
+      }
 
       size_t index = 0;
       for (size_t i = 0; i < 6; ++i) {
@@ -197,9 +280,12 @@ namespace zubarev
           break;
         }
       }
-      res.push(functions[index](b, a));
+      res.push(functions[index](oper2, oper1));
     }
-
-    return res.top();
+    if (!res.empty()) {
+      return res.top();
+    } else {
+      throw std::runtime_error("Invalid expression: not enough operands");
+    }
   }
 }

@@ -8,7 +8,7 @@ int main(int argc, char const* argv[])
 
   if (argc > 1) {
     filename = argv[1];
-  }
+  } 
 
   std::ifstream file(filename);
 
@@ -36,7 +36,7 @@ int main(int argc, char const* argv[])
       postfixQ.print();
 
       std::cout << "Result: ";
-      std::cout << zubarev::evil(postfixQ) << '\n';
+      std::cout << zubarev::eval(postfixQ) << '\n';
       std::cout << '\n';
     }
   }
