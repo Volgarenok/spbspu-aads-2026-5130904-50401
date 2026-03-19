@@ -9,6 +9,7 @@
 namespace sedov
 {
   using lli_t = long long int;
+  using func_t = lli_t(*)(const lli_t &, const lli_t &);
 
   bool isOperand(const std::string & sym);
   size_t getPriority(const std::string & sym);
@@ -21,5 +22,7 @@ namespace sedov
 
   void getInfix(std::istream & in, Stack< Queue< std::string > > & infix);
   void convertInfToPost(const Queue< std::string > & infix, Queue< std::string > & postfix);
+  size_t getIndex(const std::string & sign, const List< std::string > & funcs);
+  std::string calculate(const Queue< std::string > & postfix);
 }
 #endif
