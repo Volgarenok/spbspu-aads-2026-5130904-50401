@@ -20,5 +20,6 @@ namespace sedov
   lli_t bitRightShift(const lli_t & a, const lli_t & b);
 
   void getInfix(std::istream & in, Stack< Queue< std::string > > & infix);
+  void convertInfToPost(const Queue< std::string > & infix, Queue< std::string > & postfix);
 }
 #endif
