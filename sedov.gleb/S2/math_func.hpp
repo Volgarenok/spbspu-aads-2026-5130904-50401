@@ -18,5 +18,7 @@ namespace sedov
   lli_t div(const lli_t & a, const lli_t & b);
   lli_t mod(const lli_t & a, const lli_t & b);
   lli_t bitRightShift(const lli_t & a, const lli_t & b);
+
+  void getInfix(std::istream & in, Stack< Queue< std::string > > & infix);
 }
 #endif
