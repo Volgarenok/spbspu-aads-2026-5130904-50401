@@ -254,4 +254,109 @@ namespace sedov
       stack.pop();
     }
   }
+
+  size_t getIndex(const std::string & sign, List< std::string > & funcs)
+  {
+    size_t i = 0;
+    for (LIter< std::string > it = funcs.begin(); it != funcs.end(); ++it, ++i)
+    {
+      if ((*it) == sign)
+      {
+        return i;
+      }
+    }
+    return funcs.size();
+  }
+
+  std::string calculate(const Queue< std::string > & postfix)
+  {
+    Queue< std::string > postfixNew = postfix;
+    List< std::string > funcNames;
+    try
+    {
+      funcNames.pushBack("+");
+      funcNames.pushBack("-");
+      funcNames.pushBack("*");
+      funcNames.pushBack("/");
+      funcNames.pushBack("%");
+      funcNames.pushBack(">>");
+    }
+    catch (...)
+    {
+      funcNames.clear();
+      throw;
+    }
+
+    List< func_t > funcs;
+    try
+    {
+      funcs.pushBack(add);
+      funcs.pushBack(sub);
+      funcs.pushBack(mult);
+      funcs.pushBack(div);
+      funcs.pushBack(mod);
+      funcs.pushBack(bitRightShift);
+    }
+    catch (...)
+    {
+      funcs.clear();
+      funcNames.clear();
+      throw;
+    }
+
+    Stack< std::string > nums;
+    while (!postfixNew.empty())
+    {
+      std::string sym = postfixNew.front();
+      postfixNew.pop();
+      if (isOperand(sym))
+      {
+        nums.push(sym);
+      }
+      else
+      {
+        size_t ind = getIndex(sym, funcNames);
+        lli_t num1;
+        try
+        {
+          num1 = std::stoll(nums.top());
+          nums.pop();
+        }
+        catch (const std::invalid_argument &)
+        {
+          funcNames.clear();
+          funcs.clear();
+          nums.clear();
+          throw std::invalid_argument("Input error");
+        }
+        lli_t num2;
+        try
+        {
+          num2 = std::stoll(nums.top());
+          nums.pop();
+        }
+        catch (const std::invalid_argument &)
+        {
+          funcNames.clear();
+          funcs.clear();
+          nums.clear();
+          throw std::invalid_argument("Input error");
+        }
+        auto it = funcs.begin();
+        for (size_t i = 0; i < ind; ++i) {
+            ++it;
+        }
+        lli_t newNum = (*it)(num2, num1);
+        nums.push(std::to_string(newNum));
+      }
+    }
+    if (nums.size() != 1)
+    {
+      funcNames.clear();
+      funcs.clear();
+      nums.clear();
+      throw std::invalid_argument("Input error");
+    }
+    return nums.top();
+  }
 }
