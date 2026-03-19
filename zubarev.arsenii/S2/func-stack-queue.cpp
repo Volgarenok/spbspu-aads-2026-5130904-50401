@@ -2,7 +2,7 @@
 #include <iostream>
 namespace zubarev
 {
-
+  using ll_int = long long int;
   std::string input(std::istream& in, bool& error)
   {
     std::string str = "";
@@ -137,5 +137,69 @@ namespace zubarev
       stack.drop();
     }
     return postfixQ;
+  }
+
+  ll_int summation(size_t oper1, size_t oper2)
+  {
+    return oper1 + oper2;
+  }
+  ll_int subtraction(size_t oper1, size_t oper2)
+  {
+    return oper1 - oper2;
+  }
+  ll_int multiplication(size_t oper1, size_t oper2)
+  {
+    return oper1 * oper2;
+  }
+  ll_int division(size_t oper1, size_t oper2)
+  {
+    return oper1 / oper2;
+  }
+  ll_int remainder(size_t oper1, size_t oper2)
+  {
+    return oper1 % oper2;
+  }
+  ll_int concatenation(size_t oper1, size_t oper2)
+  {
+    return oper1 + oper2;
+  }
+  size_t fromStrToNum(std::string str)
+  {
+    size_t num = 0;
+    for (size_t i = 0; i < str.size(); ++i) {
+      num = num * 10 + (str[i] - '0');
+    }
+    return num;
+  }
+  ll_int evil(Queue< std::string > postfixQ)
+  {
+    const std::string symbols[] = {"+", "-", "*", "/", "%", "##"};
+
+    ll_int (*functions[])(size_t,
+                          size_t) = {summation, subtraction, multiplication, division, remainder, concatenation};
+    Stack< ll_int > res;
+    while (!postfixQ.empty()) {
+      while (!postfixQ.empty() && isdigit(postfixQ.top())) {
+        res.push(fromStrToNum(postfixQ.top()));
+        postfixQ.drop();
+      }
+      ll_int a = res.top();
+      res.drop();
+      ll_int b = res.top();
+      res.drop();
+      std::string operation = postfixQ.top();
+      postfixQ.drop();
+
+      size_t index = 0;
+      for (size_t i = 0; i < 6; ++i) {
+        if (operation == symbols[i]) {
+          index = i;
+          break;
+        }
+      }
+      res.push(functions[index](b, a));
+    }
+
+    return res.top();
   }
 }

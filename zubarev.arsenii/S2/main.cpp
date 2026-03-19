@@ -1,8 +1,8 @@
 #include "all.hpp"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-int main(int argc, char* argv[])
+int main(int argc, char const* argv[])
 {
   std::string filename = "in.txt";
 
@@ -16,7 +16,6 @@ int main(int argc, char* argv[])
     std::cerr << "Ошибка: Не удалось открыть файл " << filename << '\n';
     std::cerr << "Текущая директория: ";
 
-
     return 1;
   }
 
@@ -28,16 +27,17 @@ int main(int argc, char* argv[])
 
     if (!expression.empty()) {
       std::cout << "Выражение: " << expression << '\n';
-      zubarev::Queue<std::string> infixQ=zubarev::fromStrToQueue(expression);
-      std::cout << "Infix: " << '\n';
+      zubarev::Queue< std::string > infixQ = zubarev::fromStrToQueue(expression);
+      std::cout << "Infix: ";
       infixQ.print();
-      std::cout << '\n';
-      zubarev::Queue<std::string> postfixQ=zubarev::fromInfixToPostfix(infixQ);
-      std::cout << "Postfix: " << '\n';
+
+      zubarev::Queue< std::string > postfixQ = zubarev::fromInfixToPostfix(infixQ);
+      std::cout << "Postfix: ";
       postfixQ.print();
+
+      std::cout << "Result: ";
+      std::cout << zubarev::evil(postfixQ) << '\n';
       std::cout << '\n';
-
-
     }
   }
 }
