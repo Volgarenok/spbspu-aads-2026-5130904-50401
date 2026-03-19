@@ -161,4 +161,47 @@ namespace sedov
     }
     return a >> b;
   }
+
+  void getInfix(std::istream & in, Stack< Queue< std::string > > & infix)
+  {
+    char c;
+    std::string cur;
+    sedov::Queue< std::string > e;
+    while (in.get(c))
+    {
+      if (c == '\n')
+      {
+        if (!cur.empty())
+        {
+          e.push(cur);
+          cur.clear();
+        }
+        if (!e.empty())
+        {
+          infix.push(e);
+          e.clear();
+        }
+      }
+      else if (c == ' ' || c == '\t')
+      {
+        if (!cur.empty())
+        {
+          e.push(cur);
+          cur.clear();
+        }
+      }
+      else
+      {
+        cur += c;
+      }
+    }
+    if (!cur.empty())
+    {
+      e.push(cur);
+    }
+    if (!e.empty())
+    {
+      infix.push(e);
+    }
+  }
 }

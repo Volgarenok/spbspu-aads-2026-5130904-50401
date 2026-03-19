@@ -29,7 +29,7 @@ namespace sedov
       return *this;
     }
 
-    Stack 7 operator=(Stack< T > && s)
+    Stack & operator=(Stack< T > && s)
     {
       if (this == &s)
       {
