@@ -1,6 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include <S1/list.hpp>
+#include "../common/list.hpp"
 
 namespace sedov
 {
@@ -39,7 +39,12 @@ namespace sedov
       return *this;
     }
 
-    T & top() const
+    T & top()
+    {
+      return list_.back();
+    }
+
+    const T & top() const
     {
       return list_.back();
     }

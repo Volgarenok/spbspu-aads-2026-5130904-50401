@@ -1,6 +1,6 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
-#include <S1/list.hpp>
+#include "../common/list.hpp"
 
 namespace sedov
 {
@@ -39,7 +39,12 @@ namespace sedov
       return *this;
     }
 
-    T & front() const
+    T & front()
+    {
+      return list_.front();
+    }
+
+    const T & front() const
     {
       return list_.front();
     }
