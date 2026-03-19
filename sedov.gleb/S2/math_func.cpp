@@ -204,4 +204,54 @@ namespace sedov
       infix.push(e);
     }
   }
+
+  void convertInfToPost(const Queue< std::string > & infix, Queue< std::string > & postfix)
+  {
+    Queue< std::string > infixNew = infix;
+    Stack< std::string > stack;
+    while (!infixNew.empty())
+    {
+      std::string sym = infixNew.front();
+      infixNew.pop();
+      if (sym == "(")
+      {
+        stack.push(sym);
+        continue;
+      }
+      if (sym == ")")
+      {
+        while (stack.top() != "(")
+        {
+          postfix.push(stack.top());
+          stack.pop();
+        }
+        stack.pop();
+        continue;
+      }
+      if (isOperand(sym))
+      {
+        postfix.push(sym);
+      }
+      else
+      {
+        if (stack.empty() || stack.top() == "(" || stack.top() == ")")
+        {
+          stack.push(sym);
+          continue;
+        }
+        if (getPriority(stack.top()) >= getPriority(sym))
+        {
+          postfix.push(stack.top());
+          stack.pop();
+          stack.push(sym);
+          continue;
+        }
+      }
+    }
+    while (!stack.empty())
+    {
+      postfix.push(stack.top());
+      stack.pop();
+    }
+  }
 }
