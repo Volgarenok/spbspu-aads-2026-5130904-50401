@@ -6,8 +6,8 @@ BOOST_AUTO_TEST_SUITE(QueueTest)
 BOOST_AUTO_TEST_CASE(ConstructAndOperatorsTests)
 {
   sedov::Queue< int > q1;
-  BOOST_CHECK(q.empty());
-  q.push(1);
+  BOOST_CHECK(q1.empty());
+  q1.push(1);
   sedov::Queue< int > q2(q1);
   BOOST_CHECK(q2.size() == 1);
   BOOST_CHECK(q2.front() == 1);
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(SwapTests)
   q1.push(1);
   sedov::Queue< int > q2;
   q2.push(2);
-  q2.push(2);
+  q2.push(3);
   q2.swap(q1);
   BOOST_CHECK(q1.front() == 2);
   BOOST_CHECK(q2.front() == 1);
