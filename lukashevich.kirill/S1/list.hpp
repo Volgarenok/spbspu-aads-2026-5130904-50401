@@ -10,6 +10,12 @@ namespace lukashevich
   class Node
   {
     public:
+      Node(T value, Node<T>* n, Node<T>* p):
+        val(value),
+        next(n),
+        prev(p)
+      {}
+
       T val;
       Node< T >* next;
       Node< T >* prev;
@@ -25,6 +31,8 @@ namespace lukashevich
       List< T >& operator=(List< T >& list);
       List(const List< T >&& list);
       List< T >& operator=(List< T >&& list);
+
+      void clear();
 
       size_t size() const;
 
@@ -46,6 +54,33 @@ namespace lukashevich
   void removeFake(Node< T >* fake) noexcept
   {
     ::operator delete(fake);
+  }
+
+  template< class T >
+  List<T>::List():
+    fake_(makeFake<T>()),
+    size_(0)
+  {}
+
+  template< class T >
+  List<T>::~List()
+  {
+    clear();
+    removeFake(fake_);
+  }
+
+  template<class T>
+  void List<T>::clear()
+  {
+    Node<T>* cur = fake_->next;
+    while (cur != nullptr) {
+        Node<T>* next = cur->next;
+        delete cur;
+        cur = next;
+    }
+    fake_->next = nullptr;
+    fake_->prev = nullptr;
+    size_ = 0;
   }
 }
 
