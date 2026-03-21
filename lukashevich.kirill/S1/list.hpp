@@ -32,6 +32,9 @@ namespace lukashevich
       List(const List< T >&& list);
       List< T >& operator=(List< T >&& list);
 
+      void pushFront(const T& value);
+      void pushBack(const T& value);
+
       void clear();
 
       size_t size() const;
@@ -57,30 +60,58 @@ namespace lukashevich
   }
 
   template< class T >
-  List<T>::List():
-    fake_(makeFake<T>()),
+  List< T >::List():
+    fake_(makeFake< T >()),
     size_(0)
   {}
 
   template< class T >
-  List<T>::~List()
+  List< T >::~List()
   {
     clear();
     removeFake(fake_);
   }
 
-  template<class T>
-  void List<T>::clear()
+  template< class T >
+  void List< T >::clear()
   {
-    Node<T>* cur = fake_->next;
+    Node< T >* cur = fake_->next;
     while (cur != nullptr) {
-        Node<T>* next = cur->next;
+        Node< T >* next = cur->next;
         delete cur;
         cur = next;
     }
     fake_->next = nullptr;
     fake_->prev = nullptr;
     size_ = 0;
+  }
+
+  template< class T >
+  void List< T >::pushFront(const T& value)
+  {
+    Node< T >* node = new Node< T >(value, fake_->next, fake_);
+
+    if (fake_->next != nullptr) {
+        fake_->next->prev = node;
+    } else
+        fake_->prev = node;
+
+    fake_->next = node;
+    size_++;
+  }
+
+  template< class T >
+  void List< T >::pushBack(const T& value)
+  {
+    Node< T >* node = new Node< T >(value, nullptr, fake_->prev);
+
+    if (fake_->prev != nullptr) {
+        fake_->prev->next = node;
+    } else
+        fake_->next = node;
+
+    fake_->prev = node;
+    size_++;
   }
 }
 
