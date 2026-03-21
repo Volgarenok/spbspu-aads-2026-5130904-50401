@@ -1,4 +1,5 @@
 #include "math_func.hpp"
+#include <climits>
 
 namespace sedov
 {
