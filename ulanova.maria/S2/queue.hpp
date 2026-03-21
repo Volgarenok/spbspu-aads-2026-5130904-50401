@@ -13,7 +13,7 @@ namespace ulanova
     List<T> list;
   public:
     Queue() = default;
-    
+
     void push(const T& value);
     void clear();
     T drop();
@@ -38,9 +38,11 @@ namespace ulanova
   {
     if (empty())
     {
-      throw stdd::runtime_error("Queue is empty");
+      throw std::runtime_error("Queue is empty");
     }
-    return list.pop_front();
+    T value = list.front();
+    list.pop_front();
+    return value;
   }
   template <class T>
   bool Queue<T>::empty() const
