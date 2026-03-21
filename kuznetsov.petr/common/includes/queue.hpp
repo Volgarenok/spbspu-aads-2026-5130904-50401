@@ -9,8 +9,12 @@ namespace kuznetsov {
       list_()
     {}
 
-    Queue(Queue< T >&& q) :
-      list_(std::move(q))
+    Queue(const Queue< T >& q):
+      list_(q.list_)
+    {}
+
+    Queue(Queue< T >&& q) noexcept :
+      list_(std::move(q.list_))
     {}
 
     Queue& operator=(const Queue< T >& q)
@@ -19,16 +23,20 @@ namespace kuznetsov {
       return *this;
     }
 
-    Queue& operator=(Queue< T >&& q)
+    Queue& operator=(Queue< T >&& q) noexcept
     {
       if (this == &q) {
         return *this;
       }
-      this->list_ = std::move(q);
+      this->list_ = std::move(q.list_);
       return *this;
     }
 
     T& front()
+    {
+      return list_.front();
+    }
+    const T& front() const
     {
       return list_.front();
     }
@@ -37,10 +45,14 @@ namespace kuznetsov {
     {
       return list_.back();
     }
-
-    void push(const T& rhs)
+    const T& back() const
     {
-      list_.insert(list_.end(), rhs);
+      return list_.back();
+    }
+
+    void push(const T& val)
+    {
+      list_.insert(list_.end(), val);
     }
 
     void pop()
@@ -48,11 +60,12 @@ namespace kuznetsov {
       list_.popFront();
     }
 
-    bool empty()
+    bool empty() const
     {
       return list_.empty();
     }
-    size_t size()
+
+    size_t size() const
     {
       return list_.size();
     }
