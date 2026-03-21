@@ -5,28 +5,63 @@ namespace kuznetsov {
   template< class T >
   class Queue {
   public:
-    Queue();
-    Queue(Queue< T >&& q);
+    Queue():
+      list_()
+    {}
 
-    Queue& operator=(const Queue< T >& q);
-    Queue& operator=(Queue< T >&& q);
+    Queue(Queue< T >&& q) :
+      list_(std::move(q))
+    {}
 
-    T& front();
-    T& back();
+    Queue& operator=(const Queue< T >& q)
+    {
+      this->list_ = q.list_;
+      return *this;
+    }
 
-    void push(T rhs);
-    T pop();
+    Queue& operator=(Queue< T >&& q)
+    {
+      if (this == &q) {
+        return *this;
+      }
+      this->list_ = std::move(q);
+      return *this;
+    }
 
-    bool empty();
-    size_t size();
+    T& front()
+    {
+      return list_.front();
+    }
+
+    T& back()
+    {
+      return list_.back();
+    }
+
+    void push(const T& rhs)
+    {
+      list_.insert(list_.end(), rhs);
+    }
+
+    T pop()
+    {
+      T v = list_.front();
+      list_.popFront();
+      return v;
+    }
+
+    bool empty()
+    {
+      return list_.empty();
+    }
+    size_t size()
+    {
+      return list_.size();
+    }
+
   private:
     List< T > list_;
   };
-
-
-
-
-
 }
 
 #endif
