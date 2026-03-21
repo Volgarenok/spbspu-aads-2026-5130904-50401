@@ -3,7 +3,6 @@
 
 #include <cstddef>
 
-
 namespace lukashevich
 {
   template< class T >
@@ -82,9 +81,9 @@ namespace lukashevich
   {
     Node< T >* cur = fake_->next;
     while (cur != nullptr) {
-        Node< T >* next = cur->next;
-        delete cur;
-        cur = next;
+      Node< T >* next = cur->next;
+      delete cur;
+      cur = next;
     }
     fake_->next = nullptr;
     fake_->prev = nullptr;
@@ -97,7 +96,7 @@ namespace lukashevich
     Node< T >* node = new Node< T >(value, fake_->next, fake_);
 
     if (fake_->next != nullptr) {
-        fake_->next->prev = node;
+      fake_->next->prev = node;
     } else
         fake_->prev = node;
 
@@ -111,7 +110,7 @@ namespace lukashevich
     Node< T >* node = new Node< T >(value, nullptr, fake_->prev);
 
     if (fake_->prev != nullptr) {
-        fake_->prev->next = node;
+      fake_->prev->next = node;
     } else
         fake_->next = node;
 
@@ -146,7 +145,7 @@ namespace lukashevich
     assert(fake_->prev != nullptr);
     return fake_->prev->val;
   }
-  
+
 }
 
 #endif
