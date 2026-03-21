@@ -85,8 +85,8 @@ namespace tarasenko
     void push_back(T&& val);
     void push_front(T&& val);
     bool empty() const noexcept;
-    T& front() const;
-    T& back() const;
+    const T& front() const;
+    const T& back() const;
     ListIter< T > erase(ListIter< T > it) noexcept;
     ListIter< T > erase(ListIter< T > start, ListIter< T > end) noexcept;
     void pop_front() noexcept;
@@ -335,12 +335,12 @@ namespace tarasenko
   }
 
   template< class T >
-  T& BidirList< T >::front() const
+  const T& BidirList< T >::front() const
   {
     return _head->_val;
   }
   template< class T >
-  T& BidirList< T >::back() const
+  const T& BidirList< T >::back() const
   {
     return _tail->_val;
   }
