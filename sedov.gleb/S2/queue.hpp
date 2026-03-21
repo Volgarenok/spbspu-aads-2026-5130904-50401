@@ -54,6 +54,11 @@ namespace sedov
       return list_.back();
     }
 
+    const T & back() const
+    {
+      return list_.back();
+    }
+
     bool empty() const
     {
       return list_.size() == 0;
