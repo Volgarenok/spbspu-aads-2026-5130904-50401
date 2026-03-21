@@ -40,7 +40,9 @@ namespace ulanova
     {
       throw std::runtime_error("Stack is empty");
     }
-    return list.pop_front();
+    T value = list.front();
+    list.pop_front();
+    return value;
   }
   template <class T>
   T& Stack<T>::front()
@@ -54,7 +56,7 @@ namespace ulanova
   template <class T>
   bool Stack<T>::empty()
   {
-    return list.empty
+    return list.empty();
   }
 }
 #endif
