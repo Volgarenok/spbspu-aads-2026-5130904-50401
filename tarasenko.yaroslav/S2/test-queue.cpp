@@ -1,7 +1,7 @@
 #include "boost/test/unit_test.hpp"
 #include "queue.hpp"
 
-BOOST_AUTO_TEST_CASE(push)
+BOOST_AUTO_TEST_CASE(queue_push)
 {
   tarasenko::Queue< int > queue;
   BOOST_TEST(queue.empty());
@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(push)
   BOOST_TEST(queue.empty());
 }
 
-BOOST_AUTO_TEST_CASE(pop)
+BOOST_AUTO_TEST_CASE(queue_pop)
 {
   tarasenko::Queue< int > queue;
   for (size_t i = 0; i < 10; ++i)
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(pop)
   }
 }
 
-BOOST_AUTO_TEST_CASE(copy_and_move_semantic)
+BOOST_AUTO_TEST_CASE(queue_copy_and_move_semantic)
 {
   tarasenko::Queue< int > queue;
   for (size_t i = 0; i < 10; ++i)
