@@ -43,11 +43,9 @@ namespace kuznetsov {
       list_.insert(list_.end(), rhs);
     }
 
-    T pop()
+    void pop()
     {
-      T v = list_.front();
       list_.popFront();
-      return v;
     }
 
     bool empty()
