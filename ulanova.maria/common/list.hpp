@@ -118,6 +118,7 @@ namespace ulanova
     void clear();
 
     T& front();
+    bool empty() const;
   };
 
   template<class T>
@@ -274,6 +275,11 @@ namespace ulanova
     }
     pos.node -> next = temp -> next;
     delete temp;
+  }
+  template <class T>
+  bool List<T>::empty() const
+  {
+    return head == nullptr;
   }
 }
 #endif
