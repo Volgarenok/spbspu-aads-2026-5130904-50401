@@ -1,3 +1,5 @@
+#ifndef LIST_HPP
+#define LIST_HPP
 #include <stdexcept>
 namespace ulanova
 {
@@ -274,3 +276,4 @@ namespace ulanova
     delete temp;
   }
 }
+#endif
