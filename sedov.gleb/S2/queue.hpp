@@ -49,7 +49,7 @@ namespace sedov
       return list_.front();
     }
 
-    T & back() const
+    T & back()
     {
       return list_.back();
     }
