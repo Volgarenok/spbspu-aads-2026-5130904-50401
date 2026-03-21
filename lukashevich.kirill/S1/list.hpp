@@ -32,6 +32,11 @@ namespace lukashevich
       List(const List< T >&& list);
       List< T >& operator=(List< T >&& list);
 
+      T& front();
+      T& back();
+      const T& front() const;
+      const T& back() const;
+
       void pushFront(const T& value);
       void pushBack(const T& value);
 
@@ -113,6 +118,35 @@ namespace lukashevich
     fake_->prev = node;
     size_++;
   }
+
+  template< class T >
+  const T& List< T >::front() const
+  {
+    assert(fake_->next != nullptr);
+    return fake_->next->val;
+  }
+
+  template< class T >
+  T& List< T >::front()
+  {
+    assert(fake_->next != nullptr);
+    return fake_->next->val;
+  }
+
+  template< class T >
+  const T& List< T >::back() const
+  {
+    assert(fake_->prev != nullptr);
+    return fake_->prev->val;
+  }
+
+  template< class T >
+  T& List< T >::back()
+  {
+    assert(fake_->prev != nullptr);
+    return fake_->prev->val;
+  }
+  
 }
 
 #endif
