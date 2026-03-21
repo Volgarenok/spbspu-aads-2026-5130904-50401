@@ -39,6 +39,9 @@ namespace lukashevich
       void pushFront(const T& value);
       void pushBack(const T& value);
 
+      void popFront();
+      void popBack();
+
       void clear();
 
       size_t size() const;
@@ -144,6 +147,49 @@ namespace lukashevich
   {
     assert(fake_->prev != nullptr);
     return fake_->prev->val;
+  }
+
+  template< class T >
+  void List< T >::popFront()
+  {
+    assert(fake_->next != nullptr);
+
+    Node< T >* node = fake_->next;
+    fake_->next = node->next;
+
+    if (fake_->next != nullptr)
+    {
+      fake_->next->prev = fake_;
+    }
+    else
+    {
+      fake_->prev = nullptr;
+    }
+
+    delete node;
+    size_--;
+  }
+
+  template< class T >
+  void List< T >::popBack()
+  {
+    assert(fake_->prev != nullptr);
+
+    Node< T >* node = fake_->prev;
+    fake_->prev = node->prev;
+
+    if (fake_->prev != fake_)
+    {
+      fake_->prev->next = nullptr;
+    }
+    else
+    {
+      fake_->prev = nullptr;
+      fake_->next = nullptr;
+    }
+
+    delete node;
+    size_--;
   }
 
 }
