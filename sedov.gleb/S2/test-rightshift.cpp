@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "math_func.hpp"
 
-BOOST_AUtO_TEST_CASE(BitRightShiftTest)
+BOOST_AUTO_TEST_CASE(BitRightShiftTest)
 {
   std::string input = "( 15 + 7  >> 2 ) - 3\n42 >> 1 >> 1\n";
   std::istringstream iss(input);
