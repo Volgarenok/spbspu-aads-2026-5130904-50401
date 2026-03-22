@@ -21,6 +21,12 @@ namespace lukashevich
   };
 
   template< class T >
+  class LIter;
+
+  template< class T >
+  class LCIter;
+
+  template< class T >
   class List
   {
     public:
@@ -45,6 +51,11 @@ namespace lukashevich
       void clear();
 
       size_t size() const;
+
+      LIter< T > begin();
+      LIter< T > end();
+      LCIter< T > begin() const;
+      LCIter< T > end() const;
 
     private:
       Node< T >* fake_;
@@ -192,6 +203,29 @@ namespace lukashevich
     size_--;
   }
 
+  template< class T >
+  LIter< T > List< T >::begin()
+  {
+    return LIter< T >(fake_->next);
+  }
+
+  template< class T >
+  LCIter< T > List< T >::begin() const
+  {
+    return LCIter< T >(fake_->next);
+  }
+
+  template< class T >
+  LIter< T > List< T >::end()
+  {
+    return LIter< T >(nullptr);
+  }
+
+  template< class T >
+  LCIter< T > List< T >::end() const
+  {
+    return LCIter< T >(nullptr);
+  }
 }
 
 #endif
