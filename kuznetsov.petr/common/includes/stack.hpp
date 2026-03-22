@@ -43,11 +43,12 @@ namespace kuznetsov {
       return list_.front();
     }
 
-    bool empty()
+    bool empty() const
+
     {
       return list_.empty();
     }
-    size_t size()
+    size_t size() const
     {
       return list_.size();
     }
