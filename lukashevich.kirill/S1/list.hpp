@@ -57,6 +57,9 @@ namespace lukashevich
       LCIter< T > begin() const;
       LCIter< T > end() const;
 
+      size_t size() const;
+      bool empty() const;
+
     private:
       Node< T >* fake_;
       size_t size_;
@@ -225,6 +228,18 @@ namespace lukashevich
   LCIter< T > List< T >::end() const
   {
     return LCIter< T >(nullptr);
+  }
+
+  template<class T>
+  size_t List<T>::size() const
+  {
+    return size_;
+  }
+
+  template<class T>
+  bool List<T>::empty() const
+  {
+    return size_ == 0;
   }
 }
 
