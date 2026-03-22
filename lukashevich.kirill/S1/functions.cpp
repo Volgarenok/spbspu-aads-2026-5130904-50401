@@ -122,7 +122,7 @@ namespace lukashevich
   {
     if (sums.empty())
     {
-      std::cout << 0 << '\n';
+      std::cout << 0;
     }
 
     bool first = true;
