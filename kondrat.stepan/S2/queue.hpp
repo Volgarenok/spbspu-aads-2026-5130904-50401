@@ -30,10 +30,10 @@ namespace kondrat
   };
 
   template< class T >
-  Queue::Queue() : list_() {}
+  Queue< T >::Queue() : list_() {}
 
   template< class T >
-  Queue::Queue(const Queue< T > & queue) : list_ (queue.list_);
+  Queue< T >::Queue(const Queue< T > & queue) : list_ (queue.list_);
 
   template< class T >
   Queue< T > & Queue< T >::operator=(const Queue< T > & queue)
@@ -43,10 +43,10 @@ namespace kondrat
   }
 
   template< class T >
-  Queue::Queue(Queue< T > && queue) : list_(std::move(queue.list_)) {}
+  Queue< T >::Queue(Queue< T > && queue) : list_(std::move(queue.list_)) {}
 
   template< class T >
-  Queue< T > & Queue::operator=(Queue< T > && queue)
+  Queue< T > & Queue< T >::operator=(Queue< T > && queue)
   {
     if (this != &queue)
     {
@@ -56,19 +56,19 @@ namespace kondrat
   }
 
   template< class T >
-  bool Queue::empty() const
+  bool Queue< T >::empty() const
   {
     return list_.empty();
   }
 
   template< class T >
-  size_t Queue::size() const
+  size_t Queue< T >::size() const
   {
     return list_.size();
   }
 
   template< class T >
-  T & Queue::first() const
+  T & Queue< T >::first() const
   {
     if (empty())
     {
@@ -78,7 +78,7 @@ namespace kondrat
   }
 
   template< class T >
-  T & Queue::last() const
+  T & Queue< T >::last() const
   {
     if (empty())
     {
@@ -88,13 +88,13 @@ namespace kondrat
   }
 
   template< class T >
-  Queue::push(const T & rhs)
+  void Queue< T >::push(const T & rhs)
   {
     list_.pushBack(rhs);
   }
 
   template< class T >
-  T Queue::drop()
+  T Queue< T >::drop()
   {
     if (empty())
     {
@@ -107,7 +107,7 @@ namespace kondrat
   }
   
   template< class T >
-  void clear();
+  void clear()
   {
     list_.clear();
   }
