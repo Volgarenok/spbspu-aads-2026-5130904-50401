@@ -18,7 +18,7 @@ namespace kondrat
       bool empty() const;
       size_t size() const;
 
-      T & first() const;
+      const T & first() const;
 
       void push(const T & rhs);
       T drop();

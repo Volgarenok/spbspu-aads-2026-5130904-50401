@@ -18,8 +18,8 @@ namespace kondrat
       bool empty() const;
       size_t size() const;
 
-      T & first() const;
-      T & last() const;
+      const T & first() const;
+      const T & last() const;
 
       void push(const T & rhs);
       T drop();
@@ -68,21 +68,21 @@ namespace kondrat
   }
 
   template< class T >
-  T & Queue< T >::first() const
+  const T & Queue< T >::first() const
   {
     if (empty())
     {
-      return std::runtime_error("empty queue");
+      throw std::runtime_error("empty queue");
     }
     return list_.front();
   }
 
   template< class T >
-  T & Queue< T >::last() const
+  const T & Queue< T >::last() const
   {
     if (empty())
     {
-      throw std::runtime_error("empty queue")
+      throw std::runtime_error("empty queue");
     }
     return list_.back();
   }
@@ -102,12 +102,12 @@ namespace kondrat
     }
     
     T value = list_.front();
-    list_.popFront;
+    list_.popFront();
     return value;
   }
   
   template< class T >
-  void clear()
+  void Queue< T >::clear()
   {
     list_.clear();
   }
