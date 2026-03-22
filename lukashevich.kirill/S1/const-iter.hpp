@@ -15,7 +15,6 @@ namespace lukashevich
   class LCIter
   {
     friend class List< T >;
-
     public:
       LCIter();
       LCIter< T >& operator++();

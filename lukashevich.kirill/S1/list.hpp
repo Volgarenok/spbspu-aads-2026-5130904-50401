@@ -1,6 +1,9 @@
 #ifndef LIST_HPP
 #define LIST_HPP
 
+#include "iter.hpp"
+#include "const-iter.hpp"
+
 #include <cstddef>
 
 namespace lukashevich
@@ -114,9 +117,10 @@ namespace lukashevich
 
     if (fake_->next != nullptr) {
       fake_->next->prev = node;
-    } else
-        fake_->prev = node;
-
+    }
+    else {
+      fake_->prev = node;
+    }
     fake_->next = node;
     size_++;
   }
@@ -128,8 +132,10 @@ namespace lukashevich
 
     if (fake_->prev != nullptr) {
       fake_->prev->next = node;
-    } else
-        fake_->next = node;
+    }
+    else {
+      fake_->next = node;
+    }
 
     fake_->prev = node;
     size_++;
@@ -171,12 +177,10 @@ namespace lukashevich
     Node< T >* node = fake_->next;
     fake_->next = node->next;
 
-    if (fake_->next != nullptr)
-    {
+    if (fake_->next != nullptr) {
       fake_->next->prev = fake_;
     }
-    else
-    {
+    else {
       fake_->prev = nullptr;
     }
 
@@ -192,12 +196,10 @@ namespace lukashevich
     Node< T >* node = fake_->prev;
     fake_->prev = node->prev;
 
-    if (fake_->prev != fake_)
-    {
+    if (fake_->prev != fake_) {
       fake_->prev->next = nullptr;
     }
-    else
-    {
+    else {
       fake_->prev = nullptr;
       fake_->next = nullptr;
     }
@@ -250,18 +252,19 @@ namespace lukashevich
     Node< T >* cur = list.fake_->next;
 
     while (cur != nullptr) {
-        pushBack(cur->val);
-        cur = cur->next;
+      pushBack(cur->val);
+      cur = cur->next;
     }
   }
 
   template< class T >
-  List< T >& List< T >::operator=(const List< T >& list) {
+  List< T >& List< T >::operator=(const List< T >& list)
+  {
     if (this == &list) {
       return *this;
     }
     clear();
-    
+
     Node< T >* cur = list.fake_->next;
     while (cur != nullptr) {
       pushBack(cur->val);
@@ -282,8 +285,7 @@ namespace lukashevich
   template< class T >
   List< T >& List< T >::operator=(List< T >&& list)
   {
-    if (this == &list)
-    {
+    if (this == &list) {
       return *this;
     }
 
@@ -299,5 +301,4 @@ namespace lukashevich
     return *this;
   }
 }
-
 #endif
