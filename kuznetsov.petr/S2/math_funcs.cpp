@@ -80,7 +80,9 @@ kuznetsov::lli_t kuznetsov::mod(const lli_t& a, const lli_t& b)
   if (b == 0) {
     throw std::logic_error("Dont div by zero");
   }
-  return a % b;
+  lli_t r = a % b;
+  r += (r < 0) ? b : 0;
+  return r;
 }
 
 kuznetsov::lli_t kuznetsov::bitShiftToRight(const lli_t& a, const lli_t& b)
