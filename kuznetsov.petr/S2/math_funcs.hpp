@@ -19,6 +19,7 @@ namespace kuznetsov {
 
   using stackOfinfixExpression = Stack< Queue< std::string > >;
   void getExpressions(std::istream& in,  stackOfinfixExpression& res);
+  lli_t calculate(Queue< std::string > postfix);
   void calculate(stackOfinfixExpression infix, Queue< lli_t >& res);
 }
 
