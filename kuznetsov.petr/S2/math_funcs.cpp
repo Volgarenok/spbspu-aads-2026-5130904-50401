@@ -1,4 +1,6 @@
 #include "math_funcs.hpp"
+#include <limits>
+#include <climits>
 
 const kuznetsov::lli_t MAX = std::numeric_limits< kuznetsov::lli_t >::max();
 const kuznetsov::lli_t MIN = std::numeric_limits< kuznetsov::lli_t >::min();
@@ -92,3 +94,38 @@ kuznetsov::lli_t kuznetsov::bitShiftToRight(const lli_t& a, const lli_t& b)
   }
   return a >> b;
 }
+
+void kuznetsov::getExpressions(std::istream& in, stackOfinfixExpression& res)
+{
+  std::string current;
+  Queue< std::string > expression;
+  int a = in.get();
+  while (a != -1) {
+    if (a == '\n') {
+      if (!current.empty()) {
+        expression.push(current);
+        current.clear();
+      }
+      if (!expression.empty()) {
+        res.push(expression);
+        expression.clear();
+      }
+    } else if (a == ' ') {
+      expression.push(current);
+      current.clear();
+    } else {
+      current.push_back(static_cast< char >(a));
+    }
+    a = in.get();
+  }
+  if (!current.empty()) {
+    expression.push(current);
+    current.clear();
+  }
+  if (!expression.empty()) {
+    res.push(expression);
+    expression.clear();
+  }
+}
+
+

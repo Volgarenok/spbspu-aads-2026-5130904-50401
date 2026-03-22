@@ -70,6 +70,11 @@ namespace kuznetsov {
       return list_.size();
     }
 
+    void clear() noexcept
+    {
+      list_.clear();
+    }
+
   private:
     List< T > list_;
   };

@@ -61,6 +61,11 @@ namespace kuznetsov {
       list_.popFront();
     }
 
+    void clear()
+    {
+      list_.clear();
+    }
+
   private:
     List< T > list_;
   };

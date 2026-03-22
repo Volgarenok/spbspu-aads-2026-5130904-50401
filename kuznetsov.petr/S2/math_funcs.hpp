@@ -18,8 +18,8 @@ namespace kuznetsov {
   lli_t bitShiftToRight(const lli_t& a, const lli_t& b);
 
   using stackOfinfixExpression = Stack< Queue< std::string > >;
-  void getExpressions(std::istream& in,  stackOfinfixExpression res);
-  void calculate(stackOfinfixExpression infix, Queue< lli_t > res);
+  void getExpressions(std::istream& in,  stackOfinfixExpression& res);
+  void calculate(stackOfinfixExpression infix, Queue< lli_t >& res);
 }
 
 #endif
