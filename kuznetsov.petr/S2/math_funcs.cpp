@@ -1,7 +1,7 @@
 #include "math_funcs.hpp"
 
-const lli_t MAX = std::numeric_limits< kuznetsov::lli_t >::max();
-const lli_t MIN = std::numeric_limits< kuznetsov::lli_t >::min();
+const kuznetsov::lli_t MAX = std::numeric_limits< kuznetsov::lli_t >::max();
+const kuznetsov::lli_t MIN = std::numeric_limits< kuznetsov::lli_t >::min();
 
 bool kuznetsov::isOperand(const std::string& c)
 {
