@@ -7,8 +7,8 @@ const kuznetsov::lli_t MIN = std::numeric_limits< kuznetsov::lli_t >::min();
 
 bool kuznetsov::isOperand(const std::string& c)
 {
-  std::string operators[] = {"+", "-", "*", "/", "%", ">>"};
-  for (size_t i = 0; i < 6; ++i) {
+  std::string operators[] = {"+", "-", "*", "/", "%", ">>", "(", ")"};
+  for (size_t i = 0; i < 8; ++i) {
     if (c == operators[i]) {
       return false;
     }
@@ -129,3 +129,90 @@ void kuznetsov::getExpressions(std::istream& in, stackOfinfixExpression& res)
 }
 
 
+kuznetsov::lli_t kuznetsov::calculate(Queue<std::string> postfix)
+{
+  Stack<lli_t> evalStack;
+  while (!postfix.empty()) {
+    std::string sym = postfix.front();
+    postfix.pop();
+
+    if (isOperand(sym)) {
+      evalStack.push(std::stoll(sym));
+    } else {
+      if (evalStack.size() < 2) {
+        throw std::logic_error("Not enough operands for operator: " + sym);
+      }
+      lli_t b = evalStack.top();
+      evalStack.pop();
+      lli_t a = evalStack.top();
+      evalStack.pop();
+
+      lli_t result = 0;
+      if (sym == "+") {
+        result = add(a, b);
+      } else if (sym == "-") {
+        result = sub(a, b);
+      } else if (sym == "*") {
+        result = mul(a, b);
+      } else if (sym == "/") {
+        result = div(a, b);
+      } else if (sym == "%") {
+        result = mod(a, b);
+      } else if (sym == ">>") {
+        result = bitShiftToRight(a, b);
+      } else {
+        throw std::logic_error("Unknown operator: " + sym);
+      }
+
+      evalStack.push(result);
+    }
+  }
+
+  if (evalStack.size() != 1) {
+    throw std::logic_error("Must be one res ");
+  }
+
+  return evalStack.top();
+}
+
+void kuznetsov::calculate(stackOfinfixExpression infix, Queue<lli_t>& res)
+{
+  Queue<std::string> postfix;
+  Stack<std::string> temp;
+  while (!infix.empty()) {
+    Queue<std::string> curr = infix.top();
+    infix.pop();
+    while (!curr.empty()) {
+      std::string sym = curr.front();
+      curr.pop();
+      if (sym == "(") {
+        temp.push(sym);
+      } else if (sym == ")") {
+        while (!temp.empty() && temp.top() != "(") {
+          postfix.push(temp.top());
+          temp.pop();
+        }
+        temp.pop();
+      } else if (isOperand(sym)) {
+        postfix.push(sym);
+      } else {
+        while (!temp.empty() && temp.top() != "(") {
+          if (getPriority(sym) <= getPriority(temp.top())) {
+            postfix.push(temp.top());
+            temp.pop();
+          } else {
+            break;
+          }
+        }
+        temp.push(sym);
+      }
+    }
+    while (!temp.empty()) {
+      postfix.push(temp.top());
+      temp.pop();
+    }
+    temp.clear();
+    res.push(calculate(postfix));
+    postfix.clear();
+  }
+}

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "math_funcs.hpp"
+#include "math_funcs.cpp"
 #include "../common/includes/stack.hpp"
 #include "../common/includes/queue.hpp"
 
@@ -27,7 +27,6 @@ int main(int argc, char* argv[])
   if (mathExpressions.empty()) {
     return 0;
   }
-
   kuz::Queue< kuz::lli_t > res;
   kuz::calculate(mathExpressions, res);
 
