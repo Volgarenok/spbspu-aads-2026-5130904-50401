@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
-
-#include "math_funcs.cpp"
+#include "math_funcs.hpp"
 #include "../common/includes/stack.hpp"
 #include "../common/includes/queue.hpp"
 
@@ -21,14 +20,22 @@ int main(int argc, char* argv[])
       kuz::getExpressions(std::cin, mathExpressions);
     }
   } catch (...) {
-
+    std::cerr << "Input error\n";
+    mathExpressions.clear();
+    return 1;
   }
 
   if (mathExpressions.empty()) {
     return 0;
   }
+
   kuz::Queue< kuz::lli_t > res;
-  kuz::calculate(mathExpressions, res);
+
+  try {
+    kuz::calculate(mathExpressions, res);
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << '\n';
+  }
 
   std::cout << res.front();
   res.pop();
@@ -38,5 +45,6 @@ int main(int argc, char* argv[])
   }
   std::cout << '\n';
 
+  return 0;
 }
 
