@@ -35,6 +35,7 @@ int main(int argc, char* argv[])
     kuz::calculate(mathExpressions, res);
   } catch (const std::exception& e) {
     std::cerr << e.what() << '\n';
+    return 1;
   }
 
   std::cout << res.front();
