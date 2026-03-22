@@ -2,6 +2,8 @@
 #define MATH_FUNCS_HPP
 #include <cstddef>
 #include <string>
+#include "../common/includes/stack.hpp"
+#include "../common/includes/queue.hpp"
 
 namespace kuznetsov {
   bool isOperand(const std::string& c);
@@ -14,6 +16,10 @@ namespace kuznetsov {
   lli_t div(const lli_t& a, const lli_t& b);
   lli_t mod(const lli_t& a, const lli_t& b);
   lli_t bitShiftToRight(const lli_t& a, const lli_t& b);
+
+  using stackOfinfixExpression = Stack< Queue< std::string > >;
+  void getExpressions(std::istream& in,  stackOfinfixExpression res);
+  void calculate(stackOfinfixExpression infix, Queue< lli_t > res);
 }
 
 #endif
