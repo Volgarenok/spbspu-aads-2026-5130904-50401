@@ -2,6 +2,8 @@
 #define STACK_HPP
 
 #include "../common/list.hpp"
+#include <cstddef>
+#include <stdexcept>
 
 namespace studilova
 {
