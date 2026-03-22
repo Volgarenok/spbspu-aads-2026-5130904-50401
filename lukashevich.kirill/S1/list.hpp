@@ -53,8 +53,6 @@ namespace lukashevich
 
       void clear();
 
-      size_t size() const;
-
       LIter< T > begin();
       LIter< T > end();
       LCIter< T > begin() const;
