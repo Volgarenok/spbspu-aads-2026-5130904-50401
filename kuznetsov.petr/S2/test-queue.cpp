@@ -90,3 +90,4 @@ BOOST_AUTO_TEST_CASE(MoveAssignmentOperatorOfQueueTest)
   BOOST_CHECK(3 == queue2.front());
   BOOST_CHECK(8 == queue2.back());
 }
+
