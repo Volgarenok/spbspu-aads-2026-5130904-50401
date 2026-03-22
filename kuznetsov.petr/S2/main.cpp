@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
   }
 
   if (mathExpressions.empty()) {
+    std::cout << '\n';
     return 0;
   }
 
