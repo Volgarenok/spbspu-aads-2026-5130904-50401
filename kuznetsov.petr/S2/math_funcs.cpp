@@ -83,4 +83,12 @@ kuznetsov::lli_t kuznetsov::mod(const lli_t& a, const lli_t& b)
 
 kuznetsov::lli_t kuznetsov::bitShiftToRight(const lli_t& a, const lli_t& b)
 {
+  if (b == 0) {
+    throw std::logic_error("Bit right shift by value less then zero");
+  }
+  const int totalBits = sizeof(lli_t) * CHAR_BIT;
+  if (b > totalBits || a == 0) {
+    return 0;
+  }
+  return a >> b;
 }
