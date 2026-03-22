@@ -33,8 +33,8 @@ namespace lukashevich
       List();
       ~List();
       List(const List< T >& list);
-      List< T >& operator=(List< T >& list);
-      List(const List< T >&& list);
+      List< T >& operator=(const List< T >& list);
+      List(List< T >&& list);
       List< T >& operator=(List< T >&& list);
 
       T& front();
@@ -230,16 +230,73 @@ namespace lukashevich
     return LCIter< T >(nullptr);
   }
 
-  template<class T>
-  size_t List<T>::size() const
+  template< class T >
+  size_t List< T >::size() const
   {
     return size_;
   }
 
-  template<class T>
-  bool List<T>::empty() const
+  template< class T >
+  bool List< T >::empty() const
   {
     return size_ == 0;
+  }
+
+  template< class T >
+  List< T >::List(const List< T >& list):
+    fake_(makeFake< T >()),
+    size_(0)
+  {
+    Node< T >* cur = list.fake_->next;
+
+    while (cur != nullptr) {
+        pushBack(cur->val);
+        cur = cur->next;
+    }
+  }
+
+  template< class T >
+  List< T >& List< T >::operator=(const List< T >& list) {
+    if (this == &list) {
+      return *this;
+    }
+    clear();
+    
+    Node< T >* cur = list.fake_->next;
+    while (cur != nullptr) {
+      pushBack(cur->val);
+      cur = cur->next;
+    }
+    return *this;
+  }
+
+  template< class T >
+  List< T >::List(List< T >&& list):
+    fake_(list.fake_),
+    size_(list.size_)
+  {
+    list.fake_ = makeFake< T >();
+    list.size_ = 0;
+  }
+
+  template< class T >
+  List< T >& List< T >::operator=(List< T >&& list)
+  {
+    if (this == &list)
+    {
+      return *this;
+    }
+
+    clear();
+    removeFake(fake_);
+
+    fake_ = list.fake_;
+    size_ = list.size_;
+
+    list.fake_ = makeFake< T >();
+    list.size_ = 0;
+
+    return *this;
   }
 }
 
