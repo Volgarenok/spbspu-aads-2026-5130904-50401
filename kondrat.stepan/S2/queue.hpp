@@ -33,7 +33,7 @@ namespace kondrat
   Queue< T >::Queue() : list_() {}
 
   template< class T >
-  Queue< T >::Queue(const Queue< T > & queue) : list_ (queue.list_);
+  Queue< T >::Queue(const Queue< T > & queue) : list_ (queue.list_) {}
 
   template< class T >
   Queue< T > & Queue< T >::operator=(const Queue< T > & queue)
