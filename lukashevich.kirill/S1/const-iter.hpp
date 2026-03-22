@@ -1,5 +1,5 @@
 #ifndef CONST_ITER_HPP
-#define CONAT_ITER_HPP
+#define CONST_ITER_HPP
 
 #include <cassert>
 
