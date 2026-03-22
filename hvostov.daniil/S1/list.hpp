@@ -70,7 +70,6 @@ namespace hvostov {
       LCiter< T > cbegin() const noexcept;
 
       Liter< T > insertAfter(const Liter< T > it, const T& val);
-      Liter< T > pushBack(const T&val);
       void eraseAfter(const Liter< T > it) noexcept;
       void clear() noexcept;
       bool empty() const noexcept;
@@ -108,8 +107,9 @@ hvostov::List< T >::List(const List< T >& list):
 {
   createFake();
   fake_->next_ = fake_;
+  Liter< T > mit = begin();
   for (Liter< T > it = list.begin(); it != list.end(); it++) {
-    pushBack(*it);
+    mit = insertAfter(mit, *it);
   }
 }
 
@@ -134,8 +134,9 @@ hvostov::List< T >& hvostov::List< T >::operator=(const List< T >& list)
     return *this;
   }
   clear();
+  Liter< T > mit = begin();
   for (Liter< T > it = list.begin(); it != list.end(); it++) {
-    pushBack(*it);
+    mit = insertAfter(mit, *it);
   }
   return *this;
 }
@@ -202,14 +203,6 @@ template< class T >
 bool hvostov::List< T >::empty() const noexcept
 {
   return fake_->next_ == fake_;
-}
-
-template< class T >
-hvostov::Liter< T > hvostov::List< T >::pushBack(const T& val)
-{
-  Liter< T > it = begin();
-  it = insertAfter(it, val);
-  return it;
 }
 
 template< class T >

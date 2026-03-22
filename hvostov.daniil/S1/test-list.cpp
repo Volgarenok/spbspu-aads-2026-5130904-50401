@@ -6,14 +6,7 @@ BOOST_AUTO_TEST_SUITE(list_suite)
 BOOST_AUTO_TEST_CASE(test_create_list)
 {
   hvostov::List< int > list;
-  BOOST_CHECK(list.empty()); }
-
-BOOST_AUTO_TEST_CASE(test_push_element)
-{
-  hvostov::List< int > list;
-  list.pushBack(6);
-  BOOST_CHECK(!list.empty());
-  BOOST_CHECK(*(list.begin()) == 6);
+  BOOST_CHECK(list.empty());
 }
 
 BOOST_AUTO_TEST_CASE(test_insert_element)
@@ -42,9 +35,10 @@ BOOST_AUTO_TEST_CASE(test_insert_element)
 BOOST_AUTO_TEST_CASE(test_erase_element)
 {
   hvostov::List< int > list;
-  list.pushBack(6);
-  list.pushBack(7);
   hvostov::Liter< int > it = list.begin();
+  it = list.insertAfter(it, 6);
+  it = list.insertAfter(it, 7);
+  it = list.begin();
   list.eraseAfter(it);
   it++;
   BOOST_CHECK(!list.empty());
@@ -56,15 +50,17 @@ BOOST_AUTO_TEST_CASE(test_erase_element)
 BOOST_AUTO_TEST_CASE(test_clear)
 {
   hvostov::List< int > list;
-  list.pushBack(6);
-  list.pushBack(7);
-  list.pushBack(6);
-  list.pushBack(7);
+  hvostov::Liter< int > it = list.begin();
+  it = list.insertAfter(it, 6);
+  it = list.insertAfter(it, 7);
+  it = list.insertAfter(it, 6);
+  it = list.insertAfter(it, 7);
   BOOST_CHECK(!list.empty());
   list.clear();
   BOOST_CHECK(list.empty());
-  list.pushBack(6);
-  list.pushBack(7);
+  it = list.begin();
+  it = list.insertAfter(it, 6);
+  it = list.insertAfter(it, 7);
   BOOST_CHECK(!list.empty());
   list.clear();
   BOOST_CHECK(list.empty());
