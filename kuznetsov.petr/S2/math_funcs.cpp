@@ -1,5 +1,8 @@
 #include "math_funcs.hpp"
 
+const lli_t MAX = std::numeric_limits< kuznetsov::lli_t >::max();
+const lli_t MIN = std::numeric_limits< kuznetsov::lli_t >::min();
+
 bool kuznetsov::isOperand(const std::string& c)
 {
   std::string operators[] = {"+", "-", "*", "/", "%", ">>"};
@@ -24,8 +27,6 @@ size_t kuznetsov::getPriority(const std::string& c)
 
 kuznetsov::lli_t kuznetsov::add(const lli_t& a, const lli_t& b)
 {
-  lli_t MAX = std::numeric_limits< lli_t >::max();
-  lli_t MIN = std::numeric_limits< lli_t >::min();
   if (a > 0 && b > 0 && a > MAX - b) {
     throw std::overflow_error("Add overflow");
   } else if (a < 0 && b < 0 && a < MIN - b) {
@@ -36,8 +37,6 @@ kuznetsov::lli_t kuznetsov::add(const lli_t& a, const lli_t& b)
 
 kuznetsov::lli_t kuznetsov::sub(const lli_t& a, const lli_t& b)
 {
-  lli_t MAX = std::numeric_limits< lli_t >::max();
-  lli_t MIN = std::numeric_limits< lli_t >::min();
   if (a < 0 && b > 0 && a < MIN + b) {
     throw std::overflow_error("Sub overflow");
   } else if (a > 0 && b < 0 && a < MAX + b) {
@@ -48,6 +47,19 @@ kuznetsov::lli_t kuznetsov::sub(const lli_t& a, const lli_t& b)
 
 kuznetsov::lli_t kuznetsov::mul(const lli_t& a, const lli_t& b)
 {
+  if (!a || !b) {
+    return 0;
+  }
+  if (a > 0 && b > 0 && a > MAX / b) {
+    throw std::overflow_error("Multiply overflow");
+  } else if (a < 0 && b < 0 && a > MAX / b) {
+    throw std::overflow_error("Multiply overflow");
+  } else if (a > 0 && b < 0 && b < MIN / a) {
+    throw std::overflow_error("Multiply overflow");
+  } else if (a < 0 && b > 0 && a < MIN / b) {
+    throw std::overflow_error("Multiply overflow");
+  }
+  return a * b;
 }
 
 kuznetsov::lli_t kuznetsov::div(const lli_t& a, const lli_t& b)
