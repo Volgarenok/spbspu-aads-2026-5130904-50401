@@ -27,6 +27,7 @@ namespace zubarev
       std::cout << results.top() << (results.size() > 1 ? " " : "");
       results.drop();
     }
+    std::cout << '\n'; 
   }
   std::string input(std::istream& in, bool& error)
   {
@@ -91,9 +92,7 @@ namespace zubarev
         infixQ.push(std::string(1, str[num]));
         num++;
       }
-
       else {
-
         num++;
       }
     }
@@ -240,12 +239,14 @@ namespace zubarev
   }
   ll_int remainder(ll_int oper1, ll_int oper2)
   {
-    if (oper2 != 0) {
-      return oper1 % oper2;
-    } else {
+    if (oper2 == 0) {
       throw std::runtime_error("Modulo by zero");
-      ;
     }
+    ll_int res = oper1 % oper2;
+    if (res < 0) {
+      res += (oper2 > 0 ? oper2 : -oper2); // или std::abs(oper2)
+    }
+    return res;
   }
   ll_int concatenation(ll_int oper1, ll_int oper2)
   {
@@ -308,8 +309,6 @@ namespace zubarev
               break;
             }
           }
-
-
 
           if (index != -1) {
 
