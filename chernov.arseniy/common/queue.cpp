@@ -20,6 +20,8 @@ namespace chernov {
 
     T & front() const;
     T & back() const;
+    void push(const T & value);
+    void push(T && value);
     bool empty() const noexcept;
     size_t size() const noexcept;
     void clear();
@@ -100,6 +102,18 @@ template< class T >
 T & chernov::Queue< T >::back() const
 {
   return *last_;
+}
+
+template< class T >
+void chernov::Queue< T >::push(const T & value)
+{
+  last_ = list_.insertAfter(last_, value);
+}
+
+template< class T >
+void chernov::Queue< T >::push(T && value)
+{
+  last_ = list_.insertAfter(last_, std::move(value));
 }
 
 template< class T >
