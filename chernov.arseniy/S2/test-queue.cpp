@@ -165,3 +165,68 @@ BOOST_AUTO_TEST_CASE(test_empty)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(queue_modifiers_tests)
+
+BOOST_AUTO_TEST_CASE(test_push)
+{
+  chernov::Queue< int > queue;
+
+  queue.push(1);
+  BOOST_CHECK_EQUAL(queue.size(), 1);
+  BOOST_CHECK_EQUAL(queue.front(), 1);
+
+  queue.push(2);
+  queue.push(3);
+  BOOST_CHECK_EQUAL(queue.size(), 3);
+  BOOST_CHECK_EQUAL(queue.back(), 3);
+
+  int value = 4;
+  queue.push(value);
+  BOOST_CHECK_EQUAL(queue.size(), 4);
+  BOOST_CHECK_EQUAL(queue.back(), 4);
+}
+
+BOOST_AUTO_TEST_CASE(test_pop)
+{
+  chernov::Queue< int > queue;
+
+  queue.push(1);
+  queue.pop();
+  BOOST_CHECK_EQUAL(queue.size(), 0);
+
+  queue.push(2);
+  queue.push(3);
+  queue.pop();
+  BOOST_CHECK_EQUAL(queue.size(), 1);
+
+  queue.pop();
+  BOOST_CHECK_EQUAL(queue.size(), 0);
+
+  queue.pop();
+  BOOST_CHECK_EQUAL(queue.size(), 0);
+  BOOST_CHECK(queue.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_clear)
+{
+  chernov::Queue< int > queue;
+
+  queue.clear();
+  BOOST_CHECK_EQUAL(queue.size(), 0);
+
+  queue.push(1);
+  queue.clear();
+  BOOST_CHECK_EQUAL(queue.size(), 0);
+
+  queue.push(2);
+  queue.push(3);
+  queue.push(4);
+  queue.clear();
+  BOOST_CHECK_EQUAL(queue.size(), 0);
+
+  queue.clear();
+  BOOST_CHECK_EQUAL(queue.size(), 0);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
