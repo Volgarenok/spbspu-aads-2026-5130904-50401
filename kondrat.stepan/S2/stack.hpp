@@ -25,7 +25,7 @@ namespace kondrat
       void clear();
 
     private:
-      List< T > list_
+      List< T > list_;
   };
 
   template< class T >
@@ -49,7 +49,7 @@ namespace kondrat
   {
     if (this != &stack)
     {
-      list_ = std::move(stack.list_)
+      list_ = std::move(stack.list_);
     }
     return *this;
   }
@@ -63,11 +63,11 @@ namespace kondrat
   template< class T >
   size_t Stack< T >::size() const
   {
-    return list_.size()
+    return list_.size();
   }
 
   template< class T >
-  T & Stack< T >::first() const
+  const T & Stack< T >::first() const
   {
     return list_.back();
   }
