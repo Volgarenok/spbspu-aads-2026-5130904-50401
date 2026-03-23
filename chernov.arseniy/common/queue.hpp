@@ -137,7 +137,12 @@ void chernov::Queue< T >::push(T && value)
 template< class T >
 void chernov::Queue< T >::pop()
 {
-  list_.popFront();
+  if (list_.size() == 1) {
+    list_.popFront();
+    last_ = list_.beforeBegin();
+  } else {
+    list_.popFront();
+  }
 }
 
 template< class T >
