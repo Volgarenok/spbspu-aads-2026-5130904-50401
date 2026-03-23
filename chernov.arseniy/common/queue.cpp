@@ -2,25 +2,90 @@
 #define QUEUE_HPP
 
 #include <cstddef>
+#include <iterator>
+
 #include <list.hpp>
+#include <liter.hpp>
 
 namespace chernov {
   template< class T >
   class Queue {
   public:
-    Queue() = default;
-    Queue(const Queue< T > &) = default;
-    Queue(Queue< T > &&) = default;
+    Queue();
+    Queue(const Queue< T > & queue);
+    Queue(Queue< T > && queue);
     ~Queue() = default;
-    Queue< T > & operator=(const Queue< T > &) = default;
-    Queue< T > & operator=(Queue< T > &&) = default;
+    Queue< T > & operator=(const Queue< T > & queue);
+    Queue< T > & operator=(Queue< T > && queue);
 
     bool empty() const noexcept;
     size_t size() const noexcept;
     void clear();
   private:
     List< T > list_;
+    LIter< T > last_;
+    void updateLast();
   };
+}
+
+template< class T >
+void chernov::Queue< T >::updateLast()
+{
+  if (list_.empty()) {
+    last_ = list_.beforeBegin();
+  } else {
+    LIter< T > iter = list_.begin();
+    while (std::next(iter) != list_.begin()) {
+      ++iter;
+    }
+    last_ = iter;
+  }
+}
+
+template< class T >
+chernov::Queue< T >::Queue():
+  list_(),
+  last_()
+{
+  updateLast();
+}
+
+template< class T >
+chernov::Queue< T >::Queue(const Queue< T > & queue):
+  list_(queue.list_),
+  last_()
+{
+  updateLast();
+}
+
+template< class T >
+chernov::Queue< T >::Queue(Queue< T > && queue):
+  list_(std::move(queue.list_)),
+  last_()
+{
+  updateLast();
+}
+
+template< class T >
+chernov::Queue< T > & chernov::Queue< T >::operator=(const Queue< T > & queue)
+{
+  if (this == &queue) {
+    return *this;
+  }
+  list_ = queue.list_;
+  updateLast();
+  return *this;
+}
+
+template< class T >
+chernov::Queue< T > & chernov::Queue< T >::operator=(Queue< T > && queue)
+{
+  if (this == &queue) {
+    return *this;
+  }
+  list_ = std::move(queue.list_);
+  updateLast();
+  return *this;
 }
 
 template< class T >
