@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE S1
 #include <boost/test/included/unit_test.hpp>
-#include "list.hpp"
+#include <list.hpp>
 
 BOOST_AUTO_TEST_CASE(DefaultListConstructorTest)
 {

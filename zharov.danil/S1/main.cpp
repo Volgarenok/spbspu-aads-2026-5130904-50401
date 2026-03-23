@@ -1,7 +1,7 @@
 #include <iostream>
 #include <limits>
 #include <string>
-#include "list.hpp"
+#include <list.hpp>
 
 namespace zharov {
   std::istream & getData(std::istream & in,
