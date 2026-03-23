@@ -13,7 +13,6 @@ namespace zubarev
       std::string expression = input(in, error);
 
       if (error) {
-        std::cout << "here" << '\n';
         throw std::runtime_error("input: incorrect input");
       }
 
@@ -88,7 +87,7 @@ namespace zubarev
         }
 
       } else if (str[num] == '+' || str[num] == '-' || str[num] == '*' || str[num] == '/' || str[num] == '(' ||
-                 str[num] == ')') {
+                 str[num] == ')' || str[num] == '%') {
         infixQ.push(std::string(1, str[num]));
         num++;
       }
@@ -309,7 +308,11 @@ namespace zubarev
               break;
             }
           }
+
+
+
           if (index != -1) {
+
             res.push(functions[index](oper2, oper1));
           } else {
             throw std::runtime_error("Invalid expression: incorrect operation");
