@@ -2,7 +2,6 @@
 #define QUEUE_HPP
 
 #include <cstddef>
-#include <iterator>
 
 #include <list.hpp>
 #include <liter.hpp>
