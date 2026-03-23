@@ -18,7 +18,7 @@ namespace zubarev
   ll_int concatenation(ll_int oper1, ll_int oper2);
   ll_int eval(Queue< std::string >& postfixQ);
   ll_int fromStrToNum(std::string& str);
-
+  void output(std::istream& in);
 }
 
 #endif

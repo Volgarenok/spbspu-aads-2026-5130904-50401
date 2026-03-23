@@ -4,35 +4,65 @@
 namespace zubarev
 {
   using ll_int = long long int;
-  std::string input(std::istream& in, bool& error)
+  void output(std::istream& in)
   {
-    std::string str = "";
-    char ch;
-    while (in.peek() == ' ' || in.peek() == '\t' || in.peek() == '\n') {
-      in.get();
-    }
-    while (in.peek() != '\n' && in.peek() != EOF) {
-      ch = in.get();
-      if (ch != ' ' && ch != '\t') {
-        if (!isalpha(ch)) {
-          str += ch;
-        } else {
-          error = true;
-          std::cerr << "input: incorrect input" << '\n';
-          return "";
-        }
+    Stack< ll_int > results;
+
+    while (in && !in.eof()) {
+      bool error = false;
+      std::string expression = input(in, error);
+
+      if (error) {
+        std::cout<<"here"<<'\n';
+        throw std::runtime_error("input: incorrect input");
+      }
+
+      if (!expression.empty()) {
+        Queue< std::string > infixQ = fromStrToQueue(expression);
+        Queue< std::string > postfixQ = fromInfixToPostfix(infixQ);
+        results.push(eval(postfixQ));
       }
     }
-    if (in.peek() == '\n') {
-      in.get();
+
+    while (!results.empty()) {
+      std::cout << results.top() << (results.size() > 1 ? " " : "");
+      results.drop();
+    }
+    std::cout << ' ';
+  }
+  std::string input(std::istream& in, bool& error)
+  {
+    error = false;
+    std::string line;
+
+    if (!std::getline(in, line)) {
+      if (in.eof()) {
+        return "";
+      }
+      error = true;
+      return "";
     }
 
-    // if (str == "") {
-    //   error = true;
-    // } else {
-    //   error = false;
-    // }
-    return str;
+    std::string result;
+    char ch;
+    for (size_t i = 0; i < line.size(); ++i) {
+      ch = line[i];
+      if (std::isspace(static_cast< unsigned char >(ch))) {
+        continue;
+      }
+
+      if (std::isdigit(static_cast< unsigned char >(ch)) || ch == '+' || ch == '-' || ch == '*' || ch == '/' ||
+          ch == '(' || ch == ')') {
+        result += ch;
+      } else {
+        std::cout<<"here"<<'\n';
+        error = true;
+        std::cerr << "input: incorrect input (invalid char '" << ch << "')\n";
+        return "";
+      }
+    }
+
+    return result;
   }
 
   Queue< std::string > fromStrToQueue(std::string& str)
@@ -120,12 +150,11 @@ namespace zubarev
           stack.push(el);
         } else {
           if (el == ")") {
-            while (stack.top() != "(") {
+            while (!stack.empty() && stack.top() != "(") {
               postfixQ.push(stack.top());
               stack.drop();
               if (stack.empty()) {
                 throw std::runtime_error("Unbalanced parentheses: missing '('");
-                ;
               }
             }
             stack.drop();
@@ -157,12 +186,11 @@ namespace zubarev
   }
   ll_int subtraction(ll_int oper1, ll_int oper2)
   {
-    if (oper1 > std::numeric_limits< ll_int >::min() + oper2) {
-      return oper1 - oper2;
-    } else {
+    if ((oper2 > 0 && oper1 < std::numeric_limits< ll_int >::min() + oper2) ||
+        (oper2 < 0 && oper1 > std::numeric_limits< ll_int >::max() + oper2)) {
       throw std::overflow_error("Subtraction overflow");
-      ;
     }
+    return oper1 - oper2;
   }
   ll_int multiplication(ll_int oper1, ll_int oper2)
   {
@@ -228,18 +256,24 @@ namespace zubarev
     if (oper2 < 0) {
       oper2 = -1 * oper2;
     }
-    res = multiplication(oper1, pow(10, ceil(log10(oper2))));
+    ll_int temp = oper2;
+    ll_int factor = 1;
 
-    res = summation(res, oper2);
+    while (temp > 0) {
+      factor = multiplication(factor, 10);
+      temp /= 10;
+    }
+
+    res = summation(multiplication(oper1, factor), oper2);
     return res;
   }
 
-  ll_int fromStrToNum(std::string str)
+  ll_int fromStrToNum(std::string& str)
   {
     ll_int num = 0;
     for (size_t i = 0; i < str.size(); ++i) {
       ll_int digit = (str[i] - '0');
-      if (num < (std::numeric_limits< ll_int >::max() - digit) / 10) {
+      if (num <= (std::numeric_limits< ll_int >::max() - digit) / 10) {
         num = num * 10 + digit;
       } else {
         throw std::overflow_error("Number parsing overflow");
@@ -256,36 +290,40 @@ namespace zubarev
                           ll_int) = {summation, subtraction, multiplication, division, remainder, concatenation};
     Stack< ll_int > res;
     ll_int oper1, oper2;
-    std::string operation;
     while (!postfixQ.empty()) {
-      while (!postfixQ.empty() && isdigit(postfixQ.top())) {
-        res.push(fromStrToNum(postfixQ.top()));
-        postfixQ.drop();
-      }
-      if (!res.empty() && !postfixQ.empty()) {
-        oper1 = res.top();
-        res.drop();
-        oper2 = res.top();
-        res.drop();
-        operation = postfixQ.top();
-        postfixQ.drop();
+      std::string el=postfixQ.top();
+      postfixQ.drop();
+      if (isdigit(el)) {
+        res.push(fromStrToNum(el));
       } else {
-        throw std::runtime_error("Invalid expression: not enough operands");
+        if (res.size()<2) {
+          throw std::runtime_error("Invalid expression: not enough operands");
+        } else {
+          oper1=res.top();
+          res.drop();
+          oper2=res.top();
+          res.drop();
+
+          int index=-1;
+          for (size_t i=0;i<6;++i) {
+            if (el==symbols[i]) {
+              index=i;
+              break;
+            }
+          }
+          if (index!=-1) {
+             res.push(functions[index](oper2, oper1));
+      } else {
+        throw std::runtime_error("Invalid expression: incorrect operation");
       }
 
-      size_t index = 0;
-      for (size_t i = 0; i < 6; ++i) {
-        if (operation == symbols[i]) {
-          index = i;
-          break;
         }
       }
-      res.push(functions[index](oper2, oper1));
     }
-    if (!res.empty()) {
-      return res.top();
-    } else {
-      throw std::runtime_error("Invalid expression: not enough operands");
+
+    if (res.size() != 1) {
+      throw std::runtime_error("Invalid expression: final stack size is not 1");
     }
+    return res.top();
   }
 }
