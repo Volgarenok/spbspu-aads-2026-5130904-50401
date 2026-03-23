@@ -13,7 +13,7 @@ namespace zubarev
       std::string expression = input(in, error);
 
       if (error) {
-        std::cout<<"here"<<'\n';
+        std::cout << "here" << '\n';
         throw std::runtime_error("input: incorrect input");
       }
 
@@ -28,7 +28,6 @@ namespace zubarev
       std::cout << results.top() << (results.size() > 1 ? " " : "");
       results.drop();
     }
-    std::cout << ' ';
   }
   std::string input(std::istream& in, bool& error)
   {
@@ -52,10 +51,9 @@ namespace zubarev
       }
 
       if (std::isdigit(static_cast< unsigned char >(ch)) || ch == '+' || ch == '-' || ch == '*' || ch == '/' ||
-          ch == '(' || ch == ')') {
+          ch == '(' || ch == ')' || ch == '%' || ch == '#') {
         result += ch;
       } else {
-        std::cout<<"here"<<'\n';
         error = true;
         std::cerr << "input: incorrect input (invalid char '" << ch << "')\n";
         return "";
@@ -291,32 +289,31 @@ namespace zubarev
     Stack< ll_int > res;
     ll_int oper1, oper2;
     while (!postfixQ.empty()) {
-      std::string el=postfixQ.top();
+      std::string el = postfixQ.top();
       postfixQ.drop();
       if (isdigit(el)) {
         res.push(fromStrToNum(el));
       } else {
-        if (res.size()<2) {
+        if (res.size() < 2) {
           throw std::runtime_error("Invalid expression: not enough operands");
         } else {
-          oper1=res.top();
+          oper1 = res.top();
           res.drop();
-          oper2=res.top();
+          oper2 = res.top();
           res.drop();
 
-          int index=-1;
-          for (size_t i=0;i<6;++i) {
-            if (el==symbols[i]) {
-              index=i;
+          int index = -1;
+          for (size_t i = 0; i < 6; ++i) {
+            if (el == symbols[i]) {
+              index = i;
               break;
             }
           }
-          if (index!=-1) {
-             res.push(functions[index](oper2, oper1));
-      } else {
-        throw std::runtime_error("Invalid expression: incorrect operation");
-      }
-
+          if (index != -1) {
+            res.push(functions[index](oper2, oper1));
+          } else {
+            throw std::runtime_error("Invalid expression: incorrect operation");
+          }
         }
       }
     }
