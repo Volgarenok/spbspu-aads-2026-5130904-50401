@@ -42,8 +42,11 @@ void chernov::Queue< T >::updateLast()
     last_ = list_.beforeBegin();
   } else {
     LIter< T > iter = list_.begin();
-    while (std::next(iter) != list_.begin()) {
+    LIter< T > next_iter = iter;
+    ++next_iter;
+    while (next_iter != list_.begin()) {
       ++iter;
+      ++next_iter;
     }
     last_ = iter;
   }
