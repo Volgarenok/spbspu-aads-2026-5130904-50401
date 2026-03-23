@@ -91,8 +91,7 @@ namespace zubarev
                  str[num] == ')' || str[num] == '%') {
         infixQ.push(std::string(1, str[num]));
         num++;
-      }
-      else {
+      } else {
         num++;
       }
     }
