@@ -27,7 +27,7 @@ namespace zubarev
       std::cout << results.top() << (results.size() > 1 ? " " : "");
       results.drop();
     }
-    std::cout << '\n'; 
+    std::cout << '\n';
   }
   std::string input(std::istream& in, bool& error)
   {
