@@ -18,6 +18,8 @@ namespace chernov {
     Queue< T > & operator=(const Queue< T > & queue);
     Queue< T > & operator=(Queue< T > && queue);
 
+    T & front() const;
+    T & back() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
     void clear();
@@ -86,6 +88,18 @@ chernov::Queue< T > & chernov::Queue< T >::operator=(Queue< T > && queue)
   list_ = std::move(queue.list_);
   updateLast();
   return *this;
+}
+
+template< class T >
+T & chernov::Queue< T >::front() const
+{
+  return list_.first();
+}
+
+template< class T >
+T & chernov::Queue< T >::back() const
+{
+  return *last_;
 }
 
 template< class T >
