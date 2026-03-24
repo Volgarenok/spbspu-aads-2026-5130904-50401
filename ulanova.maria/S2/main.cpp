@@ -18,9 +18,8 @@ int main(int argc, char* argv[])
     }
     input = &file;
   }
-   ulanova::Stack<long long> results;
-   std::string line;
-   bool has_input = false;
+  ulanova::Stack<long long> results;
+  std::string line;
   try
   {
     while (std::getline(*input, line))
@@ -29,14 +28,9 @@ int main(int argc, char* argv[])
       {
         continue;
       }
-      has_input = true;
       std::string postfix = ulanova::infix_to_postfix(line);
       long long result = ulanova::postfix(postfix);
       results.push(result);
-    }
-    if (!has_input)
-    {
-      throw std::runtime_error("empty input");
     }
     bool first = true;
     while (!results.empty())
