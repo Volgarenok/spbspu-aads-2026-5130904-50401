@@ -18,4 +18,28 @@ namespace ulanova
     }
     return 0;
   }
+  long long apply_op(long long a, long long b, char op)
+  {
+    switch (op)
+    {
+      case '+' : return a + b;
+      case '-' : return a - b;
+      case '*' : return a * b;
+      case '/' :
+        if ( b == 0)
+        {
+          throw std::runtime_error("division by zero");
+        }
+        return a / b;
+      case '%' :
+        if ( b == 0)
+        {
+          throw std::runtime_error("modul by zero");
+        }
+        return a % b;
+      case '^' : return a ^ b;
+      default:
+        throw std::runtime_error("unknown operator");
+    }
+  }
 }
