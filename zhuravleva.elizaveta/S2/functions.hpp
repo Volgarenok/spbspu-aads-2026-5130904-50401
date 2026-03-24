@@ -59,7 +59,7 @@ namespace zhuravleva
     zhuravleva::Queue< std::string > out;
     zhuravleva::Stack< std::string > ops;
     std::string part;
-  
+
     for (size_t i = 0; i <= line.size(); i++)
     {
       if (i == line.size() || line[i] == ' ')
