@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <stdexcept>
 
-BOOST_AUTO_TEST_CASE(test_push_pop)
+BOOST_AUTO_TEST_CASE(test_push_pop_stack)
 {
   ulanova::Stack<size_t> s;
   s.push(1);
@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(test_push_pop)
   BOOST_CHECK(s.drop() == 2);
   BOOST_CHECK(s.drop() == 1);
 }
-BOOST_AUTO_TEST_CASE(test_empty)
+BOOST_AUTO_TEST_CASE(test_empty_stack)
 {
   ulanova::Stack<size_t> s;
   BOOST_CHECK(s.empty());
@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(test_empty)
   s.drop();
   BOOST_CHECK(s.empty());
 }
-BOOST_AUTO_TEST_CASE(test_clear)
+BOOST_AUTO_TEST_CASE(test_clear_stack)
 {
   ulanova::Stack<size_t> s;
   s.push(1);
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(test_clear)
   s.clear();
   BOOST_CHECK(s.empty());
 }
-BOOST_AUTO_TEST_CASE(test_exception)
+BOOST_AUTO_TEST_CASE(test_exception_stack)
 {
   ulanova::Stack<size_t> s;
   BOOST_CHECK_THROW(s.drop(), std::runtime_error);
