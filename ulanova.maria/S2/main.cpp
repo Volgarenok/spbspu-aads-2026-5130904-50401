@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
         std::cout << results.drop();
         first = false;
       }
-      std::cout << "\n";
     }
+    std::cout << "\n";
   } catch (const std::exception& e)
   {
     std::cerr << e.what() << "\n";
