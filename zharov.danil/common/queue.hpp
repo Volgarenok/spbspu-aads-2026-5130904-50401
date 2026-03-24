@@ -64,25 +64,25 @@ zharov::Queue< T > & zharov::Queue< T >::operator=(Queue && q) noexcept
 template< class T >
 T & zharov::Queue< T >::front()
 {
-  return list_.front;
+  return list_.front();
 }
 
 template< class T >
 const T & zharov::Queue< T >::front() const
 {
-  return list_.front;
+  return list_.front();
 }
 
 template< class T >
 T & zharov::Queue< T >::back()
 {
-  return list_.back;
+  return list_.back();
 }
 
 template< class T >
 const T & zharov::Queue< T >::back() const
 {
-  return list_.back;
+  return list_.back();
 }
 
 template< class T >
@@ -112,7 +112,9 @@ void zharov::Queue< T >::push(T rhs)
 template< class T >
 T zharov::Queue< T >::drop()
 {
+  T fr = front();
   list_.popFront();
+  return fr;
 }
 
 template< class T >
