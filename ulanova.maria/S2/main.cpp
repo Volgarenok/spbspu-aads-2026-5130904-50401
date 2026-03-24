@@ -16,6 +16,10 @@ int main(int argc, char* argv[])
       std::cerr << "cannot open file\n";
       return 1;
     }
+    if (file.peek() == EOF)
+    {
+      return 0;
+    }
     input = &file;
   }
   ulanova::Stack<long long> results;
