@@ -2,27 +2,51 @@
 #include "postfix.hpp"
 #include <iostream>
 #include <string>
+#include <fstream>
 
-int main()
+int main(int argc, char* argv[])
 {
-  ulanova::Stack<long long> results;
-  std::string line;
-
+  std::istream* input = &std::cin;
+  std::ifstream file;
+  if (argc > 1)
+  {
+    file.open(argv[1]);
+    if (!file.is_open())
+    {
+      std::cerr << "cannot open file\n";
+      return 1;
+    }
+    input = &file;
+  }
+   ulanova::Stack<long long> results;
+   std::string line;
+   bool has_input = false;
   try
   {
-    while (std::getline(std::cin, line))
+    while (std::getline(*input, line))
     {
       if (line.empty())
       {
-        continue; //
+        continue;
       }
+      has_input = true;
       std::string postfix = ulanova::infix_to_postfix(line);
       long long result = ulanova::postfix(postfix);
       results.push(result);
     }
+    if (!has_input)
+    {
+      throw std::runtime_error("empty input");
+    }
+    bool first = true;
     while (!results.empty())
     {
-      std::cout << results.drop() << "\n";
+      if (!first)
+      {
+        std::cout << " ";
+      }
+      std::cout << results.drop();
+      first = false;
     }
   } catch (const std::exception& e)
   {
