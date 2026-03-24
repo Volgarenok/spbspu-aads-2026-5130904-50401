@@ -7,7 +7,7 @@
 namespace zhuravleva
 {
   using value_t = long long;
-  value_t add(value_t a, value_t b)
+  inline value_t add(value_t a, value_t b)
   {
     if ((b > 0 && a > std::numeric_limits<value_t>::max() - b) ||
         (b < 0 && a < std::numeric_limits<value_t>::min() - b))
@@ -17,7 +17,7 @@ namespace zhuravleva
     return a + b;
   }
 
-  value_t sub(value_t a, value_t b)
+  inline value_t sub(value_t a, value_t b)
   {
     if ((b < 0 && a > std::numeric_limits<value_t>::max() + b) ||
         (b > 0 && a < std::numeric_limits<value_t>::min() + b))
@@ -27,7 +27,7 @@ namespace zhuravleva
     return a - b;
   }
 
-  value_t mul(value_t a, value_t b)
+  inline value_t mul(value_t a, value_t b)
   {
     if (a == 0 || b == 0)
     {
@@ -41,7 +41,7 @@ namespace zhuravleva
     return a * b;
   }
 
-  value_t div(value_t a, value_t b)
+  inline value_t div(value_t a, value_t b)
   {
     if (b == 0)
     {
@@ -50,7 +50,7 @@ namespace zhuravleva
     return a / b;
   }
 
-  value_t mod(value_t a, value_t b)
+  inline value_t mod(value_t a, value_t b)
   {
     if (b == 0)
     {
@@ -59,7 +59,7 @@ namespace zhuravleva
     return a % b;
   }
 
-  value_t bitNot(value_t a)
+  inline value_t bitNot(value_t a)
   {
     return ~a;
   }

@@ -9,7 +9,7 @@
 #include "operations.hpp"
 namespace zhuravleva
 {
-  bool isOperator(const std::string& op)
+  inline bool isOperator(const std::string& op)
   {
     if (op == "+" || op == "-" || op == "*" || op == "/" || op == "!" || op == "%")
     {
@@ -18,7 +18,7 @@ namespace zhuravleva
     return false;
   }
 
-  bool isNumber(const std::string& num)
+  inline bool isNumber(const std::string& num)
   {
     if (num.empty())
     {
@@ -39,7 +39,7 @@ namespace zhuravleva
     return true;
   }
 
-  int priority(const std::string& op)
+  inline int priority(const std::string& op)
   {
     if (op == "!")
     {
@@ -54,7 +54,7 @@ namespace zhuravleva
     return 0;
   }
 
-  zhuravleva::Queue< std::string > infToPostfix(const std::string& line)
+  inline zhuravleva::Queue< std::string > infToPostfix(const std::string& line)
   {
     zhuravleva::Queue< std::string > out;
     zhuravleva::Stack< std::string > ops;
@@ -118,8 +118,7 @@ namespace zhuravleva
     return out;
   }
 
-
-  zhuravleva::value_t applyBinary(const std::string& op, int a, int b)
+  inline zhuravleva::value_t applyBinary(const std::string& op, int a, int b)
   {
     if (op == "+")
     {
@@ -147,8 +146,7 @@ namespace zhuravleva
     throw std::runtime_error("error");
   }
 
-
-  zhuravleva::value_t calcPostfix(zhuravleva::Queue< std::string > line)
+  inline zhuravleva::value_t calcPostfix(zhuravleva::Queue< std::string > line)
   {
     zhuravleva::Stack<zhuravleva::value_t> st;
     while (!line.empty())

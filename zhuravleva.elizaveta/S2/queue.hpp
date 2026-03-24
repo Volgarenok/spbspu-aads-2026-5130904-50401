@@ -47,7 +47,7 @@ T zhuravleva::Queue< T >::front()
   {
     throw std::runtime_error("error");
   }
-  returnd (*data.begin());
+  return (*data.begin());
 }
 
 template< class T >

@@ -2,7 +2,7 @@
 #define STACK_HPP
 
 #include <stdexcept>
-#include "common/list.hpp"
+#include "../common/list.hpp"
 #include "../common/node.hpp"
 #include "../common/iterator.hpp"
 
@@ -17,7 +17,7 @@ namespace zhuravleva
   public:
     void push(const T& value);
     void pop();
-    T top();
+    T& top();
     bool empty() const;
     void clear();
   };
@@ -26,7 +26,7 @@ namespace zhuravleva
 template< class T >
 void zhuravleva::Stack< T >::push(const T& value)
 {
-  data.addEnd(value);
+  data.AddStart(value);
 }
 
 template< class T >
@@ -36,22 +36,17 @@ void zhuravleva::Stack< T >::pop()
   {
     throw std::runtime_error("empty data error");
   }
-  data.deleteEnd();
+  data.deleteStart();
 }
 
 template< class T >
-T zhuravleva::Stack< T >::top()
+T& zhuravleva::Stack< T >::top()
 {
   if(data.empty())
   {
     throw std::runtime_error("empty data error");
   }
-  auto cur = data.begin();
-  while(cur -> next != data.end())
-  {
-    cur = cur -> next;
-  }
-  return *cur;
+  return *data.begin();
 }
 
 template< class T >
