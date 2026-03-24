@@ -1,3 +1,6 @@
+#ifndef STACK_HPP
+#define STACK_HPP
+
 #include "common/STRUCTS.hpp"
 
 namespace petrov
@@ -123,3 +126,5 @@ namespace petrov
     clear();
   }
 }
+
+#endif
