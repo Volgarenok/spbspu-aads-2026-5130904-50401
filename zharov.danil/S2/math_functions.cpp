@@ -5,10 +5,7 @@
 
 using ll_t = zharov::ll_t;
 
-
-
-
-ll_t add(const ll_t & a, const ll_t & b)
+ll_t zharov::add(const ll_t & a, const ll_t & b)
 {
   ll_t max = std::numeric_limits< ll_t >::max();
   ll_t min = std::numeric_limits< ll_t >::min();
@@ -18,7 +15,7 @@ ll_t add(const ll_t & a, const ll_t & b)
   return a + b;
 }
 
-ll_t sub(const ll_t & a, const ll_t & b)
+ll_t zharov::sub(const ll_t & a, const ll_t & b)
 {
   ll_t max = std::numeric_limits< ll_t >::max();
   ll_t min = std::numeric_limits< ll_t >::min();
@@ -28,7 +25,7 @@ ll_t sub(const ll_t & a, const ll_t & b)
   return a - b;
 }
 
-ll_t mul(const ll_t & a, const ll_t & b)
+ll_t zharov::mul(const ll_t & a, const ll_t & b)
 {
   if (a == 0 || b == 0) {
     return 0;
@@ -47,10 +44,9 @@ ll_t mul(const ll_t & a, const ll_t & b)
   return a * b;
 }
 
-ll_t div(const ll_t & a, const ll_t & b)
+ll_t zharov::div(const ll_t & a, const ll_t & b)
 {
-  ll_t max = std::numeric_limits<ll_t>::max();
-  ll_t min = std::numeric_limits<ll_t>::min();
+  ll_t min = std::numeric_limits< ll_t >::min();
   if (b == 0) {
     throw std::logic_error("Div by zero");
   }
@@ -60,7 +56,7 @@ ll_t div(const ll_t & a, const ll_t & b)
   return a / b;
 }
 
-ll_t mod(const ll_t & a, const ll_t & b)
+ll_t zharov::mod(const ll_t & a, const ll_t & b)
 {
   ll_t min = std::numeric_limits<ll_t>::min();
 
@@ -73,9 +69,9 @@ ll_t mod(const ll_t & a, const ll_t & b)
   return a % b;
 }
 
-ll_t bitShiftLeft(const ll_t & a, const ll_t & b)
+ll_t zharov::bitShiftLeft(const ll_t & a, const ll_t & b)
 {
-  ll_t max = std::numeric_limits<ll_t>::max();
+  ll_t max = std::numeric_limits< ll_t >::max();
   ll_t width = sizeof(ll_t) * CHAR_BIT;
   if (a < 0) {
     throw std::overflow_error("Cannot shift negative number");
