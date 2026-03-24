@@ -2,6 +2,8 @@
 #define STACK_HPP
 
 #include "common/STRUCTS.hpp"
+#include <stdexcept>
+#include <cstddef>
 
 namespace petrov
 {
@@ -23,8 +25,8 @@ namespace petrov
     bool empty() const;
     size_t getSize() const;
     void clear();
-    ~Stack();
 
+    ~Stack();
   private:
     List<T> list_;
   };
@@ -67,7 +69,7 @@ namespace petrov
   template<typename T>
   void Stack<T>::push(const T& rhs)
   {
-    list_.insert(list_.begin(), rhs);
+    list_.addStart(rhs);
   }
 
   template<typename T>
