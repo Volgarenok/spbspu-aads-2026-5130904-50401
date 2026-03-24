@@ -69,6 +69,10 @@ namespace kondrat
   template< class T >
   const T & Stack< T >::first() const
   {
+    if (empty())
+    {
+      throw std::runtime_error("empty stack");
+    }
     return list_.back();
   }
 
