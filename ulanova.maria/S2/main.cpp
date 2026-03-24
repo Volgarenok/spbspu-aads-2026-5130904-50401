@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
       {
         std::cout << " ";
       }
-      std::cout << results.drop();
+      std::cout << results.drop() << "\n";
       first = false;
     }
   } catch (const std::exception& e)
