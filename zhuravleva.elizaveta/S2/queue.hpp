@@ -35,7 +35,7 @@ void zhuravleva::Queue< T >::pop()
 {
   if (data.empty())
   {
-    throw std::runtime_error("error");
+    throw std::runtime_error("empty data error");
   }
   data.deleteStart();
 }
