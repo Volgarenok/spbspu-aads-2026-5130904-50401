@@ -5,33 +5,6 @@ namespace kuznetsov {
   template< class T >
   class Queue {
   public:
-    Queue():
-      list_()
-    {}
-
-    Queue(const Queue< T >& q):
-      list_(q.list_)
-    {}
-
-    Queue(Queue< T >&& q) noexcept :
-      list_(std::move(q.list_))
-    {}
-
-    Queue& operator=(const Queue< T >& q)
-    {
-      this->list_ = q.list_;
-      return *this;
-    }
-
-    Queue& operator=(Queue< T >&& q) noexcept
-    {
-      if (this == &q) {
-        return *this;
-      }
-      this->list_ = std::move(q.list_);
-      return *this;
-    }
-
     T& front()
     {
       return list_.front();
@@ -45,6 +18,7 @@ namespace kuznetsov {
     {
       return list_.back();
     }
+
     const T& back() const
     {
       return list_.back();

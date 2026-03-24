@@ -6,32 +6,6 @@ namespace kuznetsov {
   template< class T >
   class Stack {
   public:
-    Stack():
-      list_()
-    {}
-
-    Stack(const Stack< T >& s):
-      list_(s.list_)
-    {}
-
-    Stack(Stack< T >&& s) noexcept :
-      list_(std::move(s.list_))
-    {}
-
-    Stack& operator=(const Stack< T >& s)
-    {
-      this->list_ = s.list_;
-      return *this;
-    }
-
-    Stack& operator=(Stack< T >&& s) noexcept
-    {
-      if (this == &s) {
-        return *this;
-      }
-      this->list_ = std::move(s.list_);
-      return *this;
-    }
 
     T& top()
     {
