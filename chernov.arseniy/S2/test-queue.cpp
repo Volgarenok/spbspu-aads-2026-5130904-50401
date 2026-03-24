@@ -105,11 +105,11 @@ BOOST_AUTO_TEST_CASE(test_front)
 
 BOOST_AUTO_TEST_CASE(test_const_front)
 {
-  chernov::Queue< int > queue1;
-  queue1.push(1);
+  chernov::Queue< int > queue;
+  queue.push(1);
 
-  const chernov::Queue< int > queue2(queue1);
-  BOOST_CHECK_EQUAL(queue2.front(), 1);
+  const chernov::Queue< int > & const_queue = queue;
+  BOOST_CHECK_EQUAL(const_queue.front(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_back)
@@ -127,12 +127,12 @@ BOOST_AUTO_TEST_CASE(test_back)
 
 BOOST_AUTO_TEST_CASE(test_const_back)
 {
-  chernov::Queue< int > queue1;
-  queue1.push(1);
-  queue1.push(2);
+  chernov::Queue< int > queue;
+  queue.push(1);
+  queue.push(2);
 
-  const chernov::Queue< int > queue2(queue1);
-  BOOST_CHECK_EQUAL(queue2.back(), 2);
+  const chernov::Queue< int > & const_queue = queue;
+  BOOST_CHECK_EQUAL(const_queue.back(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_size)

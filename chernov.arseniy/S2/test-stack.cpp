@@ -104,11 +104,11 @@ BOOST_AUTO_TEST_CASE(test_top)
 
 BOOST_AUTO_TEST_CASE(test_const_top)
 {
-  chernov::Stack< int > stack1;
-  stack1.push(1);
+  chernov::Stack< int > stack;
+  stack.push(1);
 
-  const chernov::Stack< int > stack2(stack1);
-  BOOST_CHECK_EQUAL(stack2.top(), 1);
+  const chernov::Stack< int > & const_stack = stack;
+  BOOST_CHECK_EQUAL(const_stack.top(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_size)
