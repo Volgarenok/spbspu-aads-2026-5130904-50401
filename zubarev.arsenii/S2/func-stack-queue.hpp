@@ -10,14 +10,6 @@ namespace zubarev
   bool isdigit(const std::string& str);
   size_t getPriority(const std::string& oper);
   Queue< std::string > fromInfixToPostfix(Queue< std::string >& infixQ);
-  ll_int summation(ll_int oper1, ll_int oper2);
-  ll_int division(ll_int oper1, ll_int oper2);
-  ll_int multiplication(ll_int oper1, ll_int oper2);
-  ll_int subtraction(ll_int oper1, ll_int oper2);
-  ll_int remainder(ll_int oper1, ll_int oper2);
-  ll_int concatenation(ll_int oper1, ll_int oper2);
-  ll_int eval(Queue< std::string >& postfixQ);
-  ll_int fromStrToNum(std::string& str);
   void output(std::istream& in);
 }
 
