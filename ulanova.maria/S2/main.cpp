@@ -18,9 +18,11 @@ int main(int argc, char* argv[])
     }
     if (file.peek() == EOF)
     {
-      return 0;
     }
-    input = &file;
+    else
+    {
+      input = &file;
+    }
   }
   ulanova::Stack<long long> results;
   std::string line;
