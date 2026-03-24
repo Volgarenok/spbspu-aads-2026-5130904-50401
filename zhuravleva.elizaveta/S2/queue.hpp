@@ -23,4 +23,43 @@ namespace zhuravleva
   };
 }
 
+template< class T >
+void zhuravleva::Queue< T >::push(const T& value)
+{
+  data.addEnd(value);
+}
+
+
+template< class T >
+void zhuravleva::Queue< T >::pop()
+{
+  if (data.empty())
+  {
+    throw std::runtime_error("error");
+  }
+  data.deleteStart();
+}
+
+template< class T >
+T zhuravleva::Queue< T >::front()
+{
+  if (data.empty())
+  {
+    throw std::runtime_error("error");
+  }
+  returnd (*data.begin());
+}
+
+template< class T >
+bool zhuravleva::Queue< T >::empty() const
+{
+  return data.empty();
+}
+
+template< class T >
+void zhuravleva::Queue< T >::clear()
+{
+  data.clear();
+}
+
 #endif
