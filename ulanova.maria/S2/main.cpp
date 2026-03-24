@@ -32,13 +32,19 @@ int main(int argc, char* argv[])
       long long result = ulanova::postfix(postfix);
       results.push(result);
     }
-    while (!results.empty())
+    if (!results.empty())
     {
-      std::cout << results.drop() << "\n";
-      if (!results.empty())
+      bool first = true;
+      while (!results.empty())
       {
-        std::cout << "\n";
+        if (!first)
+        {
+          std::cout << " ";
+        }
+        std::cout << results.drop();
+        first = false;
       }
+      std::cout << "\n";
     }
   } catch (const std::exception& e)
   {
