@@ -218,4 +218,31 @@ BOOST_AUTO_TEST_CASE(test_swap_eqaul_queue)
   BOOST_CHECK_EQUAL(q2.front(), 1);
 }
 
+BOOST_AUTO_TEST_CASE(test_copy_contructor)
+{
+  Queue< int > q1;
+  q1.push(1);
+  q1.push(2);
+  Queue< int > q2(q1);
+
+  BOOST_REQUIRE(q2.size() == 2);
+  BOOST_CHECK_EQUAL(q2.front(), 1);
+  BOOST_CHECK_EQUAL(q2.back(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_moving_contructor)
+{
+  Queue< int > q1;
+  q1.push(1);
+  q1.push(2);
+  Queue< int > q2(std::move(q1));
+
+  BOOST_REQUIRE(q2.size() == 2);
+  BOOST_CHECK_EQUAL(q2.front(), 1);
+  BOOST_CHECK_EQUAL(q2.back(), 2);
+
+  BOOST_CHECK_EQUAL(q1.size(), 0);
+  BOOST_CHECK(q1.empty());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
