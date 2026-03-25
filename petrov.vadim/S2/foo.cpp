@@ -121,4 +121,17 @@ namespace petrov
       res.push(output);
     }
   }
+
+  bool isNumber(const std::string& token)
+  {
+    if (token.empty())
+    {
+      return false;
+    }
+    if (token[0] == '-' && token.size() > 1)
+    {
+      return true;
+    }
+    return std::isdigit(token[0]);
+  }
 }
