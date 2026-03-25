@@ -228,10 +228,14 @@ namespace burukov
       }
       if (sym == ")")
       {
-        while (ops.top() != "(")
+        while (!ops.empty() && ops.top() != "(")
         {
           postfix.push(ops.top());
           ops.pop();
+        }
+        if (ops.empty())
+        {
+          throw std::invalid_argument("Mismatched parentheses");
         }
         ops.pop();
         continue;
@@ -253,6 +257,10 @@ namespace burukov
     }
     while (!ops.empty())
     {
+      if (ops.top() == "(")
+      {
+        throw std::invalid_argument("Mismatched parentheses");
+      }
       postfix.push(ops.top());
       ops.pop();
     }
@@ -288,6 +296,11 @@ namespace burukov
       }
       else
       {
+        if (nums.size() < 2)
+        {
+          throw std::invalid_argument("Invalid expression");
+        }
+
         size_t index = 0;
         LIter< std::string > nameIt = funcNames.begin();
         while (nameIt != funcNames.end() && (*nameIt) != sym)

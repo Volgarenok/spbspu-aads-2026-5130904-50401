@@ -1,5 +1,5 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include "mathFunctions.hpp"
 
 int main(int argc, char **argv)
@@ -42,11 +42,18 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  burukov::Queue< std::string > results;
+  burukov::Stack< burukov::Queue< std::string > > reversed;
   while (!infix.empty())
   {
-    const burukov::Queue< std::string > inf = infix.top();
+    reversed.push(infix.top());
     infix.pop();
+  }
+
+  burukov::Queue< std::string > results;
+  while (!reversed.empty())
+  {
+    const burukov::Queue< std::string > inf = reversed.top();
+    reversed.pop();
     burukov::Queue< std::string > postfix;
     burukov::convertToPostfix(inf, postfix);
     try
