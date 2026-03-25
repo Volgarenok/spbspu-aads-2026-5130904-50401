@@ -18,7 +18,7 @@ namespace petrov
     {
       return 2;
     }
-    if (op == "+" || op == "-") 
+    if (op == "+" || op == "-")
     {
       return 1;
     }
