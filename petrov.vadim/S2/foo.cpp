@@ -7,7 +7,7 @@ namespace petrov
     return token == "+" || token == "-" || token == "*" ||
            token == "/" || token == "%" || token == "#";
   }
-  
+
   size_t getPriority(const std::string& op)
   {
     if (op == "#")
@@ -103,7 +103,7 @@ namespace petrov
           {
             size_t topPriority = getPriority(operators.top());
             size_t currPriority = getPriority(token);
-            
+
             if ((token != "#" && topPriority >= currPriority) ||
                 (token == "#" && topPriority > currPriority))
             {

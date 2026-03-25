@@ -45,7 +45,7 @@ namespace petrov
   Queue<T>::Queue(Queue<T>&& q):
     list_(std::move(q.list_))
   {}
-  
+
   template<typename T>
   Queue<T>& Queue<T>::operator=(const Queue<T>& q)
   {
