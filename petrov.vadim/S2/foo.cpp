@@ -199,4 +199,14 @@ namespace petrov
     }
     return st.drop();
   }
+
+  void calculateAll(Stack< Queue<std::string> >& postfix, Stack<long long>& results)
+  {
+    while (!postfix.empty())
+    {
+      Queue<std::string> expr = postfix.drop();
+      ll value = calculatePostfix(expr);
+      results.push(value);
+    }
+  }
 }
