@@ -16,19 +16,26 @@ namespace khasnulin
     Queue(Queue< T > &&) noexcept = default;
 
     Queue< T > &operator=(const Queue< T > &) = default;
-    Queue< T > &operator=(Queue< T > &&) = default;
+    Queue< T > &operator=(Queue< T > &&) noexcept = default;
 
-    ~Queue< T >() = default;
+    bool operator==(const Queue< T > &rhs) const noexcept;
+    bool operator!=(const Queue< T > &rhs) const noexcept;
 
-    Queue< T > &front();
-    Queue< T > &back();
+    ~Queue< T >() noexcept = default;
+
+    T &front();
+    const T &front() const;
+
+    T &back();
+    const T &back() const;
 
     bool empty() const noexcept;
     size_t size() const noexcept;
 
     void push(const T &elem);
+    void push(T &&elem);
     void pop();
-    template < class... Args > void emplace(Args... args);
+    template < class... Args > void emplace(Args &&...args);
 
     void swap(Queue< T > &rhs) noexcept;
 
