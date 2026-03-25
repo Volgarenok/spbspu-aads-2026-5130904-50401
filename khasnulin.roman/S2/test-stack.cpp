@@ -184,4 +184,35 @@ BOOST_AUTO_TEST_CASE(test_not_equal_operation_one_stack_is_empty)
   BOOST_CHECK(s2.size() == 1);
 }
 
+BOOST_AUTO_TEST_CASE(test_swap)
+{
+  Stack< int > s1;
+  s1.push(1);
+  Stack< int > s2;
+  s2.push(2);
+  s2.push(3);
+
+  s1.swap(s2);
+  BOOST_REQUIRE(s1 != s2);
+  BOOST_CHECK(s1.size() == 2);
+  BOOST_CHECK_EQUAL(s1.top(), 2);
+  BOOST_CHECK(s2.size() == 1);
+  BOOST_CHECK_EQUAL(s2.top(), 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_swap_eqaul_queue)
+{
+  Stack< int > s1;
+  s1.push(1);
+  Stack< int > s2;
+  s2.push(1);
+
+  s1.swap(s2);
+  BOOST_REQUIRE(s1 == s2);
+  BOOST_CHECK(s1.size() == 1);
+  BOOST_CHECK_EQUAL(s1.top(), 1);
+  BOOST_CHECK(s2.size() == 1);
+  BOOST_CHECK_EQUAL(s2.top(), 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
