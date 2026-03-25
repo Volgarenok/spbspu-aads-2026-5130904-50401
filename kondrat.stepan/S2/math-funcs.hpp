@@ -2,6 +2,8 @@
 #define MATH_FUNCS_HPP
 #include <cstddef>
 #include <string>
+#include <istream>
+#include <ostream>
 #include <limits>
 #include <stdexcept>
 #include "queue.hpp"
@@ -27,6 +29,9 @@ namespace kondrat
 
   Queue< std::string > tokenize(const std::string & str);
   Queue< std::string > infixToPostfix(Queue< std::string > & before);
+
+  void readExpressions(std::istream & in, Stack< ll > & result);
+  void printResults(Stack< ll > & result, std::ostream & in);
 }
 
 #endif

@@ -312,4 +312,37 @@ namespace kondrat
     }
     return values.drop();
   }
+
+  void readExpressions(std::istream & in, Stack< ll > & result)
+  {
+    std::string line;
+
+    while (std::getline(in, line))
+    {
+      if (line.empty())
+      {
+        continue;
+      }
+
+      Queue< std::string > tokens = tokenize(line);
+      tokens = infixToPostfix(tokens);
+      result.push(evaluatePostfix(tokens));
+    }
+  }
+
+  void printResults(Stack < ll > & result, std::ostream & out)
+  {
+    bool first = true;
+    while (!result.empty())
+    {
+      if (!first)
+      {
+        out << ' ';
+      }
+
+      out << result.drop();
+      first = false;
+    }
+    out << "\n";
+  }
 }
