@@ -237,8 +237,8 @@ namespace khasnulin
     {
       return *this;
     }
-    std::swap(h_, list.h_);
-    std::swap(s_, list.s_);
+    BiList< T > cpy(std::move(list));
+    swap(cpy);
     return *this;
   }
 

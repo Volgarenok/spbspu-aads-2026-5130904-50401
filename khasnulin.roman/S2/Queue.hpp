@@ -21,7 +21,7 @@ namespace khasnulin
     bool operator==(const Queue< T > &rhs) const noexcept;
     bool operator!=(const Queue< T > &rhs) const noexcept;
 
-    ~Queue< T >() noexcept = default;
+    ~Queue() noexcept = default;
 
     T &front();
     const T &front() const;
@@ -42,6 +42,70 @@ namespace khasnulin
   private:
     BiList< T > list_;
   };
+
+  template < class T > bool Queue< T >::operator==(const Queue< T > &rhs) const noexcept
+  {
+    return list_ == rhs.list_;
+  }
+  template < class T > bool Queue< T >::operator!=(const Queue< T > &rhs) const noexcept
+  {
+    return !(list_ == rhs.list_);
+  }
+
+  template < class T > T &Queue< T >::front()
+  {
+    return list_.front();
+  }
+
+  template < class T > const T &Queue< T >::front() const
+  {
+    return static_cast< const BiList< T > >(list_).front();
+  }
+
+  template < class T > T &Queue< T >::back()
+  {
+    return list_.back();
+  }
+
+  template < class T > const T &Queue< T >::back() const
+  {
+    return static_cast< const BiList< T > >(list_).back();
+  }
+
+  template < class T > bool Queue< T >::empty() const noexcept
+  {
+    return list_.empty();
+  }
+
+  template < class T > size_t Queue< T >::size() const noexcept
+  {
+    return list_.size();
+  }
+
+  template < class T > void Queue< T >::push(const T &elem)
+  {
+    list_.push_back(elem);
+  }
+
+  template < class T > void Queue< T >::push(T &&elem)
+  {
+    list_.push_back(std::move(elem));
+  }
+
+  template < class T > void Queue< T >::pop()
+  {
+    list_.pop_front();
+  }
+
+  template < class T > template < class... Args > void Queue< T >::emplace(Args &&...args)
+  {
+    list_.emplace_back(std::forward< Args >(args)...);
+  }
+
+  template < class T > void Queue< T >::swap(Queue< T > &rhs) noexcept
+  {
+    list_.swap(rhs.list_);
+  }
 }
 
 #endif
