@@ -60,7 +60,54 @@ namespace kondrat
     return res;
   }
 
-  Queue< std::string > infixToPostfix(Queue< std::string > before)
+  Queue< std::string > infixToPostfix(Queue< std::string > & before)
   {
+    Queue< std::string > postfix;
+    Stack< std::string > stackForTemp;
+
+    while (!before.empty())
+    {
+      std::string token = before.drop();
+      if (token == "(")
+      {
+        stackForTemp.push(token);
+      }
+      else if (token == ")")
+      {
+        while (!stackForTemp.empty() && (stackForTemp.first() != "("))
+        {
+          postfix.push(stackForTemp.drop());
+        }
+
+        if (stackForTemp.empty())
+        {
+          throw std::logic_error("invalid brackets");
+        }
+
+        stackForTemp.drop();
+      }
+      else if (isOperator(token))
+      {
+        while (!stackForTemp.empty() && isOperator(stackForTemp.first()) && getPriority(stackForTemp.first()) >= getPriority(token))
+        {
+          postfix.push(stackForTemp.drop());
+        }
+        stackForTemp.push(token);
+      }
+      else
+      {
+        postfix.push(token);
+      }
+    }
+
+    while (!stackForTemp.empty())
+    {
+      if (stackForTemp.first() == "(" || stackForTemp.first() == ")")
+      {
+        throw std::logic_error("invalid brackets");
+      }
+      postfix.push(stackForTemp.drop());
+    }
+    return postfix;
   }
 }

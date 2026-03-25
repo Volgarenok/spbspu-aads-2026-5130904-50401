@@ -14,7 +14,7 @@ namespace kondrat
   size_t getPriority(const std::string & token);
 
   Queue< std::string > tokenize(const std::string & str);
-  Queue< std::string > infixToPostfix(const Queue< std::string > & before);
+  Queue< std::string > infixToPostfix(Queue< std::string > & before);
 }
 
 #endif

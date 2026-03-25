@@ -195,13 +195,12 @@ namespace kondrat
     Node< T > * node = fake_->prev;
     fake_->prev = node->prev;
 
-    if (fake_->prev != fake_)
+    if (fake_->prev != nullptr)
     {
       fake_->prev->next = nullptr;
     }
     else
     {
-      fake_->prev = nullptr;
       fake_->next = nullptr;
     }
 
