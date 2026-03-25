@@ -2,6 +2,8 @@
 #define MATH_FUNCS_HPP
 #include <cstddef>
 #include <string>
+#include <limits>
+#include <stdexcept>
 #include "queue.hpp"
 #include "stack.hpp"
 
