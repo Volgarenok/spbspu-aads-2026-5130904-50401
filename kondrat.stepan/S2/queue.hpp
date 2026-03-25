@@ -1,6 +1,8 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 #include "../Common/list.hpp"
+#include <stdexcept>
+#include <utility>
 
 namespace kondrat
 {

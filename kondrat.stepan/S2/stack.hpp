@@ -1,6 +1,8 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 #include "../Common/list.hpp"
+#include <stdexcept>
+#include <utility>
 
 namespace kondrat
 {
