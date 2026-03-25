@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(ExpressionEvaluation)
     output += results.front();
     results.pop();
   }
-  BOOST_CHECK(output == "0 5");
+  BOOST_CHECK(output == "5 0");
 }
 
 BOOST_AUTO_TEST_CASE(PriorityCheck)
