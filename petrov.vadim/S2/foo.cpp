@@ -10,13 +10,22 @@ namespace petrov
   
   size_t getPriority(const std::string& op)
   {
-    if (op == "#") return 3;
-    if (op == "*" || op == "/" || op == "%") return 2;
-    if (op == "+" || op == "-") return 1;
+    if (op == "#")
+    {
+      return 3;
+    }
+    if (op == "*" || op == "/" || op == "%")
+    {
+      return 2;
+    }
+    if (op == "+" || op == "-") 
+    {
+      return 1;
+    }
     return 0;
   }
 
-  void getInfix(const std::istream& in, Stack< Queue < std::string > >& data)
+  void getInfix(std::istream& in, Stack< Queue < std::string > >& data)
   {
     char c;
     std::string token;
@@ -37,7 +46,7 @@ namespace petrov
         }
       }
 
-      if (c == ' ' | c == '\t')
+      if (c == ' ' || c == '\t')
       {
         if (!token.empty())
         {
@@ -57,6 +66,59 @@ namespace petrov
     if (!current.empty())
     {
       data.push(current);
+    }
+  }
+
+  void infixToPostfix(Stack< Queue < std::string > >& data, Stack< Queue < std::string > >& res)
+  {
+    while (!data.empty())
+    {
+      Stack<std::string> operators;
+      Queue<std::string> current = data.drop();
+      Queue<std::string> output;
+
+      while (!current.empty())
+      {
+        std::string token = current.front();
+        current.pop();
+
+        if (token == "(")
+        {
+          operators.push(token);
+        }
+        else if (token == ")")
+        {
+          while (!operators.empty() && operators.top() != "(")
+          {
+            output.push(operators.top());
+            operators.pop();
+          }
+          if (!operators.empty())
+          {
+            operators.pop();
+          }
+        }
+        else if (isOperator(token))
+        {
+          while (!operators.empty() && getPriority(operators.top()) >= getPriority(token))
+          {
+            output.push(operators.top());
+            operators.pop();
+          }
+          operators.push(token);
+        }
+        else
+        {
+          output.push(token);
+        }
+      }
+
+      while (!operators.empty())
+      {
+        output.push(operators.top());
+        operators.pop();
+      }
+      res.push(output);
     }
   }
 }
