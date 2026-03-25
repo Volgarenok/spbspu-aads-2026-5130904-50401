@@ -120,14 +120,44 @@ burukov::lli_t burukov::mul(const lli_t lhs, const lli_t rhs)
   return lhs * rhs;
 }
 
-burukov::lli_t burukov::div(const lli_t, const lli_t)
+burukov::lli_t burukov::div(const lli_t lhs, const lli_t rhs)
 {
-  return 0;
+  const lli_t minVal = std::numeric_limits< lli_t >::min();
+  if (rhs == 0)
+  {
+    throw std::invalid_argument("Div by 0");
+  }
+  if ((lhs == minVal) && (rhs == -1))
+  {
+    throw std::overflow_error("Div overflow");
+  }
+  return lhs / rhs;
 }
 
-burukov::lli_t burukov::mod(const lli_t, const lli_t)
+burukov::lli_t burukov::mod(const lli_t lhs, const lli_t rhs)
 {
-  return 0;
+  const lli_t minVal = std::numeric_limits< lli_t >::min();
+  if (rhs == 0)
+  {
+    throw std::invalid_argument("Mod by 0");
+  }
+  if ((lhs == minVal) && (rhs == -1))
+  {
+    throw std::overflow_error("Mod overflow");
+  }
+  lli_t result = lhs % rhs;
+  if (result < 0)
+  {
+    if (rhs > 0)
+    {
+      result += rhs;
+    }
+    else
+    {
+      result -= rhs;
+    }
+  }
+  return result;
 }
 
 burukov::lli_t burukov::bitwiseAnd(const lli_t, const lli_t)
