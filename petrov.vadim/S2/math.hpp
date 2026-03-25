@@ -12,7 +12,7 @@ namespace petrov
   ll mult(const ll& a, const ll& b);
   ll div(const ll& a, const ll& b);
   ll mod(const ll& a, const ll& b);
-  size_t reverseNumber(size_t num);
+  ll reverseNumber(ll num);
 }
 
-#endif // !MATH_HPP
+#endif
