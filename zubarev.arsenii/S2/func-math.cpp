@@ -1,7 +1,8 @@
 #include "all.hpp"
 #include <iostream>
 #include <limits>
-namespace zubarev {
+namespace zubarev
+{
   ll_int summation(ll_int oper1, ll_int oper2)
   {
     if (oper2 > 0 && oper1 > std::numeric_limits< ll_int >::max() - oper2) {
@@ -76,7 +77,7 @@ namespace zubarev {
     }
     ll_int res = oper1 % oper2;
     if (res < 0) {
-      res += (oper2 > 0 ? oper2 : -oper2); // или std::abs(oper2)
+      res += (oper2 > 0 ? oper2 : -oper2);  
     }
     return res;
   }

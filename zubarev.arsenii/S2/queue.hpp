@@ -53,7 +53,7 @@ namespace zubarev
     if (list_.empty()) {
       throw std::runtime_error("Queue is empty");
     }
-    return list_.back();
+    return *list_.back();
   }
   template < class T >
   bool Queue< T >::empty() const

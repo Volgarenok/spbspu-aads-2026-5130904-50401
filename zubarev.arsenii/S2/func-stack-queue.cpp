@@ -170,5 +170,4 @@ namespace zubarev
     return postfixQ;
   }
 
-
 }
