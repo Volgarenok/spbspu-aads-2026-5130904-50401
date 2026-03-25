@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(test_pop)
   q.pop();
 
   BOOST_REQUIRE(q.empty() == false);
-  BOOST_CHECK_EQUAL(q.front(), 1);
+  BOOST_CHECK_EQUAL(q.front(), 2);
   BOOST_CHECK_EQUAL(q.front(), q.back());
 
   q.pop();
@@ -57,6 +57,14 @@ BOOST_AUTO_TEST_CASE(test_empty_pop)
   Queue< int > q;
 
   BOOST_CHECK_THROW(q.pop(), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_empty_front_back)
+{
+  Queue< int > q;
+
+  BOOST_CHECK_THROW(q.back(), std::runtime_error);
+  BOOST_CHECK_THROW(q.front(), std::runtime_error);
 }
 
 struct Person
@@ -108,7 +116,6 @@ BOOST_AUTO_TEST_CASE(test_emplacing_element)
   Person last{0, "Andrey"};
   BOOST_CHECK_EQUAL(q.back(), last);
   BOOST_CHECK_EQUAL(q.front(), first);
-  BOOST_CHECK_EQUAL(q.front(), q.back());
 }
 
 BOOST_AUTO_TEST_CASE(test_push_rvalue)
@@ -283,6 +290,32 @@ BOOST_AUTO_TEST_CASE(test_moving_assign)
 
   BOOST_REQUIRE(q1.empty());
   BOOST_CHECK_THROW(q1.front(), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_moving_assign_self_assign)
+{
+  Queue< int > q1;
+  q1.push(1);
+  q1.push(2);
+
+  q1 = std::move(q1);
+
+  BOOST_REQUIRE(q1.size() == 2);
+  BOOST_CHECK_EQUAL(q1.front(), 1);
+  BOOST_CHECK_EQUAL(q1.back(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_copy_assign_self_assign)
+{
+  Queue< int > q1;
+  q1.push(1);
+  q1.push(2);
+
+  q1 = q1;
+
+  BOOST_REQUIRE(q1.size() == 2);
+  BOOST_CHECK_EQUAL(q1.front(), 1);
+  BOOST_CHECK_EQUAL(q1.back(), 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
