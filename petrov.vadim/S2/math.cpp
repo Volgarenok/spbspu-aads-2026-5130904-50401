@@ -69,11 +69,17 @@ namespace petrov
     {
       throw std::invalid_argument("Division by zero");
     }
-    if ((a == LLONG_MIN && b == -1))
+    if (a == LLONG_MIN && b == -1)
     {
       throw std::overflow_error("Overflow in modulus");
     }
-    return a % b;
+
+    ll res = a % b;
+    if (res < 0)
+    {
+      res += (b > 0) ? b : -b;
+    }
+    return res;
   }
 
   ll reverseNumber(ll num)
