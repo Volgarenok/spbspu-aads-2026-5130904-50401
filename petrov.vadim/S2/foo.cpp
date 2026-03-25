@@ -99,10 +99,21 @@ namespace petrov
         }
         else if (isOperator(token))
         {
-          while (!operators.empty() && getPriority(operators.top()) >= getPriority(token))
+          while (!operators.empty() && operators.top() != "(")
           {
-            output.push(operators.top());
-            operators.pop();
+            size_t topPriority = getPriority(operators.top());
+            size_t currPriority = getPriority(token);
+            
+            if ((token != "#" && topPriority >= currPriority) ||
+                (token == "#" && topPriority > currPriority))
+            {
+              output.push(operators.top());
+              operators.pop();
+            }
+            else
+            {
+              break;
+            }
           }
           operators.push(token);
         }
@@ -230,7 +241,6 @@ namespace petrov
       results.push(value);
     }
   }
-
 
   std::ostream& printResults(std::ostream& out, Stack<ll>& results)
   {
