@@ -77,7 +77,7 @@ namespace zubarev
     }
     ll_int res = oper1 % oper2;
     if (res < 0) {
-      res += (oper2 > 0 ? oper2 : -oper2);  
+      res += (oper2 > 0 ? oper2 : -oper2);
     }
     return res;
   }
