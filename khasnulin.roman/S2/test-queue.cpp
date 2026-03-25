@@ -86,11 +86,12 @@ struct Person
   {
     return !(*this == rhs);
   }
-  std::ostream &operator<<(std::ostream &out) const
-  {
-    return out << age << ", " << name << "; ";
-  }
 };
+
+std::ostream &operator<<(std::ostream &out, const Person &rhs)
+{
+  return out << rhs.age << ", " << rhs.name << "; ";
+}
 
 BOOST_AUTO_TEST_CASE(test_emplacing_element)
 {
@@ -107,6 +108,18 @@ BOOST_AUTO_TEST_CASE(test_emplacing_element)
   Person last{0, "Andrey"};
   BOOST_CHECK_EQUAL(q.back(), frst);
   BOOST_CHECK_EQUAL(q.front(), last);
+  BOOST_CHECK_EQUAL(q.front(), q.back());
+}
+
+BOOST_AUTO_TEST_CASE(test_push_rvalue)
+{
+  Queue< Person > q;
+  Person test_person{1, "Oleg"};
+  q.push(std::move(test_person));
+
+  BOOST_REQUIRE(q.empty() == false);
+  BOOST_CHECK(q.front() == (Person{1, "Oleg"}));
+  BOOST_CHECK(test_person.name.empty() == true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
