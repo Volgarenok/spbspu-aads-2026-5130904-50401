@@ -173,4 +173,13 @@ namespace petrov
     }
     throw std::invalid_argument("Unknown operator");
   }
+
+  ll pickReverse(ll a, const std::string& op)
+  {
+    if (op == "#")
+    {
+      return reverseNumber(a);
+    }
+    throw std::invalid_argument("Unknown operator");
+  }
 }
