@@ -39,7 +39,6 @@ int main()
       std::cout << results.drop();
       first = false;
     }
-    std::cout << " ";
     if (!std::cin.eof())
     {
       std::cerr << "input error";
