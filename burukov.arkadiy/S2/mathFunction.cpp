@@ -59,9 +59,65 @@ burukov::lli_t burukov::sub(const lli_t lhs, const lli_t rhs)
   return lhs - rhs;
 }
 
-burukov::lli_t burukov::mul(const lli_t, const lli_t)
+burukov::lli_t burukov::mul(const lli_t lhs, const lli_t rhs)
 {
-  return 0;
+  const lli_t maxVal = std::numeric_limits< lli_t >::max();
+  const lli_t minVal = std::numeric_limits< lli_t >::min();
+  if (lhs == 0 || rhs == 0)
+  {
+    return 0;
+  }
+  if (lhs == -1)
+  {
+    if (rhs == minVal)
+    {
+      throw std::overflow_error("Mul overflow");
+    }
+    return -rhs;
+  }
+  if (rhs == -1)
+  {
+    if (lhs == minVal)
+    {
+      throw std::overflow_error("Mul overflow");
+    }
+    return -lhs;
+  }
+  if (lhs > 0)
+  {
+    if (rhs > 0)
+    {
+      if (lhs > maxVal / rhs)
+      {
+        throw std::overflow_error("Mul overflow");
+      }
+    }
+    else
+    {
+      if (rhs < minVal / lhs)
+      {
+        throw std::overflow_error("Mul overflow");
+      }
+    }
+  }
+  else
+  {
+    if (rhs > 0)
+    {
+      if (lhs < minVal / rhs)
+      {
+        throw std::overflow_error("Mul overflow");
+      }
+    }
+    else
+    {
+      if (lhs != 0 && rhs < maxVal / lhs)
+      {
+        throw std::overflow_error("Mul overflow");
+      }
+    }
+  }
+  return lhs * rhs;
 }
 
 burukov::lli_t burukov::div(const lli_t, const lli_t)
