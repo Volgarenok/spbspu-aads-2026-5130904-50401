@@ -160,9 +160,9 @@ burukov::lli_t burukov::mod(const lli_t lhs, const lli_t rhs)
   return result;
 }
 
-burukov::lli_t burukov::bitwiseAnd(const lli_t, const lli_t)
+burukov::lli_t burukov::bitwiseAnd(const lli_t lhs, const lli_t rhs)
 {
-  return 0;
+  return lhs & rhs;
 }
 
 void burukov::getInfix(std::istream &,
