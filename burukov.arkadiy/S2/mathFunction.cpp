@@ -209,9 +209,50 @@ void burukov::getInfix(std::istream &in,
   }
 }
 
-void burukov::convertToPostfix(const Queue< std::string > &,
-    Queue< std::string > &)
+void burukov::convertToPostfix(const Queue< std::string > &infix,
+    Queue< std::string > &postfix)
 {
+  Queue< std::string > infixCopy = infix;
+  Stack< std::string > ops;
+  while (!infixCopy.empty())
+  {
+    const std::string sym = infixCopy.front();
+    infixCopy.pop();
+    if (sym == "(")
+    {
+      ops.push(sym);
+      continue;
+    }
+    if (sym == ")")
+    {
+      while (ops.top() != "(")
+      {
+        postfix.push(ops.top());
+        ops.pop();
+      }
+      ops.pop();
+      continue;
+    }
+    if (isOperand(sym))
+    {
+      postfix.push(sym);
+    }
+    else
+    {
+      while (!ops.empty() && ops.top() != "("
+          && getPriority(ops.top()) >= getPriority(sym))
+      {
+        postfix.push(ops.top());
+        ops.pop();
+      }
+      ops.push(sym);
+    }
+  }
+  while (!ops.empty())
+  {
+    postfix.push(ops.top());
+    ops.pop();
+  }
 }
 
 std::string burukov::calculate(const Queue< std::string > &)
