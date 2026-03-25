@@ -9,6 +9,16 @@ namespace kondrat
 {
   using ll = long long;
 
+  ll add(ll lhs, ll rhs);
+  ll sub(ll lhs, ll rhs);
+  ll mul(ll lhs, ll rhs);
+  ll divide(ll lhs, ll rhs);
+  ll mod(ll lhs, ll rhs);
+  ll reverseNumber(ll value);
+  ll applyBinaryOperation(ll lhs, ll rhs, const std::string & token);
+  ll applyUnaryOperation(ll value, const std::string & token);
+  ll evaluatePostfix(Queue< std::string > & postfix);
+
   size_t getOperatorType(const std::string & token);
   bool isOperator(const std::string & token);
   size_t getPriority(const std::string & token);
