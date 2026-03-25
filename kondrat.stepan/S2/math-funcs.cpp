@@ -205,7 +205,15 @@ namespace kondrat
     {
       throw std::logic_error("division by zero");
     }
-    return lhs % rhs;
+
+    ll result = lhs % rhs;
+    ll modBase = rhs < 0 ? -rhs : rhs;
+
+    if (result < 0)
+    {
+      result += modBase;
+    }
+    return result;
   }
 
   ll reverseNumber(ll value)
