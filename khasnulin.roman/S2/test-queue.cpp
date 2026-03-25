@@ -177,7 +177,6 @@ BOOST_AUTO_TEST_CASE(test_not_equal_operation)
 BOOST_AUTO_TEST_CASE(test_not_equal_operation_one_queue_is_empty)
 {
   Queue< int > q;
-  ;
 
   Queue< int > q2;
   q2.push(2);
@@ -185,6 +184,38 @@ BOOST_AUTO_TEST_CASE(test_not_equal_operation_one_queue_is_empty)
   BOOST_REQUIRE(q2 != q);
   BOOST_CHECK(q.empty());
   BOOST_CHECK(q2.size() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_swap)
+{
+  Queue< int > q1;
+  q1.push(1);
+  Queue< int > q2;
+  q2.push(2);
+  q2.push(3);
+
+  q1.swap(q2);
+  BOOST_REQUIRE(q1 != q2);
+  BOOST_CHECK(q1.size() == 2);
+  BOOST_CHECK_EQUAL(q1.front(), 2);
+  BOOST_CHECK_EQUAL(q1.back(), 3);
+  BOOST_CHECK(q2.size() == 1);
+  BOOST_CHECK_EQUAL(q2.front(), 1);
+}
+
+BOOST_AUTO_TEST_CASE(test_swap_eqaul_queue)
+{
+  Queue< int > q1;
+  q1.push(1);
+  Queue< int > q2;
+  q2.push(1);
+
+  q1.swap(q2);
+  BOOST_REQUIRE(q1 == q2);
+  BOOST_CHECK(q1.size() == 1);
+  BOOST_CHECK_EQUAL(q1.front(), 1);
+  BOOST_CHECK(q2.size() == 1);
+  BOOST_CHECK_EQUAL(q2.front(), 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
