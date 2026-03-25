@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(ExpressionEvaluation)
   burukov::Stack< burukov::Queue< std::string > > infix;
   burukov::getInfix(iss, infix);
 
-  
+
   burukov::Queue< std::string > results;
   while (!infix.empty())
   {
