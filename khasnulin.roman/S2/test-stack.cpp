@@ -109,4 +109,79 @@ BOOST_AUTO_TEST_CASE(test_emplacing_element)
   BOOST_CHECK_EQUAL(s.top(), top);
 }
 
+BOOST_AUTO_TEST_CASE(test_push_rvalue)
+{
+  Stack< Person > s;
+  Person test_person{1, "Oleg"};
+  s.push(std::move(test_person));
+
+  BOOST_REQUIRE(s.empty() == false);
+  BOOST_CHECK(s.top() == (Person{1, "Oleg"}));
+  BOOST_CHECK(test_person.name.empty() == true);
+}
+
+BOOST_AUTO_TEST_CASE(test_equal_operation)
+{
+  Stack< int > s;
+  s.push(1);
+  s.push(2);
+  s.push(3);
+
+  Stack< int > s2;
+  s2.push(2);
+  s2.push(4);
+  s2.pop();
+  s2.pop();
+  s2.push(1);
+  s2.push(2);
+  s2.push(3);
+
+  BOOST_REQUIRE(s2 == s);
+  BOOST_CHECK(s.size() == 3);
+  BOOST_CHECK(s2.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_empty_equal_operation)
+{
+  Stack< int > s;
+
+  Stack< int > s2;
+
+  BOOST_REQUIRE(s2 == s);
+  BOOST_CHECK(s.empty());
+  BOOST_CHECK(s2.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_not_equal_operation)
+{
+  Stack< int > s;
+  s.push(1);
+  s.push(2);
+  s.push(3);
+
+  Stack< int > s2;
+  s2.push(2);
+  s2.push(4);
+  s2.pop();
+  s2.push(1);
+  s2.push(2);
+  s2.push(3);
+
+  BOOST_REQUIRE(s2 != s);
+  BOOST_CHECK(s.size() == 3);
+  BOOST_CHECK(s2.size() == 4);
+}
+
+BOOST_AUTO_TEST_CASE(test_not_equal_operation_one_stack_is_empty)
+{
+  Stack< int > s;
+
+  Stack< int > s2;
+  s2.push(2);
+
+  BOOST_REQUIRE(s2 != s);
+  BOOST_CHECK(s.empty());
+  BOOST_CHECK(s2.size() == 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
