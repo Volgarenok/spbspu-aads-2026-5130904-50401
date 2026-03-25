@@ -40,6 +40,60 @@ namespace khasnulin
   private:
     BiList< T > list_;
   };
+
+  template < class T > bool Stack< T >::operator==(const Stack< T > &rhs) const noexcept
+  {
+    return list_ == rhs.list_;
+  }
+  template < class T > bool Stack< T >::operator!=(const Stack< T > &rhs) const noexcept
+  {
+    return !(list_ == rhs.list_);
+  }
+
+  template < class T > T &Stack< T >::top()
+  {
+    return list_.back();
+  }
+
+  template < class T > const T &Stack< T >::top() const
+  {
+    return static_cast< const BiList< T > & >(list_).back();
+  }
+
+  template < class T > bool Stack< T >::empty() const noexcept
+  {
+    return list_.empty();
+  }
+
+  template < class T > size_t Stack< T >::size() const noexcept
+  {
+    return list_.size();
+  }
+
+  template < class T > void Stack< T >::push(const T &elem)
+  {
+    list_.push_back(elem);
+  }
+
+  template < class T > void Stack< T >::push(T &&elem)
+  {
+    list_.push_back(std::move(elem));
+  }
+
+  template < class T > void Stack< T >::pop()
+  {
+    list_.pop_back();
+  }
+
+  template < class T > template < class... Args > void Stack< T >::emplace(Args &&...args)
+  {
+    list_.emplace_back(std::forward< Args >(args)...);
+  }
+
+  template < class T > void Stack< T >::swap(Stack< T > &rhs) noexcept
+  {
+    list_.swap(rhs.list_);
+  }
 }
 
 #endif
