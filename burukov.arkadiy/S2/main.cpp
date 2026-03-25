@@ -43,6 +43,33 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  std::cout << "Expressions: " << infix.size() << "\n";
+  Queue< std::string > results;
+  while (!infix.empty())
+  {
+    const Queue< std::string > inf = infix.top();
+    infix.pop();
+    Queue< std::string > postfix;
+    convertToPostfix(inf, postfix);
+    try
+    {
+      const std::string res = calculate(postfix);
+      results.push(res);
+    }
+    catch (const std::exception &exc)
+    {
+      std::cerr << exc.what() << "\n";
+      return 1;
+    }
+  }
+
+  std::cout << results.front();
+  results.pop();
+  while (!results.empty())
+  {
+    std::cout << " " << results.front();
+    results.pop();
+  }
+  std::cout << "\n";
+
   return 0;
 }
