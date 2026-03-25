@@ -89,7 +89,7 @@ namespace kondrat
       else if (isOperator(token))
       {
         while (!stackForTemp.empty()
-              && isOperator(stackForTemp.first()) 
+              && isOperator(stackForTemp.first())
               && getPriority(stackForTemp.first()) >= getPriority(token))
         {
           postfix.push(stackForTemp.drop());
@@ -115,7 +115,7 @@ namespace kondrat
 
   ll add(ll lhs, ll rhs)
   {
-    if ((rhs > 0 && lhs > std::numeric_limits< ll >::max() - rhs) 
+    if ((rhs > 0 && lhs > std::numeric_limits< ll >::max() - rhs)
         || (rhs < 0 && lhs < std::numeric_limits< ll >::min() - rhs))
     {
       throw std::overflow_error("overflow");

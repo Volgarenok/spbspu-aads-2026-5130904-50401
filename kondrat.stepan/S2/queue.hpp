@@ -100,12 +100,12 @@ namespace kondrat
     {
       throw std::runtime_error("empty queue");
     }
-    
+
     T value = list_.front();
     list_.popFront();
     return value;
   }
-  
+
   template< class T >
   void Queue< T >::clear()
   {

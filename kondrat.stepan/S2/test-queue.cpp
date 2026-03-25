@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(OperatorsConstructors)
   BOOST_CHECK(!qCopy.empty());
   BOOST_CHECK(qCopy.first() == 32);
   BOOST_CHECK(qCopy.last() == 52);
-  
+
   kondrat::Queue< int > qMove(std::move(qCopy));
   BOOST_CHECK(qCopy.size() == 0);
   BOOST_CHECK(qCopy.empty());

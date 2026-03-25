@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(ReverseNumber)
   ll num1 = 123;
   ll num2 = -123;
   ll num3 = 0;
-  
+
   BOOST_CHECK(reverseNumber(num1) == 321);
   BOOST_CHECK(reverseNumber(num2) == -321);
   BOOST_CHECK(reverseNumber(num3) == 0);
