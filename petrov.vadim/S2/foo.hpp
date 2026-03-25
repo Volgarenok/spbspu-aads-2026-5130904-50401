@@ -15,6 +15,7 @@ namespace petrov
   bool isNumber(const std::string& token);
   void getInfix(const std::istream& in, Stack< Queue < std::string > >& data);
   void infixToPostfix(Stack< Queue < std::string > >& data, Stack< Queue < std::string > >& res);
+  ll strToNum(const std::string& str);
 }
 
 #endif

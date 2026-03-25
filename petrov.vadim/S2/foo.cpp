@@ -134,4 +134,20 @@ namespace petrov
     }
     return std::isdigit(token[0]);
   }
+
+  ll strToNum(const std::string& str)
+  {
+    try
+    {
+      return std::stoll(str);
+    }
+    catch (const std::invalid_argument&)
+    {
+      throw std::runtime_error("Not a number");
+    }
+    catch (const std::out_of_range&)
+    {
+      throw std::overflow_error("Number overflow");
+    }
+  }
 }
