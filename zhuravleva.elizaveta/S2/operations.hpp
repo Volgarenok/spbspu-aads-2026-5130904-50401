@@ -33,8 +33,7 @@ namespace zhuravleva
     {
       return 0;
     }
-    if (a > std::numeric_limits<value_t>::max() / b ||
-        a < std::numeric_limits<value_t>::min() / b)
+    if (a != 0 && ((b > std::numeric_limits<value_t>::max() / a) || (b < std::numeric_limits<value_t>::min() / a)))
     {
       throw std::overflow_error("overflow while multiply");
     }
@@ -47,6 +46,10 @@ namespace zhuravleva
     {
       throw std::runtime_error("division by zero");
     }
+    if (a == std::numeric_limits< value_t >::min() && b == -1)
+    {
+      throw std::overflow_error("overflow while division");
+    }
     return a / b;
   }
 
@@ -56,7 +59,9 @@ namespace zhuravleva
     {
       throw std::runtime_error("mod by zero");
     }
-    return a % b;
+    value_t r = a % b;
+    if (r < 0) r += b;
+    return r;
   }
 
   inline value_t bitNot(value_t a)

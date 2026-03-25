@@ -29,6 +29,10 @@ namespace zhuravleva
     {
       i = 1;
     }
+    if (i == num.size())
+    {
+      return false;
+    }
     for (; i < num.size(); i++)
     {
       if(!isdigit(num[i]))
@@ -66,6 +70,7 @@ namespace zhuravleva
       {
         if (part.empty())
         {
+          part.clear();
           continue;
         }
         if (isNumber(part))
@@ -100,7 +105,7 @@ namespace zhuravleva
           throw std::runtime_error("not right symbol error");
         }
         part.clear();
-      }else
+      }else if (line[i] != ' ')
       {
         part += line[i];
       }
@@ -118,7 +123,7 @@ namespace zhuravleva
     return out;
   }
 
-  inline zhuravleva::value_t applyBinary(const std::string& op, int a, int b)
+  inline zhuravleva::value_t applyBinary(const std::string& op, long long a, long long b)
   {
     if (op == "+")
     {
@@ -155,7 +160,13 @@ namespace zhuravleva
       line.pop();
       if (isNumber(t))
       {
-        st.push(std::stoll(t));
+        try
+        {
+          st.push(std::stoll(t));
+        }catch (...)
+        {
+          throw std::runtime_error("overflow");
+        }
       }else if (isOperator(t))
       {
         if (t == "!")
