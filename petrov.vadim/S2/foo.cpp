@@ -15,4 +15,48 @@ namespace petrov
     if (op == "+" || op == "-") return 1;
     return 0;
   }
+
+  void getInfix(const std::istream& in, Stack< Queue < std::string > >& data)
+  {
+    char c;
+    std::string token;
+    Queue<std::string> current;
+    while (in.get(c))
+    {
+      if (c == '\n')
+      {
+        if (!token.empty())
+        {
+          current.push(token);
+          token.clear();
+        }
+        if (!current.empty())
+        {
+          data.push(current);
+          current.clear();
+        }
+      }
+
+      if (c == ' ' | c == '\t')
+      {
+        if (!token.empty())
+        {
+          current.push(token);
+          token.clear();
+        }
+      }
+      else
+      {
+        token += c;
+      }
+    }
+    if (!token.empty())
+    {
+      current.push(token);
+    }
+    if (!current.empty())
+    {
+      data.push(current);
+    }
+  }
 }
