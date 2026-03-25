@@ -59,7 +59,7 @@ namespace khasnulin
 
   template < class T > const T &Queue< T >::front() const
   {
-    return static_cast< const BiList< T > >(list_).front();
+    return static_cast< const BiList< T > & >(list_).front();
   }
 
   template < class T > T &Queue< T >::back()
@@ -69,7 +69,7 @@ namespace khasnulin
 
   template < class T > const T &Queue< T >::back() const
   {
-    return static_cast< const BiList< T > >(list_).back();
+    return static_cast< const BiList< T > & >(&list_).back();
   }
 
   template < class T > bool Queue< T >::empty() const noexcept
