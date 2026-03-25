@@ -255,7 +255,76 @@ void burukov::convertToPostfix(const Queue< std::string > &infix,
   }
 }
 
-std::string burukov::calculate(const Queue< std::string > &)
+std::string burukov::calculate(const Queue< std::string > &postfix)
 {
-  return "0";
+  Queue< std::string > postfixCopy = postfix;
+  List< std::string > funcNames;
+  funcNames.pushFront("&");
+  funcNames.pushFront("%");
+  funcNames.pushFront("/");
+  funcNames.pushFront("*");
+  funcNames.pushFront("-");
+  funcNames.pushFront("+");
+
+  List< func_t > funcs;
+  funcs.pushFront(bitwiseAnd);
+  funcs.pushFront(mod);
+  funcs.pushFront(div);
+  funcs.pushFront(mul);
+  funcs.pushFront(sub);
+  funcs.pushFront(add);
+
+  Stack< std::string > nums;
+  while (!postfixCopy.empty())
+  {
+    const std::string sym = postfixCopy.front();
+    postfixCopy.pop();
+    if (isOperand(sym))
+    {
+      nums.push(sym);
+    }
+    else
+    {
+      size_t index = 0;
+      LIter< std::string > nameIt = funcNames.begin();
+      while (nameIt != funcNames.end() && (*nameIt) != sym)
+      {
+        ++nameIt;
+        ++index;
+      }
+
+      const char *str1 = nums.top().c_str();
+      char *end1 = nullptr;
+      errno = 0;
+      const lli_t num1 = std::strtoll(str1, &end1, 10);
+      if (end1 == str1 || *end1 != '\0' || errno == ERANGE)
+      {
+        throw std::invalid_argument("Input error");
+      }
+      nums.pop();
+
+      const char *str2 = nums.top().c_str();
+      char *end2 = nullptr;
+      errno = 0;
+      const lli_t num2 = std::strtoll(str2, &end2, 10);
+      if (end2 == str2 || *end2 != '\0' || errno == ERANGE)
+      {
+        throw std::invalid_argument("Input error");
+      }
+      nums.pop();
+
+      LIter< func_t > funcIt = funcs.begin();
+      for (size_t i = 0; i < index; ++i)
+      {
+        ++funcIt;
+      }
+      const lli_t result = (*funcIt)(num2, num1);
+      nums.push(std::to_string(result));
+    }
+  }
+  if (nums.size() != 1)
+  {
+    throw std::invalid_argument("Input error");
+  }
+  return nums.top();
 }
