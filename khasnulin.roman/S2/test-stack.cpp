@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(test_pop)
   s.pop();
 
   BOOST_REQUIRE(s.empty() == false);
-  BOOST_CHECK_EQUAL(s.top(), 2);
+  BOOST_CHECK_EQUAL(s.top(), 1);
 
   s.pop();
 
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(test_swap)
   s1.swap(s2);
   BOOST_REQUIRE(s1 != s2);
   BOOST_CHECK(s1.size() == 2);
-  BOOST_CHECK_EQUAL(s1.top(), 2);
+  BOOST_CHECK_EQUAL(s1.top(), 3);
   BOOST_CHECK(s2.size() == 1);
   BOOST_CHECK_EQUAL(s2.top(), 1);
 }
@@ -223,10 +223,10 @@ BOOST_AUTO_TEST_CASE(test_copy_contructor)
   Stack< int > s2(s1);
 
   BOOST_REQUIRE(s2.size() == 2);
-  BOOST_CHECK_EQUAL(s2.top(), 1);
+  BOOST_CHECK_EQUAL(s2.top(), 2);
 
   BOOST_REQUIRE(s1.size() == 2);
-  BOOST_CHECK_EQUAL(s1.top(), 1);
+  BOOST_CHECK_EQUAL(s1.top(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_moving_contructor)
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(test_moving_contructor)
   Stack< int > s2(std::move(s1));
 
   BOOST_REQUIRE(s2.size() == 2);
-  BOOST_CHECK_EQUAL(s2.top(), 1);
+  BOOST_CHECK_EQUAL(s2.top(), 2);
 
   BOOST_CHECK_EQUAL(s1.size(), 0);
   BOOST_CHECK(s1.empty());
@@ -256,9 +256,9 @@ BOOST_AUTO_TEST_CASE(test_copy_assign)
   s2 = s1;
 
   BOOST_REQUIRE(s2.size() == 2);
-  BOOST_CHECK_EQUAL(s2.top(), 1);
+  BOOST_CHECK_EQUAL(s2.top(), 2);
 
-  BOOST_CHECK_EQUAL(s1.top(), 1);
+  BOOST_CHECK_EQUAL(s1.top(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_moving_assign)
@@ -274,7 +274,7 @@ BOOST_AUTO_TEST_CASE(test_moving_assign)
   s2 = std::move(s1);
 
   BOOST_REQUIRE(s2.size() == 2);
-  BOOST_CHECK_EQUAL(s2.top(), 1);
+  BOOST_CHECK_EQUAL(s2.top(), 2);
 
   BOOST_REQUIRE(s1.empty());
   BOOST_CHECK_THROW(s1.top(), std::runtime_error);
@@ -291,7 +291,7 @@ BOOST_AUTO_TEST_CASE(test_moving_assign_self_assign)
   s1 = std::move(qc);
 
   BOOST_REQUIRE(s1.size() == 2);
-  BOOST_CHECK_EQUAL(s1.top(), 1);
+  BOOST_CHECK_EQUAL(s1.top(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_copy_assign_self_assign)
@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE(test_copy_assign_self_assign)
   s1 = s1;
 
   BOOST_REQUIRE(s1.size() == 2);
-  BOOST_CHECK_EQUAL(s1.top(), 1);
+  BOOST_CHECK_EQUAL(s1.top(), 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
