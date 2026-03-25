@@ -29,8 +29,8 @@ BOOST_AUTO_TEST_CASE(test_push)
 
   BOOST_REQUIRE(q.empty() == false);
   BOOST_CHECK_EQUAL(q.size(), 2);
-  BOOST_CHECK_EQUAL(q.front(), 2);
-  BOOST_CHECK_EQUAL(q.back(), 1);
+  BOOST_CHECK_EQUAL(q.front(), 1);
+  BOOST_CHECK_EQUAL(q.back(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_pop)
@@ -104,10 +104,10 @@ BOOST_AUTO_TEST_CASE(test_emplacing_element)
 
   BOOST_REQUIRE(q.empty() == false);
   BOOST_CHECK_EQUAL(q.size(), 4);
-  Person frst{1, "Oleg"};
+  Person first{1, "Oleg"};
   Person last{0, "Andrey"};
-  BOOST_CHECK_EQUAL(q.back(), frst);
-  BOOST_CHECK_EQUAL(q.front(), last);
+  BOOST_CHECK_EQUAL(q.back(), last);
+  BOOST_CHECK_EQUAL(q.front(), first);
   BOOST_CHECK_EQUAL(q.front(), q.back());
 }
 
@@ -120,6 +120,71 @@ BOOST_AUTO_TEST_CASE(test_push_rvalue)
   BOOST_REQUIRE(q.empty() == false);
   BOOST_CHECK(q.front() == (Person{1, "Oleg"}));
   BOOST_CHECK(test_person.name.empty() == true);
+}
+
+BOOST_AUTO_TEST_CASE(test_equal_operation)
+{
+  Queue< int > q;
+  q.push(1);
+  q.push(2);
+  q.push(3);
+
+  Queue< int > q2;
+  q2.push(2);
+  q2.push(4);
+  q2.pop();
+  q2.pop();
+  q2.push(1);
+  q2.push(2);
+  q2.push(3);
+
+  BOOST_REQUIRE(q2 == q);
+  BOOST_CHECK(q.size() == 3);
+  BOOST_CHECK(q2.size() == 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_empty_equal_operation)
+{
+  Queue< int > q;
+
+  Queue< int > q2;
+
+  BOOST_REQUIRE(q2 == q);
+  BOOST_CHECK(q.empty());
+  BOOST_CHECK(q2.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_not_equal_operation)
+{
+  Queue< int > q;
+  q.push(1);
+  q.push(2);
+  q.push(3);
+
+  Queue< int > q2;
+  q2.push(2);
+  q2.push(4);
+  q2.pop();
+  q2.push(1);
+  q2.push(2);
+  q2.push(3);
+
+  BOOST_REQUIRE(q2 != q);
+  BOOST_CHECK(q.size() == 3);
+  BOOST_CHECK(q2.size() == 4);
+}
+
+BOOST_AUTO_TEST_CASE(test_not_equal_operation_one_queue_is_empty)
+{
+  Queue< int > q;
+  ;
+
+  Queue< int > q2;
+  q2.push(2);
+
+  BOOST_REQUIRE(q2 != q);
+  BOOST_CHECK(q.empty());
+  BOOST_CHECK(q2.size() == 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
