@@ -18,6 +18,7 @@ namespace zhuravleva
     void push(const T& value);
     void pop();
     T& top();
+    T drop();
     bool empty() const;
     void clear();
   };
@@ -47,6 +48,18 @@ T& zhuravleva::Stack< T >::top()
     throw std::runtime_error("empty data error");
   }
   return *data.begin();
+}
+
+template< class T >
+T zhuravleva::Stack< T >::drop()
+{
+  if (data.empty())
+  {
+    throw std::runtime_error("empty data error when drop");
+  }
+  T val = *data.begin();
+  data.deleteStart();
+  return val;
 }
 
 template< class T >

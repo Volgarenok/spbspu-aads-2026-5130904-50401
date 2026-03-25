@@ -17,7 +17,8 @@ namespace zhuravleva
   public:
     void push(const T& value);
     void pop();
-    T front();
+    T& front();
+    T drop();
     bool empty() const;
     void clear();
   };
@@ -41,13 +42,25 @@ void zhuravleva::Queue< T >::pop()
 }
 
 template< class T >
-T zhuravleva::Queue< T >::front()
+T& zhuravleva::Queue< T >::front()
 {
   if (data.empty())
   {
     throw std::runtime_error("error");
   }
   return (*data.begin());
+}
+
+template< class T >
+T zhuravleva::Queue< T >::drop()
+{
+  if (data.empty())
+  {
+    throw std::runtime_error("empty data error when drop");
+  }
+  T val = *data.begin();
+  data.deleteStart();
+  return val;
 }
 
 template< class T >
