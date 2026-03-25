@@ -298,7 +298,9 @@ BOOST_AUTO_TEST_CASE(test_moving_assign_self_assign)
   q1.push(1);
   q1.push(2);
 
-  q1 = std::move(q1);
+  Queue< int > &qc = q1;
+
+  q1 = std::move(qc);
 
   BOOST_REQUIRE(q1.size() == 2);
   BOOST_CHECK_EQUAL(q1.front(), 1);
