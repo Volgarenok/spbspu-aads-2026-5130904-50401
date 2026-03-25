@@ -16,6 +16,8 @@ namespace petrov
   void getInfix(const std::istream& in, Stack< Queue < std::string > >& data);
   void infixToPostfix(Stack< Queue < std::string > >& data, Stack< Queue < std::string > >& res);
   ll strToNum(const std::string& str);
+  ll pickOperation(ll a, ll b, const std::string& op);
+  ll pickReverse(ll a, ll b, const std::string& op);
 }
 
 #endif

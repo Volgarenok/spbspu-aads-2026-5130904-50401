@@ -150,4 +150,27 @@ namespace petrov
       throw std::overflow_error("Number overflow");
     }
   }
+
+  ll pickOperation(ll a, ll b, const std::string& op)
+  {
+    if (op == "+"){
+      return plus(a, b);
+    }
+    if (op == "-"){
+      return minus(a, b);
+    }
+    if (op == "*")
+    {
+      return mult(a, b);
+    }
+    if (op == "/")
+    {
+      return div(a, b);
+    }
+    if (op == "%")
+    {
+      return mod(a, b);
+    }
+    throw std::invalid_argument("Unknown operator");
+  }
 }
