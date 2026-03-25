@@ -1,5 +1,5 @@
-#ifndef QEUEUE_HPP
-#define QEUEUE_HPP
+#ifndef QUEUE_HPP
+#define QUEUE_HPP
 
 #include "common/STRUCTS.hpp"
 #include <stdexcept>

@@ -45,8 +45,7 @@ namespace petrov
           current.clear();
         }
       }
-
-      if (c == ' ' || c == '\t')
+      else if (c == ' ' || c == '\t')
       {
         if (!token.empty())
         {
@@ -181,9 +180,9 @@ namespace petrov
     {
       std::string token = postfix.front();
       postfix.pop();
-      if (std::isdigit(token[0]))
+      if (isNumber(token))
       {
-        st.push(std::stoll(token));
+        st.push(strToNum(token));
       }
       else if (token == "#")
       {
@@ -194,7 +193,7 @@ namespace petrov
         ll a = st.drop();
         st.push(reverseNumber(a));
       }
-      else
+      else if (isOperator(token))
       {
         if (st.empty())
         {
@@ -210,7 +209,16 @@ namespace petrov
         st.push(pickOperation(a, b, token));
       }
     }
-    return st.drop();
+    if (st.empty())
+    {
+      throw std::logic_error("Empty expression");
+    }
+    ll result = st.drop();
+    if (!st.empty())
+    {
+      throw std::logic_error("Too many operands");
+    }
+    return result;
   }
 
   void calculateAll(Stack< Queue<std::string> >& postfix, Stack<ll>& results)

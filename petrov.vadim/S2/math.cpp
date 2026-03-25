@@ -4,34 +4,50 @@ namespace petrov
 {
   ll plus(const ll& a, const ll& b)
   {
-    if (LLONG_MAX - a < b || LLONG_MIN - a > b)
+    if (b > 0 && a > LLONG_MAX - b)
     {
       throw std::overflow_error("Overflow in addition");
+    }
+    if (b < 0 && a < LLONG_MIN - b)
+    {
+      throw std::overflow_error("Underflow in addition");
     }
     return a + b;
   }
 
   ll minus(const ll& a, const ll& b)
   {
-    if (LLONG_MIN - a > -b || LLONG_MAX - a < -b)
+    if (b < 0 && a > LLONG_MAX + b)
     {
       throw std::overflow_error("Overflow in subtraction");
+    }
+    if (b > 0 && a < LLONG_MIN + b)
+    {
+      throw std::overflow_error("Underflow in subtraction");
     }
     return a - b;
   }
 
   ll mult(const ll& a, const ll& b)
   {
-    if ((a > 0 && b > 0 && LLONG_MAX / a < b) ||
-        (a > 0 && b < 0 && LLONG_MIN / a > b) ||
-        (a < 0 && b > 0 && LLONG_MIN / b > a) ||
-        (a < 0 && b < 0 && LLONG_MAX / a > b) ||
-        (a == LLONG_MIN && b == -1) ||
-        (b == LLONG_MIN && a == -1))
+    if (a == 0 || b == 0)
+    {
+      return 0;
+    }
+    if (a == -1 && b == LLONG_MIN)
     {
       throw std::overflow_error("Overflow in multiplication");
     }
-    return a * b;
+    if (b == -1 && a == LLONG_MIN)
+    {
+      throw std::overflow_error("Overflow in multiplication");
+    }
+    ll result = a * b;
+    if (a == result / b)
+    {
+      return result;
+    }
+    throw std::overflow_error("Overflow in multiplication");
   }
 
   ll div(const ll& a, const ll& b)
