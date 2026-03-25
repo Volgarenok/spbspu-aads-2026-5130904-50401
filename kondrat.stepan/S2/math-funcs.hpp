@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <string>
 #include <istream>
+#include <fstream>
 #include <ostream>
 #include <limits>
 #include <stdexcept>
