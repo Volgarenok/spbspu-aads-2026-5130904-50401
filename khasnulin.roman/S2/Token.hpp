@@ -2,6 +2,7 @@
 #define TOKEN_HPP
 
 #include <istream>
+#include <ostream>
 
 namespace khasnulin
 {
@@ -13,6 +14,8 @@ namespace khasnulin
     RightParen,
     End
   };
+
+  std::ostream &operator<<(std::ostream &out, const TokenType &type);
 
   struct Token
   {
