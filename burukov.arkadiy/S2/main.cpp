@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  burukov::Stack< std::string > resultStack;
+  burukov::Queue< std::string > results;
   while (!infix.empty())
   {
     const burukov::Queue< std::string > inf = infix.top();
@@ -52,20 +52,13 @@ int main(int argc, char **argv)
     {
       burukov::convertToPostfix(inf, postfix);
       const std::string res = burukov::calculate(postfix);
-      resultStack.push(res);
+      results.push(res);
     }
     catch (const std::exception &exc)
     {
       std::cerr << exc.what() << "\n";
       return 1;
     }
-  }
-
-  burukov::Queue< std::string > results;
-  while (!resultStack.empty())
-  {
-    results.push(resultStack.top());
-    resultStack.pop();
   }
 
   std::cout << results.front();

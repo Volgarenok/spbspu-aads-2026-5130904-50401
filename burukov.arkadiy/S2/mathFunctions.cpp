@@ -148,17 +148,12 @@ namespace burukov
     {
       throw std::overflow_error("Mod overflow");
     }
+
     lli_t result = lhs % rhs;
-    if (result < 0)
+
+    if ((result > 0) != (rhs > 0) && result != 0)
     {
-      if (rhs > 0)
-      {
         result += rhs;
-      }
-      else
-      {
-        result -= rhs;
-      }
     }
     return result;
   }
