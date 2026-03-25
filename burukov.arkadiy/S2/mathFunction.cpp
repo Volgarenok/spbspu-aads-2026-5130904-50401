@@ -165,9 +165,48 @@ burukov::lli_t burukov::bitwiseAnd(const lli_t lhs, const lli_t rhs)
   return lhs & rhs;
 }
 
-void burukov::getInfix(std::istream &,
-    Stack< Queue< std::string > > &)
+void burukov::getInfix(std::istream &in,
+    Stack< Queue< std::string > > &infix)
 {
+  char sym = 0;
+  std::string current;
+  Queue< std::string > expression;
+  while (in.get(sym))
+  {
+    if (sym == '\n')
+    {
+      if (!current.empty())
+      {
+        expression.push(current);
+        current.clear();
+      }
+      if (!expression.empty())
+      {
+        infix.push(expression);
+        expression.clear();
+      }
+    }
+    else if (sym == ' ' || sym == '\t')
+    {
+      if (!current.empty())
+      {
+        expression.push(current);
+        current.clear();
+      }
+    }
+    else
+    {
+      current += sym;
+    }
+  }
+  if (!current.empty())
+  {
+    expression.push(current);
+  }
+  if (!expression.empty())
+  {
+    infix.push(expression);
+  }
 }
 
 void burukov::convertToPostfix(const Queue< std::string > &,
