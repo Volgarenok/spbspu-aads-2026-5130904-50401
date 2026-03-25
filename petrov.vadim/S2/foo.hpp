@@ -18,7 +18,8 @@ namespace petrov
   ll strToNum(const std::string& str);
   ll pickOperation(ll a, ll b, const std::string& op);
   ll calculatePostfix(Queue<std::string> postfix);
-  void calculateAll(Stack< Queue<std::string> >& postfix, Stack<long long>& results);
+  void calculateAll(Stack< Queue<std::string> >& postfix, Stack<ll>& results);
+  std::ostream& printResults(std::ostream& out, const Stack<ll>& results);
 }
 
 #endif

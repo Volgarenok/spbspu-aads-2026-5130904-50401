@@ -187,12 +187,25 @@ namespace petrov
       }
       else if (token == "#")
       {
+        if (st.empty())
+        {
+          throw std::logic_error("Not enough operands");
+        }
         ll a = st.drop();
         st.push(reverseNumber(a));
       }
       else
       {
+        if (st.empty())
+        {
+          throw std::logic_error("Not enough operands");
+        }
         ll b = st.drop();
+
+        if (st.empty())
+        {
+          throw std::logic_error("Not enough operands");
+        }
         ll a = st.drop();
         st.push(pickOperation(a, b, token));
       }
@@ -200,7 +213,7 @@ namespace petrov
     return st.drop();
   }
 
-  void calculateAll(Stack< Queue<std::string> >& postfix, Stack<long long>& results)
+  void calculateAll(Stack< Queue<std::string> >& postfix, Stack<ll>& results)
   {
     while (!postfix.empty())
     {
@@ -208,5 +221,20 @@ namespace petrov
       ll value = calculatePostfix(expr);
       results.push(value);
     }
+  }
+
+
+  std::ostream& printResults(std::ostream& out, Stack<ll>& results)
+  {
+    while (!results.empty())
+    {
+      out << results.drop();
+      if (!results.empty())
+      {
+        out << " ";
+      }
+    }
+    out << "\n";
+    return out;
   }
 }
