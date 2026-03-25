@@ -42,30 +42,30 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  burukov::Stack< burukov::Queue< std::string > > reversed;
+  burukov::Stack< std::string > resultStack;
   while (!infix.empty())
   {
-    reversed.push(infix.top());
+    const burukov::Queue< std::string > inf = infix.top();
     infix.pop();
-  }
-
-  burukov::Queue< std::string > results;
-  while (!reversed.empty())
-  {
-    const burukov::Queue< std::string > inf = reversed.top();
-    reversed.pop();
     burukov::Queue< std::string > postfix;
-    burukov::convertToPostfix(inf, postfix);
     try
     {
+      burukov::convertToPostfix(inf, postfix);
       const std::string res = burukov::calculate(postfix);
-      results.push(res);
+      resultStack.push(res);
     }
     catch (const std::exception &exc)
     {
       std::cerr << exc.what() << "\n";
       return 1;
     }
+  }
+
+  burukov::Queue< std::string > results;
+  while (!resultStack.empty())
+  {
+    results.push(resultStack.top());
+    resultStack.pop();
   }
 
   std::cout << results.front();
