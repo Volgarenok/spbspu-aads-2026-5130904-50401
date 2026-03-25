@@ -1,7 +1,10 @@
 #include <boost/test/tools/old/interface.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
+#include <cstddef>
+#include <ostream>
 #include <stdexcept>
+#include <string>
 
 #include "Queue.hpp"
 
@@ -54,6 +57,56 @@ BOOST_AUTO_TEST_CASE(test_empty_pop)
   Queue< int > q;
 
   BOOST_CHECK_THROW(q.pop(), std::runtime_error);
+}
+
+struct Person
+{
+  size_t age;
+  std::string name;
+  Person(size_t a):
+      age(a),
+      name("unknown")
+  {
+  }
+  Person(const std::string &n):
+      age(0),
+      name(n)
+  {
+  }
+  Person(size_t a, const std::string &n):
+      age(a),
+      name(n)
+  {
+  }
+  bool operator==(const Person &rhs) const
+  {
+    return age == rhs.age && name == rhs.name;
+  }
+  bool operator!=(const Person &rhs) const
+  {
+    return !(*this == rhs);
+  }
+  std::ostream &operator<<(std::ostream &out) const
+  {
+    return out << age << ", " << name << "; ";
+  }
+};
+
+BOOST_AUTO_TEST_CASE(test_emplacing_element)
+{
+  Queue< Person > q;
+  q.push(Person{1, "Oleg"});
+
+  q.emplace(2, "Kristina");
+  q.emplace(3);
+  q.emplace("Andrey");
+
+  BOOST_REQUIRE(q.empty() == false);
+  BOOST_CHECK_EQUAL(q.size(), 4);
+  Person frst{1, "Oleg"};
+  Person last{0, "Andrey"};
+  BOOST_CHECK_EQUAL(q.back(), frst);
+  BOOST_CHECK_EQUAL(q.front(), last);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
