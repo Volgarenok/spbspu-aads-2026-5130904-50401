@@ -174,12 +174,29 @@ namespace petrov
     throw std::invalid_argument("Unknown operator");
   }
 
-  ll pickReverse(ll a, const std::string& op)
+  ll calculatePostfix(Queue<std::string> postfix)
   {
-    if (op == "#")
+    Stack<ll> st;
+    while (!postfix.empty())
     {
-      return reverseNumber(a);
+      std::string token = postfix.front();
+      postfix.pop();
+      if (std::isdigit(token[0]))
+      {
+        st.push(std::stoll(token));
+      }
+      else if (token == "#")
+      {
+        ll a = st.drop();
+        st.push(reverseNumber(a));
+      }
+      else
+      {
+        ll b = st.drop();
+        ll a = st.drop();
+        st.push(pickOperation(a, b, token));
+      }
     }
-    throw std::invalid_argument("Unknown operator");
+    return st.drop();
   }
 }
