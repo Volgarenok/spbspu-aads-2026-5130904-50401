@@ -29,14 +29,34 @@ int burukov::getPriority(const std::string &sym)
   return -1;
 }
 
-burukov::lli_t burukov::add(const lli_t, const lli_t)
+burukov::lli_t burukov::add(const lli_t lhs, const lli_t rhs)
 {
-  return 0;
+  const lli_t maxVal = std::numeric_limits< lli_t >::max();
+  const lli_t minVal = std::numeric_limits< lli_t >::min();
+  if ((rhs > 0) && (lhs > maxVal - rhs))
+  {
+    throw std::overflow_error("Add overflow");
+  }
+  if ((rhs < 0) && (lhs < minVal - rhs))
+  {
+    throw std::overflow_error("Add overflow");
+  }
+  return lhs + rhs;
 }
 
-burukov::lli_t burukov::sub(const lli_t, const lli_t)
+burukov::lli_t burukov::sub(const lli_t lhs, const lli_t rhs)
 {
-  return 0;
+  const lli_t maxVal = std::numeric_limits< lli_t >::max();
+  const lli_t minVal = std::numeric_limits< lli_t >::min();
+  if ((rhs > 0) && (lhs < minVal + rhs))
+  {
+    throw std::overflow_error("Sub overflow");
+  }
+  if ((rhs < 0) && (lhs > maxVal + rhs))
+  {
+    throw std::overflow_error("Sub overflow");
+  }
+  return lhs - rhs;
 }
 
 burukov::lli_t burukov::mul(const lli_t, const lli_t)
