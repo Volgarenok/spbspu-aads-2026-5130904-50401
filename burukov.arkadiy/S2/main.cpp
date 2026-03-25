@@ -4,13 +4,12 @@
 
 int main(int argc, char **argv)
 {
-  using namespace burukov;
-  Stack< Queue< std::string > > infix;
+  burukov::Stack< burukov::Queue< std::string > > infix;
   if (argc < 2)
   {
     try
     {
-      getInfix(std::cin, infix);
+      burukov::getInfix(std::cin, infix);
     }
     catch (...)
     {
@@ -28,7 +27,7 @@ int main(int argc, char **argv)
     }
     try
     {
-      getInfix(input, infix);
+      burukov::getInfix(input, infix);
     }
     catch (...)
     {
@@ -43,16 +42,16 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  Queue< std::string > results;
+  burukov::Queue< std::string > results;
   while (!infix.empty())
   {
-    const Queue< std::string > inf = infix.top();
+    const burukov::Queue< std::string > inf = infix.top();
     infix.pop();
-    Queue< std::string > postfix;
-    convertToPostfix(inf, postfix);
+    burukov::Queue< std::string > postfix;
+    burukov::convertToPostfix(inf, postfix);
     try
     {
-      const std::string res = calculate(postfix);
+      const std::string res = burukov::calculate(postfix);
       results.push(res);
     }
     catch (const std::exception &exc)
