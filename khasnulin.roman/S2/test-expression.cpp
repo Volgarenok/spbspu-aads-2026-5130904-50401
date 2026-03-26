@@ -234,4 +234,15 @@ BOOST_AUTO_TEST_CASE(test_multiplication_underflow)
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::underflow_error);
 }
 
+BOOST_AUTO_TEST_CASE(test_modulo_overflow)
+{
+  std::string expr = "( 0 - " + std::to_string(std::numeric_limits< int >::max()) + " - 1 ) % ( 0 - 1 )";
+  BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_modulo_by_zero)
+{
+  BOOST_CHECK_THROW(readAndProcessExpressionLine("10 % 0"), std::logic_error);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
