@@ -25,7 +25,7 @@ chernov::Queue< std::string > chernov::processLine(const std::string & line)
 void chernov::executeOperation(Stack< long long > & result, const std::string & oper)
 {
   if (result.size() < 2) {
-    throw std::runtime_error("invalid math expression");
+    throw std::runtime_error("invalid math expression: few operands");
   }
 
   long long b = result.top();
@@ -47,7 +47,7 @@ void chernov::executeOperation(Stack< long long > & result, const std::string & 
   } else if (oper == "-") {
     c = sub(a, b);
   } else {
-    throw std::runtime_error("invalid math expression");
+    throw std::runtime_error("invalid math expression: unknown operator (" + oper + ")");
   }
 
   result.push(c);
@@ -70,15 +70,15 @@ long long chernov::calculateMathExpression(Queue< std::string > math_expression)
         stack.pop();
       }
       if (stack.empty()) {
-        throw std::runtime_error("invalid math expression");
+        throw std::runtime_error("invalid math expression: opening bracket is missing");
       }
       stack.pop();
     } else if (isOperand(element)) {
       result.push(std::stoll(element));
     } else if (!isOperator(element)) {
-      throw std::runtime_error("invalid math expression");
+      throw std::runtime_error("invalid math expression: element is not operator or operand");
     } else {
-      while (!math_expression.empty() && (getPriority(element) >= getPriority(stack.top()))) {
+      while (!stack.empty() && (getPriority(element) >= getPriority(stack.top()))) {
         executeOperation(result, stack.top());
         stack.pop();
       }
@@ -91,8 +91,11 @@ long long chernov::calculateMathExpression(Queue< std::string > math_expression)
     stack.pop();
   }
 
-  if (!stack.empty() || result.size() != 1) {
-    throw std::runtime_error("invalid math expression");
+  if (!stack.empty()) {
+    throw std::runtime_error("invalid math expression: extra opening bracket");
+  }
+  if (result.size() != 1) {
+    throw std::runtime_error("invalid math expression: few operators");
   }
 
   return result.top();
