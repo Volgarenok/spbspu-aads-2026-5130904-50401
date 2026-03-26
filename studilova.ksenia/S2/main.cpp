@@ -26,5 +26,19 @@ int main()
       return 1;
     }
   }
+
+  bool first = true;
+  while(!results.empty())
+  {
+    if (!first)
+    {
+      std::cout << " ";
+    }
+    std::cout << results.top();
+    results.pop();
+
+    first = false;
+  }
+  std::cout << "/n";
   return 0;
 }
