@@ -193,7 +193,7 @@ studilova::Queue< std::string > studilova::infixToPostfix(const std::string& lin
         {
           output.push(token);
         }
-        else if (token == "()")
+        else if (token == "(")
         {
           ops.push(token);
         }
