@@ -51,7 +51,7 @@ int studilova::getPrecedence(const std::string& op)
   return 0;
 }
 
-bool studilova::IsRightAssociative(const std::string& op)
+bool studilova::isRightAssociative(const std::string& op)
 {
   return op == "**";
 }
@@ -174,4 +174,95 @@ long long studilova::applyOperator( long long a, long long b, const std::string&
     return studilova::power(a, b);
   }
   throw std::runtime_error("Unknown operator");
+}
+
+studilova::Queue< std::string > studilova::infixToPostfix(const std::string& line)
+{
+  studilova::Stack< std::string > ops;
+  studilova::Queue< std::string > output;
+
+  std::string token;
+
+  for (size_t i = 0; i < line.length(); ++i)
+  {
+    if (line[i] == ' ')
+    {
+      if (!token.empty())
+      {
+        if (isNumber(token))
+        {
+          output.push(token);
+        }
+        else if (token == "()")
+        {
+          ops.push(token);
+        }
+        else if (token == ")")
+        {
+          while (!ops.empty() && ops.top() != "(")
+          {
+            output.push(ops.top());
+            ops.pop();
+          }
+          if (ops.empty())
+          {
+            throw std::runtime_error("Mismatvhed parentheses");
+          }
+          ops.pop();
+        }
+        else if (isOperator(token))
+        {
+          while (!ops.empty() && isOperator(ops.top()))
+          {
+            std::string topOp = ops.top();
+
+            int p1 = getPrecedence(token);
+            int p2 = getPrecedence(topOp);
+
+            if((!isRightAssociative(token) && p1 <= p2) || (isRightAssociative(token) && p1 < p2))
+            {
+              output.push(topOp);
+              ops.pop();
+            } else {
+              break;
+            }
+          }
+          ops.push(token);
+        } else {
+          throw std::runtime_error("Invalid token: " + token);
+        }
+        token.clear();
+      }
+    } else {
+      token += line[i];
+    }
+  }
+  if (!token.empty())
+  {
+    if (isNumber(token))
+    {
+      output.push(token);
+    }
+    else if (isOperator(token))
+    {
+      while (!ops.empty() && isOperator(ops.top()))
+      {
+        output.push(ops.top());
+        ops.pop();
+      }
+      ops.push(token);
+    } else {
+      throw std::runtime_error("Invalid token: " + token);
+    }
+  }
+  while (!ops.empty())
+  {
+    if (ops.top() == "(")
+    {
+      throw std::runtime_error("Mismatched parentheses");
+    }
+    output.push(ops.top());
+    ops.pop();
+  }
+  return output;
 }
