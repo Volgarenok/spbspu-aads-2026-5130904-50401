@@ -18,9 +18,9 @@ namespace donkeev
     size_t length_;
 
   public:
-    List< T >();
-    List< T >(size_t, T);
-    List< T >(const List< T >&);
+    List();
+    List(size_t, T);
+    List(const List< T >&);
 
     LIter< T > begin();
     LCIter< T > begin() const;
