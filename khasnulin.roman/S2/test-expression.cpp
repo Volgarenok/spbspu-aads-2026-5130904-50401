@@ -95,3 +95,53 @@ BOOST_AUTO_TEST_CASE(test_eof_handling)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(process_token_suite)
+
+using namespace khasnulin;
+
+BOOST_AUTO_TEST_CASE(test_step_by_step_stacks)
+{
+  Stack< Token > values;
+  Stack< Token > operations;
+
+  Token t1 = {TokenType::Number, 3, '0', 0};
+  processToken(t1, values, operations);
+
+  BOOST_CHECK_EQUAL(values.size(), 1);
+  BOOST_CHECK_EQUAL(values.top().value, 3);
+  BOOST_CHECK(operations.empty());
+
+  Token t2 = {TokenType::Operator, 0, '+', 1};
+  processToken(t2, values, operations);
+
+  BOOST_CHECK_EQUAL(values.size(), 1);
+  BOOST_CHECK_EQUAL(operations.size(), 1);
+  BOOST_CHECK_EQUAL(operations.top().op, '+');
+
+  Token t3 = {TokenType::Number, 4, '0', 0};
+  processToken(t3, values, operations);
+
+  BOOST_CHECK_EQUAL(values.size(), 2);
+  BOOST_CHECK_EQUAL(values.top().value, 4);
+  BOOST_CHECK_EQUAL(operations.top().op, '+');
+}
+
+BOOST_AUTO_TEST_CASE(test_operator_priority)
+{
+  Stack< Token > values;
+  Stack< Token > operations;
+
+  values.push({TokenType::Number, 10, '0', 0});
+  values.push({TokenType::Number, 5, '0', 0});
+  operations.push({TokenType::Operator, 0, '*', 2});
+
+  Token plus = {TokenType::Operator, 0, '+', 1};
+
+  processToken(plus, values, operations);
+
+  BOOST_CHECK_EQUAL(operations.top().op, '+');
+  BOOST_CHECK_EQUAL(values.top().value, 50);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
