@@ -266,3 +266,43 @@ studilova::Queue< std::string > studilova::infixToPostfix(const std::string& lin
   }
   return output;
 }
+
+long long studilova::evaluatePostfix(studilova::Queue< std::string >& postfix)
+{
+  Stack< long long > values;
+
+  while (!postfix.empty())
+  {
+    std::string token = postfix.front();
+    postfix.pop();
+
+    if (isNumber(token))
+    {
+      values.push(std::stoll(token));
+    }
+    else if (isOperator(token))
+    {
+      if (values.size() < 2)
+      {
+        throw std::runtime_error("Invalid expression");
+      }
+
+      long long b = values.top();
+      values.pop();
+
+      long long a = values.top();
+      values.pop();
+
+      long long res = applyOperator(a, b, token);
+      values.push(res);
+    } else {
+      throw std::runtime_error("Invalid token");
+    }
+  }
+
+  if (values.size() != 1)
+  {
+    throw std::runtime_error("Invalid expression");
+  }
+  return values.top();
+}
