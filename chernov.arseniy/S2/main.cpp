@@ -25,5 +25,28 @@ int main(int args, char ** argv)
     if (math_expression.size() == 0) {
       continue;
     }
+
+    long long result = 0;
+    try {
+      result = calculateMathExpression(math_expression);
+    } catch (const std::exception & e) {
+      std::cerr << e.what() << "\n";
+      return 1;
+    }
+
+    results.push(result);
   }
+
+  bool first_result = true;
+  while (!results.empty()) {
+    if (first_result) {
+      first_result = false;
+    } else {
+      std::cout << " ";
+    }
+
+    std::cout << results.top();
+    results.pop();
+  }
+  std::cout << "\n";
 }
