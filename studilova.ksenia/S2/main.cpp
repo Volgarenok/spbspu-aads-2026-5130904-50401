@@ -71,6 +71,6 @@ int main(int argc, char* argv[])
 
     first = false;
   }
-  std::cout << "/n";
+  std::cout << "\n";
   return 0;
 }
