@@ -88,9 +88,12 @@ long long chernov::gcd(long long a, long long b)
 
 long long chernov::lcm(long long a, long long b)
 {
+  if (a == 0 || b == 0) {
+    return 0;
+  }
   long long ab_gcd = gcd(a, b);
   long long a_div = a / ab_gcd;
-  return mul(a_div, b);
+  return abs(mul(a_div, b));
 }
 
 bool chernov::isOperator(const std::string & str)
