@@ -86,6 +86,8 @@ int khasnulin::getOpPriority(char ch)
 {
   switch (ch)
   {
+  case '>':
+    return 0;
   case '+':
   case '-':
     return 1;

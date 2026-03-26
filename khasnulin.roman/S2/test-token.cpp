@@ -133,6 +133,7 @@ BOOST_AUTO_TEST_CASE(test_read_bitwise_right_shift_operator)
   Token token = readToken(s, pos);
   BOOST_CHECK_EQUAL(token.type, TokenType::Operator);
   BOOST_CHECK_EQUAL(token.op, '>');
+  BOOST_CHECK_EQUAL(token.priority, 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_read_bitwise_right_shift_expression)
@@ -146,6 +147,7 @@ BOOST_AUTO_TEST_CASE(test_read_bitwise_right_shift_expression)
   Token token = readToken(s, pos);
   BOOST_CHECK_EQUAL(token.type, TokenType::Operator);
   BOOST_CHECK_EQUAL(token.op, '>');
+  BOOST_CHECK_EQUAL(token.priority, 0);
 
   BOOST_CHECK_EQUAL(readToken(s, pos).type, TokenType::Number);
 }
