@@ -1,5 +1,6 @@
 #include "math_funcs.hpp"
 
+#include <cctype>
 #include <stdexcept>
 
 long long chernov::abs(long long a)
@@ -91,12 +92,26 @@ long long chernov::lcm(long long a, long long b)
 
 bool chernov::isOperator(const std::string & str)
 {
-  constexpr size_t count_operators = 8;
-  const std::string operators[count_operators] = {"+", "-", "*", "/", "%", "lcm", "(", ")"};
   for (size_t i = 0; i < count_operators; ++i) {
     if (str == operators[i]) {
       return true;
     }
   }
   return false;
+}
+
+bool chernov::isOperand(const std::string & str)
+{
+  if (str[0] == '\0') {
+    return false;
+  }
+  size_t i = 0;
+  i += str[0] == '-';
+  while (str[i] != '\0') {
+    if (!std::isdigit(str[i])) {
+      return false;
+    }
+    ++i;
+  }
+  return true;
 }
