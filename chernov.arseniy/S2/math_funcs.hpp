@@ -4,6 +4,8 @@
 #include <limits>
 #include <string>
 
+#include <queue.hpp>
+
 namespace chernov {
   constexpr long long MIN_LLI = std::numeric_limits< long long >::min();
   constexpr long long MAX_LLI = std::numeric_limits< long long >::max();
@@ -22,6 +24,9 @@ namespace chernov {
 
   bool isOperator(const std::string & str);
   bool isOperand(const std::string & str);
+  size_t getPriority(const std::string & oper);
+
+  Queue< std::string > convertInfix2Postfix(Queue< std::string > math_expression);
 }
 
 #endif

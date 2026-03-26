@@ -2,6 +2,10 @@
 
 #include <cctype>
 #include <stdexcept>
+#include <string>
+
+#include <stack.hpp>
+#include <queue.hpp>
 
 long long chernov::abs(long long a)
 {
@@ -114,4 +118,62 @@ bool chernov::isOperand(const std::string & str)
     ++i;
   }
   return true;
+}
+
+size_t chernov::getPriority(const std::string & oper)
+{
+  if (oper == "lcm") {
+    return 3;
+  } else if (oper == "*" || oper == "/" || oper == "%") {
+    return 2;
+  } else if (oper == "+" || oper == "-") {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+chernov::Queue< std::string > chernov::convertInfix2Postfix(Queue< std::string > infix)
+{
+  Queue< std::string > postfix;
+  Stack< std::string > stack;
+
+  while (!infix.empty()) {
+    std::string element = infix.front();
+    infix.pop();
+
+    if (element == "(") {
+      stack.push(element);
+    } else if (element == ")") {
+      while (!stack.empty() && stack.top() != "(") {
+        postfix.push(stack.top());
+        stack.pop();
+      }
+      if (stack.empty()) {
+        throw std::invalid_argument("invalid math expression");
+      }
+      stack.pop();
+    } else if (isOperand(element)) {
+      postfix.push(element);
+    } else if (!isOperator(element)) {
+      throw std::invalid_argument("invalid math expression");
+    } else {
+      while (!infix.empty() && (getPriority(element) >= getPriority(stack.top()))) {
+        postfix.push(stack.top());
+        stack.pop();
+      }
+      stack.push(element);
+    }
+  }
+
+  while (!stack.empty() && stack.top() != "(") {
+    postfix.push(stack.top());
+    stack.pop();
+  }
+
+  if (!stack.empty()) {
+    throw std::invalid_argument("invalid math expression");
+  }
+
+  return postfix;
 }
