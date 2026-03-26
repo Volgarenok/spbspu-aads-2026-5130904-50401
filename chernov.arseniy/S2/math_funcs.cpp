@@ -133,33 +133,64 @@ size_t chernov::getPriority(const std::string & oper)
   }
 }
 
-chernov::Queue< std::string > chernov::convertInfix2Postfix(Queue< std::string > infix)
+void chernov::executeOperation(Stack< long long > & result, const std::string & oper)
 {
-  Queue< std::string > postfix;
+  if (result.size() < 2) {
+    throw std::runtime_error("invalid math expression");
+  }
+
+  long long b = result.top();
+  result.pop();
+  long long a = result.top();
+  result.pop();
+
+  long long c = 0;
+  if (oper == "lcm") {
+    c = lcm(a, b);
+  } else if (oper == "*") {
+    c = mul(a, b);
+  } else if (oper == "/") {
+    c = div(a, b);
+  } else if (oper == "%") {
+    c = mod(a, b);
+  } else if (oper == "+") {
+    c = add(a, b);
+  } else if (oper == "-") {
+    c = sub(a, b);
+  } else {
+    throw std::runtime_error("invalid math expression");
+  }
+
+  result.push(c);
+}
+
+long long chernov::calculateMathExpression(Queue< std::string > math_expression)
+{
+  Stack< long long > result;
   Stack< std::string > stack;
 
-  while (!infix.empty()) {
-    std::string element = infix.front();
-    infix.pop();
+  while (!math_expression.empty()) {
+    std::string element = math_expression.front();
+    math_expression.pop();
 
     if (element == "(") {
       stack.push(element);
     } else if (element == ")") {
       while (!stack.empty() && stack.top() != "(") {
-        postfix.push(stack.top());
+        executeOperation(result, stack.top());
         stack.pop();
       }
       if (stack.empty()) {
-        throw std::invalid_argument("invalid math expression");
+        throw std::runtime_error("invalid math expression");
       }
       stack.pop();
     } else if (isOperand(element)) {
-      postfix.push(element);
+      result.push(std::stoll(element));
     } else if (!isOperator(element)) {
-      throw std::invalid_argument("invalid math expression");
+      throw std::runtime_error("invalid math expression");
     } else {
-      while (!infix.empty() && (getPriority(element) >= getPriority(stack.top()))) {
-        postfix.push(stack.top());
+      while (!math_expression.empty() && (getPriority(element) >= getPriority(stack.top()))) {
+        executeOperation(result, stack.top());
         stack.pop();
       }
       stack.push(element);
@@ -167,13 +198,13 @@ chernov::Queue< std::string > chernov::convertInfix2Postfix(Queue< std::string >
   }
 
   while (!stack.empty() && stack.top() != "(") {
-    postfix.push(stack.top());
+    executeOperation(result, stack.top());
     stack.pop();
   }
 
-  if (!stack.empty()) {
-    throw std::invalid_argument("invalid math expression");
+  if (!stack.empty() || result.size() != 1) {
+    throw std::runtime_error("invalid math expression");
   }
 
-  return postfix;
+  return result.top();
 }

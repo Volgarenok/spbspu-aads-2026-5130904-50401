@@ -4,6 +4,7 @@
 #include <limits>
 #include <string>
 
+#include <stack.hpp>
 #include <queue.hpp>
 
 namespace chernov {
@@ -26,7 +27,8 @@ namespace chernov {
   bool isOperand(const std::string & str);
   size_t getPriority(const std::string & oper);
 
-  Queue< std::string > convertInfix2Postfix(Queue< std::string > math_expression);
+  void executeOperation(Stack< long long > & result, const std::string & oper);
+  long long calculateMathExpression(Queue< std::string > math_expression);
 }
 
 #endif
