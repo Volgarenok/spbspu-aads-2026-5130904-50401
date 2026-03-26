@@ -175,3 +175,31 @@ BOOST_AUTO_TEST_CASE(test_minimal_expressions)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(expression_processing_with_overflow_suite)
+using namespace khasnulin;
+
+BOOST_AUTO_TEST_CASE(test_addition_overflow)
+{
+  std::string expr = std::to_string(std::numeric_limits< int >::max()) + " + 1";
+  BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_subtraction_underflow)
+{
+  std::string expr = std::to_string(std::numeric_limits< int >::min()) + " - 1";
+  BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::underflow_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_multiplication_overflow)
+{
+  std::string expr = std::to_string(std::numeric_limits< int >::max() / 2 + 1) + " * 2";
+  BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_division_by_zero)
+{
+  BOOST_CHECK_THROW(readAndProcessExpressionLine("10 / 0"), std::logic_error);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
