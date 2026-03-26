@@ -9,9 +9,9 @@ chernov::Queue< std::string > chernov::processLine(const std::string & line)
 {
   Queue< std::string > math_expression;
   size_t i = 0;
-  while (line[i] != '\0') {
+  while (i < line.size()) {
     size_t j = i;
-    while (line[j] != '\0' && !std::isspace(line[j])) {
+    while (j < line.size() && !std::isspace(line[j])) {
       ++j;
     }
     if (i != j) {
@@ -78,7 +78,7 @@ long long chernov::calculateMathExpression(Queue< std::string > math_expression)
     } else if (!isOperator(element)) {
       throw std::runtime_error("invalid math expression: element is not operator or operand");
     } else {
-      while (!stack.empty() && (getPriority(element) >= getPriority(stack.top()))) {
+      while (!stack.empty() && stack.top() != "(" && (getPriority(element) <= getPriority(stack.top()))) {
         executeOperation(result, stack.top());
         stack.pop();
       }

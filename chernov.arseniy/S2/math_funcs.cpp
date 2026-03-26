@@ -63,7 +63,7 @@ long long chernov::mul(long long a, long long b)
     return 0;
   } else if ((a > 0 && b > 0 && a > MAX_LLI / b) || (a < 0 && b < 0 && a < MAX_LLI / b)) {
     throw std::overflow_error("overflow_error");
-  } else if ((a > 0 && b < 0 && a > MIN_LLI / b) || (a < 0 && b > 0 && a < MIN_LLI / b)) {
+  } else if ((a > 0 && b < 0 && b < MIN_LLI / a) || (a < 0 && b > 0 && a < MIN_LLI / b)) {
     throw std::underflow_error("underflow error");
   } else {
     return a * b;
@@ -103,7 +103,7 @@ bool chernov::isOperator(const std::string & str)
 
 bool chernov::isOperand(const std::string & str)
 {
-  if (str[0] == '\0') {
+  if (str == "" || str == "-") {
     return false;
   }
   size_t i = 0;
