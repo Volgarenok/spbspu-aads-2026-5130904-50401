@@ -9,6 +9,8 @@ namespace khasnulin
 {
   Queue< Token > readExpression(std::istream &in);
 
+  Stack< int > readAndProcessAllExpressions(std::istream &in);
+
   int readAndProcessExpressionLine(const std::string &line);
 
   void processToken(Token &token, Stack< Token > &values, Stack< Token > &operations);
