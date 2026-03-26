@@ -64,6 +64,20 @@ namespace
     return a * b;
   }
 
+  int safeModulo(int a, int b)
+  {
+    static constexpr int min = std::numeric_limits< int >::min();
+    if (a == min && b == -1)
+    {
+      throw std::overflow_error("get overflow while module operation");
+    }
+    if (b == 0)
+    {
+      throw std::logic_error("can't get modulo of zero");
+    }
+    return a % b;
+  }
+
   int calculateBinaryOp(int v1, int v2, char op)
   {
     switch (op)
@@ -77,7 +91,7 @@ namespace
     case '/':
       return safeDivide(v2, v1);
     case '%':
-      return v2 % v1;
+      return safeModulo(v2, v1);
     default:
       return v2;
     }
