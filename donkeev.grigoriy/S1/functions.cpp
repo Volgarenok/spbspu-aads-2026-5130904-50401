@@ -30,6 +30,19 @@ namespace donkeev
       }
     }
   }
+  bool areAnyvalues(const List< std::pair< std::string, List< size_t > > >& data)
+  {
+    LCIter< std::pair< std::string, List< size_t > > > outIt = data.begin();
+    for (size_t i = 0; i < data.size(); ++i)
+    {
+      if (!outIt->second.isEmpty())
+      {
+        return true;
+      }
+      ++outIt;
+    }
+    return false;
+  }
   size_t getMaxSize(const List< std::pair< std::string, List< size_t > > >& data)
   {
     size_t maximum = 0;
@@ -74,6 +87,10 @@ namespace donkeev
       }
       output << "\n";
       ++iterationCount;
+    }
+    if (!areAnyvalues(data))
+    {
+      output << 0 << "\n";
     }
   }
 }
