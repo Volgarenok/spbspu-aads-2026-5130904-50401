@@ -49,6 +49,21 @@ namespace
     return a / b;
   }
 
+  int safeMultiply(int a, int b)
+  {
+    static constexpr int max = std::numeric_limits< int >::max();
+    static constexpr int min = std::numeric_limits< int >::min();
+    if ((a > 0 && b > 0 && a > max / b) || (a < 0 && b < 0 && a < max / b))
+    {
+      throw std::overflow_error("get overflow while multyplying");
+    }
+    if ((a > 0 && b < 0 && b < min / a) || (a < 0 && b > 0 && a < min / b))
+    {
+      throw std::underflow_error("get underflow while myltiplying");
+    }
+    return a * b;
+  }
+
   int calculateBinaryOp(int v1, int v2, char op)
   {
     switch (op)
@@ -58,7 +73,7 @@ namespace
     case '-':
       return safeSubtraction(v2, v1);
     case '*':
-      return v2 * v1;
+      return safeMultiply(v2, v1);
     case '/':
       return safeDivide(v2, v1);
     case '%':
