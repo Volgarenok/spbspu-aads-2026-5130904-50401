@@ -306,3 +306,9 @@ long long studilova::evaluatePostfix(studilova::Queue< std::string >& postfix)
   }
   return values.top();
 }
+
+long long studilova::evaluateExpression(const std::string& line)
+{
+  studilova::Queue< std::string > postfix = infixToPostfix(line);
+  return evaluatePostfix(postfix);
+}
