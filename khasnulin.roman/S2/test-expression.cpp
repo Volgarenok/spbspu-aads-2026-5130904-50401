@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE(test_division_int_min_by_minus_one)
 {
   std::string min_int_str = "( 0 - " + (std::to_string(std::numeric_limits< int >::max())) + " - 1 )";
   std::string expr = min_int_str + " / ( 0 - 1 )";
-  BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
+  BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::underflow_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_multiplication_overflow_binary)
