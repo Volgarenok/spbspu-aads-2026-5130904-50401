@@ -1,7 +1,6 @@
 #include "ExpressionProcess.hpp"
-#include "Stack.hpp"
 
-#include <cctype>
+#include <istream>
 #include <limits>
 #include <stdexcept>
 #include <string>

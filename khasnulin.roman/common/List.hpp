@@ -2,11 +2,6 @@
 #define LIST_HPP
 
 #include <initializer_list>
-#include <iostream>
-#include <memory>
-#include <ostream>
-#include <stdexcept>
-#include <utility>
 
 #include "LCIter.hpp"
 #include "LIter.hpp"
