@@ -30,7 +30,7 @@ namespace
     }
     if (b < 0 && a > max + b)
     {
-      throw std::underflow_error("get overflow while subtract");
+      throw std::overflow_error("get overflow while subtract");
     }
     return a - b;
   }
