@@ -91,8 +91,8 @@ long long chernov::lcm(long long a, long long b)
 
 bool chernov::isOperator(const std::string & str)
 {
-  constexpr size_t count_operators = 7;
-  const std::string operators[count_operators] = {"+", "-", "*", "/", "%", "lcm"};
+  constexpr size_t count_operators = 8;
+  const std::string operators[count_operators] = {"+", "-", "*", "/", "%", "lcm", "(", ")"};
   for (size_t i = 0; i < count_operators; ++i) {
     if (str == operators[i]) {
       return true;
