@@ -41,11 +41,18 @@ int main(int argc, char **argv)
     return 1;
   }
 
+  bool first = true;
   while (!answers.empty())
   {
-    std::cout << answers.top() << "\n";
+    if (!first)
+    {
+      std::cout << " ";
+    }
+    std::cout << answers.top();
+    first = false;
     answers.pop();
   }
+  std::cout << "\n";
 
   return 0;
 }
