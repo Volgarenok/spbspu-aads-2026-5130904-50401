@@ -1,6 +1,7 @@
 #include <boost/test/tools/old/interface.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
+#include <stdexcept>
 
 #include "ExpressionProcess.hpp"
 
@@ -185,10 +186,22 @@ BOOST_AUTO_TEST_CASE(test_addition_overflow)
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
 }
 
+BOOST_AUTO_TEST_CASE(test_addition_underflow)
+{
+  std::string expr = "( 0 - " + (std::to_string(std::numeric_limits< int >::max())) + " - 1 ) + ( 0 - 1 )";
+  BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::underflow_error);
+}
+
 BOOST_AUTO_TEST_CASE(test_subtraction_underflow)
 {
-  std::string expr = std::to_string(std::numeric_limits< int >::min()) + " - 1";
+  std::string expr = "( 0 - " + (std::to_string(std::numeric_limits< int >::max())) + " - 1 ) - 1";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::underflow_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_subtraction_overflow_with_negative)
+{
+  std::string expr = std::to_string(std::numeric_limits< int >::max()) + " - ( 0 - 1 )";
+  BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_multiplication_overflow)
@@ -202,22 +215,10 @@ BOOST_AUTO_TEST_CASE(test_division_by_zero)
   BOOST_CHECK_THROW(readAndProcessExpressionLine("10 / 0"), std::logic_error);
 }
 
-BOOST_AUTO_TEST_CASE(test_subtraction_from_min)
-{
-  std::string expr = std::to_string(std::numeric_limits< int >::min()) + " - 1";
-  BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::underflow_error);
-}
-
 BOOST_AUTO_TEST_CASE(test_division_int_min_by_minus_one)
 {
-  std::string min_int_str = std::to_string(std::numeric_limits< int >::min());
+  std::string min_int_str = "( 0 - " + (std::to_string(std::numeric_limits< int >::max())) + " - 1 )";
   std::string expr = min_int_str + " / ( 0 - 1 )";
-  BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
-}
-
-BOOST_AUTO_TEST_CASE(test_subtraction_overflow_with_negative)
-{
-  std::string expr = std::to_string(std::numeric_limits< int >::max()) + " - ( 0 - 1 )";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
 }
 
