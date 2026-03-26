@@ -34,6 +34,15 @@ int main(int argc, char* argv[])
 
   while(std::getline(std::cin, line))
   {
+    bool empty = true;
+    for (size_t i = 0; i < line.length(); ++i)
+    {
+      if (line[i] != ' ' && line[i] != '\t')
+      {
+        empty = false;
+        break;
+      }
+    }
     if (line.empty())
     {
       continue;
