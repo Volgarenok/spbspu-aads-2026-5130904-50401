@@ -6,12 +6,14 @@
 
 int main(int argc, char* argv[])
 {
-   std::ifstream file;
-   std::istream* input = &std::cin;
-   if (argc > 1) {
+  std::istream* input = &std::cin;
+  std::ifstream file;
+  if (argc > 1)
+  {
     file.open(argv[1]);
-    if (!file.is_open()) {
-      std::cerr << "Cannot open file: " << argv[1] << "\n";
+    if (!file.is_open())
+    {
+      std::cerr << "cannot open file\n";
       return 1;
     }
     if (file.peek() == EOF)
@@ -23,37 +25,35 @@ int main(int argc, char* argv[])
     }
   }
 
-  std::string line;
-  zhuravleva::Stack < zhuravleva::value_t > results;
-  try
+std::string line;
+zhuravleva::Stack < zhuravleva::value_t > results;
+try
+{
+  while(std::getline(*input, line))
   {
-    while(std::getline(*input, line))
+    if (line.empty())
     {
-      if (line.empty())
-      {
-        continue;
-      }
-      auto postfix = zhuravleva::infToPostfix(line);
-      zhuravleva::value_t result = zhuravleva::calcPostfix(postfix);
-      results.push(result);
+      continue;
     }
+    auto postfix = zhuravleva::infToPostfix(line);
+    zhuravleva::value_t result = zhuravleva::calcPostfix(postfix);
+    results.push(result);
+  }
+  if (!results.empty())
+  {
     bool first = true;
-    while(!results.empty())
+    while (!results.empty())
     {
-      if(!first)
+      if (!first)
       {
         std::cout << " ";
       }
-      std::cout << results.drop();
+        std::cout << results.drop();
       first = false;
     }
-    if (!std::cin.eof())
-    {
-      std::cerr << "input error";
-      return 1;
-    }
-    std::cout << std::endl;
-  }catch(const std::exception& e)
+  }
+    std::cout << "\n";
+  } catch (const std::exception& e)
   {
     std::cerr << e.what() << "\n";
     return 1;
