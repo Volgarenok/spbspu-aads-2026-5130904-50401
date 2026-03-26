@@ -7,6 +7,7 @@ int main()
 {
   std::string line;
   zhuravleva::Stack < zhuravleva::value_t > results;
+  bool hasInput = false;
   try
   {
     while(std::getline(std::cin, line))
@@ -24,10 +25,14 @@ int main()
       {
         continue;
       }
+      hasInput = true;
       auto postfix = zhuravleva::infToPostfix(line);
       zhuravleva::value_t result = zhuravleva::calcPostfix(postfix);
-
       results.push(result);
+    }
+    if (!hasInput) {
+      std::cout << std::endl;
+      return 0;
     }
     bool first = true;
     while(!results.empty())
@@ -44,6 +49,7 @@ int main()
       std::cerr << "input error";
       return 1;
     }
+    std::cout << std::endl;
   }catch(const std::exception& e)
   {
     std::cerr << e.what() << "\n";
