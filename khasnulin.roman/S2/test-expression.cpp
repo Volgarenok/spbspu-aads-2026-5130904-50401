@@ -246,3 +246,28 @@ BOOST_AUTO_TEST_CASE(test_modulo_by_zero)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(read_all_expressions_suite)
+
+BOOST_AUTO_TEST_CASE(test_process_all_expressions_with_empty_lines)
+{
+  std::stringstream input;
+  input << "2 + 2\n";
+  input << "          \n";
+  input << "\n";
+  input << "10 * 3\n";
+
+  khasnulin::Stack< int > results = khasnulin::readAndProcessAllExpressions(input);
+
+  BOOST_CHECK_EQUAL(results.size(), 2);
+
+  int second = results.top();
+  results.pop();
+  int first = results.top();
+  results.pop();
+
+  BOOST_CHECK_EQUAL(first, 4);
+  BOOST_CHECK_EQUAL(second, 30);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
