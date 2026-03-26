@@ -25,32 +25,17 @@ int main(int argc, char* argv[])
 
   std::string line;
   zhuravleva::Stack < zhuravleva::value_t > results;
-  bool hasInput = false;
   try
   {
     while(std::getline(*input, line))
     {
-      bool empt = true;
-      for (char c : line)
-      {
-        if (c != ' ')
-        {
-          empt = false;
-          break;
-        }
-      }
-      if (empt)
+      if (line.empty())
       {
         continue;
       }
-      hasInput = true;
       auto postfix = zhuravleva::infToPostfix(line);
       zhuravleva::value_t result = zhuravleva::calcPostfix(postfix);
       results.push(result);
-    }
-    if (!hasInput) {
-      std::cout << std::endl;
-      return 0;
     }
     bool first = true;
     while(!results.empty())
