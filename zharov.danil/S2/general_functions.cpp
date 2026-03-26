@@ -1,4 +1,5 @@
-#include <iostream>
+#include <string>
+#include <stdexcept>
 #include "general_functions.hpp"
 #include "math_functions.hpp"
 
@@ -49,11 +50,11 @@ zharov::Queue< std::string > zharov::getPostfix(Queue< std::string > & infix)
   while (!infix.empty()) {
     std::string curr = infix.drop();
     if (isOperand(curr)) {
-      res.push(infix.drop());
+      res.push(curr);
     } else if (curr == "(") {
-      stack.push(infix.drop());
+      stack.push(curr);
     } else if (curr == ")") {
-      while (!stack.empty() && stack.top() != ")") {
+      while (!stack.empty() && stack.top() != "(") {
         res.push(stack.drop());
       }
       if (!stack.empty()) {
@@ -84,7 +85,6 @@ zharov::Queue< std::string > zharov::getPostfix(Queue< std::string > & infix)
 
 zharov::ll_t zharov::getResult(Queue< std::string > & postfix)
 {
-  ll_t res;
   Stack< ll_t > temp;
   while (!postfix.empty()) {
     std::string curr = postfix.drop();
@@ -93,8 +93,8 @@ zharov::ll_t zharov::getResult(Queue< std::string > & postfix)
         throw std::logic_error("Not enough operands for operator: " + curr);
       }
       else {
-        ll_t a = temp.drop();
         ll_t b = temp.drop();
+        ll_t a = temp.drop();
         if (curr == "+") {
           temp.push(add(a, b));
         } else if (curr == "-") {

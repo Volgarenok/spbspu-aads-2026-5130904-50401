@@ -1,8 +1,8 @@
 #ifndef GENERAL_FUNCTIONS_HPP
 #define GENERAL_FUNCTIOINS_HPP
-#include <iostream>
-#include "../common/stack.hpp"
-#include "../common/queue.hpp"
+#include <string>
+#include <stack.hpp>
+#include <queue.hpp>
 
 namespace zharov {
   using ll_t = long long;
