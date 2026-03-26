@@ -10,7 +10,7 @@ namespace studilova
   bool isNumber(const std::string& s);
   bool isOperator(const std::string& s);
   int getPrecedence(const std::string& op);
-  bool IsRightAssociative(const std::string& op);
+  bool isRightAssociative(const std::string& op);
   long long applyOperator( long long a, long long b, const std::string& op);
 
   long long add(long long a, long long b);
