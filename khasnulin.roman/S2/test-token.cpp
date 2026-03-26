@@ -123,4 +123,31 @@ BOOST_AUTO_TEST_CASE(test_empty_line)
   BOOST_CHECK_EQUAL(readToken(s, pos).type, TokenType::EndOfExpr);
 }
 
+BOOST_AUTO_TEST_CASE(test_read_bitwise_right_shift_operator)
+{
+  std::stringstream ss(">>");
+  std::string s;
+  std::getline(ss, s);
+  size_t pos = 0;
+
+  Token token = readToken(s, pos);
+  BOOST_CHECK_EQUAL(token.type, TokenType::Operator);
+  BOOST_CHECK_EQUAL(token.op, '>');
+}
+
+BOOST_AUTO_TEST_CASE(test_read_bitwise_right_shift_expression)
+{
+  std::stringstream ss("1 >> 5");
+  std::string s;
+  std::getline(ss, s);
+  size_t pos = 0;
+  BOOST_CHECK_EQUAL(readToken(s, pos).type, TokenType::Number);
+
+  Token token = readToken(s, pos);
+  BOOST_CHECK_EQUAL(token.type, TokenType::Operator);
+  BOOST_CHECK_EQUAL(token.op, '>');
+
+  BOOST_CHECK_EQUAL(readToken(s, pos).type, TokenType::Number);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
