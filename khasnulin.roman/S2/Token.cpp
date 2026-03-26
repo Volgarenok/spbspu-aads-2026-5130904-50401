@@ -29,37 +29,48 @@ namespace
   }
 }
 
-khasnulin::Token khasnulin::readToken(std::istream &in)
+khasnulin::Token khasnulin::readToken(const std::string &line, size_t &pos)
 {
-  std::string str;
+  size_t size = line.length();
   Token newToken;
-  if (in >> str && str.length() > 0)
+
+  while (pos < size && std::isspace(line[pos]))
   {
-    if (str[0] >= '0' && str[0] <= '9')
-    {
-      newToken = {TokenType::Number, strToNum(str), '0', 0};
-    }
-    else if (str[0] == '(')
-    {
-      newToken = {TokenType::LeftParen, 0, '(', 0};
-    }
-    else if (str[0] == ')')
-    {
-      newToken = {TokenType::RightParen, 0, ')', 0};
-    }
-    else if (str.length() == 1 &&
-             (str[0] == '+' || str[0] == '-' || str[0] == '*' || str[0] == '/' || str[0] == '%'))
-    {
-      newToken = {TokenType::Operator, 0, str[0], getOpPriority(str[0])};
-    }
-    else
-    {
-      throw std::runtime_error("read unknown token from input stream");
-    }
+    pos++;
+  }
+
+  if (pos == size)
+  {
+    newToken = {TokenType::EndOfExpr, 0, '0', 0};
+    return newToken;
+  }
+
+  std::string lexeme;
+  while (pos < size && line[pos] != ' ')
+  {
+    lexeme += line[pos++];
+  }
+
+  if ((lexeme[0] >= '0' && lexeme[0] <= '9'))
+  {
+    newToken = {TokenType::Number, strToNum(lexeme), '0', 0};
+  }
+  else if (lexeme.length() == 1 && lexeme[0] == '(')
+  {
+    newToken = {TokenType::LeftParen, 0, '(', 0};
+  }
+  else if (lexeme.length() == 1 && lexeme[0] == ')')
+  {
+    newToken = {TokenType::RightParen, 0, ')', 0};
+  }
+  else if (lexeme.length() == 1 &&
+           (lexeme[0] == '+' || lexeme[0] == '-' || lexeme[0] == '*' || lexeme[0] == '/' || lexeme[0] == '%'))
+  {
+    newToken = {TokenType::Operator, 0, lexeme[0], getOpPriority(lexeme[0])};
   }
   else
   {
-    newToken = {TokenType::End, 0, '0', 0};
+    throw std::runtime_error("read unknown token from input stream");
   }
 
   return newToken;
