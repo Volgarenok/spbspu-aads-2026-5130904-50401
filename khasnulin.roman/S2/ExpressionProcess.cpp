@@ -81,6 +81,15 @@ namespace
     return result >= 0 ? result : result + b;
   }
 
+  long long safeBitwiseRightShift(long long a, long long b)
+  {
+    if (b < 0)
+    {
+      throw std::logic_error("bitwise right shift rhs can't be negative");
+    }
+    return a >> b;
+  }
+
   long long calculateBinaryOp(long long v1, long long v2, char op)
   {
     switch (op)
@@ -95,6 +104,8 @@ namespace
       return safeDivide(v2, v1);
     case '%':
       return safeModulo(v2, v1);
+    case '>':
+      return safeBitwiseRightShift(v2, v1);
     default:
       return v2;
     }
