@@ -20,6 +20,21 @@ namespace
     return a + b;
   }
 
+  int safeSubtraction(int a, int b)
+  {
+    static constexpr int max = std::numeric_limits< int >::max();
+    static constexpr int min = std::numeric_limits< int >::min();
+    if (b > 0 && a < min + b)
+    {
+      throw std::underflow_error("get underflow while subtract");
+    }
+    if (b < 0 && a > max + b)
+    {
+      throw std::underflow_error("get overflow while subtract");
+    }
+    return a - b;
+  }
+
   int calculateBinaryOp(int v1, int v2, char op)
   {
     switch (op)
@@ -27,7 +42,7 @@ namespace
     case '+':
       return safeSum(v2, v1);
     case '-':
-      return v2 - v1;
+      return safeSubtraction(v2, v1);
     case '*':
       return v2 * v1;
     case '/':
