@@ -1,7 +1,10 @@
 #include "ExpressionProcess.hpp"
+#include "Stack.hpp"
 
+#include <cctype>
 #include <limits>
 #include <stdexcept>
+#include <string>
 
 namespace
 {
@@ -144,8 +147,7 @@ int khasnulin::readAndProcessExpressionLine(const std::string &line)
   {
     makeSingleCalculation(values, operations);
   }
-
-  return values.top().value;
+  return !values.empty() ? values.top().value : 0;
 }
 
 khasnulin::Stack< khasnulin::Queue< khasnulin::Token > > khasnulin::readAllExpressions(std::istream &in)
@@ -188,4 +190,27 @@ void khasnulin::processToken(Token &token, Stack< Token > &values, Stack< Token 
     }
     operations.pop();
   }
+}
+
+khasnulin::Stack< int > khasnulin::readAndProcessAllExpressions(std::istream &in)
+{
+  Stack< int > answers;
+  std::string line;
+  while (std::getline(in, line))
+  {
+    bool empty = true;
+    for (size_t i = 0, end = line.size(); i < end && empty; ++i)
+    {
+      if (!std::isspace(line[i]))
+      {
+        empty = false;
+      }
+    }
+    if (!empty)
+    {
+      int result = readAndProcessExpressionLine(line);
+      answers.push(result);
+    }
+  }
+  return answers;
 }
