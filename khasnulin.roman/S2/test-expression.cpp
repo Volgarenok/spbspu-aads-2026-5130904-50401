@@ -145,3 +145,33 @@ BOOST_AUTO_TEST_CASE(test_operator_priority)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(expression_processing_suite)
+using namespace khasnulin;
+
+BOOST_AUTO_TEST_CASE(test_basic_operations)
+{
+  BOOST_CHECK_EQUAL(readAndProcessExpressionLine("2 + 2"), 4);
+  BOOST_CHECK_EQUAL(readAndProcessExpressionLine("10 - 3"), 7);
+  BOOST_CHECK_EQUAL(readAndProcessExpressionLine("5 * 4"), 20);
+  BOOST_CHECK_EQUAL(readAndProcessExpressionLine("20 / 5"), 4);
+}
+
+BOOST_AUTO_TEST_CASE(test_operator_precedence)
+{
+  BOOST_CHECK_EQUAL(readAndProcessExpressionLine("2 + 3 * 4"), 14);
+  BOOST_CHECK_EQUAL(readAndProcessExpressionLine("15 - 10 / 2"), 10);
+}
+
+BOOST_AUTO_TEST_CASE(test_parentheses)
+{
+  BOOST_CHECK_EQUAL(readAndProcessExpressionLine("( 2 + 3 ) * 4"), 20);
+  BOOST_CHECK_EQUAL(readAndProcessExpressionLine("2 * ( 3 + ( 10 / 2 ) )"), 16);
+}
+
+BOOST_AUTO_TEST_CASE(test_minimal_expressions)
+{
+  BOOST_CHECK_EQUAL(readAndProcessExpressionLine("42"), 42);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
