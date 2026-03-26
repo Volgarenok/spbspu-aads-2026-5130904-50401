@@ -3,10 +3,14 @@
 
 #include <stack.hpp>
 #include <queue.hpp>
+#include "general_funcs.hpp"
+#include "math_funcs.hpp"
 
 int main(int args, char ** argv)
 {
   using namespace chernov;
+
+  Stack< long long > results;
 
   std::istream * input = &std::cin;
   if (args > 1) {
@@ -16,6 +20,10 @@ int main(int args, char ** argv)
 
   std::string line;
   while (*input) {
-    *input >> line;
+    std::getline(*input, line);
+    Queue< std::string > math_expression = processLine(line);
+    if (math_expression.size() == 0) {
+      continue;
+    }
   }
 }
