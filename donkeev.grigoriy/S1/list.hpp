@@ -28,7 +28,7 @@ namespace donkeev
     LIter< T > pushAfter(LIter< T >, const T&);
     void pushFront(const T&);
     void pushBack(const T&);
-    
+
     void popFront();
     void cutAfter(LIter< T >&);
     void clearAll();
@@ -93,7 +93,7 @@ namespace donkeev
   {
     return LCIter< T >{head_};
   }
-  
+
   template< class T >
   LIter< T > List< T >::pushAfter(LIter< T > it, const T& value)
   {

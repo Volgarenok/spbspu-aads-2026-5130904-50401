@@ -6,7 +6,7 @@ namespace donkeev
 {
   void read(List< std::pair< std::string, List< size_t > > >& data, std::istream& input)
   {
-    
+
     std::string seqName;
     while (input >> seqName)
     {
@@ -22,7 +22,7 @@ namespace donkeev
         break;
       }
       if (input.fail())
-      
+
       {
         input.clear();
         data.pushBack({seqName, inner});

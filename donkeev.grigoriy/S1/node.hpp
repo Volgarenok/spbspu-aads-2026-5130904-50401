@@ -8,6 +8,5 @@ namespace donkeev
     T val;
     Node< T >* next;
   };
-  
 }
 #endif
