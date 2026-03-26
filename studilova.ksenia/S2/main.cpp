@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
   studilova::Stack< long long > results;
   std::string line;
 
-  while(std::getline(std::cin, line))
+  while(std::getline(*input, line))
   {
     bool empty = true;
     for (size_t i = 0; i < line.length(); ++i)
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
         break;
       }
     }
-    if (line.empty())
+    if (empty)
     {
       continue;
     }
