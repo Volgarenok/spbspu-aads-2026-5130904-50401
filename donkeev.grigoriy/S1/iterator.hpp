@@ -2,6 +2,7 @@
 #define ITERATOR_HPP
 
 #include "node.hpp"
+#include <cassert>
 #include <memory>
 
 namespace donkeev
@@ -41,9 +42,11 @@ namespace donkeev
     LCIter(const LCIter&);
     LCIter(const Node< T >*);
 
+    LCIter& operator=(const LCIter&);
+
     LCIter< T >& operator++() noexcept;
     LCIter< T > operator++(int) noexcept;
-    LCIter< T >& operator+=(int) noexcept;
+    LCIter< T >& operator+=(size_t) noexcept;
 
     const T& operator*() const noexcept;
     const T* operator ->() const noexcept;
@@ -126,6 +129,13 @@ namespace donkeev
   {}
 
   template< class T >
+  LCIter< T >& LCIter< T >::operator=(const LCIter< T >& v)
+  {
+    n = v.n;
+    return *this;
+  }
+
+  template< class T >
   LCIter< T >& LCIter< T >::operator++() noexcept
   {
     n = n->next;
@@ -139,7 +149,7 @@ namespace donkeev
     return tmp;
   }
   template< class T >
-  LCIter< T >& LCIter< T >::operator+=(int j) noexcept
+  LCIter< T >& LCIter< T >::operator+=(size_t j) noexcept
   {
     for (size_t i = 0; i < j; ++i)
     {

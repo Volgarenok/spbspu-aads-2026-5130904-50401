@@ -7,13 +7,7 @@ namespace donkeev
   {
     T val;
     Node< T >* next;
-    Node(); 
   };
-
-  template< class T >
-  Node< T >::Node():
-    val(T()),
-    next(nullptr)
-  {}
+  
 }
 #endif

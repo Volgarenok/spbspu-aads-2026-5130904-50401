@@ -23,6 +23,7 @@ namespace donkeev
     List< T >(const List< T >&);
 
     LIter< T > begin();
+    LCIter< T > begin() const;
 
     LIter< T > pushAfter(LIter< T >, const T&);
     void pushFront(const T&);
@@ -32,8 +33,8 @@ namespace donkeev
     void cutAfter(LIter< T >&);
     void clearAll();
 
-    bool isEmpty();
-    size_t size();
+    bool isEmpty() const;
+    size_t size() const;
   };
 
   template< class T >
@@ -68,14 +69,14 @@ namespace donkeev
   List< T >::List(const List< T >& yaList):
     head_(nullptr),
     tail_(nullptr),
-    length_(yaList.length_)
+    length_(0)
   {
-    if (length_ == 0)
+    if (yaList.size() == 0)
     {
       return;
     }
-    LCIter< T > it{yaList.head};
-    for (size_t i = 0; i < length_; ++i)
+    LCIter< T > it{yaList.head_};
+    for (size_t i = 0; i < yaList.size(); ++i)
     {
       pushBack(*it);
       ++it;
@@ -85,7 +86,12 @@ namespace donkeev
   template< class T >
   LIter< T > List< T >::begin()
   {
-    return LIter< T >(head_);
+    return LIter< T >{head_};
+  }
+  template< class T >
+  LCIter< T > List< T >::begin() const
+  {
+    return LCIter< T >{head_};
   }
   
   template< class T >
@@ -108,6 +114,15 @@ namespace donkeev
   void List< T >::pushBack(const T& value)
   {
     Node< T >* tmp = new Node< T >{value, head_};
+    if (length_ == 0)
+    {
+      head_ = tmp;
+      tail_ = tmp;
+      tail_->next = tmp;
+      head_->next = tmp;
+      ++length_;
+      return;
+    }
     tail_->next = tmp;
     tail_ = tmp;
     ++length_;
@@ -156,12 +171,12 @@ namespace donkeev
   }
 
   template< class T >
-  bool List< T >::isEmpty()
+  bool List< T >::isEmpty() const
   {
     return (length_ == 0);
   }
   template< class T >
-  size_t List< T >::size()
+  size_t List< T >::size() const
   {
     return length_;
   }
