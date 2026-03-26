@@ -17,7 +17,7 @@ namespace studilova
 
       bool empty() const;
       size_t size() const;
-    
+
     private:
       List< T > data_;
   };
