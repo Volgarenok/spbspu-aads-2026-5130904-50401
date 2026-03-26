@@ -5,10 +5,10 @@
 
 namespace
 {
-  int strToNum(const std::string &str)
+  long long strToNum(const std::string &str)
   {
-    int max_int = std::numeric_limits< int >::max();
-    int res = 0;
+    long long max_int = std::numeric_limits< long long >::max();
+    long long res = 0;
     for (char ch : str)
     {
       if (ch < '0' || ch > '9')

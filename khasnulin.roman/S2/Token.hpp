@@ -19,7 +19,7 @@ namespace khasnulin
   struct Token
   {
     TokenType type;
-    int value;
+    long long value;
     char op;
     int priority;
   };

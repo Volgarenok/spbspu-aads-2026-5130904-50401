@@ -7,10 +7,10 @@
 
 namespace
 {
-  int safeSum(int a, int b)
+  long long safeSum(long long a, long long b)
   {
-    static constexpr int max = std::numeric_limits< int >::max();
-    static constexpr int min = std::numeric_limits< int >::min();
+    static constexpr long long max = std::numeric_limits< long long >::max();
+    static constexpr long long min = std::numeric_limits< long long >::min();
     if (b > 0 && a > max - b)
     {
       throw std::overflow_error("get overflow while sum");
@@ -22,10 +22,10 @@ namespace
     return a + b;
   }
 
-  int safeSubtraction(int a, int b)
+  long long safeSubtraction(long long a, long long b)
   {
-    static constexpr int max = std::numeric_limits< int >::max();
-    static constexpr int min = std::numeric_limits< int >::min();
+    static constexpr long long max = std::numeric_limits< long long >::max();
+    static constexpr long long min = std::numeric_limits< long long >::min();
     if (b > 0 && a < min + b)
     {
       throw std::underflow_error("get underflow while subtract");
@@ -37,9 +37,9 @@ namespace
     return a - b;
   }
 
-  int safeDivide(int a, int b)
+  long long safeDivide(long long a, long long b)
   {
-    static constexpr int min = std::numeric_limits< int >::min();
+    static constexpr long long min = std::numeric_limits< long long >::min();
     if (b == -1 && a == min)
     {
       throw std::underflow_error("get underflow while divide (get int min / (-1))");
@@ -51,10 +51,10 @@ namespace
     return a / b;
   }
 
-  int safeMultiply(int a, int b)
+  long long safeMultiply(long long a, long long b)
   {
-    static constexpr int max = std::numeric_limits< int >::max();
-    static constexpr int min = std::numeric_limits< int >::min();
+    static constexpr long long max = std::numeric_limits< long long >::max();
+    static constexpr long long min = std::numeric_limits< long long >::min();
     if ((a > 0 && b > 0 && a > max / b) || (a < 0 && b < 0 && a < max / b))
     {
       throw std::overflow_error("get overflow while multyplying");
@@ -66,9 +66,9 @@ namespace
     return a * b;
   }
 
-  int safeModulo(int a, int b)
+  long long safeModulo(long long a, long long b)
   {
-    static constexpr int min = std::numeric_limits< int >::min();
+    static constexpr long long min = std::numeric_limits< long long >::min();
     if (a == min && b == -1)
     {
       throw std::overflow_error("get overflow while module operation");
@@ -80,7 +80,7 @@ namespace
     return a % b;
   }
 
-  int calculateBinaryOp(int v1, int v2, char op)
+  long long calculateBinaryOp(long long v1, long long v2, char op)
   {
     switch (op)
     {
@@ -104,16 +104,16 @@ namespace
   {
     char op = operations.top().op;
     operations.pop();
-    int v1 = values.top().value;
+    long long v1 = values.top().value;
     values.pop();
-    int v2 = values.top().value;
+    long long v2 = values.top().value;
     values.pop();
-    int result = calculateBinaryOp(v1, v2, op);
+    long long result = calculateBinaryOp(v1, v2, op);
     values.push(khasnulin::Token{khasnulin::TokenType::Number, result, '0', 0});
   }
 }
 
-int khasnulin::readAndProcessExpressionLine(const std::string &line)
+long long khasnulin::readAndProcessExpressionLine(const std::string &line)
 {
   size_t pos = 0;
   Stack< Token > values;
@@ -161,9 +161,9 @@ void khasnulin::processToken(Token &token, Stack< Token > &values, Stack< Token 
   }
 }
 
-khasnulin::Stack< int > khasnulin::readAndProcessAllExpressions(std::istream &in)
+khasnulin::Stack< long long > khasnulin::readAndProcessAllExpressions(std::istream &in)
 {
-  Stack< int > answers;
+  Stack< long long > answers;
   std::string line;
   while (std::getline(in, line))
   {
@@ -177,7 +177,7 @@ khasnulin::Stack< int > khasnulin::readAndProcessAllExpressions(std::istream &in
     }
     if (!empty)
     {
-      int result = readAndProcessExpressionLine(line);
+      long long result = readAndProcessExpressionLine(line);
       answers.push(result);
     }
   }

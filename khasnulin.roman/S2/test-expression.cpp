@@ -90,25 +90,26 @@ using namespace khasnulin;
 
 BOOST_AUTO_TEST_CASE(test_addition_overflow)
 {
-  std::string expr = std::to_string(std::numeric_limits< int >::max()) + " + 1";
+  std::string expr = std::to_string(std::numeric_limits< long long >::max()) + " + 1";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_addition_underflow)
 {
-  std::string expr = "( 0 - " + (std::to_string(std::numeric_limits< int >::max())) + " - 1 ) + ( 0 - 1 )";
+  std::string expr =
+      "( 0 - " + (std::to_string(std::numeric_limits< long long >::max())) + " - 1 ) + ( 0 - 1 )";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::underflow_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_subtraction_underflow)
 {
-  std::string expr = "( 0 - " + (std::to_string(std::numeric_limits< int >::max())) + " - 1 ) - 1";
+  std::string expr = "( 0 - " + (std::to_string(std::numeric_limits< long long >::max())) + " - 1 ) - 1";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::underflow_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_subtraction_overflow_with_negative)
 {
-  std::string expr = std::to_string(std::numeric_limits< int >::max()) + " - ( 0 - 1 )";
+  std::string expr = std::to_string(std::numeric_limits< long long >::max()) + " - ( 0 - 1 )";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
 }
 
@@ -119,32 +120,33 @@ BOOST_AUTO_TEST_CASE(test_division_by_zero)
 
 BOOST_AUTO_TEST_CASE(test_division_int_min_by_minus_one)
 {
-  std::string min_int_str = "( 0 - " + (std::to_string(std::numeric_limits< int >::max())) + " - 1 )";
+  std::string min_int_str = "( 0 - " + (std::to_string(std::numeric_limits< long long >::max())) + " - 1 )";
   std::string expr = min_int_str + " / ( 0 - 1 )";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::underflow_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_multiplication_overflow)
 {
-  std::string expr = std::to_string(std::numeric_limits< int >::max() / 2 + 1) + " * 2";
+  std::string expr = std::to_string(std::numeric_limits< long long >::max() / 2 + 1) + " * 2";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_multiplication_overflow_binary)
 {
-  std::string expr = "( 0 - 100000 ) * ( 0 - 30000 )";
+  std::string expr = "( 0 - 10000000000 ) * ( 0 - 3000000000 )";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_multiplication_underflow)
 {
-  std::string expr = std::to_string(std::numeric_limits< int >::max() / 2 + 1) + " * ( 0 - 4 ) ";
+  std::string expr = std::to_string(std::numeric_limits< long long >::max() / 2 + 1) + " * ( 0 - 4 ) ";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::underflow_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_modulo_overflow)
 {
-  std::string expr = "( 0 - " + std::to_string(std::numeric_limits< int >::max()) + " - 1 ) % ( 0 - 1 )";
+  std::string expr =
+      "( 0 - " + std::to_string(std::numeric_limits< long long >::max()) + " - 1 ) % ( 0 - 1 )";
   BOOST_CHECK_THROW(readAndProcessExpressionLine(expr), std::overflow_error);
 }
 
@@ -165,13 +167,13 @@ BOOST_AUTO_TEST_CASE(test_process_all_expressions_with_empty_lines)
   input << "\n";
   input << "10 * 3\n";
 
-  khasnulin::Stack< int > results = khasnulin::readAndProcessAllExpressions(input);
+  khasnulin::Stack< long long > results = khasnulin::readAndProcessAllExpressions(input);
 
   BOOST_CHECK_EQUAL(results.size(), 2);
 
-  int second = results.top();
+  long long second = results.top();
   results.pop();
-  int first = results.top();
+  long long first = results.top();
   results.pop();
 
   BOOST_CHECK_EQUAL(first, 4);

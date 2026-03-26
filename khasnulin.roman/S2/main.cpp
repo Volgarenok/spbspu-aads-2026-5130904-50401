@@ -12,7 +12,7 @@ int main(int argc, char **argv)
     std::cerr << "too many comand line params, must be zero or one!\n";
     return 1;
   }
-  khasnulin::Stack< int > answers;
+  khasnulin::Stack< long long > answers;
   try
   {
     if (argc == 2)
