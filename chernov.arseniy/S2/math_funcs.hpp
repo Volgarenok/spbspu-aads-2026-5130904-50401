@@ -2,6 +2,7 @@
 #define MATH_FUNCS_HPP
 
 #include <limits>
+#include <string>
 
 namespace chernov {
   constexpr long long MIN_LLI = std::numeric_limits< long long >::min();
@@ -15,6 +16,8 @@ namespace chernov {
   long long mul(long long a, long long b);
   long long gcd(long long a, long long b);
   long long lcm(long long a, long long b);
+
+  bool isOperator(const std::string & str);
 }
 
 #endif

@@ -88,3 +88,15 @@ long long chernov::lcm(long long a, long long b)
   long long a_div = a / ab_gcd;
   return mul(a_div, b);
 }
+
+bool chernov::isOperator(const std::string & str)
+{
+  constexpr size_t count_operators = 7;
+  const std::string operators[count_operators] = {"+", "-", "*", "/", "%", "lcm"};
+  for (size_t i = 0; i < count_operators; ++i) {
+    if (str == operators[i]) {
+      return true;
+    }
+  }
+  return false;
+}
