@@ -35,6 +35,20 @@ namespace
     return a - b;
   }
 
+  int safeDivide(int a, int b)
+  {
+    static constexpr int min = std::numeric_limits< int >::min();
+    if (b == -1 && a == min)
+    {
+      throw std::underflow_error("get underflow while divide (get int min / (-1))");
+    }
+    if (b == 0)
+    {
+      throw std::logic_error("can't divide to zero");
+    }
+    return a / b;
+  }
+
   int calculateBinaryOp(int v1, int v2, char op)
   {
     switch (op)
@@ -46,7 +60,7 @@ namespace
     case '*':
       return v2 * v1;
     case '/':
-      return v2 / v1;
+      return safeDivide(v2, v1);
     case '%':
       return v2 % v1;
     default:
