@@ -63,7 +63,7 @@ zharov::Queue< std::string > zharov::getPostfix(Queue< std::string > & infix)
       }
     } else {
       while (!stack.empty() && stack.top() != "(") {
-        if (getPriority(curr) > getPriority(stack.top())) {
+        if (getPriority(curr) >= getPriority(stack.top())) {
           res.push(stack.drop());
         } else {
           break;
