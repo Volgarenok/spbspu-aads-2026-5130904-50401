@@ -2,6 +2,7 @@
 
 #include <limits>
 #include <stdexcept>
+#include <string>
 
 namespace
 {
@@ -26,6 +27,12 @@ namespace
       }
     }
     return res;
+  }
+
+  bool isOperationLexeme(const std::string &lexeme)
+  {
+    return lexeme == "+" || lexeme == "-" || lexeme == "*" || lexeme == "/" || lexeme == "%" ||
+           lexeme == ">>";
   }
 }
 
@@ -63,8 +70,7 @@ khasnulin::Token khasnulin::readToken(const std::string &line, size_t &pos)
   {
     newToken = {TokenType::RightParen, 0, ')', 0};
   }
-  else if (lexeme.length() == 1 &&
-           (lexeme[0] == '+' || lexeme[0] == '-' || lexeme[0] == '*' || lexeme[0] == '/' || lexeme[0] == '%'))
+  else if (isOperationLexeme(lexeme))
   {
     newToken = {TokenType::Operator, 0, lexeme[0], getOpPriority(lexeme[0])};
   }
