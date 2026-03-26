@@ -42,7 +42,9 @@ long long chernov::mod(long long a, long long b)
   if (b == 0) {
     throw std::logic_error("division by zero");
   } else {
-    return a % b;
+    long long r = a % b;
+    r += (r < 0) ? b : 0;
+    return r;
   }
 }
 
