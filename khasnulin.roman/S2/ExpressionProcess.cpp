@@ -77,7 +77,8 @@ namespace
     {
       throw std::logic_error("can't get modulo of zero");
     }
-    return a % b;
+    long long result = a % b;
+    return result >= 0 ? result : result + b;
   }
 
   long long calculateBinaryOp(long long v1, long long v2, char op)
