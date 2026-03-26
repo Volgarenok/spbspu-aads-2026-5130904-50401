@@ -1,16 +1,34 @@
 #include <iostream>
 #include <string>
+#include <fstream>
 #include "functions.hpp"
 #include "stack.hpp"
 
-int main()
+int main(int argc, char* argv[])
 {
+   std::ifstream file;
+   std::istream* input = &std::cin;
+   if (argc > 1) {
+    file.open(argv[1]);
+    if (!file.is_open()) {
+      std::cerr << "Cannot open file: " << argv[1] << "\n";
+      return 1;
+    }
+    if (file.peek() == EOF)
+    {
+    }
+    else
+    {
+      input = &file;
+    }
+  }
+
   std::string line;
   zhuravleva::Stack < zhuravleva::value_t > results;
   bool hasInput = false;
   try
   {
-    while(std::getline(std::cin, line))
+    while(std::getline(*input, line))
     {
       bool empt = true;
       for (char c : line)
