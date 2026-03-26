@@ -1,4 +1,3 @@
-#include <string>
 #include <stdexcept>
 #include "general_functions.hpp"
 #include "math_functions.hpp"
@@ -83,7 +82,7 @@ zharov::Queue< std::string > zharov::getPostfix(Queue< std::string > & infix)
   return res;
 }
 
-zharov::ll_t zharov::getResult(Queue< std::string > & postfix)
+zharov::ll_t zharov::calculate(Queue< std::string > & postfix)
 {
   Stack< ll_t > temp;
   while (!postfix.empty()) {
@@ -119,4 +118,16 @@ zharov::ll_t zharov::getResult(Queue< std::string > & postfix)
     throw std::logic_error("Not enough operators");
   }
   return temp.drop();
+}
+
+std::istream & zharov::getResults(std::istream & in, Stack< ll_t > & results)
+{
+  std::string line;
+  while (!std::getline(in, line).eof()) {
+    zharov::Queue< std::string> queue = zharov::getQueue(line);
+    queue = zharov::getPostfix(queue);
+    ll_t result = zharov::calculate(queue);
+    results.push(result);
+  }
+  return in;
 }
