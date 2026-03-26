@@ -1,13 +1,31 @@
 #include "ExpressionProcess.hpp"
 
+#include <limits>
+#include <stdexcept>
+
 namespace
 {
+  int safeSum(int a, int b)
+  {
+    static constexpr int max = std::numeric_limits< int >::max();
+    static constexpr int min = std::numeric_limits< int >::min();
+    if (b > 0 && a > max - b)
+    {
+      throw std::overflow_error("get overflow while sum");
+    }
+    if (b < 0 && a < min - b)
+    {
+      throw std::underflow_error("get underflow while sum");
+    }
+    return a + b;
+  }
+
   int calculateBinaryOp(int v1, int v2, char op)
   {
     switch (op)
     {
     case '+':
-      return v2 + v1;
+      return safeSum(v2, v1);
     case '-':
       return v2 - v1;
     case '*':
@@ -92,7 +110,7 @@ void khasnulin::processToken(Token &token, Stack< Token > &values, Stack< Token 
   {
     values.push(token);
   }
-  if (token.type == TokenType::LeftParen)
+  else if (token.type == TokenType::LeftParen)
   {
     operations.push(token);
   }
