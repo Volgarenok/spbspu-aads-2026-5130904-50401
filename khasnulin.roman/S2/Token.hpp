@@ -1,7 +1,6 @@
 #ifndef TOKEN_HPP
 #define TOKEN_HPP
 
-#include <istream>
 #include <ostream>
 
 namespace khasnulin
@@ -12,7 +11,7 @@ namespace khasnulin
     Operator,
     LeftParen,
     RightParen,
-    End
+    EndOfExpr
   };
 
   std::ostream &operator<<(std::ostream &out, const TokenType &type);
@@ -25,7 +24,7 @@ namespace khasnulin
     int priority;
   };
 
-  Token readToken(std::istream &in);
+  Token readToken(const std::string &line, size_t &pos);
 
   int getOpPriority(char ch);
 }
