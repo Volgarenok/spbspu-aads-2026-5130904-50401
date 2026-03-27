@@ -69,6 +69,9 @@ void math(madieva::Queue< std::string > & post, madieva::Stack< int > & res) {
     }
     post.pop();
   }
+  if (temp.size() != 1) {
+    throw std::runtime_error("Invalid expression");
+  }
   res.push(temp.top());
 }
 

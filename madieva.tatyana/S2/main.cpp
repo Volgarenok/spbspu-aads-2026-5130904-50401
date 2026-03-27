@@ -1,5 +1,6 @@
 #include "stack.hpp"
 #include "queue.hpp"
+#include "math.hpp"
 #include <fstream>
 
 
@@ -68,10 +69,35 @@ void postfix(std::string line, madieva::Queue< std::string > & post)
       }
     }
   }
+  if (number.length()) {
+    post.push(number);
+    number.clear();
+  } else if (op_gcd.length()) {
+    if (op_gcd != "gcd") {
+      throw std::runtime_error("Unknown token");
+    } else {
+      char gcd = 'g';
+      handleOperator(gcd, op, post);
+      op_gcd.clear();
+    }
+  }
   while (!op.empty()) {
     post.push(op.top());
     op.pop();
   }
+}
+
+void print(madieva::Stack< int > & res)
+{
+  if (!res.empty()) {
+    std::cout << res.top();
+    res.pop();
+  }
+  while (!res.empty()) {
+    std::cout << " " << res.top();
+    res.pop();
+  }
+  std::cout << "\n";
 }
 
 main(int argc, char * argv[])
@@ -99,11 +125,15 @@ main(int argc, char * argv[])
       }
     }
     if (!empty) {
-      mad::Queue< std::string > post;
-      postfix(line, post);
-      mad::Stack< int > res;
-      // math (result)
+      try {
+        mad::Queue< std::string > post;
+        postfix(line, post);
+        math(post, res);
+      } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+      }
     }
   }
-
+  print(res);
 }
