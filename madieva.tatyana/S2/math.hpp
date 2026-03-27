@@ -2,9 +2,19 @@
 #include "queue.hpp"
 #include <fstream>
 
+int gcd(int a, int b) {
+    while (b != 0) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
 
-bool priority(char & s, madieva::Stack< std::string > & op)  // s priority op or havnt op on stack
-{}
+bool priority(char & s, madieva::Stack< std::string > & op)  // s priority op
+{
+
+}
 
 void postfix(std::string line, madieva::Queue< std::string > & post)
 {
@@ -47,15 +57,11 @@ void postfix(std::string line, madieva::Queue< std::string > & post)
           number.clear();
         } else if (op_gcd.length()) {
           if (op_gcd != "gcd") {
-            throw std::runtime_error("Unknown token");
+            throw std:://
           } else {
             char gcd = 'g';
             if (priority(gcd, op)) {
-              op.push(std::string(1, gcd));
-            } else {
-              post.push(op.top());
-              op.pop();
-              op.push(std::string(1, gcd));
+
             }
           }
         }
@@ -63,30 +69,4 @@ void postfix(std::string line, madieva::Queue< std::string > & post)
     } catch (const std::runtime_error & e) {
     }
   }
-}
-
-main(int argc, char * argv[])
-{
-  namespace mad = madieva;
-  std::ifstream file;
-  std::istream * in = & std::cin;
-  if (argc == 2) {
-    file.open(argv[1]);
-    if (!file.is_open()) {
-      std::cerr << "file not opeen\n";
-      return 1;
-    }
-    in = & file;
-  } else if (argc > 2) {
-    std::cerr  << "not right size arguments\n";
-  }
-  mad::Stack< int > res;
-  std::string line;
-  while(std::getline(*in, line)) {
-    // empty?
-    mad::Queue< std::string > post;
-    // postfix
-    // math (result)
-  }
-
 }

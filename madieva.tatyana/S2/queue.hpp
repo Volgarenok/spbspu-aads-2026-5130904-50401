@@ -1,5 +1,5 @@
-#ifndef STAC_HPP
-#define STAC_HPP
+#ifndef QUEUE_HPP
+#define QUEUE_HPP
 #include "../common/list.hpp"
 #include <stdexcept>
 namespace madieva {
