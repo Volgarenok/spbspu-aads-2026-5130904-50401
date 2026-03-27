@@ -92,10 +92,18 @@ main(int argc, char * argv[])
   mad::Stack< int > res;
   std::string line;
   while(std::getline(*in, line)) {
-    // empty?
-    mad::Queue< std::string > post;
-    // postfix
-    // math (result)
+    bool empty = true;
+    for (size_t i = 0; empty && i < line.size(); ++i) {
+      if (line[i] != ' ' && line[i] != '\n') {
+        empty = false;
+      }
+    }
+    if (!empty) {
+      mad::Queue< std::string > post;
+      postfix(line, post);
+      mad::Stack< int > res;
+      // math (result)
+    }
   }
 
 }
