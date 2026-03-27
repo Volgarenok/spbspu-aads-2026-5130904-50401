@@ -185,30 +185,14 @@ studilova::Queue< std::string > studilova::infixToPostfix(const std::string& lin
 
   for (size_t i = 0; i < line.length(); ++i)
   {
-    if (line[i] == ' ')
+    char ch = line[i];
+    if (ch == ' ')
     {
       if (!token.empty())
       {
         if (isNumber(token))
         {
           output.push(token);
-        }
-        else if (token == "(")
-        {
-          ops.push(token);
-        }
-        else if (token == ")")
-        {
-          while (!ops.empty() && ops.top() != "(")
-          {
-            output.push(ops.top());
-            ops.pop();
-          }
-          if (ops.empty())
-          {
-            throw std::runtime_error("Mismatvhed parentheses");
-          }
-          ops.pop();
         }
         else if (isOperator(token))
         {
@@ -233,9 +217,85 @@ studilova::Queue< std::string > studilova::infixToPostfix(const std::string& lin
         }
         token.clear();
       }
-    } else {
-      token += line[i];
+      continue;
     }
+    if (ch == '(')
+    {
+      if (!token.empty())
+      {
+        if (isNumber(token))
+        {
+          output.push(token);
+        }
+        else if (isOperator(token))
+        {
+          while (!ops.empty() && isOperator(ops.top()))
+          {
+            std::string topOp = ops.top();
+
+            int p1 = getPrecedence(token);
+            int p2 = getPrecedence(topOp);
+            if((!isRightAssociative(token) && p1 <= p2) || (isRightAssociative(token) && p1 < p2))
+            {
+              output.push(topOp);
+              ops.pop();
+            } else {
+              break;
+            }
+          }
+          ops.push(token);
+        } else {
+          throw std::runtime_error("Invalid token: " + token);
+        }
+        token.clear();
+      }
+      ops.push("(");
+      continue;
+    }
+    if (ch == ')')
+    {
+      if (!token.empty())
+      {
+        if (isNumber(token))
+        {
+          output.push(token);
+        }
+        else if (isOperator(token))
+        {
+          while (!ops.empty() && isOperator(ops.top()))
+          {
+            std::string topOp = ops.top();
+            int p1 = getPrecedence(token);
+            int p2 = getPrecedence(topOp);
+
+            if ((!isRightAssociative(token) && p1 <= p2) ||
+                (isRightAssociative(token) && p1 < p2))
+            {
+              output.push(topOp);
+              ops.pop();
+            } else {
+              break;
+            }
+          }
+          ops.push(token);
+        } else {
+          throw std::runtime_error("Invalid token: " + token);
+        }
+        token.clear();
+      }
+      while (!ops.empty() && ops.top() != "(")
+      {
+        output.push(ops.top());
+        ops.pop();
+      }
+      if (ops.empty())
+      {
+        throw std::runtime_error("Mismatched parentheses");
+      }
+      ops.pop();
+      continue;
+    }
+    token += ch;
   }
   if (!token.empty())
   {
@@ -251,7 +311,9 @@ studilova::Queue< std::string > studilova::infixToPostfix(const std::string& lin
         ops.pop();
       }
       ops.push(token);
-    } else {
+    }
+    else
+    {
       throw std::runtime_error("Invalid token: " + token);
     }
   }
