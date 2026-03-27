@@ -100,7 +100,7 @@ void print(madieva::Stack< int > & res)
   std::cout << "\n";
 }
 
-main(int argc, char * argv[])
+int main(int argc, char * argv[])
 {
   namespace mad = madieva;
   std::ifstream file;
@@ -113,7 +113,7 @@ main(int argc, char * argv[])
     }
     in = & file;
   } else if (argc > 2) {
-    std::cerr  << "not right size arguments\n";
+    std::cerr  << "Not right size arguments\n";
   }
   mad::Stack< int > res;
   std::string line;

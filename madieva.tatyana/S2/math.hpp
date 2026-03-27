@@ -24,7 +24,6 @@ int calculation(const std::string & op, madieva::Stack< int > & temp) {
   }
   int left = temp.top();
   temp.pop();
-    
   if (op == "+") {
     return left + right;
   }

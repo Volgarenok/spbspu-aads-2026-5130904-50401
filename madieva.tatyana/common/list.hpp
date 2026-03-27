@@ -160,8 +160,13 @@ namespace madieva {
   {
     Node< T > * temp = a.head;
     for (size_t i = 0; i < a.size_; ++i) {
-      this->push_back(temp->val);
-      temp = temp->next;
+      try{
+        this->push_back(temp->val);
+        temp = temp->next;
+      } catch (const std::bad_alloc&) {
+        clear();
+        throw;
+      }
     }
   }
 
