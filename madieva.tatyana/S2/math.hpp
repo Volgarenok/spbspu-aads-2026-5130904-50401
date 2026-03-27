@@ -48,7 +48,6 @@ int calculation(const std::string & op, madieva::Stack< int > & temp) {
   if (op == "g") {
     return gcd(left, right);
   }
-  
   throw std::runtime_error("Unknown operator");
 }
 
