@@ -56,6 +56,33 @@ bool studilova::isRightAssociative(const std::string& op)
   return op == "**";
 }
 
+void studilova::processToken(const std::string& token, studilova::Stack<std::string>& ops, studilova::Queue<std::string>& output)
+{
+  if (isNumber(token))
+  {
+    output.push(token);
+  }
+  else if (isOperator(token))
+  {
+    while (!ops.empty() && isOperator(ops.top()))
+    {
+      std::string topOp = ops.top();
+      int p1 = getPrecedence(token);
+      int p2 = getPrecedence(topOp);
+      if ((!isRightAssociative(token) && p1 <= p2) || (isRightAssociative(token) && p1 < p2))
+      {
+        output.push(topOp);
+        ops.pop();
+      } else {
+        break;
+      }
+    }
+    ops.push(token);
+  } else {
+    throw std::runtime_error("Invalid token: " + token);
+  }
+}
+
 long long studilova::add(long long a, long long b)
 {
   if (b > 0 && a > studilova::MAX - b)
@@ -190,31 +217,7 @@ studilova::Queue< std::string > studilova::infixToPostfix(const std::string& lin
     {
       if (!token.empty())
       {
-        if (isNumber(token))
-        {
-          output.push(token);
-        }
-        else if (isOperator(token))
-        {
-          while (!ops.empty() && isOperator(ops.top()))
-          {
-            std::string topOp = ops.top();
-
-            int p1 = getPrecedence(token);
-            int p2 = getPrecedence(topOp);
-
-            if((!isRightAssociative(token) && p1 <= p2) || (isRightAssociative(token) && p1 < p2))
-            {
-              output.push(topOp);
-              ops.pop();
-            } else {
-              break;
-            }
-          }
-          ops.push(token);
-        } else {
-          throw std::runtime_error("Invalid token: " + token);
-        }
+        processToken(token, ops, output);
         token.clear();
       }
       continue;
@@ -223,30 +226,7 @@ studilova::Queue< std::string > studilova::infixToPostfix(const std::string& lin
     {
       if (!token.empty())
       {
-        if (isNumber(token))
-        {
-          output.push(token);
-        }
-        else if (isOperator(token))
-        {
-          while (!ops.empty() && isOperator(ops.top()))
-          {
-            std::string topOp = ops.top();
-
-            int p1 = getPrecedence(token);
-            int p2 = getPrecedence(topOp);
-            if((!isRightAssociative(token) && p1 <= p2) || (isRightAssociative(token) && p1 < p2))
-            {
-              output.push(topOp);
-              ops.pop();
-            } else {
-              break;
-            }
-          }
-          ops.push(token);
-        } else {
-          throw std::runtime_error("Invalid token: " + token);
-        }
+        processToken(token, ops, output);
         token.clear();
       }
       ops.push("(");
@@ -256,31 +236,7 @@ studilova::Queue< std::string > studilova::infixToPostfix(const std::string& lin
     {
       if (!token.empty())
       {
-        if (isNumber(token))
-        {
-          output.push(token);
-        }
-        else if (isOperator(token))
-        {
-          while (!ops.empty() && isOperator(ops.top()))
-          {
-            std::string topOp = ops.top();
-            int p1 = getPrecedence(token);
-            int p2 = getPrecedence(topOp);
-
-            if ((!isRightAssociative(token) && p1 <= p2) ||
-                (isRightAssociative(token) && p1 < p2))
-            {
-              output.push(topOp);
-              ops.pop();
-            } else {
-              break;
-            }
-          }
-          ops.push(token);
-        } else {
-          throw std::runtime_error("Invalid token: " + token);
-        }
+        processToken(token, ops, output);
         token.clear();
       }
       while (!ops.empty() && ops.top() != "(")
@@ -299,23 +255,7 @@ studilova::Queue< std::string > studilova::infixToPostfix(const std::string& lin
   }
   if (!token.empty())
   {
-    if (isNumber(token))
-    {
-      output.push(token);
-    }
-    else if (isOperator(token))
-    {
-      while (!ops.empty() && isOperator(ops.top()))
-      {
-        output.push(ops.top());
-        ops.pop();
-      }
-      ops.push(token);
-    }
-    else
-    {
-      throw std::runtime_error("Invalid token: " + token);
-    }
+    processToken(token, ops, output);
   }
   while (!ops.empty())
   {

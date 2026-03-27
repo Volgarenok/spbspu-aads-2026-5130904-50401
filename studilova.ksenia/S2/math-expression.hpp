@@ -4,6 +4,7 @@
 #include <string>
 #include <limits>
 #include "queue.hpp"
+#include "stack.hpp"
 
 namespace studilova
 {
@@ -12,6 +13,7 @@ namespace studilova
   int getPrecedence(const std::string& op);
   bool isRightAssociative(const std::string& op);
   long long applyOperator( long long a, long long b, const std::string& op);
+  void processToken(const std::string& token, studilova::Stack< std::string >& ops, studilova::Queue< std::string >& output);
 
   long long add(long long a, long long b);
   long long subtract(long long a, long long b);
