@@ -3,9 +3,22 @@
 #include <fstream>
 
 
-bool priority(char & s, madieva::Stack< std::string > & op)  // s priority op or havnt op on stack
-{}
+int getPriority(char op) {
+  if (op == '+' || op == '-') return 1;
+  if (op == '*' || op == '/' || op == '%' || op == 'g') return 2;
+  return 0;
+}
 
+void handleOperator(char s, madieva::Stack< std::string > & op, madieva::Queue< std::string > & post) {
+  int prior = getPriority(s);
+
+  while (!op.empty() && op.top() != "(" && getPriority(op.top()[0]) >= prior) {
+      post.push(op.top());
+      op.pop();
+  }
+
+  op.push(std::string(1, s));
+}
 void postfix(std::string line, madieva::Queue< std::string > & post)
 {
   madieva::Stack< std::string > op;
@@ -14,54 +27,50 @@ void postfix(std::string line, madieva::Queue< std::string > & post)
   char s;
   for (size_t i = 0; i < line.length(); ++i) {
     s = line[i];
-    try{
-      if (s != ' ') {
-        if (s == '(') {
-          op.push(std::string(1, s));
-        } else if (s == '*' || s == '/' || s == '%' || s == '+' || s == '-') {
-          if (priority(s, op)) {
-            op.push(std::string(1, s));
-          } else {
-            post.push(op.top());
-            op.pop();
-            op.push(std::string(1, s));
-          }
-        } else if (s == ')') {
-          std::string temp = op.top();
-          while (temp != "(") {
-            post.push(temp);
-            op.pop();
-            temp = op.top();
-          }
-          op.pop();
-        } else {
-          if (std::isdigit(s)) {
-            number += s;
-          } else {
-            op_gcd += s;
-          }
+    if (s != ' ') {
+      if (s == '(') {
+        op.push(std::string(1, s));
+      } else if (s == '*' || s == '/' || s == '%' || s == '+' || s == '-') {
+        handleOperator(s, op, post);
+      } else if (s == ')') {
+        if (op.empty()) {
+          throw std::runtime_error("Mismatched parentheses");
         }
-      } else {
-        if (number.length()) {
-          post.push(number);
-          number.clear();
-        } else if (op_gcd.length()) {
-          if (op_gcd != "gcd") {
-            throw std::runtime_error("Unknown token");
-          } else {
-            char gcd = 'g';
-            if (priority(gcd, op)) {
-              op.push(std::string(1, gcd));
-            } else {
-              post.push(op.top());
-              op.pop();
-              op.push(std::string(1, gcd));
-            }
+        std::string temp = op.top();
+        while (temp != "(") {
+          post.push(temp);
+          op.pop();
+          if (op.empty()) {
+            throw std::runtime_error("Mismatched parentheses");
           }
+          temp = op.top();
+        }
+        op.pop();
+      } else {
+        if (std::isdigit(s)) {
+          number += s;
+        } else {
+          op_gcd += s;
         }
       }
-    } catch (const std::runtime_error & e) {
+    } else {
+      if (number.length()) {
+        post.push(number);
+        number.clear();
+      } else if (op_gcd.length()) {
+        if (op_gcd != "gcd") {
+          throw std::runtime_error("Unknown token");
+        } else {
+          char gcd = 'g';
+          handleOperator(gcd, op, post);
+          op_gcd.clear();
+        }
+      }
     }
+  }
+  while (!op.empty()) {
+    post.push(op.top());
+    op.pop();
   }
 }
 
