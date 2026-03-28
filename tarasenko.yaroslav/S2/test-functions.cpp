@@ -68,3 +68,28 @@ BOOST_AUTO_TEST_CASE(calculate_valid_expression)
   BOOST_TEST(calculate(s9), 2);
   BOOST_TEST(calculate(s9), 25);
 }
+
+BOOST_AUTO_TEST_CASE(calculate_invalid_expression)
+{
+ const std::string expressions[] =
+  {
+    "",
+    "( )",
+    "(",
+    "( 1 + 2 ",
+    ")",
+    "1 + 2 )",
+    "( 1 + ) 2 (",
+    "+ 1",
+    "1 + + 2",
+    "( 1 + 2 3 )",
+    "( 1 + a )",
+    "( 4 & 1 )",
+    "( 1 + 2 ) 3"
+  };
+
+  for (size_t i = 0; i < 13; ++i)
+  {
+    BOOST_CHECK_THROW(calculate(expressions[i]), std::logic_error);
+  }
+}

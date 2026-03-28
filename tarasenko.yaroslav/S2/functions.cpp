@@ -103,13 +103,13 @@ namespace tarasenko
           case '>':
            if (i + 1 >= line.size() || line[i + 1] != '>')
             {
-              throw std::runtime_error("Incorrect input");
+              throw std::logic_error("Incorrect input");
             }
             queue.push(Token{TokenType::operation, 0, '>', 3});
             ++i;
             break;
           default:
-            throw std::runtime_error("Incorrect input");
+            throw std::logic_error("Incorrect input");
         }
       }
     }
