@@ -3,6 +3,10 @@
 #include "stack.hpp"
 #include "queue.hpp"
 #include <fstream>
+#include <limits>
+
+const long long MAX = std::numeric_limits<long long>::max();
+const long long MIN = std::numeric_limits<long long>::min();
 
 long long gcd(long long a, long long b) {
     while (b != 0) {
@@ -25,12 +29,28 @@ long long calculation(const std::string & op, madieva::Stack< long long > & temp
   long long left = temp.top();
   temp.pop();
   if (op == "+") {
+    if ((right > 0 && left > MAX - right) ||
+      (right < 0 && left < MIN - right)) {
+      throw std::runtime_error("Overflow");
+    }
     return left + right;
   }
   if (op == "-") {
+    if ((right > 0 && left < MIN + right) ||
+      (right < 0 && left > MAX + right)) {
+      throw std::runtime_error("Overflow");
+    }
     return left - right;
   }
   if (op == "*") {
+    if (left != 0 && right != 0) {
+      if ((left > 0 && right > 0 && left > MAX / right) ||
+        (left > 0 && right < 0 && right < MIN / left) ||
+        (left < 0 && right > 0 && left < MIN / right) ||
+        (left < 0 && right < 0 && left > MAX / right)) {
+        throw std::runtime_error("Overflow");
+      }
+    }
     return left * right;
   }
   if (op == "/") {
