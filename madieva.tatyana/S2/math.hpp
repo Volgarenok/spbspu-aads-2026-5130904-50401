@@ -67,7 +67,7 @@ void math(madieva::Queue< std::string > & post, madieva::Stack< long long > & re
       token == "g") {
       temp.push(calculation(token, temp));
     } else {
-      temp.push(std::stoi(token));
+      temp.push(std::stoll(token));
     }
     post.pop();
   }
