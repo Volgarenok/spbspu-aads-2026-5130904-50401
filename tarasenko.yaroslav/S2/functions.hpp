@@ -36,6 +36,8 @@ namespace tarasenko
   long long divide(long long a, long long b);
   long long mod(long long a, long long b);
   long long rightShift(long long a, long long b);
+
+  void readStreamAndPrintResults(std::istream& stream);
 }
 
 #endif

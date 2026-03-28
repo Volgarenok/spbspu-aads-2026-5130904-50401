@@ -5,24 +5,31 @@
 
 int main(int argc, char** argv)
 {
-  if (argc > 1)
+  if (argc > 2)
   {
     std::cerr << "to many arguments\n";
     return 1;
   }
-  if (argc)
+  try
   {
-    std::ifstream file(argv[0]);
-    if (!file.is_open())
+    if (argc == 2)
     {
-      std::cerr << "could not open file\n";
-      return 1;
+      std::ifstream file(argv[1]);
+      if (!file.is_open())
+      {
+        std::cerr << "could not open file\n";
+        return 1;
+      }
+      tarasenko::readStreamAndPrintResults(file);
     }
-    tarasenko::Stack< long long > results;
-    std::string line;
-    while (std::getline(file, line))
+    else
     {
-      results.push(tarasenko::calculate(line));
+      tarasenko::readStreamAndPrintResults(std::cin);
     }
+  }
+  catch (const std::exception& e)
+  {
+    std::cerr << e.what() << "\n";
+    return 1;
   }
 }

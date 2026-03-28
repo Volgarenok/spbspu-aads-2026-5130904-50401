@@ -2,6 +2,7 @@
 #include "stack.hpp"
 #include <stdexcept>
 #include <limits>
+#include <iostream>
 
 const long long MAX = std::numeric_limits< long long >::max();
 const long long MIN = std::numeric_limits< long long >::min();
@@ -249,5 +250,24 @@ namespace tarasenko
         throw std::logic_error("Incorrect operation");
     }
     operands_stack.push(result);
+  }
+
+  void readStreamAndPrintResults(std::istream& stream)
+  {
+    tarasenko::Stack< long long > results;
+    std::string line;
+    while (std::getline(stream, line))
+    {
+      results.push(tarasenko::calculate(line));
+    }
+    if (!results.empty())
+    {
+      std::cout << results.pop();
+    }
+    while (!results.empty())
+    {
+      std::cout << " " << results.pop();
+    }
+    std::cout << "\n";
   }
 }
