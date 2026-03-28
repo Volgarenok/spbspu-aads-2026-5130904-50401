@@ -125,7 +125,7 @@ namespace tarasenko
       {
         if (num > (MAX - (line[pos] - '0')) / 10)
         {
-          throw std::overflow_error("number overflow");
+          throw std::overflow_error("too large number");
         }
         num = num * 10 + (line[pos] - '0');
       }

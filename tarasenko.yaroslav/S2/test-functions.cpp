@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(calculate_valid_expression)
 
 BOOST_AUTO_TEST_CASE(calculate_invalid_expression)
 {
- const std::string expressions[] =
+ std::string expressions[] =
   {
     "",
     "( )",
@@ -91,5 +91,33 @@ BOOST_AUTO_TEST_CASE(calculate_invalid_expression)
   for (size_t i = 0; i < 13; ++i)
   {
     BOOST_CHECK_THROW(calculate(expressions[i]), std::logic_error);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(calsulate_overflow_expression)
+{
+  std::string expressions[] =
+  {
+    "9223372036854775807 + 1",
+    "9223372036854775807 + 9223372036854775807",
+    "( ( 0 - 9223372036854775807 ) - 1 ) + ( 0 - 1 )",
+    "( ( 0 - 9223372036854775807 ) - 1 ) - 1",
+    "9223372036854775807 - ( 0 - 1 )",
+    "3037000500 * 3037000500",
+    "3037000500 * ( 0 - 3037000500 )",
+    "9223372036854775807 * 2",
+    "( ( 0 - 9223372036854775807 ) - 1 ) * 2",
+    "4611686018427387904 * 2",
+    "( ( 0 - 9223372036854775807 ) - 1 ) / ( 0 - 1 )",
+    "( ( 0 - 9223372036854775807 ) - 1 ) % ( 0 - 1 )",
+    "8 >> -1",
+    "1 >> 63",
+    "5 / 0"
+    "5 % 0"
+  };
+
+  for (size_t i = 0; i < 14; ++i)
+  {
+    BOOST_CHECK_THROW(calculate(expressions[i]), std::exception);
   }
 }
