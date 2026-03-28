@@ -4,25 +4,25 @@
 #include "queue.hpp"
 #include <fstream>
 
-int gcd(int a, int b) {
+long long gcd(long long a, long long b) {
     while (b != 0) {
-        int temp = b;
+        long long temp = b;
         b = a % b;
         a = temp;
     }
     return a;
 }
 
-int calculation(const std::string & op, madieva::Stack< int > & temp) {
+long long calculation(const std::string & op, madieva::Stack< long long > & temp) {
   if (temp.empty()) {
     throw std::runtime_error("Empty expression");
   }
-  int right = temp.top();
+  long long right = temp.top();
   temp.pop();
   if (temp.empty()) {
     throw std::runtime_error("Empty expression");
   }
-  int left = temp.top();
+  long long left = temp.top();
   temp.pop();
   if (op == "+") {
     return left + right;
@@ -43,7 +43,11 @@ int calculation(const std::string & op, madieva::Stack< int > & temp) {
     if (right == 0) {
       throw std::runtime_error("Modulo by zero");
     }
-    return left % right;
+    long long result = left % right;
+    if (result < 0) {
+      result += right;
+    }
+    return result;
   }
   if (op == "g") {
     return gcd(left, right);
@@ -51,8 +55,8 @@ int calculation(const std::string & op, madieva::Stack< int > & temp) {
   throw std::runtime_error("Unknown operator");
 }
 
-void math(madieva::Queue< std::string > & post, madieva::Stack< int > & res) {
-  madieva::Stack< int > temp;
+void math(madieva::Queue< std::string > & post, madieva::Stack< long long > & res) {
+  madieva::Stack< long long > temp;
   while (!post.empty()) {
     std::string token = post.front();
     if (token == "+" ||

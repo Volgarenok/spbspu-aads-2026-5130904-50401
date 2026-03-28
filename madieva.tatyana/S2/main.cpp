@@ -87,7 +87,7 @@ void postfix(std::string line, madieva::Queue< std::string > & post)
   }
 }
 
-void print(madieva::Stack< int > & res)
+void print(madieva::Stack< long long > & res)
 {
   if (!res.empty()) {
     std::cout << res.top();
@@ -115,7 +115,7 @@ int main(int argc, char * argv[])
   } else if (argc > 2) {
     std::cerr  << "Not right size arguments\n";
   }
-  mad::Stack< int > res;
+  mad::Stack< long long > res;
   std::string line;
   while(std::getline(*in, line)) {
     bool empty = true;
