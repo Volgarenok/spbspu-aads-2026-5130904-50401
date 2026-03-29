@@ -72,4 +72,64 @@ hvostov::Queue< T >& hvostov::Queue< T >::operator=(Queue< T >&& queue) noexcept
   return *this;
 }
 
+template< class T >
+T hvostov::Queue< T >::drop()
+{
+  T res = front();
+  list_.eraseAfter(list_.end());
+  if (empty()) {
+    tail_ = list_.begin();
+  }
+  return res;
+}
+
+template< class T >
+void hvostov::Queue< T >::push(T rhs)
+{
+  tail_ = list_.insertAfter(tail_, rhs);
+}
+
+template< class T >
+void hvostov::Queue< T >::clear() noexcept
+{
+  list_.clear();
+  tail_ = list_.begin();
+}
+
+template< class T >
+bool hvostov::Queue< T >::empty() const noexcept
+{
+  return list_.empty();
+}
+
+template< class T >
+T& hvostov::Queue< T >::front()
+{
+  return *(list_.begin());
+}
+
+template< class T >
+T& hvostov::Queue< T >::back()
+{
+  return *tail_;
+}
+
+template< class T >
+const T& hvostov::Queue< T >::front() const
+{
+  return *(list_.begin());
+}
+
+template< class T >
+const T& hvostov::Queue< T >::back() const
+{
+  return *tail_;
+}
+
+template< class T >
+size_t hvostov::Queue< T >::getSize() const noexcept
+{
+  return list_.getSize();
+}
+
 #endif
