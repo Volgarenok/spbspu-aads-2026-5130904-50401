@@ -143,3 +143,40 @@ long long int hvostov::evaluatePostfix(Queue< std::string >& postfix)
   }
   return values.drop();
 }
+
+hvostov::Stack< long long int > hvostov::getResult(std::istream& in)
+{
+  Stack< long long int > results;
+  std::string line;
+  while (std::getline(in, line)) {
+    if (line.empty()) {
+      continue;
+    }
+    try {
+      Queue< std::string > infix = getInfix(line);
+      Queue< std::string > postfix = getPostfix(infix);
+      long long int result = evaluatePostfix(postfix);
+      results.push(result);
+    } catch (const std::exception& e) {
+      std::cerr << e.what() << "\n";
+    }
+  }
+  return results;
+}
+
+void hvostov::printResult(Stack< long long int > result)
+{
+  if (result.empty()) {
+    return;
+  }
+  bool first = true;
+  while (!result.empty()) {
+    if (first) {
+      std::cout << result.drop();
+      first = false;
+    } else {
+      std::cout << " " << result.drop();
+    }
+  }
+  std::cout << "\n";
+}
