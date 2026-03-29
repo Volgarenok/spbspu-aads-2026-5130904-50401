@@ -51,3 +51,54 @@ hvostov::Queue< std::string > hvostov::getInfix(const std::string& expression)
   }
   return infix;
 }
+
+size_t hvostov::getPriority(const std::string& operation)
+{
+  if (operation == "<<") {
+    return 3;
+  } else if (operation == "*" || operation == "/") {
+    return 2;
+  } else if (operation == "+" || operation == "-" || operation == "%") {
+    return 1;
+  }
+  return 0;
+}
+
+hvostov::Queue< std::string > hvostov::getPostfix(Queue< std::string >& infix)
+{
+  Stack< std::string > operations;
+  Queue< std::string > posfix;
+  while (!infix.empty()) {
+    std::string curr = infix.drop();
+    if (isNumber(curr)) {
+      posfix.push(curr);
+    } else if (isSupportedOperand(curr)) {
+      size_t priority = getPriority(curr);
+      if (priority > 0) {
+        while (!operations.empty() &&
+            operations.top() != "(" &&
+            (getPriority(operations.top()) >= priority)) {
+          posfix.push(operations.drop());
+        }
+        operations.push(curr);
+      } else if (curr == "(") {
+        operations.push(curr);
+      } else if (curr == ")") {
+        while (!operations.empty() && operations.top() != "(") {
+          posfix.push(operations.drop());
+        }
+        if (!operations.empty() && operations.top() == "(") {
+          operations.drop();
+        } else {
+          throw std::logic_error("Mismatched parentheses!");
+        }
+      }
+    } else {
+      throw std::logic_error("Unsupported operation: " + curr + "!");
+    }
+  }
+  while (!operations.empty()) {
+    posfix.push(operations.drop());
+  }
+  return posfix;
+}
