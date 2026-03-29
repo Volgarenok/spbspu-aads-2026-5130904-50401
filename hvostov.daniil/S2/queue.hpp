@@ -30,4 +30,46 @@ namespace hvostov {
   };
 }
 
+template< class T >
+hvostov::Queue< T >::Queue():
+  list_(),
+  tail_()
+{
+  tail_ = list_.begin();
+}
+
+template< class T >
+hvostov::Queue< T >::Queue(const Queue< T >& queue):
+  list_(queue.list_),
+  tail_(queue.tail_)
+{}
+
+template< class T >
+hvostov::Queue< T >::Queue(Queue< T >&& queue) noexcept:
+  list_(std::move(queue.list_)),
+  tail_(std::move(queue.tail_))
+{}
+
+template< class T >
+hvostov::Queue< T >& hvostov::Queue< T >::operator=(const Queue< T >& queue)
+{
+  if (this == &queue) {
+    return *this;
+  }
+  list_ = queue.list_;
+  tail_ = queue.tail_;
+  return *this;
+}
+
+template< class T >
+hvostov::Queue< T >& hvostov::Queue< T >::operator=(Queue< T >&& queue) noexcept
+{
+  if (this == &queue) {
+    return *this;
+  }
+  list_ = std::move(queue.list_);
+  tail_ = std::move(queue.tail_);
+  return *this;
+}
+
 #endif
