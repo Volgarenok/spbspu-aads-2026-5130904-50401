@@ -163,6 +163,7 @@ hvostov::Stack< long long int > hvostov::getResult(std::istream& in)
 void hvostov::printResult(Stack< long long int > result)
 {
   if (result.empty()) {
+    std::cout << "\n";
     return;
   }
   bool first = true;
