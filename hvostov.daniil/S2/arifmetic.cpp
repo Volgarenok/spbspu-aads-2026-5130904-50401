@@ -152,14 +152,10 @@ hvostov::Stack< long long int > hvostov::getResult(std::istream& in)
     if (line.empty()) {
       continue;
     }
-    try {
-      Queue< std::string > infix = getInfix(line);
-      Queue< std::string > postfix = getPostfix(infix);
-      long long int result = evaluatePostfix(postfix);
-      results.push(result);
-    } catch (const std::exception& e) {
-      std::cerr << e.what() << "\n";
-    }
+    Queue< std::string > infix = getInfix(line);
+    Queue< std::string > postfix = getPostfix(infix);
+    long long int result = evaluatePostfix(postfix);
+    results.push(result);
   }
   return results;
 }
