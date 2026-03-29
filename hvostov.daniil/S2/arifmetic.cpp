@@ -102,3 +102,44 @@ hvostov::Queue< std::string > hvostov::getPostfix(Queue< std::string >& infix)
   }
   return posfix;
 }
+
+long long int hvostov::calculate(long long int left, const std::string& operation, long long int right)
+{
+  if (operation == "+") {
+    return addWithOverflowCheck(left, right);
+  } else if (operation == "-") {
+    return subtractWithOverflowCheck(left, right);
+  } else if (operation == "*") {
+    return multiplyWithOverflowCheck(left, right);
+  } else if (operation == "/") {
+    return divideWithOverflowCheck(left, right);
+  } else if (operation == "%") {
+    return moduloWithOverflowCheck(left, right);
+  } else if (operation == "<<") {
+    return shiftLeftWithOverflowCheck(left, right);
+  } else {
+    throw std::logic_error("Unknown operation: " + operation);
+  }
+}
+
+long long int hvostov::evaluatePostfix(Queue< std::string >& postfix)
+{
+  Stack< long long int > values;
+  while (!postfix.empty()) {
+    std::string token = postfix.drop();
+    if (isNumber(token)) {
+      values.push(std::stoll(token));
+    } else {
+      if (values.getSize() < 2) {
+        throw std::logic_error("Too few numbers!");
+      }
+      long long int right = values.drop();
+      long long int left = values.drop();
+      values.push(calculate(left, token, right));
+    }
+  }
+  if (values.getSize() != 1) {
+    throw std::logic_error("Too few operands!");
+  }
+  return values.drop();
+}
