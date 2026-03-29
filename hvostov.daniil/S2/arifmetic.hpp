@@ -4,8 +4,8 @@
 #include <cstddef>
 #include <string>
 #include <istream>
-#include "stack.hpp"
-#include "queue.hpp"
+#include <stack.hpp>
+#include <queue.hpp>
 
 namespace hvostov {
   Queue< std::string > getInfix(const std::string& expression);

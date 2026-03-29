@@ -1,7 +1,7 @@
 #ifndef UTILITY_HPP
 #define UTILITY_HPP
 #include <string>
-#include "list.hpp"
+#include <list.hpp>
 
 namespace hvostov {
   List< std::pair< std::string, List< size_t > > > getData(std::istream& in);
