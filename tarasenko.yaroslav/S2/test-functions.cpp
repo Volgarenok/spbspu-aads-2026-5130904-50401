@@ -57,6 +57,8 @@ BOOST_AUTO_TEST_CASE(calculate_valid_expression)
   std::string s8 = "1 + 3";
   std::string s9 = "( 10 / ( 2 + 3 ) % 4 )";
   std::string s10 = "4 * 7 - 3";
+  std::string s11 = "4 >> 2";
+  std::string s12 = "5 + 7 >> 1";
   BOOST_TEST(calculate(s1) == -3);
   BOOST_TEST(calculate(s2) == 2);
   BOOST_TEST(calculate(s3) == 14);
@@ -65,8 +67,10 @@ BOOST_AUTO_TEST_CASE(calculate_valid_expression)
   BOOST_TEST(calculate(s6) == 63);
   BOOST_TEST(calculate(s7) == 1);
   BOOST_TEST(calculate(s8) == 4);
-  BOOST_TEST(calculate(s9), 2);
-  BOOST_TEST(calculate(s9), 25);
+  BOOST_TEST(calculate(s9) == 2);
+  BOOST_TEST(calculate(s10) == 25);
+  BOOST_TEST(calculate(s11) == 1);
+  BOOST_TEST(calculate(s12) == 8);
 }
 
 BOOST_AUTO_TEST_CASE(calculate_invalid_expression)

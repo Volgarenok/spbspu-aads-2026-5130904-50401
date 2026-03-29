@@ -258,7 +258,10 @@ namespace tarasenko
     std::string line;
     while (std::getline(stream, line))
     {
-      results.push(tarasenko::calculate(line));
+      if (!line.empty())
+      {
+        results.push(tarasenko::calculate(line));
+      }
     }
     if (!results.empty())
     {
