@@ -50,7 +50,11 @@ long long int hvostov::moduloWithOverflowCheck(long long int left, long long int
   if (left == LLMIN && right == -1) {
     throw std::overflow_error("Modulo overflow!");
   }
-  return left % right;
+  long long result = left % right;
+  if (result < 0) {
+    result += right;
+  }
+  return result;
 }
 
 long long int hvostov::shiftLeftWithOverflowCheck(long long int left, long long int right)
