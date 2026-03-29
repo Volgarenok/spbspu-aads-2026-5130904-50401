@@ -189,7 +189,8 @@ namespace tarasenko
     {
       throw std::logic_error("division by zero");
     }
-    return a % b;
+    long long res = a % b;
+    return res >= 0 ? res : b + res;
   }
 
   long long rightShift(long long a, long long b)
