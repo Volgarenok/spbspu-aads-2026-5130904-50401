@@ -194,7 +194,7 @@ namespace tarasenko
 
   long long rightShift(long long a, long long b)
   {
-    const int LEN = std::numeric_limits< long long >::digits; 
+    const int LEN = std::numeric_limits< long long >::digits;
     if (b < 0)
     {
       throw std::invalid_argument("negative shift");
