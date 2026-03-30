@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include "stack.hpp"
 using namespace levkin;
-BOOST_AUTO_TEST_CASE(constructor_test)
+BOOST_AUTO_TEST_CASE(stack_test)
 {
   levkin::Stack< int > a{};
   a.push(1);

@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include "queue.hpp"
 using namespace levkin;
-BOOST_AUTO_TEST_CASE(constructor_test)
+BOOST_AUTO_TEST_CASE(queue_test)
 {
   levkin::Queue< int > a{};
   a.push(1);
