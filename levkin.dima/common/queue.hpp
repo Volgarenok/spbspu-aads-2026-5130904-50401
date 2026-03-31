@@ -10,33 +10,46 @@ namespace levkin {
 
   public:
     Queue() : list_(List< T >{}) {}
-    void push(T rhs);
+    void push(const T& v);
     T drop();
-    size_t size();
+    size_t size() const;
     void pop();
-    T front();
+
+    T& front();
+    const T& front() const;
+    bool empty() const;
   };
+
+  template < class T > bool levkin::Queue< T >::empty() const
+  {
+    return size() == 0;
+  }
+
   template < class T > T levkin::Queue< T >::drop()
   {
-    T val = front();
+    T val = std::move(front());
     list_.popFront();
     return val;
   }
   template < class T > void levkin::Queue< T >::pop() { list_.popFront(); }
 
-  template < class T > T levkin::Queue< T >::front()
+  template < class T > const T& levkin::Queue< T >::front() const
   {
-    auto iter = list_.cbegin();
-    T val = *iter;
-    return val;
+    return *list_.cbegin();
   }
 
-  template < class T > size_t levkin::Queue< T >::size()
+  template < class T > T& levkin::Queue< T >::front() { return *list_.begin(); }
+
+
+  template < class T > size_t levkin::Queue< T >::size() const
   {
     return list_.size();
   }
 
-  template < class T > void levkin::Queue< T >::push(T v) { list_.pushBack(v); }
+  template < class T > void levkin::Queue< T >::push(const T& v)
+  {
+    list_.pushBack(v);
+  }
 
 }
 
