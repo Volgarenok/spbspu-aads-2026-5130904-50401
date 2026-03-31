@@ -1,51 +1,76 @@
 #ifndef MY_STACK
 #define MY_STACK
 #include "list.hpp"
+#include <utility>  
+#include <stdexcept>
 namespace levkin {
   template < typename T > class Stack
   {
 
   private:
-    levkin::List< T > list_;
+    List< T > list_;
 
   public:
-    Stack() : list_(List< T >{}) {}
+    Stack() = default;
     void push(const T& v);
+    void push(T&& v);
     T drop();
     size_t size() const;
     void pop();
 
-    T& front();
-    const T& front() const;
+    T& top();
+    const T& top() const;
     bool empty() const;
   };
 
-  template < class T > bool levkin::Stack< T >::empty() const
+  template < class T > bool Stack< T >::empty() const
   {
     return size() == 0;
   }
 
-  template < class T > T levkin::Stack< T >::drop()
+  template < class T > void Stack< T >::push(T&& v)
   {
-    T val = std::move(front());
+    list_.pushFront(std::move(v));
+  }
+
+  template < class T > T Stack< T >::drop()
+  {
+    if (empty()) {
+      throw std::out_of_range("stack is empty!");
+    }
+    T val = std::move(top());
     list_.popFront();
     return val;
   }
-  template < class T > void levkin::Stack< T >::pop() { list_.popFront(); }
-
-  template < class T > const T& levkin::Stack< T >::front() const
+  template < class T > void Stack< T >::pop()
   {
+    if (!empty()) {
+      list_.popFront();
+    }
+  }
+
+  template < class T > const T& Stack< T >::top() const
+  {
+    if (empty()) {
+      throw std::out_of_range("stack is empty!");
+    }
     return *list_.cbegin();
   }
 
-  template < class T > T& levkin::Stack< T >::front() { return *list_.begin(); }
+  template < class T > T& Stack< T >::top()
+  {
+    if (empty()) {
+      throw std::out_of_range("stack is empty!");
+    }
+    return *list_.begin();
+  }
 
-  template < class T > size_t levkin::Stack< T >::size() const
+  template < class T > size_t Stack< T >::size() const
   {
     return list_.size();
   }
 
-  template < class T > void levkin::Stack< T >::push(const T& v)
+  template < class T > void Stack< T >::push(const T& v)
   {
     list_.pushFront(v);
   }
