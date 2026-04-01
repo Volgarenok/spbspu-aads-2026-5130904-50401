@@ -114,6 +114,7 @@ int main(int argc, char * argv[])
     in = & file;
   } else if (argc > 2) {
     std::cerr  << "Not right size arguments\n";
+    return 2;
   }
   mad::Stack< long long > res;
   std::string line;
