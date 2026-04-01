@@ -14,6 +14,9 @@ long long gcd(long long a, long long b) {
         b = a % b;
         a = temp;
     }
+    if (a < 0) {
+      a *=  (-1);
+    }
     return a;
 }
 
