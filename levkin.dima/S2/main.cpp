@@ -18,9 +18,9 @@ int main(int argc, char* argv[])
     levkin::Stack< long long > results = levkin::parse(in);
 
     while (!results.empty()) {
-      std::cout << results.drop();
-      std::cout <<  "\n";
+        std::cout << results.drop() << (results.empty() ? "" : " ");
     }
+    std::cout << "\n";
   } catch (const std::exception& e) {
     std::cerr << e.what() << "\n";
     return 1;
