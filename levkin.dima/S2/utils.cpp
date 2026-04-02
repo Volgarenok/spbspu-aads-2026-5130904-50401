@@ -43,6 +43,10 @@ namespace levkin {
       weight = 1;
     } else if (i == '%' || i == '*' || i == '/') {
       weight = 2;
+    } else if (i == '^') {
+      weight = 3;
+    } else {
+        throw std::runtime_error("wierd input (caught bad operation)\n");
     }
     return weight;
   }
