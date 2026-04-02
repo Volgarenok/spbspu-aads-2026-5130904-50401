@@ -26,7 +26,11 @@ int main()
     yalovsky::NumberList sums;
     yalovsky::calculateSums(matrix, sums);
 
-    if (!sums.empty())
+    if (sums.empty())
+    {
+      std::cout << "0\n";
+    }
+    else
     {
       yalovsky::printNumberList(std::cout, sums);
     }
