@@ -14,7 +14,6 @@ BOOST_AUTO_TEST_CASE(to_digit)
   BOOST_CHECK_EQUAL(flag, 0);
 }
 
-
 BOOST_AUTO_TEST_CASE(to_digit_corner_case_with_chars)
 {
   std::string s = "3234a";
@@ -23,4 +22,12 @@ BOOST_AUTO_TEST_CASE(to_digit_corner_case_with_chars)
   size_t result = toDigit(s, 0, s.size(), flag);
   BOOST_CHECK_EQUAL(result, 0);
   BOOST_CHECK_EQUAL(flag, 1);
+}
+
+BOOST_AUTO_TEST_CASE(get_nxt_word)
+{
+  std::string s = "abc 123";
+
+  BOOST_CHECK_EQUAL(getNextWord(s, 0), 3);
+  BOOST_CHECK_EQUAL(getNextWord(s, 4), s.size());
 }

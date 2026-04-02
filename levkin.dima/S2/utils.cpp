@@ -11,7 +11,7 @@ namespace levkin {
     }
     return weight;
   }
-  
+
   size_t toDigit(std::string& s, size_t start, size_t len, bool& wasnotdigit)
   {
     size_t result = 0;
@@ -26,5 +26,14 @@ namespace levkin {
     }
     wasnotdigit = false;
     return result;
+  }
+
+  size_t getNextWord(const std::string& s, size_t start)
+  {
+    size_t shift = 0;
+    while ((start + shift) < s.length() && s[start + shift] != ' ') {
+      ++shift;
+    }
+    return shift + start;
   }
 }
