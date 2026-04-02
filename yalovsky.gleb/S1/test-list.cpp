@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructor)
 
   BOOST_TEST(list.empty());
   BOOST_TEST(list.size() == 0);
-  BOOST_TEST(list.begin() == list.end());
+  BOOST_CHECK(list.begin() == list.end());
 }
 
 BOOST_AUTO_TEST_CASE(pushFrontAndPushBack)
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(moveConstructorLeavesSourceValid)
   BOOST_TEST(moved.front() == 10);
   BOOST_TEST(moved.back() == 20);
   BOOST_TEST(source.empty());
-  BOOST_TEST(source.begin() == source.end());
+  BOOST_CHECK(source.begin() == source.end());
 }
 
 BOOST_AUTO_TEST_CASE(clearRemovesAllElements)
@@ -92,7 +92,21 @@ BOOST_AUTO_TEST_CASE(clearRemovesAllElements)
 
   BOOST_TEST(list.empty());
   BOOST_TEST(list.size() == 0);
-  BOOST_TEST(list.begin() == list.end());
+  BOOST_CHECK(list.begin() == list.end());
+}
+
+BOOST_AUTO_TEST_CASE(readSequencesWorksWithEmptySequence)
+{
+  std::istringstream input("first 1 2\nsecond\nthird 3\n");
+  yalovsky::SequenceList sequences;
+
+  yalovsky::readSequences(input, sequences);
+
+  BOOST_TEST(sequences.size() == 3);
+  BOOST_TEST(sequences.front().first == "first");
+  BOOST_TEST((sequences.begin() + 1)->first == "second");
+  BOOST_TEST(sequences.back().first == "third");
+  BOOST_TEST((sequences.begin() + 1)->second.empty());
 }
 
 BOOST_AUTO_TEST_CASE(transposeAndSumsMatchTaskLogic)
