@@ -29,3 +29,22 @@ BOOST_AUTO_TEST_CASE(pushFrontAndPushBack)
   BOOST_TEST(list.back() == 3);
   BOOST_TEST(*(list.begin() + 1) == 2);
 }
+
+BOOST_AUTO_TEST_CASE(insertAndErase)
+{
+  yalovsky::List< int > list;
+  list.pushBack(1);
+  list.pushBack(3);
+
+  yalovsky::List< int >::iterator pos = list.begin();
+  ++pos;
+  list.insert(pos, 2);
+
+  BOOST_TEST(*(list.begin() + 1) == 2);
+
+  pos = list.begin() + 1;
+  yalovsky::List< int >::iterator next = list.erase(pos);
+  BOOST_TEST(*next == 3);
+  BOOST_TEST(list.size() == 2);
+  BOOST_TEST(*(list.begin() + 1) == 3);
+}
