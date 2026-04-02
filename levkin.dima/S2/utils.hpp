@@ -1,31 +1,24 @@
 #ifndef UTILS_S2
 #define UTILS_S2
 
+#include "stack.hpp"
 #include <cstddef>
 #include <iostream>
 #include <string>
 namespace levkin {
 
-  // size_t getNextWord(std::string s, size_t start);
+  using Operation = size_t (*)(size_t, size_t);
+
+  size_t getNextWord(const std::string& s, size_t start);
   unsigned short priority(char i);
-  size_t toDigit(std::string& s, size_t start, size_t len, bool& wasnotdigit);
+  size_t toDigit(std::string& s, size_t start, size_t end, bool& wasnotdigit);
+  Operation encodeOpOrThrow(std::string& s, size_t start, size_t end);
+  void parse(std::istream&);
 
-  // void parse(std::istream& in)
-  // {
-  //   std::string line;
-  //   while (std::getline(in, line)) {
-  //     size_t pos = 0;
-
-  //     size_t next_pos = getNextWord(line, pos);
-  //   }
-  // }
-  // size_t getNextWord(std::string s, size_t start)
-  // {
-  //   size_t shift = 0;
-  //   for (; s[start + shift] != ' '; ++shift) {
-  //   }
-  //   return shift;
-  // }
-
+  size_t add(size_t a, size_t b);
+  size_t subtract(size_t a, size_t b);
+  size_t multiply(size_t a, size_t b);
+  size_t divide(size_t a, size_t b);
+  size_t exponent(size_t a, size_t b);
 }
 #endif
