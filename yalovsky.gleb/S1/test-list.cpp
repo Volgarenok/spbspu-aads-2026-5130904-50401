@@ -134,3 +134,15 @@ BOOST_AUTO_TEST_CASE(transposeAndSumsMatchTaskLogic)
   yalovsky::printNumberList(sumsOut, sums);
   BOOST_TEST(sumsOut.str() == "7 7 3 2\n");
 }
+
+BOOST_AUTO_TEST_CASE(calculateSumsThrowsOnOverflow)
+{
+  yalovsky::Matrix matrix;
+  yalovsky::NumberList row;
+  row.pushBack(std::numeric_limits< std::size_t >::max());
+  row.pushBack(1);
+  matrix.pushBack(row);
+
+  yalovsky::NumberList sums;
+  BOOST_CHECK_THROW(yalovsky::calculateSums(matrix, sums), std::overflow_error);
+}
