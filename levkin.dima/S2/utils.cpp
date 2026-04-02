@@ -2,21 +2,46 @@
 #include "stack.hpp"
 namespace levkin {
 
-  long long add(long long a, long long b) { return a + b; }
+  long long add(long long a, long long b)
+  {
+    if ((b > 0 && a > MAX - b) || (b < 0 && a < MIN - b)) {
+      throw std::overflow_error("addition overflow");
+    }
+    return a + b;
+  }
 
-  long long subtract(long long a, long long b) { return (a >= b) ? (a - b) : 0; }
+  long long subtract(long long a, long long b)
+  {
+    if ((b > 0 && a < MIN + b) || (b < 0 && a > MAX + b)) {
+      throw std::overflow_error("subtraction overflow");
+    }
+    return (a >= b) ? (a - b) : 0;
+  }
 
-  long long multiply(long long a, long long b) { return a * b; }
+  long long multiply(long long a, long long b)
+  {
+    if ((a > 0 && b > 0 && a > MAX / b) || (a < 0 && b < 0 && a < MAX / b) ||
+        (a > 0 && b < 0 && b < MIN / a) || (a < 0 && b > 0 && a < MIN / b)) {
+      throw std::overflow_error("multiplying overflow");
+    }
+    return a * b;
+  }
 
   long long divide(long long a, long long b)
   {
+    if (a == MIN && b == -1) {
+      throw std::overflow_error("division overflow");
+    }
     if (b == 0)
-      throw std::runtime_error("Division by zero");
+      throw std::logic_error("Division by zero");
     return a / b;
   }
 
   long long reminder(long long a, long long b)
   {
+    if (a == MIN && b == -1) {
+      throw std::overflow_error("division overflow");
+    }
     if (b == 0)
       throw std::runtime_error("Division by zero");
     return a % b;
@@ -36,11 +61,20 @@ namespace levkin {
       symbols.pop();
     }
   }
-  long long exponent(long long a, long long b)
+
+  long long exponent(long long base, long long exp)
   {
+    if (exp < 0) {
+      throw std::runtime_error("Negative exponent not supported for integers");
+    }
+    if (base == 0 && exp == 0)
+      return 1;
+    if (base == 0)
+      return 0;
+
     long long result = 1;
-    for (long long i = 0; i < b; ++i) {
-      result *= a;
+    for (long long i = 0; i < exp; ++i) {
+      result = multiply(result, base);
     }
     return result;
   }

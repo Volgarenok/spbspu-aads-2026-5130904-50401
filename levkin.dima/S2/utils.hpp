@@ -2,12 +2,17 @@
 #define UTILS_S2
 
 #include <iostream>
+#include <limits>
 #include <string>
 #include <cstddef>
 #include "stack.hpp"
+
 namespace levkin {
 
   using Operation = long long (*)(long long, long long);
+  
+  const long long MAX = std::numeric_limits< long long >::max();
+  const long long MIN = std::numeric_limits< long long >::min();
 
   size_t getNextWord(const std::string& s, size_t start);
   unsigned short priority(char i);

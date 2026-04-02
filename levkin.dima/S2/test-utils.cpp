@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(parse_parentheses)
 BOOST_AUTO_TEST_CASE(parse_errors)
 {
   std::stringstream ss1("10 / 0\n");
-  BOOST_CHECK_THROW(parse(ss1), std::runtime_error);
+  BOOST_CHECK_THROW(parse(ss1), std::logic_error);
 
   std::stringstream ss3("1 ? 2\n");
   BOOST_CHECK_THROW(parse(ss3), std::runtime_error);
