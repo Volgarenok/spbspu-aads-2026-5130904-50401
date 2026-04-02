@@ -2,20 +2,20 @@
 #include "stack.hpp"
 namespace levkin {
 
-  int add(int a, int b) { return a + b; }
+  long long add(long long a, long long b) { return a + b; }
 
-  int subtract(int a, int b) { return (a >= b) ? (a - b) : 0; }
+  long long subtract(long long a, long long b) { return (a >= b) ? (a - b) : 0; }
 
-  int multiply(int a, int b) { return a * b; }
+  long long multiply(long long a, long long b) { return a * b; }
 
-  int divide(int a, int b)
+  long long divide(long long a, long long b)
   {
     if (b == 0)
       throw std::runtime_error("Division by zero");
     return a / b;
   }
 
-  int reminder(int a, int b)
+  long long reminder(long long a, long long b)
   {
     if (b == 0)
       throw std::runtime_error("Division by zero");
@@ -23,7 +23,7 @@ namespace levkin {
   }
 
   void processOps(
-      Stack< int >& nums,
+      Stack< long long >& nums,
       Stack< Operation >& ops,
       Stack< char >& symbols,
       char currentOp)
@@ -36,22 +36,22 @@ namespace levkin {
       symbols.pop();
     }
   }
-  int exponent(int a, int b)
+  long long exponent(long long a, long long b)
   {
-    int result = 1;
-    for (int i = 0; i < b; ++i) {
+    long long result = 1;
+    for (long long i = 0; i < b; ++i) {
       result *= a;
     }
     return result;
   }
 
-  void applyOp(Stack< int >& nums, Stack< Operation >& ops)
+  void applyOp(Stack< long long >& nums, Stack< Operation >& ops)
   {
     if (nums.size() < 2) {
       throw std::runtime_error("bad input\n");
     }
-    int rhs = nums.drop();
-    int lhs = nums.drop();
+    long long rhs = nums.drop();
+    long long lhs = nums.drop();
     Operation op = ops.drop();
 
     nums.push(op(lhs, rhs));
@@ -72,7 +72,7 @@ namespace levkin {
     return weight;
   }
 
-  int toDigit(std::string& s, size_t start, size_t end, bool& isdigit)
+  long long toDigit(std::string& s, size_t start, size_t end, bool& isdigit)
   {
     size_t result = 0;
     for (size_t i = 0; start + i < end; ++i) {
@@ -97,19 +97,18 @@ namespace levkin {
     return shift + start;
   }
 
-  Stack< int > parse(std::istream& in)
+  Stack< long long > parse(std::istream& in)
   {
-    Stack< int > finalResults;
+    Stack< long long > finalResults;
 
     std::string line;
     while (std::getline(in, line)) {
       if (line.empty())
         continue;
-      Stack< int > numbers;
+      Stack< long long > numbers;
       Stack< Operation > operators;
       Stack< char > opSymbols;
 
-      // int currResult = 0;
       size_t pos = 0;
       while (pos < line.size()) {
         if (line[pos] == ' ') {

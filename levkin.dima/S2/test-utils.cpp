@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(applying_operations)
 {
   Stack< Operation > ops;
   ops.push(&exponent);
-  Stack< int > nums;
+  Stack< long long > nums;
   nums.push(2);
   nums.push(5);
 
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(parse_simple_expressions)
   ss << "30 - 10\n";
   ss << "5 * 5\n";
 
-  Stack< int > results = parse(ss);
+  Stack< long long > results = parse(ss);
 
   BOOST_CHECK_EQUAL(results.size(), 3);
   BOOST_CHECK_EQUAL(results.drop(), 25);
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(parse_complex_priority)
   ss << "10 / 2 - 1\n";
   ss << "2 ** 3 * 2\n";
 
-  Stack< int > results = parse(ss);
+  Stack< long long > results = parse(ss);
 
   BOOST_CHECK_EQUAL(results.drop(), 16);
   BOOST_CHECK_EQUAL(results.drop(), 4);
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(parse_parentheses)
   ss << "( 2 + 2 ) * 2\n";
   ss << "10 / ( 2 + 3 )\n";
 
-  Stack< int > results = parse(ss);
+  Stack< long long > results = parse(ss);
 
   BOOST_CHECK_EQUAL(results.drop(), 2);
   BOOST_CHECK_EQUAL(results.drop(), 8);

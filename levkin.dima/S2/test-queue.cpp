@@ -8,7 +8,7 @@ using namespace levkin;
 
 BOOST_AUTO_TEST_CASE(queue_basic_operations)
 {
-  Queue< int > q;
+  Queue< long long > q;
   BOOST_CHECK(q.empty());
   BOOST_CHECK_EQUAL(q.size(), 0);
 
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(queue_basic_operations)
 
 BOOST_AUTO_TEST_CASE(queue_exception_safety)
 {
-  Queue< int > q;
+  Queue< long long > q;
   BOOST_CHECK_THROW(q.front(), std::out_of_range);
   BOOST_CHECK_THROW(q.drop(), std::out_of_range);
 

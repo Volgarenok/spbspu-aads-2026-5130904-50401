@@ -7,24 +7,24 @@
 #include "stack.hpp"
 namespace levkin {
 
-  using Operation = int (*)(int, int);
+  using Operation = long long (*)(long long, long long);
 
   size_t getNextWord(const std::string& s, size_t start);
   unsigned short priority(char i);
-  int toDigit(std::string& s, size_t start, size_t end, bool& wasnotdigit);
+  long long toDigit(std::string& s, size_t start, size_t end, bool& wasnotdigit);
   Operation encodeOpOrThrow(std::string& s, size_t start, size_t end);
-  Stack< int > parse(std::istream&);
+  Stack< long long > parse(std::istream&);
 
-  int add(int a, int b);
-  int subtract(int a, int b);
-  int multiply(int a, int b);
-  int divide(int a, int b);
-  int exponent(int a, int b);
-  int reminder(int a, int b);
+  long long add(long long a, long long b);
+  long long subtract(long long a, long long b);
+  long long multiply(long long a, long long b);
+  long long divide(long long a, long long b);
+  long long exponent(long long a, long long b);
+  long long reminder(long long a, long long b);
 
-  void applyOp(Stack< int >&, Stack< Operation >&);
+  void applyOp(Stack< long long >&, Stack< Operation >&);
   void processOps(
-      Stack< int >& nums,
+      Stack< long long >& nums,
       Stack< Operation >& ops,
       Stack< char >& symbols,
       char currentOp = '\0');

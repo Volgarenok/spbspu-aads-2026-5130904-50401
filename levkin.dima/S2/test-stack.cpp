@@ -5,7 +5,7 @@
 using namespace levkin;
 BOOST_AUTO_TEST_CASE(stack_lifo_order)
 {
-  Stack< int > s;
+  Stack< long long > s;
   s.push(1);
   s.push(2);
   s.push(3);
@@ -33,14 +33,14 @@ BOOST_AUTO_TEST_CASE(stack_empty_behavior)
 
 BOOST_AUTO_TEST_CASE(stack_large_volume)
 {
-  Stack< int > s;
-  for (int i = 0; i < 1000; ++i) {
+  Stack< long long > s;
+  for (long long i = 0; i < 1000; ++i) {
     s.push(i);
   }
   BOOST_CHECK_EQUAL(s.size(), 1000);
   BOOST_CHECK_EQUAL(s.top(), 999);
 
-  for (int i = 0; i < 1000; ++i) {
+  for (long long i = 0; i < 1000; ++i) {
     s.pop();
   }
   BOOST_CHECK(s.empty());
