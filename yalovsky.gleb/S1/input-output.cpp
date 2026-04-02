@@ -127,3 +127,18 @@ namespace
     return a + b;
   }
 }
+
+void yalovsky::calculateSums(const Matrix& matrix, NumberList& sums)
+{
+  for (Matrix::const_iterator rowIt = matrix.cbegin(); rowIt != matrix.cend(); ++rowIt)
+  {
+    std::size_t sum = 0;
+
+    for (NumberList::const_iterator valIt = rowIt->cbegin(); valIt != rowIt->cend(); ++valIt)
+    {
+      sum = addChecked(sum, *valIt);
+    }
+
+    sums.pushBack(sum);
+  }
+}
