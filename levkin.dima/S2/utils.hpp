@@ -10,13 +10,14 @@
 namespace levkin {
 
   using Operation = long long (*)(long long, long long);
-  
+
   const long long MAX = std::numeric_limits< long long >::max();
   const long long MIN = std::numeric_limits< long long >::min();
 
   size_t getNextWord(const std::string& s, size_t start);
   unsigned short priority(char i);
-  long long toDigit(std::string& s, size_t start, size_t end, bool& wasnotdigit);
+  long long
+  toDigit(std::string& s, size_t start, size_t end, bool& wasnotdigit);
   Operation encodeOpOrThrow(std::string& s, size_t start, size_t end);
   Stack< long long > parse(std::istream&);
 
