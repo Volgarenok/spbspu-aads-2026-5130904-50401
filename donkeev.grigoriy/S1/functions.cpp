@@ -54,12 +54,42 @@ namespace donkeev
     }
     return maximum;
   }
+  bool checkOnOverflow(const List< std::pair< std::string, List< size_t > > >& data)
+  {
+    size_t maximumIteration = getMaxSize(data);
+    size_t iterationCount = 0;
+    while (iterationCount < maximumIteration)
+    {
+      size_t overflow = 0;
+      LCIter< std::pair< std::string, List< size_t > > > outIt = data.begin();
+      for (size_t i = 0; i < data.size(); ++i)
+      {
+        LCIter< size_t > innerIt = outIt->second.begin();
+        if (outIt->second.size() > iterationCount)
+        {
+          innerIt += iterationCount;
+          if ((overflow + *innerIt) < overflow)
+          {
+            return true;
+          }
+          overflow += *innerIt;
+        }
+        ++outIt;
+      }
+      ++iterationCount;
+    }
+    return false;
+  }
   void printInfo(const List< std::pair< std::string, List< size_t > > >& data, std::ostream& output)
   {
     if (data.isEmpty())
     {
       output << "0" << "\n";
       return;
+    }
+    if (checkOnOverflow(data))
+    {
+      throw std::overflow_error("Sum of elements is overflow");
     }
     size_t maximumIteration = getMaxSize(data);
     size_t* sumArray = new size_t[maximumIteration]{0};
@@ -84,7 +114,6 @@ namespace donkeev
         {
           innerIt += iterationCount;
           output << *innerIt << " ";
-          sumArray[sumIteration] += *innerIt;
         }
         ++outIt;
       }
