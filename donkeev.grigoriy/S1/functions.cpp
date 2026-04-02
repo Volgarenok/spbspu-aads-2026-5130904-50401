@@ -61,6 +61,9 @@ namespace donkeev
       output << "0" << "\n";
       return;
     }
+    size_t maximumIteration = getMaxSize(data);
+    size_t* sumArray = new size_t[maximumIteration]{0};
+    size_t sumIteration = 0;
     LCIter< std::pair< std::string, List< size_t > > > outIt = data.begin();
     output << outIt->first;
     outIt++;
@@ -71,7 +74,6 @@ namespace donkeev
     }
     output << "\n";
     size_t iterationCount = 0;
-    size_t maximumIteration = getMaxSize(data);
     while (iterationCount < maximumIteration)
     {
       outIt = data.begin();
@@ -82,9 +84,11 @@ namespace donkeev
         {
           innerIt += iterationCount;
           output << *innerIt << " ";
+          sumArray[sumIteration] += *innerIt;
         }
         ++outIt;
       }
+      ++sumIteration;
       output << "\n";
       ++iterationCount;
     }
@@ -92,5 +96,16 @@ namespace donkeev
     {
       output << 0 << "\n";
     }
+    size_t i = 0;
+    if (maximumIteration)
+    {
+      output << sumArray[i];
+    }
+    ++i;
+    for (; i < maximumIteration; ++i)
+    {
+      output << " " << sumArray[i];
+    }
+    output << "\n";
   }
 }
