@@ -65,3 +65,18 @@ BOOST_AUTO_TEST_CASE(copyConstructorCreatesIndependentCopy)
   BOOST_TEST(copy.front() == 2);
   BOOST_TEST(copy.back() == 3);
 }
+
+BOOST_AUTO_TEST_CASE(moveConstructorLeavesSourceValid)
+{
+  yalovsky::List< int > source;
+  source.pushBack(10);
+  source.pushBack(20);
+
+  yalovsky::List< int > moved(std::move(source));
+
+  BOOST_TEST(moved.size() == 2);
+  BOOST_TEST(moved.front() == 10);
+  BOOST_TEST(moved.back() == 20);
+  BOOST_TEST(source.empty());
+  BOOST_TEST(source.begin() == source.end());
+}
