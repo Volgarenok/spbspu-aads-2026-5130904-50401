@@ -80,3 +80,17 @@ BOOST_AUTO_TEST_CASE(moveConstructorLeavesSourceValid)
   BOOST_TEST(source.empty());
   BOOST_TEST(source.begin() == source.end());
 }
+
+BOOST_AUTO_TEST_CASE(clearRemovesAllElements)
+{
+  yalovsky::List< int > list;
+  list.pushBack(1);
+  list.pushBack(2);
+  list.pushBack(3);
+
+  list.clear();
+
+  BOOST_TEST(list.empty());
+  BOOST_TEST(list.size() == 0);
+  BOOST_TEST(list.begin() == list.end());
+}
