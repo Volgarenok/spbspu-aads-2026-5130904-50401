@@ -160,3 +160,23 @@ BOOST_AUTO_TEST_CASE(calculateSumsThrowsOnOverflow)
   yalovsky::NumberList sums;
   BOOST_CHECK_THROW(yalovsky::calculateSums(matrix, sums), std::overflow_error);
 }
+
+BOOST_AUTO_TEST_CASE(onlyEmptySequenceProducesZeroSums)
+{
+  std::istringstream input("d\n");
+  yalovsky::SequenceList sequences;
+
+  yalovsky::readSequences(input, sequences);
+
+  BOOST_TEST(sequences.size() == 1);
+  BOOST_TEST(sequences.front().first == "d");
+  BOOST_TEST(sequences.front().second.empty());
+
+  yalovsky::Matrix matrix;
+  yalovsky::transposeSequences(sequences, matrix);
+  BOOST_TEST(matrix.empty());
+
+  yalovsky::NumberList sums;
+  yalovsky::calculateSums(matrix, sums);
+  BOOST_TEST(sums.empty());
+}
