@@ -84,3 +84,23 @@ void yalovsky::transposeSequences(const SequenceList& sequences, Matrix& result)
     result.pushBack(std::move(row));
   }
 }
+
+void yalovsky::printNumberList(std::ostream& out, const NumberList& numbers)
+{
+  if (numbers.empty())
+  {
+    return;
+  }
+
+  NumberList::const_iterator it = numbers.cbegin();
+
+  out << *it;
+  ++it;
+
+  for (; it != numbers.cend(); ++it)
+  {
+    out << ' ' << *it;
+  }
+
+  out << '\n';
+}
