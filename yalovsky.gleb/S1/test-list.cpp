@@ -94,3 +94,43 @@ BOOST_AUTO_TEST_CASE(clearRemovesAllElements)
   BOOST_TEST(list.size() == 0);
   BOOST_TEST(list.begin() == list.end());
 }
+
+BOOST_AUTO_TEST_CASE(transposeAndSumsMatchTaskLogic)
+{
+  yalovsky::SequenceList sequences;
+
+  yalovsky::NumberList first;
+  first.pushBack(1);
+  first.pushBack(1);
+  first.pushBack(1);
+  sequences.pushBack(std::make_pair(std::string("first"), first));
+
+  yalovsky::NumberList second;
+  second.pushBack(2);
+  second.pushBack(2);
+  second.pushBack(2);
+  second.pushBack(2);
+  sequences.pushBack(std::make_pair(std::string("second"), second));
+
+  yalovsky::NumberList third;
+  sequences.pushBack(std::make_pair(std::string("third"), third));
+
+  yalovsky::NumberList fourth;
+  fourth.pushBack(4);
+  fourth.pushBack(4);
+  sequences.pushBack(std::make_pair(std::string("fourth"), fourth));
+
+  yalovsky::Matrix matrix;
+  yalovsky::transposeSequences(sequences, matrix);
+
+  std::ostringstream matrixOut;
+  yalovsky::printMatrix(matrixOut, matrix);
+  BOOST_TEST(matrixOut.str() == "1 2 4\n1 2 4\n1 2\n2\n");
+
+  yalovsky::NumberList sums;
+  yalovsky::calculateSums(matrix, sums);
+
+  std::ostringstream sumsOut;
+  yalovsky::printNumberList(sumsOut, sums);
+  BOOST_TEST(sumsOut.str() == "7 7 3 2\n");
+}
