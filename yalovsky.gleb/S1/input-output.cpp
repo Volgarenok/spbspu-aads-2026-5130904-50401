@@ -41,3 +41,18 @@ void yalovsky::readSequences(std::istream& in, SequenceList& sequences)
     sequences.pushBack(std::make_pair(name, std::move(numbers)));
   }
 }
+
+void yalovsky::printNames(std::ostream& out, const SequenceList& sequences)
+{
+  SequenceList::const_iterator it = sequences.cbegin();
+
+  out << it->first;
+  ++it;
+
+  for (; it != sequences.cend(); ++it)
+  {
+    out << ' ' << it->first;
+  }
+
+  out << '\n';
+}
