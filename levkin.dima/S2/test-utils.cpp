@@ -44,3 +44,16 @@ BOOST_AUTO_TEST_CASE(shorten_operation)
   BOOST_CHECK_EQUAL(encodeOpOrThrow(s, 4, 6)(2, 5), 32);
   BOOST_CHECK_THROW(encodeOpOrThrow(s, 6, s.size()), std::runtime_error);
 }
+
+BOOST_AUTO_TEST_CASE(applying_operations)
+{
+  Stack< Operation > ops;
+  ops.push(&exponent);
+  Stack< size_t > nums;
+  nums.push(2);
+  nums.push(5);
+
+  applyOp(nums, ops);
+  BOOST_CHECK_EQUAL(nums.top(), 32);
+  BOOST_CHECK_THROW(applyOp(nums, ops), std::runtime_error);
+}

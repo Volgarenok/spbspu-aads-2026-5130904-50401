@@ -1,5 +1,5 @@
 #include "utils.hpp"
-
+#include "stack.hpp"
 namespace levkin {
 
   size_t add(size_t a, size_t b) { return a + b; }
@@ -62,26 +62,31 @@ namespace levkin {
 
   void parse(std::istream& in)
   {
+    Stack< int > results;
+
     std::string line;
-
-    Stack< char > operators;
-    Stack< size_t > numbers;
-
-    size_t pos;
-    size_t next_pos;
-    bool isDigit;
-    size_t digit;
     while (std::getline(in, line)) {
-      pos = 0;
+      Stack< size_t > numbers;
+      Stack< Operation > operators;
 
-      next_pos = getNextWord(line, pos);
-      digit = toDigit(line, pos, next_pos, isDigit);
+      // int currResult = 0;
+      size_t pos = 0;
+      while (pos < line.length()) {
+        if (line[pos] == ' ') {
+          pos++;
+          continue;
+        }
+        size_t next_pos = getNextWord(line, pos);
 
-      if (isDigit) {
-        numbers.push(digit);
-      } else {
-        // op=  doWeKnowThisOp(s, pos, next_pos)
-        // operators.push(op);
+        bool isDigit;
+        size_t digit = toDigit(line, pos, next_pos, isDigit);
+
+        if (isDigit) {
+          numbers.push(digit);
+        } else {
+          Operation op = encodeOpOrThrow(line, pos, next_pos);
+          operators.push(op);
+        }
       }
     }
   }

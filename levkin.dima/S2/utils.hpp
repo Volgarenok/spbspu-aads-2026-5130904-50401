@@ -20,5 +20,7 @@ namespace levkin {
   size_t multiply(size_t a, size_t b);
   size_t divide(size_t a, size_t b);
   size_t exponent(size_t a, size_t b);
+
+  void applyOp(Stack< size_t >&, Stack< Operation >&);
 }
 #endif
