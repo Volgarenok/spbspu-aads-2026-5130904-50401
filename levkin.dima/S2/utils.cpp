@@ -15,6 +15,27 @@ namespace levkin {
     return a / b;
   }
 
+  size_t reminder(size_t a, size_t b)
+  {
+    if (b == 0)
+      throw std::runtime_error("Division by zero");
+    return a % b;
+  }
+
+  void processOps(
+      Stack< size_t >& nums,
+      Stack< Operation >& ops,
+      Stack< char >& symbols,
+      char currentOp)
+  {
+    while (!symbols.empty() && symbols.top() != '(') {
+      if (currentOp != '\0' && priority(symbols.top()) < priority(currentOp)) {
+        break;
+      }
+      applyOp(nums, ops);
+      symbols.pop();
+    }
+  }
   size_t exponent(size_t a, size_t b)
   {
     size_t result = 1;
@@ -29,8 +50,8 @@ namespace levkin {
     if (nums.size() < 2) {
       throw std::runtime_error("bad input\n");
     }
-    size_t lhs = nums.drop();
     size_t rhs = nums.drop();
+    size_t lhs = nums.drop();
     Operation op = ops.drop();
 
     nums.push(op(lhs, rhs));
@@ -46,7 +67,7 @@ namespace levkin {
     } else if (i == '^') {
       weight = 3;
     } else {
-        throw std::runtime_error("wierd input (caught bad operation)\n");
+      throw std::runtime_error("wierd input (caught bad operation)\n");
     }
     return weight;
   }
@@ -76,18 +97,21 @@ namespace levkin {
     return shift + start;
   }
 
-  void parse(std::istream& in)
+  Stack< size_t > parse(std::istream& in)
   {
-    Stack< int > results;
+    Stack< size_t > finalResults;
 
     std::string line;
     while (std::getline(in, line)) {
+      if (line.empty())
+        continue;
       Stack< size_t > numbers;
       Stack< Operation > operators;
+      Stack< char > opSymbols;
 
       // int currResult = 0;
       size_t pos = 0;
-      while (pos < line.length()) {
+      while (pos < line.size()) {
         if (line[pos] == ' ') {
           pos++;
           continue;
@@ -100,11 +124,42 @@ namespace levkin {
         if (isDigit) {
           numbers.push(digit);
         } else {
-          Operation op = encodeOpOrThrow(line, pos, next_pos);
-          operators.push(op);
+          char currentSymbol = line[pos];
+
+          if (currentSymbol == '(') {
+            opSymbols.push('(');
+          } else if (currentSymbol == ')') {
+            processOps(numbers, operators, opSymbols);
+            if (opSymbols.empty())
+              throw std::runtime_error("bad parenthesis\n");
+            opSymbols.pop();
+          } else {
+
+            if (next_pos - pos == 2 && line[pos] == '*' &&
+                line[pos + 1] == '*') {
+              currentSymbol = '^';
+            }
+            processOps(numbers, operators, opSymbols, currentSymbol);
+            opSymbols.push(currentSymbol);
+            Operation op = encodeOpOrThrow(line, pos, next_pos);
+            operators.push(op);
+          }
         }
+        pos = next_pos;
       }
+      while (!operators.empty()) {
+        if (opSymbols.top() == '(')
+          throw std::runtime_error("Mismatched parenthesis");
+        applyOp(numbers, operators);
+        opSymbols.pop();
+      }
+
+      if (numbers.size() != 1)
+        throw std::runtime_error("Invalid expression");
+      finalResults.push(numbers.top());
     }
+
+    return finalResults;
   }
 
   Operation encodeOpOrThrow(std::string& s, size_t start, size_t end)
@@ -115,7 +170,7 @@ namespace levkin {
     } else if (end - start == 1) {
       c = s[start];
     } else {
-      throw std::runtime_error("don't know this operation");
+      throw std::runtime_error("don't know this operation\n");
     }
 
     switch (c) {
@@ -127,6 +182,8 @@ namespace levkin {
       return &multiply;
     case '/':
       return &divide;
+    case '%':
+      return &reminder;
     case '^':
       return &exponent;
     default:
