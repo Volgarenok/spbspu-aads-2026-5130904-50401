@@ -56,3 +56,31 @@ void yalovsky::printNames(std::ostream& out, const SequenceList& sequences)
 
   out << '\n';
 }
+
+void yalovsky::transposeSequences(const SequenceList& sequences, Matrix& result)
+{
+  std::size_t maxSize = 0;
+
+  for (SequenceList::const_iterator it = sequences.cbegin(); it != sequences.cend(); ++it)
+  {
+    maxSize = std::max(maxSize, it->second.size());
+  }
+
+  for (std::size_t index = 0; index < maxSize; ++index)
+  {
+    NumberList row;
+
+    for (SequenceList::const_iterator it = sequences.cbegin(); it != sequences.cend(); ++it)
+    {
+      if (it->second.size() <= index)
+      {
+        continue;
+      }
+
+      NumberList::const_iterator numIt = it->second.cbegin() + index;
+      row.pushBack(*numIt);
+    }
+
+    result.pushBack(std::move(row));
+  }
+}
