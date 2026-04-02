@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <stdexcept>
 #include <string>
+
 using namespace levkin;
 
 BOOST_AUTO_TEST_CASE(to_digit)
@@ -30,4 +31,17 @@ BOOST_AUTO_TEST_CASE(get_nxt_word)
 
   BOOST_CHECK_EQUAL(getNextWord(s, 0), 3);
   BOOST_CHECK_EQUAL(getNextWord(s, 4), s.size());
+}
+
+
+BOOST_AUTO_TEST_CASE(shorten_operation)
+{
+  std::string s = "+-*/**what?";
+
+  BOOST_CHECK_EQUAL(encodeOpOrThrow(s, 0, 1), '+');
+  BOOST_CHECK_EQUAL(encodeOpOrThrow(s, 1, 2), '-');
+  BOOST_CHECK_EQUAL(encodeOpOrThrow(s, 2, 3), '*');
+  BOOST_CHECK_EQUAL(encodeOpOrThrow(s, 3, 4), '/');
+  BOOST_CHECK_EQUAL(encodeOpOrThrow(s, 4, 6), '^');
+  BOOST_CHECK_THROW(encodeOpOrThrow(s, 6, s.size()),std::runtime_error);
 }
