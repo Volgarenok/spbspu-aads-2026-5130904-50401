@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
       }
     }
     std::istream& in = (argc > 1) ? file : std::cin;
-    levkin::Stack< size_t > results = levkin::parse(in);
+    levkin::Stack< int > results = levkin::parse(in);
     while (!results.empty()) {
       std::cout << results.drop() << (results.empty() ? "" : " ");
     }

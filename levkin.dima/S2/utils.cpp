@@ -2,20 +2,20 @@
 #include "stack.hpp"
 namespace levkin {
 
-  size_t add(size_t a, size_t b) { return a + b; }
+  int add(int a, int b) { return a + b; }
 
-  size_t subtract(size_t a, size_t b) { return (a >= b) ? (a - b) : 0; }
+  int subtract(int a, int b) { return (a >= b) ? (a - b) : 0; }
 
-  size_t multiply(size_t a, size_t b) { return a * b; }
+  int multiply(int a, int b) { return a * b; }
 
-  size_t divide(size_t a, size_t b)
+  int divide(int a, int b)
   {
     if (b == 0)
       throw std::runtime_error("Division by zero");
     return a / b;
   }
 
-  size_t reminder(size_t a, size_t b)
+  int reminder(int a, int b)
   {
     if (b == 0)
       throw std::runtime_error("Division by zero");
@@ -23,7 +23,7 @@ namespace levkin {
   }
 
   void processOps(
-      Stack< size_t >& nums,
+      Stack< int >& nums,
       Stack< Operation >& ops,
       Stack< char >& symbols,
       char currentOp)
@@ -36,22 +36,22 @@ namespace levkin {
       symbols.pop();
     }
   }
-  size_t exponent(size_t a, size_t b)
+  int exponent(int a, int b)
   {
-    size_t result = 1;
-    for (size_t i = 0; i < b; ++i) {
+    int result = 1;
+    for (int i = 0; i < b; ++i) {
       result *= a;
     }
     return result;
   }
 
-  void applyOp(Stack< size_t >& nums, Stack< Operation >& ops)
+  void applyOp(Stack< int >& nums, Stack< Operation >& ops)
   {
     if (nums.size() < 2) {
       throw std::runtime_error("bad input\n");
     }
-    size_t rhs = nums.drop();
-    size_t lhs = nums.drop();
+    int rhs = nums.drop();
+    int lhs = nums.drop();
     Operation op = ops.drop();
 
     nums.push(op(lhs, rhs));
@@ -72,7 +72,7 @@ namespace levkin {
     return weight;
   }
 
-  size_t toDigit(std::string& s, size_t start, size_t end, bool& isdigit)
+  int toDigit(std::string& s, size_t start, size_t end, bool& isdigit)
   {
     size_t result = 0;
     for (size_t i = 0; start + i < end; ++i) {
@@ -97,15 +97,15 @@ namespace levkin {
     return shift + start;
   }
 
-  Stack< size_t > parse(std::istream& in)
+  Stack< int > parse(std::istream& in)
   {
-    Stack< size_t > finalResults;
+    Stack< int > finalResults;
 
     std::string line;
     while (std::getline(in, line)) {
       if (line.empty())
         continue;
-      Stack< size_t > numbers;
+      Stack< int > numbers;
       Stack< Operation > operators;
       Stack< char > opSymbols;
 
