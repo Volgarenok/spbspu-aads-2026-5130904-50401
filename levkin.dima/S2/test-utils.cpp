@@ -1,7 +1,7 @@
 #include "utils.hpp"
-#include <boost/test/unit_test.hpp>
 #include <stdexcept>
 #include <string>
+#include <boost/test/unit_test.hpp>
 
 using namespace levkin;
 

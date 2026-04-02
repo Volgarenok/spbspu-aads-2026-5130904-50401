@@ -1,10 +1,10 @@
 #ifndef UTILS_S2
 #define UTILS_S2
 
-#include "stack.hpp"
-#include <cstddef>
 #include <iostream>
 #include <string>
+#include <cstddef>
+#include "stack.hpp"
 namespace levkin {
 
   using Operation = size_t (*)(size_t, size_t);

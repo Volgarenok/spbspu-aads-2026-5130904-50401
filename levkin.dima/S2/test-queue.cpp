@@ -1,7 +1,7 @@
 #include "queue.hpp"
-#include <boost/test/unit_test.hpp>
 #include <string>
 #include <stdexcept>
+#include <boost/test/unit_test.hpp>
 
 using namespace levkin;
 

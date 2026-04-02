@@ -1,6 +1,6 @@
 #include "stack.hpp"
-#include <boost/test/unit_test.hpp>
 #include <stdexcept>
+#include <boost/test/unit_test.hpp>
 
 using namespace levkin;
 BOOST_AUTO_TEST_CASE(stack_lifo_order)

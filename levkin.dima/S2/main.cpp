@@ -1,4 +1,5 @@
 #include "stack.hpp"
+#include "utils.hpp"
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -6,7 +7,7 @@ int main(int argc, char* argv[])
 {
   try {
 
-      std::ifstream file;
+    std::ifstream file;
     if (argc > 1) {
       file.open(argv[1]);
       if (!file) {
@@ -15,20 +16,12 @@ int main(int argc, char* argv[])
       }
     }
     std::istream& in = (argc > 1) ? file : std::cin;
-
-    levkin::Stack< int > results;
-    std::string line;
-
-    using Block = int;
-    levkin::Stack< Block > a;
-    while (std::getline(in, line)) {
-      if (line.empty())
-        continue;
-      std::cout << line;
+    auto results = levkin::parse(in);
+    while (!results.empty()) {
+      std::cout << results.drop() << (results.empty() ? "" : " ");
     }
   } catch (const std::exception& e) {
     std::cerr << e.what() << "\n";
     return 1;
   }
 }
-
