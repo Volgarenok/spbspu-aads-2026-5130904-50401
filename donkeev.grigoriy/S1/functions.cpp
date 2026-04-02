@@ -22,7 +22,6 @@ namespace donkeev
         break;
       }
       if (input.fail())
-
       {
         input.clear();
         data.pushBack({seqName, inner});

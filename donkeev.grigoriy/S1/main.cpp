@@ -7,5 +7,13 @@ int main()
   using namespace donkeev;
   List< std::pair< std::string, List< size_t > > > data{};
   read(data, std::cin);
-  printInfo(data, std::cout);
+  try
+  {
+    printInfo(data, std::cout);
+  }
+  catch (const std::overflow_error& e)
+  {
+    std::cout << e.what() << "\n";
+    return 1;
+  }
 }

@@ -22,6 +22,8 @@ namespace donkeev
     List(size_t, T);
     List(const List< T >&);
 
+    ~List();
+
     LIter< T > begin();
     LCIter< T > begin() const;
 
@@ -81,6 +83,12 @@ namespace donkeev
       pushBack(*it);
       ++it;
     }
+  }
+
+  template< class T >
+  donkeev::List< T >::~List()
+  {
+    clearAll();
   }
 
   template< class T >
