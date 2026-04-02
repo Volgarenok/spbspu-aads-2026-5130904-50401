@@ -48,3 +48,20 @@ BOOST_AUTO_TEST_CASE(insertAndErase)
   BOOST_TEST(list.size() == 2);
   BOOST_TEST(*(list.begin() + 1) == 3);
 }
+
+BOOST_AUTO_TEST_CASE(copyConstructorCreatesIndependentCopy)
+{
+  yalovsky::List< int > source;
+  source.pushBack(1);
+  source.pushBack(2);
+
+  yalovsky::List< int > copy(source);
+  copy.popFront();
+  copy.pushBack(3);
+
+  BOOST_TEST(source.size() == 2);
+  BOOST_TEST(source.front() == 1);
+  BOOST_TEST(source.back() == 2);
+  BOOST_TEST(copy.front() == 2);
+  BOOST_TEST(copy.back() == 3);
+}
