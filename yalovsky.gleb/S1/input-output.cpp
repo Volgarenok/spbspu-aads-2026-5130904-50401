@@ -104,3 +104,11 @@ void yalovsky::printNumberList(std::ostream& out, const NumberList& numbers)
 
   out << '\n';
 }
+
+void yalovsky::printMatrix(std::ostream& out, const Matrix& matrix)
+{
+  for (Matrix::const_iterator it = matrix.cbegin(); it != matrix.cend(); ++it)
+  {
+    printNumberList(out, *it);
+  }
+}
