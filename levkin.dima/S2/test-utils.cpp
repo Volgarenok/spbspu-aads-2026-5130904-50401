@@ -50,8 +50,8 @@ BOOST_AUTO_TEST_CASE(applying_operations)
   Stack< Operation > ops;
   ops.push(&exponent);
   Stack< size_t > nums;
-  nums.push(2);
   nums.push(5);
+  nums.push(2);
 
   applyOp(nums, ops);
   BOOST_CHECK_EQUAL(nums.top(), 32);

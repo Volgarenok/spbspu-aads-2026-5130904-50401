@@ -24,6 +24,18 @@ namespace levkin {
     return result;
   }
 
+  void applyOp(Stack< size_t >& nums, Stack< Operation >& ops)
+  {
+    if (nums.size() < 2) {
+      throw std::runtime_error("bad input\n");
+    }
+    size_t lhs = nums.drop();
+    size_t rhs = nums.drop();
+    Operation op = ops.drop();
+
+    nums.push(op(lhs, rhs));
+  }
+
   unsigned short priority(char i)
   {
     unsigned short weight = 0;
