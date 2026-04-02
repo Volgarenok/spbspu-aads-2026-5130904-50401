@@ -50,10 +50,63 @@ BOOST_AUTO_TEST_CASE(applying_operations)
   Stack< Operation > ops;
   ops.push(&exponent);
   Stack< size_t > nums;
-  nums.push(5);
   nums.push(2);
+  nums.push(5);
 
   applyOp(nums, ops);
   BOOST_CHECK_EQUAL(nums.top(), 32);
   BOOST_CHECK_THROW(applyOp(nums, ops), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(parse_simple_expressions)
+{
+  std::stringstream ss;
+  ss << "10 + 20\n";
+  ss << "30 - 10\n";
+  ss << "5 * 5\n";
+
+  Stack< size_t > results = parse(ss);
+
+  BOOST_CHECK_EQUAL(results.size(), 3);
+  BOOST_CHECK_EQUAL(results.drop(), 25);
+  BOOST_CHECK_EQUAL(results.drop(), 20);
+  BOOST_CHECK_EQUAL(results.drop(), 30);
+}
+
+BOOST_AUTO_TEST_CASE(parse_complex_priority)
+{
+  std::stringstream ss;
+  ss << "2 + 2 * 2\n";
+  ss << "10 / 2 - 1\n";
+  ss << "2 ** 3 * 2\n";
+
+  Stack< size_t > results = parse(ss);
+
+  BOOST_CHECK_EQUAL(results.drop(), 16);
+  BOOST_CHECK_EQUAL(results.drop(), 4);
+  BOOST_CHECK_EQUAL(results.drop(), 6);
+}
+
+BOOST_AUTO_TEST_CASE(parse_parentheses)
+{
+  std::stringstream ss;
+  ss << "( 2 + 2 ) * 2\n";
+  ss << "10 / ( 2 + 3 )\n";
+
+  Stack< size_t > results = parse(ss);
+
+  BOOST_CHECK_EQUAL(results.drop(), 2);
+  BOOST_CHECK_EQUAL(results.drop(), 8);
+}
+
+BOOST_AUTO_TEST_CASE(parse_errors)
+{
+  std::stringstream ss1("10 / 0\n");
+  BOOST_CHECK_THROW(parse(ss1), std::runtime_error);
+
+  std::stringstream ss3("1 ? 2\n");
+  BOOST_CHECK_THROW(parse(ss3), std::runtime_error);
+
+  std::stringstream ss4("1 + \n");
+  BOOST_CHECK_THROW(parse(ss4), std::runtime_error);
 }
