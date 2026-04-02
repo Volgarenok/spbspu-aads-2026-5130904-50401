@@ -1,8 +1,10 @@
 #ifndef MY_STACK
 #define MY_STACK
-#include "list.hpp"
-#include <utility>  
+
 #include <stdexcept>
+#include <utility>
+#include "list.hpp"
+
 namespace levkin {
   template < typename T > class Stack
   {
@@ -23,10 +25,7 @@ namespace levkin {
     bool empty() const;
   };
 
-  template < class T > bool Stack< T >::empty() const
-  {
-    return size() == 0;
-  }
+  template < class T > bool Stack< T >::empty() const { return size() == 0; }
 
   template < class T > void Stack< T >::push(T&& v)
   {
@@ -65,15 +64,9 @@ namespace levkin {
     return *list_.begin();
   }
 
-  template < class T > size_t Stack< T >::size() const
-  {
-    return list_.size();
-  }
+  template < class T > size_t Stack< T >::size() const { return list_.size(); }
 
-  template < class T > void Stack< T >::push(const T& v)
-  {
-    list_.pushFront(v);
-  }
+  template < class T > void Stack< T >::push(const T& v) { list_.pushFront(v); }
 
 }
 
