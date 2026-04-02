@@ -1,7 +1,7 @@
+#include "utils.hpp"
 #include <exception>
 #include <fstream>
 #include <iostream>
-#include "utils.hpp"
 int main(int argc, char* argv[])
 {
   try {
@@ -16,8 +16,10 @@ int main(int argc, char* argv[])
     }
     std::istream& in = (argc > 1) ? file : std::cin;
     levkin::Stack< long long > results = levkin::parse(in);
+
     while (!results.empty()) {
-      std::cout << results.drop() << (results.empty() ? "" : " ");
+      std::cout << results.drop();
+      std::cout <<  "\n";
     }
   } catch (const std::exception& e) {
     std::cerr << e.what() << "\n";
