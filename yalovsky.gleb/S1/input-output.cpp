@@ -112,3 +112,18 @@ void yalovsky::printMatrix(std::ostream& out, const Matrix& matrix)
     printNumberList(out, *it);
   }
 }
+
+namespace
+{
+  std::size_t addChecked(std::size_t a, std::size_t b)
+  {
+    const std::size_t maxVal = std::numeric_limits< std::size_t >::max();
+
+    if (maxVal - a < b)
+    {
+      throw std::overflow_error("overflow");
+    }
+
+    return a + b;
+  }
+}
