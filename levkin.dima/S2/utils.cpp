@@ -13,17 +13,17 @@ namespace levkin {
   long long subtract(long long a, long long b)
   {
     if ((b > 0 && a < MIN + b) || (b < 0 && a > MAX + b)) {
-      throw std::overflow_error("subtraction overflow");
+        throw std::overflow_error("subtraction overflow");
     }
-    return (a >= b) ? (a - b) : 0;
+    return a - b;
   }
 
-  long long multiply(long long a, long long b)
-  {
-    if ((a > 0 && b > 0 && a > MAX / b) || (a < 0 && b < 0 && a < MAX / b) ||
-        (a > 0 && b < 0 && b < MIN / a) || (a < 0 && b > 0 && a < MIN / b)) {
-      throw std::overflow_error("multiplying overflow");
-    }
+  long long multiply(long long a, long long b) {
+    if (a == 0 || b == 0) return 0;
+    if (a > 0 && b > 0 && a > MAX / b) throw std::overflow_error("overflow");
+    if (a < 0 && b < 0 && a < MAX / b) throw std::overflow_error("overflow");
+    if (a > 0 && b < 0 && b < MIN / a) throw std::overflow_error("underflow");
+    if (a < 0 && b > 0 && a < MIN / b) throw std::overflow_error("underflow");
     return a * b;
   }
 
@@ -39,12 +39,12 @@ namespace levkin {
 
   long long reminder(long long a, long long b)
   {
-    if (a == MIN && b == -1) {
-      throw std::overflow_error("division overflow");
-    }
-    if (b == 0)
-      throw std::runtime_error("Division by zero");
-    return a % b;
+      if (b == 0) throw std::logic_error("division by zero");
+      long long res = a % b;
+      if (res < 0) {
+          res += std::abs(b);
+      }
+      return res;
   }
 
   void processOps(
