@@ -140,7 +140,6 @@ namespace donkeev
     {
       output << " " << sumArray[i];
     }
-    output << "\n";
     delete [] sumArray;
   }
 }
