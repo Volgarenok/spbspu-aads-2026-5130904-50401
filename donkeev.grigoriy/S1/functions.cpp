@@ -111,14 +111,25 @@ namespace donkeev
     while (iterationCount < maximumIteration)
     {
       outIt = data.begin();
+      bool firstPrint = true;
       for (size_t i = 0; i < data.size(); ++i)
       {
         LCIter< size_t > innerIt = outIt->second.begin();
         if (outIt->second.size() > iterationCount)
         {
-          innerIt += iterationCount;
-          sumArray[sumIteration] += *innerIt;
-          output << *innerIt << " ";
+          if (firstPrint)
+          {
+            innerIt += iterationCount;
+            sumArray[sumIteration] += *innerIt;
+            output << *innerIt;
+            firstPrint = false;
+          }
+          else
+          {
+            innerIt += iterationCount;
+            sumArray[sumIteration] += *innerIt;
+            output << " " << *innerIt;
+          }
         }
         ++outIt;
       }
