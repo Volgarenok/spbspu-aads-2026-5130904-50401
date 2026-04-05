@@ -25,7 +25,7 @@ namespace donkeev
     ~List();
 
     LIter< T > begin();
-    LCIter< T > begin() const;
+    LCIter< T > cbegin() const;
 
     LIter< T > pushAfter(LIter< T >, const T&);
     void pushFront(const T&);
@@ -97,7 +97,7 @@ namespace donkeev
     return LIter< T >{head_};
   }
   template< class T >
-  LCIter< T > List< T >::begin() const
+  LCIter< T > List< T >::cbegin() const
   {
     return LCIter< T >{head_};
   }
@@ -152,6 +152,7 @@ namespace donkeev
     if (length_ == 1)
     {
       delete it.n;
+      it.n = nullptr;
       --length_;
       return;
     }
@@ -176,6 +177,7 @@ namespace donkeev
     {
       cutAfter(it);
     }
+    head_ = nullptr;
   }
 
   template< class T >

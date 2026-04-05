@@ -20,6 +20,8 @@ namespace donkeev
     LIter(const LIter&);
     LIter(Node< T >*);
 
+    LIter< T > operator+(size_t) noexcept;
+
     LIter< T >& operator++() noexcept;
     LIter< T > operator++(int) noexcept;
     LIter< T >& operator+=(int) noexcept;
@@ -28,7 +30,9 @@ namespace donkeev
     T* operator->() noexcept;
 
     bool operator==(const LIter< T >&) const noexcept;
+    bool operator==(std::nullptr_t) const noexcept;
     bool operator!=(const LIter< T >&) const noexcept;
+    bool operator!=(std::nullptr_t) const noexcept;
   };
 
   template< class T >
@@ -44,6 +48,8 @@ namespace donkeev
 
     LCIter& operator=(const LCIter&);
 
+    LCIter< T > operator+(size_t) noexcept;
+
     LCIter< T >& operator++() noexcept;
     LCIter< T > operator++(int) noexcept;
     LCIter< T >& operator+=(size_t) noexcept;
@@ -52,7 +58,9 @@ namespace donkeev
     const T* operator ->() const noexcept;
 
     bool operator==(const LCIter< T >&) const noexcept;
+    bool operator==(std::nullptr_t) const noexcept;
     bool operator!=(const LCIter< T >&) const noexcept;
+    bool operator!=(std::nullptr_t) const noexcept;
   };
 
   template< class T >
@@ -67,6 +75,17 @@ namespace donkeev
   LIter< T >::LIter(Node< T >* node):
     n(node)
   {}
+
+  template< class T >
+  LIter< T > LIter< T >::operator+(size_t count) noexcept
+  {
+    LIter< T > iter{*this};
+    for (size_t i = 0; i < count; ++i)
+    {
+      ++iter;
+    }
+    return iter;
+  }
 
   template< class T >
   LIter< T >& LIter< T >::operator++() noexcept
@@ -110,9 +129,19 @@ namespace donkeev
     return n == yaLIter.n;
   }
   template< class T >
+  bool LIter< T >::operator==(std::nullptr_t) const noexcept
+  {
+    return n == nullptr;
+  }
+  template< class T >
   bool LIter< T >::operator!=(const LIter< T >& yaLIter) const noexcept
   {
     return !(*this == yaLIter);
+  }
+  template< class T >
+  bool LIter< T >::operator!=(std::nullptr_t) const noexcept
+  {
+    return n != nullptr;
   }
 
   template< class T >
@@ -133,6 +162,17 @@ namespace donkeev
   {
     n = v.n;
     return *this;
+  }
+
+  template< class T >
+  LCIter< T > LCIter< T >::operator+(size_t count) noexcept
+  {
+    LCIter< T > iter{*this};
+    for (size_t i = 0; i < count; ++i)
+    {
+      ++iter;
+    }
+    return iter;
   }
 
   template< class T >
@@ -177,9 +217,19 @@ namespace donkeev
     return n == yaLCIter.n;
   }
   template< class T >
+  bool LCIter< T >::operator==(std::nullptr_t) const noexcept
+  {
+    return n == nullptr;
+  }
+  template< class T >
   bool LCIter< T >::operator!=(const LCIter< T >& yaLCIter) const noexcept
   {
     return !(*this == yaLCIter);
+  }
+  template< class T >
+  bool LCIter< T >::operator!=(std::nullptr_t) const noexcept
+  {
+    return n != nullptr;
   }
 }
 #endif
