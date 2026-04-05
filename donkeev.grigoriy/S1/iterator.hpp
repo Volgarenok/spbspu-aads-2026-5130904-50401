@@ -24,7 +24,7 @@ namespace donkeev
 
     LIter< T >& operator++() noexcept;
     LIter< T > operator++(int) noexcept;
-    LIter< T >& operator+=(int) noexcept;
+    LIter< T >& operator+=(size_t) noexcept;
 
     T& operator*() noexcept;
     T* operator->() noexcept;
@@ -101,7 +101,7 @@ namespace donkeev
     return tmp;
   }
   template< class T >
-  LIter< T >& LIter< T >::operator+=(int k) noexcept
+  LIter< T >& LIter< T >::operator+=(size_t k) noexcept
   {
     for (size_t i = 0; i < k; ++i)
     {
