@@ -11,9 +11,9 @@ int main()
   {
     printInfo(data, std::cout);
   }
-  catch (const std::overflow_error& e)
+  catch (...)
   {
-    std::cerr << e.what() << "\n";
+    std::cerr << "Overflow error" << "\n";
     return 1;
   }
 }
