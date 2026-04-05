@@ -92,7 +92,11 @@ namespace donkeev
       throw std::overflow_error("Sum of elements is overflow");
     }
     size_t maximumIteration = getMaxSize(data);
-    size_t* sumArray = new size_t[maximumIteration]{0};
+    size_t* sumArray = nullptr;
+    if (maximumIteration)
+    {
+      sumArray = new size_t[maximumIteration]{0};
+    }
     size_t sumIteration = 0;
     LCIter< std::pair< std::string, List< size_t > > > outIt = data.begin();
     output << outIt->first;
@@ -112,8 +116,8 @@ namespace donkeev
         LCIter< size_t > innerIt = outIt->second.begin();
         if (outIt->second.size() > iterationCount)
         {
-          sumArray[sumIteration] += *innerIt;
           innerIt += iterationCount;
+          sumArray[sumIteration] += *innerIt;
           output << *innerIt << " ";
         }
         ++outIt;
@@ -137,5 +141,6 @@ namespace donkeev
       output << " " << sumArray[i];
     }
     output << "\n";
+    delete [] sumArray;
   }
 }
