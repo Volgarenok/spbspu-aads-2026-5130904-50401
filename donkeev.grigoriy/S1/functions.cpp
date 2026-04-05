@@ -50,6 +50,7 @@ namespace donkeev
     {
       List< size_t > innerList = outIt->second;
       maximum = std::max(maximum, innerList.size());
+      ++outIt;
     }
     return maximum;
   }
@@ -111,6 +112,7 @@ namespace donkeev
         LCIter< size_t > innerIt = outIt->second.begin();
         if (outIt->second.size() > iterationCount)
         {
+          sumArray[sumIteration] += *innerIt;
           innerIt += iterationCount;
           output << *innerIt << " ";
         }
