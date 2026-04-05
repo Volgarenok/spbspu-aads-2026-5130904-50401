@@ -151,7 +151,10 @@ namespace donkeev
     {
       output << " " << sumArray[i];
     }
-    output << "\n";
+    if (maximumIteration)
+    {
+      output << "\n";
+    }
     delete [] sumArray;
   }
 }
