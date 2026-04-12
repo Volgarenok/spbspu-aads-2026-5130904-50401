@@ -4,7 +4,8 @@
 #include <string>
 #include "list.hpp"
 
-namespace petrov {
+namespace petrov
+{
 
   bool isDigit(char sym)
   {
@@ -13,18 +14,23 @@ namespace petrov {
 
   bool isNumber(const std::string & s)
   {
-    if (s.empty()) {
+    if (s.empty())
+    {
       return 0;
     }
     size_t start_index = 0;
-    if (s[0] == '-') {
+    if (s[0] == '-')
+    {
       start_index = 1;
     }
-    if (start_index == s.length()) {
+    if (start_index == s.length())
+    {
       return 0;
     }
-    for (size_t i = start_index; i < s.length(); ++i) {
-      if (!isDigit(s[i])) {
+    for (size_t i = start_index; i < s.length(); ++i)
+    {
+      if (!isDigit(s[i]))
+    {
         return 0;
       }
     }
@@ -35,7 +41,8 @@ namespace petrov {
   {
     size_t result = 0;
     const size_t base = 10;
-    for (size_t i = 0; i < str.length(); ++i) {
+    for (size_t i = 0; i < str.length(); ++i)
+    {
       result = result * base + static_cast< size_t >(str[i] - '0');
     }
     return result;
@@ -47,25 +54,33 @@ int main()
   petrov::List< std::pair< std::string, petrov::List< size_t > > > data;
   std::string s;
 
-  while (std::cin >> s) {
-    if (!petrov::isNumber(s)) {
+  while (std::cin >> s)
+  {
+    if (!petrov::isNumber(s))
+    {
       std::pair< std::string, petrov::List< size_t > > new_column;
       new_column.first = s;
       data.pushBack(new_column);
-    } else {
-      if (!data.isEmpty()) {
+    }
+    else
+    {
+      if (!data.isEmpty())
+      {
         data.getBack().second.pushBack(petrov::parseSizeT(s));
       }
     }
   }
-  if (data.isEmpty()) {
+  if (data.isEmpty())
+  {
     std::cout << "0\n";
     return 0;
   }
 
   bool is_first_name = 1;
-  for (auto it = data.begin(); it != data.end(); ++it) {
-    if (!is_first_name) {
+  for (auto it = data.begin(); it != data.end(); ++it)
+  {
+    if (!is_first_name)
+    {
       std::cout << " ";
     }
     std::cout << it->first;
@@ -74,14 +89,16 @@ int main()
   std::cout << "\n";
 
   petrov::List< petrov::List< size_t >::Iterator > iterators;
-  for (auto it = data.begin(); it != data.end(); ++it) {
+  for (auto it = data.begin(); it != data.end(); ++it)
+  {
     iterators.pushBack(it->second.begin());
   }
 
   petrov::List< size_t > row_sums;
   bool has_active_elements = 1;
 
-  while (has_active_elements) {
+  while (has_active_elements)
+  {
     has_active_elements = 0;
     bool is_first_in_row = 1;
     size_t current_row_sum = 0;
@@ -90,16 +107,20 @@ int main()
     auto iter_it = iterators.begin();
     auto data_it = data.begin();
 
-    for (; iter_it != iterators.end(); ++iter_it, ++data_it) {
-      if (* iter_it != data_it->second.end()) {
+    for (; iter_it != iterators.end(); ++iter_it, ++data_it)
+    {
+      if (* iter_it != data_it->second.end())
+      {
         size_t value = ** iter_it;
 
-        if (!is_first_in_row) {
+        if (!is_first_in_row)
+        {
           std::cout << " ";
         }
         std::cout << value;
 
-        if (std::numeric_limits< size_t >::max() - value < current_row_sum) {
+        if (std::numeric_limits< size_t >::max() - value < current_row_sum)
+        {
           has_overflow = 1;
         }
         current_row_sum += value;
@@ -110,9 +131,11 @@ int main()
       }
     }
 
-    if (has_active_elements) {
+    if (has_active_elements)
+    {
       std::cout << "\n";
-      if (has_overflow) {
+      if (has_overflow)
+      {
         std::cerr << "Overflow detected\n";
         return 1;
       }
@@ -120,18 +143,24 @@ int main()
     }
   }
 
-  if (row_sums.isEmpty()) {
+  if (row_sums.isEmpty())
+  {
     std::cout << "0\n";
-  } else {
+  }
+  else
+  {
     bool is_first_sum = 1;
-    for (auto it = row_sums.begin(); it != row_sums.end(); ++it) {
-      if (!is_first_sum) {
+    for (auto it = row_sums.begin(); it != row_sums.end(); ++it)
+    {
+      if (!is_first_sum)
+      {
         std::cout << " ";
       }
       std::cout << * it;
       is_first_sum = 0;
     }
-    if (!row_sums.isEmpty()) {
+    if (!row_sums.isEmpty())
+    {
       std::cout << "\n";
     }
   }
