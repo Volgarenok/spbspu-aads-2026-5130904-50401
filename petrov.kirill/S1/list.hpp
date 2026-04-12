@@ -4,9 +4,11 @@
 #include <cstddef>
 #include <utility>
 
-namespace petrov {
+namespace petrov
+{
   template< typename T >
-  struct Node {
+  struct Node
+  {
     T data_;
     Node< T > * next_;
 
@@ -17,9 +19,11 @@ namespace petrov {
   };
 
   template< typename T >
-  class List {
+  class List
+  {
   public:
-    class Iterator {
+    class Iterator
+    {
     public:
       Iterator(Node< T > * node);
 
@@ -33,7 +37,8 @@ namespace petrov {
       Node< T > * current_;
     };
 
-    class ConstIterator {
+    class ConstIterator
+    {
     public:
       ConstIterator(const Node< T > * node);
 
@@ -93,7 +98,8 @@ namespace petrov {
   template< typename T >
   typename List< T >::Iterator & List< T >::Iterator::operator++()
   {
-    if (current_) {
+    if (current_)
+    {
       current_ = current_->next_;
     }
     return * this;
@@ -131,7 +137,8 @@ namespace petrov {
   template< typename T >
   typename List< T >::ConstIterator & List< T >::ConstIterator::operator++()
   {
-    if (current_) {
+    if (current_)
+    {
       current_ = current_->next_;
     }
     return * this;
@@ -160,7 +167,8 @@ namespace petrov {
   List< T >::List(const List< T > & other):
     List()
   {
-    for (Node< T > * curr = other.head_; curr != nullptr; curr = curr->next_) {
+    for (Node< T > * curr = other.head_; curr != nullptr; curr = curr->next_)
+    {
       pushBack(curr->data_);
     }
   }
@@ -184,9 +192,12 @@ namespace petrov {
   void List< T >::pushBack(const T & value)
   {
     Node< T > * new_node = new Node< T >(value);
-    if (! head_) {
+    if (! head_)
+    {
       head_ = tail_ = new_node;
-    } else {
+    }
+    else
+    {
       tail_->next_ = new_node;
       tail_ = new_node;
     }
@@ -196,7 +207,8 @@ namespace petrov {
   template< typename T >
   void List< T >::clear()
   {
-    while (head_) {
+    while (head_)
+    {
       Node< T > * temp = head_;
       head_ = head_->next_;
       delete temp;
