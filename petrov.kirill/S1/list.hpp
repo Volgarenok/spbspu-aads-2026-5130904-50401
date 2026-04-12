@@ -34,11 +34,21 @@ namespace petrov
 		node<T>* cur;
 		ListIterator(node<T>* n);
 	public:
-		bool operator==(const ListIterator i) const;
-		bool operator!=(const ListIterator i) const;
-		
+		bool operator==(const ListIterator<T>& i) const;
+		bool operator!=(const ListIterator<T>& i) const;
 		T& operator*() const;
-		ListIterator& operator++();
+		ListIterator<T>& operator++();
+		ListIterator<T>& operator+(size_t s);
+		ListIterator<T>& operator--();
+		ListIterator<T>& operator-(size_t s);
+
+		ListIterator<T> const_begin() const;
+		ListIterator<T> const_end() const;
+		ListIterator<T> begin();
+		ListIterator<T> end();
+		
+		bool IsEmpty() const noexcept;
+		size_t getSize() const noexcept;
 	};
 };
 #endif
