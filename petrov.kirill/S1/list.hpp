@@ -75,7 +75,59 @@ template<class T>
 	s(0)
 {}
 
+template<class	T>
+bool List<T>::IsEmpty() const noexcept
+{
+	return (!s || h == nullptr);
+}
 
+template<class T>
+size_t List<T>::getSize() const noexcept
+{
+	return s;
+}
+
+template<class T>
+void List<T>::push_back(const T& d)
+{
+	if (IsEmpty())
+	{
+		h = new node<T>;
+		h->val = d;
+		h->next = nullptr;
+		h->prev = nullptr;
+		t = h;
+		s = 1;
+		return;
+	}
+	t->next = new node<T>;
+	t->next->val = d;
+	t->next->prev = t;
+	t = t->next;
+	t->next = nullptr;
+	s++;
+}
+
+template<class T>
+void List<T>::push_front(const T& d)
+{
+	if (IsEmpty())
+	{
+		h = new node<T>;
+		h->val = d;
+		h->next = nullptr;
+		h->prev = nullptr;
+		t = h;
+		s = 1;
+		return;
+	}
+	h->prev = new node<T>;
+	h->prev->val = d;
+	h->prev->next = t;
+	h = h->prev;
+	h->prev = nullptr;
+	s++;
+}
 
 template<class T>
 List<T>::List(const List<T>& l):
