@@ -31,6 +31,11 @@ namespace petrov
 		size_t getSize() const noexcept;
 		ListIterator<T> begin();
 		ListIterator<T> end();
+		
+		void push_back(const T& d);
+		void push_front(const T& d);
+		void pop_back();
+		void pop_front();
 	};
 	template<class T>
 	class ListIterator
@@ -46,6 +51,7 @@ namespace petrov
 		ListIterator<T>& operator--();
 		T* operator->() const;
 	};
+
 	template<class T>
 	class ListIteratorConst
 	{
@@ -61,4 +67,28 @@ namespace petrov
 		const T* operator->() const;
 	};
 };
+
+template<class T>
+	List<T>::List():
+	h(nullptr),
+	t(nullptr),
+	s(0)
+{}
+
+
+
+template<class T>
+List<T>::List(const List<T>& l):
+	h(nullptr),
+	t(nullptr),
+	s(0)
+{
+	node<T>*	nod = l.h;
+	while (nod != nullptr)
+	{
+		push_back(nod->val);
+		nod = nod->next;
+	}
+}
+
 #endif
