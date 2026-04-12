@@ -138,7 +138,29 @@ ListIterator<T> List<T>::begin()
 template<class T>
 ListIterator<T> List<T>::end()
 {
-	return ListIterator(nullpt);
+	return ListIterator(nullptr);
+}
+
+template<class T>
+ListIterator<T>& ListIterator<T>::operator++()
+{
+	if (cur->next != nullptr)
+	{
+		cur = cur->next;
+	}
+	return *this;
+}
+
+template<class T>
+T&	ListIterator<T>::operator*() const
+{
+	return cur->val;
+}
+
+template<class T>
+T* ListIterator<T>::operator->() const
+{
+	return &(cur->val);
 }
 
 template<class T>
