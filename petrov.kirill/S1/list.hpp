@@ -36,6 +36,7 @@ namespace petrov
 		void push_front(const T& d);
 		void pop_back();
 		void pop_front();
+		void clear();
 	};
 	template<class T>
 	class ListIterator
@@ -74,6 +75,135 @@ template<class T>
 	t(nullptr),
 	s(0)
 {}
+
+template<class T>
+bool ListIteratorConst<T>::operator==(const ListIteratorConst<T>& i) const
+{
+	!(return cur != i.cur);
+}
+
+template<class T>
+bool ListIteratorConst<T>::operator!=(const ListIteratorConst<T>& i) const
+{
+	return cur != i.cur;
+}
+
+template<class T>
+const T& ListIteratorConst<T>::operator*() const
+{
+	return cur->val;
+}
+
+template<class T>
+const T* ListIteratorConst<T>::operator->() const
+{
+	return &(cur->val);
+}
+
+template<class T>
+ListIteratorConst<T>& ListIteratorConst<T>::operator++()
+{
+	if (cur != nullptr)
+	{
+		cur = cur->next;
+	}
+	return *this;
+}
+
+template<class T>
+ListIteratorConst<T>& ListIteratorConst<T>::operator--()
+{
+	if (cur != nullptr)
+	{
+		cur = cur->prev;
+	}
+	return *this;
+}
+
+template<class T>
+bool ListIterator<T>::operator==(const ListIterator<T>& i) const
+{
+	return !(cur != i.cur);
+}
+
+template<class T>
+bool ListIterator<T>::operator!=(const ListIterator<T>& i) const
+{
+	return cur != i.cur;
+}
+
+template<class T>
+ListIterator<T>::ListIterator(node<T>* n):
+	cur(n)
+{}
+
+template<class T>
+ListIteratorConst<T>::ListIteratorConst(const node<T>* n):
+cur(n)
+{}
+
+template<class T>
+void List<T>::clear()
+{
+	if (h != nullptr)
+	{
+		while (h->next != nullptr)
+		{
+			node<T>*	promej = h->next;
+			delete h;
+			h = promej;
+		}
+		delete h;
+	}
+	h = nullptr;
+	t = nullptr;
+	s = 0;
+	return;
+}
+
+template<class T>
+List<T>::~List()
+{
+	clear();
+}
+
+template<class T>
+void List<T>::pop_front()
+{
+	if (!IsEmpty())
+	{
+		node<T>*	new_h = h->next;
+		delete h;
+		h = new_h;
+		if (h == nullptr)
+		{
+			t = nullptr;
+			s = 0; 
+			return;
+		}
+		h->prev = nullptr;
+		s--;
+	}
+}
+
+template<class T>
+void List<T>::pop_back()
+{
+	if (!IsEmpty())
+	{
+		node<T>*	new_t = t->prev;
+		delete t;
+		t = new_t;
+		if (t == nullptr)
+		{
+			h = nullptr;
+			s = 0;
+			return;
+		}
+		t->next = nullptr;
+		s--;
+	}
+}
 
 template<class	T>
 bool List<T>::IsEmpty() const noexcept
@@ -123,7 +253,7 @@ void List<T>::push_front(const T& d)
 	}
 	h->prev = new node<T>;
 	h->prev->val = d;
-	h->prev->next = t;
+	h->prev->next = h;
 	h = h->prev;
 	h->prev = nullptr;
 	s++;
@@ -144,9 +274,19 @@ ListIterator<T> List<T>::end()
 template<class T>
 ListIterator<T>& ListIterator<T>::operator++()
 {
-	if (cur->next != nullptr)
+	if (cur != nullptr)
 	{
 		cur = cur->next;
+	}
+	return *this;
+}
+
+template<class T>
+ListIterator<T>& ListIterator<T>::operator--()
+{
+	if (cur != nullptr)
+	{
+		cur = cur->prev;
 	}
 	return *this;
 }
