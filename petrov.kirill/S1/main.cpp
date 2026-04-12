@@ -40,7 +40,7 @@ namespace petrov
   void printNames(const petrov::List< std::pair< std::string, petrov::List< size_t > > > & data)
   {
     bool f = 1;
-    for (petrov::List< std::pair< std::string, petrov::List< size_t > > >::ConstIterator it = data.begin(); it != data.end(); ++it)
+    for (petrov::List<std::pair<std::string,petrov::List<size_t>>>::ConstIteratorit=data.begin();it!=data.end();++it)
     {
       std::cout << (f ? "" : " ") << it->first;
       f = 0;
@@ -59,7 +59,7 @@ namespace petrov
     petrov::printNames(data);
 
     petrov::List< petrov::List< size_t >::ConstIterator > its;
-    for (petrov::List< std::pair< std::string, petrov::List< size_t > > >::ConstIterator it = data.begin(); it != data.end(); ++it)
+    for (petrov::List<std::pair<std::string,petrov::List<size_t>>>::ConstIterator it=data.begin();it!=data.end();++it)
     {
       its.pushBack(it->second.begin());
     }
@@ -75,7 +75,7 @@ namespace petrov
       bool ok = 0;
 
       petrov::List< petrov::List< size_t >::ConstIterator >::Iterator it_n = its.begin();
-      for (petrov::List< std::pair< std::string, petrov::List< size_t > > >::ConstIterator it_d = data.begin(); it_d != data.end(); ++it_d, ++it_n)
+      for (petrov::List<std::pair<std::string,petrov::List<size_t>>>::ConstIterator it_d=data.begin();it_d!=data.end();++it_d,++it_n)
       {
         if (* it_n != it_d->second.end())
         {
