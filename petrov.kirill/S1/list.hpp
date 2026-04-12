@@ -130,6 +130,18 @@ void List<T>::push_front(const T& d)
 }
 
 template<class T>
+ListIterator<T> List<T>::begin()
+{
+	return ListIterator(h);
+}
+
+template<class T>
+ListIterator<T> List<T>::end()
+{
+	return ListIterator(nullpt);
+}
+
+template<class T>
 List<T>::List(const List<T>& l):
 	h(nullptr),
 	t(nullptr),
