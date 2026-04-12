@@ -17,13 +17,38 @@ namespace petrov
 		node<T>* h;
 		node<T>* t;
 		size_t s;
+	public:
+		~List();
+		List();
+		List(const List<T>& l);
+		List(List<T>&& l) noexcept;
+		List(size_t s, const T& init);
+		
+		List<T>& operator=(List<T>&& l) noexcept;
+		List<T>& operator=(const List<T>& l);
 	};
-	~List();
-	List();
-	List(const List<T>& l);
-	List(List<T>&& l) noexcept;
-	List(size_t s, const T& init);
-	
-	List<T>& operator=(List<T>&& l) noexcept;
-  List<T>& operator=(const List<T>& l);
+	template<class T>
+	class ListIterator
+	{
+		friend class List<T>;
+		node<T>* cur;
+		ListIterator(node<T>* n);
+	public:
+		bool operator==(const ListIterator<T>& i) const;
+		bool operator!=(const ListIterator<T>& i) const;
+		T& operator*() const;
+		ListIterator<T>& operator++();
+		ListIterator<T>& operator+(size_t s);
+		ListIterator<T>& operator--();
+		ListIterator<T>& operator-(size_t s);
+
+		ListIterator<T> const_begin() const;
+		ListIterator<T> const_end() const;
+		ListIterator<T> begin();
+		ListIterator<T> end();
+		
+		bool IsEmpty() const noexcept;
+		size_t getSize() const noexcept;
+	};
 };
+#endif
