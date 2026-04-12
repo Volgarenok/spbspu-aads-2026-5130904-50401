@@ -26,6 +26,17 @@ namespace petrov
 	
 	List<T>& operator=(List<T>&& l) noexcept;
 	List<T>& operator=(const List<T>& l);
+	
+	template<class T>
+	class ListIterator
+	{
+		friend class List<T>;
+		node<T>* cur;
+		ListIterator(node<T>* n);
+	public:
+		bool operator==(ListIterator& i) const;
+		bool operator==(const ListIterator i) const;
+		bool operator!=(ListIterator& i) const;
+		bool operator!=(const ListIterator i) const;
+	};
 };
-
-#endif
