@@ -10,7 +10,7 @@ namespace petrov
   struct node
   {
     T val;
-    node<T>*next;
+    node<T>* next;
     node<T>* prev;
   };
 };
