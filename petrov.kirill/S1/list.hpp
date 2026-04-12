@@ -6,11 +6,11 @@
 
 namespace petrov
 {
-	template< class T >
-	struct node
-	{
-		T val;
-		node<T>*	next;
-		node<T>*	prev;
-	};
+  template<class T>
+  struct node
+  {
+    T val;
+    node<T>*next;
+    node<T>* prev;
+  };
 };
