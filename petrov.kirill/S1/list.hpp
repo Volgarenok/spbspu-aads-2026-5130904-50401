@@ -145,7 +145,7 @@ cur(n)
 template<class T>
 void List<T>::clear()
 {
-	if (h != nullptr)
+	if (h != nullpt)
 	{
 		while (h->next != nullptr)
 		{
