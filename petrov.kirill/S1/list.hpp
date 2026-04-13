@@ -305,7 +305,7 @@ T* ListIterator<T>::operator->() const
 
 template<class T>
 List<T>::List(const List<T>& l):
-	h(nullptr),
+	h(nullptr)
 	t(nullptr),
 	s(0)
 {
@@ -314,6 +314,61 @@ List<T>::List(const List<T>& l):
 	{
 		push_back(nod->val);
 		nod = nod->next;
+	}
+}
+
+template<class T>
+List<T>& List<T>::operator=(const List<T>& l)
+{
+	if (*this != l)
+	{
+		clear();
+		node<T>* now = l.h;
+		while (now != nullptr)
+		{
+			push_back(now->val);
+			now = now->next;
+		}
+	}
+	return *this;
+}
+
+template<class T>
+List<T>::List(List<T>&& l) noexcept:
+	h(l.h),
+	t(l.t),
+	s(l.s)
+{
+	l.h = nulltpr;
+	l.t = nullptr;
+	l.s = 0;
+}
+
+template<class T>
+List<T>& List<T>::operator=(List<T>&& l) noexcept
+{
+	if (*this != l)
+	{
+		clear();
+		h = l.h;
+		s = l.s;
+		t = l.t;
+		l.h = nullptr;
+		l.t = nullptr;
+		l.s = 0;
+	}
+	return *this;
+}
+
+template<class T>
+List<T>::List(size_t s, const T& init):
+	h(nullptr),
+	t(nullptr),
+	s(0)
+{
+	for (size_t i = 0; i <	s; ++i)
+	{
+		push_back(init);
 	}
 }
 
