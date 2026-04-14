@@ -129,7 +129,29 @@ namespace donkeev
       return 2;
     }
   }
-  
+  llint_t doOperation(const llint_t& operand1, const llint_t& operand2, const char& operation)
+  {
+    llint_t max_llint = std::numeric_limits< llint_t >::max();
+    llint_t min_llint = std::numeric_limits< llint_t >::min();
+
+    if (operation == '+')
+    {
+      if ((operand2 > 0 && operand1 > max_llint - operand2) || (operand2 < 0 && operand1 < min_llint - operand2))
+      {
+        throw std::overflow_error("Summ overflow");
+      }
+
+      return operand1 + operand2;
+    }
+    else if (operation == '-')
+    {
+      if ((operand1 < 0 && operand1 < min_llint + operand2) || (operand2 < 0 && operand1 > max_llint + operand2))
+      {
+        throw std::overflow_error("Subtraction overflow");
+      }
+    }
+    
+  }
   void calculate(Stack< llint_t >& result, Queue< Queue< char > >& expressionsQueue)
   {
     while (!expressionsQueue.isEmpty())
