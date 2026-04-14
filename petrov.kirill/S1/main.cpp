@@ -34,14 +34,14 @@ int main()
       {
         if (val_2 > std::numeric_limits<int>::max() || val_2 < std::numeric_limits<int>::min())
         {
-          std::cerr << "err\n";
+          std::cerr << "overflow\n";
           return 1;
         }
         count_nums.push_back(static_cast<int>(val_2));
       }
       else
       {
-        std::cerr << "err\n";
+        std::cerr << "overflow\n";
         return 1;
       }
     }
@@ -51,6 +51,7 @@ int main()
 
   if (list_for_sol.IsEmpty())
   {
+    std::cout << "0\n";
     return 0;
   }
 
@@ -134,7 +135,7 @@ int main()
   }
   catch (...)
   {
-    std::cerr << "err\n";
+    std::cerr << "overflow\n";
     return 1;
   }
 
