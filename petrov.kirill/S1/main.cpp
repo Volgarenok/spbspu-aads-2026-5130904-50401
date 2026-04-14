@@ -22,7 +22,7 @@ int main() {
     while (std::cin >> s) {
       petrov::List<int> count_nums;
       while (std::cin.peek() == ' ') std::cin.ignore();
-      
+
       while (std::cin.peek() != '\n' && std::cin.peek() != EOF) {
         std::string raw_val;
         if (!(std::cin >> raw_val)) break;
@@ -43,7 +43,7 @@ int main() {
         }
         while (std::cin.peek() == ' ') std::cin.ignore();
       }
-      
+
       list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
       if (std::cin.peek() == '\n') std::cin.ignore();
     }
@@ -118,3 +118,4 @@ int main() {
   }
   return 0;
 }
+
