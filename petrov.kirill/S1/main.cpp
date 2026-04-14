@@ -30,19 +30,13 @@ int main()
       if (std::cin.peek() == '\n' || std::cin.peek() == EOF) break;
 
       long long val_2;
-      if (std::cin >> val_2)
-      {
-        if (val_2 > std::numeric_limits<int>::max() || val_2 < std::numeric_limits<int>::min())
-        {
-          std::cerr << "overflow\n";
+      if (!(std::cin >> val_2)) {
+          std::cerr << "overflow" << std::endl;
           return 1;
-        }
-        count_nums.push_back(static_cast<int>(val_2));
       }
-      else
-      {
-        std::cerr << "overflow\n";
-        return 1;
+      if (val_2 > std::numeric_limits<int>::max() || val_2 < std::numeric_limits<int>::min()) {
+          std::cerr << "overflow" << std::endl;
+          return 1;
       }
     }
     list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
