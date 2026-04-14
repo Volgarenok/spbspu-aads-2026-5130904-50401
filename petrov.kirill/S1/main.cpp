@@ -17,7 +17,7 @@ int main()
 {
   petrov::List<std::pair<std::string, petrov::List<int>>> list_for_sol;
   std::string s;
-  int val_for_int;
+  long int val_for_int;
 
   while (std::cin >> s)
   {
@@ -26,23 +26,23 @@ int main()
     {
       std::cin.ignore();
     }
-    try {
-      while (std::cin.peek() != '\n' && !std::cin.eof() && std::cin >> val_for_int)
+    while (std::cin.peek() != '\n' && !std::cin.eof() && std::cin >> val_for_int)
+    {
+      if (std::numeric_limits<int>::max() < val_for_int)
       {
-        count_nums.push_back(val_for_int);
-        while (std::cin.peek() == ' ')
-        {
-          std::cin.ignore();
-        }
+        std::cerr << "overflow\n";
+        return 1;
       }
-      list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
-      if (std::cin.peek() == '\n')
+      count_nums.push_back(static_cast<int>(val_for_int));
+      while (std::cin.peek() == ' ')
       {
         std::cin.ignore();
       }
-    } catch (...) {
-      std::cerr << "err\n";
-      return 1;
+    }
+    list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
+    if (std::cin.peek() == '\n')
+    {
+      std::cin.ignore();
     }
   }
 
