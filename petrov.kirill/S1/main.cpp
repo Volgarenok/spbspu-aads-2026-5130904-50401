@@ -81,7 +81,7 @@ int main()
     if (is_ovf)
     {
       std::cerr << "overflow\n";
-      return 0;
+      return 1;
     }
 
     bool all_empty = 1;
@@ -155,7 +155,7 @@ int main()
   catch (...)
   {
     std::cerr << "overflow\n";
-    return 0;
+    return 1;
   }
 
   return 0;

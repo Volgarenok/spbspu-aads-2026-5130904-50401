@@ -55,8 +55,9 @@ namespace petrov
   {
     friend class List<T>;
     node<T>* cur;
-    LIter(node<T>* n);
   public:
+    LIter() : cur(nullptr) {}
+    LIter(node<T>* n) : cur(n) {}
     bool operator==(const LIter<T>& i) const;
     bool operator!=(const LIter<T>& i) const;
     T& operator*() const;
@@ -70,8 +71,9 @@ namespace petrov
   {
     friend class List<T>;
     const node<T>* cur;
-    LCIter(const node<T>* n);
   public:
+    LCIter() : cur(nullptr) {}
+    LCIter(node<T>* n) : cur(n) {}
     bool operator==(const LCIter<T>& i) const;
     bool operator!=(const LCIter<T>& i) const;
     const T& operator*() const;
@@ -142,16 +144,6 @@ namespace petrov
   {
     return cur != i.cur;
   }
-
-  template<class T>
-  LIter<T>::LIter(node<T>* n):
-    cur(n)
-  {}
-
-  template<class T>
-  LCIter<T>::LCIter(const node<T>* n):
-    cur(n)
-  {}
 
   template<class T>
   void List<T>::clear()
