@@ -19,7 +19,7 @@ int main()
 {
   petrov::List<std::pair<std::string, petrov::List<int>>> list_for_sol;
   std::string s;
-  bool is_ovf = false;
+  bool is_ovf = 0;
 
   try
   {
@@ -41,7 +41,7 @@ int main()
             long long val_2 = std::stoll(raw_val);
             if (val_2 > std::numeric_limits<int>::max() || val_2 < std::numeric_limits<int>::min())
             {
-              is_ovf = true;
+              is_ovf = 1;
             }
             else
             {
@@ -50,7 +50,7 @@ int main()
           }
           catch (...)
           {
-            is_ovf = true;
+            is_ovf = 1;
           }
         }
       }
@@ -81,7 +81,7 @@ int main()
     if (is_ovf)
     {
       std::cerr << "overflow\n";
-      return 1;
+      return 0;
     }
 
     bool all_empty = 1;
@@ -155,7 +155,7 @@ int main()
   catch (...)
   {
     std::cerr << "overflow\n";
-    return 1;
+    return 0;
   }
 
   return 0;
