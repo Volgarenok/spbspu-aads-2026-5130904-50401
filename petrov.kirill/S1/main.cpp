@@ -26,18 +26,23 @@ int main()
     {
       std::cin.ignore();
     }
-    while (std::cin.peek() != '\n' && !std::cin.eof() && std::cin >> val_for_int)
-    {
-      count_nums.push_back(val_for_int);
-      while (std::cin.peek() == ' ')
+    try {
+      while (std::cin.peek() != '\n' && !std::cin.eof() && std::cin >> val_for_int)
+      {
+        count_nums.push_back(val_for_int);
+        while (std::cin.peek() == ' ')
+        {
+          std::cin.ignore();
+        }
+      }
+      list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
+      if (std::cin.peek() == '\n')
       {
         std::cin.ignore();
       }
-    }
-    list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
-    if (std::cin.peek() == '\n')
-    {
-      std::cin.ignore();
+    } catch (...) {
+      std::cerr << "err\n";
+      return 1;
     }
   }
 
