@@ -34,14 +34,14 @@ int main()
       {
         if (val_2 > std::numeric_limits<int>::max() || val_2 < std::numeric_limits<int>::min())
         {
-          std::cerr << "error\n";
+          std::cerr << "err\n";
           return 1;
         }
         count_nums.push_back(static_cast<int>(val_2));
       }
       else
       {
-        std::cerr << "error\n";
+        std::cerr << "err\n";
         return 1;
       }
     }
@@ -134,7 +134,7 @@ int main()
   }
   catch (...)
   {
-    std::cerr << "error\n";
+    std::cerr << "err\n";
     return 1;
   }
 
