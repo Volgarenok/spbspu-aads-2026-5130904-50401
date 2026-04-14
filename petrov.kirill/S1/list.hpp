@@ -13,13 +13,13 @@ namespace petrov
 		node(const T& v, node<T>* n = nullptr, node<T>* p = nullptr) : val(v), next(n), prev(p)
 		{}
 	};
-
+	
 	template<class	T>
 	class LIter;
-
+	
 	template<class T>
 	class LCIter;
-
+	
 	template<class T>
 	class List
 	{
@@ -32,7 +32,7 @@ namespace petrov
 		List(const List<T>& l);
 		List(List<T>&& l) noexcept;
 		List(size_t s, const T& init);
-
+		
 		List<T>& operator=(List<T>&& l) noexcept;
 		List<T>& operator=(const List<T>& l);
 
@@ -78,38 +78,38 @@ namespace petrov
 		LCIter<T>& operator--();
 		const T* operator->() const;
 	};
-
+	
 	template<class T>
 		List<T>::List():
 		h(nullptr),
 		t(nullptr),
 		s(0)
 	{}
-
+	
 	template<class T>
 	bool LCIter<T>::operator==(const LCIter<T>& i) const
 	{
 		return !(cur != i.cur);
 	}
-
+	
 	template<class T>
 	bool LCIter<T>::operator!=(const LCIter<T>& i) const
 	{
 		return cur != i.cur;
 	}
-
+	
 	template<class T>
 	const T& LCIter<T>::operator*() const
 	{
 		return cur->val;
 	}
-
+	
 	template<class T>
 	const T* LCIter<T>::operator->() const
 	{
 		return &(cur->val);
 	}
-
+	
 	template<class T>
 	LCIter<T>& LCIter<T>::operator++()
 	{
@@ -119,7 +119,7 @@ namespace petrov
 		}
 		return *this;
 	}
-
+	
 	template<class T>
 	LCIter<T>& LCIter<T>::operator--()
 	{
@@ -129,29 +129,29 @@ namespace petrov
 		}
 		return *this;
 	}
-
+	
 	template<class T>
 	bool LIter<T>::operator==(const LIter<T>& i) const
 	{
 		return !(cur != i.cur);
 	}
-
+	
 	template<class T>
 	bool LIter<T>::operator!=(const LIter<T>& i) const
 	{
 		return cur != i.cur;
 	}
-
+	
 	template<class T>
 	LIter<T>::LIter(node<T>* n):
 		cur(n)
 	{}
-
+	
 	template<class T>
 	LCIter<T>::LCIter(const node<T>* n):
 	cur(n)
 	{}
-
+	
 	template<class T>
 	void List<T>::clear()
 	{
@@ -170,13 +170,13 @@ namespace petrov
 		s = 0;
 		return;
 	}
-
+	
 	template<class T>
 	List<T>::~List()
 	{
 		clear();
 	}
-
+	
 	template<class T>
 	void List<T>::pop_front()
 	{
@@ -188,14 +188,14 @@ namespace petrov
 			if (h == nullptr)
 			{
 				t = nullptr;
-				s = 0;
+				s = 0; 
 				return;
 			}
 			h->prev = nullptr;
 			s--;
 		}
 	}
-
+	
 	template<class T>
 	void List<T>::pop_back()
 	{
@@ -214,19 +214,19 @@ namespace petrov
 			s--;
 		}
 	}
-
+	
 	template<class	T>
 	bool List<T>::IsEmpty() const noexcept
 	{
 		return (!s || h == nullptr);
 	}
-
+	
 	template<class T>
 	size_t List<T>::getSize() const noexcept
 	{
 		return s;
 	}
-
+	
 	template<class T>
 	void List<T>::push_back(const T& d)
 	{
@@ -245,7 +245,7 @@ namespace petrov
 		t->next = nullptr;
 		s++;
 	}
-
+	
 	template<class T>
 	void List<T>::push_front(const T& d)
 	{
@@ -264,19 +264,19 @@ namespace petrov
 		h->prev = nullptr;
 		s++;
 	}
-
+	
 	template<class T>
 	LIter<T> List<T>::begin()
 	{
 		return LIter(h);
 	}
-
+	
 	template<class T>
 	LIter<T> List<T>::end()
 	{
 		return LIter<T>(nullptr);
 	}
-
+	
 	template<class T>
 	LIter<T>& LIter<T>::operator++()
 	{
@@ -286,7 +286,7 @@ namespace petrov
 		}
 		return *this;
 	}
-
+	
 	template<class T>
 	LIter<T>& LIter<T>::operator--()
 	{
@@ -296,19 +296,19 @@ namespace petrov
 		}
 		return *this;
 	}
-
+	
 	template<class T>
 	T&	LIter<T>::operator*() const
 	{
 		return cur->val;
 	}
-
+	
 	template<class T>
 	T* LIter<T>::operator->() const
 	{
 		return &(cur->val);
 	}
-
+	
 	template<class T>
 	List<T>::List(const List<T>& l):
 		h(nullptr),
@@ -322,7 +322,7 @@ namespace petrov
 			nod = nod->next;
 		}
 	}
-
+	
 	template<class T>
 	List<T>& List<T>::operator=(const List<T>& l)
 	{
@@ -338,7 +338,7 @@ namespace petrov
 		}
 		return *this;
 	}
-
+	
 	template<class T>
 	List<T>::List(List<T>&& l) noexcept:
 		h(l.h),
@@ -349,7 +349,7 @@ namespace petrov
 		l.t = nullptr;
 		l.s = 0;
 	}
-
+	
 	template<class T>
 	List<T>& List<T>::operator=(List<T>&& l) noexcept
 	{
@@ -365,7 +365,7 @@ namespace petrov
 		}
 		return *this;
 	}
-
+	
 	template<class T>
 	List<T>::List(size_t s, const T& init):
 		h(nullptr),
@@ -377,18 +377,17 @@ namespace petrov
 			push_back(init);
 		}
 	}
-
+	
 	template<class T>
 	LCIter<T> List<T>::begin() const
 	{
 		return LCIter<T>(h);
 	}
-
+	
 	template<class T>
 	LCIter<T> List<T>::end() const
 	{
 		return LCIter<T>(nullptr);
 	}
 };
-
 #endif
