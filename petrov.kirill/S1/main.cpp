@@ -63,6 +63,24 @@ int main()
     }
   }
   std::cout << '\n';
+  
+  bool all_empty = true;
+  petrov::LIter<std::pair<std::string, petrov::List<int>>> check_empty = list_for_sol.begin();
+  while (check_empty != list_for_sol.end())
+  {
+    if (!check_empty->second.IsEmpty())
+    {
+        all_empty = false;
+        break;
+    }
+    ++check_empty;
+  }
+
+  if (all_empty)
+  {
+      std::cout << "0\n";
+      return 0;
+  }
 
   petrov::List<petrov::LIter<int>> iters;
   petrov::LIter<std::pair<std::string, petrov::List<int>>> q_init = list_for_sol.begin();
@@ -128,6 +146,7 @@ int main()
   }
   catch (...)
   {
+    std::cerr << "overflow\n";
     return 1;
   }
   return 0;
