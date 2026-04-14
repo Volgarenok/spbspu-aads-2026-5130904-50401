@@ -19,7 +19,7 @@ int main()
 {
   petrov::List<std::pair<std::string, petrov::List<int>>> list_for_sol;
   std::string s;
-  bool is_ovf = false;
+  bool is_ovf = 0;
 
   try
   {
@@ -38,7 +38,7 @@ int main()
         {
           if (val_ull > static_cast<unsigned long long>(std::numeric_limits<int>::max()))
           {
-            is_ovf = true;
+            is_ovf = 1;
           }
           else
           {
@@ -50,7 +50,7 @@ int main()
           std::cin.clear();
           std::string garbage;
           std::cin >> garbage;
-          is_ovf = true;
+          is_ovf = 1;
         }
       }
       list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
@@ -83,11 +83,11 @@ int main()
       return 1;
     }
 
-    bool all_empty = true;
+    bool all_empty = 1;
     petrov::LIter<std::pair<std::string, petrov::List<int>>> check_empty = list_for_sol.begin();
     while (check_empty != list_for_sol.end())
     {
-      if (!check_empty->second.IsEmpty()) { all_empty = false; break; }
+      if (!check_empty->second.IsEmpty()) { all_empty = 0; break; }
       ++check_empty;
     }
 
@@ -106,10 +106,10 @@ int main()
     }
 
     petrov::List<int> sums;
-    while (true)
+    while (1)
     {
       int current_row_sum = 0;
-      bool isleft = false;
+      bool isleft = 0;
       petrov::List<int> curRows;
 
       petrov::LIter<petrov::LIter<int>> its_it = iters.begin();
@@ -123,7 +123,7 @@ int main()
           curRows.push_back(val);
           current_row_sum = sum(current_row_sum, val);
           ++(*its_it);
-          isleft = true;
+          isleft = 1;
         }
         ++its_it;
         ++data_it;
