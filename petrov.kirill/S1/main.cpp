@@ -63,11 +63,11 @@ int main()
   }
   std::cout << '\n';
 
-  bool all_empty = true;
+  bool all_empty = 1;
   petrov::LIter<std::pair<std::string, petrov::List<int>>> check_empty = list_for_sol.begin();
   while (check_empty != list_for_sol.end())
   {
-    if (!check_empty->second.IsEmpty()) { all_empty = false; break; }
+    if (!check_empty->second.IsEmpty()) { all_empty = 0; break; }
     ++check_empty;
   }
 
@@ -88,12 +88,12 @@ int main()
   petrov::List<int> sums;
   try
   {
-    while (true)
+    while (1)
     {
       int current_row_sum = 0;
-      bool isleft = false;
+      bool isleft = 0;
       petrov::List<int> curRows;
-      
+
       petrov::LIter<petrov::LIter<int>> its_it = iters.begin();
       petrov::LIter<std::pair<std::string, petrov::List<int>>> data_it = list_for_sol.begin();
 
@@ -105,7 +105,7 @@ int main()
           curRows.push_back(val);
           current_row_sum = sum(current_row_sum, val);
           ++(*its_it);
-          isleft = true;
+          isleft = 1;
         }
         ++its_it;
         ++data_it;
@@ -140,3 +140,4 @@ int main()
 
   return 0;
 }
+
