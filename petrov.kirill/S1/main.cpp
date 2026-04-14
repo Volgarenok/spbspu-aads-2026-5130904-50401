@@ -18,9 +18,9 @@ int main()
     {
       count_nums.push_back(t);
     }
-    
+
     list_for_sol.push_back(std::make_pair(name, std::move(count_nums)));
-    
+
     if (std::cin.bad())
     {
       return 1;
