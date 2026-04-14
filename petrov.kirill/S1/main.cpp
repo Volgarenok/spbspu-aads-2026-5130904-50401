@@ -50,7 +50,6 @@ int main()
 
         try
         {
-          // Простейшая проверка длины, чтобы stoll не выкинул out_of_range
           if (raw_val.length() > 19 || (raw_val.length() > 0 && raw_val[0] != '-' && raw_val.length() >= 11))
           {
             is_ovf = 1;
@@ -91,7 +90,6 @@ int main()
       return 0;
     }
 
-    // ВЫВОД ИМЕН (Stdout)
     petrov::LIter<std::pair<std::string, petrov::List<int>>> q_names = list_for_sol.begin();
     while (q_names != list_for_sol.end())
     {
@@ -104,7 +102,6 @@ int main()
     }
     std::cout << '\n';
 
-    // ЗДЕСЬ КРИЧИМ ПРО ОШИБКУ ЧТЕНИЯ (Stderr)
     if (is_ovf)
     {
       std::cerr << "overflow\n";
