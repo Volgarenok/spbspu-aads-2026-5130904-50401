@@ -2,6 +2,7 @@
 #define MATH_OPERATIONS_HPP
 
 #include "queue.hpp"
+#include <limits>
 
 namespace donkeev
 {

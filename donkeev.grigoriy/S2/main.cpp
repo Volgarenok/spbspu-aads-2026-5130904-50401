@@ -2,6 +2,9 @@
 #include <stdexcept>
 #include "math-operations.hpp"
 #include "queue.hpp"
+#include "stack.hpp"
+
+using llint_t = long long int;
 
 int main(int argc, char** argv)
 {
@@ -25,4 +28,8 @@ int main(int argc, char** argv)
   {
     donkeev::readFromTerminal(infixExpression, std::cin);
   }
+
+  donkeev::Stack< llint_t > result;
+
+  
 }
