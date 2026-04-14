@@ -25,7 +25,7 @@ int main()
     {
       return 1;
     }
-    
+
     std::cin.clear();
   }
 
