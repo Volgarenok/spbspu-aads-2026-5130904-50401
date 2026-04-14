@@ -149,8 +149,47 @@ namespace donkeev
       {
         throw std::overflow_error("Subtraction overflow");
       }
+
+      return operand1 - operand2;
     }
-    
+    else if (operation == '*')
+    {
+      if (operand1 != 0 && operand2 != 0)
+      {
+        if ((operand1 > max_llint / operand2) || (operand1 < min_llint / operand2))
+        {
+          throw std::overflow_error("Multiplication overflow");
+        }
+      }
+
+      return operand1 * operand2;
+    }
+    else if (operation == '/')
+    {
+      if (operand2 == 0)
+      {
+        throw std::domain_error("Division by zero");
+      }
+      if (operand1 == min_llint && operand2 == -1)
+      {
+        throw std::overflow_error("Division overflow");
+      }
+
+      return operand1 / operand2;
+    }
+    else if (operation == '%')
+    {
+      if (operand2 == 0)
+      {
+        throw std::domain_error("Modulo by zero");
+      }
+      if (operand1 == std::numeric_limits<llint_t>::min() && operand2 == -1)
+      {
+        throw std::overflow_error("Modulo overflow");
+      }
+
+      return operand1 % operand2;
+    }
   }
   void calculate(Stack< llint_t >& result, Queue< Queue< char > >& expressionsQueue)
   {
@@ -210,14 +249,7 @@ namespace donkeev
               finishQueue.pop();
               llint_t operand1 = finishQueue.front();
               finishQueue.pop();
-              try
-              {
-                finishQueue.push(doOperation(operand1, operand2, test));
-              }
-              catch ()
-              {
-
-              }
+              finishQueue.push(doOperation(operand1, operand2, test));
             }
           }
         }
