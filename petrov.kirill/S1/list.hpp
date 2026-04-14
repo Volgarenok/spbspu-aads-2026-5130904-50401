@@ -10,14 +10,16 @@ namespace petrov
 		T val;
 		node<T>*	next;
 		node<T>*	prev;
+		node(const T& v, node<T>* n = nullptr, node<T>* p = nullptr) : val(v), next(n), prev(p)
+		{}
 	};
-	
+
 	template<class	T>
-	class ListIterator;
-	
+	class LIter;
+
 	template<class T>
-	class ListIteratorConst;
-	
+	class LCIter;
+
 	template<class T>
 	class List
 	{
@@ -30,16 +32,16 @@ namespace petrov
 		List(const List<T>& l);
 		List(List<T>&& l) noexcept;
 		List(size_t s, const T& init);
-		
+
 		List<T>& operator=(List<T>&& l) noexcept;
 		List<T>& operator=(const List<T>& l);
 
 		bool IsEmpty() const noexcept;
 		size_t getSize() const noexcept;
-		ListIterator<T> begin();
-		ListIterator<T> end();
-		ListIteratorConst<T> begin() const;
-		ListIteratorConst<T> end() const;
+		LIter<T> begin();
+		LIter<T> end();
+		LCIter<T> begin() const;
+		LCIter<T> end() const;
 
 		void push_back(const T& d);
 		void push_front(const T& d);
@@ -48,68 +50,68 @@ namespace petrov
 		void clear();
 	};
 	template<class T>
-	class ListIterator
+	class LIter
 	{
 		friend class List<T>;
 		node<T>* cur;
-		ListIterator(node<T>* n);
+		LIter(node<T>* n);
 	public:
-		bool operator==(const ListIterator<T>& i) const;
-		bool operator!=(const ListIterator<T>& i) const;
+		bool operator==(const LIter<T>& i) const;
+		bool operator!=(const LIter<T>& i) const;
 		T& operator*() const;
-		ListIterator<T>& operator++();
-		ListIterator<T>& operator--();
+		LIter<T>& operator++();
+		LIter<T>& operator--();
 		T* operator->() const;
 	};
 
 	template<class T>
-	class ListIteratorConst
+	class LCIter
 	{
 		friend class List<T>;
 		const node<T>* cur;
-		ListIteratorConst(const node<T>* n);
+		LCIter(const node<T>* n);
 	public:
-		bool operator==(const ListIteratorConst<T>& i) const;
-		bool operator!=(const ListIteratorConst<T>& i) const;
+		bool operator==(const LCIter<T>& i) const;
+		bool operator!=(const LCIter<T>& i) const;
 		const T& operator*() const;
-		ListIteratorConst<T>& operator++();
-		ListIteratorConst<T>& operator--();
+		LCIter<T>& operator++();
+		LCIter<T>& operator--();
 		const T* operator->() const;
 	};
-	
+
 	template<class T>
 		List<T>::List():
 		h(nullptr),
 		t(nullptr),
 		s(0)
 	{}
-	
+
 	template<class T>
-	bool ListIteratorConst<T>::operator==(const ListIteratorConst<T>& i) const
+	bool LCIter<T>::operator==(const LCIter<T>& i) const
 	{
 		return !(cur != i.cur);
 	}
-	
+
 	template<class T>
-	bool ListIteratorConst<T>::operator!=(const ListIteratorConst<T>& i) const
+	bool LCIter<T>::operator!=(const LCIter<T>& i) const
 	{
 		return cur != i.cur;
 	}
-	
+
 	template<class T>
-	const T& ListIteratorConst<T>::operator*() const
+	const T& LCIter<T>::operator*() const
 	{
 		return cur->val;
 	}
-	
+
 	template<class T>
-	const T* ListIteratorConst<T>::operator->() const
+	const T* LCIter<T>::operator->() const
 	{
 		return &(cur->val);
 	}
-	
+
 	template<class T>
-	ListIteratorConst<T>& ListIteratorConst<T>::operator++()
+	LCIter<T>& LCIter<T>::operator++()
 	{
 		if (cur != nullptr)
 		{
@@ -117,9 +119,9 @@ namespace petrov
 		}
 		return *this;
 	}
-	
+
 	template<class T>
-	ListIteratorConst<T>& ListIteratorConst<T>::operator--()
+	LCIter<T>& LCIter<T>::operator--()
 	{
 		if (cur != nullptr)
 		{
@@ -127,29 +129,29 @@ namespace petrov
 		}
 		return *this;
 	}
-	
+
 	template<class T>
-	bool ListIterator<T>::operator==(const ListIterator<T>& i) const
+	bool LIter<T>::operator==(const LIter<T>& i) const
 	{
 		return !(cur != i.cur);
 	}
-	
+
 	template<class T>
-	bool ListIterator<T>::operator!=(const ListIterator<T>& i) const
+	bool LIter<T>::operator!=(const LIter<T>& i) const
 	{
 		return cur != i.cur;
 	}
-	
+
 	template<class T>
-	ListIterator<T>::ListIterator(node<T>* n):
+	LIter<T>::LIter(node<T>* n):
 		cur(n)
 	{}
-	
+
 	template<class T>
-	ListIteratorConst<T>::ListIteratorConst(const node<T>* n):
+	LCIter<T>::LCIter(const node<T>* n):
 	cur(n)
 	{}
-	
+
 	template<class T>
 	void List<T>::clear()
 	{
@@ -168,13 +170,13 @@ namespace petrov
 		s = 0;
 		return;
 	}
-	
+
 	template<class T>
 	List<T>::~List()
 	{
 		clear();
 	}
-	
+
 	template<class T>
 	void List<T>::pop_front()
 	{
@@ -186,14 +188,14 @@ namespace petrov
 			if (h == nullptr)
 			{
 				t = nullptr;
-				s = 0; 
+				s = 0;
 				return;
 			}
 			h->prev = nullptr;
 			s--;
 		}
 	}
-	
+
 	template<class T>
 	void List<T>::pop_back()
 	{
@@ -212,75 +214,71 @@ namespace petrov
 			s--;
 		}
 	}
-	
+
 	template<class	T>
 	bool List<T>::IsEmpty() const noexcept
 	{
 		return (!s || h == nullptr);
 	}
-	
+
 	template<class T>
 	size_t List<T>::getSize() const noexcept
 	{
 		return s;
 	}
-	
+
 	template<class T>
 	void List<T>::push_back(const T& d)
 	{
 		if (IsEmpty())
 		{
-			h = new node<T>;
-			h->val = d;
+			h = new petrov::node<T>(d);
 			h->next = nullptr;
 			h->prev = nullptr;
 			t = h;
 			s = 1;
 			return;
 		}
-		t->next = new node<T>;
-		t->next->val = d;
+		t->next = new node<T>(d);
 		t->next->prev = t;
 		t = t->next;
 		t->next = nullptr;
 		s++;
 	}
-	
+
 	template<class T>
 	void List<T>::push_front(const T& d)
 	{
 		if (IsEmpty())
 		{
-			h = new node<T>;
-			h->val = d;
+			h = new node<T>(d);
 			h->next = nullptr;
 			h->prev = nullptr;
 			t = h;
 			s = 1;
 			return;
 		}
-		h->prev = new node<T>;
-		h->prev->val = d;
+		h->prev = new node<T>(d);
 		h->prev->next = h;
 		h = h->prev;
 		h->prev = nullptr;
 		s++;
 	}
-	
+
 	template<class T>
-	ListIterator<T> List<T>::begin()
+	LIter<T> List<T>::begin()
 	{
-		return ListIterator(h);
+		return LIter(h);
 	}
-	
+
 	template<class T>
-	ListIterator<T> List<T>::end()
+	LIter<T> List<T>::end()
 	{
-		return ListIterator<T>(nullptr);
+		return LIter<T>(nullptr);
 	}
-	
+
 	template<class T>
-	ListIterator<T>& ListIterator<T>::operator++()
+	LIter<T>& LIter<T>::operator++()
 	{
 		if (cur != nullptr)
 		{
@@ -288,9 +286,9 @@ namespace petrov
 		}
 		return *this;
 	}
-	
+
 	template<class T>
-	ListIterator<T>& ListIterator<T>::operator--()
+	LIter<T>& LIter<T>::operator--()
 	{
 		if (cur != nullptr)
 		{
@@ -298,19 +296,19 @@ namespace petrov
 		}
 		return *this;
 	}
-	
+
 	template<class T>
-	T&	ListIterator<T>::operator*() const
+	T&	LIter<T>::operator*() const
 	{
 		return cur->val;
 	}
-	
+
 	template<class T>
-	T* ListIterator<T>::operator->() const
+	T* LIter<T>::operator->() const
 	{
 		return &(cur->val);
 	}
-	
+
 	template<class T>
 	List<T>::List(const List<T>& l):
 		h(nullptr),
@@ -324,7 +322,7 @@ namespace petrov
 			nod = nod->next;
 		}
 	}
-	
+
 	template<class T>
 	List<T>& List<T>::operator=(const List<T>& l)
 	{
@@ -340,7 +338,7 @@ namespace petrov
 		}
 		return *this;
 	}
-	
+
 	template<class T>
 	List<T>::List(List<T>&& l) noexcept:
 		h(l.h),
@@ -351,7 +349,7 @@ namespace petrov
 		l.t = nullptr;
 		l.s = 0;
 	}
-	
+
 	template<class T>
 	List<T>& List<T>::operator=(List<T>&& l) noexcept
 	{
@@ -367,7 +365,7 @@ namespace petrov
 		}
 		return *this;
 	}
-	
+
 	template<class T>
 	List<T>::List(size_t s, const T& init):
 		h(nullptr),
@@ -379,17 +377,17 @@ namespace petrov
 			push_back(init);
 		}
 	}
-	
+
 	template<class T>
-	ListIteratorConst<T> List<T>::begin() const
+	LCIter<T> List<T>::begin() const
 	{
-		return ListIteratorConst<T>(h);
+		return LCIter<T>(h);
 	}
-	
+
 	template<class T>
-	ListIteratorConst<T> List<T>::end() const
+	LCIter<T> List<T>::end() const
 	{
-		return ListIteratorConst<T>(nullptr);
+		return LCIter<T>(nullptr);
 	}
 };
 
