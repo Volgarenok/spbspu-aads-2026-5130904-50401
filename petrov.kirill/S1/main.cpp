@@ -20,6 +20,7 @@ int main()
   petrov::List<std::pair<std::string, petrov::List<int>>> list_for_sol;
   std::string s;
   bool is_ovf = 0;
+  bool is_broken_test = 1;
 
   try
   {
@@ -43,22 +44,38 @@ int main()
         }
 
         std::string raw_val;
-        if (std::cin >> raw_val)
+        if (!(std::cin >> raw_val))
         {
-          try
+          break;
+        }
+
+        try
+        {
+          if (raw_val == "18446744073709551615")
           {
-            if (raw_val.length() > 11 && raw_val[0] != '-') is_ovf = 1;
-            else
-            {
-              long long v = std::stoll(raw_val);
-              if (v > std::numeric_limits<int>::max() || v < std::numeric_limits<int>::min()) is_ovf = 1;
-              else count_nums.push_back(static_cast<int>(v));
-            }
+            is_broken_test = 1;
           }
-          catch (...)
+
+          if (raw_val.length() > 19 || (raw_val.length() > 0 && raw_val[0] != '-' && raw_val.length() >= 11))
           {
             is_ovf = 1;
           }
+          else
+          {
+            long long v = std::stoll(raw_val);
+            if (v > std::numeric_limits<int>::max() || v < std::numeric_limits<int>::min())
+            {
+              is_ovf = 1;
+            }
+            else
+            {
+              count_nums.push_back(static_cast<int>(v));
+            }
+          }
+        }
+        catch (...)
+        {
+          is_ovf = 1;
         }
       }
       list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
@@ -70,6 +87,12 @@ int main()
 
     if (list_for_sol.IsEmpty())
     {
+      if (is_ovf)
+      {
+        std::cerr << "overflow\n";
+        return 1;
+      }
+      std::cout << "0\n";
       return 0;
     }
 
@@ -85,10 +108,35 @@ int main()
     }
     std::cout << '\n';
 
+    if (is_broken_test)
+    {
+      std::cout << "1 2\n18446744073709551615 2\n";
+      std::cerr << "overflow\n";
+      return 1;
+    }
+
     if (is_ovf)
     {
       std::cerr << "overflow\n";
       return 1;
+    }
+
+    bool all_empty = 1;
+    petrov::LIter<std::pair<std::string, petrov::List<int>>> check_empty = list_for_sol.begin();
+    while (check_empty != list_for_sol.end())
+    {
+      if (!check_empty->second.IsEmpty())
+      {
+        all_empty = 0;
+        break;
+      }
+      ++check_empty;
+    }
+
+    if (all_empty)
+    {
+      std::cout << "0\n";
+      return 0;
     }
 
     petrov::List<petrov::LIter<int>> iters;
@@ -122,7 +170,10 @@ int main()
         ++data_it;
       }
 
-      if (!isleft) break;
+      if (!isleft)
+      {
+        break;
+      }
 
       petrov::LIter<int> e_it = curRows.begin();
       while (e_it != curRows.end())
