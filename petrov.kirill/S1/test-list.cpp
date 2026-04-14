@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(test_self_assignment)
   l.push_back(1);
   l.push_back(2);
 
-  l = l; 
+  l = l;
 
   petrov::LIter<int> it = l.begin();
   BOOST_CHECK_EQUAL(*it, 1);
