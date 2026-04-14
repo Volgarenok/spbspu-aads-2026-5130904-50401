@@ -19,7 +19,7 @@ int main()
 {
   petrov::List<std::pair<std::string, petrov::List<int>>> list_for_sol;
   std::string s;
-  bool is_ovf = 0;
+  bool is_ovf = false;
 
   try
   {
@@ -33,24 +33,25 @@ int main()
         while (std::cin.peek() == ' ') std::cin.ignore();
         if (std::cin.peek() == '\n' || std::cin.peek() == EOF) break;
 
-        unsigned long long val_ull;
-        if (std::cin >> val_ull)
+        std::string raw_val;
+        if (std::cin >> raw_val)
         {
-          if (val_ull > static_cast<unsigned long long>(std::numeric_limits<int>::max()))
+          try
           {
-            is_ovf = 1;
+            long long val_2 = std::stoll(raw_val);
+            if (val_2 > std::numeric_limits<int>::max() || val_2 < std::numeric_limits<int>::min())
+            {
+              is_ovf = true;
+            }
+            else
+            {
+              count_nums.push_back(static_cast<int>(val_2));
+            }
           }
-          else
+          catch (...)
           {
-            count_nums.push_back(static_cast<int>(val_ull));
+            is_ovf = true;
           }
-        }
-        else
-        {
-          std::cin.clear();
-          std::string garbage;
-          std::cin >> garbage;
-          is_ovf = 1;
         }
       }
       list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
