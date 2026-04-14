@@ -131,7 +131,7 @@ namespace petrov
     return *this;
   }
 
-  t   emplate<class T>
+  template<class T>
   bool LIter<T>::operator==(const LIter<T>& i) const
   {
     return !(cur != i.cur);
@@ -268,7 +268,7 @@ namespace petrov
   template<class T>
   LIter<T> List<T>::begin()
   {
-    return LIter(h);
+    return LIter<T>(h);
   }
 
   template<class T>
