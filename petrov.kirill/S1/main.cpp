@@ -24,7 +24,7 @@ int main()
   while (std::getline(std::cin, line))
   {
     if (line.empty()) continue;
-    
+
     std::stringstream ss(line);
     std::string name;
     if (!(ss >> name)) continue;
