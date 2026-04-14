@@ -2,6 +2,7 @@
 #include <string>
 #include <limits>
 #include <utility>
+#include <stdexcept>
 #include "list.hpp"
 
 int sum(int a, int b)
