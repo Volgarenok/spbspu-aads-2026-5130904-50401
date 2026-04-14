@@ -19,7 +19,7 @@ int main()
 {
   petrov::List<std::pair<std::string, petrov::List<int>>> list_for_sol;
   std::string s;
-  bool is_ovf = false;
+  bool is_ovf = 0;
 
   try
   {
@@ -53,14 +53,14 @@ int main()
           // Простейшая проверка длины, чтобы stoll не выкинул out_of_range
           if (raw_val.length() > 19 || (raw_val.length() > 0 && raw_val[0] != '-' && raw_val.length() >= 11))
           {
-            is_ovf = true;
+            is_ovf = 1;
           }
           else
           {
             long long v = std::stoll(raw_val);
             if (v > std::numeric_limits<int>::max() || v < std::numeric_limits<int>::min())
             {
-              is_ovf = true;
+              is_ovf = 1;
             }
             else
             {
@@ -70,7 +70,7 @@ int main()
         }
         catch (...)
         {
-          is_ovf = true;
+          is_ovf = 1;
         }
       }
       list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
@@ -111,13 +111,13 @@ int main()
       return 1;
     }
 
-    bool all_empty = true;
+    bool all_empty = 1;
     petrov::LIter<std::pair<std::string, petrov::List<int>>> check_empty = list_for_sol.begin();
     while (check_empty != list_for_sol.end())
     {
       if (!check_empty->second.IsEmpty())
       {
-        all_empty = false;
+        all_empty = 0;
         break;
       }
       ++check_empty;
@@ -141,7 +141,7 @@ int main()
     while (1)
     {
       int current_row_sum = 0;
-      bool isleft = false;
+      bool isleft = 0;
       petrov::List<int> curRows;
       petrov::LIter<petrov::LIter<int>> its_it = iters.begin();
       petrov::LIter<std::pair<std::string, petrov::List<int>>> data_it = list_for_sol.begin();
@@ -154,7 +154,7 @@ int main()
           curRows.push_back(val);
           current_row_sum = sum(current_row_sum, val);
           ++(*its_it);
-          isleft = true;
+          isleft = 1;
         }
         ++its_it;
         ++data_it;
