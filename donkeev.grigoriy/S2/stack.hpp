@@ -2,6 +2,7 @@
 #define STACK_HPP
 #include "../common/list.hpp"
 #include <initializer_list>
+#include <stdexcept>
 
 namespace donkeev
 {
@@ -24,7 +25,7 @@ namespace donkeev
     size_t size() const;
     void clear();
 
-    ~Queue() = default;
+    ~Stack() = default;
   };
 
   template< class T >
