@@ -19,6 +19,7 @@ int main()
 {
   petrov::List<std::pair<std::string, petrov::List<int>>> list_for_sol;
   std::string s;
+  bool is_ovf = false;
 
   try
   {
@@ -32,20 +33,21 @@ int main()
         while (std::cin.peek() == ' ') std::cin.ignore();
         if (std::cin.peek() == '\n' || std::cin.peek() == EOF) break;
 
-        long long val_2;
-        if (std::cin >> val_2)
+        unsigned long long val_ull;
+        if (std::cin >> val_ull)
         {
-          if (val_2 > std::numeric_limits<int>::max() || val_2 < std::numeric_limits<int>::min())
+          if (val_ull > static_cast<unsigned long long>(std::numeric_limits<int>::max()))
           {
-            std::cerr << "overflow\n";
-            return 1;
+            is_ovf = true;
           }
-          count_nums.push_back(static_cast<int>(val_2));
+          count_nums.push_back(static_cast<int>(val_ull));
         }
         else
         {
-          std::cerr << "overflow\n";
-          return 1;
+          std::cin.clear();
+          std::string trash;
+          std::cin >> trash;
+          is_ovf = true;
         }
       }
       list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
@@ -54,6 +56,11 @@ int main()
 
     if (list_for_sol.IsEmpty())
     {
+      if (is_ovf)
+      {
+        std::cerr << "overflow\n";
+        return 1;
+      }
       std::cout << "0\n";
       return 0;
     }
@@ -66,6 +73,12 @@ int main()
       if (q_names != list_for_sol.end()) std::cout << ' ';
     }
     std::cout << '\n';
+
+    if (is_ovf)
+    {
+      std::cerr << "overflow\n";
+      return 1;
+    }
 
     bool all_empty = 1;
     petrov::LIter<std::pair<std::string, petrov::List<int>>> check_empty = list_for_sol.begin();
