@@ -19,70 +19,76 @@ int main()
   petrov::List<std::pair<std::string, petrov::List<int>>> list_for_sol;
   std::string s;
 
-  while (std::cin >> s)
-  {
-    petrov::List<int> count_nums;
-    while (std::cin.peek() == ' ') std::cin.ignore();
-
-    while (std::cin.peek() != '\n' && std::cin.peek() != EOF)
-    {
-      while (std::cin.peek() == ' ') std::cin.ignore();
-      if (std::cin.peek() == '\n' || std::cin.peek() == EOF) break;
-
-      long long val_2;
-      if (!(std::cin >> val_2)) {
-          std::cerr << "overflow" << std::endl;
-          return 1;
-      }
-      if (val_2 > std::numeric_limits<int>::max() || val_2 < std::numeric_limits<int>::min()) {
-          std::cerr << "overflow" << std::endl;
-          return 1;
-      }
-    }
-    list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
-    if (std::cin.peek() == '\n') std::cin.ignore();
-  }
-
-  if (list_for_sol.IsEmpty())
-  {
-    std::cout << "0\n";
-    return 0;
-  }
-
-  petrov::LIter<std::pair<std::string, petrov::List<int>>> q_names = list_for_sol.begin();
-  while (q_names != list_for_sol.end())
-  {
-    std::cout << q_names->first;
-    ++q_names;
-    if (q_names != list_for_sol.end()) std::cout << ' ';
-  }
-  std::cout << '\n';
-
-  bool all_empty = 1;
-  petrov::LIter<std::pair<std::string, petrov::List<int>>> check_empty = list_for_sol.begin();
-  while (check_empty != list_for_sol.end())
-  {
-    if (!check_empty->second.IsEmpty()) { all_empty = 0; break; }
-    ++check_empty;
-  }
-
-  if (all_empty)
-  {
-    std::cout << "0\n";
-    return 0;
-  }
-
-  petrov::List<petrov::LIter<int>> iters;
-  petrov::LIter<std::pair<std::string, petrov::List<int>>> q_init = list_for_sol.begin();
-  while (q_init != list_for_sol.end())
-  {
-    iters.push_back(q_init->second.begin());
-    ++q_init;
-  }
-
-  petrov::List<int> sums;
   try
   {
+    while (std::cin >> s)
+    {
+      petrov::List<int> count_nums;
+      while (std::cin.peek() == ' ') std::cin.ignore();
+
+      while (std::cin.peek() != '\n' && std::cin.peek() != EOF)
+      {
+        while (std::cin.peek() == ' ') std::cin.ignore();
+        if (std::cin.peek() == '\n' || std::cin.peek() == EOF) break;
+
+        long long val_2;
+        if (std::cin >> val_2)
+        {
+          if (val_2 > std::numeric_limits<int>::max() || val_2 < std::numeric_limits<int>::min())
+          {
+            std::cerr << "overflow\n";
+            return 1;
+          }
+          count_nums.push_back(static_cast<int>(val_2));
+        }
+        else
+        {
+          std::cerr << "overflow\n";
+          return 1;
+        }
+      }
+      list_for_sol.push_back(std::make_pair(s, std::move(count_nums)));
+      if (std::cin.peek() == '\n') std::cin.ignore();
+    }
+
+    if (list_for_sol.IsEmpty())
+    {
+      std::cout << "0\n";
+      return 0;
+    }
+
+    petrov::LIter<std::pair<std::string, petrov::List<int>>> q_names = list_for_sol.begin();
+    while (q_names != list_for_sol.end())
+    {
+      std::cout << q_names->first;
+      ++q_names;
+      if (q_names != list_for_sol.end()) std::cout << ' ';
+    }
+    std::cout << '\n';
+
+    bool all_empty = 1;
+    petrov::LIter<std::pair<std::string, petrov::List<int>>> check_empty = list_for_sol.begin();
+    while (check_empty != list_for_sol.end())
+    {
+      if (!check_empty->second.IsEmpty()) { all_empty = 0; break; }
+      ++check_empty;
+    }
+
+    if (all_empty)
+    {
+      std::cout << "0\n";
+      return 0;
+    }
+
+    petrov::List<petrov::LIter<int>> iters;
+    petrov::LIter<std::pair<std::string, petrov::List<int>>> q_init = list_for_sol.begin();
+    while (q_init != list_for_sol.end())
+    {
+      iters.push_back(q_init->second.begin());
+      ++q_init;
+    }
+
+    petrov::List<int> sums;
     while (1)
     {
       int current_row_sum = 0;
