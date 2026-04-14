@@ -13,7 +13,7 @@ int main()
   {
     petrov::List<unsigned long long> count_nums;
     unsigned long long t = 0;
-    
+
     while (std::cin >> t)
     {
       count_nums.push_back(t);
