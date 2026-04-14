@@ -40,13 +40,16 @@ int main()
           {
             is_ovf = true;
           }
-          count_nums.push_back(static_cast<int>(val_ull));
+          else
+          {
+            count_nums.push_back(static_cast<int>(val_ull));
+          }
         }
         else
         {
           std::cin.clear();
-          std::string trash;
-          std::cin >> trash;
+          std::string garbage;
+          std::cin >> garbage;
           is_ovf = true;
         }
       }
@@ -80,11 +83,11 @@ int main()
       return 1;
     }
 
-    bool all_empty = 1;
+    bool all_empty = true;
     petrov::LIter<std::pair<std::string, petrov::List<int>>> check_empty = list_for_sol.begin();
     while (check_empty != list_for_sol.end())
     {
-      if (!check_empty->second.IsEmpty()) { all_empty = 0; break; }
+      if (!check_empty->second.IsEmpty()) { all_empty = false; break; }
       ++check_empty;
     }
 
@@ -103,10 +106,10 @@ int main()
     }
 
     petrov::List<int> sums;
-    while (1)
+    while (true)
     {
       int current_row_sum = 0;
-      bool isleft = 0;
+      bool isleft = false;
       petrov::List<int> curRows;
 
       petrov::LIter<petrov::LIter<int>> its_it = iters.begin();
@@ -120,7 +123,7 @@ int main()
           curRows.push_back(val);
           current_row_sum = sum(current_row_sum, val);
           ++(*its_it);
-          isleft = 1;
+          isleft = true;
         }
         ++its_it;
         ++data_it;
@@ -138,6 +141,7 @@ int main()
       std::cout << '\n';
       sums.push_back(current_row_sum);
     }
+
     petrov::LIter<int> s_it = sums.begin();
     while (s_it != sums.end())
     {
