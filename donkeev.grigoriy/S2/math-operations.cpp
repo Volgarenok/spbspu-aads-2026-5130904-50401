@@ -337,7 +337,8 @@ namespace donkeev
       out << " " << result.top();
       result.pop();
     }
-
+    out << '\n';
+    
     return out;
   }
 }
