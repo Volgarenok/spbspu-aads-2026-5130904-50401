@@ -190,6 +190,10 @@ namespace donkeev
 
       return operand1 % operand2;
     }
+    else
+    {
+      throw std::invalid_argument("Unknown operator");
+    }
   }
   void calculate(Stack< llint_t >& result, Queue< Queue< char > >& expressionsQueue)
   {
@@ -203,57 +207,98 @@ namespace donkeev
       while (!innerQueue.isEmpty())
       {
         test = innerQueue.front();
+        innerQueue.pop();
+        if (test == ' ')
+        {
+          continue;
+        }
         if (test == '(')
         {
           stack.push(test);
-          innerQueue.pop();
         }
-        else if (test >= '0' && test <= '9')
+        else if (std::isdigit(static_cast<unsigned char>(test)))
         {
           Queue< char > charQueue;
           charQueue.push(test);
-          innerQueue.pop();
-          if (!innerQueue.isEmpty())
+          while (!innerQueue.isEmpty() && std::isdigit(static_cast<unsigned char>(innerQueue.front())))
           {
-            test = innerQueue.front();
-            while (test != ' ' || !innerQueue.isEmpty())
-            {
-              charQueue.push(test);
-              innerQueue.pop();
-            }
-          }
-          else
-          {
-            finishQueue.push(test - '0');
-            result.push(finishQueue.front());
-            break;
+            charQueue.push(innerQueue.front());
+            innerQueue.pop();
           }
           
           llint_t operand;
-          if (isNumber(charQueue, operand))
-          {
-            finishQueue.push(operand);
-          }
-          else
+          if (!isNumber(charQueue, operand))
           {
             throw std::invalid_argument("Invalid expression");
           }
+          finishQueue.push(operand);
         }
         else if (isOperator(test))
         {
-          while (!(getPriority(test) < getPriority(stack.top())))
+          while (!stack.isEmpty() && stack.top() != '(' && getPriority(test) <= getPriority(stack.top()))
           {
-            if (finishQueue.size() == 2)
+            if (finishQueue.size() < 2)
             {
-              llint_t operand2 = finishQueue.front();
-              finishQueue.pop();
-              llint_t operand1 = finishQueue.front();
-              finishQueue.pop();
-              finishQueue.push(doOperation(operand1, operand2, test));
+              throw std::invalid_argument("Invalid expression");
             }
+
+            llint_t operand2 = finishQueue.front();
+            finishQueue.pop();
+            llint_t operand1 = finishQueue.front();
+            finishQueue.pop();
+            finishQueue.push(doOperation(operand1, operand2, stack.top()));
+            stack.pop();
           }
+
+          stack.push(test);
+        }
+        else if (test == ')')
+        {
+          while(!stack.isEmpty() && stack.top() != '(')
+          {
+            if (finishQueue.size() < 2)
+            {
+              throw std::invalid_argument("Invalid expression");
+            }
+
+            llint_t operand2 = finishQueue.front();
+            finishQueue.pop();
+            llint_t operand1 = finishQueue.front();
+            finishQueue.pop();
+            finishQueue.push(doOperation(operand1, operand2, stack.top()));
+            stack.pop();
+          }
+
+          stack.pop();
+        }
+        else
+        {
+          throw std::invalid_argument("Invalid expression");
         }
       }
+
+      while (!stack.isEmpty())
+      {
+        if (finishQueue.size() < 2)
+        {
+          throw std::invalid_argument("Invalid expression");
+        }
+
+        llint_t operand2 = finishQueue.front();
+        finishQueue.pop();
+        llint_t operand1 = finishQueue.front();
+        finishQueue.pop();
+        finishQueue.push(doOperation(operand1, operand2, stack.top()));
+        stack.pop();
+      }
+
+      if (finishQueue.size() != 1)
+      {
+        throw std::invalid_argument("Invalid expression");
+      }
+
+      result.push(finishQueue.front());
+      expressionsQueue.pop();
     }
   }
 }

@@ -60,7 +60,7 @@ namespace donkeev
     {
       throw std::underflow_error("Empty queue");
     }
-    return *list_.begin;
+    return *list_.begin();
   }
   template< class T >
   const T& Stack< T >::top() const
