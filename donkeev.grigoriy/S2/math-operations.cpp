@@ -338,7 +338,7 @@ namespace donkeev
       result.pop();
     }
     out << '\n';
-    
+
     return out;
   }
 }
