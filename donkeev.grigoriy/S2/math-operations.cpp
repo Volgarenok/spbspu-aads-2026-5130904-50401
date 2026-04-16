@@ -223,8 +223,8 @@ namespace donkeev
     while (!expressionsQueue.isEmpty())
     {
       Queue< char > innerQueue = expressionsQueue.front();
-      Stack< char > stack;
-      Queue< llint_t > finishQueue;
+      Stack< char > operatorStack;
+      Stack< llint_t > finishStack;
 
       char test;
       while (!innerQueue.isEmpty())
@@ -237,7 +237,7 @@ namespace donkeev
         }
         if (test == '(')
         {
-          stack.push(test);
+          operatorStack.push(test);
         }
         else if (std::isdigit(static_cast<unsigned char>(test)))
         {
@@ -254,45 +254,45 @@ namespace donkeev
           {
             throw std::invalid_argument("Invalid expression");
           }
-          finishQueue.push(operand);
+          finishStack.push(operand);
         }
         else if (isOperator(test))
         {
-          while (!stack.isEmpty() && stack.top() != '(' && getPriority(test) <= getPriority(stack.top()))
+          while (!operatorStack.isEmpty() && operatorStack.top() != '(' && getPriority(test) <= getPriority(operatorStack.top()))
           {
-            if (finishQueue.size() < 2)
+            if (finishStack.size() < 2)
             {
               throw std::invalid_argument("Invalid expression");
             }
 
-            llint_t operand2 = finishQueue.front();
-            finishQueue.pop();
-            llint_t operand1 = finishQueue.front();
-            finishQueue.pop();
-            finishQueue.push(doOperation(operand1, operand2, stack.top()));
-            stack.pop();
+            llint_t operand2 = finishStack.top();
+            finishStack.pop();
+            llint_t operand1 = finishStack.top();
+            finishStack.pop();
+            finishStack.push(doOperation(operand1, operand2, operatorStack.top()));
+            operatorStack.pop();
           }
 
-          stack.push(test);
+          operatorStack.push(test);
         }
         else if (test == ')')
         {
-          while(!stack.isEmpty() && stack.top() != '(')
+          while(!operatorStack.isEmpty() && operatorStack.top() != '(')
           {
-            if (finishQueue.size() < 2)
+            if (finishStack.size() < 2)
             {
               throw std::invalid_argument("Invalid expression");
             }
 
-            llint_t operand2 = finishQueue.front();
-            finishQueue.pop();
-            llint_t operand1 = finishQueue.front();
-            finishQueue.pop();
-            finishQueue.push(doOperation(operand1, operand2, stack.top()));
-            stack.pop();
+            llint_t operand2 = finishStack.top();
+            finishStack.pop();
+            llint_t operand1 = finishStack.top();
+            finishStack.pop();
+            finishStack.push(doOperation(operand1, operand2, operatorStack.top()));
+            operatorStack.pop();
           }
 
-          stack.pop();
+          operatorStack.pop();
         }
         else
         {
@@ -300,27 +300,27 @@ namespace donkeev
         }
       }
 
-      while (!stack.isEmpty())
+      while (!operatorStack.isEmpty())
       {
-        if (finishQueue.size() < 2)
+        if (finishStack.size() < 2)
         {
           throw std::invalid_argument("Invalid expression");
         }
 
-        llint_t operand2 = finishQueue.front();
-        finishQueue.pop();
-        llint_t operand1 = finishQueue.front();
-        finishQueue.pop();
-        finishQueue.push(doOperation(operand1, operand2, stack.top()));
-        stack.pop();
+        llint_t operand2 = finishStack.top();
+        finishStack.pop();
+        llint_t operand1 = finishStack.top();
+        finishStack.pop();
+        finishStack.push(doOperation(operand1, operand2, operatorStack.top()));
+        operatorStack.pop();
       }
 
-      if (finishQueue.size() != 1)
+      if (finishStack.size() != 1)
       {
         throw std::invalid_argument("Invalid expression");
       }
 
-      result.push(finishQueue.front());
+      result.push(finishStack.top());
       expressionsQueue.pop();
     }
   }
