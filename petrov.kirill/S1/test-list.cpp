@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(test_post_increment)
   l.push_back(2);
 
   petrov::LIter<int> i = l.begin();
-  petrov::LIter<int> j = i++;
+  petrov::LIter<int> j = ++i;
 
   BOOST_CHECK_EQUAL(*j, 1);
   BOOST_CHECK_EQUAL(*i, 2);
