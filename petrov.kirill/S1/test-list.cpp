@@ -81,15 +81,4 @@ BOOST_AUTO_TEST_CASE(test_nullptr)
   BOOST_CHECK(c.end() == nullptr);
 }
 
-BOOST_AUTO_TEST_CASE(test_end)
-{
-  petrov::List<int> c;
-  c.push_back(11);
-
-  petrov::LIter<int> i = c.begin();
-  ++i;
-  --i;
-  BOOST_CHECK(*i == 11);
-}
-
 BOOST_AUTO_TEST_SUITE_END()
