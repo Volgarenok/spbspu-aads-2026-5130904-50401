@@ -147,4 +147,64 @@ BOOST_AUTO_TEST_CASE(test_pop_back)
   BOOST_CHECK(++it == l.end());
 }
 
+BOOST_AUTO_TEST_CASE(test_pop_front)
+{
+  petrov::List<int> l;
+  l.push_back(10);
+  l.push_back(20);
+  l.pop_front();
+
+  BOOST_CHECK_EQUAL(*l.begin(), 20);
+  BOOST_CHECK(!l.IsEmpty());
+  l.pop_front();
+  BOOST_CHECK(l.IsEmpty());
+}
+
+BOOST_AUTO_TEST_CASE(test_clear_logic)
+{
+  petrov::List<int> l;
+  l.push_back(1);
+  l.push_back(2);
+  l.push_back(3);
+  l.clear();
+
+  BOOST_CHECK(l.IsEmpty());
+  BOOST_CHECK(l.begin() == l.end());
+}
+
+BOOST_AUTO_TEST_CASE(test_arrow_operator)
+{
+  struct Point { int x, y; };
+  petrov::List<Point> l;
+  Point p = {10, 20};
+  l.push_back(p);
+
+  petrov::LIter<Point> it = l.begin();
+  BOOST_CHECK_EQUAL(it->x, 10);
+  BOOST_CHECK_EQUAL(it->y, 20);
+}
+
+BOOST_AUTO_TEST_CASE(test_self_assignment)
+{
+  petrov::List<int> l;
+  l.push_back(42);
+  l = l;
+
+  BOOST_CHECK_EQUAL(*l.begin(), 42);
+  BOOST_CHECK(!l.IsEmpty());
+}
+
+BOOST_AUTO_TEST_CASE(test_post_increment)
+{
+  petrov::List<int> l;
+  l.push_back(1);
+  l.push_back(2);
+
+  petrov::LIter<int> i = l.begin();
+  petrov::LIter<int> j = i++;
+
+  BOOST_CHECK_EQUAL(*j, 1);
+  BOOST_CHECK_EQUAL(*i, 2);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
