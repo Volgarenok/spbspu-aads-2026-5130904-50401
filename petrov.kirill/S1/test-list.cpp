@@ -20,4 +20,23 @@ BOOST_AUTO_TEST_CASE(test_isempty)
   BOOST_CHECK_EQUAL(1, c.IsEmpty());
 }
 
+BOOST_AUTO_TEST_CASE(test_empty_plus_elems)
+{
+  petrov::List<int> c;
+  c.push_back(5);
+
+  BOOST_CHECK(!c.IsEmpty());
+}
+
+BOOST_AUTO_TEST_CASE(test_push_front)
+{
+  petrov::List<int> c;
+  c.push_front(73);
+  c.push_front(37);
+
+  petrov::LIter<int> i = c.begin();
+  BOOST_CHECK_EQUAL(*i, 37);
+  BOOST_CHECK_EQUAL(*(++i), 73);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
