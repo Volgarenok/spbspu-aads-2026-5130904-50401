@@ -16,7 +16,7 @@ namespace donkeev
 
     void push(const T&);
     void pop();
-    
+
     T& front();
     const T& front() const;
 

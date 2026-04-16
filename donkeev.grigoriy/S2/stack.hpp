@@ -10,7 +10,7 @@ namespace donkeev
   class Stack
   {
     List< T > list_;
-  
+
   public:
     Stack() = default;
     explicit Stack(std::initializer_list< T >);

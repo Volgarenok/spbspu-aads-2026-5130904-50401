@@ -107,7 +107,7 @@ namespace donkeev
   {
     operand = 0;
     Queue<char> temp = q;
-    
+
     while (!temp.isEmpty())
     {
       char ch = temp.front();
@@ -248,7 +248,7 @@ namespace donkeev
             charQueue.push(innerQueue.front());
             innerQueue.pop();
           }
-          
+
           llint_t operand;
           if (!isNumber(charQueue, operand))
           {
