@@ -1,5 +1,6 @@
 #include <fstream>
 #include <limits>
+#include <iomanip>
 #include "stack.hpp"
 #include "queue.hpp"
 
@@ -15,6 +16,12 @@ namespace donkeev
       throw std::runtime_error("Can't open the file");
     }
 
+    bool isSkipws = input.flags() & std::ios_base::skipws;
+    if (isSkipws)
+    {
+      input >> std::noskipws;
+    }
+
     char test;
     while (input >> test)
     {
@@ -45,9 +52,20 @@ namespace donkeev
 
       expressionsQueue.push(symbolsQueue);
     }
+
+    if(isSkipws)
+    {
+      input >> std::skipws;
+    }
   }
   void readFromTerminal(Queue< Queue< char > >& expressionsQueue, std::istream& input)
   {
+    bool isSkipws = input.flags() & std::ios_base::skipws;
+    if (isSkipws)
+    {
+      input >> std::noskipws;
+    }
+
     char test;
     while (input >> test)
     {
@@ -77,6 +95,11 @@ namespace donkeev
       }
 
       expressionsQueue.push(symbolsQueue);
+    }
+
+    if(isSkipws)
+    {
+      input >> std::skipws;
     }
   }
 
@@ -300,5 +323,21 @@ namespace donkeev
       result.push(finishQueue.front());
       expressionsQueue.pop();
     }
+  }
+
+  std::ostream& printResult(Stack< llint_t >& result, std::ostream& out)
+  {
+    if (!result.isEmpty())
+    {
+      out << result.top();
+      result.pop();
+    }
+    while (!result.isEmpty())
+    {
+      out << " " << result.top();
+      result.pop();
+    }
+
+    return out;
   }
 }

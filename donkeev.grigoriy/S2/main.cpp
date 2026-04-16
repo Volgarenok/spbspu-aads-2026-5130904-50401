@@ -31,5 +31,7 @@ int main(int argc, char** argv)
 
   donkeev::Stack< llint_t > result;
 
-  
+  donkeev::calculate(result, infixExpression);
+
+  donkeev::printResult(result, std::cout);
 }

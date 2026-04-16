@@ -114,6 +114,10 @@ namespace donkeev
   void List< T >::pushFront(const T& value)
   {
     Node < T >* tmp = new Node< T >{value, head_};
+    if (length_ == 0)
+    {
+      tail_ = tmp;
+    }
     head_ = tmp;
     tail_->next = head_;
     ++length_;
