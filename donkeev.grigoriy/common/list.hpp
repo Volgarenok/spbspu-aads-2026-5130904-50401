@@ -147,7 +147,7 @@ namespace donkeev
     {
       delete head_;
       head_ = nullptr;
-      tail = nullptr;
+      tail_ = nullptr;
       --length_;
       return;
     }
