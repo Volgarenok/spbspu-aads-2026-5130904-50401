@@ -143,6 +143,14 @@ namespace donkeev
   template< class T >
   void List< T >::popFront()
   {
+    if (length_ == 1)
+    {
+      delete head_;
+      head_ = nullptr;
+      tail = nullptr;
+      --length_;
+      return;
+    }
     Node< T >* tmp = head_->next;
     delete head_;
     head_ = tmp;
