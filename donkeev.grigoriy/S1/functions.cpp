@@ -134,7 +134,7 @@ namespace donkeev
       }
 
       delete [] sumArray;
-      
+
       throw std::overflow_error("Sum of elements is overflow");
     }
     size_t iterationCount = 0;
