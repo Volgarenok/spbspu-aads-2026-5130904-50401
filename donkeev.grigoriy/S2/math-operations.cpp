@@ -211,7 +211,12 @@ namespace donkeev
         throw std::overflow_error("Modulo overflow");
       }
 
-      return operand1 % operand2;
+      llint_t result = operand1 % operand2;
+      if (result < 0)
+      {
+        result += operand2;
+      }
+      return result;
     }
     else
     {
