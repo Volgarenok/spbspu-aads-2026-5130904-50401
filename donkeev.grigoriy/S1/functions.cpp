@@ -87,10 +87,6 @@ namespace donkeev
       output << "0" << "\n";
       return;
     }
-    if (checkOnOverflow(data))
-    {
-      throw std::overflow_error("Sum of elements is overflow");
-    }
     size_t maximumIteration = getMaxSize(data);
     size_t* sumArray = nullptr;
     if (maximumIteration)
@@ -107,6 +103,37 @@ namespace donkeev
       outIt++;
     }
     output << "\n";
+    if (checkOnOverflow(data))
+    {
+      size_t iterationCount = 0;
+      while (iterationCount < maximumIteration)
+      {
+        outIt = data.cbegin();
+        bool firstPrint = true;
+        for (size_t i = 0; i < data.size(); ++i)
+        {
+          LCIter< size_t > innerIt = outIt->second.cbegin();
+          if (outIt->second.size() > iterationCount)
+          {
+            if (firstPrint)
+            {
+              innerIt += iterationCount;
+              output << *innerIt;
+              firstPrint = false;
+            }
+            else
+            {
+              innerIt += iterationCount;
+              output << " " << *innerIt;
+            }
+          }
+          ++outIt;
+        }
+        output << "\n";
+        ++iterationCount;
+      }
+      throw std::overflow_error("Sum of elements is overflow");
+    }
     size_t iterationCount = 0;
     while (iterationCount < maximumIteration)
     {
