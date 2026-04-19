@@ -128,8 +128,8 @@ namespace donkeev
   }
   bool isOperator(const char& ch)
   {
-    const char operators[] = {'+', '-', '*', '/', '%'};
-    const size_t operatorsSize = 5;
+    const char operators[] = {'+', '-', '*', '/', '%', '&'};
+    const size_t operatorsSize = 6;
 
     for (size_t i = 0; i < operatorsSize; ++i)
     {
@@ -147,9 +147,13 @@ namespace donkeev
     {
       return 1;
     }
-    else
+    else if (ch == '*' || ch == '/' || ch == '%')
     {
       return 2;
+    }
+    else
+    {
+      return 0;
     }
   }
   llint_t doOperation(const llint_t& operand1, const llint_t& operand2, const char& operation)
@@ -217,6 +221,14 @@ namespace donkeev
         result += operand2;
       }
       return result;
+    }
+    else if (operation == '&')
+    {
+      if (operand1 < 0 || operand2 < 0)
+      {
+          throw std::invalid_argument("Bitwise AND requires non-negative operands");
+      }
+      return operand1 & operand2;
     }
     else
     {
