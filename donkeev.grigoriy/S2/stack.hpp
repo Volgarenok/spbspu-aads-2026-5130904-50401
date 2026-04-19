@@ -69,7 +69,7 @@ namespace donkeev
     {
       throw std::underflow_error("Empty queue");
     }
-    return *list_.cbegin;
+    return *list_.cbegin();
   }
 
   template< class T >
