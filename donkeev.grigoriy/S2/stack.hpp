@@ -34,7 +34,7 @@ namespace donkeev
   {
     for (auto it = il.begin(); it != il.end(); ++it)
     {
-      list_.popFront(*it);
+      list_.pushFront(*it);
     }
   }
 
