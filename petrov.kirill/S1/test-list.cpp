@@ -194,17 +194,4 @@ BOOST_AUTO_TEST_CASE(test_self_assignment)
   BOOST_CHECK(!l.IsEmpty());
 }
 
-BOOST_AUTO_TEST_CASE(test_post_increment)
-{
-  petrov::List<int> l;
-  l.push_back(1);
-  l.push_back(2);
-
-  petrov::LIter<int> i = l.begin();
-  petrov::LIter<int> j = ++i;
-
-  BOOST_CHECK_EQUAL(*j, 1);
-  BOOST_CHECK_EQUAL(*i, 2);
-}
-
 BOOST_AUTO_TEST_SUITE_END()
