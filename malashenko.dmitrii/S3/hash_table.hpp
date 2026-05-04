@@ -1,20 +1,12 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
 #include <common/list/list.hpp>
-#include <openssl/hmac.h>
 namespace malashenko
 {
-
-  template< class T >
-  class Hash {
-    size_t operator()(const T& key);
-  };
-
   template< class T >
   class Equal {
     bool operator()(const T& lhs, const T& rhs);
   };
-
 
   template< class Key, class Value, class Hash, class Equal >
   class HashTable {
