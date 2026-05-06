@@ -387,6 +387,51 @@ namespace vasyakin
 
     buckets_.swap(tmp);
   }
+
+  template< class Key, class Value, class Hash, class Equal >
+  Value& HashTable< Key, Value, Hash, Equal >::get(const Key& k)
+  {
+    size_t ind = hasher_(k) % buckets_.getSize();
+    auto res = find_node(ind, k);
+
+    if (!res.first)
+    {
+      throw std::out_of_range("Key not found");
+    }
+
+    return res.second->next->val.second;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  const Value& HashTable< Key, Value, Hash, Equal >::get(const Key& k) const
+  {
+    size_t ind = hasher_(k) % buckets_.getSize();
+    auto res = find_node(ind, k);
+
+    if (!res.first)
+    {
+      throw std::out_of_range("Key not found");
+    }
+    return res.second->next->val.second;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  std::pair< bool, vasyakin::Node< std::pair< Key, Value > >* > HashTable< Key, Value, Hash, Equal >::find_node(size_t ind, const Key& key) const
+  {
+    const auto& chain = buckets_[ind];
+    auto prev = chain.get_fake();
+    auto curr = prev->next;
+
+    while (curr != chain.get_fake())
+    {
+      if (equal_(curr->val.first, key))
+      {
+        return {true, prev};
+      }
+      prev = curr; curr = curr->next;
+    }
+    return {false, nullptr};
+  }
 }
 
 #endif
