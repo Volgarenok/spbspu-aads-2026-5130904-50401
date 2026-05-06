@@ -54,7 +54,7 @@ namespace vasyakin
 
   public:
     HashConstIter();
-    HashConstIter(const topit::Vector< ChainType >* buckets, size_t capacity, size_t start_idx);
+    HashConstIter(const vasyakin::Vector< ChainType >* buckets, size_t capacity, size_t start_idx);
 
     HashConstIter& operator++();
     HashConstIter operator++(int);
@@ -81,7 +81,7 @@ namespace vasyakin
 
     using PairType = std::pair< Key, Value >;
     using ChainType = vasyakin::List< PairType >;
-    using BucketsType = topit::Vector< ChainType >;
+    using BucketsType = vasyakin::Vector< ChainType >;
 
   public:
     using Iterator = HashIter< Key, Value, Hash, Equal >;
@@ -225,7 +225,7 @@ namespace vasyakin
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  HashConstIter< Key, Value, Hash, Equal >::HashConstIter(const topit::Vector< ChainType >* buckets, size_t capacity, size_t start_idx):
+  HashConstIter< Key, Value, Hash, Equal >::HashConstIter(const vasyakin::Vector< ChainType >* buckets, size_t capacity, size_t start_idx):
     buckets_(buckets),
     capacity_(capacity),
     bucket_idx_(start_idx),
@@ -252,6 +252,70 @@ namespace vasyakin
     buckets_ = nullptr;
     list_it_ = LCIter< PairType >(nullptr);
     list_end_ = LCIter< PairType >(nullptr);
+  }
+
+    template< class Key, class Value, class Hash, class Equal >
+  HashConstIter< Key, Value, Hash, Equal >& HashConstIter< Key, Value, Hash, Equal >::operator++()
+  {
+    if (!buckets_)
+    {
+      return *this;
+    }
+
+    ++list_it_;
+
+    if (list_it_ != list_end_)
+    {
+      return *this;
+    }
+    ++bucket_idx_;
+    find_valid();
+    return *this;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashConstIter< Key, Value, Hash, Equal > HashConstIter< Key, Value, Hash, Equal >::operator++(int)
+  {
+    HashConstIter tmp = *this;
+    ++(*this);
+    return tmp;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  const typename HashConstIter< Key, Value, Hash, Equal >::PairType& HashConstIter< Key, Value, Hash, Equal >::operator*() const
+  {
+    return *list_it_;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  const typename HashConstIter< Key, Value, Hash, Equal >::PairType* HashConstIter< Key, Value, Hash, Equal >::operator->() const
+  {
+    return &(*list_it_);
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool HashConstIter< Key, Value, Hash, Equal >::operator==(const HashConstIter& other) const
+  {
+    if (!buckets_ && !other.buckets_)
+    {
+      return true;
+    }
+    if (!buckets_ || !other.buckets_)
+    {
+      return false;
+    }
+    if (bucket_idx_ >= capacity_ && other.bucket_idx_ >= other.capacity_)
+    {
+      return true;
+    }
+
+    return bucket_idx_ == other.bucket_idx_ && list_it_ == other.list_it_;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool HashConstIter< Key, Value, Hash, Equal >::operator!=(const HashConstIter& other) const
+  {
+    return !(*this == other);
   }
 }
 
