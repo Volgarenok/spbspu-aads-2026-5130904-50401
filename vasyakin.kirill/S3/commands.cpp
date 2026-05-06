@@ -342,4 +342,142 @@ namespace vasyakin
     }
     out << "<INVALID COMMAND>" << '\n';
   }
+
+  void create(std::istream& in, std::ostream& out, GraphsMap& graphs)
+  {
+    std::string graph_name;
+    if (!(in >> graph_name))
+    {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    if (graphs.has(graph_name))
+    {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    size_t k = 0;
+    char next_char = in.peek();
+    if (next_char != '\n' && next_char != EOF)
+    {
+      if (!(in >> k))
+      {
+        out << "<INVALID COMMAND>\n";
+        return;
+      }
+
+      Graph graph;
+      for (size_t i = 0; i < k; ++i)
+      {
+        std::string vertex;
+        if (!(in >> vertex))
+        {
+          out << "<INVALID COMMAND>\n";
+          return;
+        }
+        graph.addVertex(vertex);
+      }
+      graphs.add(graph_name, std::move(graph));
+    }
+    else
+    {
+      graphs.add(graph_name, Graph{});
+    }
+  }
+
+  void merge(std::istream& in, std::ostream& out, GraphsMap& graphs)
+  {
+    std::string new_graph_name;
+    std::string graph_name1, graph_name2;
+    in >> new_graph_name >> graph_name1 >> graph_name2;
+
+    if (graphs.has(new_graph_name) || !graphs.has(graph_name1) || !graphs.has(graph_name2))
+    {
+      out << "<INVALID COMMAND>" << '\n';
+      return;
+    }
+
+    const Graph& graph1 = graphs.get(graph_name1);
+    const Graph& graph2 = graphs.get(graph_name2);
+    Graph graph;
+
+    auto copy_data = [&](const Graph& src)
+    {
+      for (auto it = src.adj.begin(); it != src.adj.end(); ++it)
+      {
+        const std::string& vertex = it->first;
+        const auto& src_edges = it->second;
+
+        if (!graph.adj.has(vertex))
+        {
+          graph.adj.add(vertex, vasyakin::List< Edge >{});
+        }
+
+        auto& edges = graph.adj.get(vertex);
+        for (auto it = src_edges.begin(); it != src_edges.end(); ++it)
+        {
+          edges.push_back(*it);
+        }
+      }
+    };
+
+    copy_data(graph1);
+    copy_data(graph2);
+
+    graphs.add(new_graph_name, graph);
+  }
+
+  void extract(std::istream& in, std::ostream& out, GraphsMap& graphs)
+  {
+    std::string new_graph_name;
+    std::string old_graph_name;
+    size_t k = 0;
+    in >> new_graph_name >> old_graph_name >> k;
+
+    if (graphs.has(new_graph_name) || !graphs.has(old_graph_name))
+    {
+      out << "<INVALID COMMAND>" << '\n';
+      return;
+    }
+
+    const Graph& old_graph = graphs.get(old_graph_name);
+    Graph new_graph;
+
+    for (size_t i = 0; i < k; ++i)
+    {
+      std::string vertex_name;
+      in >> vertex_name;
+
+      if (!in || !old_graph.adj.has(vertex_name))
+      {
+        out << "<INVALID COMMAND>" << '\n';
+        return;
+      }
+
+      new_graph.addVertex(vertex_name);
+    }
+
+    for (auto it = old_graph.adj.begin(); it != old_graph.adj.end(); ++it)
+    {
+      const std::string& vertex_name = it->first;
+
+      if (!new_graph.adj.has(vertex_name))
+      {
+        continue;
+      }
+
+      const vasyakin::List< Edge >& edges = it->second;
+
+      for (auto it = edges.begin(); it != edges.end(); ++it)
+      {
+        if (new_graph.adj.has(it->to))
+        {
+          new_graph.adj.get(vertex_name).push_back(*it);
+        }
+      }
+    }
+    graphs.add(new_graph_name, std::move(new_graph));
+  }
 }
