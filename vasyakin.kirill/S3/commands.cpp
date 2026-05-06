@@ -68,7 +68,7 @@ namespace vasyakin
   {
     std::string graph_name;
     in >> graph_name;
-    
+
     if (!graphs.has(graph_name))
     {
       out << "<INVALID COMMAND>" << '\n';
@@ -239,7 +239,7 @@ namespace vasyakin
     std::string vertex_name_to;
     size_t w = 0;
     in >> graph_name >> vertex_name >> vertex_name_to >> w;
-    
+
     if (!graphs.has(graph_name))
     {
       out << "<INVALID COMMAND>" << '\n';
@@ -252,7 +252,7 @@ namespace vasyakin
     {
       graph.adj.add(vertex_name_to, vasyakin::List< Edge >{});
     }
-    
+
     if (graph.adj.has(vertex_name))
     {
       graph.adj.get(vertex_name).push_back({vertex_name_to, w});
@@ -297,7 +297,7 @@ namespace vasyakin
         if (vertex_from_exists) break;
       }
     }
-  
+
     bool vertex_to_exists = graph.adj.has(vertex_name_to);
     if (!vertex_to_exists)
     {
@@ -317,7 +317,7 @@ namespace vasyakin
         }
       }
     }
-  
+
     if (!vertex_from_exists || !vertex_to_exists)
     {
       out << "<INVALID COMMAND>" << '\n';

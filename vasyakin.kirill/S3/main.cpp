@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     std::cerr << "Error: cannot open file '" << argv[1] << "'\n";
     return 1;
   }
-  
+
   vasyakin::GraphsMap graphs(16);
   std::string graph_name;
   size_t edge_count = 0;
@@ -61,7 +61,6 @@ int main(int argc, char* argv[])
   cmds.add("merge", vasyakin::merge);
   cmds.add("extract", vasyakin::extract);
 
-  
   std::string cmd;
   while (std::cin >> cmd)
   {

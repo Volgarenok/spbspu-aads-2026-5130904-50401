@@ -15,7 +15,7 @@ namespace vasyakin
 
     template< class U >
     VectorIterator(const VectorIterator< U >& other) noexcept;
-    
+
     T& operator*() const noexcept;
     T* operator->() const noexcept;
     T& operator[](std::ptrdiff_t i) const noexcept;

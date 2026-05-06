@@ -226,7 +226,8 @@ namespace vasyakin
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  HashConstIter< Key, Value, Hash, Equal >::HashConstIter(const vasyakin::Vector< ChainType >* buckets, size_t capacity, size_t start_idx):
+  HashConstIter< Key, Value, Hash, Equal >::HashConstIter
+    (const vasyakin::Vector< ChainType >* buckets, size_t capacity, size_t start_idx):
     buckets_(buckets),
     capacity_(capacity),
     bucket_idx_(start_idx),
@@ -420,7 +421,8 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  std::pair< bool, vasyakin::Node< std::pair< Key, Value > >* > HashTable< Key, Value, Hash, Equal >::find_node(size_t ind, const Key& key) const
+  std::pair< bool, vasyakin::Node< std::pair< Key, Value > >* >
+    HashTable< Key, Value, Hash, Equal >::find_node(size_t ind, const Key& key) const
   {
     const auto& chain = buckets_[ind];
     auto prev = chain.get_fake();
