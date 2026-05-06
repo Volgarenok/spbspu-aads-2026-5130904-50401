@@ -36,6 +36,7 @@ namespace vasyakin
     {
       size_t h1 = (*this)(p.first);
       boost::hash_combine(h1, p.second);
+
       return h1;
     }
 

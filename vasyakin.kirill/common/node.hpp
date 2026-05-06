@@ -18,6 +18,8 @@ namespace vasyakin
     friend class List< T >;
     friend class LIter< T >;
     friend class LCIter< T >;
+    template <class, class, class, class>
+    friend class HashTable;
 
   public:
     explicit Node(const T& value);
