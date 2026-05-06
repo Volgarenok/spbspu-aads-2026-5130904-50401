@@ -38,8 +38,12 @@ namespace vasyakin
 
     void swap(List& other) noexcept;
     size_t get_size() const;
-    Node< T >* get_fake();
+    Node< T >* get_fake() const;
     Node< T >* get_first() const;
+
+    template< class P >
+    bool erase_if(P p);
+
     void clear();
   };
 
@@ -252,7 +256,7 @@ namespace vasyakin
   }
 
   template< class T >
-  Node< T >* List< T >::get_fake()
+  Node< T >* List< T >::get_fake() const
   {
     return fake_node;
   }
@@ -261,6 +265,31 @@ namespace vasyakin
   Node< T >* List< T >::get_first() const
   {
     return fake_node->next;
+  }
+
+  template< class T >
+  template< class P >
+  bool List< T >::erase_if(P p)
+  {
+    bool was_erased = false;
+    Node< T >* prev = fake_node;
+    Node< T >* curr = prev->next;
+
+    while (curr != fake_node)
+    {
+      if (p(curr->val))
+      {
+        erase(prev);
+        curr = prev->next;
+        was_erased = true;
+      }
+      else
+      {
+        prev = curr;
+        curr = curr->next;
+      }
+    }
+    return was_erased;
   }
 }
 
