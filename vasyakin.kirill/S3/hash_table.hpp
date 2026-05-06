@@ -167,6 +167,7 @@ namespace vasyakin
 
     ++bucket_idx_;
     find_valid();
+
     return *this;
   }
 
@@ -270,6 +271,7 @@ namespace vasyakin
     }
     ++bucket_idx_;
     find_valid();
+
     return *this;
   }
 
@@ -358,6 +360,7 @@ namespace vasyakin
     Value val = std::move(res.second->next->val.second);
     buckets_[ind].erase(res.second->next);
     --size_;
+
     return val;
   }
 
@@ -412,6 +415,7 @@ namespace vasyakin
     {
       throw std::out_of_range("Key not found");
     }
+
     return res.second->next->val.second;
   }
 
@@ -430,6 +434,7 @@ namespace vasyakin
       }
       prev = curr; curr = curr->next;
     }
+
     return {false, nullptr};
   }
 
