@@ -214,6 +214,45 @@ namespace vasyakin
   {
     return !(*this == other);
   }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashConstIter< Key, Value, Hash, Equal >::HashConstIter():
+    buckets_(nullptr),
+    capacity_(0),
+    bucket_idx_(0),
+    list_it_(nullptr),
+    list_end_(nullptr)
+  {}
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashConstIter< Key, Value, Hash, Equal >::HashConstIter(const topit::Vector< ChainType >* buckets, size_t capacity, size_t start_idx):
+    buckets_(buckets),
+    capacity_(capacity),
+    bucket_idx_(start_idx),
+    list_it_(nullptr),
+    list_end_(nullptr)
+  {
+    find_valid();
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void HashConstIter< Key, Value, Hash, Equal >::find_valid()
+  {
+    while (bucket_idx_ < capacity_)
+    {
+      list_it_ = (*buckets_)[bucket_idx_].begin();
+      list_end_ = (*buckets_)[bucket_idx_].end();
+
+      if (list_it_ != list_end_)
+      {
+        return;
+      }
+      ++bucket_idx_;
+    }
+    buckets_ = nullptr;
+    list_it_ = LCIter< PairType >(nullptr);
+    list_end_ = LCIter< PairType >(nullptr);
+  }
 }
 
 #endif
