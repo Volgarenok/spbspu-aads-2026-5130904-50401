@@ -5,15 +5,16 @@
 namespace vasyakin
 {
   template < class T > class List;
+
   template< class T >
   class LIter
   {
   private:
     friend class List< T >;
     Node< T >* ptr;
-    explicit LIter(Node< T >* p);
 
   public:
+    explicit LIter(Node< T >* p);
     T& operator*() const;
     T* operator->() const;
     LIter& operator++();
@@ -29,10 +30,10 @@ namespace vasyakin
   private:
     friend class List< T >;
     const Node< T >* ptr;
-    explicit LCIter(const Node< T >* p);
-    explicit LCIter(const LIter< T >& it);
 
   public:
+    explicit LCIter(const Node< T >* p);
+    explicit LCIter(const LIter< T >& it);
     const T& operator*() const;
     const T* operator->() const;
     LCIter& operator++();

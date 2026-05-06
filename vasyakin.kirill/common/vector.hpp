@@ -6,7 +6,7 @@
 #include <new>
 #include <algorithm>
 #include <initializer_list>
-#include "VIter.hpp"
+#include "viter.hpp"
 
 namespace vasyakin
 {
