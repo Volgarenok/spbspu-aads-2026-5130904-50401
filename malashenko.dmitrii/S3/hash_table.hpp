@@ -1,39 +1,50 @@
 #ifndef HASH_TABLE
 #define HASH_TABLE
-#include <common/list/list.hpp>
+#include <list/list.hpp>
+#include "hash_table_iter.hpp"
 namespace malashenko
 {
-
+  template< class Key, class Value, class Hash, class Equal >
+  class HashTableIter;
   template< class T >
-  class Equal {
+  struct Equal {
     bool operator()(const T& lhs, const T& rhs);
   };
 
   template< class Key, class Value, class Hash, class Equal >
   class HashTable {
   public:
-    using hashTable_t = HashTable<Key, Value, Hash, Equal>;
+    using ht_t = HashTable<Key, Value, Hash, Equal>;
+    using htIter_t = HashTableIter<Key, Value, Hash, Equal>;
     HashTable();
     HashTable(const size_t& size);
-    HashTable(const hashTable_t& rhs);
-    HashTable(hashTable_t&& rhs);
-    hashTable_t& operator=(const hashTable_t& rhs);
-    hashTable_t& operator=(hashTable_t&& rhs);
+    HashTable(const ht_t& rhs);
+    HashTable(ht_t&& rhs);
+    ht_t& operator=(const ht_t& rhs);
+    ht_t& operator=(ht_t&& rhs);
     ~HashTable();
 
     void add(const Key& key, const Value& value);
     Value drop(const Key& key);
 
     bool has(const Key& key) const;
-    Value get(const Key& key) const;
+
+    Value& get(const Key& key);
+    const Value& get(const Key& key) const;
+
     Value& operator[](const Key& key);
     const Value& operator[](const Key& key) const;
+
+    htIter_t begin();
+    htIter_t end();
+
     void rehash(const size_t& newSize);
     size_t size() const noexcept;
-    void swap(hashTable_t& rhs)
+    void swap(ht_t& rhs);
   private:
+    friend class HashTableIter<Key, Value, Hash, Equal>;
     size_t size_;
-    List< std::pair< Key, Value > >* slots_[];
+    List< std::pair< Key, Value > >** slots_;
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -41,23 +52,23 @@ namespace malashenko
   {
     for (size_t i = 0; i < size_; ++i)
     {
-      slots[i].clear();
+      delete slots_[i];
     }
-    delete[] slots;
+    delete[] slots_;
   }
 
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable():
-    slots_(new List< std::pair< Key, Value > >*[1]),
-    size_(1)
+    size_(1),
+    slots_(new List< std::pair< Key, Value > >*[1])
   {
     slots_[0] = nullptr;
   }
 
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable(const size_t& size):
-    slots_(size ? new List< std::pair< Key, Value > >*[size] : nullptr),
-    size_(size)
+    size_(size),
+    slots_(size ? new List< std::pair< Key, Value > >*[size] : nullptr)
   {
     for (size_t i = 0; i < size_; ++i)
     {
@@ -66,8 +77,7 @@ namespace malashenko
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  HashTable< Key, Value, Hash, Equal >::HashTable(const hashTable_t& rhs)
-  {
+  HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(const ht_t& rhs)  {
     if (this == std::addressof(rhs))
     {
       return *this;
@@ -78,7 +88,7 @@ namespace malashenko
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  HashTable<Key, Value, Hash, Equal>::HashTable(hashTable_t&& rhs)
+  HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(ht_t&& rhs)
   {
     if (this == std::addressof(rhs))
     {
@@ -89,14 +99,9 @@ namespace malashenko
     return *this;
   }
 
-  template< class Key, class Value, class Hash, class Equal >
-  HashTable<Key, Value, Hash, Equal>& HashTable<Key, Value, Hash, Equal>::operator=(const hashTable_t& rhs)
-  {
-
-  }
 
   template< class Key, class Value, class Hash, class Equal >
-  void HashTable< class Key, class Value, class Hash, class Equal >::swap(hashTable_t& rhs)
+  void HashTable< Key, Value, Hash, Equal >::swap(ht_t& rhs)
   {
     using std::swap;
     std::swap(slots_, rhs.slots_);
@@ -104,13 +109,13 @@ namespace malashenko
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  size_t HashTable< class Key, class Value, class Hash, class Equal >::size() const noexcept
+  size_t HashTable< Key, Value, Hash, Equal >::size() const noexcept
   {
     return size_;
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  void HashTable< class Key, class Value, class Hash, class Equal >::add(const Key& key, const Value& value)
+  void HashTable< Key, Value, Hash, Equal >::add(const Key& key, const Value& value)
   {
     Hash hasher;
     Equal eq;
@@ -133,7 +138,7 @@ namespace malashenko
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  bool HashTable< class Key, class Value, class Hash, class Equal >::has(const Key& key) const
+  bool HashTable< Key, Value, Hash, Equal >::has(const Key& key) const
   {
     Hash hasher;
     Equal eq;
@@ -152,7 +157,7 @@ namespace malashenko
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value HashTable< class Key, class Value, class Hash, class Equal >::get(const Key& key) const
+  Value& HashTable< Key, Value, Hash, Equal >::get(const Key& key)
   {
 
     Hash hasher;
@@ -174,7 +179,13 @@ namespace malashenko
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value& HashTable< class Key, class Value, class Hash, class Equal >::operator[](const Key& key)
+  const Value& HashTable< Key, Value, Hash, Equal >::get(const Key& key) const
+  {
+    return const_cast< Value& >(static_cast< const HashTable& >(*this).get(key));
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  Value& HashTable< Key, Value, Hash, Equal >::operator[](const Key& key)
   {
     if (!has(key))
     {
@@ -184,9 +195,29 @@ namespace malashenko
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  const Value& HashTable< class Key, class Value, class Hash, class Equal >::operator[](const Key& key) const
+  const Value& HashTable< Key, Value, Hash, Equal >::operator[](const Key& key) const
   {
     return get(key);
+  }
+
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTableIter< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::begin()
+  {
+    for (size_t i = 0; i < size_; ++i)
+    {
+      if (slots_[i] && !slots_[i]->empty())
+      {
+        return htIter_t(this, i, slots_[i]->begin());
+      }
+    }
+    return end();
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTableIter< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::end()
+  {
+    return htIter_t(this, size_, LIter<std::pair<Key, Value>>());
   }
 
 
