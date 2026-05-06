@@ -19,9 +19,6 @@ namespace malashenko
     htIter_t& operator++();
     htIter_t operator++(int);
 
-    htIter_t& operator--();
-    htIter_t operator--(int);
-
     std::pair<Key, Value>& operator*();
     std::pair<Key, Value>* operator->();
 
@@ -67,6 +64,14 @@ namespace malashenko
       ++it_;
     }
     return *this;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTableIter< Key, Value, Hash, Equal > HashTableIter< Key, Value, Hash, Equal >::operator++(int)
+  {
+    HashTableIter< Key, Value, Hash, Equal > tmp(*this);
+    ++(*this);
+    return tmp;
   }
 
   template< class Key, class Value, class Hash, class Equal >

@@ -77,6 +77,25 @@ namespace malashenko
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  HashTable< Key, Value, Hash, Equal >::HashTable(const ht_t& rhs):
+    HashTable(rhs.size_)
+  {
+    for (size_t i = 0; i < size_; ++i)
+    {
+      slots_[i] = rhs.slots_[i] ? new List< Key >(*rhs.slots_[i]) : nullptr;
+    }
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTable< Key, Value, Hash, Equal >::HashTable(ht_t&& rhs):
+    slots_(std::move(rhs.slots_)),
+    size_(std::move(rhs.size_))
+  {
+    rhs.slots_ = nullptr;
+    rhs.size_ = 0;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(const ht_t& rhs)  {
     if (this == std::addressof(rhs))
     {
@@ -159,7 +178,6 @@ namespace malashenko
   template< class Key, class Value, class Hash, class Equal >
   Value& HashTable< Key, Value, Hash, Equal >::get(const Key& key)
   {
-
     Hash hasher;
     Equal eq;
     size_t pos = hasher(key) % size_;
@@ -168,6 +186,7 @@ namespace malashenko
     {
       throw std::invalid_argument("Key not found");
     }
+
     for (LIter< std::pair< Key, Value > > start = slots_[pos]->begin(); start != slots_[pos]->end(); ++start)
     {
       if (eq(start->first, key))
@@ -220,7 +239,41 @@ namespace malashenko
     return htIter_t(this, size_, LIter<std::pair<Key, Value>>());
   }
 
+  template< class Key, class Value, class Hash, class Equal >
+  void HashTable< Key, Value, Hash, Equal >::rehash(const size_t& newSize)
+  {
+    ht_t newTable(newSize);
+    for (htIter_t start = begin(); start != end(); ++start)
+    {
+      newTable.add(start->first, start->second);
+    }
+    swap(newTable);
+  }
 
+  template< class Key, class Value, class Hash, class Equal >
+  Value HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
+  {
+    if (!has(key))
+    {
+      throw std::invalid_argument("Key not found");
+    }
+
+    Hash hasher;
+    Equal eq;
+    size_t pos = hasher(key) % size_;
+
+    Value res = Value();
+    for (LIter< std::pair< Key, Value > > start = slots_[pos]->begin(); start != slots_[pos]->end(); ++start)
+    {
+      if (eq(start->first, key))
+      {
+        res = start->second;
+        slots_[pos]->cut(start);
+        break;
+      }
+    }
+    return res;
+  }
 
   template< class T >
   bool Equal< T >::operator()(const T& lhs, const T& rhs)
