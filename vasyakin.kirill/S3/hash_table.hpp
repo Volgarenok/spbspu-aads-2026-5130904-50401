@@ -72,6 +72,44 @@ namespace vasyakin
 
     void find_valid();
   };
+
+  template< class Key, class Value, class Hash, class Equal >
+  class HashTable
+  {
+    friend class HashIter< Key, Value, Hash, Equal >;
+    friend class HashConstIter< Key, Value, Hash, Equal >;
+
+    using PairType = std::pair< Key, Value >;
+    using ChainType = vasyakin::List< PairType >;
+    using BucketsType = topit::Vector< ChainType >;
+
+  public:
+    using Iterator = HashIter< Key, Value, Hash, Equal >;
+    using const_iterator = HashConstIter< Key, Value, Hash, Equal >;
+
+    explicit HashTable(size_t slots, Hash hasher = Hash{}, Equal equal = Equal{});
+    void add(const Key& key, const Value& v);
+    Value drop(const Key& key);
+    bool has(const Key& key) const;
+    void rehash(size_t slots);
+    Value& get(const Key& k);
+    const Value& get(const Key& k) const;
+
+    Iterator begin();
+    Iterator end();
+    const_iterator begin() const;
+    const_iterator end() const;
+    const_iterator cbegin() const;
+    const_iterator cend() const;
+
+  private:
+    BucketsType buckets_;
+    size_t size_;
+    Hash hasher_;
+    Equal equal_;
+
+    std::pair< bool, vasyakin::Node< PairType >* > find_node(size_t ind, const Key& key) const;
+  };
 }
 
 #endif
