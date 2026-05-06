@@ -150,6 +150,70 @@ namespace vasyakin
     list_end_ = LIter< PairType >(nullptr);
   }
 
+  template< class Key, class Value, class Hash, class Equal >
+  HashIter< Key, Value, Hash, Equal >& HashIter< Key, Value, Hash, Equal >::operator++()
+  {
+    if (!buckets_)
+    {
+      return *this;
+    }
+
+    ++list_it_;
+
+    if (list_it_ != list_end_)
+    {
+      return *this;
+    }
+
+    ++bucket_idx_;
+    find_valid();
+    return *this;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashIter< Key, Value, Hash, Equal > HashIter< Key, Value, Hash, Equal >::operator++(int)
+  {
+    HashIter tmp = *this;
+    ++(*this);
+    return tmp;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  typename HashIter< Key, Value, Hash, Equal >::PairType& HashIter< Key, Value, Hash, Equal >::operator*() const
+  {
+    return *list_it_;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  typename HashIter< Key, Value, Hash, Equal >::PairType* HashIter< Key, Value, Hash, Equal >::operator->() const
+  {
+    return &(*list_it_);
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool HashIter< Key, Value, Hash, Equal >::operator==(const HashIter& other) const
+  {
+    if (!buckets_ && !other.buckets_)
+    {
+      return true;
+    }
+    if (!buckets_ || !other.buckets_)
+    {
+      return false;
+    }
+    if (bucket_idx_ >= capacity_ && other.bucket_idx_ >= other.capacity_)
+    {
+      return true;
+    }
+
+    return bucket_idx_ == other.bucket_idx_ && list_it_ == other.list_it_;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool HashIter< Key, Value, Hash, Equal >::operator!=(const HashIter& other) const
+  {
+    return !(*this == other);
+  }
 }
 
 #endif
