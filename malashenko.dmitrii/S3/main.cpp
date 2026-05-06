@@ -25,10 +25,6 @@ int main()
   ht.drop("b");
   ht.drop("c");
 
-
-
-
-
   for (HashTableIter< std::string, int, HmacHash< std::string >, Equal< std::string > > start = ht.begin(); start != ht.end(); ++start)
   {
     std::cout << start->first << ' ' << start->second << '\n';
