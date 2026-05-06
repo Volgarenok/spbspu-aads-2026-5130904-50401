@@ -25,7 +25,7 @@ namespace vasyakin
 
   public:
     HashIter();
-    HashIter(topit::Vector< ChainType >* buckets, size_t capacity, size_t start_idx);
+    HashIter(vasyakin::Vector< ChainType >* buckets, size_t capacity, size_t start_idx);
 
     HashIter& operator++();
     HashIter operator++(int);
@@ -110,6 +110,46 @@ namespace vasyakin
 
     std::pair< bool, vasyakin::Node< PairType >* > find_node(size_t ind, const Key& key) const;
   };
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashIter< Key, Value, Hash, Equal >::HashIter():
+    buckets_(nullptr),
+    capacity_(0),
+    bucket_idx_(0),
+    list_it_(nullptr),
+    list_end_(nullptr)
+  {}
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashIter< Key, Value, Hash, Equal >::HashIter(vasyakin::Vector< ChainType >* buckets, size_t capacity, size_t start_idx):
+    buckets_(buckets),
+    capacity_(capacity),
+    bucket_idx_(start_idx),
+    list_it_(nullptr),
+    list_end_(nullptr)
+  {
+    find_valid();
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void HashIter< Key, Value, Hash, Equal >::find_valid()
+  {
+    while (bucket_idx_ < capacity_)
+    {
+      list_it_ = (*buckets_)[bucket_idx_].begin();
+      list_end_ = (*buckets_)[bucket_idx_].end();
+      if (list_it_ != list_end_)
+      {
+        return;
+      }
+      ++bucket_idx_;
+    }
+
+    buckets_ = nullptr;
+    list_it_ = LIter< PairType >(nullptr);
+    list_end_ = LIter< PairType >(nullptr);
+  }
+
 }
 
 #endif
