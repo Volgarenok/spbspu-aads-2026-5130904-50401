@@ -317,6 +317,76 @@ namespace vasyakin
   {
     return !(*this == other);
   }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots, Hash hasher, Equal equal):
+    buckets_(slots, ChainType{}),
+    size_(0),
+    hasher_(std::move(hasher)),
+    equal_(std::move(equal))
+  {
+    if (slots == 0)
+    {
+      throw std::invalid_argument("Slots count must be > 0");
+    }
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void HashTable< Key, Value, Hash, Equal >::add(const Key& key, const Value& value)
+  {
+    if (size_ >= buckets_.getSize())
+    {
+      throw std::overflow_error("HashTable overflow");
+    }
+
+    size_t idx = hasher_(key) % buckets_.getSize();
+    buckets_[idx].push_back(std::make_pair(key, value));
+    ++size_;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  Value HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
+  {
+    size_t ind = hasher_(key) % buckets_.getSize();
+    auto res = find_node(ind, key);
+
+    if (!res.first)
+    {
+      throw std::out_of_range("Key not found");
+    }
+
+    Value val = std::move(res.second->next->val.second);
+    buckets_[ind].erase(res.second->next);
+    --size_;
+    return val;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool HashTable< Key, Value, Hash, Equal >::has(const Key& key) const
+  {
+    size_t ind = hasher_(key) % buckets_.getSize();
+    return find_node(ind, key).first;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
+  {
+    if (slots == 0 || slots == buckets_.getSize())
+    {
+      return;
+    }
+
+    BucketsType tmp(slots, ChainType{});
+    for (size_t i = 0; i < buckets_.getSize(); ++i)
+    {
+      for (auto it = buckets_[i].begin(); it != buckets_[i].end(); ++it)
+      {
+        tmp[hasher_(it->first) % slots].push_back(*it);
+      }
+    }
+
+    buckets_.swap(tmp);
+  }
 }
 
 #endif
