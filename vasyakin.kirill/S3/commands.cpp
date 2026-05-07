@@ -128,15 +128,38 @@ namespace vasyakin
     }
 
     const Graph& graph = graphs.get(graph_name);
+
+    bool vertex_exists = graph.adj.has(vertex_name);
+    if (!vertex_exists)
+    {
+      for (auto it = graph.adj.begin(); it != graph.adj.end() && !vertex_exists; ++it)
+      {
+        for (auto eit = it->second.begin(); eit != it->second.end(); ++eit)
+        {
+          if (eit->to == vertex_name) { vertex_exists = true; break; }
+        }
+      }
+    }
+    if (!vertex_exists)
+    {
+     out << "<INVALID COMMAND>" << '\n';
+      return;
+    }
+
     if (!graph.adj.has(vertex_name))
     {
-      out << "<INVALID COMMAND>" << '\n';
+      out << '\n';
       return;
     }
 
     const auto& edges = graph.adj.get(vertex_name);
-    vasyakin::List< OutputLine > lines;
+    if (edges.begin() == edges.end())
+    {
+      out << '\n';
+      return;
+    }
 
+    vasyakin::List< OutputLine > lines;
     for (auto it = edges.begin(); it != edges.end(); ++it)
     {
       bool found = false;
@@ -159,7 +182,6 @@ namespace vasyakin
     }
 
     sort_list(lines, f);
-
     for (auto lit = lines.begin(); lit != lines.end(); ++lit)
     {
       sort_list(lit->weights, g);
@@ -472,7 +494,7 @@ namespace vasyakin
       std::string vertex_name;
       in >> vertex_name;
 
-      if (!in || !old_graph.adj.has(vertex_name))
+      if (!in)
       {
         out << "<INVALID COMMAND>" << '\n';
         return;
