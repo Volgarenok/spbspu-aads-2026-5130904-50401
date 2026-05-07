@@ -56,6 +56,12 @@ namespace vasyakin
       names.push_back(it->first);
     }
 
+    if (names.begin() == names.end())
+    {
+      out << '\n';
+      return;
+    }
+
     sort_list(names, p);
 
     for (auto it = names.begin(); it != names.end(); ++it)
@@ -86,6 +92,12 @@ namespace vasyakin
       {
         vertices.push_back(eit->to);
       }
+    }
+
+    if (vertices.begin() == vertices.end())
+    {
+      out << '\n';
+      return;
     }
 
     sort_list(vertices, p);
@@ -445,12 +457,37 @@ namespace vasyakin
     const Graph& old_graph = graphs.get(old_graph_name);
     Graph new_graph;
 
+    vasyakin::List< std::string > all_vertices;
+    for (auto it = old_graph.adj.begin(); it != old_graph.adj.end(); ++it)
+    {
+      all_vertices.push_back(it->first);
+      for (auto eit = it->second.begin(); eit != it->second.end(); ++eit)
+      {
+        all_vertices.push_back(eit->to);
+      }
+    }
+
     for (size_t i = 0; i < k; ++i)
     {
       std::string vertex_name;
       in >> vertex_name;
 
       if (!in || !old_graph.adj.has(vertex_name))
+      {
+        out << "<INVALID COMMAND>" << '\n';
+        return;
+      }
+
+      bool found = false;
+      for (auto vit = all_vertices.begin(); vit != all_vertices.end(); ++vit)
+      {
+        if (*vit == vertex_name)
+        {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
       {
         out << "<INVALID COMMAND>" << '\n';
         return;
