@@ -337,12 +337,18 @@ namespace vasyakin
   template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::add(const Key& key, const Value& value)
   {
-    if (size_ >= buckets_.getSize())
+    size_t idx = hasher_(key) % buckets_.getSize();
+    auto& bucket = buckets_[idx];
+
+    for (auto it = bucket.begin(); it != bucket.end(); ++it)
     {
-      throw std::overflow_error("HashTable overflow");
+      if (equal_(it->first, key))
+      {
+        it->second = value;
+        return;
+      }
     }
 
-    size_t idx = hasher_(key) % buckets_.getSize();
     buckets_[idx].push_back(std::make_pair(key, value));
     ++size_;
   }
@@ -358,11 +364,13 @@ namespace vasyakin
       throw std::out_of_range("Key not found");
     }
 
-    Value val = std::move(res.second->next->val.second);
-    buckets_[ind].erase(res.second->next);
+    Value extracted_value;
+    std::swap(res.second->next->val.second, extracted_value);
+
+    buckets_[ind].erase(res.second);
     --size_;
 
-    return val;
+    return extracted_value;
   }
 
   template< class Key, class Value, class Hash, class Equal >
