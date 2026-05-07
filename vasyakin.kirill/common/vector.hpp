@@ -376,7 +376,6 @@ T& vasyakin::Vector< T >::at(size_t id)
   return const_cast< T& >(cthis->at(id));
 }
 
-
 template< class T >
 const T& vasyakin::Vector< T >::at(size_t id) const
 {
@@ -482,7 +481,7 @@ void vasyakin::Vector< T >::insert(size_t i, const Vector< T >& rhs, size_t star
   {
     throw std::out_of_range("Too much");
   }
-  
+
   size_t count = end - start;
   if (count == 0)
   {
@@ -507,7 +506,7 @@ void vasyakin::Vector< T >::insert(size_t i, const Vector< T >& rhs, size_t star
   {
     new (&temp.data_[i + j]) T(rhs.data_[start + j]);
   }
-  
+
   temp.size_ += count;
 
   swap(temp);
@@ -602,7 +601,7 @@ void vasyakin::Vector< T >::erase(size_t start, size_t end)
   {
     throw std::out_of_range("Too much");
   }
-  
+
   size_t count = end - start;
   if (count == 0)
   {
@@ -620,7 +619,7 @@ void vasyakin::Vector< T >::erase(size_t start, size_t end)
   {
     new (&temp.data_[j - count]) T(data_[j]);
   }
-  
+
   temp.size_ = size_ - count;
 
   swap(temp);

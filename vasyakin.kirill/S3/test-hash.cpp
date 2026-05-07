@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(test_hmac_determinism)
   vasyakin::HMACHash hasher("my_secret_key");
   size_t h1 = hasher("test_string");
   size_t h2 = hasher("test_string");
-  
+
   BOOST_CHECK_EQUAL(h1, h2);
   BOOST_CHECK(h1 != hasher("another_string"));
 }
