@@ -24,17 +24,17 @@ namespace vasyakin
     vasyakin::List< size_t > weights;
   };
 
-  static inline auto p = [](const std::string& a, const std::string& b)
+  static auto p = [](const std::string& a, const std::string& b)
   {
     return a < b;
   };
 
-  static inline auto f = [](const OutputLine& a, const OutputLine& b)
+  static auto f = [](const OutputLine& a, const OutputLine& b)
   {
     return a.name < b.name;
   };
 
-  static inline auto g = [](size_t a, size_t b)
+  static auto g = [](size_t a, size_t b)
   {
     return a < b;
   };
@@ -48,7 +48,7 @@ namespace vasyakin
     out << '\n';
   }
 
-  void graphs(std::istream& in, std::ostream& out, GraphsMap& graphs)
+  void graphs(std::istream&, std::ostream& out, GraphsMap& graphs)
   {
     vasyakin::List< std::string > names;
     for (auto it = graphs.begin(); it != graphs.end(); ++it)

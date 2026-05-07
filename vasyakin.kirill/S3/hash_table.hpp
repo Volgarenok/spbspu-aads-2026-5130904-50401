@@ -35,7 +35,7 @@ namespace vasyakin
     bool operator!=(const HashIter& other) const;
 
   private:
-    topit::Vector< ChainType >* buckets_;
+    vasyakin::Vector< ChainType >* buckets_;
     size_t capacity_;
     size_t bucket_idx_;
     vasyakin::LIter< PairType > list_it_;
@@ -64,7 +64,7 @@ namespace vasyakin
     bool operator!=(const HashConstIter& other) const;
 
   private:
-    const topit::Vector< ChainType >* buckets_;
+    const vasyakin::Vector< ChainType >* buckets_;
     size_t capacity_;
     size_t bucket_idx_;
     vasyakin::LCIter< PairType > list_it_;
