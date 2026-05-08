@@ -14,29 +14,29 @@ namespace sedov
   {
     ~Vector();
     Vector();
-    Vector(const Vector< T >&);
-    Vector(Vector< T >&&) noexcept;
-    Vector(size_t size, const T& init);
+    Vector(const Vector< T > &);
+    Vector(Vector< T > &&) noexcept;
+    Vector(size_t size, const T & init);
     explicit Vector(std::initializer_list< T > il);
-    Vector< T >& operator=(const Vector< T >&);
-    Vector< T >& operator=(Vector< T >&&) noexcept;
+    Vector< T > & operator=(const Vector< T > &);
+    Vector< T > & operator=(Vector< T > &&) noexcept;
 
-    void swap(Vector< T >& rhs) noexcept;
+    void swap(Vector< T > & rhs) noexcept;
 
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
 
-    T& operator[](size_t id) noexcept;
-    const T& operator[](size_t id) const noexcept;
-    T& at(size_t id);
-    const T& at(size_t id) const;
+    T & operator[](size_t id) noexcept;
+    const T & operator[](size_t id) const noexcept;
+    T & at(size_t id);
+    const T & at(size_t id) const;
 
-    void pushBack(const T& v);
+    void pushBack(const T & v);
     void popBack();
 
-    void insert(size_t i, const T& v);
-    void insert(size_t i, const Vector< T >& rhs, size_t start, size_t end);
+    void insert(size_t i, const T & v);
+    void insert(size_t i, const Vector< T > & rhs, size_t start, size_t end);
     void erase(size_t i);
     void erase(size_t start, size_t count);
 
@@ -47,8 +47,8 @@ namespace sedov
     CIter< T > begin() const noexcept;
     CIter< T > end() const noexcept;
 
-    void insert(CIter< T > it, const T& v);
-    void insert(CIter< T > it, T&& v);
+    void insert(CIter< T > it, const T & v);
+    void insert(CIter< T > it, T && v);
     void insert(CIter< T > i, CIter< T > start, CIter< T > end);
 
     CIter< T > erase(CIter< T > i);
@@ -56,27 +56,23 @@ namespace sedov
     template< class C >
     CIter< T > erase(CIter< T > start, CIter< T > end, C c);
 
-    // Классная работа 30.03.2026
     void reserve(size_t k);
     void shrinkToFit();
-    void pushBackCount(size_t k, const T& v);
+    void pushBackCount(size_t k, const T & v);
     template< class IT >
     void pushBackRange(IT b, size_t c);
-    void unsafePushBack(const T& v);
-
-    // Домашка 30.03.2026
-    // Избавиться от требования конструктора по умолчанию к типа T
+    void unsafePushBack(const T & v);
 
   private:
-    T* data_;
+    T * data_;
     size_t size_, capacity_;
     explicit Vector(size_t size);
     void grow(size_t newCap);
     template< class P >
-    void uniInsert(size_t pos, P&& value);
+    void uniInsert(size_t pos, P && value);
   };
   template< class T >
-  bool operator==(const Vector< T >& lhs, const Vector< T > & rhs);
+  bool operator==(const Vector< T > & lhs, const Vector< T > & rhs);
 }
 
 template< class T >
@@ -108,7 +104,7 @@ sedov::Vector< T >::Vector(const Vector< T > & rhs):
 }
 
 template< class T >
-sedov::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
+sedov::Vector< T >::Vector(Vector< T > && rhs) noexcept:
   data_(rhs.data_),
   size_(rhs.size_),
   capacity_(rhs.capacity_)
@@ -120,13 +116,13 @@ sedov::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
 
 template< class T >
 sedov::Vector< T >::Vector(size_t size):
-  data_(size ? static_cast< T* >(operator new(sizeof(T) * size)) : nullptr),
+  data_(size ? static_cast< T * >(operator new(sizeof(T) * size)) : nullptr),
   size_(size),
   capacity_(size)
 {}
 
 template< class T >
-sedov::Vector< T >::Vector(size_t size, const T& init):
+sedov::Vector< T >::Vector(size_t size, const T & init):
   Vector(size)
 {
   for (size_t i = 0; i < size; ++i)
@@ -149,7 +145,7 @@ sedov::Vector< T >::Vector(std::initializer_list< T > il):
 }
 
 template< class T >
-sedov::Vector< T >& sedov::Vector< T >::operator=(const Vector< T >& rhs)
+sedov::Vector< T > & sedov::Vector< T >::operator=(const Vector< T > & rhs)
 {
   if (this == std::addressof(rhs))
   {
@@ -161,7 +157,7 @@ sedov::Vector< T >& sedov::Vector< T >::operator=(const Vector< T >& rhs)
 }
 
 template< class T >
-sedov::Vector< T >& sedov::Vector< T >::operator=(Vector< T >&& rhs) noexcept
+sedov::Vector< T > & sedov::Vector< T >::operator=(Vector< T > && rhs) noexcept
 {
   if (this == std::addressof(rhs))
   {
@@ -173,7 +169,7 @@ sedov::Vector< T >& sedov::Vector< T >::operator=(Vector< T >&& rhs) noexcept
 }
 
 template< class T >
-void sedov::Vector< T >::swap(Vector< T >& rhs) noexcept
+void sedov::Vector< T >::swap(Vector< T > & rhs) noexcept
 {
   std::swap(data_, rhs.data_);
   std::swap(size_, rhs.size_);
@@ -199,27 +195,27 @@ size_t sedov::Vector< T >::getCapacity() const noexcept
 }
 
 template< class T >
-T& sedov::Vector< T >::operator[](size_t id) noexcept
+T & sedov::Vector< T >::operator[](size_t id) noexcept
 {
-  const Vector< T >* cthis = this;
-  return const_cast< T& >((*cthis)[id]);
+  const Vector< T > * cthis = this;
+  return const_cast< T & >((*cthis)[id]);
 }
 
 template< class T >
-const T& sedov::Vector< T >::operator[](size_t id) const noexcept
+const T & sedov::Vector< T >::operator[](size_t id) const noexcept
 {
   return data_[id];
 }
 
 template< class T >
-T& sedov::Vector< T >::at(size_t id)
+T & sedov::Vector< T >::at(size_t id)
 {
   const Vector< T >* cthis = this;
-  return const_cast< T& >(cthis->at(id));
+  return const_cast< T & >(cthis->at(id));
 }
 
 template< class T >
-const T& sedov::Vector< T >::at(size_t id) const
+const T & sedov::Vector< T >::at(size_t id) const
 {
   if (id < getSize())
   {
@@ -231,7 +227,7 @@ const T& sedov::Vector< T >::at(size_t id) const
 template < class T >
 void sedov::Vector< T >::grow(size_t newCap)
 {
-  T* newData = static_cast< T* >(operator new(sizeof(T) * newCap));
+  T * newData = static_cast< T * >(operator new(sizeof(T) * newCap));
   size_t c = 0;
   try
   {
@@ -260,7 +256,7 @@ void sedov::Vector< T >::grow(size_t newCap)
 }
 
 template< class T >
-void sedov::Vector< T >::pushBack(const T& v)
+void sedov::Vector< T >::pushBack(const T & v)
 {
   Vector< T > t = *this;
   if (t.size_ == t.capacity_)
@@ -284,7 +280,7 @@ void sedov::Vector< T >::popBack()
 }
 
 template< class T >
-void sedov::Vector< T >::insert(size_t i, const T& v)
+void sedov::Vector< T >::insert(size_t i, const T & v)
 {
   if (i > size_)
   {
@@ -294,7 +290,7 @@ void sedov::Vector< T >::insert(size_t i, const T& v)
 }
 
 template< class T >
-void sedov::Vector< T >::insert(size_t i, const Vector< T >& rhs, size_t start, size_t end)
+void sedov::Vector< T >::insert(size_t i, const Vector< T > & rhs, size_t start, size_t end)
 {
   if (i > size_)
   {
@@ -310,7 +306,7 @@ void sedov::Vector< T >::insert(size_t i, const Vector< T >& rhs, size_t start, 
   {
     newCap = capacity_;
   }
-  T* newData = static_cast< T* >(operator new(sizeof(T) * newCap));
+  T* newData = static_cast< T * >(operator new(sizeof(T) * newCap));
   size_t j = 0;
   size_t k = 0;
   try
@@ -359,7 +355,7 @@ void sedov::Vector< T >::erase(size_t i)
     popBack();
     return;
   }
-  T* v = static_cast< T* >(operator new(sizeof(T) * (size_ - 1)));
+  T * v = static_cast< T * >(operator new(sizeof(T) * (size_ - 1)));
   size_t j = 0;
   try
   {
@@ -405,7 +401,7 @@ void sedov::Vector< T >::erase(size_t start, size_t count)
   {
     count = size_ - start;
   }
-  T* v = static_cast< T* >(operator new(sizeof(T) * (size_ - count)));
+  T * v = static_cast< T * >(operator new(sizeof(T) * (size_ - count)));
   size_t i = 0;
   try
   {
@@ -513,7 +509,7 @@ void sedov::Vector< T >::insert(CIter< T > i, CIter< T > start, CIter< T > end)
   {
     newCap = capacity_ * 2 + count;
   }
-  T* newData = static_cast< T* >(operator new(sizeof(T) * newCap));
+  T * newData = static_cast< T * >(operator new(sizeof(T) * newCap));
   size_t j = 0;
   try
   {
@@ -622,7 +618,7 @@ void sedov::Vector< T >::shrinkToFit()
 {
   if (size_ < capacity_)
   {
-    T* newData = static_cast< T* >(operator new(sizeof(T) * size_));
+    T * newData = static_cast< T * >(operator new(sizeof(T) * size_));
     size_t c = 0;
     try
     {
@@ -696,7 +692,7 @@ void sedov::Vector< T >::pushBackRange(IT b, size_t c)
 }
 
 template< class T >
-void sedov::Vector< T >::unsafePushBack(const T& value)
+void sedov::Vector< T >::unsafePushBack(const T & value)
 {
   new(&data_[size_]) T(value);
   ++size_;
@@ -704,7 +700,7 @@ void sedov::Vector< T >::unsafePushBack(const T& value)
 
 template< class T >
 template< class P >
-void sedov::Vector< T >::uniInsert(size_t i, P&& v)
+void sedov::Vector< T >::uniInsert(size_t i, P && v)
 {
   if (i > size_)
   {
@@ -715,7 +711,7 @@ void sedov::Vector< T >::uniInsert(size_t i, P&& v)
   {
     newCap = capacity_;
   }
-  T* newData = static_cast< T* >(operator new(sizeof(T) * newCap));
+  T * newData = static_cast< T * >(operator new(sizeof(T) * newCap));
   size_t j = 0;
   try
   {
@@ -749,7 +745,7 @@ void sedov::Vector< T >::uniInsert(size_t i, P&& v)
 }
 
 template< class T >
-bool sedov::operator==(const Vector< T >& lhs, const Vector< T > & rhs)
+bool sedov::operator==(const Vector< T > & lhs, const Vector< T > & rhs)
 {
   bool isEqual = lhs.getSize() == rhs.getSize();
   for (size_t i = 0; (i < lhs.getSize()) && (isEqual = isEqual && lhs[i] == rhs[i]); ++i);
