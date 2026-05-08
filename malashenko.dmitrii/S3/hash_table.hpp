@@ -3,6 +3,7 @@
 #include <list/list.hpp>
 #include "hash_table_iter.hpp"
 #include "hash_table_cIter.hpp"
+#include "graphs.hpp"
 namespace malashenko
 {
   template< class Key, class Value, class Hash, class Equal >
@@ -10,6 +11,8 @@ namespace malashenko
 
   template< class Key, class Value, class Hash, class Equal >
   class HashTableConstIter;
+  class Graph;
+
   template< class T >
   struct Equal {
     bool operator()(const T& lhs, const T& rhs);
@@ -49,6 +52,7 @@ namespace malashenko
     size_t size() const noexcept;
     void swap(ht_t& rhs);
   private:
+    friend class Graph;
     friend class HashTableIter<Key, Value, Hash, Equal>;
     size_t size_;
     List< std::pair< Key, Value > >** slots_;
