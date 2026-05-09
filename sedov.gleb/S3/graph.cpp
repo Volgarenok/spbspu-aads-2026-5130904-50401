@@ -7,9 +7,9 @@ namespace sedov
     edges(16)
   {}
 
-  Graph::Graph(size_t edgeSlots):
+  Graph::Graph(size_t slots):
     vertices(),
-    edges(edgeSlots)
+    edges(slots)
   {}
 
   void Graph::addVertex(const std::string & v)
