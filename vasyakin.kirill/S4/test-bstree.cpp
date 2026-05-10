@@ -62,8 +62,8 @@ BOOST_AUTO_TEST_CASE(test_push_get_drop)
 
   auto keys = get_keys(tree);
 
-  BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(), 
-    (std::vector< int >{30, 40, 60, 70}).begin(), 
+  BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(),
+    (std::vector< int >{30, 40, 60, 70}).begin(),
     (std::vector< int >{30, 40, 60, 70}).end());
 
   BOOST_CHECK_THROW(tree.drop(111), std::out_of_range);
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(rotate_simple)
   vasyakin::BSTree< int, std::string > tree;
   tree.push(10, "10");
   tree.push(20, "20");
-  
+
   auto it_rise = tree.begin();
   ++it_rise;
   tree.rotateLeft(it_rise);
@@ -161,23 +161,24 @@ BOOST_AUTO_TEST_CASE(rotate_large)
   tree1.rotateLargeLeft(it_mid);
   auto k1 = get_keys(tree1);
 
-  BOOST_CHECK_EQUAL_COLLECTIONS(k1.begin(), k1.end(), 
-    (std::vector< int >{30, 40, 50}).begin(), 
+  BOOST_CHECK_EQUAL_COLLECTIONS(k1.begin(), k1.end(),
+    (std::vector< int >{30, 40, 50}).begin(),
     (std::vector< int >{30, 40, 50}).end());
 
   vasyakin::BSTree< int, std::string > tree2;
+
   tree2.push(30, "30");
   tree2.push(50, "50");
   tree2.push(40, "40");
-  
+
   auto it_mid2 = tree2.begin();
   ++it_mid2;
 
   tree2.rotateLargeRight(it_mid2);
   auto k2 = get_keys(tree2);
 
-  BOOST_CHECK_EQUAL_COLLECTIONS(k2.begin(), k2.end(), 
-    (std::vector< int >{30, 40, 50}).begin(), 
+  BOOST_CHECK_EQUAL_COLLECTIONS(k2.begin(), k2.end(),
+    (std::vector< int >{30, 40, 50}).begin(),
     (std::vector< int >{30, 40, 50}).end());
 }
 
