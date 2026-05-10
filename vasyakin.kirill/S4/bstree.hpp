@@ -484,6 +484,112 @@ namespace vasyakin
   {
     return root_ == fake_leaf_;
   }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::rotateLeft(const_iterator it)
+  {
+    Node* x = const_cast< Node* >(it.node_);
+
+    if (x == fake_leaf_ || x->parent_ == nullptr)
+    {
+      throw std::invalid_argument("rotateLeft: invalid node or no parent");
+    }
+
+    Node* y = x->parent_;
+
+    y->right_ = x->left_;
+    if (x->left_ != fake_leaf_)
+    {
+      x->left_->parent_ = y;
+    }
+
+    x->parent_ = y->parent_;
+    if (y->parent_ == nullptr)
+    {
+      root_ = x;
+    }
+    else if (y->parent_->left_ == y)
+    {
+      y->parent_->left_ = x;
+    }
+    else
+    {
+      y->parent_->right_ = x;
+    }
+
+    x->left_ = y;
+    y->parent_ = x;
+
+    return const_iterator(x, fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::rotateRight(const_iterator it)
+  {
+    Node* x = const_cast< Node* >(it.node_);
+
+    if (x == fake_leaf_ || x->parent_ == nullptr)
+    {
+      throw std::invalid_argument("rotateRight: invalid node or no parent");
+    }
+
+    Node* y = x->parent_;
+
+    y->left_ = x->right_;
+    if (x->right_ != fake_leaf_)
+    {
+      x->right_->parent_ = y;
+    }
+
+    x->parent_ = y->parent_;
+    if (y->parent_ == nullptr)
+    {
+      root_ = x;
+    }
+    else if (y->parent_->right_ == y)
+    {
+      y->parent_->right_ = x;
+    }
+    else
+    {
+      y->parent_->left_ = x;
+    }
+
+    x->right_ = y;
+    y->parent_ = x;
+
+    return const_iterator(x, fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator it)
+  {
+    Node* x = const_cast< Node* >(it.node_);
+    if (x == fake_leaf_ || x->parent_ == nullptr || x->parent_->parent_ == nullptr)
+    {
+      throw std::invalid_argument("rotateLargeLeft: invalid node or missing ancestors");
+    }
+
+    rotateRight(it);
+    return rotateLeft(it);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator it)
+  {
+    Node* x = const_cast< Node* >(it.node_);
+    if (x == fake_leaf_ || x->parent_ == nullptr || x->parent_->parent_ == nullptr)
+    {
+      throw std::invalid_argument("rotateLargeRight: invalid node or missing ancestors");
+    }
+
+    rotateLeft(it);
+    return rotateRight(it);
+  }
 }
 
 #endif
