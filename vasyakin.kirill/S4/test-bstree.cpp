@@ -15,7 +15,7 @@ std::vector< int > get_keys(const vasyakin::BSTree< int, std::string >& tree)
   return res;
 }
 
-BOOST_AUTO_TEST_SUITE()
+BOOST_AUTO_TEST_SUITE(BSTreeTests)
 
 BOOST_AUTO_TEST_CASE(test_empty_height)
 {

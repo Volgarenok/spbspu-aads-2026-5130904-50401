@@ -94,15 +94,11 @@ int main(int argc, char* argv[])
     {
       cmds.get(cmd)(std::cin, std::cout, datasets);
     }
-    catch (const std::out_of_range&)
+    catch (const std::exception&)
     {
       std::cout << "<INVALID COMMAND>" << '\n';
-    }
-    catch (const std::exception& e)
-    {
-      std::cerr << "Runtime error: " << e.what() << '\n';
       std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
 
