@@ -23,4 +23,17 @@ namespace donkeev
     bool has(const Key key);
     void rehash(size_t slots);
   };
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTable< Key, Value, Hash, Equal >::HashTable(const size_t bucketCount, const size_t bucketSize):
+    data_((bucketCount + 1) * bucketSize, Node< Key, Value >()),
+    bucketCount_(bucketCount),
+    bucketSize_(bucketSize),
+    reserveBucketSize_(bucketSize),
+    totalElements_(0),
+    hashFunc_(),
+    equalFunc_()
+  {}
+
+  
 }
