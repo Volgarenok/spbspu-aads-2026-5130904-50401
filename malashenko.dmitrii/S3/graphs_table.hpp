@@ -9,8 +9,8 @@ namespace malashenko
 {
   class GraphsTable {
   public:
-    using pair_t = std::pair< std::string, malashenko::Vector< size_t > >;
-    using htIter_t = HashTableIter< std::string, malashenko::Graph, malashenko::HmacHash< std::string >, malashenko::Equal< std::string > >;
+    using pair_t = std::pair< std::string, Vector< size_t > >;
+    using htIter_t = HashTableIter< std::string, Graph, HmacHash< std::string >, Equal< std::string > >;
     void graphs(std::istream& in, std::ostream& out, std::string graphName);
     void vertexes(std::istream& in, std::ostream& out, std::string graphName);
     void outbound(std::istream& in, std::ostream& out, std::string graphName);

@@ -9,6 +9,7 @@
 
 int main(int argc, char **argv)
 {
+  using namespace malashenko;
   if (argc != 2)
   {
     std::cerr << "Invalid arguments\n";
@@ -23,7 +24,7 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  malashenko::GraphsTable table;
+  GraphsTable table;
 
   try
   {
@@ -35,17 +36,17 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  using cmd_t = void (malashenko::GraphsTable::*)( std::istream &, std::ostream &, std::string);
+  using cmd_t = void (GraphsTable::*)( std::istream &, std::ostream &, std::string);
 
-  malashenko::HashTable< std::string, cmd_t, malashenko::HmacHash< std::string >, malashenko::Equal< std::string > > commands;
+  HashTable< std::string, cmd_t, HmacHash< std::string >, Equal< std::string > > commands;
 
-  commands.add("graphs", &malashenko::GraphsTable::graphs);
-  commands.add("vertexes", &malashenko::GraphsTable::vertexes);
-  commands.add("outbound", &malashenko::GraphsTable::outbound);
-  commands.add("inbound", &malashenko::GraphsTable::inbound);
-  commands.add("bind", &malashenko::GraphsTable::bind);
-  commands.add("cut", &malashenko::GraphsTable::cut);
-  commands.add("create", &malashenko::GraphsTable::create);
+  commands.add("graphs", &GraphsTable::graphs);
+  commands.add("vertexes", &GraphsTable::vertexes);
+  commands.add("outbound", &GraphsTable::outbound);
+  commands.add("inbound", &GraphsTable::inbound);
+  commands.add("bind", &GraphsTable::bind);
+  commands.add("cut", &GraphsTable::cut);
+  commands.add("create", &GraphsTable::create);
 
   std::string command;
 
