@@ -21,8 +21,8 @@ namespace donkeev
 
     void add(const Key&, const Value&);
     Value drop(const Key&);
-    bool has(const Key& key);
-    void rehash(size_t slots);
+    bool has(const Key&);
+    void rehash(size_t);
 
   private:
     Node<Key, Value>* findNode(const Key& key);
@@ -76,7 +76,73 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   bool HashTable< Key, Value, Hash, Equal >::has(const Key& key)
   {
+    Node< Key, Value >* node = findNode(key);
+    if (!node)
+    {
+      return false;
+    }
+    return true;
+  }
 
+  template< class Key, class Value, class Hash, class Equal >
+  void HashTable< Key, Value, Hash, Equal >::rehash(size_t newBucketCount)
+  {
+    topit::Vector< Node< Key, Value > > newData = nullptr;
+    newData = topit::Vector< Node< Key, Value > >((newBucketCount + 1) * bucketSize_);
+
+    topit::VIter< Node< Key, Value > > oldDataBegin = data_.begin();
+    topit::VIter< Node< Key, Value > > oldDataEnd = data_.end();
+    while (oldDataBegin != oldDataEnd)
+    {
+      if (oldDataBegin->isEmpty())
+      {
+        ++oldDataBegin;
+        continue;
+      }
+      size_t hash = hashFunc_(oldDataBegin->key_);
+      size_t bucketId = hash % newBucketCount;
+      size_t startId = bucketId * bucketSize_;
+      size_t endId = startId + bucketSize_;
+
+      topit::VIter< Node< Key, Value > > newDataBegin = newData.begin() + startId;
+      topit::VIter< Node< Key, Value > > newDataEnd = newData.begin() + endId;
+      bool tookPlace = false;
+      while (newDataBegin != newDataEnd)
+      {
+        if (newDataBegin->isEmpty())
+        {
+          *newDataBegin = *oldDataBegin;
+          tookPlace = true;
+          break;
+        }
+
+        ++newDataBegin;
+      }
+
+      if (!tookPlace)
+      {
+        newDataBegin = newData.begin() + newBucketCount * bucketSize_;
+        newDataEnd = newDataBegin + bucketSize_;
+        while (newDataBegin != newDataEnd)
+        {
+          if (newDataBegin->isEmpty())
+          {
+            *newDataBegin = *oldDataBegin;
+            tookPlace = true;
+            break;
+          }
+
+          ++newDataBegin;
+        }
+      }
+
+      if (!tookPlace)
+      {
+        throw std::invalid_argument("New table too small for existing elements");
+      }
+
+      ++oldDataBegin;
+    }
   }
 
   template< class Key, class Value, class Hash, class Equal >
