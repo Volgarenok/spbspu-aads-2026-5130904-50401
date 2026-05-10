@@ -320,7 +320,10 @@ namespace vasyakin
 
     Node* child = (curr->left_ != fake_leaf_) ? curr->left_ : curr->right_;
 
-    child->parent_ = curr->parent_;
+    if (child != fake_leaf_)
+    {
+      child->parent_ = curr->parent_;
+    }
 
     if (curr->parent_ == nullptr)
     {
