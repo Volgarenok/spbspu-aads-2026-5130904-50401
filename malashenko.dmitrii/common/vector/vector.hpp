@@ -505,7 +505,6 @@ void malashenko::Vector< T >::erase(size_t position)
   {
     temp.data_[i] = std::move(temp.data_[i + 1]);
   }
-  // temp.data_[temp.size_ - 1].~T();
   --temp.size_;
   swap(temp);
 }

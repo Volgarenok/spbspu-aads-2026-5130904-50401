@@ -18,7 +18,7 @@ namespace malashenko
     using htCIter_t = HashTableConstIter< pair_t, Vector< size_t >, HmacHash< pair_t >, Equal< pair_t > >;
 
     Vector< std::string > getTops();
-    std::pair< bool, Vector< Graph::pairWeight_t > > getWeightPairs(const std::string& topName, size_t pos);
+    std::pair< bool, Vector< Graph::pairWeight_t > >  getWeightPairs(const std::string& topName, size_t pos);
     bool cutVertex(const std::string& from, const std::string& to, size_t size);
     void addVertex(const std::string& from, const std::string& to, Vector< size_t > vec);
   private:

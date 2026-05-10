@@ -59,17 +59,20 @@ namespace malashenko
       throw std::invalid_argument("input problem");
     }
 
+
     std::pair< bool, Vector< pair_t > > topsAndFlag = graph.getWeightPairs(topName, pos);
     if (!topsAndFlag.first)
     {
       throw std::invalid_argument("unkown top");
     }
-    Vector< pair_t > tops = topsAndFlag.second;
-    if (tops.isEmpty())
+    if (topsAndFlag.second.isEmpty() || topsAndFlag.second[0].second.isEmpty())
     {
       out << '\n';
       return;
     }
+
+    Vector< pair_t > tops = topsAndFlag.second;
+
     sortPair(tops);
     for (size_t i = 0; i < tops.getSize(); ++i)
     {
@@ -104,6 +107,7 @@ namespace malashenko
     }
     Graph& graph = graphs_.get(graphName);
 
+
     std::string from;
     std::string to;
     std::string length_str;
@@ -136,8 +140,8 @@ namespace malashenko
     {
       throw std::invalid_argument("unkown graph");
     }
-    Graph& graph = graphs_.get(graphName);
 
+    Graph& graph = graphs_.get(graphName);
     std::string from;
     std::string to;
     std::string length_str;
@@ -160,10 +164,11 @@ namespace malashenko
       throw std::invalid_argument("unkown vertexes");
     }
 
-    if (!graph.cutVertex(from, to, length))
+    if (!graphs_.get(graphName).cutVertex(from, to, length))
     {
       throw std::invalid_argument("no vertexes to cut");
     }
+
   }
 
 

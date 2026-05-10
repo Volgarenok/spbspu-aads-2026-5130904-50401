@@ -22,7 +22,11 @@ namespace malashenko
       if ((!pos ? start->first.first : start->first.second) == topName)
       {
         Vector< size_t > weights = start->second;
-        sort(weights);
+        if (!weights.isEmpty())
+        {
+          sort(weights);
+
+        }
         weightPairs.pushBack({!pos ? start->first.second : start->first.first, weights});
         isFound = true;
       }
@@ -42,6 +46,11 @@ namespace malashenko
       if (vec[i] == size)
       {
         vec.erase(i);
+        if (vec.isEmpty())
+        {
+          vertexes_.drop({from, to});
+          vertexes_.add({from, from}, Vector< size_t >());
+        }
         return true;
       }
     }
