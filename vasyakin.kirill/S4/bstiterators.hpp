@@ -81,6 +81,83 @@ namespace vasyakin
   {
     return {node_->key_, node_->value_};
   }
+
+  template< class Key, class Value >
+  BSTIterator< Key, Value >& BSTIterator< Key, Value >::operator++()
+  {
+    if (node_->right_ != fake_leaf_)
+    {
+      node_ = node_->right_;
+
+      while (node_->left_ != fake_leaf_)
+      {
+        node_ = node_->left_;
+      }
+    }
+    else
+    {
+      Node* parent = node_->parent_;
+
+      while (parent != nullptr && node_ == parent->right_)
+      {
+        node_ = parent;
+        parent = parent->parent_;
+      }
+
+      node_ = parent ? parent : fake_leaf_;
+    }
+
+    return *this;
+  }
+
+  template< class Key, class Value >
+  BSTIterator< Key, Value > BSTIterator< Key, Value >::operator++(int)
+  {
+    BSTIterator< Key, Value > temp = *this;
+    ++(*this);
+    return temp;
+  }
+
+  template< class Key, class Value >
+  BSTIterator< Key, Value >& BSTIterator< Key, Value >::operator--()
+  {
+    if (node_ == fake_leaf_)
+    {
+      return *this;
+    }
+
+    if (node_->left_ != fake_leaf_)
+    {
+      node_ = node_->left_;
+
+      while (node_->right_ != fake_leaf_)
+      {
+        node_ = node_->right_;
+      }
+    }
+    else
+    {
+      Node* parent = node_->parent_;
+
+      while (parent != nullptr && node_ == parent->left_)
+      {
+        node_ = parent;
+        parent = parent->parent_;
+      }
+
+      node_ = parent ? parent : fake_leaf_;
+    }
+
+    return *this;
+  }
+
+  template< class Key, class Value >
+  BSTIterator< Key, Value > BSTIterator< Key, Value >::operator--(int)
+  {
+    BSTIterator< Key, Value > temp = *this;
+    --(*this);
+    return temp;
+  }
 }
 
 #endif
