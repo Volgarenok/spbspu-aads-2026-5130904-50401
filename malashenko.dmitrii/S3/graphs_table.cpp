@@ -1,6 +1,6 @@
 #include "graphs_table.hpp"
 
-void malashenko::GraphsTable::graphs(std::istream& in, std::ostream& out, std::string graphName)
+void malashenko::GraphsTable::graphs(std::istream&, std::ostream& out, std::string)
 {
   malashenko::Vector< std::string > tmpTops;
   for (htIter_t start = graphs_.begin(); start != graphs_.end(); ++start)
@@ -15,7 +15,7 @@ void malashenko::GraphsTable::graphs(std::istream& in, std::ostream& out, std::s
   }
 }
 
-void malashenko::GraphsTable::vertexes(std::istream& in, std::ostream& out, std::string graphName)
+void malashenko::GraphsTable::vertexes(std::istream&, std::ostream& out, std::string graphName)
 {
   if (!graphs_.has(graphName))
   {
@@ -34,7 +34,7 @@ void malashenko::GraphsTable::vertexes(std::istream& in, std::ostream& out, std:
 
 void malashenko::GraphsTable::bounds(std::istream& in, std::ostream& out, std::string graphName, size_t pos)
 {
-  if (!graphs_.has(graphName));
+  if (!graphs_.has(graphName))
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -78,7 +78,7 @@ void malashenko::GraphsTable::outbound(std::istream& in, std::ostream& out, std:
 
 void malashenko::GraphsTable::bind(std::istream& in, std::ostream& out, std::string graphName)
 {
-  if (!graphs_.has(graphName));
+  if (!graphs_.has(graphName))
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -93,9 +93,9 @@ void malashenko::GraphsTable::bind(std::istream& in, std::ostream& out, std::str
   size_t length;
   try
   {
-    length = std::stoi(length_str);
+    length = std::stoull(length_str);
   }
-  catch(const std::exception& e)
+  catch(...)
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -111,7 +111,7 @@ void malashenko::GraphsTable::bind(std::istream& in, std::ostream& out, std::str
 
 void malashenko::GraphsTable::cut(std::istream& in, std::ostream& out, std::string graphName)
 {
-  if (!graphs_.has(graphName));
+  if (!graphs_.has(graphName))
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -126,17 +126,12 @@ void malashenko::GraphsTable::cut(std::istream& in, std::ostream& out, std::stri
     out << "<INVALID COMMAND>\n";
     return;
   }
-  if (length_str[0] == '-')
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
   size_t length;
   try
   {
-    length = std::stoi(length_str);
+    length = std::stoull(length_str);
   }
-  catch(const std::exception& e)
+  catch(...)
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -156,7 +151,7 @@ void malashenko::GraphsTable::cut(std::istream& in, std::ostream& out, std::stri
 }
 
 
-void malashenko::GraphsTable::create(std::istream& in, std::ostream& out, std::string graphName)
+void malashenko::GraphsTable::create(std::istream&, std::ostream& out, std::string graphName)
 {
   if (graphs_.has(graphName))
   {
@@ -167,11 +162,122 @@ void malashenko::GraphsTable::create(std::istream& in, std::ostream& out, std::s
   graphs_.add(graphName, Graph());
 }
 
+void malashenko::GraphsTable::sortStrs(Vector< std::string >& vec)
+{
+  if (vec.getSize() == 0)
+  {
+    return;
+  }
+  for (size_t i = 0; i < vec.getSize() - 1; ++i)
+  {
+    for (size_t j = 0; j < vec.getSize() - i - 1; ++j)
+    {
+      if (vec[j] > vec[j + 1])
+      {
+        std::string temp = vec[j];
+        vec[j] = vec[j + 1];
+        vec[j + 1] = temp;
+      }
+    }
+  }
+}
+
+void malashenko::GraphsTable::sortPair(Vector< pair_t >& vec)
+{
+  if (vec.getSize() == 0)
+  {
+    return;
+  }
+  for (size_t i = 0; i < vec.getSize() - 1; ++i)
+  {
+    for (size_t j = 0; j < vec.getSize() - i - 1; ++j)
+    {
+      if (vec[j].first > vec[j + 1].first)
+      {
+        pair_t temp = vec[j];
+        vec[j] = vec[j + 1];
+        vec[j + 1] = temp;
+      }
+    }
+  }
+}
+
+malashenko::Vector< std::string > malashenko::GraphsTable::rmRepeatStrs(const malashenko::Vector< std::string >& vec)
+{
+  malashenko::Vector< std::string > res;
+  for (size_t i = 0; i < vec.getSize(); ++i)
+  {
+    if (!res.contains(vec[i]))
+    {
+      res.pushBack(vec[i]);
+    }
+  }
+  return res;
+}
 
 
+void malashenko::GraphsTable::readFile(std::istream& in)
+{
+  std::string graphName;
 
+  while (in >> graphName)
+  {
+    std::string edgesCountStr;
+    if (!(in >> edgesCountStr))
+    {
+      throw std::runtime_error("Invalid graph description");
+    }
 
+    size_t edgesCount = 0;
 
+    try
+    {
+      edgesCount = std::stoull(edgesCountStr);
+    }
+    catch (...)
+    {
+      throw std::runtime_error("Invalid edges count");
+    }
 
+    if (graphs_.has(graphName))
+    {
+      throw std::runtime_error("Duplicate graph");
+    }
 
+    graphs_.add(graphName, Graph());
 
+    Graph& graph = graphs_.get(graphName);
+
+    for (size_t i = 0; i < edgesCount; ++i)
+    {
+      std::string from;
+      std::string to;
+      std::string weightStr;
+
+      if (!(in >> from >> to >> weightStr))
+      {
+        throw std::runtime_error("Invalid edge");
+      }
+
+      size_t weight = 0;
+
+      try
+      {
+        weight = std::stoull(weightStr);
+      }
+      catch (...)
+      {
+        throw std::runtime_error("Invalid weight");
+      }
+
+      Graph::pair_t key = { from, to };
+
+      if (!graph.vertexes_.has(key))
+      {
+        graph.vertexes_.add(key, Vector<size_t>());
+      }
+
+      graph.vertexes_.get(key).pushBack(weight);
+    }
+  }
+}

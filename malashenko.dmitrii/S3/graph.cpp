@@ -18,7 +18,8 @@ malashenko::Vector< std::pair< std::string, malashenko::Vector< size_t > > > mal
   {
     if ((!pos ? start->first.first : start->first.second) == topName)
     {
-      malashenko::Vector< size_t > weights = sort(start->second);
+      malashenko::Vector< size_t > weights = start->second;
+      sort(weights);
       weightPairs.pushBack({!pos ? start->first.second : start->first.first, weights});
     }
   }
@@ -39,3 +40,22 @@ bool malashenko::Graph::cutVertex(const std::string& from, const std::string& to
   return false;
 }
 
+void malashenko::Graph::sort(malashenko::Vector< size_t >& vec)
+{
+  if (vec.getSize() == 0)
+  {
+    return;
+  }
+  for (size_t i = 0; i < vec.getSize() - 1; ++i)
+  {
+    for (size_t j = 0; j < vec.getSize() - i - 1; ++j)
+    {
+      if (vec[j] > vec[j + 1])
+      {
+        size_t temp = vec[j];
+        vec[j] = vec[j + 1];
+        vec[j + 1] = temp;
+      }
+    }
+  }
+}

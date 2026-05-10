@@ -1,40 +1,94 @@
 #include "hash_table.hpp"
 #include "hash_func.hpp"
 #include "hash_table_iter.hpp"
+#include "graphs_table.hpp"
+
 #include <string>
 #include <iostream>
-int main()
+#include <fstream>
+
+int main(int argc, char **argv)
 {
-  using namespace malashenko;
-  // Hash< std::string > hasher("secret");
-
-  // Equal< std::string > eq;
-  HashTable< std::string, int, HmacHash< std::string >, Equal< std::string > > ht(8);
-  ht.add("a", 1);
-  ht["b"] = 6;
-  ht["111"] = 6444;
-  ht["2222"] = 99;
-
-  ht["c"] = 10;
-  ht["d"] = 2;
-
-  ht.drop("2222");
-  ht.drop("111");
-  ht.drop("a");
-  ht.drop("d");
-  ht.drop("b");
-  ht.drop("c");
-
-  for (HashTableIter< std::string, int, HmacHash< std::string >, Equal< std::string > > start = ht.begin(); start != ht.end(); ++start)
+  if (argc != 2)
   {
-    std::cout << start->first << ' ' << start->second << '\n';
+    std::cerr << "Invalid arguments\n";
+    return 1;
   }
 
+  std::ifstream file(argv[1]);
 
-  // std::cout << ht.get("a") << '\n';
-  // std::cout << ht["b"] << '\n';
-  // // std::cout << ht.get("aaaa") << '\n';
-  // std::cout << ht["c"] << '\n';
-  // std::cout << ht["d"] << '\n';
+  if (!file)
+  {
+    std::cerr << "Cannot open file\n";
+    return 1;
+  }
 
+  malashenko::GraphsTable table;
+
+  try
+  {
+    table.readFile(file);
+  }
+  catch (const std::exception &e)
+  {
+    std::cerr << e.what() << '\n';
+    return 1;
+  }
+
+  using cmd_t = void (malashenko::GraphsTable::*)( std::istream &, std::ostream &, std::string);
+
+  malashenko::HashTable< std::string, cmd_t, malashenko::HmacHash< std::string >, malashenko::Equal< std::string > > commands;
+
+  commands.add("graphs", &malashenko::GraphsTable::graphs);
+  commands.add("vertexes", &malashenko::GraphsTable::vertexes);
+  commands.add("outbound", &malashenko::GraphsTable::outbound);
+  commands.add("inbound", &malashenko::GraphsTable::inbound);
+  commands.add("bind", &malashenko::GraphsTable::bind);
+  commands.add("cut", &malashenko::GraphsTable::cut);
+  commands.add("create", &malashenko::GraphsTable::create);
+
+  std::string command;
+
+  while (std::cin >> command)
+  {
+    if (!commands.has(command))
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      while (std::cin.peek() != '\n' && std::cin.peek() != EOF)
+      {
+        std::cin.get();
+      }
+
+      continue;
+    }
+
+    std::string graphName;
+
+    if (command != "graphs")
+    {
+      if (!(std::cin >> graphName))
+      {
+        std::cout << "<INVALID COMMAND>\n";
+        continue;
+      }
+    }
+
+    try
+    {
+      cmd_t func = commands.get(command);
+
+      (table.*func)(std::cin, std::cout, graphName);
+    }
+    catch (...)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+
+      while (std::cin.peek() != '\n' && std::cin.peek() != EOF)
+      {
+        std::cin.get();
+      }
+    }
+  }
+
+  return 0;
 }
