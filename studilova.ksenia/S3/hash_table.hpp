@@ -42,6 +42,11 @@ namespace studilova
 
       bool has(const Key& key) const;
 
+      void add(const Key& key, const Value& value);
+
+      Value& get(const Key& key);
+      const Value& get(const Key& key) const;
+
     private:
       topit::Vector< Entry > table_;
       size_t size_;
@@ -50,6 +55,7 @@ namespace studilova
 
       size_t probeIndex(const Key& key, size_t attempt) const;
       bool findEntry(const Key& key, size_t& outIndex) const;
+      bool findPlace(const Key& key, size_t& outIndex) const;
   };
 }
 
@@ -103,6 +109,36 @@ bool studilova::HashTable< Key, Value, Hash, Equal >::findEntry(const Key& key, 
 }
 
 template< class Key, class Value, class Hash, class Equal >
+bool studilova::HashTable< Key, Value, Hash, Equal >::findPlace(const Key& key, size_t& outIndex) const
+{
+  bool hasTombstone = false;
+  size_t tombstoneIndex = 0;
+
+  for (size_t attempt = 0; attempt < table_.getSize(); ++attempt)
+  {
+    size_t index = probeIndex(key, attempt);
+    if (table_[index].state == State::TOMBSTONE && !hasTombstone)
+    {
+      hasTombstone = true;
+      tombstoneIndex = index;
+    }
+
+    if (table_[index].state == State::EMPTY)
+    {
+      outIndex = hasTombstone ? tombstoneIndex : index;
+      return true;
+    }
+  }
+
+  if (hasTombstone)
+  {
+    outIndex = tombstoneIndex;
+    return true;
+  }
+  return false;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 size_t studilova::HashTable< Key, Value, Hash, Equal >::size() const noexcept
 {
   return size_;
@@ -123,8 +159,51 @@ bool studilova::HashTable< Key, Value, Hash, Equal >::isEmpty() const noexcept
 template< class Key, class Value, class Hash, class Equal >
 bool studilova::HashTable< Key, Value, Hash, Equal >::has(const Key& key) const
 {
-  size_t dumny = 0;
-  return findEntry(key, dumny);
+  size_t dummy = 0;
+  return findEntry(key, dummy);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void studilova::HashTable< Key, Value, Hash, Equal >::add(const Key& key, const Value& value)
+{
+  size_t index = 0;
+  if (findEntry(key, index))
+  {
+    table_[index].value = value;
+    return;
+  }
+
+  if (!findPlace(key, index))
+  {
+    throw std::overflow_error("HashTable is full");
+  }
+
+  table_[index].key = key;
+  table_[index].value = value;
+  table_[index].state = State::OCCUPIED;
+  ++size_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+Value& studilova::HashTable< Key, Value, Hash, Equal >::get(const Key& key)
+{
+  size_t index = 0;
+  if (!findEntry(key, index))
+  {
+    throw std::out_of_range("Key not found");
+  }
+  return table_[index].value;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+const Value& studilova::HashTable< Key, Value, Hash, Equal >::get(const Key& key) const
+{
+  size_t index = 0;
+  if (!findEntry(key, index))
+  {
+    throw std::out_of_range("Key not found");
+  }
+  return table_[index].value;
 }
 
 #endif
