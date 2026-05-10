@@ -7,9 +7,17 @@ namespace donkeev
     Value value_;
     bool isOccupied_;
 
+    Node();
     Node(const Key&, const Value&);
     bool isEmpty();
   };
+
+  template< class Key, class Value >
+  Node< Key, Value >::Node():
+    key_(),
+    value_(),
+    isOccupied_(false)
+  {}
 
   template< class Key, class Value >
   Node< Key, Value >::Node(const Key& key, const Value& value_):
