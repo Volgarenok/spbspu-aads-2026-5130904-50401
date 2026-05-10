@@ -67,6 +67,7 @@ namespace malashenko
     Vector< pair_t > tops = topsAndFlag.second;
     if (tops.isEmpty())
     {
+      out << '\n';
       return;
     }
     sortPair(tops);
