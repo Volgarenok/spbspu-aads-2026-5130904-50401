@@ -168,6 +168,58 @@ namespace vasyakin
     std::swap(root_, other.root_);
     std::swap(fake_leaf_, other.fake_leaf_);
   }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::Node*
+  BSTree< Key, Value, Compare >::findNode(const Key& k)
+  {
+    Node* curr = root_;
+
+    while (curr != fake_leaf_)
+    {
+      if (!cmp_(k, curr->key_) && !cmp_(curr->key_, k))
+      {
+        return curr;
+      }
+
+      if (cmp_(k, curr->key_))
+      {
+        curr = curr->left_;
+      }
+      else
+      {
+        curr = curr->right_;
+      }
+    }
+
+    throw std::out_of_range("Tree has not this key");
+  }
+
+  template< class Key, class Value, class Compare >
+  const typename BSTree< Key, Value, Compare >::Node*
+  BSTree< Key, Value, Compare >::findNode(const Key& k) const
+  {
+    Node* curr = root_;
+
+    while (curr != fake_leaf_)
+    {
+      if (!cmp_(k, curr->key_) && !cmp_(curr->key_, k))
+      {
+        return curr;
+      }
+
+      if (cmp_(k, curr->key_))
+      {
+        curr = curr->left_;
+      }
+      else
+      {
+        curr = curr->right_;
+      }
+    }
+
+    throw std::out_of_range("Tree has not this key");
+  }
 }
 
 #endif
