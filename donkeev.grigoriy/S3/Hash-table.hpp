@@ -105,8 +105,7 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::rehash(size_t newBucketCount)
   {
-    topit::Vector< Node< Key, Value > > newData = nullptr;
-    newData = topit::Vector< Node< Key, Value > >((newBucketCount + 1) * bucketSize_);
+    topit::Vector< Node< Key, Value > > newData((newBucketCount + 1) * bucketSize_, Node< Key, Value >);
 
     topit::VIter< Node< Key, Value > > oldDataBegin = data_.begin();
     topit::VIter< Node< Key, Value > > oldDataEnd = data_.end();
@@ -161,6 +160,9 @@ namespace donkeev
 
       ++oldDataBegin;
     }
+
+    data_ = std::move(newData);
+    bucketCount_ = newBucketCount;
   }
 
   template< class Key, class Value, class Hash, class Equal >
