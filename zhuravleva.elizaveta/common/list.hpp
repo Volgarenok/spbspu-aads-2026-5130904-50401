@@ -43,6 +43,7 @@ namespace zhuravleva
     void deleteStart() noexcept;
     void deleteEnd() noexcept;
     void deleteAfter(LIter< T > pos);
+    void erase(LIter<T> pos);
 
     LIter< T > addAfter(LIter< T > pos, const T& value);
     LIter< T > addEnd(const T& value);
@@ -220,6 +221,28 @@ namespace zhuravleva
       prev->next = fake;
       delete cur;
     }
+  }
+
+  template<class T>
+  void List<T>::erase(LIter<T> pos)
+  {
+    if (pos.current == fake || pos.current == nullptr)
+    {
+      throw std::runtime_error("invalid iterator");
+    }
+    Node<T>* prev = fake;
+    Node<T>* cur = fake->next;
+    while (cur != fake && cur != pos.current)
+    {
+      prev = cur;
+      cur = cur->next;
+    }
+    if (cur == fake)
+    {
+      throw std::runtime_error("element not found");
+    }
+    prev->next = cur->next;
+    delete cur;
   }
 
 
