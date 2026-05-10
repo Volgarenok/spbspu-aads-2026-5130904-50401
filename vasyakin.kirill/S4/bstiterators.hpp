@@ -158,6 +158,18 @@ namespace vasyakin
     --(*this);
     return temp;
   }
+
+  template< class Key, class Value >
+  bool BSTIterator< Key, Value >::operator==(const BSTIterator& other) const
+  {
+    return node_ == other.node_;
+  }
+
+  template< class Key, class Value >
+  bool BSTIterator< Key, Value >::operator!=(const BSTIterator& other) const
+  {
+    return !(node_ == other.node_);
+  }
 }
 
 #endif
