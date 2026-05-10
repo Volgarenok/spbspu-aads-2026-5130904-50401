@@ -2,6 +2,7 @@
 #define MYHASH_HPP
 #include <cstddef>
 #include <vector>
+#include <utility>
 #include <stdexcept>
 #include "../common/list.hpp"
 
