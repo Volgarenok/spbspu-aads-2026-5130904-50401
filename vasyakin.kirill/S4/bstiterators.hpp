@@ -63,6 +63,24 @@ namespace vasyakin
     bool operator==(const BSTConstIterator& other) const;
     bool operator!=(const BSTConstIterator& other) const;
   };
+
+  template< class Key, class Value >
+  BSTIterator< Key, Value >::BSTIterator():
+    node_(nullptr),
+    fake_leaf_(nullptr)
+  {}
+
+  template< class Key, class Value >
+  BSTIterator< Key, Value >::BSTIterator(Node* node, Node* fake_leaf):
+    node_(node),
+    fake_leaf_(fake_leaf)
+  {}
+
+  template< class Key, class Value >
+  std::pair< Key, Value > BSTIterator< Key, Value >::operator*() const
+  {
+    return {node_->key_, node_->value_};
+  }
 }
 
 #endif
