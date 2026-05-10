@@ -2,7 +2,7 @@
 #define COMMANDS_HPP
 #include <iostream>
 #include <string>
-#include "bstTree.hpp"
+#include "bstree.hpp"
 
 namespace vasyakin
 {
