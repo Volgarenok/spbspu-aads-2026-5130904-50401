@@ -30,7 +30,7 @@ void vasyakin::cmdPrint(std::istream& in, std::ostream& out, Datasets& datasets)
   }
 }
 
-void vasyakin::cmdComplement(std::istream& in, std::ostream& out, vasyakin::Datasets& datasets)
+void vasyakin::cmdComplement(std::istream& in, std::ostream&, vasyakin::Datasets& datasets)
 {
   std::string new_map_name, map_name1, map_name2;
   if (!(in >> new_map_name >> map_name1 >> map_name2))
@@ -59,7 +59,7 @@ void vasyakin::cmdComplement(std::istream& in, std::ostream& out, vasyakin::Data
   datasets.push(new_map_name, std::move(new_ds));
 }
 
-void vasyakin::cmdIntersect(std::istream& in, std::ostream& out, vasyakin::Datasets& datasets)
+void vasyakin::cmdIntersect(std::istream& in, std::ostream&, vasyakin::Datasets& datasets)
 {
   std::string new_map_name, map_name1, map_name2;
   if (!(in >> new_map_name >> map_name1 >> map_name2))
@@ -88,7 +88,7 @@ void vasyakin::cmdIntersect(std::istream& in, std::ostream& out, vasyakin::Datas
   datasets.push(new_map_name, new_ds);
 }
 
-void vasyakin::cmdUnion(std::istream& in, std::ostream& out, vasyakin::Datasets& datasets)
+void vasyakin::cmdUnion(std::istream& in, std::ostream&, vasyakin::Datasets& datasets)
 {
   std::string new_map_name, map_name1, map_name2;
   if (!(in >>new_map_name >> map_name1 >> map_name2))
