@@ -170,6 +170,30 @@ namespace vasyakin
   {
     return !(node_ == other.node_);
   }
+
+  template< class Key, class Value >
+  BSTIterator< Key, Value >::operator vasyakin::BSTConstIterator< Key, Value >() const
+  {
+    return BSTConstIterator< Key, Value >(node_, fake_leaf_);
+  }
+
+  template< class Key, class Value >
+  BSTConstIterator< Key, Value >::BSTConstIterator():
+    node_(nullptr),
+    fake_leaf_(nullptr)
+  {}
+
+  template< class Key, class Value >
+  BSTConstIterator< Key, Value >::BSTConstIterator(const Node* node, const Node* fake_leaf):
+    node_(node),
+    fake_leaf_(fake_leaf)
+  {}
+
+  template< class Key, class Value >
+  const std::pair< Key, Value > BSTConstIterator< Key, Value >::operator*() const
+  {
+    return {node_->key_, node_->value_};
+  }
 }
 
 #endif
