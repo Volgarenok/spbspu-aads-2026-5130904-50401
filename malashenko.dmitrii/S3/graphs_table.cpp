@@ -59,16 +59,24 @@ namespace malashenko
       throw std::invalid_argument("input problem");
     }
 
-    Vector< std::pair< std::string, Vector< size_t > > > tops = graph.getWeightPairs(topName, pos);
+    std::pair< bool, Vector< pair_t > > topsAndFlag = graph.getWeightPairs(topName, pos);
+    if (!topsAndFlag.first)
+    {
+      throw std::invalid_argument("unkown top");
+    }
+    Vector< pair_t > tops = topsAndFlag.second;
     if (tops.isEmpty())
     {
-      throw std::invalid_argument("unknown vertex");
+      return;
     }
     sortPair(tops);
     for (size_t i = 0; i < tops.getSize(); ++i)
     {
-      out << tops[i].first << ' ';
-      out << tops[i].second[0];
+      if (tops[i].second.getSize() == 0)
+      {
+        continue;
+      }
+      out << tops[i].first << ' ' << tops[i].second[0];
       for (size_t j = 1; j < tops[i].second.getSize(); ++j)
       {
         out << ' ' << tops[i].second[j];

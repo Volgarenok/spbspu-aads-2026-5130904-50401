@@ -13,9 +13,10 @@ namespace malashenko
     return tops;
   }
 
-  Vector< Graph::pairWeight_t > Graph::getWeightPairs(const std::string& topName, size_t pos)
+  std::pair< bool, Vector< Graph::pairWeight_t > > Graph::getWeightPairs(const std::string& topName, size_t pos)
   {
     Vector< std::pair< std::string, Vector< size_t > > > weightPairs;
+    bool isFound = false;
     for (htIter_t start = vertexes_.begin(); start != vertexes_.end(); ++start)
     {
       if ((!pos ? start->first.first : start->first.second) == topName)
@@ -23,25 +24,25 @@ namespace malashenko
         Vector< size_t > weights = start->second;
         sort(weights);
         weightPairs.pushBack({!pos ? start->first.second : start->first.first, weights});
+        isFound = true;
       }
     }
-    return weightPairs;
+    return {isFound, weightPairs};
   }
 
   bool Graph::cutVertex(const std::string& from, const std::string& to, size_t size)
   {
+    if (!vertexes_.has({from, to}))
+    {
+      return false;
+    }
     Vector< size_t >& vec = vertexes_.get({from, to});
     for (size_t i = 0; i < vec.getSize(); ++i)
     {
       if (vec[i] == size)
       {
         vec.erase(i);
-        if (vec.isEmpty())
-        {
-          vertexes_.drop({from, to});
-        }
         return true;
-
       }
     }
     return false;
