@@ -130,6 +130,44 @@ namespace vasyakin
     swap(cpy);
     return *this;
   }
+
+  template< class Key, class Value, class Compare >
+  void BSTree< Key, Value, Compare >::clear(Node* node)
+  {
+    if (node == fake_leaf_)
+    {
+      return;
+    }
+
+    clear(node->left_);
+    clear(node->right_);
+    delete node;
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::Node*
+  BSTree< Key, Value, Compare >::cloneNode(const Node* src, Node* parent, const Node* src_fake_leaf)
+  {
+    if (src == src_fake_leaf)
+    {
+      return fake_leaf_;
+    }
+
+    Node* new_node = new Node(src->key_, src->value_);
+    new_node->parent_ = parent;
+    new_node->left_ = cloneNode(src->left_, new_node, src_fake_leaf);
+    new_node->right_ = cloneNode(src->right_, new_node, src_fake_leaf);
+
+    return new_node;
+  }
+
+  template< class Key, class Value, class Compare >
+  void BSTree< Key, Value, Compare >::swap(BSTree& other) noexcept
+  {
+    std::swap(cmp_, other.cmp_);
+    std::swap(root_, other.root_);
+    std::swap(fake_leaf_, other.fake_leaf_);
+  }
 }
 
 #endif
