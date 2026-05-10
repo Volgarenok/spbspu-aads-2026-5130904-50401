@@ -290,112 +290,53 @@ namespace vasyakin
     {
       if (!cmp_(k, curr->key_) && !cmp_(curr->key_, k))
       {
-
-        Value val = curr->value_;
-
-        if (curr->left_ == fake_leaf_ && curr->right_ == fake_leaf_)
-        {
-          if (curr->parent_)
-          {
-            if (curr->parent_->left_ == curr)
-            {
-              curr->parent_->left_ = fake_leaf_;
-            }
-            else
-            {
-              curr->parent_->right_ = fake_leaf_;
-            }
-          }
-          else
-          {
-            root_ = fake_leaf_;
-          }
-        }
-        else if (curr->left_ == fake_leaf_)
-        {
-          curr->right_->parent_ = curr->parent_;
-
-          if (curr->parent_)
-          {
-            if (curr->parent_->left_ == curr)
-            {
-              curr->parent_->left_ = curr->right_;
-            }
-            else
-            {
-              curr->parent_->right_ = curr->right_;
-            }
-          }
-          else
-          {
-            root_ = curr->right_;
-          }
-        }
-        else if (curr->right_ == fake_leaf_)
-        {
-          curr->left_->parent_ = curr->parent_;
-
-          if (curr->parent_)
-          {
-            if (curr->parent_->left_ == curr)
-            {
-              curr->parent_->left_ = curr->left_;
-            }
-            else
-            {
-              curr->parent_->right_ = curr->left_;
-            }
-          }
-          else
-          {
-            root_ = curr->left_;
-          }
-        }
-        else
-        {
-          Node* min_in_right = curr->right_;
-
-          while (min_in_right->left_ != fake_leaf_)
-          {
-            min_in_right = min_in_right->left_;
-          }
-
-          curr->key_ = min_in_right->key_;
-          curr->value_ = min_in_right->value_;
-
-          if (min_in_right->right_ != fake_leaf_)
-          {
-            min_in_right->right_->parent_ = min_in_right->parent_;
-          }
-
-          if (min_in_right->parent_->left_ == min_in_right)
-          {
-            min_in_right->parent_->left_ = min_in_right->right_;
-          }
-          else
-          {
-            min_in_right->parent_->right_ = min_in_right->right_;
-          }
-
-          delete min_in_right;
-          return val;
-        }
-
-        delete curr;
-        return val;
+        break;
       }
 
-      if (cmp_(k, curr->key_))
-      {
-        curr = curr->left_;
-      }
-      else
-      {
-        curr = curr->right_;
-      }
+      curr = cmp_(k, curr->key_) ? curr->left_ : curr->right_;
     }
 
-    throw std::out_of_range("Tree has not this key");
+    if (curr == fake_leaf_)
+    {
+      throw std::out_of_range("Tree has not this key");
+    }
+
+    Value val = curr->value_;
+
+    if (curr->left_ != fake_leaf_ && curr->right_ != fake_leaf_)
+    {
+      Node* succ = curr->right_;
+
+      while (succ->left_ != fake_leaf_)
+      {
+        succ = succ->left_;
+      }
+
+      curr->key_ = succ->key_;
+      curr->value_ = succ->value_;
+
+      curr = succ;
+    }
+
+    Node* child = (curr->left_ != fake_leaf_) ? curr->left_ : curr->right_;
+
+    child->parent_ = curr->parent_;
+
+    if (curr->parent_ == nullptr)
+    {
+      root_ = child;
+    }
+    else if (curr->parent_->left_ == curr)
+    {
+      curr->parent_->left_ = child;
+    }
+    else
+    {
+      curr->parent_->right_ = child;
+    }
+
+    delete curr;
+    return val;
   }
 
   template< class Key, class Value, class Compare >
