@@ -15,13 +15,17 @@ namespace donkeev
     Hash hashFunc_;
     Equal equalFunc_;
 
+  public:
     HashTable() = delete;
     HashTable(const size_t, const size_t);
 
     void add(const Key&, const Value&);
     Value drop(const Key&);
-    bool has(const Key key);
+    bool has(const Key& key);
     void rehash(size_t slots);
+
+  private:
+    Node<Key, Value>* findNode(const Key& key);
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -59,19 +63,37 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   Value HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
   {
+    Node<Key, Value>* node = findNode(key);
+    if (!node)
+    {
+      throw std::out_of_range("No such element");
+    }
+
+    --totalElements_;
+    return node->dropNode();
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool HashTable< Key, Value, Hash, Equal >::has(const Key& key)
+  {
+
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  Node<Key, Value>* HashTable< Key, Value, Hash, Equal >::findNode(const Key& key)
+  {
     size_t hash = hashFunc_(key);
     size_t bucketId = hash % bucketCount_;
     size_t startId = bucketId * bucketSize_;
     size_t endId = startId + bucketSize_;
 
     topit::VIter< Node< Key, Value > > begin = data_.begin() + startId;
-    topit::VIter< Node< Key, Value > > end = begin + endId;
+    topit::VIter< Node< Key, Value > > end = data_.begin() + endId;
     while (begin != end)
     {
       if (equalFunc_(key, begin->key))
       {
-        --totalElements_;
-        return begin->dropNode();
+        return &(*begin);
       }
       ++begin;
     }
@@ -82,12 +104,11 @@ namespace donkeev
     {
       if (equalFunc_(key, begin->key))
       {
-        --totalElements_;
-        return begin->dropNode();
+        return &(*begin);
       }
       ++begin;
     }
 
-    throw std::out_of_range("No such element");
+    return nullptr;
   }
 }
