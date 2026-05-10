@@ -55,4 +55,39 @@ namespace donkeev
       }
     }
   }
+
+  template< class Key, class Value, class Hash, class Equal >
+  Value HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
+  {
+    size_t hash = hashFunc_(key);
+    size_t bucketId = hash % bucketCount_;
+    size_t startId = bucketId * bucketSize_;
+    size_t endId = startId + bucketSize_;
+
+    topit::VIter< Node< Key, Value > > begin = data_.begin() + startId;
+    topit::VIter< Node< Key, Value > > end = begin + endId;
+    while (begin != end)
+    {
+      if (equalFunc_(key, begin->key))
+      {
+        --totalElements_;
+        return begin->dropNode();
+      }
+      ++begin;
+    }
+
+    begin = data_.begin() + bucketCount_ * bucketSize_;
+    end = begin + bucketSize_;
+    while (begin != end)
+    {
+      if (equalFunc_(key, begin->key))
+      {
+        --totalElements_;
+        return begin->dropNode();
+      }
+      ++begin;
+    }
+
+    throw std::out_of_range("No such element");
+  }
 }

@@ -10,6 +10,7 @@ namespace donkeev
     Node();
     Node(const Key&, const Value&);
     bool isEmpty();
+    Value dropNode();
   };
 
   template< class Key, class Value >
@@ -30,5 +31,17 @@ namespace donkeev
   bool Node< Key, Value >::isEmpty()
   {
     return isOccupied_ == false;
+  }
+
+  template< class Key, class Value >
+  Value Node< Key, Value >::dropNode()
+  {
+    Value tmp = value_;
+
+    key_.~Key();
+    value_.~Value();
+    isOccupied_ = false;
+
+    return tmp;
   }
 }
