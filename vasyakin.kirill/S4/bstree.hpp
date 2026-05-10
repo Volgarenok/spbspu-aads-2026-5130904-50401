@@ -436,6 +436,54 @@ namespace vasyakin
 
     return node;
   }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::iterator
+  BSTree< Key, Value, Compare >::begin()
+  {
+    return iterator(fallLeft(root_), fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::iterator
+  BSTree< Key, Value, Compare >::end()
+  {
+    return iterator(fake_leaf_, fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::begin() const
+  {
+    return const_iterator(fallLeft(root_), fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::end() const
+  {
+    return const_iterator(fake_leaf_, fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::cbegin() const
+  {
+    return begin();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::cend() const
+  {
+    return end();
+  }
+
+  template< class Key, class Value, class Compare >
+  bool BSTree< Key, Value, Compare >::empty() const
+  {
+    return root_ == fake_leaf_;
+  }
 }
 
 #endif
