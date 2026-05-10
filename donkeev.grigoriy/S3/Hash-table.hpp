@@ -1,6 +1,6 @@
 #include "Node.hpp"
-#include "common/top-it-vector.hpp"
-#include "common/vector-iterators.hpp"
+#include "../common/top-it-vector.hpp"
+#include "../common/vector-iterators.hpp"
 
 namespace donkeev
 {
@@ -35,5 +35,24 @@ namespace donkeev
     equalFunc_()
   {}
 
-  
+  template< class Key, class Value, class Hash, class Equal >
+  void HashTable< Key, Value, Hash, Equal >::add(const Key& key, const Value& value)
+  {
+    size_t hash = hashFunc_(key);
+    size_t bucketId = hash % bucketCount_;
+    size_t startId = bucketId * bucketSize_;
+    size_t endId = startId + bucketSize_;
+
+    topit::VIter< Node< Key, Value > > begin = data_.begin() + startId;
+    topit::VIter< Node< Key, Value > > end = data_.end();
+    while (begin != end)
+    {
+      if (begin->isEmpty())
+      {
+        *begin = Node< Key, Value >(key, value);
+        ++totalElements_;
+        return;
+      }
+    }
+  }
 }

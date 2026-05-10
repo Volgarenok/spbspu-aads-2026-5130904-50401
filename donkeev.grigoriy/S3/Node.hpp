@@ -20,7 +20,7 @@ namespace donkeev
   {}
 
   template< class Key, class Value >
-  Node< Key, Value >::Node(const Key& key, const Value& value_):
+  Node< Key, Value >::Node(const Key& key, const Value& value):
     key_(key),
     value_(value),
     isOccupied_(true)
