@@ -16,10 +16,11 @@ namespace malashenko
     using pairWeight_t = std::pair< std::string, Vector< size_t > >;
     using htIter_t = HashTableIter< pair_t, Vector< size_t >, HmacHash< pair_t >, Equal< pair_t > >;
     using htCIter_t = HashTableConstIter< pair_t, Vector< size_t >, HmacHash< pair_t >, Equal< pair_t > >;
+
     Vector< std::string > getTops();
     Vector< pairWeight_t > getWeightPairs(const std::string& topName, size_t pos);
     bool cutVertex(const std::string& from, const std::string& to, size_t size);
-
+    void addVertex(const std::string& from, const std::string& to, Vector< size_t > vec);
   private:
     friend class GraphsTable;
     void sort(Vector< size_t >& vec);

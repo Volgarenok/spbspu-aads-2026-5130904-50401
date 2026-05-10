@@ -26,6 +26,7 @@ namespace malashenko
     void sortStrs(Vector< std::string >& vec);
     Vector< std::string > rmRepeatStrs(const Vector< std::string >& vec);
     void sortPair(Vector< pair_t >& vec);
+    void copyGraph(Graph& newGraph, Graph& graph);
     HashTable< std::string, Graph, HmacHash< std::string >, Equal< std::string > > graphs_;
   };
 }

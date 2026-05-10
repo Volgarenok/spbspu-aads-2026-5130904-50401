@@ -36,10 +36,20 @@ namespace malashenko
       if (vec[i] == size)
       {
         vec.erase(i);
+        if (vec.isEmpty())
+        {
+          vertexes_.drop({from, to});
+        }
         return true;
+
       }
     }
     return false;
+  }
+
+  void Graph::addVertex(const std::string& from, const std::string& to, Vector< size_t > vec)
+  {
+    vertexes_.add({from, to}, vec);
   }
 
   void Graph::sort(Vector< size_t >& vec)

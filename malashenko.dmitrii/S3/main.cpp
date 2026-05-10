@@ -47,48 +47,36 @@ int main(int argc, char **argv)
   commands.add("bind", &GraphsTable::bind);
   commands.add("cut", &GraphsTable::cut);
   commands.add("create", &GraphsTable::create);
+  commands.add("merge", &GraphsTable::merge);
+  commands.add("extract", &GraphsTable::extract);
 
-  std::string command;
+  std::string cmd;
 
-  while (std::cin >> command)
+  while (std::cin >> cmd)
   {
-    if (!commands.has(command))
-    {
-      std::cout << "<INVALID COMMAND>\n";
-      while (std::cin.peek() != '\n' && std::cin.peek() != EOF)
-      {
-        std::cin.get();
-      }
-
-      continue;
-    }
-
     std::string graphName;
-
-    if (command != "graphs")
+    if (cmd != "graphs")
     {
       if (!(std::cin >> graphName))
       {
         std::cout << "<INVALID COMMAND>\n";
+        long toignore = std::numeric_limits<std::streamsize>::max();
+        std::cin.ignore(toignore, '\n');
         continue;
       }
     }
 
     try
     {
-      cmd_t func = commands.get(command);
-
-      (table.*func)(std::cin, std::cout, graphName);
+      (table.*commands.get(cmd))(std::cin, std::cout, graphName);
     }
     catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
-
-      while (std::cin.peek() != '\n' && std::cin.peek() != EOF)
-      {
-        std::cin.get();
-      }
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
+
   }
 
   return 0;
