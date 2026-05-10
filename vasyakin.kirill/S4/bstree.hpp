@@ -397,6 +397,45 @@ namespace vasyakin
 
     throw std::out_of_range("Tree has not this key");
   }
+
+  template< class Key, class Value, class Compare >
+  size_t BSTree< Key, Value, Compare >::calcHeight(const Node* node) const
+  {
+    if (node == fake_leaf_)
+    {
+      return 0;
+    }
+
+    size_t left_h = calcHeight(node->left_);
+    size_t right_h = calcHeight(node->right_);
+    size_t height = std::max(left_h, right_h) + 1;
+
+    return height;
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t BSTree< Key, Value, Compare >::height(const_iterator it)
+  {
+    return calcHeight(it.node_);
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t BSTree< Key, Value, Compare >::height()
+  {
+    return calcHeight(root_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::Node*
+  BSTree< Key, Value, Compare >::fallLeft(Node* node) const
+  {
+    while (node != fake_leaf_ && node->left_ != fake_leaf_)
+    {
+      node = node->left_;
+    }
+
+    return node;
+  }
 }
 
 #endif
