@@ -3,7 +3,7 @@
 #include <list/list.hpp>
 #include "hash_table_iter.hpp"
 #include "hash_table_cIter.hpp"
-#include "graphs.hpp"
+#include "graph.hpp"
 namespace malashenko
 {
   template< class Key, class Value, class Hash, class Equal >

@@ -4,9 +4,9 @@
 #include <initializer_list>
 #include <iostream>
 #include <memory>
-#include "top-it-iterator.hpp"
-#include "top-it-const-iterator.hpp"
-namespace topit
+#include "iterator.hpp"
+#include "const_iterator.hpp"
+namespace malashenko
 {
   template< class T >
   struct Vector {
@@ -69,7 +69,7 @@ namespace topit
 }
 
 template< class T >
-void topit::Vector< T >::destroy()
+void malashenko::Vector< T >::destroy()
 {
   for (size_t i = 0; i < size_; ++i)
   {
@@ -80,21 +80,21 @@ void topit::Vector< T >::destroy()
 
 
 template< class T >
-topit::Vector< T >::~Vector()
+malashenko::Vector< T >::~Vector()
 {
   destroy();
   ::operator delete (data_);
 }
 
 template< class T >
-topit::Vector< T >::Vector():
+malashenko::Vector< T >::Vector():
   data_(nullptr),
   size_(0),
   capacity_(0)
 {}
 
 template< class T >
-topit::Vector< T >::Vector(const Vector& rhs):
+malashenko::Vector< T >::Vector(const Vector& rhs):
   Vector(rhs.getSize())
 {
   for (size_t i = 0; i < rhs.getSize(); ++i)
@@ -104,7 +104,7 @@ topit::Vector< T >::Vector(const Vector& rhs):
 }
 
 template< class T >
-topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
+malashenko::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
   data_(rhs.data_),
   size_(rhs.size_),
   capacity_(rhs.capacity_)
@@ -115,7 +115,7 @@ topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
 }
 
 template< class T >
-topit::Vector< T >::Vector(size_t size, const T& init):
+malashenko::Vector< T >::Vector(size_t size, const T& init):
   Vector(size)
 {
   for (size_t i = 0; i < size; ++i)
@@ -125,14 +125,14 @@ topit::Vector< T >::Vector(size_t size, const T& init):
 }
 
 template< class T >
-topit::Vector< T >::Vector(size_t size):
+malashenko::Vector< T >::Vector(size_t size):
   data_(size ? static_cast< T* >(::operator new (size * sizeof(T))) : nullptr),
   size_(size),
   capacity_(size)
 {}
 
 template< class T >
-topit::Vector< T >::Vector(std::initializer_list< T > il):
+malashenko::Vector< T >::Vector(std::initializer_list< T > il):
   Vector(il.size())
 {
   size_t i = 0;
@@ -144,7 +144,7 @@ topit::Vector< T >::Vector(std::initializer_list< T > il):
 
 
 template< class T >
-topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
+malashenko::Vector< T >& malashenko::Vector< T >::operator=(const Vector< T >& rhs)
 {
   if (this == std::addressof(rhs))
   {
@@ -157,7 +157,7 @@ topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
 }
 
 template< class T >
-topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
+malashenko::Vector< T >& malashenko::Vector< T >::operator=(Vector< T >&& rhs) noexcept
 {
   if (this == std::addressof(rhs))
   {
@@ -170,7 +170,7 @@ topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
 }
 
 template< class T >
-T& topit::Vector< T >::operator[](size_t id) noexcept
+T& malashenko::Vector< T >::operator[](size_t id) noexcept
 {
   const Vector< T >* cthis = this;
   return const_cast< T& >((*cthis)[id]);
@@ -178,21 +178,21 @@ T& topit::Vector< T >::operator[](size_t id) noexcept
 
 
 template< class T >
-const T& topit::Vector< T >::operator[](size_t id) const noexcept
+const T& malashenko::Vector< T >::operator[](size_t id) const noexcept
 {
   return data_[id];
 }
 
 
 template< class T >
-T& topit::Vector< T >::at(size_t id)
+T& malashenko::Vector< T >::at(size_t id)
 {
   const Vector< T >* cthis = this;
   return const_cast< T& >(cthis->at(id));
 }
 
 template< class T >
-const T& topit::Vector< T >::at(size_t id) const
+const T& malashenko::Vector< T >::at(size_t id) const
 {
   if (id < getSize())
   {
@@ -203,49 +203,49 @@ const T& topit::Vector< T >::at(size_t id) const
 
 
 template< class T >
-bool topit::Vector< T >::isEmpty() const noexcept
+bool malashenko::Vector< T >::isEmpty() const noexcept
 {
   return !size_;
 }
 
 template< class T >
-size_t topit::Vector< T >::getSize() const noexcept
+size_t malashenko::Vector< T >::getSize() const noexcept
 {
   return size_;
 }
 
 template< class T >
-size_t topit::Vector< T >::getCapacity() const noexcept
+size_t malashenko::Vector< T >::getCapacity() const noexcept
 {
   return capacity_;
 }
 
 template< class T >
-topit::VecIter< T > topit::Vector< T >::begin() const
+malashenko::VecIter< T > malashenko::Vector< T >::begin() const
 {
   return {data_};
 }
 
 template< class T >
-topit::VecIter< T > topit::Vector< T >::end() const
+malashenko::VecIter< T > malashenko::Vector< T >::end() const
 {
   return {data_ + size_};
 }
 
 template< class T >
-topit::VecConstIter< T > topit::Vector< T >::cbegin() const
+malashenko::VecConstIter< T > malashenko::Vector< T >::cbegin() const
 {
   return {data_};
 }
 
 template< class T >
-topit::VecConstIter< T > topit::Vector< T >::cend() const
+malashenko::VecConstIter< T > malashenko::Vector< T >::cend() const
 {
   return {data_ + size_};
 }
 
 template< class T >
-void topit::Vector< T >::reserve(size_t newCapacity)
+void malashenko::Vector< T >::reserve(size_t newCapacity)
 {
   T* newData = static_cast< T* >(::operator new (newCapacity * sizeof(T)));
   size_t i = 0;
@@ -273,13 +273,13 @@ void topit::Vector< T >::reserve(size_t newCapacity)
 }
 
 template< class T >
-void topit::Vector< T >::shrimpToFit()
+void malashenko::Vector< T >::shrimpToFit()
 {
   reserve(size_);
 }
 
 template< class T >
-void topit::Vector< T >::pushBack(const T& value)
+void malashenko::Vector< T >::pushBack(const T& value)
 {
   if (size_ >= capacity_)
   {
@@ -295,7 +295,7 @@ void topit::Vector< T >::pushBack(const T& value)
 
 template< class T >
 template< class IT >
-void topit::Vector< T >::pushBackRange(IT beginIterator, size_t numberOfElements)
+void malashenko::Vector< T >::pushBackRange(IT beginIterator, size_t numberOfElements)
 {
   if (size_ + numberOfElements >= capacity_)
   {
@@ -319,7 +319,7 @@ void topit::Vector< T >::pushBackRange(IT beginIterator, size_t numberOfElements
 
 
 template< class T >
-void topit::Vector< T >::pushBackCount(size_t numberOfElements, const T& value)
+void malashenko::Vector< T >::pushBackCount(size_t numberOfElements, const T& value)
 {
   if (size_ + numberOfElements >= capacity_)
   {
@@ -342,7 +342,7 @@ void topit::Vector< T >::pushBackCount(size_t numberOfElements, const T& value)
 }
 
 template< class T >
-void topit::Vector< T >::unsafePushBack(const T& value)
+void malashenko::Vector< T >::unsafePushBack(const T& value)
 {
   assert(size_ < capacity_);
   new (data_ + size_) T(value);
@@ -350,7 +350,7 @@ void topit::Vector< T >::unsafePushBack(const T& value)
 }
 
 template< class T >
-void topit::Vector< T >::popBack()
+void malashenko::Vector< T >::popBack()
 {
   if (!size_)
   {
@@ -361,7 +361,7 @@ void topit::Vector< T >::popBack()
 }
 
 template< class T >
-topit::VecIter< T > topit::Vector< T >::insert(VecIter< T > position, const T& value)
+malashenko::VecIter< T > malashenko::Vector< T >::insert(VecIter< T > position, const T& value)
 {
   size_t pos = position - begin();
   insert(pos, value);
@@ -369,7 +369,7 @@ topit::VecIter< T > topit::Vector< T >::insert(VecIter< T > position, const T& v
 }
 
 template< class T >
-topit::VecIter< T > topit::Vector< T >::insert(VecIter< T > position, size_t numberOfElements, const T& value)
+malashenko::VecIter< T > malashenko::Vector< T >::insert(VecIter< T > position, size_t numberOfElements, const T& value)
 {
   if (position < begin() || position > end())
   {
@@ -398,7 +398,7 @@ topit::VecIter< T > topit::Vector< T >::insert(VecIter< T > position, size_t num
 }
 
 template< class T >
-topit::VecIter< T > topit::Vector< T >::insert(VecIter< T > position, VecIter< T > startIterator, size_t numberOfElements)
+malashenko::VecIter< T > malashenko::Vector< T >::insert(VecIter< T > position, VecIter< T > startIterator, size_t numberOfElements)
 {
   if (position < begin() || position > end())
   {
@@ -427,7 +427,7 @@ topit::VecIter< T > topit::Vector< T >::insert(VecIter< T > position, VecIter< T
 }
 
 template< class T >
-void topit::Vector< T >::insert(size_t position, const T& value)
+void malashenko::Vector< T >::insert(size_t position, const T& value)
 {
   if (position > size_)
   {
@@ -450,7 +450,7 @@ void topit::Vector< T >::insert(size_t position, const T& value)
 }
 
 template< class T >
-void topit::Vector< T >::insert(size_t position, const Vector< T >& anotherVector, size_t start, size_t end)
+void malashenko::Vector< T >::insert(size_t position, const Vector< T >& anotherVector, size_t start, size_t end)
 {
   if (start > end)
   {
@@ -492,7 +492,7 @@ void topit::Vector< T >::insert(size_t position, const Vector< T >& anotherVecto
 }
 
 template< class T >
-void topit::Vector< T >::erase(size_t position)
+void malashenko::Vector< T >::erase(size_t position)
 {
   if (position >= size_)
   {
@@ -510,7 +510,7 @@ void topit::Vector< T >::erase(size_t position)
 }
 
 template< class T >
-void topit::Vector< T >::erase(size_t start, size_t end)
+void malashenko::Vector< T >::erase(size_t start, size_t end)
 {
   if (start > end)
   {
@@ -541,7 +541,7 @@ void topit::Vector< T >::erase(size_t start, size_t end)
 }
 
 template< class T >
-void topit::Vector< T >::erase(VecIter< T > position)
+void malashenko::Vector< T >::erase(VecIter< T > position)
 {
   size_t pos = position - begin();
   erase(pos);
@@ -549,14 +549,14 @@ void topit::Vector< T >::erase(VecIter< T > position)
 
 
 template< class T >
-void topit::Vector< T >::erase(VecIter< T > position, size_t s)
+void malashenko::Vector< T >::erase(VecIter< T > position, size_t s)
 {
   size_t pos = position - begin();
   erase(pos, pos + s);
 }
 
 template< class T >
-void topit::Vector< T >::erase(VecIter< T > beginIterator, VecIter< T > endIterator)
+void malashenko::Vector< T >::erase(VecIter< T > beginIterator, VecIter< T > endIterator)
 {
   if (beginIterator > endIterator)
   {
@@ -574,7 +574,7 @@ void topit::Vector< T >::erase(VecIter< T > beginIterator, VecIter< T > endItera
 
 
 template< class T >
-void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
+void malashenko::Vector< T >::swap(Vector< T >& rhs) noexcept
 {
   std::swap(data_, rhs.data_);
   std::swap(size_, rhs.size_);
@@ -582,7 +582,7 @@ void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
 }
 
 template< class T >
-bool topit::operator==(const Vector< T >& rhs, const Vector< T >& lhs)
+bool malashenko::operator==(const Vector< T >& rhs, const Vector< T >& lhs)
 {
   bool isEqual = lhs.getSize() == rhs.getSize();
   for (size_t i = 0; (i < lhs.getSize()) && (isEqual = isEqual && lhs[i] == rhs[i]); ++i);
