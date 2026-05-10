@@ -40,16 +40,16 @@ namespace studilova
       size_t capacity() const noexcept;
       bool isEmpty() const noexcept;
 
+      bool has(const Key& key) const;
+
     private:
       topit::Vector< Entry > table_;
       size_t size_;
       Hash hash_;
       Equal equal_;
 
-      static constexpr size_t npos = static_cast< size_t >(-1);
-
       size_t probeIndex(const Key& key, size_t attempt) const;
-      size_t findIndex(const Key& key, size_t& outIndex) const;
+      bool findEntry(const Key& key, size_t& outIndex) const;
   };
 }
 
@@ -80,11 +80,11 @@ studilova::HashTable< Key, Value, Hash, Equal >::HashTable(
 template< class Key, class Value, class Hash, class Equal >
 size_t studilova::HashTable< Key, Value, Hash, Equal >::probeIndex(const Key& key, size_t attempt) const
 {
-  return(hash_(key) + attempt * attempt) % table_.getSize();
+  return (hash_(key) + attempt * attempt) % table_.getSize();
 }
 
 template< class Key, class Value, class Hash, class Equal >
-size_t studilova::HashTable< Key, Value, Hash, Equal >::findIndex(const Key& key, size_t& outIndex) const
+bool studilova::HashTable< Key, Value, Hash, Equal >::findEntry(const Key& key, size_t& outIndex) const
 {
   for (size_t attempt = 0; attempt < table_.getSize(); ++attempt)
   {
@@ -118,6 +118,13 @@ template< class Key, class Value, class Hash, class Equal >
 bool studilova::HashTable< Key, Value, Hash, Equal >::isEmpty() const noexcept
 {
   return size_ == 0;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool studilova::HashTable< Key, Value, Hash, Equal >::has(const Key& key) const
+{
+  size_t dumny = 0;
+  return findEntry(key, dumny);
 }
 
 #endif
