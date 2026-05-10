@@ -64,6 +64,72 @@ namespace vasyakin
     size_t calcHeight(const Node* node) const;
     Node* fallLeft(Node* node) const;
   };
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >::BSTree(const Compare& cmp):
+    cmp_(cmp)
+  {
+    fake_leaf_ = new Node(Key{}, Value{});
+    fake_leaf_->left_ = fake_leaf_;
+    fake_leaf_->right_ = fake_leaf_;
+    fake_leaf_->parent_ = nullptr;
+    root_ = fake_leaf_;
+  }
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >::~BSTree()
+  {
+    clear(root_);
+    delete fake_leaf_;
+  }
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >::BSTree(const BSTree& other):
+    cmp_(other.cmp_)
+  {
+    fake_leaf_ = new Node(Key{}, Value{});
+    fake_leaf_->left_ = fake_leaf_;
+    fake_leaf_->right_ = fake_leaf_;
+    fake_leaf_->parent_ = nullptr;
+
+    root_ = cloneNode(other.root_, nullptr, other.fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >::BSTree(BSTree&& other) noexcept:
+    root_(std::move(other.root_)),
+    fake_leaf_(std::move(other.fake_leaf_)),
+    cmp_(std::move(other.cmp_))
+  {
+    other.root_ = nullptr;
+    other.fake_leaf_ = nullptr;
+  }
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >& BSTree< Key, Value, Compare >::operator=(const BSTree& other)
+  {
+    if (this == std::addressof(other))
+    {
+      return *this;
+    }
+
+    BSTree< Key, Value, Compare > cpy = other;
+    swap(cpy);
+    return *this;
+  }
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >& BSTree< Key, Value, Compare >::operator=(BSTree&& other) noexcept
+  {
+    if (this == std::addressof(other))
+    {
+      return *this;
+    }
+
+    BSTree< Key, Value, Compare > cpy(std::move(other));
+    swap(cpy);
+    return *this;
+  }
 }
 
 #endif
