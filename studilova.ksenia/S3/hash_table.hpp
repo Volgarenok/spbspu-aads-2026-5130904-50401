@@ -50,6 +50,9 @@ namespace studilova
       bool erase(const Key& key);
       Value drop(const Key& key);
 
+      void swap(HashTable& other) noexcept;
+      void rehash(size_t newCapacity);
+
     private:
       topit::Vector< Entry > table_;
       size_t size_;
@@ -236,6 +239,34 @@ Value studilova::HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
   table_[index].state = State::TOMBSTONE;
   --size_;
   return result;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void studilova::HashTable< Key, Value, Hash, Equal >::swap(HashTable& other) noexcept
+{
+  table_.swap(other.table_);
+  std::swap(size_, other.size_);
+  std::swap(hash_, other.hash_);
+  std::swap(equal_, other.equal_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void studilova::HashTable< Key, Value, Hash, Equal >::rehash(size_t newCapacity)
+{
+  if (newCapacity == 0)
+  {
+    throw std::invalid_argument("HashTable capacity must be positive");
+  }
+
+  HashTable tmp(newCapacity, hash_, equal_);
+  for (size_t i = 0; i < table_.getSize(); ++i)
+  {
+    if (table_[i].state == State::OCCUPIED)
+    {
+      tmp.add(table_[i].key, table_[i].value);
+    }
+  }
+  swap(tmp);
 }
 
 #endif
