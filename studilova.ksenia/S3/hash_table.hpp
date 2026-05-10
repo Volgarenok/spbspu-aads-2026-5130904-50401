@@ -47,6 +47,9 @@ namespace studilova
       Value& get(const Key& key);
       const Value& get(const Key& key) const;
 
+      bool erase(const Key& key);
+      Value drop(const Key& key);
+
     private:
       topit::Vector< Entry > table_;
       size_t size_;
@@ -204,6 +207,35 @@ const Value& studilova::HashTable< Key, Value, Hash, Equal >::get(const Key& key
     throw std::out_of_range("Key not found");
   }
   return table_[index].value;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool studilova::HashTable< Key, Value, Hash, Equal >::erase(const Key& key)
+{
+  size_t index = 0;
+  if (!findEntry(key, index))
+  {
+    return false;
+  }
+
+  table_[index].state = State::TOMBSTONE;
+  --size_;
+  return true;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+Value studilova::HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
+{
+  size_t index = 0;
+  if (!findEntry(key, index))
+  {
+    throw std::out_of_range("Key not found");
+  }
+
+  Value result = table_[index].value;
+  table_[index].state = State::TOMBSTONE;
+  --size_;
+  return result;
 }
 
 #endif
