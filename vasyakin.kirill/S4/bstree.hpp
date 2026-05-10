@@ -303,10 +303,56 @@ namespace vasyakin
 
     Value val = curr->value_;
 
-    if (curr->left_ != fake_leaf_ && curr->right_ != fake_leaf_)
+    if (curr->left_ == fake_leaf_ && curr->right_ == fake_leaf_)
+    {
+      if (curr->parent_ == nullptr)
+      {
+        root_ = fake_leaf_;
+      }
+      else if (curr->parent_->left_ == curr)
+      {
+        curr->parent_->left_ = fake_leaf_;
+      }
+      else
+      {
+        curr->parent_->right_ = fake_leaf_;
+      }
+    }
+    else if (curr->left_ == fake_leaf_)
+    {
+      curr->right_->parent_ = curr->parent_;
+      if (curr->parent_ == nullptr)
+      {
+        root_ = curr->right_;
+      }
+      else if (curr->parent_->left_ == curr)
+      {
+        curr->parent_->left_ = curr->right_;
+      }
+      else
+      {
+        curr->parent_->right_ = curr->right_;
+      }
+    }
+    else if (curr->right_ == fake_leaf_)
+    {
+      curr->left_->parent_ = curr->parent_;
+      if (curr->parent_ == nullptr)
+      {
+        root_ = curr->left_;
+      }
+      else if (curr->parent_->left_ == curr)
+      {
+        curr->parent_->left_ = curr->left_;
+      }
+      else
+      {
+        curr->parent_->right_ = curr->left_;
+      }
+    }
+    else
     {
       Node* succ = curr->right_;
-
       while (succ->left_ != fake_leaf_)
       {
         succ = succ->left_;
@@ -315,27 +361,24 @@ namespace vasyakin
       curr->key_ = succ->key_;
       curr->value_ = succ->value_;
 
-      curr = succ;
-    }
+      Node* child = (succ->left_ != fake_leaf_) ? succ->left_ : succ->right_;
 
-    Node* child = (curr->left_ != fake_leaf_) ? curr->left_ : curr->right_;
+      if (child != fake_leaf_)
+      {
+        child->parent_ = succ->parent_;
+      }
 
-    if (child != fake_leaf_)
-    {
-      child->parent_ = curr->parent_;
-    }
+      if (succ->parent_->left_ == succ)
+      {
+        succ->parent_->left_ = child;
+      }
+      else
+      {
+        succ->parent_->right_ = child;
+      }
 
-    if (curr->parent_ == nullptr)
-    {
-      root_ = child;
-    }
-    else if (curr->parent_->left_ == curr)
-    {
-      curr->parent_->left_ = child;
-    }
-    else
-    {
-      curr->parent_->right_ = child;
+      delete succ;
+      return val;
     }
 
     delete curr;
