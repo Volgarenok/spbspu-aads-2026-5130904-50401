@@ -62,8 +62,7 @@ namespace malashenko
     Vector< std::pair< std::string, Vector< size_t > > > tops = graph.getWeightPairs(topName, pos);
     if (tops.isEmpty())
     {
-      out << '\n';
-      return;
+      throw std::invalid_argument("unknown vertex");
     }
     sortPair(tops);
     for (size_t i = 0; i < tops.getSize(); ++i)
