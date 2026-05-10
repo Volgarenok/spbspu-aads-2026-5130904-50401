@@ -48,7 +48,7 @@ namespace donkeev
     size_t endId = startId + bucketSize_;
 
     topit::VIter< Node< Key, Value > > begin = data_.begin() + startId;
-    topit::VIter< Node< Key, Value > > end = data_.end();
+    topit::VIter< Node< Key, Value > > end = data_.begin() + endId;
     while (begin != end)
     {
       if (begin->isEmpty())
@@ -57,7 +57,25 @@ namespace donkeev
         ++totalElements_;
         return;
       }
+
+      ++begin;
     }
+
+    begin = data_.begin() + bucketCount_ * bucketSize_;
+    end = begin + bucketSize_;
+    while (begin != end)
+    {
+      if (begin->isEmpty())
+      {
+        *begin = Node< Key, Value >(key, value);
+        ++totalElements_;
+        return;
+      }
+
+      ++begin;
+    }
+
+    throw std::out_of_range("Can't add becaause of overflow");
   }
 
   template< class Key, class Value, class Hash, class Equal >
