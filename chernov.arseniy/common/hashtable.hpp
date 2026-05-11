@@ -30,10 +30,14 @@ namespace chernov {
     Value * data_;
     size_t * bucket_sizes_;
     size_t total_size_;
+
     size_t num_buckets_;
     size_t bucket_cap_;
     size_t overflow_size_;
     size_t overflow_cap_;
+
+    Hash hasher_;
+    Equal equal_;
   };
 }
 
@@ -45,7 +49,9 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable():
   num_buckets_(0),
   bucket_cap_(0),
   overflow_size_(0),
-  overflow_cap_(0)
+  overflow_cap_(0),
+  hasher_(Hash{}),
+  equal_(Equal{})
 {}
 
 template< class Key, class Value, class Hash, class Equal >
@@ -88,7 +94,9 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable && ht) noexce
   num_buckets_(ht.num_buckets_),
   bucket_cap_(ht.bucket_cap_),
   overflow_size_(ht.overflow_size_),
-  overflow_cap_(ht.overflow_cap_)
+  overflow_cap_(ht.overflow_cap_),
+  hasher_(ht.hasher_),
+  equal_(ht.equal_)
 {
   ht.data_ = nullptr;
   ht.bucket_sizes_ = nullptr;
@@ -122,7 +130,9 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
   num_buckets_(0),
   bucket_cap_(0),
   overflow_size_(0),
-  overflow_cap_(0)
+  overflow_cap_(0),
+  hasher_(Hash{}),
+  equal_(Equal{})
 {
   constexpr size_t default_bucket_cap = 4;
 
@@ -150,7 +160,9 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t num_buckets, siz
   num_buckets_(num_buckets),
   bucket_cap_(bucket_cap),
   overflow_size_(0),
-  overflow_cap_(overflow_cap)
+  overflow_cap_(overflow_cap),
+  hasher_(Hash{}),
+  equal_(Equal{})
 {
   size_t size = num_buckets_ * bucket_cap_ + overflow_cap_;
   if (size) {
@@ -191,6 +203,8 @@ void chernov::HashTable< Key, Value, Hash, Equal >::swap(HashTable & ht) noexcep
   std::swap(bucket_cap_, ht.bucket_cap_);
   std::swap(overflow_size_, ht.overflow_size_);
   std::swap(overflow_cap_, ht.overflow_cap_);
+  std::swap(hasher_, ht.hasher_);
+  std::swap(equal_, ht.equal_);
 }
 
 #endif
