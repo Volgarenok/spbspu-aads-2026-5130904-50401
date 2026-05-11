@@ -11,8 +11,12 @@ namespace chernov {
     HashTable(const HashTable & ht);
     HashTable(HashTable && ht) noexcept;
     ~HashTable();
+
     HashTable(size_t slots);
     HashTable(size_t num_buckets, size_t bucket_cap, size_t overflow_cap);
+
+    void swap(HashTable & ht) noexcept;
+
     void add(Key k, Value v);
     Value drop(Key k);
     bool has(Key k);
@@ -140,6 +144,17 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t num_buckets, siz
     data_ = static_cast< Value * >(::operator new (sizeof(Value) * size));
     bucket_sizes_ = new size_t[num_buckets_]{0};
   }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void chernov::HashTable< Key, Value, Hash, Equal >::swap(HashTable & ht) noexcept
+{
+  std::swap(data_, ht.data_);
+  std::swap(bucket_sizes_, ht.bucket_sizes_);
+  std::swap(num_buckets_, ht.num_buckets_);
+  std::swap(bucket_cap_, ht.bucket_cap_);
+  std::swap(overflow_size_, ht.overflow_size_);
+  std::swap(overflow_cap_, ht.overflow_cap_);
 }
 
 #endif
