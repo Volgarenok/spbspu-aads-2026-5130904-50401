@@ -253,6 +253,17 @@ Value chernov::HashTable< Key, Value, Hash, Equal >::drop(Key k)
 }
 
 template< class Key, class Value, class Hash, class Equal >
+bool chernov::HashTable< Key, Value, Hash, Equal >::has(Key k)
+{
+  try {
+    getElementIndex(k);
+  } catch (const std::out_of_range & e) {
+    return false;
+  }
+  return true;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::getElementIndex(Key k)
 {
   size_t home_bucket = hasher_(k) % num_buckets_;
