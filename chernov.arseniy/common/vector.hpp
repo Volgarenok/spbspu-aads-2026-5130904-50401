@@ -3,6 +3,8 @@
 
 #include <initializer_list>
 #include <cstddef>
+#include <memory>
+#include <stdexcept>
 
 #include <viter.hpp>
 #include <vciter.hpp>
