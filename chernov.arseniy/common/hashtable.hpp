@@ -41,6 +41,8 @@ namespace chernov {
 
     Hash hasher_;
     Equal equal_;
+
+    size_t getElementIndex(Key k);
   };
 }
 
@@ -215,20 +217,44 @@ void chernov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
 {
   HashTable< Key, Value, Hash, Equal > new_ht{*this};
 
-  size_t home_bucket = new_ht.hasher_(k) % new_ht.num_buckets_;
-  if (new_ht.bucket_sizes_[home_bucket] < new_ht.bucket_cap_) {
-    new (new_ht.data_ + (home_bucket * new_ht.bucket_cap_ + new_ht.bucket_sizes_[home_bucket])) Element{k, v};
-    ++new_ht.bucket_sizes_[home_bucket];
-    ++new_ht.total_size_;
-  } else if (overflow_size_ < overflow_cap_) {
-    new (new_ht.data_ + (new_ht.num_buckets_ * new_ht.bucket_cap_ + new_ht.overflow_size_)) Element{k, v};
-    ++new_ht.overflow_size_;
-    ++new_ht.total_size_;
-  } else {
-    throw std::length_error("Hash table is full");
+  try {
+    size_t index = new_ht.getElementIndex(k);
+    new_ht.data_[index].second = v;
+  } catch (const std::out_of_range & e) {
+    size_t home_bucket = new_ht.hasher_(k) % new_ht.num_buckets_;
+    if (new_ht.bucket_sizes_[home_bucket] < new_ht.bucket_cap_) {
+      new (new_ht.data_ + (home_bucket * new_ht.bucket_cap_ + new_ht.bucket_sizes_[home_bucket])) Element{k, v};
+      ++new_ht.bucket_sizes_[home_bucket];
+      ++new_ht.total_size_;
+    } else if (overflow_size_ < overflow_cap_) {
+      new (new_ht.data_ + (new_ht.num_buckets_ * new_ht.bucket_cap_ + new_ht.overflow_size_)) Element{k, v};
+      ++new_ht.overflow_size_;
+      ++new_ht.total_size_;
+    } else {
+      throw std::length_error("Hash table is full");
+    }
   }
 
   swap(new_ht);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t chernov::HashTable< Key, Value, Hash, Equal >::getElementIndex(Key k)
+{
+  size_t home_bucket = hasher_(k) % num_buckets_;
+  for (size_t i = 0; i < bucket_sizes_[home_bucket]; ++i) {
+    size_t index = home_bucket * bucket_cap_ + i;
+    if (k == data_[index].first) {
+      return index;
+    }
+  }
+  for (size_t i = 0; i < overflow_size_; ++i) {
+    size_t index = num_buckets_ * bucket_cap_ + i;
+    if (k == data_[index].first) {
+      return index;
+    }
+  }
+  throw std::out_of_range("Element not found");
 }
 
 #endif
