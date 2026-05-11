@@ -44,7 +44,7 @@ namespace studilova
         private:
           friend class HashTable;
 
-          HashTable* table_;
+          HashTable* hashTable_;
           size_t index_;
 
           void skipEmpty();
@@ -99,16 +99,14 @@ studilova::HashTable< Key, Value, Hash, Equal >::Entry::Entry() :
 
 template< class Key, class Value, class Hash, class Equal >
 studilova::HashTable< Key, Value, Hash, Equal >::Iterator::Iterator():
-  table_(nullptr),
+  hashTable_(nullptr),
   index_(0)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
 void studilova::HashTable< Key, Value, Hash, Equal >::Iterator::skipEmpty()
 {
-  while (
-    table_ && index_ < table_->table_.getSize() && table_->table_[index_].state != State::OCCUPIED
-  )
+  while (hashTable_ && index_ < hashTable_->table_.getSize() && hashTable_->table_[index_].state != State::OCCUPIED)
   {
     ++index_;
   }
@@ -116,7 +114,7 @@ void studilova::HashTable< Key, Value, Hash, Equal >::Iterator::skipEmpty()
 
 template< class Key, class Value, class Hash, class Equal >
 studilova::HashTable< Key, Value, Hash, Equal >::Iterator::Iterator(HashTable* table, size_t index) :
-  table_(table),
+  hashTable_(table),
   index_(index)
 {
   skipEmpty();
@@ -125,7 +123,7 @@ studilova::HashTable< Key, Value, Hash, Equal >::Iterator::Iterator(HashTable* t
 template< class Key, class Value, class Hash, class Equal >
 std::pair< Key&, Value& > studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator*() const
 {
-  Entry& entry = table_->table_[index_];
+  Entry& entry = hashTable_->table_[index_];
   return std::pair< Key&, Value& >(entry.key, entry.value);
 }
 
@@ -141,7 +139,7 @@ studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator++()
 template< class Key, class Value, class Hash, class Equal >
 bool studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator==(const Iterator& other) const
 {
-  return table_ == other.table_ && index_ == other.index_;
+  return hashTable_ == other.hashTable_ && index_ == other.index_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
