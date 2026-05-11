@@ -568,7 +568,7 @@ namespace vasyakin
   BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator it)
   {
     Node* node = const_cast< Node* >(it.node_);
-    if (node == nullptr || node->parent_ == nullptr || node->parent_->parent_ == nullptr)
+    if (node == fake_leaf_ || node->parent_ == nullptr || node->parent_->parent_ == nullptr)
     {
       throw std::invalid_argument("Can not do rotate. No parent");
     }
@@ -582,7 +582,7 @@ namespace vasyakin
   BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator it)
   {
     Node* node = const_cast< Node* >(it.node_);
-    if (node == nullptr || node->parent_ == nullptr || node->parent_->parent_ == nullptr)
+    if (node == fake_leaf_ || node->parent_ == nullptr || node->parent_->parent_ == nullptr)
     {
       throw std::invalid_argument("Can not do rotate. No parent");
     }
