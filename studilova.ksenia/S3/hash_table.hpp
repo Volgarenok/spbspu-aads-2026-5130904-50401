@@ -34,6 +34,13 @@ namespace studilova
         public:
           Iterator();
 
+          std::pair< Key&, Value& > operator*() const;
+
+          Iterator& operator++();
+
+          bool operator==(const Iterator& other) const;
+          bool operator!=(const Iterator& other) const;
+
         private:
           friend class HashTable;
 
@@ -110,6 +117,34 @@ studilova::HashTable< Key, Value, Hash, Equal >::Iterator::Iterator(HashTable* t
   index_(index)
 {
   skipEmpty();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+std::pair< Key&, Value& > studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator*() const
+{
+  Entry& entry = table_->table_[index_];
+  return std::pair< Key&, Value& >(entry.key, entry.value);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename studilova::HashTable< Key, Value, Hash, Equal >::Iterator&
+studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator++()
+{
+  ++index_;
+  skipEmpty();
+  return *this;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator==(const Iterator& other) const
+{
+  return table_ == other.table_ && index_ == other.index_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator!=(const Iterator& other) const
+{
+  return !(*this == other);
 }
 
 template< class Key, class Value, class Hash, class Equal >
