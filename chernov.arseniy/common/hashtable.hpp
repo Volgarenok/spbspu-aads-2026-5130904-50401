@@ -43,6 +43,7 @@ namespace chernov {
     Equal equal_;
 
     size_t getElementIndex(Key k);
+    void removeElementByIndex(size_t index);
   };
 }
 
@@ -239,6 +240,19 @@ void chernov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
 }
 
 template< class Key, class Value, class Hash, class Equal >
+Value chernov::HashTable< Key, Value, Hash, Equal >::drop(Key k)
+{
+  HashTable< Key, Value, Hash, Equal > new_ht{*this};
+
+  size_t index = new_ht.getElementIndex(k);
+  Value value = new_ht.data_[index].second;
+  new_ht.removeElementByIndex(index);
+
+  swap(new_ht);
+  return value;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::getElementIndex(Key k)
 {
   size_t home_bucket = hasher_(k) % num_buckets_;
@@ -255,6 +269,23 @@ size_t chernov::HashTable< Key, Value, Hash, Equal >::getElementIndex(Key k)
     }
   }
   throw std::out_of_range("Element not found");
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void chernov::HashTable< Key, Value, Hash, Equal >::removeElementByIndex(size_t index)
+{
+  size_t last_bucket_element_index;
+  if (index < num_buckets_ * bucket_cap_) {
+    size_t home_bucket = index / bucket_cap_;
+    last_bucket_element_index = home_bucket * bucket_cap_ + bucket_sizes_[home_bucket] - 1;
+    --bucket_sizes_[home_bucket];
+  } else {
+    last_bucket_element_index = num_buckets_ * bucket_cap_ + overflow_size_ - 1;
+    --overflow_size_;
+  }
+  std::swap(data_[index], data_[last_bucket_element_index]);
+  data_[last_bucket_element_index].~Element();
+  --total_size_;
 }
 
 #endif
