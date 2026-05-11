@@ -9,6 +9,8 @@ namespace chernov {
   template< class Key, class Value, class Hash, class Equal >
   class HashTable {
   public:
+    using Element = std::pair< const Key, Value >;
+
     HashTable();
     HashTable(const HashTable & ht);
     HashTable(HashTable && ht) noexcept;
@@ -27,7 +29,7 @@ namespace chernov {
     bool has(Key k);
     void rehash(size_t slots);
   private:
-    Value * data_;
+    Element * data_;
     size_t * bucket_sizes_;
     size_t total_size_;
 
@@ -61,24 +63,24 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable & ht):
   try {
     for (size_t i = 0; i < num_buckets_; ++i) {
       for (size_t j = 0; j < ht.bucket_sizes_[i]; ++j) {
-        new (data_ + (i * bucket_cap_ + j)) Value(ht.data_[i * bucket_cap_ + j]);
+        new (data_ + (i * bucket_cap_ + j)) Element(ht.data_[i * bucket_cap_ + j]);
         ++bucket_sizes_[i];
         ++total_size_;
       }
     }
     for (size_t i = 0; i < ht.overflow_size_; ++i) {
-      new (data_ + (num_buckets_ * bucket_cap_ + i)) Value(ht.data[num_buckets_ * bucket_cap_ + i]);
+      new (data_ + (num_buckets_ * bucket_cap_ + i)) Element(ht.data_[num_buckets_ * bucket_cap_ + i]);
       ++overflow_size_;
       ++total_size_;
     }
   } catch (...) {
     for (size_t i = 0; i < num_buckets_; ++i) {
       for (size_t j = 0; j < bucket_sizes_[i]; ++j) {
-        data_[i * bucket_cap_ + j].~Value();
+        data_[i * bucket_cap_ + j].~Element();
       }
     }
     for (size_t i = 0; i < overflow_size_; ++i) {
-      data_[num_buckets_ * bucket_cap_ + i].~Value();
+      data_[num_buckets_ * bucket_cap_ + i].~Element();
     }
     ::operator delete (data_);
     delete [] bucket_sizes_;
@@ -112,11 +114,11 @@ chernov::HashTable< Key, Value, Hash, Equal >::~HashTable()
 {
   for (size_t i = 0; i < num_buckets_; ++i) {
     for (size_t j = 0; j < bucket_sizes_[i]; ++j) {
-      data_[i * bucket_cap_ + j].~Value();
+      data_[i * bucket_cap_ + j].~Element();
     }
   }
   for (size_t i = 0; i < overflow_size_; ++i) {
-    data_[num_buckets_ * bucket_cap_ + i].~Value();
+    data_[num_buckets_ * bucket_cap_ + i].~Element();
   }
   ::operator delete (data_);
   delete [] bucket_sizes_;
@@ -147,7 +149,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
       overflow_cap_ = slots % default_bucket_cap;
     }
 
-    data_ = static_cast< Value * >(::operator new (sizeof(Value) * (num_buckets_ * bucket_cap_ + overflow_cap_)));
+    data_ = static_cast< Element * >(::operator new (sizeof(Element) * (num_buckets_ * bucket_cap_ + overflow_cap_)));
     bucket_sizes_ = new size_t[num_buckets_]{0};
   }
 }
@@ -166,7 +168,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t num_buckets, siz
 {
   size_t size = num_buckets_ * bucket_cap_ + overflow_cap_;
   if (size) {
-    data_ = static_cast< Value * >(::operator new (sizeof(Value) * size));
+    data_ = static_cast< Element * >(::operator new (sizeof(Element) * size));
     bucket_sizes_ = new size_t[num_buckets_]{0};
   }
 }
