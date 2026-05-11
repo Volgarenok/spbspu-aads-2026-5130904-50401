@@ -75,6 +75,9 @@ namespace studilova
       void swap(HashTable& other) noexcept;
       void rehash(size_t newCapacity);
 
+      Iterator begin();
+      Iterator end();
+
     private:
       topit::Vector< Entry > table_;
       size_t size_;
@@ -342,6 +345,20 @@ void studilova::HashTable< Key, Value, Hash, Equal >::rehash(size_t newCapacity)
     }
   }
   swap(tmp);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename studilova::HashTable< Key, Value, Hash, Equal >::Iterator
+studilova::HashTable< Key, Value, Hash, Equal >::begin()
+{
+  return Iterator(this, 0);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename studilova::HashTable< Key, Value, Hash, Equal >::Iterator
+studilova::HashTable< Key, Value, Hash, Equal >::end()
+{
+  return Iterator(this, table_.getSize());
 }
 
 #endif
