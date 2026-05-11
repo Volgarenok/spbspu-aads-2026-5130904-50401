@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_iterators_forward)
   tree.push(30, "30");
   tree.push(10, "10");
   tree.push(20, "20");
-  tree.push(40, "40"); 
+  tree.push(40, "40");
   tree.push(5, "5");
 
   auto keys = collect_keys(tree);
