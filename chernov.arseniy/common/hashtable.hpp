@@ -2,6 +2,8 @@
 #define HASHTABLE_HPP
 
 #include <cstddef>
+#include <memory>
+#include <utility>
 
 namespace chernov {
   template< class Key, class Value, class Hash, class Equal >
@@ -14,6 +16,9 @@ namespace chernov {
 
     HashTable(size_t slots);
     HashTable(size_t num_buckets, size_t bucket_cap, size_t overflow_cap);
+
+    HashTable & operator=(const HashTable & ht);
+    HashTable & operator=(HashTable && ht) noexcept;
 
     void swap(HashTable & ht) noexcept;
 
@@ -144,6 +149,28 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t num_buckets, siz
     data_ = static_cast< Value * >(::operator new (sizeof(Value) * size));
     bucket_sizes_ = new size_t[num_buckets_]{0};
   }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+chernov::HashTable< Key, Value, Hash, Equal > & chernov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable & ht)
+{
+  if (this == std::addressof(ht)) {
+    return *this;
+  }
+  HashTable< Key, Value, Hash, Equal > new_ht = ht;
+  swap(new_ht);
+  return *this;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+chernov::HashTable< Key, Value, Hash, Equal > & chernov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable && ht) noexcept
+{
+  if (this == std::addressof(ht)) {
+    return *this;
+  }
+  HashTable< Key, Value, Hash, Equal > new_ht = std::move(ht);
+  swap(new_ht);
+  return *this;
 }
 
 template< class Key, class Value, class Hash, class Equal >
