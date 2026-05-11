@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE(test_rotate_right)
 BOOST_AUTO_TEST_CASE(test_rotate_large_left)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(10, "10"); 
+  tree.push(10, "10");
   tree.push(7, "7");
   tree.push(15, "15");
   tree.push(12, "12");
