@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(test_iterators_forward)
   tree.push(20, "20");
   tree.push(40, "40"); 
   tree.push(5, "5");
-  
+
   auto keys = collect_keys(tree);
   BOOST_REQUIRE_EQUAL(keys.size(), 5);
   BOOST_CHECK_EQUAL(keys[0], 5);
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(test_iterators_backward)
 {
   vasyakin::BSTree< int, std::string > tree;
   tree.push(1, "a");
-  tree.push(2, "b"); 
+  tree.push(2, "b");
   tree.push(3, "c");
 
   auto it = tree.begin();
@@ -150,7 +150,6 @@ BOOST_AUTO_TEST_CASE(test_iterators_backward)
   BOOST_CHECK_EQUAL(bwd[1], 2);
   BOOST_CHECK_EQUAL(bwd[2], 1);
 }
-
 
 BOOST_AUTO_TEST_CASE(test_iterators_comparison)
 {
