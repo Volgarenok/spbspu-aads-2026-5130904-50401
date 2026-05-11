@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
 namespace chernov {
@@ -207,6 +208,27 @@ void chernov::HashTable< Key, Value, Hash, Equal >::swap(HashTable & ht) noexcep
   std::swap(overflow_cap_, ht.overflow_cap_);
   std::swap(hasher_, ht.hasher_);
   std::swap(equal_, ht.equal_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void chernov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
+{
+  HashTable< Key, Value, Hash, Equal > new_ht{*this};
+
+  size_t home_bucket = new_ht.hasher_(k) % new_ht.num_buckets_;
+  if (new_ht.bucket_sizes_[home_bucket] < new_ht.bucket_cap_) {
+    new (new_ht.data_ + (home_bucket * new_ht.bucket_cap_ + new_ht.bucket_sizes_[home_bucket])) Element{k, v};
+    ++new_ht.bucket_sizes_[home_bucket];
+    ++new_ht.total_size_;
+  } else if (overflow_size_ < overflow_cap_) {
+    new (new_ht.data_ + (new_ht.num_buckets_ * new_ht.bucket_cap_ + new_ht.overflow_size_)) Element{k, v};
+    ++new_ht.overflow_size_;
+    ++new_ht.total_size_;
+  } else {
+    throw std::length_error("Hash table is full");
+  }
+
+  swap(new_ht);
 }
 
 #endif
