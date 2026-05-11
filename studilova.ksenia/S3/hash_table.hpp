@@ -29,6 +29,21 @@ namespace studilova
     };
 
     public:
+      class Iterator
+      {
+        public:
+          Iterator();
+
+        private:
+          friend class HashTable;
+
+          HashTable* table_;
+          size_t index_;
+
+          void skipEmpty();
+          Iterator(HashTable* table, size_t index);
+      };
+
       explicit HashTable
       (
         size_t capacity = 16,
@@ -71,6 +86,31 @@ studilova::HashTable< Key, Value, Hash, Equal >::Entry::Entry() :
   value(),
   state(State::EMPTY)
 {}
+
+template< class Key, class Value, class Hash, class Equal >
+studilova::HashTable< Key, Value, Hash, Equal >::Iterator::Iterator():
+  table_(nullptr),
+  index_(0)
+{}
+
+template< class Key, class Value, class Hash, class Equal >
+void studilova::HashTable< Key, Value, Hash, Equal >::Iterator::skipEmpty()
+{
+  while (
+    table_ && index_ < table_->table_.getSize() && table_->table_[index_].state != State::OCCUPIED
+  )
+  {
+    ++index_;
+  }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+studilova::HashTable< Key, Value, Hash, Equal >::Iterator::Iterator(HashTable* table, size_t index) :
+  table_(table),
+  index_(index)
+{
+  skipEmpty();
+}
 
 template< class Key, class Value, class Hash, class Equal >
 studilova::HashTable< Key, Value, Hash, Equal >::HashTable(
