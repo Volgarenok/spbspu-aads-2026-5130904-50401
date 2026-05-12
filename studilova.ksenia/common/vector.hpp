@@ -14,7 +14,6 @@ namespace studilova
   {
     public:
       Vector() noexcept;
-      explicit Vector(size_t size);
       Vector(size_t size, const T& value);
       Vector(const Vector& other);
       Vector(Vector&& other) noexcept;
@@ -29,16 +28,25 @@ namespace studilova
       size_t getSize() const noexcept;
       size_t getCapacity() const noexcept;
 
+      void reserve(size_t newCapacity);
+
       T& operator[](size_t index) noexcept;
       const T& operator[](size_t index) const noexcept;
 
       T& at(size_t index);
       const T& at(size_t index) const;
 
+      void pushBack(const T& value);
+      void popBack();
+
+      void erase(size_t index);
+
     private:
       T* data_;
       size_t size_;
       size_t capacity_;
+
+      explicit Vector(size_t size);
 
       void destroyAll() noexcept;
   };
@@ -56,27 +64,11 @@ studilova::Vector< T >::Vector(size_t size) :
   data_(size ? static_cast< T* >(operator new(sizeof(T) * size)) : nullptr),
   size_(0),
   capacity_(size)
-{
-  try
-  {
-    for (; size_ < size; ++size_)
-    {
-      new (data_ + size_) T();
-    }
-  }
-  catch(...)
-  {
-    destroyAll();
-    operator delete(data_);
-    throw;
-  }
-}
+{}
 
 template< class T >
 studilova::Vector< T >::Vector(size_t size, const T& value) :
-  data_(size ? static_cast< T* >(operator new(sizeof(T) * size)) : nullptr),
-  size_(0),
-  capacity_(size)
+  Vector(size)
 {
   try
   {
@@ -181,6 +173,24 @@ size_t studilova::Vector< T >::getCapacity() const noexcept
 }
 
 template< class T >
+void studilova::Vector< T >::reserve(size_t newCapacity)
+{
+  if (newCapacity <= capacity_)
+  {
+    return;
+  }
+
+  Vector< T > tmp(newCapacity);
+  for (size_t i = 0; i < size_; ++i)
+  {
+    new (tmp.data_ + i) T(data_[i]);
+  }
+
+  tmp.size_ = size_;
+  swap(tmp);
+}
+
+template< class T >
 T& studilova::Vector< T >::operator[](size_t index) noexcept
 {
   return data_[index];
@@ -220,6 +230,57 @@ void studilova::Vector< T >::destroyAll() noexcept
     data_[i].~T();
   }
   size_ = 0;
+}
+
+template< class T >
+void studilova::Vector< T >::pushBack(const T& value)
+{
+  Vector< T > tmp(*this);
+
+  if (tmp.size_ == tmp.capacity_)
+  {
+    size_t newCapacity = tmp.capacity_ == 0 ? 1 : tmp.capacity_ * 2;
+    tmp.reserve(newCapacity);
+  }
+
+  new (tmp.data_ + tmp.size_) T(value);
+  ++tmp.size_;
+
+  swap(tmp);
+}
+
+template< class T >
+void studilova::Vector< T >::popBack()
+{
+  if (size_ == 0)
+  {
+    return;
+  }
+
+  --size_;
+  data_[size_].~T();
+}
+
+template< class T >
+void studilova::Vector< T >::erase(size_t index)
+{
+  if (index >= size_)
+  {
+    throw std::out_of_range("Vector index is out of range");
+  }
+
+  Vector< T > tmp(size_ - 1);
+  for (size_t i = 0; i < index; ++i)
+  {
+    new (tmp.data_ + i) T(data_[i]);
+  }
+  for (size_t i = index + 1; i < size_; ++i)
+  {
+    new (tmp.data_ + i - 1) T(data_[i]);
+  }
+
+  tmp.size_ = size_ - 1;
+  swap(tmp);
 }
 
 #endif
