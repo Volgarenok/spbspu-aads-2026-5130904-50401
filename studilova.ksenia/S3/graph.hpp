@@ -28,6 +28,11 @@ namespace studilova
 
       explicit Graph(size_t edgeCapacity = 64);
 
+      bool hasVertex(const std::string& vertex) const;
+      void addVertex(const std::string& vertex);
+
+      const Vector< std::string>& getVertices() const;
+
     private:
       studilova::Vector< std::string> vertices_;
       EdgeTable edges_;
