@@ -107,7 +107,7 @@ namespace studilova
       ConstIterator cend() const;
 
     private:
-      topit::Vector< Entry > table_;
+      studilova::Vector< Entry > table_;
       size_t size_;
       Hash hash_;
       Equal equal_;
