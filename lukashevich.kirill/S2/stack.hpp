@@ -1,0 +1,66 @@
+#ifndef STACK_HPP
+#define STACK_HPP
+#include "../common/list.hpp"
+#include <stdexcept>
+namespace lukashevich
+{
+  template< class T >
+  class Stack
+  {
+    public:
+      bool empty() const;
+      size_t size() const;
+      const T& first() const;
+      void clear();
+      void push(const T& rhs);
+      T drop();
+
+    private:
+      List< T > list_;
+  };
+
+  template< class T >
+  bool Stack< T >::empty() const
+  {
+    return list_.empty();
+  }
+
+  template< class T >
+  size_t Stack< T >::size() const
+  {
+    return list_.size();
+  }
+
+  template< class T >
+  const T& Stack< T >::first() const
+  {
+    if (empty())
+    {
+      throw std::runtime_error("empty stack");
+    }
+    return list_.back();
+  }
+  template< class T >
+  void Stack< T >::clear()
+  {
+    list_.clear();
+  }
+
+  template< class T >
+  void Stack< T >::push(const T& rhs)
+  {
+    list_.pushBack(rhs);
+  }
+
+  template< class T >
+  T Stack< T >::drop()
+  {
+    if (empty()) {
+      throw std::runtime_error("empty stack");
+    }
+    T value = list_.back();
+    list_.popBack();
+    return value;
+  }
+}
+#endif
