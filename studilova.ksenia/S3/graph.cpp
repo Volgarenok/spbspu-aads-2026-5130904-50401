@@ -32,3 +32,73 @@ void studilova::Graph::addVertex(const std::string& vertex)
     vertices_.pushBack(vertex);
   }
 }
+
+void studilova::Graph::swap(Graph& other) noexcept
+{
+  vertices_.swap(other.vertices_);
+  edges_.swap(other.edges_);
+}
+
+void studilova::Graph::bind(const std::string& from, const std::string& to, size_t weight)
+{
+  Graph tmp(*this);
+  tmp.addVertex(from);
+  tmp.addVertex(to);
+
+  EdgeKey key(from, to);
+  if (tmp.edges_.has(key))
+  {
+    Weights weights = tmp.edges_.get(key);
+    weights.pushBack(weight);
+    tmp.edges_.add(key, weights);
+  } else {
+    Weights weights;
+    weights.pushBack(weight);
+    tmp.edges_.add(key, weights);
+  }
+
+  swap(tmp);
+}
+
+bool studilova::Graph::cut(const std::string& from, const std::string& to, size_t weight)
+{
+  if (!hasVertex(from) || !hasVertex(to))
+  {
+    return false;
+  }
+
+  EdgeKey key(from, to);
+  if (!edges_.has(key))
+  {
+    return false;
+  }
+
+  Graph tmp(*this);
+  Weights weights = tmp.edges_.get(key);
+  bool removed = false;
+
+  for (size_t i = 0; i < weights.getSize(); ++i)
+  {
+    if (weights[i] == weight)
+    {
+      weights.erase(i);
+      removed = true;
+      break;
+    }
+  }
+
+  if (!removed)
+  {
+    return false;
+  }
+
+  if (weights.isEmpty())
+  {
+    tmp.edges_.erase(key);
+  } else {
+    tmp.edges_.add(key, weights);
+  }
+
+  swap(tmp);
+  return true;
+}

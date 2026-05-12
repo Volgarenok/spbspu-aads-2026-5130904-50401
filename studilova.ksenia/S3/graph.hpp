@@ -31,6 +31,11 @@ namespace studilova
       bool hasVertex(const std::string& vertex) const;
       void addVertex(const std::string& vertex);
 
+      void swap(Graph& other) noexcept;
+
+      void bind(const std::string& from, const std::string& to, size_t weight);
+      bool cut(const std::string& from, const std::string& to, size_t weight);
+
       const Vector< std::string>& getVertices() const;
 
     private:
