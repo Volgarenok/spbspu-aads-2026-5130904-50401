@@ -1,10 +1,10 @@
 #ifndef MYHASH_HPP
 #define MYHASH_HPP
 #include <cstddef>
-#include <vector>
 #include <utility>
 #include <stdexcept>
 #include "../common/list.hpp"
+#include "../common/myVector.hpp"
 
 namespace zhuravleva
 {
@@ -15,10 +15,9 @@ namespace zhuravleva
       size_t size_;//кол-во пар (key, value)
       Hash hasher;
       Equal equal;
-      std::vector< List< std::pair<Key, Value> > > table;
+      myVector< List< std::pair<Key, Value> > > table;
       size_t getIndex(const Key& key) const;
     public:
-      
       HashTable(size_t bucket_count = 8);
       size_t size() const noexcept;
       size_t bucket_count() const noexcept;
@@ -144,7 +143,7 @@ void zhuravleva::HashTable< Key, Value, Hash, Equal >::rehash(size_t newSize)
   {
     throw std::invalid_argument("new size is zero");
   }
-  std::vector< List< std::pair<Key, Value> > > newTable(newSize);
+  myVector< List< std::pair<Key, Value> > > newTable(newSize);
   for (size_t i = 0; i < table.size(); i++)
   {
     List<std::pair<Key, Value>>& bucket = table[i];
