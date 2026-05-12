@@ -27,6 +27,7 @@ namespace chernov {
 
     bool empty() const noexcept;
     size_t size() const noexcept;
+    size_t maxCapacity() const noexcept;
 
     void clear() noexcept;
     void add(Key k, Value v);
@@ -214,6 +215,12 @@ template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::size() const noexcept
 {
   return total_size_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t chernov::HashTable< Key, Value, Hash, Equal >::maxCapacity() const noexcept
+{
+  return num_buckets_ * bucket_cap_ + overflow_cap_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
