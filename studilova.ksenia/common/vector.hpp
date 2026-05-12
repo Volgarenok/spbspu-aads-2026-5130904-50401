@@ -7,7 +7,7 @@
 #include <memory>
 #include <algorithm>
 
-namespace topit
+namespace studilova
 {
   template< class T >
   struct Vector
@@ -45,21 +45,21 @@ namespace topit
 }
 
 template< class T >
-topit::Vector< T >::Vector() noexcept :
+studilova::Vector< T >::Vector() noexcept :
   data_(nullptr),
   size_(0),
   capacity_(0)
 {}
 
 template< class T >
-topit::Vector< T >::Vector(size_t size) :
+studilova::Vector< T >::Vector(size_t size) :
   data_(size ? static_cast< T* >(operator new(sizeof(T) * size)) : nullptr),
   size_(0),
   capacity_(size)
 {
   try
   {
-    for (; size_ < size; ++size_) 
+    for (; size_ < size; ++size_)
     {
       new (data_ + size_) T();
     }
@@ -73,14 +73,14 @@ topit::Vector< T >::Vector(size_t size) :
 }
 
 template< class T >
-topit::Vector< T >::Vector(size_t size, const T& value) :
+studilova::Vector< T >::Vector(size_t size, const T& value) :
   data_(size ? static_cast< T* >(operator new(sizeof(T) * size)) : nullptr),
   size_(0),
   capacity_(size)
 {
   try
   {
-    for (; size_ < size; ++size_) 
+    for (; size_ < size; ++size_)
     {
       new (data_ + size_) T(value);
     }
@@ -94,14 +94,14 @@ topit::Vector< T >::Vector(size_t size, const T& value) :
 }
 
 template< class T >
-topit::Vector< T >::Vector(const Vector& other) :
+studilova::Vector< T >::Vector(const Vector& other) :
   data_(other.size_ ? static_cast< T* >(operator new(sizeof(T) * other.size_)) : nullptr),
   size_(0),
   capacity_(other.size_)
 {
   try
   {
-    for (; size_ < other.size_; ++size_) 
+    for (; size_ < other.size_; ++size_)
     {
       new (data_ + size_) T(other.data_[size_]);
     }
@@ -115,7 +115,7 @@ topit::Vector< T >::Vector(const Vector& other) :
 }
 
 template< class T >
-topit::Vector< T >::Vector(Vector&& other) noexcept :
+studilova::Vector< T >::Vector(Vector&& other) noexcept :
   data_(other.data_),
   size_(other.size_),
   capacity_(other.capacity_)
@@ -126,14 +126,14 @@ topit::Vector< T >::Vector(Vector&& other) noexcept :
 }
 
 template< class T >
-topit::Vector< T >::~Vector()
+studilova::Vector< T >::~Vector()
 {
   destroyAll();
   operator delete(data_);
 }
 
 template< class T >
-topit::Vector< T >& topit::Vector< T >::operator=(const Vector& other)
+studilova::Vector< T >& studilova::Vector< T >::operator=(const Vector& other)
 {
   if (this != std::addressof(other))
   {
@@ -144,7 +144,7 @@ topit::Vector< T >& topit::Vector< T >::operator=(const Vector& other)
 }
 
 template< class T >
-topit::Vector< T >& topit::Vector< T >::operator=(Vector&& other) noexcept
+studilova::Vector< T >& studilova::Vector< T >::operator=(Vector&& other) noexcept
 {
   if (this != std::addressof(other))
   {
@@ -155,7 +155,7 @@ topit::Vector< T >& topit::Vector< T >::operator=(Vector&& other) noexcept
 }
 
 template< class T >
-void topit::Vector< T >::swap(Vector& other) noexcept
+void studilova::Vector< T >::swap(Vector& other) noexcept
 {
   std::swap(data_, other.data_);
   std::swap(size_, other.size_);
@@ -163,47 +163,37 @@ void topit::Vector< T >::swap(Vector& other) noexcept
 }
 
 template< class T >
-bool topit::Vector< T >::isEmpty() const noexcept
+bool studilova::Vector< T >::isEmpty() const noexcept
 {
   return size_ == 0;
 }
 
 template< class T >
-size_t topit::Vector< T >::getSize() const noexcept
+size_t studilova::Vector< T >::getSize() const noexcept
 {
   return size_;
 }
 
 template< class T >
-size_t topit::Vector< T >::getCapacity() const noexcept
+size_t studilova::Vector< T >::getCapacity() const noexcept
 {
   return capacity_;
 }
 
 template< class T >
-T& topit::Vector< T >::operator[](size_t index) noexcept
+T& studilova::Vector< T >::operator[](size_t index) noexcept
 {
   return data_[index];
 }
 
 template< class T >
-const T& topit::Vector< T >::operator[](size_t index) const noexcept
+const T& studilova::Vector< T >::operator[](size_t index) const noexcept
 {
   return data_[index];
 }
 
 template< class T >
-T& topit::Vector< T >::at(size_t index)
-{
-  if (index >= size_)
-  {
-    throw std::out_of_range("Vector index is out of range");
-  }
-  return data_[index];
-}
-
-template< class T >
-const T& topit::Vector< T >::at(size_t index) const
+T& studilova::Vector< T >::at(size_t index)
 {
   if (index >= size_)
   {
@@ -213,7 +203,17 @@ const T& topit::Vector< T >::at(size_t index) const
 }
 
 template< class T >
-void topit::Vector< T >::destroyAll() noexcept
+const T& studilova::Vector< T >::at(size_t index) const
+{
+  if (index >= size_)
+  {
+    throw std::out_of_range("Vector index is out of range");
+  }
+  return data_[index];
+}
+
+template< class T >
+void studilova::Vector< T >::destroyAll() noexcept
 {
   for (size_t i = 0; i < size_; ++i)
   {
