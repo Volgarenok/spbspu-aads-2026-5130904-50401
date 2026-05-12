@@ -10,7 +10,7 @@ namespace chernov {
   template< class Key, class Value, class Hash, class Equal >
   class HashTable {
   public:
-    using Element = std::pair< const Key, Value >;
+    using Slot = std::pair< const Key, Value >;
 
     HashTable();
     HashTable(const HashTable & ht);
@@ -39,7 +39,7 @@ namespace chernov {
     Value & at(const Key & k);
     const Value & at(const Key & k) const;
   private:
-    Element * data_;
+    Slot * data_;
     size_t * bucket_sizes_;
     size_t total_size_;
 
@@ -78,24 +78,24 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable & ht):
   try {
     for (size_t i = 0; i < num_buckets_; ++i) {
       for (size_t j = 0; j < ht.bucket_sizes_[i]; ++j) {
-        new (data_ + (i * bucket_cap_ + j)) Element(ht.data_[i * bucket_cap_ + j]);
+        new (data_ + (i * bucket_cap_ + j)) Slot(ht.data_[i * bucket_cap_ + j]);
         ++bucket_sizes_[i];
         ++total_size_;
       }
     }
     for (size_t i = 0; i < ht.overflow_size_; ++i) {
-      new (data_ + (num_buckets_ * bucket_cap_ + i)) Element(ht.data_[num_buckets_ * bucket_cap_ + i]);
+      new (data_ + (num_buckets_ * bucket_cap_ + i)) Slot(ht.data_[num_buckets_ * bucket_cap_ + i]);
       ++overflow_size_;
       ++total_size_;
     }
   } catch (...) {
     for (size_t i = 0; i < num_buckets_; ++i) {
       for (size_t j = 0; j < bucket_sizes_[i]; ++j) {
-        data_[i * bucket_cap_ + j].~Element();
+        data_[i * bucket_cap_ + j].~Slot();
       }
     }
     for (size_t i = 0; i < overflow_size_; ++i) {
-      data_[num_buckets_ * bucket_cap_ + i].~Element();
+      data_[num_buckets_ * bucket_cap_ + i].~Slot();
     }
     ::operator delete (data_);
     delete [] bucket_sizes_;
@@ -148,7 +148,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
 
   if (slots) {
     setParamsByCountSlots(slots);
-    data_ = static_cast< Element * >(::operator new (sizeof(Element) * (num_buckets_ * bucket_cap_ + overflow_cap_)));
+    data_ = static_cast< Slot * >(::operator new (sizeof(Slot) * (num_buckets_ * bucket_cap_ + overflow_cap_)));
     bucket_sizes_ = new size_t[num_buckets_]{0};
   }
 }
@@ -167,7 +167,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t num_buckets, siz
 {
   size_t size = num_buckets_ * bucket_cap_ + overflow_cap_;
   if (size) {
-    data_ = static_cast< Element * >(::operator new (sizeof(Element) * size));
+    data_ = static_cast< Slot * >(::operator new (sizeof(Slot) * size));
     bucket_sizes_ = new size_t[num_buckets_]{0};
   }
 }
@@ -231,12 +231,12 @@ void chernov::HashTable< Key, Value, Hash, Equal >::clear() noexcept
 {
   for (size_t i = 0; i < num_buckets_; ++i) {
     for (size_t j = 0; j < bucket_sizes_[i]; ++j) {
-      data_[i * bucket_cap_ + j].~Element();
+      data_[i * bucket_cap_ + j].~Slot();
     }
     bucket_sizes_[i] = 0;
   }
   for (size_t i = 0; i < overflow_size_; ++i) {
-    data_[num_buckets_ * bucket_cap_ + i].~Element();
+    data_[num_buckets_ * bucket_cap_ + i].~Slot();
   }
   overflow_size_ = 0;
   total_size_ = 0;
@@ -295,13 +295,13 @@ void chernov::HashTable< Key, Value, Hash, Equal >::rehash(size_t num_buckets, s
 
   for (size_t i = 0; i < num_buckets_; ++i) {
     for (size_t j = 0; j < bucket_sizes_[i]; ++j) {
-      Element element = data_[i * bucket_cap_ + j];
+      Slot element = data_[i * bucket_cap_ + j];
       new_ht.unsafeAddWithoutCheckingExisting(element.first, element.second);
     }
   }
 
   for (size_t i = 0; i < overflow_size_; ++i) {
-    Element element = data_[num_buckets_ * bucket_cap_ + i];
+    Slot element = data_[num_buckets_ * bucket_cap_ + i];
     new_ht.unsafeAddWithoutCheckingExisting(element.first, element.second);
   }
 
@@ -354,7 +354,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::removeElementByIndex(size_t 
     --overflow_size_;
   }
   std::swap(data_[index], data_[last_bucket_element_index]);
-  data_[last_bucket_element_index].~Element();
+  data_[last_bucket_element_index].~Slot();
   --total_size_;
 }
 
@@ -363,11 +363,11 @@ void chernov::HashTable< Key, Value, Hash, Equal >::unsafeAddWithoutCheckingExis
 {
   size_t home_bucket = hasher_(k) % num_buckets_;
   if (bucket_sizes_[home_bucket] < bucket_cap_) {
-    new (data_ + (home_bucket * bucket_cap_ + bucket_sizes_[home_bucket])) Element{k, v};
+    new (data_ + (home_bucket * bucket_cap_ + bucket_sizes_[home_bucket])) Slot{k, v};
     ++bucket_sizes_[home_bucket];
     ++total_size_;
   } else if (overflow_size_ < overflow_cap_) {
-    new (data_ + (num_buckets_ * bucket_cap_ + overflow_size_)) Element{k, v};
+    new (data_ + (num_buckets_ * bucket_cap_ + overflow_size_)) Slot{k, v};
     ++overflow_size_;
     ++total_size_;
   } else {
