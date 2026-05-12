@@ -17,7 +17,6 @@ namespace zhuravleva
     Node<T>* current;
 
   public:
-
     LIter() noexcept:
       current(nullptr)
     {}
@@ -57,6 +56,32 @@ namespace zhuravleva
     bool operator!=(const LIter& other) const noexcept
     {
       return current != other.current;
+    }
+
+    LIter<T>& LIter<T>::operator++()
+    {
+      if (!current)
+      {
+        throw std::runtime_error("null iterator");
+      }
+      current = current->next;
+      return *this;
+    }
+
+    LIter<T> LIter<T>::operator++(int)
+    {
+      LIter<T> temp(*this);
+      ++(*this);
+      return temp;
+    }
+
+    T* LIter<T>::operator->() const
+    {
+      if (!current)
+      {
+        throw std::runtime_error("null iterator");
+      }
+      return &(current->data);
     }
   };
 
@@ -110,6 +135,32 @@ namespace zhuravleva
     bool operator!=(const LCIter& other) const noexcept
     {
       return current != other.current;
+    }
+  
+    LCIter<T>& LCIter<T>::operator++()
+    {
+      if (!current)
+      {
+        throw std::runtime_error("null iterator");
+      }
+      current = current->next;
+      return *this;
+    }
+  
+    LCIter<T> LCIter<T>::operator++(int)
+    {
+      LCIter<T> temp(*this);
+      ++(*this);
+      return temp;
+    }
+  
+    const T* LCIter<T>::operator->() const
+    {
+      if (!current)
+      {
+        throw std::runtime_error("null iterator");
+      }
+      return &(current->data);
     }
   };
 
