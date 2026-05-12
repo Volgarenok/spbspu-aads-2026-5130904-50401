@@ -35,6 +35,9 @@ namespace chernov {
     bool has(Key k);
     void rehash(size_t slots);
     void rehash(size_t num_buckets, size_t bucket_cap, size_t overflow_cap);
+
+    Value & at(const Key & k);
+    const Value & at(const Key & k) const;
   private:
     Element * data_;
     size_t * bucket_sizes_;
@@ -303,6 +306,20 @@ void chernov::HashTable< Key, Value, Hash, Equal >::rehash(size_t num_buckets, s
   }
 
   swap(new_ht);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+Value &  chernov::HashTable< Key, Value, Hash, Equal >::at(const Key & k)
+{
+  const HashTable< Key, Value, Hash, Equal > * cthis = this;
+  return const_cast< Value & >(cthis->at(k));
+}
+
+template< class Key, class Value, class Hash, class Equal >
+const Value &  chernov::HashTable< Key, Value, Hash, Equal >::at(const Key & k) const
+{
+  size_t index = getElementIndex(k);
+  return data_[index];
 }
 
 template< class Key, class Value, class Hash, class Equal >
