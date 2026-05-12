@@ -52,6 +52,11 @@ namespace sedov
     size_t height() const;
     size_t height(const_iterator it) const;
 
+    const_iterator rotateLeft(const_iterator it);
+    const_iterator rotateRight(const_iterator it);
+    const_iterator rotateLargeLeft(const_iterator it);
+    const_iterator rotateLargeRight(const_iterator it);
+
   private:
     TreeNode< Key, Value > * root_;
     size_t size_;
@@ -248,7 +253,7 @@ void sedov::BSTree< Key, Value, Compare >::push(const Key & k, const Value & v)
     ++size_;
     return;
   }
-  
+
   TreeNode< Key, Value > * cur = root_;
   while (true)
   {
@@ -449,6 +454,99 @@ template < class Key, class Value, class Compare >
 size_t sedov::BSTree< Key, Value, Compare >::height(const_iterator it) const
 {
   return calcHeight(it.node_);
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::const_iterator
+sedov::BSTree< Key, Value, Compare >::rotateLeft(const_iterator it)
+{
+  TreeNode< Key, Value > * x = it.node_;
+  if (x->isFake() || x->right_->isFake())
+  {
+    return it;
+  }
+  TreeNode< Key, Value > * y = x->right_;
+  x->right_ = y->left_;
+  if (!y->left_->isFake())
+  {
+    y->left_->parent_ = x;
+  }
+  y->parent_ = x->parent_;
+  if (x->parent_->isFake())
+  {
+    root_ = y;
+  }
+  else if (x == x->parent_->left_)
+  {
+    x->parent_->left_ = y;
+  }
+  else
+  {
+    x->parent_->right_ = y;
+  }
+  
+  y->left_ = x;
+  x->parent_ = y;
+  return const_iterator(y);
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::const_iterator
+sedov::BSTree< Key, Value, Compare >::rotateRight(const_iterator it)
+{
+  TreeNode< Key, Value > * y = it.node_;
+  if (y->isFake() || y->left_->isFake())
+  {
+    return it;
+  }
+  TreeNode< Key, Value > * x = y->left_;
+  y->left_ = x->right_;
+  if (!x->right_->isFake())
+  {
+    x->right_->parent_ = y;
+  }
+  x->parent_ = y->parent_;
+  if (y->parent_->isFake())
+  {
+    root_ = x;
+  }
+  else if (y == y->parent_->left_)
+  {
+    y->parent_->left_ = x;
+  }
+  else
+  {
+    y->parent_->right_ = x;
+  }
+  x->right_ = y;
+  y->parent_ = x;
+  return const_iterator(x);
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::const_iterator
+sedov::BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator it)
+{
+  TreeNode< Key, Value > * node = it.node_;
+  if (node->isFake() || node->left_->isFake() || node->left_->right_->isFake())
+  {
+    return it;
+  }
+  rotateRight(const_iterator(node->left_));
+  return rotateLeft(it);
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::const_iterator
+sedov::BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator it)
+{
+  TreeNode< Key, Value > * node = it.node_;
+  if (node->isFake() || node->right_->isFake() || node->right_->left_->isFake())
+  {
+    return it;
+  }
+  rotateLeft(const_iterator(node->right_));
+  return rotateRight(it);
 }
 
 #endif
