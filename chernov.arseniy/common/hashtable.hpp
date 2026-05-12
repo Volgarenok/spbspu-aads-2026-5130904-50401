@@ -25,6 +25,9 @@ namespace chernov {
 
     void swap(HashTable & ht) noexcept;
 
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+
     void add(Key k, Value v);
     Value drop(Key k);
     bool has(Key k);
@@ -205,6 +208,18 @@ void chernov::HashTable< Key, Value, Hash, Equal >::swap(HashTable & ht) noexcep
   std::swap(overflow_cap_, ht.overflow_cap_);
   std::swap(hasher_, ht.hasher_);
   std::swap(equal_, ht.equal_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool chernov::HashTable< Key, Value, Hash, Equal >::empty() const noexcept
+{
+  return total_size_ == 0;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t chernov::HashTable< Key, Value, Hash, Equal >::size() const noexcept
+{
+  return total_size_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
