@@ -8,6 +8,13 @@ namespace lukashevich
   class Stack
   {
     public:
+      Stack();
+      ~Stack() = default;
+      Stack(const Stack< T >& stack);
+      Stack< T >& operator=(const Stack< T >& stack);
+      Stack(Stack< T >&& stack);
+      Stack< T >& operator=(Stack< T >&& stack);
+
       bool empty() const;
       size_t size() const;
       const T& first() const;
@@ -18,6 +25,39 @@ namespace lukashevich
     private:
       List< T > list_;
   };
+
+  template< class T >
+  Stack< T >::Stack():
+    list_()
+  {}
+
+  template< class T >
+  Stack< T >::Stack(const Stack< T >& stack):
+    list_(stack.list_)
+  {}
+
+  template< class T >
+  Stack< T >& Stack< T >::operator=(const Stack< T >& stack)
+  {
+    if (this != &stack) {
+      list_ = stack.list_;
+    }
+    return *this;
+  }
+
+  template< class T >
+  Stack< T >::Stack(Stack< T >&& stack):
+    list_(std::move(stack.list_))
+  {}
+
+  template< class T >
+  Stack< T >& Stack< T >::operator=(Stack< T >&& stack)
+  {
+    if (this != &stack) {
+      list_ = std::move(stack.list_);
+    }
+    return *this;
+  }
 
   template< class T >
   bool Stack< T >::empty() const
