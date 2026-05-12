@@ -42,6 +42,16 @@ namespace sedov
     TreeNode< Key, Value > * fallLeft(TreeNode< Key, Value > * node) const;
     Value drop(const Key & k);
 
+    iterator begin();
+    iterator end() noexcept;
+    const_iterator begin() const;
+    const_iterator end() const noexcept;
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
+    size_t calcHeight(TreeNode< Key, Value > * node) const;
+    size_t height() const;
+    size_t height(const_iterator it) const;
+
   private:
     TreeNode< Key, Value > * root_;
     size_t size_;
@@ -361,6 +371,84 @@ Value sedov::BSTree< Key, Value, Compare >::drop(const Key & k)
   delete node;
   --size_;
   return res;
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::iterator
+sedov::BSTree< Key, Value, Compare >::begin()
+{
+  if (root_->isFake())
+  {
+    return iterator(nullptr);
+  }
+  return iterator(fallLeft(root_));
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::iterator
+sedov::BSTree< Key, Value, Compare >::end() noexcept
+{
+  return iterator(nullptr);
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::const_iterator
+sedov::BSTree< Key, Value, Compare >::begin() const
+{
+  if (root_->isFake())
+  {
+    return const_iterator(nullptr);
+  }
+  return const_iterator(fallLeft(root_));
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::const_iterator
+sedov::BSTree< Key, Value, Compare >::end() const noexcept
+{
+  return const_iterator(nullptr);
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::const_iterator
+sedov::BSTree< Key, Value, Compare >::cbegin() const noexcept
+{
+  if (root_->isFake())
+  {
+    return const_iterator(nullptr);
+  }
+  return const_iterator(fallLeft(root_));
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::const_iterator
+sedov::BSTree< Key, Value, Compare >::cend() const noexcept
+{
+  return const_iterator(nullptr);
+}
+
+template < class Key, class Value, class Compare >
+size_t sedov::BSTree< Key, Value, Compare >::calcHeight(TreeNode< Key, Value > * node) const
+{
+  if (node->isFake())
+  {
+    return 0;
+  }
+  size_t l = calcHeight(node->left_);
+  size_t r = calcHeight(node->right_);
+  return 1 + ((l > r) ? l : r);
+}
+
+template < class Key, class Value, class Compare >
+size_t sedov::BSTree< Key, Value, Compare >::height() const
+{
+  return calcHeight(root_);
+}
+
+template < class Key, class Value, class Compare >
+size_t sedov::BSTree< Key, Value, Compare >::height(const_iterator it) const
+{
+  return calcHeight(it.node_);
 }
 
 #endif
