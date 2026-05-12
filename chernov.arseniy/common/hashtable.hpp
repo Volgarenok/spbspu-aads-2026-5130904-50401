@@ -28,6 +28,7 @@ namespace chernov {
     bool empty() const noexcept;
     size_t size() const noexcept;
 
+    void clear() noexcept;
     void add(Key k, Value v);
     Value drop(Key k);
     bool has(Key k);
@@ -122,14 +123,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable && ht) noexce
 template< class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal >::~HashTable()
 {
-  for (size_t i = 0; i < num_buckets_; ++i) {
-    for (size_t j = 0; j < bucket_sizes_[i]; ++j) {
-      data_[i * bucket_cap_ + j].~Element();
-    }
-  }
-  for (size_t i = 0; i < overflow_size_; ++i) {
-    data_[num_buckets_ * bucket_cap_ + i].~Element();
-  }
+  clear();
   ::operator delete (data_);
   delete [] bucket_sizes_;
 }
@@ -220,6 +214,22 @@ template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::size() const noexcept
 {
   return total_size_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void chernov::HashTable< Key, Value, Hash, Equal >::clear() noexcept
+{
+  for (size_t i = 0; i < num_buckets_; ++i) {
+    for (size_t j = 0; j < bucket_sizes_[i]; ++j) {
+      data_[i * bucket_cap_ + j].~Element();
+    }
+    bucket_sizes_[i] = 0;
+  }
+  for (size_t i = 0; i < overflow_size_; ++i) {
+    data_[num_buckets_ * bucket_cap_ + i].~Element();
+  }
+  overflow_size_ = 0;
+  total_size_ = 0;
 }
 
 template< class Key, class Value, class Hash, class Equal >
