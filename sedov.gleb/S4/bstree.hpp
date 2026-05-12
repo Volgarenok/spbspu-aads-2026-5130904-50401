@@ -34,6 +34,14 @@ namespace sedov
     friend class BSTConstIterator< Key, Value >;
     friend class BSTIterator< Key, Value >;
 
+    TreeNode< Key, Value > * findNode(const Key & k) const;
+    const Value & at(const Key & k) const;
+    Value & at(const Key & k);
+    void push(const Key & k, const Value & v);
+    void push(Key && k, Value && v);
+    TreeNode< Key, Value > * fallLeft(TreeNode< Key, Value > * node) const;
+    Value drop(const Key & k);
+
   private:
     TreeNode< Key, Value > * root_;
     size_t size_;
@@ -175,6 +183,184 @@ sedov::BSTree< Key, Value, Compare >::clone(TreeNode< Key, Value > * src,
   n->left_ = clone(src->left_, n);
   n->right_ = clone(src->right_, n);
   return n;
+}
+
+template < class Key, class Value, class Compare >
+sedov::TreeNode< Key, Value > * sedov::BSTree< Key, Value, Compare >::findNode(const Key & k) const
+{
+  TreeNode< Key, Value > * cur = root_;
+  while (!cur->isFake())
+  {
+    if (comp_(k, cur->key_))
+    {
+      cur = cur->left_;
+    }
+    else if (comp_(cur->key_, k))
+    {
+      cur = cur->right_;
+    }
+    else
+    {
+      return cur;
+    }
+  }
+  return nullptr;
+}
+
+template < class Key, class Value, class Compare >
+const Value & sedov::BSTree< Key, Value, Compare >::at(const Key & k) const
+{
+  TreeNode< Key, Value > * n = findNode(k);
+  if (n == nullptr)
+  {
+    throw std::out_of_range("Key not found");
+  }
+  return n->value_;
+}
+
+template < class Key, class Value, class Compare >
+Value & sedov::BSTree< Key, Value, Compare >::at(const Key & k)
+{
+  TreeNode< Key, Value > * n = findNode(k);
+  if (n == nullptr)
+  {
+    throw std::out_of_range("Key not found");
+  }
+  return n->value_;
+}
+
+template < class Key, class Value, class Compare >
+void sedov::BSTree< Key, Value, Compare >::push(const Key & k, const Value & v)
+{
+  if (root_->isFake())
+  {
+    root_ = new TreeNode< Key, Value >(k, v, TreeNode< Key, Value >::fakeLeaf);
+    ++size_;
+    return;
+  }
+  
+  TreeNode< Key, Value > * cur = root_;
+  while (true)
+  {
+    if (comp_(k, cur->key_))
+    {
+      if (cur->left_->isFake())
+      {
+        cur->left_ = new TreeNode< Key, Value >(k, v, cur);
+        ++size_;
+        return;
+      }
+      cur = cur->left_;
+    }
+    else if (comp_(cur->key_, k))
+    {
+      if (cur->right_->isFake())
+      {
+        cur->right_ = new TreeNode< Key, Value >(k, v, cur);
+        ++size_;
+        return;
+      }
+      cur = cur->right_;
+    }
+    else
+    {
+      cur->value_ = v;
+      return;
+    }
+  }
+}
+
+template < class Key, class Value, class Compare >
+void sedov::BSTree< Key, Value, Compare >::push(Key && k, Value && v)
+{
+  if (root_->isFake())
+  {
+    root_ = new TreeNode< Key, Value >(std::move(k), std::move(v), TreeNode< Key, Value >::fakeLeaf);
+    ++size_;
+    return;
+  }
+  TreeNode< Key, Value > * cur = root_;
+  while (true)
+  {
+    if (comp_(k, cur->key_))
+    {
+      if (cur->left_->isFake())
+      {
+        cur->left_ = new TreeNode< Key, Value >(std::move(k), std::move(v), cur);
+        ++size_;
+        return;
+      }
+      cur = cur->left_;
+    }
+    else if (comp_(cur->key_, k))
+    {
+      if (cur->right_->isFake())
+      {
+        cur->right_ = new TreeNode< Key, Value >(std::move(k), std::move(v), cur);
+        ++size_;
+        return;
+      }
+      cur = cur->right_;
+    }
+    else
+    {
+      cur->value_ = std::move(v);
+      return;
+    }
+  }
+}
+
+template < class Key, class Value, class Compare >
+sedov::TreeNode< Key, Value > *
+sedov::BSTree< Key, Value, Compare >::fallLeft(TreeNode< Key, Value > * node) const
+{
+  while (!node->left_->isFake())
+  {
+    node = node->left_;
+  }
+  return node;
+}
+
+template < class Key, class Value, class Compare >
+Value sedov::BSTree< Key, Value, Compare >::drop(const Key & k)
+{
+  TreeNode< Key, Value > * node = findNode(k);
+  if (node == nullptr)
+  {
+    throw std::out_of_range("Key not found");
+  }
+  Value res = std::move(node->value_);
+  if (!node->left_->isFake() && !node->right_->isFake())
+  {
+    TreeNode< Key, Value > * succ = fallLeft(node->right_);
+    node->key_ = std::move(succ->key_);
+    node->value_ = std::move(succ->value_);
+    node = succ;
+  }
+  TreeNode< Key, Value > * child = (!node->left_->isFake()) ? node->left_ : node->right_;
+  if (child->isFake())
+  {
+    child = TreeNode< Key, Value >::fakeLeaf;
+  }
+  else
+  {
+    child->parent_ = node->parent_;
+  }
+  if (node->parent_->isFake())
+  {
+    root_ = child;
+  }
+  else if (node->parent_->left_ == node)
+  {
+    node->parent_->left_ = child;
+  }
+  else
+  {
+    node->parent_->right_ = child;
+  }
+  delete node;
+  --size_;
+  return res;
 }
 
 #endif
