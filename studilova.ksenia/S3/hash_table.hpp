@@ -239,7 +239,7 @@ studilova::HashTable< Key, Value, Hash, Equal >::HashTable(
   Hash hash,
   Equal equal
 ):
-  table_(capacity),
+  table_(capacity, Entry{}),
   size_(0),
   hash_(std::move(hash)),
   equal_(std::move(equal))
