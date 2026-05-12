@@ -189,7 +189,7 @@ namespace lukashevich
     ll res = 0;
     size_t i = 0;
     bool neg = false;
-    
+
     if (i < s.length() && s[i] == '-') {
       neg = true;
       ++i;
