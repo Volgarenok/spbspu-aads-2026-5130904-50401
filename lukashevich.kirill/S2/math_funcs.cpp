@@ -210,4 +210,54 @@ namespace lukashevich
     }
     return neg ? -res : res;
   }
+
+  ll evaluate_expression(const std::string& line)
+  {
+    List< std::string > tokens = tokenize(line);
+    List< std::string > postfix = infixToPostfix(tokens);
+    Stack< ll > eval_stack;
+
+    for (auto it = postfix.begin(); it != postfix.end(); ++it) {
+      const std::string& token = *it;
+      size_t type = getOperatorType(token);
+      if (type == 0) {
+        eval_stack.push(parse_ll(token));
+      }
+      else if (type == 1) {
+        if (eval_stack.size() < 2) {
+          throw std::runtime_error("invalid expression: missing operand");
+        }
+        ll rhs = eval_stack.drop();
+        ll lhs = eval_stack.drop();
+        ll res;
+        if (token == "+") {
+          res = add(lhs, rhs);
+        }
+        else if (token == "-") {
+          res = sub(lhs, rhs);
+        }
+        else if (token == "*") {
+          res = mul(lhs, rhs);
+        }
+        else if (token == "/") {
+          res = divide(lhs, rhs);
+        }
+        else {
+          res = mod(lhs, rhs);
+        }
+        eval_stack.push(res);
+      }
+      else if (type == 2) {
+        if (eval_stack.empty()) {
+          throw std::runtime_error("invalid expression: missing operand for !");
+        }
+        ll val = eval_stack.drop();
+        eval_stack.push(bitwise_not(val));
+      }
+    }
+    if (eval_stack.size() != 1) {
+      throw std::runtime_error("invalid expression");
+    }
+    return eval_stack.drop();
+  }
 }
