@@ -176,7 +176,11 @@ namespace lukashevich
     if (lhs == std::numeric_limits< ll >::min() && rhs == -1) {
       throw std::overflow_error("overflow");
     }
-    return lhs % rhs;
+    ll result = lhs % rhs;
+    if (result < 0) {
+      result += (rhs > 0 ? rhs : -rhs);
+    }
+    return result;
   }
 
   ll bitwise_not(ll value)
