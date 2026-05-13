@@ -484,7 +484,7 @@ sedov::BSTree< Key, Value, Compare >::rotateLeft(const_iterator it)
   {
     x->parent_->right_ = y;
   }
-  
+
   y->left_ = x;
   x->parent_ = y;
   return const_iterator(y);

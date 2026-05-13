@@ -12,15 +12,15 @@ namespace sedov
     TreeNode * left_;
     TreeNode * right_;
     TreeNode * parent_;
-    
+
     static TreeNode * fakeLeaf;
 
     TreeNode(const Key & key, const Value & value, TreeNode * parent);
     TreeNode(Key && key, Value && value, TreeNode * parent);
-    
+
     bool isFake() const noexcept;
   };
-  
+
   template < class Key, class Value >
   TreeNode< Key, Value > * TreeNode< Key, Value >::fakeLeaf = nullptr;
 }

@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(test_drop_root_with_two_children)
 
   tree.drop(2);
   BOOST_CHECK_EQUAL(tree.size(), 2);
-  
+
   bool hasOne = false;
   bool hasThree = false;
   for (auto it = tree.begin(); it != tree.end(); ++it)
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(test_drop_leaf)
   tree.push(2, "two");
   tree.push(1, "one");
   tree.push(3, "three");
-  
+
   tree.drop(1);
   BOOST_CHECK_EQUAL(tree.size(), 2);
   BOOST_CHECK_THROW(tree.at(1), std::out_of_range);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(test_drop_nonexistent)
 {
   BSTree< int, std::string > tree;
   tree.push(1, "one");
-  
+
   BOOST_CHECK_THROW(tree.drop(999), std::out_of_range);
   BOOST_CHECK_EQUAL(tree.size(), 1);
 }
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(test_end_iterator)
   BSTree< int, std::string > tree;
   tree.push(1, "one");
   tree.push(2, "two");
-  
+
   auto it = tree.begin();
   ++it;
   ++it;

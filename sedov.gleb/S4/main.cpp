@@ -31,7 +31,7 @@ namespace sedov
     }
     return true;
   }
-  
+
   template< class Key, class Value >
   void initFake()
   {
@@ -43,7 +43,7 @@ namespace sedov
       TreeNode< Key, Value >::fakeLeaf->parent_ = TreeNode< Key, Value >::fakeLeaf;
     }
   }
-  
+
   void initFakes()
   {
     initFake< int, std::string >();
