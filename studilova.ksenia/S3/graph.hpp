@@ -25,6 +25,7 @@ namespace studilova
       using EdgeKey = std::pair< std::string, std::string >;
       using Weights = studilova::Vector< size_t >;
       using EdgeTable = HashTable< EdgeKey, Weights, HMACHash, PairEqual >;
+      using Connections = Vector< std::pair< std::string, Weights > >;
 
       explicit Graph(size_t edgeCapacity = 64);
 
@@ -38,6 +39,9 @@ namespace studilova
 
       const Vector< std::string>& getVertices() const;
       const EdgeTable& getEdges() const;
+
+      Connections getOutbound(const std::string& vertex) const;
+      Connections getInbound(const std::string& vertex) const;
 
     private:
       studilova::Vector< std::string> vertices_;

@@ -112,3 +112,49 @@ const studilova::Graph::EdgeTable& studilova::Graph::getEdges() const
 {
   return edges_;
 }
+
+studilova::Graph::Connections studilova::Graph::getOutbound(const std::string& vertex) const
+{
+  if (!hasVertex(vertex))
+  {
+    throw std::out_of_range("Vertex not found");
+  }
+
+  Connections result;
+  for (auto it = edges_.begin(); it != edges_.end(); ++it)
+  {
+    auto edge = *it;
+
+    const EdgeKey& key = edge.first;
+    const Weights& weights = edge.second;
+
+    if (key.first == vertex)
+    {
+      result.pushBack(std::pair< std::string, Weights>(key.second, weights));
+    }
+  }
+  return result;
+}
+
+studilova::Graph::Connections studilova::Graph::getInbound(const std::string& vertex) const
+{
+  if (!hasVertex(vertex))
+  {
+    throw std::out_of_range("Vertex not found");
+  }
+
+  Connections result;
+  for (auto it = edges_.begin(); it != edges_.end(); ++it)
+  {
+    auto edge = *it;
+
+    const EdgeKey& key = edge.first;
+    const Weights& weights = edge.second;
+
+    if (key.second == vertex)
+    {
+      result.pushBack(std::pair< std::string, Weights>(key.first, weights));
+    }
+  }
+  return result;
+}
