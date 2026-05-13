@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(OperatorsConstructors)
   BOOST_CHECK(sCopyOperator.size() == 3);
   BOOST_CHECK(sCopyOperator.first() == 52);
   BOOST_CHECK(sMove.size() == 3);
-  
+
   Stack< int > sMoveOperator = std::move(sCopyOperator);
 
   BOOST_CHECK(sMoveOperator.size() == 3);

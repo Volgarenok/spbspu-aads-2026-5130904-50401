@@ -38,6 +38,7 @@ BOOST_AUTO_TEST_CASE(Clear)
 
   BOOST_CHECK(q.empty());
 }
+
 BOOST_AUTO_TEST_CASE(Drop)
 {
   Queue< int > q;
@@ -77,7 +78,7 @@ BOOST_AUTO_TEST_CASE(OperatorsConstructors)
   BOOST_CHECK(qMove.size() == 3);
 
   Queue< int > qMoveOperator = std::move(qCopyOperator);
-  
+
   BOOST_CHECK(qMoveOperator.size() == 3);
   BOOST_CHECK(qCopyOperator.empty());
 
