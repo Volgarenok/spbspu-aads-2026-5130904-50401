@@ -214,16 +214,19 @@ BOOST_AUTO_TEST_CASE(test_reverse_traversal_with_decrement)
   tree.push(4, "four");
 
   sedov::Vector< int > keys;
-  auto it = tree.end();
-  --it;
-  while (true)
+  if (tree.begin() != tree.end())
   {
-    keys.pushBack((*it).first);
-    if (it == tree.begin())
-    {
-      break;
-    }
+    auto it = tree.end();
     --it;
+    while (true)
+    {
+      keys.pushBack((*it).first);
+      if (it == tree.begin())
+      {
+        break;
+      }
+      --it;
+    }
   }
 
   BOOST_REQUIRE_EQUAL(keys.getSize(), 4);
