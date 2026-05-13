@@ -416,7 +416,7 @@ BOOST_AUTO_TEST_CASE(test_rotate_large_left)
   auto it = tree.cbegin();
   ++it;
   ++it;
-  auto newIt = tree.rotateLargeLeft(it);
+  tree.rotateLargeLeft(it);
 
   BOOST_CHECK_EQUAL(tree.size(), 3);
   BOOST_CHECK_EQUAL(tree.at(1), "one");
@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE(test_rotate_large_right)
   tree.push(2, "two");
 
   auto it = tree.cbegin();
-  auto newIt = tree.rotateLargeRight(it);
+  tree.rotateLargeRight(it);
 
   BOOST_CHECK_EQUAL(tree.size(), 3);
   BOOST_CHECK_EQUAL(tree.at(1), "one");
