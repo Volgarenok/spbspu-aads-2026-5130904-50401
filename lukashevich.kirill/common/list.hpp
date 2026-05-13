@@ -126,7 +126,8 @@ namespace lukashevich
   template< class T >
   void List< T >::pushBack(const T& value)
   {
-    Node< T >* node = new Node< T >(value, nullptr, fake_->prev);
+    Node< T >* prev_node = fake_->prev != nullptr ? fake_->prev : fake_;
+    Node< T >* node = new Node< T >(value, nullptr, prev_node);
 
     if (fake_->prev != nullptr) {
       fake_->prev->next = node;
