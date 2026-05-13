@@ -102,3 +102,13 @@ bool studilova::Graph::cut(const std::string& from, const std::string& to, size_
   swap(tmp);
   return true;
 }
+
+const studilova::Vector< std::string >& studilova::Graph::getVertices() const
+{
+  return vertices_;
+}
+
+const studilova::Graph::EdgeTable& studilova::Graph::getEdges() const
+{
+  return edges_;
+}

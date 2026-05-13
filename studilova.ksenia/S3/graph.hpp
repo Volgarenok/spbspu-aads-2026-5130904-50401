@@ -37,6 +37,7 @@ namespace studilova
       bool cut(const std::string& from, const std::string& to, size_t weight);
 
       const Vector< std::string>& getVertices() const;
+      const EdgeTable& getEdges() const;
 
     private:
       studilova::Vector< std::string> vertices_;
