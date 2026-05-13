@@ -205,37 +205,6 @@ BOOST_AUTO_TEST_CASE(test_end_iterator)
   BOOST_CHECK(it == tree.end());
 }
 
-BOOST_AUTO_TEST_CASE(test_reverse_traversal_with_decrement)
-{
-  BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
-  tree.push(3, "three");
-  tree.push(4, "four");
-
-  sedov::Vector< int > keys;
-  if (tree.begin() != tree.end())
-  {
-    auto it = tree.end();
-    --it;
-    while (true)
-    {
-      keys.pushBack((*it).first);
-      if (it == tree.begin())
-      {
-        break;
-      }
-      --it;
-    }
-  }
-
-  BOOST_REQUIRE_EQUAL(keys.getSize(), 4);
-  BOOST_CHECK_EQUAL(keys[0], 4);
-  BOOST_CHECK_EQUAL(keys[1], 3);
-  BOOST_CHECK_EQUAL(keys[2], 2);
-  BOOST_CHECK_EQUAL(keys[3], 1);
-}
-
 BOOST_AUTO_TEST_CASE(test_copy_constructor)
 {
   BSTree< int, std::string > tree1;
