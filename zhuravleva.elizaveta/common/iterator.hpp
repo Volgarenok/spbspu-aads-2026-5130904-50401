@@ -58,7 +58,7 @@ namespace zhuravleva
       return current != other.current;
     }
 
-    LIter<T>& LIter<T>::operator++()
+    LIter& operator++()
     {
       if (!current)
       {
@@ -68,14 +68,14 @@ namespace zhuravleva
       return *this;
     }
 
-    LIter<T> LIter<T>::operator++(int)
+    LIter operator++(int)
     {
       LIter<T> temp(*this);
       ++(*this);
       return temp;
     }
 
-    T* LIter<T>::operator->() const
+    T* operator->() const
     {
       if (!current)
       {
@@ -137,7 +137,7 @@ namespace zhuravleva
       return current != other.current;
     }
   
-    LCIter<T>& LCIter<T>::operator++()
+    LCIter& operator++()
     {
       if (!current)
       {
@@ -147,14 +147,14 @@ namespace zhuravleva
       return *this;
     }
   
-    LCIter<T> LCIter<T>::operator++(int)
+    LCIter operator++(int)
     {
       LCIter<T> temp(*this);
       ++(*this);
       return temp;
     }
   
-    const T* LCIter<T>::operator->() const
+    const T* operator->() const
     {
       if (!current)
       {
@@ -163,7 +163,6 @@ namespace zhuravleva
       return &(current->data);
     }
   };
-
 
 }
 #endif
