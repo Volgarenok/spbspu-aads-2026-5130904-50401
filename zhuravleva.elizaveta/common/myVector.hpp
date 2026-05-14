@@ -1,5 +1,5 @@
-#ifndef myVector_HPP
-#define myVector_HPP
+#ifndef MYVECTOR_HPP
+#define MYVECTOR_HPP
 #include <cstddef>
 #include <stdexcept>
 
@@ -110,6 +110,7 @@ namespace zhuravleva
   {
     if (this != &other)
     {
+      delete[] data_;
       data_ = other.data_;
       size_ = other.size_;
       capacity_ = other.capacity_;
@@ -158,7 +159,7 @@ namespace zhuravleva
     return size_ == 0;
   }
 
-template< class T >
+  template< class T >
   void myVector< T >::reserve(size_t newCapacity)
   {
     if (newCapacity <= capacity_)
