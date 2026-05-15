@@ -60,6 +60,12 @@ void studilova::graphs(std::istream&, std::ostream& out, GraphsMap& graphs)
 
   sortVector(names, compareStrings);
 
+  if (names.isEmpty())
+  {
+    out << "\n";
+    return;
+  }
+
   for (size_t i = 0; i < names.getSize(); ++i)
   {
     out << names[i] << "\n";
@@ -78,6 +84,12 @@ void studilova::vertexes(std::istream& in, std::ostream& out, GraphsMap& graphs)
   }
 
   Vector< std::string > vertices = graphs.get(graphName).getVertices();
+
+  if (vertices.isEmpty())
+  {
+    out << "\n";
+    return;
+  }
 
   sortVector(vertices, compareStrings);
 
@@ -103,6 +115,12 @@ void studilova::outbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
   try
   {
     Graph::Connections connections = graphs.get(graphName).getOutbound(vertex);
+
+    if (connections.isEmpty())
+    {
+      out << "\n";
+      return;
+    }
 
     sortVector(connections, compareConnections);
 
@@ -144,6 +162,12 @@ void studilova::inbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
   try
   {
     Graph::Connections connections = graphs.get(graphName).getInbound(vertex);
+
+    if (connections.isEmpty())
+    {
+      out << "\n";
+      return;
+    }
 
     sortVector(connections, compareConnections);
 
