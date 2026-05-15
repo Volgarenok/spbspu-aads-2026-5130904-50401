@@ -8,7 +8,6 @@
 #include <iostream>
 #include <string>
 #include <functional>
-#include <utility>
 
 namespace studilova
 {
@@ -28,38 +27,7 @@ namespace studilova
     std::equal_to< std::string >
   >;
 
-  template< class T, class Cmp >
-  void sortVector(Vector< T >& values, Cmp cmp)
-  {
-    for (size_t i = 0; i < values.getSize(); ++i)
-    {
-      for (size_t j = i + 1; j < values.getSize(); ++j)
-      {
-        if (cmp(values[j], values[i]))
-        {
-          std::swap(values[i], values[j]);
-        }
-      }
-    }
-  }
 
-  bool compareStrings(const std::string& lhs, const std::string& rhs)
-  {
-    return lhs < rhs;
-  }
-
-  bool compareWeights(size_t lhs, size_t rhs)
-  {
-    return lhs < rhs;
-  }
-
-  bool compareConnections(
-    const studilova::Graph::Connection& lhs,
-    const studilova::Graph::Connection& rhs
-  )
-  {
-    return lhs.first < rhs.first;
-  }
 
   void initCommands(CommandsMap& commands);
 
