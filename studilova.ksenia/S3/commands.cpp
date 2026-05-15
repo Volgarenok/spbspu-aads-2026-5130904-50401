@@ -180,3 +180,41 @@ void studilova::cut(std::istream& in, std::ostream& out, GraphsMap& graphs)
   }
 }
 
+void studilova::create(std::istream& in, std::ostream& out, GraphsMap& graphs)
+{
+  std::string graphName;
+  size_t count = 0;
+
+  in >> graphName >> count;
+
+  if (!in || graphs.has(graphName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  Graph graph;
+
+  for (size_t i = 0; i < count; ++i)
+  {
+    std::string vertex;
+    in >> vertex;
+
+    if (!in)
+    {
+      out << "<INVALID COMMAND>\n";
+      return;
+    }
+
+    graph.addVertex(vertex);
+  }
+
+  try
+  {
+    graphs.add(graphName, graph);
+  }
+  catch (...)
+  {
+    out << "<INVALID COMMAND>\n";
+  }
+}
