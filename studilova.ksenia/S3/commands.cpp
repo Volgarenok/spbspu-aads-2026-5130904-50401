@@ -218,3 +218,128 @@ void studilova::create(std::istream& in, std::ostream& out, GraphsMap& graphs)
     out << "<INVALID COMMAND>\n";
   }
 }
+
+void studilova::merge(std::istream& in, std::ostream& out, GraphsMap& graphs)
+{
+  std::string newGraphName;
+  std::string firstGraphName;
+  std::string secondGraphName;
+
+  in >> newGraphName >> firstGraphName >> secondGraphName;
+
+  if (
+    !in ||
+    graphs.has(newGraphName) ||
+    !graphs.has(firstGraphName) ||
+    !graphs.has(secondGraphName)
+  )
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  try
+  {
+    const Graph& firstGraph = graphs.get(firstGraphName);
+    const Graph& secondGraph = graphs.get(secondGraphName);
+
+    Graph newGraph(firstGraph.getEdges().size() + secondGraph.getEdges().size() + 64);
+
+    for (size_t i = 0; i < firstGraph.getVertices().getSize(); ++i)
+    {
+      newGraph.addVertex(firstGraph.getVertices()[i]);
+    }
+
+    for (size_t i = 0; i < secondGraph.getVertices().getSize(); ++i)
+    {
+      newGraph.addVertex(secondGraph.getVertices()[i]);
+    }
+
+    for (auto it = firstGraph.getEdges().begin(); it != firstGraph.getEdges().end(); ++it)
+    {
+      auto edge = *it;
+      const Graph::EdgeKey& key = edge.first;
+      const Graph::Weights& weights = edge.second;
+
+      for (size_t i = 0; i < weights.getSize(); ++i)
+      {
+        newGraph.bind(key.first, key.second, weights[i]);
+      }
+    }
+
+    for (auto it = secondGraph.getEdges().begin(); it != secondGraph.getEdges().end(); ++it)
+    {
+      auto edge = *it;
+      const Graph::EdgeKey& key = edge.first;
+      const Graph::Weights& weights = edge.second;
+
+      for (size_t i = 0; i < weights.getSize(); ++i)
+      {
+        newGraph.bind(key.first, key.second, weights[i]);
+      }
+    }
+
+    graphs.add(newGraphName, newGraph);
+  }
+  catch (...)
+  {
+    out << "<INVALID COMMAND>\n";
+  }
+}
+
+void studilova::extract(std::istream& in, std::ostream& out, GraphsMap& graphs)
+{
+  std::string newGraphName;
+  std::string oldGraphName;
+  size_t count = 0;
+
+  in >> newGraphName >> oldGraphName >> count;
+
+  if (!in || graphs.has(newGraphName) || !graphs.has(oldGraphName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  try
+  {
+    const Graph& oldGraph = graphs.get(oldGraphName);
+
+    Graph newGraph(oldGraph.getEdges().size() + 64);
+
+    for (size_t i = 0; i < count; ++i)
+    {
+      std::string vertex;
+      in >> vertex;
+
+      if (!in || !oldGraph.hasVertex(vertex))
+      {
+        out << "<INVALID COMMAND>\n";
+        return;
+      }
+
+      newGraph.addVertex(vertex);
+    }
+
+    for (auto it = oldGraph.getEdges().begin(); it != oldGraph.getEdges().end(); ++it)
+    {
+      auto edge = *it;
+      const Graph::EdgeKey& key = edge.first;
+      const Graph::Weights& weights = edge.second;
+
+      if (newGraph.hasVertex(key.first) && newGraph.hasVertex(key.second))
+      {
+        for (size_t i = 0; i < weights.getSize(); ++i)
+        {
+          newGraph.bind(key.first, key.second, weights[i]);
+        }
+      }
+    }
+
+    graphs.add(newGraphName, newGraph);
+  }
+  catch (...)
+  {
+    out << "<INVALID COMMAND>\n";
+  }
+}
