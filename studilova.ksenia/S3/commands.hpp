@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <functional>
+#include <utility>
 
 namespace studilova
 {
@@ -26,6 +27,21 @@ namespace studilova
     HMACHash,
     std::equal_to< std::string >
   >;
+
+  template< class T, class Cmp >
+  void sortVector(Vector< T >& values, Cmp cmp)
+  {
+    for (size_t i = 0; i < values.getSize(); ++i)
+    {
+      for (size_t j = i + 1; j < values.getSize(); ++j)
+      {
+        if (cmp(values[j], values[i]))
+        {
+          std::swap(values[i], values[j]);
+        }
+      }
+    }
+  }
 
   void initCommands(CommandsMap& commands);
 
