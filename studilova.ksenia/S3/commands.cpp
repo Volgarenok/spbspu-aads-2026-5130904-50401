@@ -133,3 +133,50 @@ void studilova::inbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
     out << "<INVALID COMMAND>\n";
   }
 }
+
+void studilova::bind(std::istream& in, std::ostream& out, GraphsMap& graphs)
+{
+  std::string graphName;
+  std::string from;
+  std::string to;
+  size_t weight = 0;
+
+  in >> graphName >> from >> to >> weight;
+
+  if (!in || !graphs.has(graphName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  try
+  {
+    graphs.get(graphName).bind(from, to, weight);
+  }
+  catch (...)
+  {
+    out << "<INVALID COMMAND>\n";
+  }
+}
+
+void studilova::cut(std::istream& in, std::ostream& out, GraphsMap& graphs)
+{
+  std::string graphName;
+  std::string from;
+  std::string to;
+  size_t weight = 0;
+
+  in >> graphName >> from >> to >> weight;
+
+  if (!in || !graphs.has(graphName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  if (!graphs.get(graphName).cut(from, to, weight))
+  {
+    out << "<INVALID COMMAND>\n";
+  }
+}
+
