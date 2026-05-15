@@ -76,6 +76,9 @@ int main(int argc, char** argv)
     {
       std::cout << "<INVALID COMMAND>\n";
     }
+    std::cin.clear();
+    std::string rest;
+    std::getline(std::cin, rest);
   }
 
   return 0;

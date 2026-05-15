@@ -244,11 +244,21 @@ void studilova::create(std::istream& in, std::ostream& out, GraphsMap& graphs)
   std::string graphName;
   size_t count = 0;
 
-  in >> graphName >> count;
+  in >> graphName;
+
+  if (!in)
+  {
+    out << "<INVALID COMMAND>\n";
+    in.clear();
+    return;
+  }
+
+  in >> count;
 
   if (!in || graphs.has(graphName))
   {
     out << "<INVALID COMMAND>\n";
+    in.clear();
     return;
   }
 
@@ -262,9 +272,9 @@ void studilova::create(std::istream& in, std::ostream& out, GraphsMap& graphs)
     if (!in)
     {
       out << "<INVALID COMMAND>\n";
+      in.clear();
       return;
     }
-
     graph.addVertex(vertex);
   }
 
