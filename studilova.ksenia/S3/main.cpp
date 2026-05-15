@@ -61,6 +61,10 @@ int main(int argc, char** argv)
     if (!commands.has(commandName))
     {
       std::cout << "<INVALID COMMAND>\n";
+
+      std::string line;
+      std::getline(std::cin, line);
+
       continue;
     }
 
