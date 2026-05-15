@@ -51,3 +51,85 @@ void studilova::vertexes(std::istream& in, std::ostream& out, GraphsMap& graphs)
     out << vertices[i] << "\n";
   }
 }
+
+void studilova::outbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
+{
+  std::string graphName;
+  std::string vertex;
+
+  in >> graphName >> vertex;
+
+  if (!in || !graphs.has(graphName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  try
+  {
+    Graph::Connections connections = graphs.get(graphName).getOutbound(vertex);
+
+    sortVector(connections, compareConnections);
+
+    for (size_t i = 0; i < connections.getSize(); ++i)
+    {
+      Graph::Weights weights = connections[i].second;
+
+      sortVector(weights, compareWeights);
+
+      out << connections[i].first;
+
+      for (size_t j = 0; j < weights.getSize(); ++j)
+      {
+        out << " " << weights[j];
+      }
+
+      out << "\n";
+    }
+  }
+  catch (...)
+  {
+    out << "<INVALID COMMAND>\n";
+  }
+}
+
+void studilova::inbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
+{
+  std::string graphName;
+  std::string vertex;
+
+  in >> graphName >> vertex;
+
+  if (!in || !graphs.has(graphName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  try
+  {
+    Graph::Connections connections = graphs.get(graphName).getInbound(vertex);
+
+    sortVector(connections, compareConnections);
+
+    for (size_t i = 0; i < connections.getSize(); ++i)
+    {
+      Graph::Weights weights = connections[i].second;
+
+      sortVector(weights, compareWeights);
+
+      out << connections[i].first;
+
+      for (size_t j = 0; j < weights.getSize(); ++j)
+      {
+        out << " " << weights[j];
+      }
+
+      out << "\n";
+    }
+  }
+  catch (...)
+  {
+    out << "<INVALID COMMAND>\n";
+  }
+}
