@@ -1,5 +1,5 @@
-#ifndef STUDILOVA_COMMANDS_HPP
-#define STUDILOVA_COMMANDS_HPP
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
 
 #include "graph.hpp"
 #include "hash_table.hpp"
@@ -41,6 +41,24 @@ namespace studilova
         }
       }
     }
+  }
+
+  bool compareStrings(const std::string& lhs, const std::string& rhs)
+  {
+    return lhs < rhs;
+  }
+
+  bool compareWeights(size_t lhs, size_t rhs)
+  {
+    return lhs < rhs;
+  }
+
+  bool compareConnections(
+    const studilova::Graph::Connection& lhs,
+    const studilova::Graph::Connection& rhs
+  )
+  {
+    return lhs.first < rhs.first;
   }
 
   void initCommands(CommandsMap& commands);
