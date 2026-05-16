@@ -180,6 +180,9 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t num_buckets, siz
 {
   size_t size = num_buckets_ * bucket_cap_ + overflow_cap_;
   if (size) {
+    if (num_buckets == 0) {
+      throw std::logic_error("num_buckets must be positive");
+    }
     data_ = static_cast< Slot * >(::operator new (sizeof(Slot) * size));
     bucket_sizes_ = new size_t[num_buckets_]{0};
   }
@@ -438,8 +441,9 @@ void chernov::HashTable< Key, Value, Hash, Equal >::removeElementByIndex(size_t 
 template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::unsafeAddWithoutCheckingExisting(Key k, Value v)
 {
-  size_t home_bucket = hasher_(k) % num_buckets_;
-  if (bucket_sizes_[home_bucket] < bucket_cap_) {
+  size_t hash = hasher_(k);
+  if (num_buckets_ && bucket_sizes_[hash % num_buckets_] < bucket_cap_) {
+    size_t home_bucket = hash % num_buckets_;
     new (data_ + (home_bucket * bucket_cap_ + bucket_sizes_[home_bucket])) Slot{k, v};
     ++bucket_sizes_[home_bucket];
     ++total_size_;
