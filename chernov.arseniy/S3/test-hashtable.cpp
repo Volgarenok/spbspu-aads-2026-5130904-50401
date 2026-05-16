@@ -123,3 +123,77 @@ BOOST_AUTO_TEST_CASE(test_move_operator)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(hashtable_iterator_tests)
+
+BOOST_AUTO_TEST_CASE(test_begin_iterator)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(64);
+  BOOST_CHECK(ht.begin() == ht.end());
+
+  ht.add(123, 42);
+  ht.add(321, 52);
+
+  auto iter = ht.begin();
+  BOOST_CHECK(iter != ht.end());
+  if ((iter++)->first == 123) {
+    BOOST_CHECK_EQUAL(iter->first, 321);
+  } else {
+    BOOST_CHECK_EQUAL(iter->first, 123);
+  }
+  BOOST_CHECK(++iter == ht.end());
+}
+
+BOOST_AUTO_TEST_CASE(test_сbegin_iterator)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht1(64);
+  BOOST_CHECK(ht1.cbegin() == ht1.cend());
+
+  ht1.add(123, 42);
+  ht1.add(321, 52);
+
+  const chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > & ht2 = ht1;
+
+  auto iter = ht2.cbegin();
+  BOOST_CHECK(iter != ht2.cend());
+  if ((iter++)->first == 123) {
+    BOOST_CHECK_EQUAL(iter->first, 321);
+  } else {
+    BOOST_CHECK_EQUAL(iter->first, 123);
+  }
+  BOOST_CHECK(++iter == ht2.end());
+}
+
+BOOST_AUTO_TEST_CASE(test_end_iterator)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(64);
+  BOOST_CHECK(ht.begin() == ht.end());
+
+  ht.add(123, 42);
+  ht.add(321, 52);
+
+  size_t count = 0;
+  for (auto iter = ht.begin(); iter != ht.end(); ++iter) {
+    ++count;
+  }
+  BOOST_CHECK_EQUAL(count, 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_cend_iterator)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht1(64);
+  BOOST_CHECK(ht1.cbegin() == ht1.cend());
+
+  ht1.add(123, 42);
+  ht1.add(321, 52);
+
+  const chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > & ht2 = ht1;
+
+  size_t count = 0;
+  for (auto iter = ht2.cbegin(); iter != ht2.cend(); ++iter) {
+    ++count;
+  }
+  BOOST_CHECK_EQUAL(count, 2);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

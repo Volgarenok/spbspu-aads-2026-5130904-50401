@@ -12,7 +12,8 @@ namespace chernov {
   template< class Key, class Value, class Hash, class Equal >
   class HashTable {
   public:
-    friend class HIter;
+    template< class K, class V, class H, class E, bool IC >
+    friend class HTIter;
 
     using Slot = std::pair< const Key, Value >;
     using iterator = HTIter< Key, Value, Hash, Equal, false >;

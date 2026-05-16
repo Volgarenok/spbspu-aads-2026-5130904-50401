@@ -32,7 +32,7 @@ namespace chernov {
     point operator->() const;
 
     HTIter & operator++();
-    HTIter & operator++(int);
+    HTIter operator++(int);
 
     template< bool OtherConst >
     bool operator==(const HTIter< Key, Value, Hash, Equal, OtherConst > & other) const noexcept;
@@ -89,7 +89,7 @@ chernov::HTIter< Key, Value, Hash, Equal, IsConst > & chernov::HTIter< Key, Valu
       }
     }
   } else {
-    if (index_ + 1 < ht_->num_buckets_ * ht_->backet_cap_ + ht_->overflow_size_) {
+    if (index_ + 1 < ht_->num_buckets_ * ht_->bucket_cap_ + ht_->overflow_size_) {
       ++index_;
       return *this;
     }
@@ -99,7 +99,7 @@ chernov::HTIter< Key, Value, Hash, Equal, IsConst > & chernov::HTIter< Key, Valu
 }
 
 template< class Key, class Value, class Hash, class Equal, bool IsConst >
-chernov::HTIter< Key, Value, Hash, Equal, IsConst > & chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator++(int)
+chernov::HTIter< Key, Value, Hash, Equal, IsConst > chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator++(int)
 {
   HTIter old = *this;
   ++(*this);
