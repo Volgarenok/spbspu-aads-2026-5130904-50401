@@ -12,7 +12,11 @@ namespace chernov {
   template< class Key, class Value, class Hash, class Equal >
   class HashTable {
   public:
+    friend class HIter;
+
     using Slot = std::pair< const Key, Value >;
+    using iterator = HTIter< Key, Value, Hash, Equal, false >;
+    using const_iterator = HTIter< Key, Value, Hash, Equal, true >;
 
     HashTable();
     HashTable(const HashTable & ht);
@@ -43,7 +47,13 @@ namespace chernov {
     Value & at(const Key & k);
     const Value & at(const Key & k) const;
 
-    friend class HIter;
+    iterator begin();
+    const_iterator begin() const;
+    const_iterator cbegin() const;
+
+    iterator end();
+    const_iterator end() const;
+    const_iterator cend() const;
   private:
     Slot * data_;
     size_t * bucket_sizes_;
@@ -61,6 +71,8 @@ namespace chernov {
     void removeElementByIndex(size_t index);
     void unsafeAddWithoutCheckingExisting(Key k, Value v);
     void setParamsByCountSlots(size_t slots);
+    size_t getFirstValidIndex() const noexcept;
+    size_t getEndIndex() const noexcept;
   };
 }
 
@@ -329,6 +341,48 @@ const Value & chernov::HashTable< Key, Value, Hash, Equal >::at(const Key & k) c
 }
 
 template< class Key, class Value, class Hash, class Equal >
+typename chernov::HashTable< Key, Value, Hash, Equal >::iterator
+chernov::HashTable< Key, Value, Hash, Equal >::begin()
+{
+  return iterator(this, getFirstValidIndex());
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename chernov::HashTable< Key, Value, Hash, Equal >::const_iterator
+chernov::HashTable< Key, Value, Hash, Equal >::begin() const
+{
+  return const_iterator(this, getFirstValidIndex());
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename chernov::HashTable< Key, Value, Hash, Equal >::const_iterator
+chernov::HashTable< Key, Value, Hash, Equal >::cbegin() const
+{
+  return begin();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename chernov::HashTable< Key, Value, Hash, Equal >::iterator
+chernov::HashTable< Key, Value, Hash, Equal >::end()
+{
+  return iterator(this, getEndIndex());
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename chernov::HashTable< Key, Value, Hash, Equal >::const_iterator
+chernov::HashTable< Key, Value, Hash, Equal >::end() const
+{
+  return const_iterator(this, getEndIndex());
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename chernov::HashTable< Key, Value, Hash, Equal >::const_iterator
+chernov::HashTable< Key, Value, Hash, Equal >::cend() const
+{
+  return end();
+}
+
+template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::getElementIndex(const Key & k) const
 {
   size_t home_bucket = hasher_(k) % num_buckets_;
@@ -400,6 +454,26 @@ void chernov::HashTable< Key, Value, Hash, Equal >::setParamsByCountSlots(size_t
     bucket_cap_ = default_bucket_cap;
     overflow_cap_ = default_overflow_cap + (slots - default_overflow_cap) % default_bucket_cap;
   }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t chernov::HashTable< Key, Value, Hash, Equal >::getFirstValidIndex() const noexcept
+{
+  for (size_t i = 0; i < num_buckets_; ++i) {
+    if (bucket_sizes_[i] > 0) {
+      return i * bucket_cap_;
+    }
+  }
+  if (overflow_size_ > 0) {
+    return num_buckets_ * bucket_cap_;
+  }
+  return getEndIndex();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t chernov::HashTable< Key, Value, Hash, Equal >::getEndIndex() const noexcept
+{
+  return num_buckets_ * bucket_cap_ + overflow_cap_;
 }
 
 #endif
