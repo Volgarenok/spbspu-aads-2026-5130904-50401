@@ -396,13 +396,13 @@ size_t chernov::HashTable< Key, Value, Hash, Equal >::getElementIndex(const Key 
     size_t home_bucket = hasher_(k) % num_buckets_;
     for (size_t i = 0; i < bucket_sizes_[home_bucket]; ++i) {
       size_t index = home_bucket * bucket_cap_ + i;
-      if (k == data_[index].first) {
+      if (equal_(k, data_[index].first)) {
         return index;
       }
     }
     for (size_t i = 0; i < overflow_size_; ++i) {
       size_t index = num_buckets_ * bucket_cap_ + i;
-      if (k == data_[index].first) {
+      if (equal_(k, data_[index].first)) {
         return index;
       }
     }
