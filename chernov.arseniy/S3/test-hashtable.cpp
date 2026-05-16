@@ -197,3 +197,87 @@ BOOST_AUTO_TEST_CASE(test_cend_iterator)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(hashtable_capacity_tests)
+
+BOOST_AUTO_TEST_CASE(test_empty)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(64);
+  BOOST_CHECK_EQUAL(ht.size(), 0);
+  BOOST_CHECK(ht.empty());
+
+  ht.add(123, 42);
+  BOOST_CHECK_EQUAL(ht.size(), 1);
+  BOOST_CHECK(!ht.empty());
+
+  ht.clear();
+  BOOST_CHECK_EQUAL(ht.size(), 0);
+  BOOST_CHECK(ht.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_size)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(64);
+  BOOST_CHECK_EQUAL(ht.size(), 0);
+
+  ht.add(123, 42);
+  BOOST_CHECK_EQUAL(ht.size(), 1);
+
+  ht.add(321, 52);
+  BOOST_CHECK_EQUAL(ht.size(), 2);
+
+  ht.remove(123);
+  BOOST_CHECK_EQUAL(ht.size(), 1);
+
+  ht.clear();
+  BOOST_CHECK_EQUAL(ht.size(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_max_capacity)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht;
+  BOOST_CHECK_EQUAL(ht.maxCapacity(), 0);
+
+  ht = chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > >(64);
+  BOOST_CHECK_EQUAL(ht.maxCapacity(), 64);
+
+  ht.rehash(100);
+  BOOST_CHECK_EQUAL(ht.maxCapacity(), 100);
+
+  ht.rehash(16, 4, 8);
+  BOOST_CHECK_EQUAL(ht.maxCapacity(), 72);
+}
+
+BOOST_AUTO_TEST_CASE(test_has)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(64);
+
+  BOOST_CHECK(!ht.has(123));
+  ht.add(123, 42);
+  ht.add(321, 52);
+  BOOST_CHECK(ht.has(123));
+
+  ht.remove(123);
+  BOOST_CHECK(!ht.has(123));
+  BOOST_CHECK(ht.has(321));
+}
+
+BOOST_AUTO_TEST_CASE(test_at)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(64);
+  BOOST_CHECK_THROW(ht.at(123), std::out_of_range);
+
+  ht.add(123, 42);
+  BOOST_CHECK_EQUAL(ht.at(123), 42);
+
+  ht.add(321, 52);
+  BOOST_CHECK_EQUAL(ht.at(321), 52);
+
+  ht.rehash(100);
+  BOOST_CHECK_EQUAL(ht.at(321), 52);
+
+  ht.clear();
+  BOOST_CHECK_THROW(ht.at(321), std::out_of_range);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
