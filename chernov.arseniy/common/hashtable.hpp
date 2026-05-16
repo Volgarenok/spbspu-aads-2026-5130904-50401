@@ -32,8 +32,9 @@ namespace chernov {
     size_t maxCapacity() const noexcept;
 
     void clear() noexcept;
+
     void add(Key k, Value v);
-    Value drop(Key k);
+    void remove(Key k);
     bool has(Key k);
     void rehash(size_t slots);
     void rehash(size_t num_buckets, size_t bucket_cap, size_t overflow_cap);
@@ -262,7 +263,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
 }
 
 template< class Key, class Value, class Hash, class Equal >
-Value chernov::HashTable< Key, Value, Hash, Equal >::drop(Key k)
+void chernov::HashTable< Key, Value, Hash, Equal >::remove(Key k)
 {
   HashTable< Key, Value, Hash, Equal > new_ht{*this};
 
@@ -271,7 +272,6 @@ Value chernov::HashTable< Key, Value, Hash, Equal >::drop(Key k)
   new_ht.removeElementByIndex(index);
 
   swap(new_ht);
-  return value;
 }
 
 template< class Key, class Value, class Hash, class Equal >
