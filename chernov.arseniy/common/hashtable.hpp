@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <utility>
 
+#include <htiter.hpp>
+
 namespace chernov {
   template< class Key, class Value, class Hash, class Equal >
   class HashTable {
@@ -38,6 +40,8 @@ namespace chernov {
 
     Value & at(const Key & k);
     const Value & at(const Key & k) const;
+
+    friend class HIter;
   private:
     Slot * data_;
     size_t * bucket_sizes_;
