@@ -229,24 +229,10 @@ namespace vasyakin
   {
     fake_node_->next_ = fake_node_;
 
-    if (other.fake_node_->next_ == other.fake_node_)
+    for (auto it = other.cbegin(); it != other.cend(); ++it)
     {
-      return;
+      pushBack(*it);
     }
-
-    detail::Node< T >* other_cur = other.fake_node_->next_;
-    detail::Node< T >* prev = fake_node_;
-
-    while (other_cur != other.fake_node_)
-    {
-      detail::Node< T >* new_node = new detail::Node< T >(other_cur->val_);
-      prev->next_ = new_node;
-      prev = new_node;
-      other_cur = other_cur->next_;
-      ++size_;
-    }
-
-    prev->next_ = fake_node_;
   }
 
   template< class T >

@@ -130,7 +130,7 @@ int main()
           sum += *nit;
         }
       }
-      catch (std::overflow_error& e)
+      catch (const std::overflow_error& e)
       {
         std::cerr << e.what() << "\n";
         return 1;
