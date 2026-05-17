@@ -14,7 +14,7 @@ int main()
   {
     vasyakin::List< size_t > numbers;
     size_t num = 0;
-    vasyakin::Node< size_t >* last_num = nullptr;
+    vasyakin::detail::Node< size_t >* last_num = nullptr;
 
     while (std::cin >> num)
     {
@@ -63,7 +63,7 @@ int main()
   }
 
   vasyakin::List< vasyakin::List< size_t > > transposed;
-  vasyakin::Node< vasyakin::List< size_t > >* last_trans = nullptr;
+  vasyakin::detail::Node< vasyakin::List< size_t > >* last_trans = nullptr;
   bool hasNumbers = false;
 
   for (size_t pos = 0; pos < max_len; ++pos)
