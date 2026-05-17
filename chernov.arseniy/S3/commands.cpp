@@ -28,3 +28,11 @@ void chernov::cmdInbound(std::istream & input, std::ostream & output, Graphs & g
   graphs.showGraphInbound(graph_name, vertex, output);
 }
 
+void chernov::cmdBind(std::istream & input, std::ostream & output, Graphs & graphs)
+{
+  std::string graph_name, vertex_a, vertex_b;
+  size_t weight;
+  input >> graph_name >> vertex_a >> vertex_b >> weight;
+  graphs.bindGraphVertexes(graph_name, vertex_a, vertex_b, weight, output);
+}
+

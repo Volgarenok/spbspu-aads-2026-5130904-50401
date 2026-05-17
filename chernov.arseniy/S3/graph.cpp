@@ -167,3 +167,12 @@ void chernov::Graphs::showGraphInbound(std::string graph_name, std::string verte
     output << "<INVALID COMMAND>\n";
   }
 }
+
+void chernov::Graphs::bindGraphVertexes(std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output)
+{
+  try {
+    graphs_.at(graph_name).addEdge(vertex_a, vertex_b, weight);
+  } catch (const std::out_of_range & e) {
+    output << "<INVALID COMMAND>\n";
+  }
+}

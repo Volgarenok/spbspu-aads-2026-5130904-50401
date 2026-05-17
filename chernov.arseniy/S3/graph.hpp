@@ -61,6 +61,7 @@ namespace chernov {
     void showGraphVertexes(std::string graph_name, std::ostream & output);
     void showGraphOutbound(std::string graph_name, std::string vertex, std::ostream & output);
     void showGraphInbound(std::string graph_name, std::string vertex, std::ostream & output);
+    void bindGraphVertexes(std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output);
   };
 }
 

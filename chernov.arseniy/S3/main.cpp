@@ -43,6 +43,7 @@ int main(int args, char ** argv)
   cmds.add("vertexes", chernov::cmdVertexes);
   cmds.add("outbound", chernov::cmdOutbound);
   cmds.add("inbound", chernov::cmdInbound);
+  cmds.add("bind", chernov::cmdBind);
 
   std::string cmd;
   while (input >> cmd) {

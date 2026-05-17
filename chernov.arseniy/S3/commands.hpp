@@ -11,6 +11,7 @@ namespace chernov {
   void cmdVertexes(std::istream & input, std::ostream & output, Graphs & graphs);
   void cmdOutbound(std::istream & input, std::ostream & output, Graphs & graphs);
   void cmdInbound(std::istream & input, std::ostream & output, Graphs & graphs);
+  void cmdBind(std::istream & input, std::ostream & output, Graphs & graphs);
 }
 
 #endif
