@@ -14,18 +14,10 @@ int main()
   {
     vasyakin::List< size_t > numbers;
     size_t num = 0;
-    vasyakin::detail::Node< size_t >* last_num = nullptr;
 
     while (std::cin >> num)
     {
-      if (last_num == nullptr)
-      {
-        last_num = numbers.insert(numbers.getFake(), num);
-      }
-      else
-      {
-        last_num = numbers.insert(last_num, num);
-      }
+      numbers.pushBack(num);
     }
     std::cin.clear();
 
@@ -63,7 +55,6 @@ int main()
   }
 
   vasyakin::List< vasyakin::List< size_t > > transposed;
-  vasyakin::detail::Node< vasyakin::List< size_t > >* last_trans = nullptr;
   bool hasNumbers = false;
 
   for (size_t pos = 0; pos < max_len; ++pos)
@@ -89,14 +80,7 @@ int main()
 
     if (new_seq.begin() != new_seq.end())
     {
-      if (last_trans == nullptr)
-      {
-        last_trans = transposed.insert(transposed.getFake(), std::move(new_seq));
-      }
-      else
-      {
-        last_trans = transposed.insert(last_trans, std::move(new_seq));
-      }
+      transposed.pushBack(std::move(new_seq));
     }
   }
 

@@ -95,7 +95,6 @@ namespace vasyakin
     LCIter< T > cend() const;
 
     size_t getSize() const noexcept;
-    detail::Node< T >* getFake() const noexcept;
     detail::Node< T >* getFirst() const noexcept;
 
   private:
@@ -409,12 +408,6 @@ namespace vasyakin
   size_t List< T >::getSize() const noexcept
   {
     return size_;
-  }
-
-  template< class T >
-  detail::Node< T >* List< T >::getFake() const noexcept
-  {
-    return fake_node_;
   }
 
   template< class T >
