@@ -8,35 +8,28 @@
 #include <vector.hpp>
 
 namespace chernov {
-  class Edges {
-  public:
+  struct Edges {
+    HashTable< std::string, Vector< size_t >, std::hash< std::string >, std::equal_to< std::string > > edges_;
+
     Edges();
     void addEdge(std::string vertex, size_t weight);
-  private:
-    HashTable< std::string, Vector< size_t >, std::hash< std::string >, std::equal_to< std::string > > edges_;
-    size_t capacity_;
   };
 
-  class Graph {
-  public:
-    Graph() = delete;
-    Graph(std::string name);
-    void addEdge(std::string start_vertex, std::string end_vertex, size_t weight);
-  private:
+  struct Graph {
     std::string name_;
     HashTable< std::string, Edges, std::hash< std::string >, std::equal_to< std::string > > incoming_;
     HashTable< std::string, Edges, std::hash< std::string >, std::equal_to< std::string > > outgoing_;
-    size_t incoming_capacity_;
-    size_t outgoing_capacity_;
+
+    Graph() = delete;
+    Graph(std::string name);
+    void addEdge(std::string start_vertex, std::string end_vertex, size_t weight);
   };
 
-  class Graphs {
-  public:
+  struct Graphs {
+    HashTable< std::string, Graph, std::hash< std::string >, std::equal_to< std::string > > graphs_;
+
     Graphs();
     void addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight);
-  private:
-    HashTable< std::string, Graph, std::hash< std::string >, std::equal_to< std::string > > graphs_;
-    size_t capacity_;
   };
 }
 

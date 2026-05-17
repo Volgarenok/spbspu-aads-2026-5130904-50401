@@ -1,15 +1,15 @@
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <string>
 
+#include "commands.hpp"
 #include "graph.hpp"
 #include <hashtable.hpp>
 #include <vector.hpp>
 
 int main(int args, char ** argv)
 {
-  using namespace chernov;
-
   if (args != 2) {
     std::cerr << "filename is required, count of args must be 1\n";
     return 1;
@@ -24,7 +24,7 @@ int main(int args, char ** argv)
   std::istream & input = std::cin;
   std::ostream & output = std::cout;
 
-  Graphs graphs;
+  chernov::Graphs graphs;
 
   std::string graph_name;
   while (file >> graph_name) {
@@ -36,5 +36,23 @@ int main(int args, char ** argv)
       file >> start >> end >> weight;
       graphs.addEdge(graph_name, start, end, weight);
     }
+  }
+
+  chernov::HashTable< std::string, chernov::cmd_t, std::hash< std::string >, std::equal_to< std::string > > cmds(64);
+  cmds.add("graphs", chernov::cmdGraphs);
+
+  std::string cmd;
+  while (input >> cmd) {
+    try {
+      cmds.at(cmd)(input, output, graphs);
+    } catch (const std::out_of_range & e) {
+      output << "<INVALID COMMAND>\n";
+      std::streamsize max_streamsize = std::numeric_limits< std::streamsize >::max();
+      input.ignore(max_streamsize, '\n');
+    }
+  }
+  if (!input.eof()) {
+    std::cerr << "bad input\n";
+    return 1;
   }
 }

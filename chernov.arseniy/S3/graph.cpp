@@ -1,11 +1,8 @@
 #include "graph.hpp"
 
 chernov::Edges::Edges():
-  edges_(),
-  capacity_(64)
-{
-  edges_.rehash(capacity_);
-}
+  edges_(64)
+{}
 
 void chernov::Edges::addEdge(std::string vertex, size_t weight)
 {
@@ -13,8 +10,7 @@ void chernov::Edges::addEdge(std::string vertex, size_t weight)
     try {
       edges_.add(vertex, Vector< size_t >());
     } catch (const std::length_error & e) {
-      capacity_ *= 2;
-      edges_.rehash(capacity_);
+      edges_.rehash(edges_.maxCapacity() * 2);
       edges_.add(vertex, Vector< size_t >());
     }
   }
@@ -23,14 +19,9 @@ void chernov::Edges::addEdge(std::string vertex, size_t weight)
 
 chernov::Graph::Graph(std::string name):
   name_(name),
-  incoming_(),
-  outgoing_(),
-  incoming_capacity_(64),
-  outgoing_capacity_(64)
-{
-  incoming_.rehash(incoming_capacity_);
-  outgoing_.rehash(outgoing_capacity_);
-}
+  incoming_(64),
+  outgoing_(64)
+{}
 
 void chernov::Graph::addEdge(std::string start_vertex, std::string end_vertex, size_t weight)
 {
@@ -38,18 +29,16 @@ void chernov::Graph::addEdge(std::string start_vertex, std::string end_vertex, s
     try {
       incoming_.add(end_vertex, Edges());
     } catch (const std::length_error & e) {
-      incoming_capacity_ *= 2;
-      incoming_.rehash(incoming_capacity_);
+      incoming_.rehash(incoming_.maxCapacity() * 2);
       incoming_.add(end_vertex, Edges());
     }
   }
-  if (!outgoing_.has(end_vertex)) {
+  if (!outgoing_.has(start_vertex)) {
     try {
-      outgoing_.add(end_vertex, Edges());
+      outgoing_.add(start_vertex, Edges());
     } catch (const std::length_error & e) {
-      outgoing_capacity_ *= 2;
-      outgoing_.rehash(outgoing_capacity_);
-      outgoing_.add(end_vertex, Edges());
+      outgoing_.rehash(outgoing_.maxCapacity() * 2);
+      outgoing_.add(start_vertex, Edges());
     }
   }
   incoming_.at(end_vertex).addEdge(start_vertex, weight);
@@ -57,11 +46,8 @@ void chernov::Graph::addEdge(std::string start_vertex, std::string end_vertex, s
 }
 
 chernov::Graphs::Graphs():
-  graphs_(),
-  capacity_(64)
-{
-  graphs_.rehash(capacity_);
-}
+  graphs_(64)
+{}
 
 void chernov::Graphs::addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight)
 {
@@ -69,8 +55,7 @@ void chernov::Graphs::addEdge(std::string graph_name, std::string start_vertex, 
     try {
       graphs_.add(graph_name, Graph(graph_name));
     } catch (const std::length_error & e) {
-      capacity_ *= 2;
-      graphs_.rehash(capacity_);
+      graphs_.rehash(graphs_.maxCapacity() * 2);
       graphs_.add(graph_name, Graph(graph_name));
     }
   }

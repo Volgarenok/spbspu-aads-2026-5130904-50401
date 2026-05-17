@@ -1,0 +1,13 @@
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
+
+#include <iosfwd>
+#include "graph.hpp"
+
+namespace chernov {
+  using cmd_t = void(*)(std::istream &, std::ostream &, Graphs &);
+
+  void cmdGraphs(std::istream & input, std::ostream & output, Graphs & graphs);
+}
+
+#endif
