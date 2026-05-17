@@ -206,10 +206,23 @@ void chernov::Graphs::showGraphOutbound(std::string graph_name, std::string vert
 void chernov::Graphs::showGraphInbound(std::string graph_name, std::string vertex, std::ostream & output)
 {
   try {
-    Vector< std::pair< std::string, size_t > > vertexes = graphs_.at(graph_name).getInbound(vertex);
-    sort(vertexes, PairComparator< std::string, size_t >{});
-    for (auto iter = vertexes.cbegin(); iter != vertexes.cend(); ++iter) {
-      output << iter->first << " " << iter->second << "\n";
+    Vector< std::pair< std::string, size_t > > edges = graphs_.at(graph_name).getInbound(vertex);
+    if (edges.getSize() == 0) {
+      return;
+    }
+
+    sort(edges, PairComparator< std::string, size_t >{});
+
+    auto iter = edges.cbegin();
+    while (iter != edges.cend()) {
+      std::string current_name = iter->first;
+      output << current_name;
+
+      while (iter != edges.cend() && iter->first == current_name) {
+        output << " " << iter->second;
+        ++iter;
+      }
+      output << "\n";
     }
   } catch (const std::out_of_range & e) {
     output << "<INVALID COMMAND>\n";
