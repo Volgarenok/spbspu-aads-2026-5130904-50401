@@ -104,15 +104,13 @@ int main()
   {
     for (auto tit = transposed.begin(); tit != transposed.end(); ++tit)
     {
-      bool first = true;
       for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)
       {
-        if (!first)
+        if (nit != tit->cbegin())
         {
           std::cout << " ";
         }
         std::cout << *nit;
-        first = false;
       }
       std::cout << '\n';
     }
@@ -140,15 +138,13 @@ int main()
       sums.pushBack(sum);
     }
 
-    bool first = true;
     for (auto sit = sums.begin(); sit != sums.end(); ++sit)
     {
-      if (!first)
+      if (sit != sums.begin())
       {
         std::cout << " ";
       }
       std::cout << *sit;
-      first = false;
     }
     std::cout << '\n';
   }
