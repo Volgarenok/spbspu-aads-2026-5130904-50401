@@ -55,6 +55,7 @@ namespace chernov {
 
     Graph() = delete;
     Graph(std::string name);
+    void addVertex(std::string vertex);
     void addEdge(std::string start_vertex, std::string end_vertex, size_t weight);
     void cutEdge(std::string start_vertex, std::string end_vertex, size_t weight);
     Vector< std::string > getVertexes() const;
@@ -66,6 +67,7 @@ namespace chernov {
     HashTable< std::string, Graph, HasherXx< std::string >, KeyComparator > graphs_;
 
     Graphs();
+    void addVertex(std::string graph_name, std::string vertex, std::ostream & output);
     void createGraphWithoutCheckingExisting(std::string graph_name);
     void createGraph(std::string graph_name, std::ostream & output);
     void addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight);

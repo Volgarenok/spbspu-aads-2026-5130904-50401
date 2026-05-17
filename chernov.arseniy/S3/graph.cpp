@@ -64,6 +64,13 @@ chernov::Graph::Graph(std::string name):
   outgoing_(64)
 {}
 
+void chernov::Graph::addVertex(std::string vertex)
+{
+  if (!outgoing_.has(vertex)) {
+    outgoing_.add(vertex, Edges());
+  }
+}
+
 void chernov::Graph::addEdge(std::string start_vertex, std::string end_vertex, size_t weight)
 {
   auto ensure_exists = [&](auto & table, const std::string & key) {
@@ -136,6 +143,15 @@ chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getInbound(s
 chernov::Graphs::Graphs():
   graphs_(64)
 {}
+
+void chernov::Graphs::addVertex(std::string graph_name, std::string vertex, std::ostream & output)
+{
+  try {
+    graphs_.at(graph_name).addVertex(vertex);
+  } catch (const std::out_of_range&) {
+    output << "<INVALID COMMAND>\n";
+  }
+}
 
 void chernov::Graphs::createGraphWithoutCheckingExisting(std::string graph_name)
 {

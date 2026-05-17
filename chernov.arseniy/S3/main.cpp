@@ -54,6 +54,12 @@ int main(int args, char ** argv)
   while (input >> cmd) {
     try {
       cmds.at(cmd)(input, output, graphs);
+      if (input.fail()) {
+        output << "<INVALID COMMAND>\n";
+        input.clear();
+        std::streamsize max_streamsize = std::numeric_limits< std::streamsize >::max();
+        input.ignore(max_streamsize, '\n');
+      }
     } catch (const std::out_of_range & e) {
       output << "<INVALID COMMAND>\n";
       std::streamsize max_streamsize = std::numeric_limits< std::streamsize >::max();
