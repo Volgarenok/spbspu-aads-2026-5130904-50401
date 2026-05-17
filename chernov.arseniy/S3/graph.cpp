@@ -262,3 +262,47 @@ void chernov::Graphs::mergeGraphs(std::string new_graph, std::string old_graph1,
     graphs_.add(new_graph, graph);
   }
 }
+
+void chernov::Graphs::extractGraphs(std::string new_graph, std::string old_graph, size_t count_k, Vector<std::string>& vertexes, std::ostream& output)
+{
+  if (graphs_.has(new_graph) || !graphs_.has(old_graph)) {
+    output << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  try {
+    Graph new_gr(new_graph);
+    const Graph& old_gr = graphs_.at(old_graph);
+
+    for (size_t i = 0; i < count_k && i < vertexes.getSize(); ++i) {
+      const std::string& src = vertexes[i];
+      Vector<std::pair<std::string, size_t>> edges = old_gr.getOutbound(src);
+
+      for (size_t j = 0; j < edges.getSize(); ++j) {
+        const std::string& dst = edges[j].first;
+        size_t weight = edges[j].second;
+
+        bool dst_allowed = false;
+        for (size_t k = 0; k < count_k && k < vertexes.getSize(); ++k) {
+          if (dst == vertexes[k]) {
+            dst_allowed = true;
+            break;
+          }
+        }
+
+        if (dst_allowed) {
+          new_gr.addEdge(src, dst, weight);
+        }
+      }
+    }
+
+    try {
+      graphs_.add(new_graph, new_gr);
+    } catch (const std::length_error&) {
+      graphs_.rehash(graphs_.maxCapacity() ? graphs_.maxCapacity() * 2 : 2);
+      graphs_.add(new_graph, new_gr);
+    }
+  } catch (const std::out_of_range&) {
+    output << "<INVALID COMMAND>\n";
+  }
+}

@@ -57,3 +57,16 @@ void chernov::cmdMerge(std::istream & input, std::ostream & output, Graphs & gra
   input >> new_graph >> old_graph1 >> old_graph2;
   graphs.mergeGraphs(new_graph, old_graph1, old_graph2, output);
 }
+
+void chernov::cmdExtract(std::istream & input, std::ostream & output, Graphs & graphs)
+{
+  std::string new_graph, old_graph;
+  size_t count_k;
+  input >> new_graph >> old_graph >> count_k;
+
+  Vector< std::string > vertexes(count_k, "");
+  for (size_t i = 0; i < count_k; ++i) {
+    input >> vertexes[i];
+  }
+  graphs.extractGraphs(new_graph, old_graph, count_k, vertexes, output);
+}
