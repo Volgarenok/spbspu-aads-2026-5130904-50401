@@ -263,7 +263,7 @@ void chernov::Graphs::mergeGraphs(std::string new_graph, std::string old_graph1,
   }
 }
 
-void chernov::Graphs::extractGraphs(std::string new_graph, std::string old_graph, size_t count_k, Vector<std::string>& vertexes, std::ostream& output)
+void chernov::Graphs::extractGraphs(std::string new_graph, std::string old_graph, size_t count_k, Vector< std::string > & vertexes, std::ostream & output)
 {
   if (graphs_.has(new_graph) || !graphs_.has(old_graph)) {
     output << "<INVALID COMMAND>\n";
@@ -272,14 +272,14 @@ void chernov::Graphs::extractGraphs(std::string new_graph, std::string old_graph
 
   try {
     Graph new_gr(new_graph);
-    const Graph& old_gr = graphs_.at(old_graph);
+    const Graph & old_gr = graphs_.at(old_graph);
 
     for (size_t i = 0; i < count_k && i < vertexes.getSize(); ++i) {
-      const std::string& src = vertexes[i];
-      Vector<std::pair<std::string, size_t>> edges = old_gr.getOutbound(src);
+      const std::string & src = vertexes[i];
+      Vector< std::pair< std::string, size_t > > edges = old_gr.getOutbound(src);
 
       for (size_t j = 0; j < edges.getSize(); ++j) {
-        const std::string& dst = edges[j].first;
+        const std::string & dst = edges[j].first;
         size_t weight = edges[j].second;
 
         bool dst_allowed = false;
