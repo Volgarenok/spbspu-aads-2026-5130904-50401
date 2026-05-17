@@ -137,15 +137,30 @@ chernov::Graphs::Graphs():
   graphs_(64)
 {}
 
+void chernov::Graphs::createGraphWithoutCheckingExisting(std::string graph_name)
+{
+  try {
+    graphs_.add(graph_name, Graph(graph_name));
+  } catch (const std::length_error & e) {
+    graphs_.rehash(graphs_.maxCapacity() ? graphs_.maxCapacity() * 2 : 2);
+    graphs_.add(graph_name, Graph(graph_name));
+  }
+}
+
+void chernov::Graphs::createGraph(std::string graph_name, std::ostream & output)
+{
+  if (!graphs_.has(graph_name)) {
+    createGraphWithoutCheckingExisting(graph_name);
+  } else {
+    output << "<INVALID COMMAND>\n";
+  }
+}
+
+
 void chernov::Graphs::addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight)
 {
   if (!graphs_.has(graph_name)) {
-    try {
-      graphs_.add(graph_name, Graph(graph_name));
-    } catch (const std::length_error & e) {
-      graphs_.rehash(graphs_.maxCapacity() * 2);
-      graphs_.add(graph_name, Graph(graph_name));
-    }
+    createGraphWithoutCheckingExisting(graph_name);
   }
   graphs_.at(graph_name).addEdge(start_vertex, end_vertex, weight);
 }

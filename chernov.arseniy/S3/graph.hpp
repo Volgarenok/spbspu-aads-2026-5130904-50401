@@ -58,6 +58,8 @@ namespace chernov {
     HashTable< std::string, Graph, std::hash< std::string >, std::equal_to< std::string > > graphs_;
 
     Graphs();
+    void createGraphWithoutCheckingExisting(std::string graph_name);
+    void createGraph(std::string graph_name, std::ostream & output);
     void addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight);
     void showGraphs(std::ostream & output);
     void showGraphVertexes(std::string graph_name, std::ostream & output);

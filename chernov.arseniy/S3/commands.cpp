@@ -43,3 +43,10 @@ void chernov::cmdCut(std::istream & input, std::ostream & output, Graphs & graph
   input >> graph_name >> vertex_a >> vertex_b >> weight;
   graphs.cutGraphEdge(graph_name, vertex_a, vertex_b, weight, output);
 }
+
+void chernov::cmdCreate(std::istream & input, std::ostream & output, Graphs & graphs)
+{
+  std::string graph_name;
+  input >> graph_name;
+  graphs.createGraph(graph_name, output);
+}
