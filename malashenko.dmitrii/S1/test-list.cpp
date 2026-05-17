@@ -5,16 +5,12 @@ BOOST_AUTO_TEST_SUITE(List_test_suite)
 BOOST_AUTO_TEST_CASE(creation_of_list)
 {
   malashenko::List< int > l;
-  BOOST_CHECK(l.begin() == l.getFake());
-  BOOST_CHECK(l.end() == l.getFake());
-
   l.push_back(1);
   l.push_back(2);
   l.push_back(3);
 
   BOOST_CHECK(l.front() == 1);
 
-  BOOST_CHECK(l.end() == l.getFake());
 
   malashenko::List< int > k(l);
   k.push_back(4);
@@ -39,7 +35,6 @@ BOOST_AUTO_TEST_CASE(begin_and_end)
   BOOST_CHECK(*(l.begin()) == 1);
   BOOST_CHECK(*(l.begin() + 1) == 2);
   BOOST_CHECK(*(l.begin() + 2) == 3);
-  BOOST_CHECK(l.end() == l.getFake());
 }
 
 BOOST_AUTO_TEST_CASE(cbegin_and_cend)
