@@ -77,7 +77,7 @@ namespace vasyakin
     List(const List& other);
     List(List&& other) noexcept;
     explicit List(const T& value);
-    ~List();
+    ~List() noexcept;
     List& operator=(const List& other);
     List& operator=(List&& other) noexcept;
 
@@ -85,7 +85,7 @@ namespace vasyakin
     detail::Node< T >* erase(detail::Node< T >* h);
     detail::Node< T >* pushBack(const T& value);
     void swap(List& other) noexcept;
-    void clear();
+    void clear() noexcept;
 
     LIter< T > begin();
     LIter< T > end();
@@ -94,9 +94,9 @@ namespace vasyakin
     LCIter< T > cbegin() const;
     LCIter< T > cend() const;
 
-    size_t getSize() const;
-    detail::Node< T >* getFake() const;
-    detail::Node< T >* getFirst() const;
+    size_t getSize() const noexcept;
+    detail::Node< T >* getFake() const noexcept;
+    detail::Node< T >* getFirst() const noexcept;
 
   private:
     detail::Node< T >* fake_node_;
@@ -269,12 +269,8 @@ namespace vasyakin
   }
 
   template< class T >
-  List< T >::~List()
+  List< T >::~List() noexcept
   {
-    if (!fake_node_)
-    {
-      return;
-    }
     clear();
     delete fake_node_;
     fake_node_ = nullptr;
@@ -303,7 +299,7 @@ namespace vasyakin
   }
 
   template< class T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     if (!fake_node_)
     {
@@ -418,19 +414,19 @@ namespace vasyakin
   }
 
   template< class T >
-  size_t List< T >::getSize() const
+  size_t List< T >::getSize() const noexcept
   {
     return size_;
   }
 
   template< class T >
-  detail::Node< T >* List< T >::getFake() const
+  detail::Node< T >* List< T >::getFake() const noexcept
   {
     return fake_node_;
   }
 
   template< class T >
-  detail::Node< T >* List< T >::getFirst() const
+  detail::Node< T >* List< T >::getFirst() const noexcept
   {
     return fake_node_->next_;
   }
