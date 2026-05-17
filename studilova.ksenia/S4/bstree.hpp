@@ -16,10 +16,29 @@ namespace studilova
       bool empty() const;
 
     private:
-      struct Node;
+      struct Node
+      {
+        Key key_;
+        Value value_;
+        Node* left_;
+        Node* right_;
+        Node* parent_;
+
+        Node(const Key& key, const Value& value);
+      };
+
       Node* root_;
-      Compare cmp_
+      Compare cmp_;
   };
 }
+
+template< class Key, class Value, class Compare >
+studilova::BSTree< Key, Value, Compare >::Node::Node(const Key& key, const Value& value) :
+  key_(key),
+  value_(value),
+  left_(nullptr),
+  right_(nullptr),
+  parent_(nullptr)
+{}
 
 #endif
