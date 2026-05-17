@@ -251,21 +251,27 @@ namespace vasyakin
 
   template< class T >
   List< T >::List(List&& other) noexcept:
-    size_(other.size_),
-    fake_node_(other.fake_node_)
-  {
-    other.fake_node_ = nullptr;
-    other.size_ = 0;
-  }
+    size_(std::exchange(other.size_, 0)),
+    fake_node_(std::exchange(other.fake_node_, nullptr))
+  {}
 
   template< class T >
   List< T >::List(const T& value):
     size_(1),
     fake_node_(new detail::Node< T >(T{}))
   {
-    detail::Node< T >* head = new detail::Node< T >(value);
-    head->next_ = fake_node_;
-    fake_node_->next_ = head;
+    try
+    {
+      detail::Node< T >* head = new detail::Node< T >(value);
+      head->next_ = fake_node_;
+      fake_node_->next_ = head;
+    }
+    catch (...)
+    {
+      delete fake_node_;
+      fake_node_ = nullptr;
+      throw;
+    }
   }
 
   template< class T >
