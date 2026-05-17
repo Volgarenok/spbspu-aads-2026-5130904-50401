@@ -1,6 +1,6 @@
+#include <iostream>
 #include "list.hpp"
 #include "functions.hpp"
-#include <iostream>
 
 int main()
 {

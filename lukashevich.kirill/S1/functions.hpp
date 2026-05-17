@@ -1,11 +1,11 @@
 #ifndef FUNCTIONS_HPP
 #define FUNCTIONS_HPP
 
-#include "list.hpp"
 #include <iostream>
 #include <string>
 #include <stdexcept>
 #include <limits>
+#include "list.hpp"
 
 namespace lukashevich
 {

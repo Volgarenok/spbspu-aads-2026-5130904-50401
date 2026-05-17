@@ -26,8 +26,8 @@ namespace lukashevich
       bool operator==(const LIter< T >& rhs) const;
       bool operator!=(const LIter< T >& rhs) const;
 
-      T& operator*() const;
-      T* operator->() const;
+      T& operator*();
+      T* operator->();
 
     private:
       explicit LIter(Node< T >* node):
@@ -86,14 +86,14 @@ namespace lukashevich
   }
 
   template< class T >
-  T& LIter< T >::operator*() const
+  T& LIter< T >::operator*()
   {
     assert(node_ != nullptr);
     return node_->val;
   }
 
   template< class T >
-  T* LIter< T >::operator->() const
+  T* LIter< T >::operator->()
   {
     assert(node_ != nullptr);
     return &node_->val;

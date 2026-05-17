@@ -14,7 +14,6 @@ namespace lukashevich
   template< class T >
   class LCIter
   {
-    friend class List< T >;
     public:
       LCIter();
       LCIter< T >& operator++();
@@ -33,6 +32,7 @@ namespace lukashevich
         node_(node)
       {}
       Node< T >* node_;
+      friend class List< T >;
   };
 
   template< class T >
