@@ -33,7 +33,7 @@ void lukashevich::printSeqName(const List< pair_t >& data)
       std::cout << ' ';
     }
 
-    std::cout << (*it).first;
+    std::cout << it->first;
 
     first = false;
     ++it;
@@ -51,8 +51,8 @@ size_t lukashevich::printOneRow(List< pair_t >& data)
   size_t sum = 0;
 
   while (it != end) {
-    if (!((*it).second.empty())) {
-      size_t value = (*it).second.front();
+    if (!(it->second.empty())) {
+      size_t value = it->second.front();
 
       if (!first) {
         std::cout << ' ';
@@ -69,7 +69,7 @@ size_t lukashevich::printOneRow(List< pair_t >& data)
         }
       }
 
-      (*it).second.popFront();
+      it->second.popFront();
       first = false;
     }
 
@@ -91,7 +91,7 @@ bool lukashevich::hasNum(const List< pair_t >& data)
   LCIter< pair_t > end = data.end();
 
   while (it != end) {
-    if (!((*it).second.empty())) {
+    if (!(it->second.empty())) {
       return true;
     }
     ++it;
