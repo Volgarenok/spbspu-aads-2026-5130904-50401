@@ -8,6 +8,13 @@
 #include <vector.hpp>
 
 namespace chernov {
+  struct KeyComparator {
+    bool operator()(const std::string & s1, const std::string & s2)
+    {
+      return s1 == s2;
+    }
+  };
+
   template< class T >
   struct Comparator {
     bool operator()(const T & p1, const T & p2)
