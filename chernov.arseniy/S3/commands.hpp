@@ -8,6 +8,7 @@ namespace chernov {
   using cmd_t = void(*)(std::istream &, std::ostream &, Graphs &);
 
   void cmdGraphs(std::istream & input, std::ostream & output, Graphs & graphs);
+  void cmdVertexes(std::istream & input, std::ostream & output, Graphs & graphs);
 }
 
 #endif
