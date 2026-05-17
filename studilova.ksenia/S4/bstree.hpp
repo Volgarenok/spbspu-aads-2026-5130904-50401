@@ -38,6 +38,7 @@ namespace studilova
 
       void clear(Node* node);
       Node* clone(Node* node, Node* parent);
+      void swap(BSTree& other) noexcept;
   };
 }
 
@@ -85,6 +86,30 @@ studilova::BSTree< Key, Value, Compare >::BSTree(BSTree&& other) noexcept :
 }
 
 template< class Key, class Value, class Compare >
+studilova::BSTree< Key, Value, Compare >& studilova::BSTree< Key, Value, Compare >::operator=(const BSTree& other)
+{
+  if (this != &other)
+  {
+    BSTree temp(other);
+    swap(temp);
+  }
+  return *this;
+}
+
+template< class Key, class Value, class Compare >
+studilova::BSTree< Key, Value, Compare >& studilova::BSTree< Key, Value, Compare >::operator=(BSTree&& other) noexcept
+{
+  if (this != other)
+  {
+    clear(root_);
+    root_ = other.root_;
+    cmp_ = other.cmp_;
+    other.root_ = nullptr;
+  }
+  return *this;
+}
+
+template< class Key, class Value, class Compare >
 void studilova::BSTree< Key, Value, Compare >::clear(Node* node)
 {
   if (!node)
@@ -110,6 +135,13 @@ typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key,
   copy->right_ = clone(node->right_, copy);
 
   return copy;
+}
+
+template< class Key, class Value, class Compare >
+void studilova::BSTree< Key, Value, Compare >::swap(BSTree& other) noexcept
+{
+  std::swap(root_, other.root_);
+  std::swap(cmp_, other.cmp_);
 }
 
 #endif
