@@ -18,7 +18,9 @@ namespace topit
     explicit Vector(std::initializer_list< T >);
 
     VIter< T > begin() const noexcept;
+    VIter< T > end() const noexcept;
     VCIter< T > cbegin() const noexcept;
+    VCIter< T > cend() const noexcept;
 
     Vector< T >& operator=(Vector< T >&&);
     Vector< T >& operator=(const Vector< T >&);
@@ -124,9 +126,21 @@ topit::VIter< T > topit::Vector< T >::begin() const noexcept
   return tmp;
 }
 template< class T >
+topit::VIter< T > topit::Vector< T >::end() const noexcept
+{
+  VIter< T > tmp{data_ + size_};
+  return tmp;
+}
+template< class T >
 topit::VCIter< T > topit::Vector< T >::cbegin() const noexcept
 {
   VCIter< T > tmp{data_};
+  return tmp;
+}
+template< class T >
+topit::VCIter< T > topit::Vector< T >::cend() const noexcept
+{
+  VCIter< T > tmp{data_ + size_};
   return tmp;
 }
 
