@@ -73,7 +73,8 @@ chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator->() const
 }
 
 template< class Key, class Value, class Hash, class Equal, bool IsConst >
-chernov::HTIter< Key, Value, Hash, Equal, IsConst > & chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator++()
+chernov::HTIter< Key, Value, Hash, Equal, IsConst > &
+chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator++()
 {
   if (index_ < ht_->num_buckets_ * ht_->bucket_cap_) {
     size_t home_bucket = index_ / ht_->bucket_cap_;
@@ -87,6 +88,10 @@ chernov::HTIter< Key, Value, Hash, Equal, IsConst > & chernov::HTIter< Key, Valu
           index_ = i * ht_->bucket_cap_;
           return *this;
         }
+      }
+      if (ht_->overflow_size_ > 0) {
+        index_ = ht_->num_buckets_ * ht_->bucket_cap_;
+        return *this;
       }
     }
   } else {

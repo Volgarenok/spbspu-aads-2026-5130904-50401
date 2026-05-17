@@ -5,7 +5,7 @@
 template< class T, class Cmp >
 void chernov::sort(Vector< T > & v, Cmp cmp)
 {
-  for (size_t i = 0; i < v.getSize() - 1; ++i) {
+  for (size_t i = 0; i < v.getSize(); ++i) {
     size_t min = i;
     for (size_t j = i + 1; j < v.getSize(); ++j) {
       if (cmp(v[j], v[min])) {
@@ -28,7 +28,7 @@ void chernov::Edges::addEdge(std::string vertex, size_t weight)
     try {
       edges_.add(vertex, Vector< size_t >());
     } catch (const std::length_error & e) {
-      edges_.rehash(edges_.maxCapacity() * 2);
+      edges_.rehash(edges_.maxCapacity() ? edges_.maxCapacity() * 2 : 2);
       edges_.add(vertex, Vector< size_t >());
     }
   }
@@ -71,7 +71,7 @@ void chernov::Graph::addEdge(std::string start_vertex, std::string end_vertex, s
       try {
         table.add(key, Edges());
       } catch (const std::length_error &) {
-        table.rehash(table.maxCapacity() > 0 ? table.maxCapacity() * 2 : 2);
+        table.rehash(table.maxCapacity() ? table.maxCapacity() * 2 : 2);
         table.add(key, Edges());
       }
     }
