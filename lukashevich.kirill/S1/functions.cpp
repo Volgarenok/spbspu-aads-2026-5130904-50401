@@ -38,6 +38,7 @@ void lukashevich::printSeqName(const List< pair_t >& data)
     first = false;
     ++it;
   }
+  std::cout << '\n';
 }
 
 size_t lukashevich::printOneRow(List< pair_t >& data)
