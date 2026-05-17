@@ -5,6 +5,7 @@
 
 #include "commands.hpp"
 #include "graph.hpp"
+#include "hasher.hpp"
 #include <hashtable.hpp>
 #include <vector.hpp>
 
@@ -38,7 +39,7 @@ int main(int args, char ** argv)
     }
   }
 
-  chernov::HashTable< std::string, chernov::cmd_t, std::hash< std::string >, std::equal_to< std::string > > cmds(64);
+  chernov::HashTable< std::string, chernov::cmd_t, HasherXx< std::string >, KeyComparator > cmds(64);
   cmds.add("graphs", chernov::cmdGraphs);
   cmds.add("vertexes", chernov::cmdVertexes);
   cmds.add("outbound", chernov::cmdOutbound);

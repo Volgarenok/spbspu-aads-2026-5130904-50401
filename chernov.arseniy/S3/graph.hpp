@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <string>
 
+#include "hasher.hpp"
 #include <hashtable.hpp>
 #include <vector.hpp>
 
@@ -39,7 +40,7 @@ namespace chernov {
   void sort(Vector< T > & v, Cmp cmp);
 
   struct Edges {
-    HashTable< std::string, Vector< size_t >, std::hash< std::string >, std::equal_to< std::string > > edges_;
+    HashTable< std::string, Vector< size_t >, HasherXx< std::string >, KeyComparator > edges_;
 
     Edges();
     void addEdge(std::string vertex, size_t weight);
@@ -49,8 +50,8 @@ namespace chernov {
 
   struct Graph {
     std::string name_;
-    HashTable< std::string, Edges, std::hash< std::string >, std::equal_to< std::string > > incoming_;
-    HashTable< std::string, Edges, std::hash< std::string >, std::equal_to< std::string > > outgoing_;
+    HashTable< std::string, Edges, HasherXx< std::string >, KeyComparator > incoming_;
+    HashTable< std::string, Edges, HasherXx< std::string >, KeyComparator > outgoing_;
 
     Graph() = delete;
     Graph(std::string name);
@@ -62,7 +63,7 @@ namespace chernov {
   };
 
   struct Graphs {
-    HashTable< std::string, Graph, std::hash< std::string >, std::equal_to< std::string > > graphs_;
+    HashTable< std::string, Graph, HasherXx< std::string >, KeyComparator > graphs_;
 
     Graphs();
     void createGraphWithoutCheckingExisting(std::string graph_name);
