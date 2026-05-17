@@ -50,3 +50,10 @@ void chernov::cmdCreate(std::istream & input, std::ostream & output, Graphs & gr
   input >> graph_name;
   graphs.createGraph(graph_name, output);
 }
+
+void chernov::cmdMerge(std::istream & input, std::ostream & output, Graphs & graphs)
+{
+  std::string new_graph, old_graph1, old_graph2;
+  input >> new_graph >> old_graph1 >> old_graph2;
+  graphs.mergeGraphs(new_graph, old_graph1, old_graph2, output);
+}

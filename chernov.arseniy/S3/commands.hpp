@@ -14,6 +14,7 @@ namespace chernov {
   void cmdBind(std::istream & input, std::ostream & output, Graphs & graphs);
   void cmdCut(std::istream & input, std::ostream & output, Graphs & graphs);
   void cmdCreate(std::istream & input, std::ostream & output, Graphs & graphs);
+  void cmdMerge(std::istream & input, std::ostream & output, Graphs & graphs);
 }
 
 #endif

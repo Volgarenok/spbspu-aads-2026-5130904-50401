@@ -233,3 +233,32 @@ void chernov::Graphs::cutGraphEdge(std::string graph_name, std::string vertex_a,
     output << "<INVALID COMMAND>\n";
   }
 }
+
+void chernov::Graphs::mergeGraphs(std::string new_graph, std::string old_graph1, std::string old_graph2, std::ostream & output)
+{
+  if (graphs_.has(new_graph) || !graphs_.has(old_graph1) || !graphs_.has(old_graph2)) {
+    output << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  Graph graph(new_graph);
+
+  auto add_edges = [&graph](Graph gr) {
+    for (auto iter = gr.outgoing_.cbegin(); iter != gr.outgoing_.cend(); ++iter) {
+      Vector< std::pair< std::string, size_t > > edges = iter->second.getEdges();
+      for (auto v_iter = edges.cbegin(); v_iter != edges.cend(); ++v_iter) {
+        graph.addEdge(iter->first, v_iter->first, v_iter->second);
+      }
+    }
+  };
+
+  add_edges(graphs_.at(old_graph1));
+  add_edges(graphs_.at(old_graph2));
+
+  try {
+    graphs_.add(new_graph, graph);
+  } catch (const std::length_error & e) {
+    graphs_.rehash(graphs_.maxCapacity() ? graphs_.maxCapacity() * 2 : 2);
+    graphs_.add(new_graph, graph);
+  }
+}
