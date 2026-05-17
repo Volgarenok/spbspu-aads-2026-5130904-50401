@@ -7,7 +7,11 @@
 
 namespace vasyakin
 {
-  template< class T > class Node;
+  namespace detail
+  {
+    template< class T > class Node;
+  }
+
   template< class T > class List;
   const size_t max = std::numeric_limits< size_t >::max();
 
@@ -21,12 +25,12 @@ namespace vasyakin
     LIter operator++(int);
     bool operator==(const LIter& other) const;
     bool operator!=(const LIter& other) const;
-    Node< T >* getPtr() const;
+    detail::Node< T >* getPtr() const;
 
   private:
     friend class List< T >;
-    Node< T >* ptr_;
-    explicit LIter(Node< T >* p);
+    detail::Node< T >* ptr_;
+    explicit LIter(detail::Node< T >* p);
   };
 
   template< class T >
@@ -39,28 +43,31 @@ namespace vasyakin
     LCIter operator++(int);
     bool operator==(const LCIter& other) const;
     bool operator!=(const LCIter& other) const;
-    const Node< T >* getPtr() const;
+    const detail::Node< T >* getPtr() const;
 
   private:
     friend class List< T >;
-    const Node< T >* ptr_;
-    explicit LCIter(const Node< T >* p);
+    const detail::Node< T >* ptr_;
+    explicit LCIter(const detail::Node< T >* p);
     explicit LCIter(const LIter< T >& it);
   };
 
-  template< class T >
-  class Node
+  namespace detail
   {
-  public:
-    explicit Node(const T& value);
+    template< class T >
+    class Node
+    {
+    public:
+      explicit Node(const T& value);
 
-  private:
-    T val_;
-    Node< T >* next_;
-    friend class List< T >;
-    friend class LIter< T >;
-    friend class LCIter< T >;
-  };
+    private:
+      T val_;
+      Node< T >* next_;
+      friend class List< T >;
+      friend class LIter< T >;
+      friend class LCIter< T >;
+    };
+  }
 
   template< class T >
   class List
@@ -74,9 +81,11 @@ namespace vasyakin
     List& operator=(const List& other);
     List& operator=(List&& other) noexcept;
 
-    Node< T >* insert(Node< T >* h, const T& value);
-    Node< T >* erase(Node< T >* h);
-    Node< T >* pushBack(const T& value);
+    detail::Node< T >* insert(detail::Node< T >* h, const T& value);
+    detail::Node< T >* erase(detail::Node< T >* h);
+    detail::Node< T >* pushBack(const T& value);
+    void swap(List& other) noexcept;
+    void clear();
 
     LIter< T > begin();
     LIter< T > end();
@@ -85,19 +94,17 @@ namespace vasyakin
     LCIter< T > cbegin() const;
     LCIter< T > cend() const;
 
-    void swap(List& other) noexcept;
     size_t getSize() const;
-    Node< T >* getFake() const;
-    Node< T >* getFirst() const;
-    void clear();
+    detail::Node< T >* getFake() const;
+    detail::Node< T >* getFirst() const;
 
   private:
-    Node< T >* fake_node_;
+    detail::Node< T >* fake_node_;
     size_t size_;
   };
 
   template< class T >
-  LIter< T >::LIter(Node< T >* p):
+  LIter< T >::LIter(detail::Node< T >* p):
     ptr_(p)
   {}
 
@@ -141,13 +148,13 @@ namespace vasyakin
   }
 
   template< class T >
-  Node< T >* LIter< T >::getPtr() const
+  detail::Node< T >* LIter< T >::getPtr() const
   {
     return ptr_;
   }
 
   template< class T >
-  LCIter< T >::LCIter(const Node< T >* p):
+  LCIter< T >::LCIter(const detail::Node< T >* p):
     ptr_(p)
   {}
 
@@ -196,13 +203,13 @@ namespace vasyakin
   }
 
   template< class T >
-  const Node< T >* LCIter< T >::getPtr() const
+  const detail::Node< T >* LCIter< T >::getPtr() const
   {
     return ptr_;
   }
 
   template< class T >
-  Node< T >::Node(const T& value):
+  detail::Node< T >::Node(const T& value):
     val_(value),
     next_(nullptr)
   {}
@@ -210,7 +217,7 @@ namespace vasyakin
   template< class T >
   List< T >::List():
     size_(0),
-    fake_node_(new Node< T >(T{}))
+    fake_node_(new detail::Node< T >(T{}))
   {
     fake_node_->next_ = fake_node_;
   }
@@ -218,7 +225,7 @@ namespace vasyakin
   template< class T >
   List< T >::List(const List& other):
     size_(0),
-    fake_node_(new Node< T >(T{}))
+    fake_node_(new detail::Node< T >(T{}))
   {
     fake_node_->next_ = fake_node_;
 
@@ -227,17 +234,18 @@ namespace vasyakin
       return;
     }
 
-    Node< T >* other_cur = other.fake_node_->next_;
-    Node< T >* prev = fake_node_;
+    detail::Node< T >* other_cur = other.fake_node_->next_;
+    detail::Node< T >* prev = fake_node_;
 
     while (other_cur != other.fake_node_)
     {
-      Node< T >* new_node = new Node< T >(other_cur->val_);
+      detail::Node< T >* new_node = new detail::Node< T >(other_cur->val_);
       prev->next_ = new_node;
       prev = new_node;
       other_cur = other_cur->next_;
       ++size_;
     }
+
     prev->next_ = fake_node_;
   }
 
@@ -253,9 +261,9 @@ namespace vasyakin
   template< class T >
   List< T >::List(const T& value):
     size_(1),
-    fake_node_(new Node< T >(T{}))
+    fake_node_(new detail::Node< T >(T{}))
   {
-    Node< T >* head = new Node< T >(value);
+    detail::Node< T >* head = new detail::Node< T >(value);
     head->next_ = fake_node_;
     fake_node_->next_ = head;
   }
@@ -307,10 +315,10 @@ namespace vasyakin
       return;
     }
 
-    Node< T >* current = fake_node_->next_;
+    detail::Node< T >* current = fake_node_->next_;
     while (current != fake_node_)
     {
-      Node< T >* next = current->next_;
+      detail::Node< T >* next = current->next_;
       delete current;
       current = next;
     }
@@ -319,9 +327,9 @@ namespace vasyakin
   }
 
   template< class T >
-  Node< T >* List< T >::insert(Node< T >* h, const T& value)
+  detail::Node< T >* List< T >::insert(detail::Node< T >* h, const T& value)
   {
-    Node< T >* new_node = new Node< T >(value);
+    detail::Node< T >* new_node = new detail::Node< T >(value);
 
     if (fake_node_->next_ == fake_node_)
     {
@@ -338,13 +346,13 @@ namespace vasyakin
   }
 
   template< class T >
-  Node< T >* List< T >::erase(Node< T >* h)
+  detail::Node< T >* List< T >::erase(detail::Node< T >* h)
   {
     if (!fake_node_ || h->next_ == fake_node_)
     {
       return fake_node_;
     }
-    Node< T >* to_delete = h->next_;
+    detail::Node< T >* to_delete = h->next_;
     h->next_ = to_delete->next_;
     delete to_delete;
     --size_;
@@ -352,10 +360,10 @@ namespace vasyakin
   }
 
   template< class T >
-  Node< T >* List< T >::pushBack(const T& value)
+  detail::Node< T >* List< T >::pushBack(const T& value)
   {
-    Node< T >* new_node = new Node< T >(value);
-    Node< T >* last = fake_node_;
+    detail::Node< T >* new_node = new detail::Node< T >(value);
+    detail::Node< T >* last = fake_node_;
     while (last->next_ != fake_node_)
     {
       last = last->next_;
@@ -416,13 +424,13 @@ namespace vasyakin
   }
 
   template< class T >
-  Node< T >* List< T >::getFake() const
+  detail::Node< T >* List< T >::getFake() const
   {
     return fake_node_;
   }
 
   template< class T >
-  Node< T >* List< T >::getFirst() const
+  detail::Node< T >* List< T >::getFirst() const
   {
     return fake_node_->next_;
   }
