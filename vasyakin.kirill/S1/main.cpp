@@ -20,7 +20,7 @@ int main()
     {
       if (last_num == nullptr)
       {
-        last_num = numbers.insert(numbers.get_fake(), num);
+        last_num = numbers.insert(numbers.getFake(), num);
       }
       else
       {
@@ -29,7 +29,7 @@ int main()
     }
     std::cin.clear();
 
-    sequences.push_back(std::make_pair(name, std::move(numbers)));
+    sequences.pushBack(std::make_pair(name, std::move(numbers)));
   }
 
   if (sequences.begin() == sequences.end())
@@ -82,7 +82,7 @@ int main()
 
       if (nit != sit->second.cend())
       {
-        new_seq.push_back(*nit);
+        new_seq.pushBack(*nit);
         hasNumbers = true;
       }
     }
@@ -91,7 +91,7 @@ int main()
     {
       if (last_trans == nullptr)
       {
-        last_trans = transposed.insert(transposed.get_fake(), std::move(new_seq));
+        last_trans = transposed.insert(transposed.getFake(), std::move(new_seq));
       }
       else
       {
@@ -125,19 +125,19 @@ int main()
       {
         for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)
         {
-          if (sum > vasyakin::MAX - *nit)
+          if (sum > vasyakin::max - *nit)
           {
             throw std::overflow_error("Sum overflow");
           }
           sum += *nit;
         }
       }
-      catch(std::overflow_error& e)
+      catch (std::overflow_error& e)
       {
         std::cerr << e.what() << "\n";
         return 1;
       }
-      sums.push_back(sum);
+      sums.pushBack(sum);
     }
 
     bool first = true;
