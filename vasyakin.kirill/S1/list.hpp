@@ -216,16 +216,16 @@ namespace vasyakin
 
   template< class T >
   List< T >::List():
-    size_(0),
-    fake_node_(new detail::Node< T >(T{}))
+    fake_node_(new detail::Node< T >(T{})),
+    size_(0)
   {
     fake_node_->next_ = fake_node_;
   }
 
   template< class T >
   List< T >::List(const List& other):
-    size_(0),
-    fake_node_(new detail::Node< T >(T{}))
+    fake_node_(new detail::Node< T >(T{})),
+    size_(0)
   {
     fake_node_->next_ = fake_node_;
 
@@ -237,14 +237,14 @@ namespace vasyakin
 
   template< class T >
   List< T >::List(List&& other) noexcept:
-    size_(std::exchange(other.size_, 0)),
-    fake_node_(std::exchange(other.fake_node_, nullptr))
+    fake_node_(std::exchange(other.fake_node_, nullptr)),
+    size_(std::exchange(other.size_, 0))
   {}
 
   template< class T >
   List< T >::List(const T& value):
-    size_(1),
-    fake_node_(new detail::Node< T >(T{}))
+    fake_node_(new detail::Node< T >(T{})),
+    size_(1)
   {
     try
     {
