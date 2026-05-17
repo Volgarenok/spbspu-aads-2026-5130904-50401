@@ -71,7 +71,8 @@ namespace chernov {
     size_t getElementIndex(const Key & k) const;
     void removeElementByIndex(size_t index);
     void unsafeAddWithoutCheckingExisting(Key k, Value v);
-    void calculateParamsFromSlots(size_t slots, size_t & new_num_buckets, size_t & new_bucket_cap, size_t & new_overflow_cap) const noexcept;
+    void calculateParamsFromSlots(size_t slots,
+      size_t & new_num_buckets, size_t & new_bucket_cap, size_t & new_overflow_cap) const noexcept;
     void setParamsByCountSlots(size_t slots) noexcept;
     size_t getFirstValidIndex() const noexcept;
     size_t getEndIndex() const noexcept;
@@ -197,7 +198,8 @@ chernov::HashTable< Key, Value, Hash, Equal >::~HashTable()
 }
 
 template< class Key, class Value, class Hash, class Equal >
-chernov::HashTable< Key, Value, Hash, Equal > & chernov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable & ht)
+chernov::HashTable< Key, Value, Hash, Equal > &
+chernov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable & ht)
 {
   if (this == std::addressof(ht)) {
     return *this;
@@ -208,7 +210,8 @@ chernov::HashTable< Key, Value, Hash, Equal > & chernov::HashTable< Key, Value, 
 }
 
 template< class Key, class Value, class Hash, class Equal >
-chernov::HashTable< Key, Value, Hash, Equal > & chernov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable && ht) noexcept
+chernov::HashTable< Key, Value, Hash, Equal > &
+chernov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable && ht) noexcept
 {
   if (this == std::addressof(ht)) {
     return *this;
@@ -457,7 +460,8 @@ void chernov::HashTable< Key, Value, Hash, Equal >::unsafeAddWithoutCheckingExis
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void chernov::HashTable< Key, Value, Hash, Equal >::calculateParamsFromSlots(size_t slots, size_t & new_num_buckets, size_t & new_bucket_cap, size_t & new_overflow_cap) const noexcept
+void chernov::HashTable< Key, Value, Hash, Equal >::calculateParamsFromSlots(size_t slots,
+  size_t & new_num_buckets, size_t & new_bucket_cap, size_t & new_overflow_cap) const noexcept
 {
   constexpr size_t default_bucket_cap = 4;
   constexpr size_t default_overflow_cap = 4;

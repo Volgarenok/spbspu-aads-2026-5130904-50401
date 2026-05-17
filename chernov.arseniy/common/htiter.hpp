@@ -52,7 +52,8 @@ chernov::HTIter< Key, Value, Hash, Equal, IsConst >::HTIter():
 {}
 
 template< class Key, class Value, class Hash, class Equal, bool IsConst >
-chernov::HTIter< Key, Value, Hash, Equal, IsConst >::HTIter(const HashTable< Key, Value, Hash, Equal > * ht, size_t index):
+chernov::HTIter< Key, Value, Hash, Equal, IsConst >::
+HTIter(const HashTable< Key, Value, Hash, Equal > * ht, size_t index):
   ht_(ht),
   index_(index)
 {}
@@ -99,7 +100,8 @@ chernov::HTIter< Key, Value, Hash, Equal, IsConst > & chernov::HTIter< Key, Valu
 }
 
 template< class Key, class Value, class Hash, class Equal, bool IsConst >
-chernov::HTIter< Key, Value, Hash, Equal, IsConst > chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator++(int)
+chernov::HTIter< Key, Value, Hash, Equal, IsConst >
+chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator++(int)
 {
   HTIter old = *this;
   ++(*this);
@@ -108,7 +110,8 @@ chernov::HTIter< Key, Value, Hash, Equal, IsConst > chernov::HTIter< Key, Value,
 
 template< class Key, class Value, class Hash, class Equal, bool IsConst >
 template< bool OtherConst >
-bool chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator==(const HTIter< Key, Value, Hash, Equal, OtherConst > & other) const noexcept
+bool chernov::HTIter< Key, Value, Hash, Equal, IsConst >::
+operator==(const HTIter< Key, Value, Hash, Equal, OtherConst > & other) const noexcept
 {
   return ht_ == other.ht_ && index_ == other.index_;
 }
@@ -116,7 +119,8 @@ bool chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator==(const HTIte
 
 template< class Key, class Value, class Hash, class Equal, bool IsConst >
 template< bool OtherConst >
-bool chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator!=(const HTIter< Key, Value, Hash, Equal, OtherConst > & other) const noexcept
+bool chernov::HTIter< Key, Value, Hash, Equal, IsConst >::
+operator!=(const HTIter< Key, Value, Hash, Equal, OtherConst > & other) const noexcept
 {
   return !(*this == other);
 }

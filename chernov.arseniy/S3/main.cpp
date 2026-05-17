@@ -39,7 +39,7 @@ int main(int args, char ** argv)
     }
   }
 
-  chernov::HashTable< std::string, chernov::cmd_t, HasherXx< std::string >, KeyComparator > cmds(64);
+  chernov::HashTable< std::string, chernov::cmd_t, chernov::HasherXx< std::string >, chernov::KeyComparator > cmds(64);
   cmds.add("graphs", chernov::cmdGraphs);
   cmds.add("vertexes", chernov::cmdVertexes);
   cmds.add("outbound", chernov::cmdOutbound);

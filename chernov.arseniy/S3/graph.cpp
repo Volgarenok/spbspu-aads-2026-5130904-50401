@@ -216,7 +216,8 @@ void chernov::Graphs::showGraphInbound(std::string graph_name, std::string verte
   }
 }
 
-void chernov::Graphs::bindGraphVertexes(std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output)
+void chernov::Graphs::bindGraphVertexes(
+  std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output)
 {
   try {
     graphs_.at(graph_name).addEdge(vertex_a, vertex_b, weight);
@@ -225,7 +226,8 @@ void chernov::Graphs::bindGraphVertexes(std::string graph_name, std::string vert
   }
 }
 
-void chernov::Graphs::cutGraphEdge(std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output)
+void chernov::Graphs::cutGraphEdge(std::string graph_name,
+  std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output)
 {
   try {
     graphs_.at(graph_name).cutEdge(vertex_a, vertex_b, weight);
@@ -234,7 +236,8 @@ void chernov::Graphs::cutGraphEdge(std::string graph_name, std::string vertex_a,
   }
 }
 
-void chernov::Graphs::mergeGraphs(std::string new_graph, std::string old_graph1, std::string old_graph2, std::ostream & output)
+void chernov::Graphs::mergeGraphs(std::string new_graph,
+  std::string old_graph1, std::string old_graph2, std::ostream & output)
 {
   if (graphs_.has(new_graph) || !graphs_.has(old_graph1) || !graphs_.has(old_graph2)) {
     output << "<INVALID COMMAND>\n";
@@ -263,7 +266,8 @@ void chernov::Graphs::mergeGraphs(std::string new_graph, std::string old_graph1,
   }
 }
 
-void chernov::Graphs::extractGraphs(std::string new_graph, std::string old_graph, size_t count_k, Vector< std::string > & vertexes, std::ostream & output)
+void chernov::Graphs::extractGraphs(std::string new_graph,
+  std::string old_graph, size_t count_k, Vector< std::string > & vertexes, std::ostream & output)
 {
   if (graphs_.has(new_graph) || !graphs_.has(old_graph)) {
     output << "<INVALID COMMAND>\n";

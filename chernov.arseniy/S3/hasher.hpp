@@ -15,8 +15,8 @@ namespace chernov {
     size_t operator()(const T & p) const
     {
       boost::hash2::xxhash_64 h(seed_);
-      voost::hash2::hash_append(h, {}, p);
-      return r.result();
+      boost::hash2::hash_append(h, {}, p);
+      return h.result();
     }
 
   private:
