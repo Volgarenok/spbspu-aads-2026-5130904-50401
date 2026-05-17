@@ -1,8 +1,8 @@
 #ifndef SEQUENCE_FUNCTIONS
 #define SEQUENCE_FUNCTIONS
-#include <utility>
-#include <string>
 #include <iostream>
+#include <string>
+#include <utility>
 #include "list.hpp"
 #include "iterator.hpp"
 namespace malashenko

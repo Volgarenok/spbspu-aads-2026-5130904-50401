@@ -1,9 +1,10 @@
 #ifndef CONSTITERATOR
 #define CONSTITERATOR
+#include <cassert>
+#include <memory>
 #include "list.hpp"
 #include "node.hpp"
-#include <memory>
-#include <cassert>
+
 
 namespace malashenko
 {

@@ -1,7 +1,7 @@
 #ifndef ITERATOR
 #define ITERATOR
-#include <memory>
 #include <cassert>
+#include <memory>
 #include "list.hpp"
 #include "node.hpp"
 

@@ -1,12 +1,12 @@
 #ifndef LIST
 #define LIST
+#include <iostream>
+#include <cstddef>
+#include <string>
+#include <utility>
 #include "iterator.hpp"
 #include "const-iterator.hpp"
 #include "node.hpp"
-#include <iostream>
-#include <cstddef>
-#include <utility>
-#include <string>
 
 namespace malashenko {
   template< class T > class LIter;
@@ -93,19 +93,16 @@ namespace malashenko {
 
   template< class T >
   List< T >::List(List< T >&& other) noexcept:
-    fake_(std::move(other.fake_)),
-    s_(std::move(other.s_))
-  {
-    std::exchange(other.fake_, nullptr);
-    std::exchange(other.s_, 0);
-  }
+    fake_(std::exchange(other.fake_, nullptr)),
+    s_(std::exchange(other.s_, 0))
+  {}
 
   template< class T >
   List< T >& List< T >::operator=(List< T >&& other) noexcept
   {
     assert(this == &other);
 
-    List< T > temp(std::move(other));
+    List< T > temp(std::forward(other));
     swap(temp);
     return *this;
   }

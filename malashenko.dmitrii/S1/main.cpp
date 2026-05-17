@@ -1,6 +1,6 @@
-#include <utility>
-#include <string>
 #include <iostream>
+#include <string>
+#include <utility>
 #include "list.hpp"
 #include "functions.hpp"
 #include "iterator.hpp"
@@ -24,6 +24,8 @@ int main()
     return 1;
   }
   printSeqNames(std::cout, data);
+  std::cout << '\n';
+
 
   List< List< size_t > > res;
   try
@@ -38,6 +40,7 @@ int main()
       return 0;
     }
     printSums(std::cout, sums);
+    std::cout << '\n';
   }
   catch (const std::exception& e)
   {
