@@ -167,8 +167,13 @@ void chernov::Graphs::addEdge(std::string graph_name, std::string start_vertex, 
 
 void chernov::Graphs::showGraphs(std::ostream & output)
 {
+  Vector< std::string > graphs;
   for (auto iter = graphs_.begin(); iter != graphs_.end(); ++iter) {
-    output << iter->first << "\n";
+    graphs.pushBack(iter->first);
+  }
+  sort(graphs, Comparator< std::string >{});
+  for (auto iter = graphs.cbegin(); iter != graphs.cend(); ++iter) {
+    output << *iter << "\n";
   }
 }
 
