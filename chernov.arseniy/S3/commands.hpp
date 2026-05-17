@@ -9,6 +9,8 @@ namespace chernov {
 
   void cmdGraphs(std::istream & input, std::ostream & output, Graphs & graphs);
   void cmdVertexes(std::istream & input, std::ostream & output, Graphs & graphs);
+  void cmdOutbound(std::istream & input, std::ostream & output, Graphs & graphs);
+  void cmdInbound(std::istream & input, std::ostream & output, Graphs & graphs);
 }
 
 #endif

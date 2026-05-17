@@ -35,6 +35,17 @@ void chernov::Edges::addEdge(std::string vertex, size_t weight)
   edges_.at(vertex).pushBack(weight);
 }
 
+chernov::Vector< std::pair< std::string, size_t > > chernov::Edges::getEdges() const
+{
+  Vector< std::pair< std::string, size_t > > edges;
+  for (auto ht_iter = edges_.cbegin(); ht_iter != edges_.cend(); ++ht_iter) {
+    for (auto v_iter = ht_iter->second.cbegin(); v_iter != ht_iter->second.cend(); ++v_iter) {
+      edges.pushBack({ht_iter->first, *v_iter});
+    }
+  }
+  return edges;
+}
+
 chernov::Graph::Graph(std::string name):
   name_(name),
   incoming_(64),
@@ -84,6 +95,16 @@ chernov::Vector< std::string > chernov::Graph::getVertexes() const
   return vertexes;
 }
 
+chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getOutbound(std::string vertex) const
+{
+  return outgoing_.at(vertex).getEdges();
+}
+
+chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getInbound(std::string vertex) const
+{
+  return incoming_.at(vertex).getEdges();
+}
+
 chernov::Graphs::Graphs():
   graphs_(64)
 {}
@@ -115,6 +136,32 @@ void chernov::Graphs::showGraphVertexes(std::string graph_name, std::ostream & o
     sort(vertexes, Comparator< std::string >{});
     for (auto iter = vertexes.cbegin(); iter != vertexes.cend(); ++iter) {
       output << *iter << "\n";
+    }
+  } catch (const std::out_of_range & e) {
+    output << "<INVALID COMMAND>\n";
+  }
+}
+
+void chernov::Graphs::showGraphOutbound(std::string graph_name, std::string vertex, std::ostream & output)
+{
+  try {
+    Vector< std::pair< std::string, size_t > > vertexes = graphs_.at(graph_name).getOutbound(vertex);
+    sort(vertexes, PairComparator< std::string, size_t >{});
+    for (auto iter = vertexes.cbegin(); iter != vertexes.cend(); ++iter) {
+      output << iter->first << " " << iter->second << "\n";
+    }
+  } catch (const std::out_of_range & e) {
+    output << "<INVALID COMMAND>\n";
+  }
+}
+
+void chernov::Graphs::showGraphInbound(std::string graph_name, std::string vertex, std::ostream & output)
+{
+  try {
+    Vector< std::pair< std::string, size_t > > vertexes = graphs_.at(graph_name).getInbound(vertex);
+    sort(vertexes, PairComparator< std::string, size_t >{});
+    for (auto iter = vertexes.cbegin(); iter != vertexes.cend(); ++iter) {
+      output << iter->first << " " << iter->second << "\n";
     }
   } catch (const std::out_of_range & e) {
     output << "<INVALID COMMAND>\n";

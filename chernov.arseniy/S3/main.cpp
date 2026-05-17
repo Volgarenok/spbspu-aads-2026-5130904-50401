@@ -41,6 +41,8 @@ int main(int args, char ** argv)
   chernov::HashTable< std::string, chernov::cmd_t, std::hash< std::string >, std::equal_to< std::string > > cmds(64);
   cmds.add("graphs", chernov::cmdGraphs);
   cmds.add("vertexes", chernov::cmdVertexes);
+  cmds.add("outbound", chernov::cmdOutbound);
+  cmds.add("inbound", chernov::cmdInbound);
 
   std::string cmd;
   while (input >> cmd) {

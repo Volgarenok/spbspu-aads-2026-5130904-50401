@@ -16,6 +16,18 @@ namespace chernov {
     }
   };
 
+  template< class F, class S >
+  struct PairComparator {
+    using pair_t = std::pair< F, S >;
+    bool operator()(const pair_t & p1, const pair_t & p2)
+    {
+      if (p1.first != p2.first) {
+        return p1.first < p2.first;
+      }
+      return p1.second < p2.second;
+    }
+  };
+
   template< class T, class Cmp >
   void sort(Vector< T > & v, Cmp cmp);
 
@@ -24,6 +36,7 @@ namespace chernov {
 
     Edges();
     void addEdge(std::string vertex, size_t weight);
+    Vector< std::pair< std::string, size_t > > getEdges() const;
   };
 
   struct Graph {
@@ -35,6 +48,8 @@ namespace chernov {
     Graph(std::string name);
     void addEdge(std::string start_vertex, std::string end_vertex, size_t weight);
     Vector< std::string > getVertexes() const;
+    Vector< std::pair< std::string, size_t > > getOutbound(std::string vertex) const;
+    Vector< std::pair< std::string, size_t > > getInbound(std::string vertex) const;
   };
 
   struct Graphs {
@@ -44,6 +59,8 @@ namespace chernov {
     void addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight);
     void showGraphs(std::ostream & output);
     void showGraphVertexes(std::string graph_name, std::ostream & output);
+    void showGraphOutbound(std::string graph_name, std::string vertex, std::ostream & output);
+    void showGraphInbound(std::string graph_name, std::string vertex, std::ostream & output);
   };
 }
 
