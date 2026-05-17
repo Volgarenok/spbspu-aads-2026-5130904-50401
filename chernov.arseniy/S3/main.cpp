@@ -44,6 +44,7 @@ int main(int args, char ** argv)
   cmds.add("outbound", chernov::cmdOutbound);
   cmds.add("inbound", chernov::cmdInbound);
   cmds.add("bind", chernov::cmdBind);
+  cmds.add("cut", chernov::cmdCut);
 
   std::string cmd;
   while (input >> cmd) {

@@ -12,6 +12,7 @@ namespace chernov {
   void cmdOutbound(std::istream & input, std::ostream & output, Graphs & graphs);
   void cmdInbound(std::istream & input, std::ostream & output, Graphs & graphs);
   void cmdBind(std::istream & input, std::ostream & output, Graphs & graphs);
+  void cmdCut(std::istream & input, std::ostream & output, Graphs & graphs);
 }
 
 #endif

@@ -36,3 +36,10 @@ void chernov::cmdBind(std::istream & input, std::ostream & output, Graphs & grap
   graphs.bindGraphVertexes(graph_name, vertex_a, vertex_b, weight, output);
 }
 
+void chernov::cmdCut(std::istream & input, std::ostream & output, Graphs & graphs)
+{
+  std::string graph_name, vertex_a, vertex_b;
+  size_t weight;
+  input >> graph_name >> vertex_a >> vertex_b >> weight;
+  graphs.cutGraphEdge(graph_name, vertex_a, vertex_b, weight, output);
+}

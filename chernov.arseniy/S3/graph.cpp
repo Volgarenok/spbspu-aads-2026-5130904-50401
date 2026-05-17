@@ -35,6 +35,18 @@ void chernov::Edges::addEdge(std::string vertex, size_t weight)
   edges_.at(vertex).pushBack(weight);
 }
 
+void chernov::Edges::cutEdge(std::string vertex, size_t weight)
+{
+  Vector< size_t > & weights = edges_.at(vertex);
+  for (auto iter = weights.begin(); iter != weights.end(); ++iter) {
+    if (*iter == weight) {
+      weights.erase(iter);
+      return;
+    }
+  }
+  throw std::out_of_range("edge not found");
+}
+
 chernov::Vector< std::pair< std::string, size_t > > chernov::Edges::getEdges() const
 {
   Vector< std::pair< std::string, size_t > > edges;
@@ -54,24 +66,28 @@ chernov::Graph::Graph(std::string name):
 
 void chernov::Graph::addEdge(std::string start_vertex, std::string end_vertex, size_t weight)
 {
-  if (!incoming_.has(end_vertex)) {
-    try {
-      incoming_.add(end_vertex, Edges());
-    } catch (const std::length_error & e) {
-      incoming_.rehash(incoming_.maxCapacity() * 2);
-      incoming_.add(end_vertex, Edges());
+  auto ensure_exists = [&](auto & table, const std::string & key) {
+    if (!table.has(key)) {
+      try {
+        table.add(key, Edges());
+      } catch (const std::length_error &) {
+        table.rehash(table.maxCapacity() > 0 ? table.maxCapacity() * 2 : 2);
+        table.add(key, Edges());
+      }
     }
-  }
-  if (!outgoing_.has(start_vertex)) {
-    try {
-      outgoing_.add(start_vertex, Edges());
-    } catch (const std::length_error & e) {
-      outgoing_.rehash(outgoing_.maxCapacity() * 2);
-      outgoing_.add(start_vertex, Edges());
-    }
-  }
+  };
+
+  ensure_exists(incoming_, end_vertex);
+  ensure_exists(outgoing_, start_vertex);
+
   incoming_.at(end_vertex).addEdge(start_vertex, weight);
   outgoing_.at(start_vertex).addEdge(end_vertex, weight);
+}
+
+void chernov::Graph::cutEdge(std::string start_vertex, std::string end_vertex, size_t weight)
+{
+  incoming_.at(end_vertex).cutEdge(start_vertex, weight);
+  outgoing_.at(start_vertex).cutEdge(end_vertex, weight);
 }
 
 chernov::Vector< std::string > chernov::Graph::getVertexes() const
@@ -97,11 +113,23 @@ chernov::Vector< std::string > chernov::Graph::getVertexes() const
 
 chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getOutbound(std::string vertex) const
 {
+  if (!outgoing_.has(vertex) && !incoming_.has(vertex)) {
+    throw std::out_of_range("vertex not found");
+  }
+  if (!outgoing_.has(vertex)) {
+    return {};
+  }
   return outgoing_.at(vertex).getEdges();
 }
 
 chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getInbound(std::string vertex) const
 {
+   if (!incoming_.has(vertex) && !outgoing_.has(vertex)) {
+    throw std::out_of_range("vertex not found");
+  }
+  if (!incoming_.has(vertex)) {
+    return {};
+  }
   return incoming_.at(vertex).getEdges();
 }
 
@@ -172,6 +200,15 @@ void chernov::Graphs::bindGraphVertexes(std::string graph_name, std::string vert
 {
   try {
     graphs_.at(graph_name).addEdge(vertex_a, vertex_b, weight);
+  } catch (const std::out_of_range & e) {
+    output << "<INVALID COMMAND>\n";
+  }
+}
+
+void chernov::Graphs::cutGraphEdge(std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output)
+{
+  try {
+    graphs_.at(graph_name).cutEdge(vertex_a, vertex_b, weight);
   } catch (const std::out_of_range & e) {
     output << "<INVALID COMMAND>\n";
   }

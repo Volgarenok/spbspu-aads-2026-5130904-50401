@@ -36,6 +36,7 @@ namespace chernov {
 
     Edges();
     void addEdge(std::string vertex, size_t weight);
+    void cutEdge(std::string vertex, size_t weight);
     Vector< std::pair< std::string, size_t > > getEdges() const;
   };
 
@@ -47,6 +48,7 @@ namespace chernov {
     Graph() = delete;
     Graph(std::string name);
     void addEdge(std::string start_vertex, std::string end_vertex, size_t weight);
+    void cutEdge(std::string start_vertex, std::string end_vertex, size_t weight);
     Vector< std::string > getVertexes() const;
     Vector< std::pair< std::string, size_t > > getOutbound(std::string vertex) const;
     Vector< std::pair< std::string, size_t > > getInbound(std::string vertex) const;
@@ -62,6 +64,7 @@ namespace chernov {
     void showGraphOutbound(std::string graph_name, std::string vertex, std::ostream & output);
     void showGraphInbound(std::string graph_name, std::string vertex, std::ostream & output);
     void bindGraphVertexes(std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output);
+    void cutGraphEdge(std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output);
   };
 }
 
