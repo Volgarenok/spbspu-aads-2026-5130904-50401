@@ -1,9 +1,9 @@
 #ifndef ITERATOR
 #define ITERATOR
-#include "list.hpp"
-#include "node.hpp"
 #include <memory>
 #include <cassert>
+#include "list.hpp"
+#include "node.hpp"
 
 namespace malashenko
 {
@@ -28,9 +28,9 @@ namespace malashenko
     bool operator!=(const LIter< T >& other) const;
     bool operator==(const LIter< T >& other) const;
   private:
-    LIter(Node< T >* other);
     friend class List< T >;
-    Node< T >* node_;
+    detail::Node< T >* node_;
+    LIter(detail::Node< T >* other);
   };
 
   template< class T >
@@ -39,7 +39,7 @@ namespace malashenko
   {}
 
   template< class T >
-  LIter< T >::LIter(Node< T >* other):
+  LIter< T >::LIter(detail::Node< T >* other):
     node_(other)
   {}
 

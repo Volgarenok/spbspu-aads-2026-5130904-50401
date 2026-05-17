@@ -1,5 +1,5 @@
-#ifndef FUNCTIONS
-#define FUNCTIONS
+#ifndef SEQUENCE_FUNCTIONS
+#define SEQUENCE_FUNCTIONS
 #include <utility>
 #include <string>
 #include <iostream>
@@ -20,6 +20,7 @@ namespace malashenko
   void printNewSeqs(std::ostream& out, const List< List< size_t > >& list);
   void countSums(const List< List< size_t > >& list, List< size_t >& sums);
   void printSums(std::ostream& out, const List< size_t >& sums);
+  size_t getCheckedSum(size_t a, size_t b);
 }
 
 #endif

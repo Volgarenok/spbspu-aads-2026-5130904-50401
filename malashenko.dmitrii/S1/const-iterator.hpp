@@ -22,14 +22,14 @@ namespace malashenko
     LCIter< T > operator--(int);
     LCIter< T > operator-(size_t s);
 
-    const T& operator*();
-    const T* operator->();
+    const T& operator*() const;
+    const T* operator->() const;
 
     bool operator!=(const LCIter< T >& other) const;
     bool operator==(const LCIter< T >& other) const;
   private:
-    Node< T >* node_;
-    LCIter(Node< T >* other);
+    detail::Node< T >* node_;
+    LCIter(detail::Node< T >* other);
     friend class List< T >;
   };
 
@@ -39,7 +39,7 @@ namespace malashenko
   {}
 
   template< class T >
-  LCIter< T >::LCIter(Node< T >* other):
+  LCIter< T >::LCIter(detail::Node< T >* other):
     node_(other)
   {}
 
@@ -112,14 +112,14 @@ namespace malashenko
   }
 
   template< class T >
-  const T& LCIter< T >::operator*()
+  const T& LCIter< T >::operator*() const
   {
     assert(node_ != nullptr && "There is no node to gain access");
     return node_ ->value_;
   }
 
   template< class T >
-  const T* LCIter< T >::operator->()
+  const T* LCIter< T >::operator->() const
   {
     assert(node_ != nullptr && "There is no node to gain access");
     return std::addressof(node_->value_);

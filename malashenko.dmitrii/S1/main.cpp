@@ -17,7 +17,8 @@ int main()
       std::cout << "0\n";
       return 0;
     }
-  } catch(const std::exception& e)
+  }
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
     return 1;
@@ -37,7 +38,8 @@ int main()
       return 0;
     }
     printSums(std::cout, sums);
-  } catch(const std::exception& e)
+  }
+  catch (const std::exception& e)
   {
     std::cerr << e.what() << '\n';
     return 1;

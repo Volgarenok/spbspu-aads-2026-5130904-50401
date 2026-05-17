@@ -16,23 +16,28 @@ namespace malashenko {
   public:
     List();
     List(const List< T >& other);
-    List(List< T >&& other);
+    List(List< T >&& other) noexcept;
 
     List& operator=(const List< T >& other);
-    List& operator=(List< T >&& other);
+    List& operator=(List< T >&& other) noexcept;
 
-    LIter< T > begin() const;
-    LIter< T > end() const;
-    LCIter< T > cbegin() const;
-    LCIter< T > cend() const;
+    LIter< T > begin() noexcept;
+    LCIter< T > begin() const noexcept;
+    LCIter< T > cbegin() const noexcept;
 
-    T& front() const;
-    T& back() const;
-    LIter< T > getFake() const;
+    LIter< T > end() noexcept;
+    LCIter< T > end() const noexcept;
+    LCIter< T > cend() const noexcept;
+
+    T& front();
+    T& back();
 
     LIter< T > insert(LIter< T > h, const T& value);
     void push_back(const T& value);
+    void push_back(T&& value);
+
     void push_front(const T& value);
+    void push_front(T&& value);
 
     LIter< T > cut(LIter< T > h);
     LIter< T > erase(LIter< T > h);
@@ -46,9 +51,9 @@ namespace malashenko {
     ~List();
     bool empty() const;
   private:
-    void rmFake();
-    Node< T >* fake_;
+    detail::Node< T >* fake_;
     size_t s_;
+    void rmFake();
   };
 
   template< class T >
@@ -60,25 +65,25 @@ namespace malashenko {
   List< T >::List():
     s_(0)
   {
-    fake_ = static_cast< Node< T >* >(::operator new (sizeof(Node< T >)));
+    fake_ = static_cast< detail::Node< T >* >(::operator new (sizeof(detail::Node< T >)));
     fake_->next = fake_;
     fake_->prev = fake_;
   }
 
   template< class T >
   List< T >::List(const List< T >& other):
+    fake_(reinterpret_cast< detail::Node< T >* >(::operator new (sizeof(detail::Node< T >)))),
     s_(0)
   {
-    fake_ = static_cast< Node< T >* >(::operator new (sizeof(Node< T >)));
     fake_->next = fake_;
     fake_->prev = fake_;
-    for (LIter< T > start = other.begin(); start != other.end(); ++start)
+    for (LCIter< T > start = other.begin(); start != other.end(); ++start)
     {
       try
       {
         push_back(*start);
       }
-      catch(...)
+      catch (...)
       {
         clear();
         throw;
@@ -87,26 +92,21 @@ namespace malashenko {
   }
 
   template< class T >
-  List< T >::List(List< T >&& other):
+  List< T >::List(List< T >&& other) noexcept:
     fake_(std::move(other.fake_)),
     s_(std::move(other.s_))
   {
-    other.fake_ = nullptr;
-    other.s_ = 0;
+    std::exchange(other.fake_, nullptr);
+    std::exchange(other.s_, 0);
   }
 
   template< class T >
-  List< T >& List< T >::operator=(List< T >&& other)
+  List< T >& List< T >::operator=(List< T >&& other) noexcept
   {
-    if (this == &other)
-    {
-      return *this;
-    }
+    assert(this == &other);
 
-    fake_ = std::move(other.fake_);
-    s_ = std::move(other.s_);
-    other.fake_ = nullptr;
-    other.s_ = 0;
+    List< T > temp(std::move(other));
+    swap(temp);
     return *this;
   }
 
@@ -127,51 +127,57 @@ namespace malashenko {
   }
 
   template< class T >
-  LIter< T > List< T >::begin() const
+  LIter< T > List< T >::begin() noexcept
   {
     return LIter< T >(fake_->next);
   }
 
   template< class T >
-  LIter< T > List< T >::end() const
+  LIter< T > List< T >::end() noexcept
   {
     return LIter< T >(fake_);
   }
 
   template< class T >
-  LCIter< T > List< T >::cbegin() const
+  LCIter< T > List< T >::begin() const noexcept
   {
     return LCIter< T >(fake_->next);
   }
 
   template< class T >
-  LCIter< T > List< T >::cend() const
+  LCIter< T > List< T >::end() const noexcept
   {
     return LCIter< T >(fake_);
   }
 
   template< class T >
-  T& List< T >::front() const
+  LCIter< T > List< T >::cbegin() const noexcept
+  {
+    return LCIter< T >(fake_->next);
+  }
+
+  template< class T >
+  LCIter< T > List< T >::cend() const noexcept
+  {
+    return LCIter< T >(fake_);
+  }
+
+  template< class T >
+  T& List< T >::front()
   {
     return fake_->next->value_;
   }
 
   template< class T >
-  T& List< T >::back() const
+  T& List< T >::back()
   {
     return fake_->prev->value_;
   }
 
   template< class T >
-  LIter< T > List< T >::getFake() const
-  {
-    return LIter< T >(fake_);
-  }
-
-  template< class T >
   LIter< T > List< T >::insert(LIter< T > h, const T& value)
   {
-    Node< T >* newNode = new Node< T >{value, h.node_->next, h.node_};
+    detail::Node< T >* newNode = new detail::Node< T >{value, h.node_->next, h.node_};
     h.node_->next = newNode;
     newNode->next->prev = newNode;
     ++s_;
@@ -186,9 +192,22 @@ namespace malashenko {
   }
 
   template< class T >
+  void List< T >::push_back(T&& value)
+  {
+    LIter< T > itBack = end().node_->prev;
+    insert(itBack, std::move(value));
+  }
+
+  template< class T >
   void List< T >::push_front(const T& value)
   {
     insert(fake_, value);
+  }
+
+  template< class T >
+  void List< T >::push_front(T&& value)
+  {
+    insert(fake_, std::move(value));
   }
 
   template< class T >
