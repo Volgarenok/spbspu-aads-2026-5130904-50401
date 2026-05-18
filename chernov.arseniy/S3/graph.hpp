@@ -70,6 +70,7 @@ namespace chernov {
     void addVertex(std::string graph_name, std::string vertex, std::ostream & output);
     void createGraphWithoutCheckingExisting(std::string graph_name);
     void createGraph(std::string graph_name, std::ostream & output);
+    bool hasGraph(const std::string& name) const;
     void addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight);
     void showGraphs(std::ostream & output);
     void showGraphVertexes(std::string graph_name, std::ostream & output);

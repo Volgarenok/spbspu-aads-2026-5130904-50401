@@ -50,15 +50,23 @@ void chernov::cmdCut(std::istream & input, std::ostream & output, Graphs & graph
 
 void chernov::cmdCreate(std::istream & input, std::ostream & output, Graphs & graphs)
 {
-  std::string graph_name, vertex;
+  std::string graph_name;
   input >> graph_name;
+
+  if (graphs.hasGraph(graph_name)) {
+    output << "<INVALID COMMAND>\n";
+    return;
+  }
+
   graphs.createGraph(graph_name, output);
 
   size_t count;
   if (!(input >> count)) {
     return;
   }
+
   for (size_t i = 0; i < count; ++i) {
+    std::string vertex;
     input >> vertex;
     graphs.addVertex(graph_name, vertex, output);
   }

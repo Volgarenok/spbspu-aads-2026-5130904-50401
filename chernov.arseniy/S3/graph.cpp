@@ -172,6 +172,9 @@ void chernov::Graphs::createGraph(std::string graph_name, std::ostream & output)
   }
 }
 
+bool chernov::Graphs::hasGraph(const std::string& name) const {
+    return graphs_.has(name);
+}
 
 void chernov::Graphs::addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight)
 {
@@ -214,7 +217,8 @@ void chernov::Graphs::showGraphVertexes(std::string graph_name, std::ostream & o
 
 void chernov::Graphs::showGraphEdges(Vector< std::pair< std::string, size_t > > & edges, std::ostream & output)
 {
-  if (edges.getSize() == 0) {
+  if (edges.isEmpty()) {
+    output << "\n";
     return;
   }
 
@@ -229,9 +233,6 @@ void chernov::Graphs::showGraphEdges(Vector< std::pair< std::string, size_t > > 
       output << " " << iter->second;
       ++iter;
     }
-    output << "\n";
-  }
-  if (edges.isEmpty()) {
     output << "\n";
   }
 }
