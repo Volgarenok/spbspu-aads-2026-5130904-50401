@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <functional>
 #include <stdexcept>
+#include <utility>
 
 namespace studilova
 {
@@ -22,6 +23,7 @@ namespace studilova
 
       bool empty() const;
 
+      void push(const Key& key, const Value& value);
       Value& get(const Key& key);
       const Value& get(const Key& key) const;
 
@@ -105,7 +107,7 @@ studilova::BSTree< Key, Value, Compare >& studilova::BSTree< Key, Value, Compare
 template< class Key, class Value, class Compare >
 studilova::BSTree< Key, Value, Compare >& studilova::BSTree< Key, Value, Compare >::operator=(BSTree&& other) noexcept
 {
-  if (this != other)
+  if (this != &other)
   {
     clear(root_);
     root_ = other.root_;
@@ -113,6 +115,52 @@ studilova::BSTree< Key, Value, Compare >& studilova::BSTree< Key, Value, Compare
     other.root_ = nullptr;
   }
   return *this;
+}
+
+template< class Key, class Value, class Compare >
+bool studilova::BSTree< Key, Value, Compare >::empty() const
+{
+  return root_ == nullptr;
+}
+
+template< class Key, class Value, class Compare >
+void studilova::BSTree< Key, Value, Compare >::push(const Key& key, const Value& value)
+{
+  if (!root_)
+  {
+    root_ = new Node(key, value);
+    return;
+  }
+
+  Node* current = root_;
+  Node* parent = nullptr;
+
+  while (current)
+  {
+    parent = current;
+
+    if (!cmp_(key, current->key_) && !cmp_(current->key_, key))
+    {
+      current->value_ = value;
+      return;
+    }
+    else if (cmp_(key, current->key_))
+    {
+      current = current->left_;
+    } else {
+      current = current->right_;
+    }
+  }
+
+  Node* new_node = new Node(key, value);
+  new_node->parent_ = parent;
+
+  if (cmp_(key, parent->key_))
+  {
+    parent->left_ = new_node;
+  } else {
+    parent->right_ = new_node;
+  }
 }
 
 template< class Key, class Value, class Compare >
