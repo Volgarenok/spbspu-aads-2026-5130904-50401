@@ -231,6 +231,9 @@ void chernov::Graphs::showGraphEdges(Vector< std::pair< std::string, size_t > > 
     }
     output << "\n";
   }
+  if (edges.isEmpty()) {
+    output << "\n";
+  }
 }
 
 void chernov::Graphs::showGraphOutbound(std::string graph_name, std::string vertex, std::ostream & output)

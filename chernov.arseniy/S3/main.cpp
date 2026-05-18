@@ -29,6 +29,7 @@ int main(int args, char ** argv)
 
   std::string graph_name;
   while (file >> graph_name) {
+    graphs.createGraph(graph_name, output);
     size_t edges_count;
     file >> edges_count;
     for (size_t i = 0; i < edges_count; ++i) {
