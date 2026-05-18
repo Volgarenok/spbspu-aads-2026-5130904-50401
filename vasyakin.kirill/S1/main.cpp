@@ -48,10 +48,7 @@ int main()
     {
       ++len;
     }
-    if (len > max_len)
-    {
-      max_len = len;
-    }
+    max_len = std::max(max_len, len);
   }
 
   vasyakin::List< vasyakin::List< size_t > > transposed;
