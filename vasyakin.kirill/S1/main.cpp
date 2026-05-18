@@ -85,13 +85,14 @@ int main()
   {
     for (auto tit = transposed.begin(); tit != transposed.end(); ++tit)
     {
-      for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)
+      auto nit = tit->cbegin();
+      if (nit != tit->cend())
       {
-        if (nit != tit->cbegin())
-        {
-          std::cout << " ";
-        }
         std::cout << *nit;
+        for (++nit; nit != tit->cend(); ++nit)
+        {
+          std::cout << " " << *nit;
+        }
       }
       std::cout << '\n';
     }
