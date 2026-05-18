@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <utility>
 #include <limits>
+#include <memory>
 
 namespace vasyakin
 {
@@ -19,8 +20,10 @@ namespace vasyakin
   class LIter
   {
   public:
-    T& operator*() const noexcept;
-    T* operator->() const noexcept;
+    T& operator*() noexcept;
+    T* operator->() noexcept;
+    const T& operator*() const noexcept;
+    const T* operator->() const noexcept;
     LIter& operator++() noexcept;
     LIter operator++(int) noexcept;
     bool operator==(const LIter& other) const noexcept;
@@ -108,15 +111,27 @@ namespace vasyakin
   {}
 
   template< class T >
-  T& LIter< T >::operator*() const noexcept
+  T& LIter< T >::operator*() noexcept
   {
     return ptr_->val_;
   }
 
   template< class T >
-  T* LIter< T >::operator->() const noexcept
+  T* LIter< T >::operator->() noexcept
   {
-    return &(ptr_->val_);
+    return std::addressof(ptr_->val_);
+  }
+
+  template< class T >
+  const T& LIter< T >::operator*() const noexcept
+  {
+    return ptr_->val_;
+  }
+
+  template< class T >
+  const T* LIter< T >::operator->() const noexcept
+  {
+    return std::addressof(ptr_->val_);
   }
 
   template< class T >
@@ -171,7 +186,7 @@ namespace vasyakin
   template< class T >
   const T* LCIter< T >::operator->() const noexcept
   {
-    return &(ptr_->val_);
+    return std::addressof(ptr_->val_);
   }
 
   template< class T >
