@@ -452,10 +452,8 @@ void zhuravleva::HashTable< Key, Value, Hash, Equal >::rehash(size_t newSize)
     List<std::pair<Key, Value>>& bucket = table[i];
     for (auto it = bucket.begin(); it != bucket.end(); it++)
     {
-      Key key = it->first;
-      Value value = it->second;
-      size_t newindex = hasher(key) % newSize; 
-      newTable[newindex].addEnd(std::make_pair(key, value));
+      size_t newindex = hasher(it->first) % newSize;
+      newTable[newindex].addEnd(*it);
     }
   }
 

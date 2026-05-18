@@ -2,28 +2,43 @@
 #define HASHER_HPP
 
 #include <cstddef>
-#include <string>
 #include <utility>
 #include <boost/hash2/blake2.hpp>
+#include <boost/hash2/hash_append.hpp>
+#include <boost/hash2/get_integral_result.hpp>
 
 namespace zhuravleva
 {
-  struct StringHash
+  template< class T >
+  struct Blake2Hasher
   {
-    size_t operator()(const std::string& str) const;
+    size_t operator()(const T& value) const
+    {
+      boost::hash2::blake2b_512 hash;
+      boost::hash2::hash_append(hash, {}, value);
+      return boost::hash2::get_integral_result< size_t >(hash);
+    }
   };
-  struct StringEqual
+
+  template< class First, class Second >
+  struct Blake2Hasher< std::pair< First, Second > >
   {
-    bool operator()(const std::string& a, const std::string& b) const;
+    size_t operator()(const std::pair< First, Second >& value) const
+    {
+      boost::hash2::blake2b_512 hash;
+      boost::hash2::hash_append(hash, {}, value.first);
+      boost::hash2::hash_append(hash, {}, value.second);
+      return boost::hash2::get_integral_result< size_t >(hash);
+    }
   };
-  struct PairHash
+
+  struct KeyEqual
   {
-    size_t operator()(const std::pair< std::string, std::string >& p) const;
-  };
-  struct PairEqual
-  {
-    bool operator()(const std::pair< std::string, std::string >& a,
-        const std::pair< std::string, std::string >& b) const;
+    template< class T >
+    bool operator()(const T& a, const T& b) const
+    {
+      return a == b;
+    }
   };
 }
 
