@@ -1,6 +1,8 @@
 #ifndef BSTREE_HPP
 #define BSTREE_HPP
 
+#include "bstree_node.hpp"
+
 #include <cstddef>
 #include <functional>
 #include <stdexcept>
@@ -28,16 +30,7 @@ namespace studilova
       const Value& get(const Key& key) const;
 
     private:
-      struct Node
-      {
-        Key key_;
-        Value value_;
-        Node* left_;
-        Node* right_;
-        Node* parent_;
-
-        Node(const Key& key, const Value& value);
-      };
+      using Node = studilova::Node< Key, Value >;
 
       Node* root_;
       Compare cmp_;
@@ -49,15 +42,6 @@ namespace studilova
       void swap(BSTree& other) noexcept;
   };
 }
-
-template< class Key, class Value, class Compare >
-studilova::BSTree< Key, Value, Compare >::Node::Node(const Key& key, const Value& value) :
-  key_(key),
-  value_(value),
-  left_(nullptr),
-  right_(nullptr),
-  parent_(nullptr)
-{}
 
 template< class Key, class Value, class Compare >
 studilova::BSTree< Key, Value, Compare >::BSTree() :
