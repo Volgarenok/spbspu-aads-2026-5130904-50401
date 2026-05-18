@@ -364,16 +364,12 @@ namespace vasyakin
   template< class T >
   detail::Node< T >* List< T >::pushBack(const T& value)
   {
-    detail::Node< T >* new_node = new detail::Node< T >(value);
     detail::Node< T >* last = fake_node_;
     while (last->next_ != fake_node_)
     {
       last = last->next_;
     }
-    new_node->next_ = fake_node_;
-    last->next_ = new_node;
-    ++size_;
-    return new_node;
+    return insert(last, value);
   }
 
   template< class T >
