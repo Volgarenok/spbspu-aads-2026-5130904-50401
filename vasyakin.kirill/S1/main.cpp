@@ -120,13 +120,14 @@ int main()
       sums.pushBack(sum);
     }
 
-    for (auto sit = sums.begin(); sit != sums.end(); ++sit)
+    auto sit = sums.begin();
+    if (sit != sums.end())
     {
-      if (sit != sums.begin())
-      {
-        std::cout << " ";
-      }
       std::cout << *sit;
+      for (++sit; sit != sums.end(); ++sit)
+      {
+        std::cout << " " << *sit;
+      }
     }
     std::cout << '\n';
   }
