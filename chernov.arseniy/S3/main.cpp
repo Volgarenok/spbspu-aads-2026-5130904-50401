@@ -29,7 +29,7 @@ int main(int args, char ** argv)
 
   std::string graph_name;
   while (file >> graph_name) {
-    graphs.createGraph(graph_name, output);
+    graphs.createGraph(graph_name);
     size_t edges_count;
     file >> edges_count;
     for (size_t i = 0; i < edges_count; ++i) {
@@ -51,6 +51,7 @@ int main(int args, char ** argv)
   cmds.add("merge", chernov::cmdMerge);
   cmds.add("extract", chernov::cmdExtract);
 
+  std::streamsize max_streamsize = std::numeric_limits< std::streamsize >::max();
   std::string cmd;
   while (input >> cmd) {
     try {
@@ -58,12 +59,10 @@ int main(int args, char ** argv)
       if (input.fail()) {
         output << "<INVALID COMMAND>\n";
         input.clear();
-        std::streamsize max_streamsize = std::numeric_limits< std::streamsize >::max();
         input.ignore(max_streamsize, '\n');
       }
     } catch (const std::out_of_range & e) {
       output << "<INVALID COMMAND>\n";
-      std::streamsize max_streamsize = std::numeric_limits< std::streamsize >::max();
       input.ignore(max_streamsize, '\n');
     }
   }

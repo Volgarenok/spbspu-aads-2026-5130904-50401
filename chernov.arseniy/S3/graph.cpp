@@ -163,12 +163,10 @@ void chernov::Graphs::createGraphWithoutCheckingExisting(std::string graph_name)
   }
 }
 
-void chernov::Graphs::createGraph(std::string graph_name, std::ostream & output)
+void chernov::Graphs::createGraph(std::string graph_name)
 {
   if (!graphs_.has(graph_name)) {
     createGraphWithoutCheckingExisting(graph_name);
-  } else {
-    output << "<INVALID COMMAND>\n";
   }
 }
 

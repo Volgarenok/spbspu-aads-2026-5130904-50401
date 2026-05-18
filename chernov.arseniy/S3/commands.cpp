@@ -51,23 +51,24 @@ void chernov::cmdCut(std::istream & input, std::ostream & output, Graphs & graph
 void chernov::cmdCreate(std::istream & input, std::ostream & output, Graphs & graphs)
 {
   std::string graph_name;
-  input >> graph_name;
+  if (!(input >> graph_name)) return;
 
   if (graphs.hasGraph(graph_name)) {
-    output << "<INVALID COMMAND>\n";
+    input.setstate(std::ios::failbit);
     return;
   }
 
-  graphs.createGraph(graph_name, output);
+  graphs.createGraphWithoutCheckingExisting(graph_name);
 
   size_t count;
-  if (!(input >> count)) {
-    return;
-  }
+  if (!(input >> count)) return;
 
+  std::string vertex;
   for (size_t i = 0; i < count; ++i) {
-    std::string vertex;
-    input >> vertex;
+    if (!(input >> vertex)) {
+      input.setstate(std::ios::failbit);
+      return;
+    }
     graphs.addVertex(graph_name, vertex, output);
   }
 }
