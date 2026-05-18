@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <stdexcept>
 
 namespace studilova
 {
@@ -21,6 +22,9 @@ namespace studilova
 
       bool empty() const;
 
+      Value& get(const Key& key);
+      const Value& get(const Key& key) const;
+
     private:
       struct Node
       {
@@ -38,6 +42,8 @@ namespace studilova
 
       void clear(Node* node);
       Node* clone(Node* node, Node* parent);
+      Node* findNode(const Key& key);
+      const Node* findNode(const Key& key) const;
       void swap(BSTree& other) noexcept;
   };
 }
@@ -110,6 +116,18 @@ studilova::BSTree< Key, Value, Compare >& studilova::BSTree< Key, Value, Compare
 }
 
 template< class Key, class Value, class Compare >
+Value& studilova::BSTree< Key, Value, Compare >::get(const Key& key)
+{
+  return findNode(key)->value_;
+}
+
+template< class Key, class Value, class Compare >
+const Value& studilova::BSTree< Key, Value, Compare >::get(const Key& key) const
+{
+  return findNode(key)->value_;
+}
+
+template< class Key, class Value, class Compare >
 void studilova::BSTree< Key, Value, Compare >::clear(Node* node)
 {
   if (!node)
@@ -135,6 +153,46 @@ typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key,
   copy->right_ = clone(node->right_, copy);
 
   return copy;
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare >::findNode(const Key& key)
+{
+  Node* current = root_;
+  while (current)
+  {
+    if (!cmp_(key, current->key_) && !cmp_(current->key_, key))
+    {
+      return current;
+    }
+    else if (cmp_(key, current->key_))
+    {
+      current = current->left_;
+    } else {
+      current = current->right_;
+    }
+  }
+  throw std::out_of_range("key not found");
+}
+
+template< class Key, class Value, class Compare >
+const typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare >::findNode(const Key& key) const
+{
+  const Node* current = root_;
+  while (current)
+  {
+    if (!cmp_(key, current->key_) && !cmp_(current->key_, key))
+    {
+      return current;
+    }
+    else if (cmp_(key, current->key_))
+    {
+      current = current->left_;
+    } else {
+      current = current->right_;
+    }
+  }
+  throw std::out_of_range("key not found");
 }
 
 template< class Key, class Value, class Compare >
