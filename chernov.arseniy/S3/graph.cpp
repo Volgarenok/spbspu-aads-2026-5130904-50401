@@ -204,6 +204,9 @@ void chernov::Graphs::showGraphVertexes(std::string graph_name, std::ostream & o
     for (auto iter = vertexes.cbegin(); iter != vertexes.cend(); ++iter) {
       output << *iter << "\n";
     }
+    if (vertexes.isEmpty()) {
+      output << "\n";
+    }
   } catch (const std::out_of_range & e) {
     output << "<INVALID COMMAND>\n";
   }
