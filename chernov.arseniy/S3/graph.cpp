@@ -191,7 +191,7 @@ void chernov::Graphs::showGraphs(std::ostream & output)
   for (auto iter = graphs.cbegin(); iter != graphs.cend(); ++iter) {
     output << *iter << "\n";
   }
-  if (graphs.getSize()) {
+  if (!graphs.getSize()) {
     output << "\n";
   }
 }
