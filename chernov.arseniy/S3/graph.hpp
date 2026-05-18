@@ -73,6 +73,7 @@ namespace chernov {
     void addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight);
     void showGraphs(std::ostream & output);
     void showGraphVertexes(std::string graph_name, std::ostream & output);
+    void showGraphEdges(Vector< std::pair< std::string, size_t > > & edges, std::ostream & output);
     void showGraphOutbound(std::string graph_name, std::string vertex, std::ostream & output);
     void showGraphInbound(std::string graph_name, std::string vertex, std::ostream & output);
     void bindGraphVertexes(std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output);
