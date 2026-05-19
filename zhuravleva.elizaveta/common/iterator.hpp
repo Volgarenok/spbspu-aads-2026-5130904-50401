@@ -136,7 +136,7 @@ namespace zhuravleva
     {
       return current != other.current;
     }
-  
+
     LCIter& operator++()
     {
       if (!current)
@@ -146,14 +146,14 @@ namespace zhuravleva
       current = current->next;
       return *this;
     }
-  
+
     LCIter operator++(int)
     {
       LCIter<T> temp(*this);
       ++(*this);
       return temp;
     }
-  
+
     const T* operator->() const
     {
       if (!current)
