@@ -2,6 +2,7 @@
 #include <string>
 #include <limits>
 #include <utility>
+#include <algorithm>
 
 #include "list.hpp"
 
@@ -49,11 +50,7 @@ int main()
   it = list.begin();
   for (size_t i = 0; i < list.size(); ++i, ++it)
   {
-    size_t currLen = it->second.size();
-    if (currLen > maxLen)
-    {
-      maxLen = currLen;
-    }
+    maxLen = std::max(maxLen, it->second.size());
   }
 
   if (maxLen == 0)
@@ -75,8 +72,9 @@ int main()
   {
     it = list.begin();
     bool found = false;
+    size_t pos = 0;
 
-    for (size_t i = 0; i < list.size(); ++i, ++it)
+    for (; pos < list.size(); ++pos, ++it)
     {
       auto& seq = it->second;
 
@@ -101,13 +99,14 @@ int main()
         found = true;
 
         ++it;
+        ++pos;
         break;
       }
     }
 
     if (found)
     {
-      for (; it != list.end(); ++it)
+      for (; pos < list.size(); ++pos, ++it)
       {
         auto& seq = it->second;
 
