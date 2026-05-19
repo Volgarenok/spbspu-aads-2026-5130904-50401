@@ -152,7 +152,7 @@ namespace zhuravleva
   {
     return capacity_;
   }
-  
+
   template< class T >
   bool myVector< T >::empty() const noexcept
   {

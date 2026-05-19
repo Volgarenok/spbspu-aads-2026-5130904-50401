@@ -13,7 +13,7 @@ namespace zhuravleva
   void vertexes(std::ostream& out, std::istream& in, const GraphTable& graphs);
   void outbound(std::ostream& out, std::istream& in, const GraphTable& graphs);
   void inbound(std::ostream& out, std::istream& in, const GraphTable& graphs);
-  
+
   void bind(std::ostream& out, std::istream& in, GraphTable& graphs);
   void cut(std::ostream& out, std::istream& in, GraphTable& graphs);
   void create(std::ostream& out, std::istream& in, GraphTable& graphs);

@@ -37,7 +37,7 @@ namespace zhuravleva
       const Value& get(const Key& key) const;
       void rehash(size_t newSize);
       bool empty() const noexcept;
-      void clear();  
+      void clear();
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -488,4 +488,3 @@ void zhuravleva::HashTable< Key, Value, Hash, Equal >::clear()
 }
 
 #endif
- 
