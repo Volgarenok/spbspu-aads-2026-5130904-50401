@@ -6,27 +6,42 @@
 
 namespace chernov {
   namespace detail {
+    struct NodeBase {
+      NodeBase * parent = nullptr;
+      NodeBase * left = nullptr;
+      NodeBase * right = nullptr;
+
+      NodeBase() = default;
+      NodeBase(NodeBase * p, NodeBase * l, NodeBase * r):
+        parent(p),
+        left(l),
+        right(r)
+      {}
+    };
+
     template< class Key, class Value >
-    struct Node {
-      using value_type = std::pair< const Key, Value >;
-      value_type key_value_;
-      Node * left;
-      Node * parent;
-      Node * right;
+    struct Node: NodeBase {
+      std::pair< const Key, Value > key_value_;
+
+      Node(const Key & k, const Value & v, NodeBase * p, NodeBase * l, NodeBase * r):
+        NodeBase(p, l, r),
+        key_value_(k, v)
+      {}
     };
   }
 
   template< class Key, class Value, class Compare >
   class BSTree {
   public:
+    BSTree();
     void push(Key k, Value v);
     Value get(Key k);
     void remove(Key k);
 
   private:
-    detail::Node< Key, Value > * fake_root_;
-    detail::Node< Key, Value > * fake_leaf_;
-    Compare cmp;
+    detail::NodeBase * fake_root_;
+    detail::NodeBase * fake_leaf_;
+    Compare cmp_;
   };
 
   template< class Key, class Value, bool IsConst >
@@ -40,8 +55,8 @@ namespace chernov {
     template< class, class, class >
     friend class BSTree;
 
-    detail::Node< Key, Value > * node_;
-    explicit BSTIterator(detail::Node< Key, Value > * node);
+    detail::NodeBase * node_;
+    explicit BSTIterator(detail::NodeBase * node);
   };
 }
 
