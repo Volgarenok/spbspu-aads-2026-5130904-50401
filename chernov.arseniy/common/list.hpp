@@ -62,10 +62,9 @@ namespace chernov {
 
   template< class T >
   List< T >::List():
-    fake_(nullptr),
+    fake_(createFake()),
     size_(0)
   {
-    createFake();
     fake_->next = fake_;
   }
 
