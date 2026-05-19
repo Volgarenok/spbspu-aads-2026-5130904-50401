@@ -53,6 +53,9 @@ namespace chernov {
   LIter< T > & LIter< T >::operator++()
   {
     ptr = ptr->next;
+    if (ptr == fake_) {
+      ptr = fake_->next;
+    }
     return *this;
   }
 
