@@ -32,7 +32,7 @@ namespace chernov {
     LCIter< T > cend() const noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
-    void clear();
+    void clear() noexcept;
     LIter< T > insertAfter(LIter< T > pos, const T & value);
     LIter< T > insertAfter(LIter< T > pos, T && value);
     LIter< T > eraseAfter(LIter< T > pos);
@@ -189,7 +189,7 @@ namespace chernov {
   }
 
   template< class T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     if (fake_ == nullptr) {
       return;
