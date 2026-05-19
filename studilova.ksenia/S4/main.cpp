@@ -88,5 +88,29 @@ int main(int argc, char* argv[])
       datasets.get(current_name).push(key, value);
     }
   }
+
+  using Command = void(*)(std::istream&, std::ostream&, studilova::Datasets&);
+  studilova::BSTree< std::string, Command > commands;
+
+  commands.push("print", studilova::Print);
+  commands.push("complement", studilova::Complement);
+  commands.push("intersect", studilova::Intersect);
+  commands.push("union", studilova::cmdUnion);
+
+  std::string command_name;
+
+  while (std::cin >> command_name)
+  {
+    try
+    {
+      commands.get(command_name)(std::cin, std::cout, datasets);
+    }
+    catch(const std::exception&)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
   return 0;
 }
