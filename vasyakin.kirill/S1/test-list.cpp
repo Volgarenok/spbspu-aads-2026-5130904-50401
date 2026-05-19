@@ -279,13 +279,13 @@ BOOST_AUTO_TEST_CASE(SpliceSingleTest)
   BOOST_CHECK_EQUAL(*b.begin(), 10);
 
   auto it = a.begin();
-  BOOST_CHECK_EQUAL(*it, 1); 
+  BOOST_CHECK_EQUAL(*it, 1);
   ++it;
 
   BOOST_CHECK_EQUAL(*it, 20);
   ++it;
 
-  BOOST_CHECK_EQUAL(*it, 3); 
+  BOOST_CHECK_EQUAL(*it, 3);
   ++it;
 
   BOOST_CHECK(it == a.end());
@@ -316,7 +316,7 @@ BOOST_AUTO_TEST_CASE(SpliceRangeTest)
 
   auto check = a.begin();
 
-  BOOST_CHECK_EQUAL(*check, 1); 
+  BOOST_CHECK_EQUAL(*check, 1);
   ++check;
 
   BOOST_CHECK_EQUAL(*check, 20);
@@ -325,7 +325,7 @@ BOOST_AUTO_TEST_CASE(SpliceRangeTest)
   BOOST_CHECK_EQUAL(*check, 30);
   ++check;
 
-  BOOST_CHECK_EQUAL(*check, 5); 
+  BOOST_CHECK_EQUAL(*check, 5);
   ++check;
 
   BOOST_CHECK(check == a.end());

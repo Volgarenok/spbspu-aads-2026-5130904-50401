@@ -445,7 +445,7 @@ namespace vasyakin
         splice_after(curr, other);
         break;
       }
-      
+
       splice_after(curr, other, prev);
       ++curr;
     }
