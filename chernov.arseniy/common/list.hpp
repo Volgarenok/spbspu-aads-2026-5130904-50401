@@ -94,12 +94,9 @@ namespace chernov {
 
   template< class T >
   List< T >::List(List< T > && list) noexcept:
-    fake_(list.fake_),
-    size_(list.size_)
-  {
-    list.fake_ = nullptr;
-    list.size_ = 0;
-  }
+    fake_(std::exchange(list.fake_, nullptr)),
+    size_(std::exchange(list.size_, 0))
+  {}
 
   template< class T >
   List< T > & List< T >::operator=(const List< T > & list)
