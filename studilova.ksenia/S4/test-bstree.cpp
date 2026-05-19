@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(iterator_inorder)
   ++it;
   BOOST_TEST((*it).first == 15);
   ++it;
-  BOOST_TEST(it == tree.cend());
+  BOOST_CHECK(it == tree.cend());
 }
 
 BOOST_AUTO_TEST_CASE(reverse_iteration)
@@ -103,6 +103,7 @@ BOOST_AUTO_TEST_CASE(reverse_iteration)
   BOOST_TEST((*it).first == 10);
   --it;
   BOOST_TEST((*it).first == 5);
+  BOOST_CHECK(it == tree.begin());
 }
 
 BOOST_AUTO_TEST_CASE(iterator_change_value)
@@ -132,6 +133,8 @@ BOOST_AUTO_TEST_CASE(drop_leaf)
   BOOST_TEST((*it).first == 10);
   ++it;
   BOOST_TEST((*it).first == 15);
+  ++it;
+  BOOST_CHECK(it == tree.cend());
 }
 
 BOOST_AUTO_TEST_CASE(drop_one_child)
@@ -149,7 +152,7 @@ BOOST_AUTO_TEST_CASE(drop_one_child)
   ++it;
   BOOST_TEST((*it).first == 20);
   ++it;
-  BOOST_TEST(it == tree.cend());
+  BOOST_CHECK(it == tree.cend());
 }
 
 BOOST_AUTO_TEST_CASE(drop_two_children)
@@ -173,6 +176,8 @@ BOOST_AUTO_TEST_CASE(drop_two_children)
   BOOST_TEST((*it).first == 15);
   ++it;
   BOOST_TEST((*it).first == 20);
+  ++it;
+  BOOST_CHECK(it == tree.cend());
 }
 
 BOOST_AUTO_TEST_CASE(height_test)
@@ -214,6 +219,8 @@ BOOST_AUTO_TEST_CASE(rotate_left)
   BOOST_TEST((*it).first == 20);
   ++it;
   BOOST_TEST((*it).first == 30);
+  ++it;
+  BOOST_CHECK(it == tree.cend());
 }
 
 BOOST_AUTO_TEST_CASE(rotate_right)
@@ -242,6 +249,8 @@ BOOST_AUTO_TEST_CASE(rotate_right)
   BOOST_TEST((*it).first == 15);
   ++it;
   BOOST_TEST((*it).first == 20);
+  ++it;
+  BOOST_CHECK(it == tree.cend());
 }
 
 BOOST_AUTO_TEST_CASE(rotate_large_left)
@@ -265,6 +274,8 @@ BOOST_AUTO_TEST_CASE(rotate_large_left)
   BOOST_TEST((*it).first == 20);
   ++it;
   BOOST_TEST((*it).first == 30);
+  ++it;
+  BOOST_CHECK(it == tree.cend());
 }
 
 BOOST_AUTO_TEST_CASE(rotate_large_right)
@@ -290,6 +301,8 @@ BOOST_AUTO_TEST_CASE(rotate_large_right)
   BOOST_TEST((*it).first == 20);
   ++it;
   BOOST_TEST((*it).first == 30);
+  ++it;
+  BOOST_CHECK(it == tree.cend());
 }
 
 BOOST_AUTO_TEST_CASE(exceptions_test)
