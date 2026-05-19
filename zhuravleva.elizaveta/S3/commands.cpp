@@ -1,6 +1,7 @@
 #include "commands.hpp"
 #include <istream>
 #include <ostream>
+#include <sstream>
 #include <stdexcept>
 #include <utility>
 
@@ -244,9 +245,12 @@ void zhuravleva::cut(std::ostream&, std::istream& in, GraphTable& graphs)
 
 void zhuravleva::create(std::ostream&, std::istream& in, GraphTable& graphs)
 {
+  std::string line;
+  std::getline(in, line);
+  std::istringstream input(line);
   std::string graphName;
   size_t count = 0;
-  if (!(in >> graphName >> count))
+  if (!(input >> graphName >> count))
   {
     throw std::runtime_error("invalid command");
   }
@@ -258,7 +262,7 @@ void zhuravleva::create(std::ostream&, std::istream& in, GraphTable& graphs)
   for (size_t i = 0; i < count; i++)
   {
     std::string vertex;
-    if (!(in >> vertex))
+    if (!(input >> vertex))
     {
       throw std::runtime_error("invalid command");
     }
