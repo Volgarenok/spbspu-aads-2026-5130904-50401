@@ -43,6 +43,9 @@ namespace studilova
       CIt cbegin() const;
       CIt cend() const;
 
+      CIt rotateLeft(CIt it);
+      CIt rotateRight(CIt it);
+
       size_t height() const;
       size_t height(CIt it) const;
 
@@ -241,6 +244,82 @@ typename studilova::BSTree< Key, Value, Compare >::CIt studilova::BSTree< Key, V
 }
 
 template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::CIt studilova::BSTree< Key, Value, Compare >::rotateLeft(CIt it)
+{
+  Node* old_root = const_cast< Node* >(it.node_);
+
+  if (!old_root || !old_root->right_)
+  {
+    throw std::logic_error("left rotation is impossible");
+  }
+
+  Node* new_root = old_root->right_;
+  Node* moved_subtree = new_root->left_;
+
+  old_root->right_ = moved_subtree;
+  if (moved_subtree)
+  {
+    moved_subtree->parent_ = old_root;
+  }
+
+  new_root->parent_ = old_root->parent_;
+
+  if (!old_root->parent_)
+  {
+    root_ = new_root;
+  }
+  else if (old_root == old_root->parent_->left_)
+  {
+    old_root->parent_->left_ = new_root;
+  } else {
+    old_root->parent_->right_ = new_root;
+  }
+
+  new_root->left_ = old_root;
+  old_root->parent_ = new_root;
+
+  return CIt(new_root, root_);
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::CIt studilova::BSTree< Key, Value, Compare >::rotateRight(CIt it)
+{
+  Node* old_root = const_cast< Node* >(it.node_);
+
+  if (!old_root || !old_root->left_)
+  {
+    throw std::logic_error("right rotation is impossible");
+  }
+
+  Node* new_root = old_root->left_;
+  Node* moved_subtree = new_root->right_;
+
+  old_root->left_ = moved_subtree;
+  if (moved_subtree)
+  {
+    moved_subtree->parent_ = old_root;
+  }
+
+  new_root->parent_ = old_root->parent_;
+
+  if (!old_root->parent_)
+  {
+    root_ = new_root;
+  }
+  else if (old_root == old_root->parent_->left_)
+  {
+    old_root->parent_->left_ = new_root;
+  } else {
+    old_root->parent_->right_ = new_root;
+  }
+
+  new_root->right_ = old_root;
+  old_root->parent_ = new_root;
+
+  return CIt(new_root, root_);
+}
+
+template< class Key, class Value, class Compare >
 size_t studilova::BSTree< Key, Value, Compare >::height() const
 {
   return calcHeight(root_);
@@ -321,7 +400,7 @@ const typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree
 }
 
 template< class Key, class Value, class Compare >
-typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare>::getMin(Node* node) const
+typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare >::getMin(Node* node) const
 {
   if (!node)
   {
