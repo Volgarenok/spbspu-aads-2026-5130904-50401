@@ -88,6 +88,15 @@ namespace vasyakin
     void swap(List& other) noexcept;
     void clear() noexcept;
 
+    void splice_after(LIter< T > pos, List& other) noexcept;
+    void splice_after(LIter< T > pos, List& other, LIter< T > it) noexcept;
+    void splice_after(LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept;
+    void merge(List& other) noexcept;
+    void sort() noexcept;
+
+    template< class P >
+    LIter< T > partition(P p) noexcept;
+
     LIter< T > begin() noexcept;
     LIter< T > end() noexcept;
     LCIter< T > begin() const noexcept;
@@ -356,6 +365,140 @@ namespace vasyakin
       last = last->next_;
     }
     insert(LIter< T >(last), value);
+  }
+
+  template< class T >
+  void List< T >::splice_after(LIter< T > pos, List& other) noexcept
+  {
+    if (other.size_ == 0)
+    {
+      return;
+    }
+
+    splice_after(pos, other, LIter< T >(other.fake_node_), LIter< T >(other.fake_node_));
+  }
+
+  template< class T >
+  void List< T >::splice_after(LIter< T > pos, List& other, LIter< T > it) noexcept
+  {
+    if (it.ptr_->next_ == other.fake_node_)
+    {
+      return;
+    }
+
+    LIter< T > last_range(it.ptr_->next_->next_);
+    splice_after(pos, other, it, last_range);
+  }
+
+  template< class T >
+  void List< T >::splice_after(LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept
+  {
+    if (std::addressof(other) == this)
+    {
+      return;
+    }
+
+    detail::Node< T >* range_start = first.ptr_->next_;
+    detail::Node< T >* range_end = last.ptr_;
+    if (range_start == range_end)
+    {
+      return;
+    }
+
+    detail::Node< T >* range_tail = range_start;
+    size_t count = 1;
+    while (range_tail->next_ != range_end)
+    {
+      range_tail = range_tail->next_;
+      ++count;
+    }
+
+    first.ptr_->next_ = range_end;
+    detail::Node< T >* saved_next = pos.ptr_->next_;
+    pos.ptr_->next_ = range_start;
+    range_tail->next_ = saved_next;
+
+    size_ += count;
+    other.size_ -= count;
+  }
+
+  template< class T >
+  void List< T >::merge(List& other) noexcept
+  {
+    if (other.size_ == 0)
+    {
+      return;
+    }
+
+    LIter< T > curr(fake_node_);
+    LIter< T > prev(other.fake_node_);
+
+    while (prev.ptr_->next_ != other.fake_node_)
+    {
+      while (curr.ptr_->next_ != fake_node_ && curr.ptr_->next_->val_ < prev.ptr_->next_->val_)
+      {
+        ++curr;
+      }
+
+      if (curr.ptr_->next_ == fake_node_)
+      {
+        splice_after(curr, other);
+        break;
+      }
+      
+      splice_after(curr, other, prev);
+      ++curr;
+    }
+  }
+
+  template< class T >
+  void List< T >::sort() noexcept
+  {
+    if (size_ <= 1)
+    {
+      return;
+    }
+
+    List< T > second_half;
+    LIter< T > mid = begin();
+    size_t half_size = size_ / 2;
+
+    for (size_t i = 0; i < half_size - 1; ++i)
+    {
+      ++mid;
+    }
+
+    splice_after(LIter< T >(second_half.fake_node_), *this, mid, end());
+
+    sort();
+    second_half.sort();
+
+    merge(second_half);
+  }
+
+  template< class T >
+  template< class P >
+  LIter< T > List< T >::partition(P p) noexcept
+  {
+    List< T > false_list;
+    LIter< T > false_tail(false_list.fake_node_);
+    LIter< T > curr(fake_node_);
+
+    while (curr.ptr_->next_ != fake_node_)
+    {
+      if (!p(curr.ptr_->next_->val_))
+      {
+        false_list.splice_after(false_tail, *this, curr);
+        ++false_tail;
+      }
+      else
+      {
+        ++curr;
+      }
+    }
+
+    splice_after(curr, false_list);
+    return (curr.ptr_->next_ == fake_node_) ? end() : LIter< T >(curr.ptr_->next_);
   }
 
   template< class T >

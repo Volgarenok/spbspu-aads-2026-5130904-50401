@@ -1,7 +1,13 @@
 #include <boost/test/unit_test.hpp>
 #include "list.hpp"
 
+auto l = [](int x)
+{
+  return x % 2 == 0;
+};
+
 BOOST_AUTO_TEST_SUITE(ListTests)
+
 BOOST_AUTO_TEST_CASE(DefConstructTest)
 {
   vasyakin::List< int > list;
@@ -227,6 +233,210 @@ BOOST_AUTO_TEST_CASE(ConstIteratorTest)
   BOOST_CHECK_EQUAL(*cit2, 10);
   vasyakin::List< int > empty;
   BOOST_CHECK(empty.cbegin() == empty.cend());
+}
+
+BOOST_AUTO_TEST_CASE(SpliceAllTest)
+{
+  vasyakin::List< int > a;
+  a.pushBack(1);
+  a.pushBack(2);
+
+  vasyakin::List< int > b;
+  b.pushBack(10);
+  b.pushBack(20);
+  b.pushBack(30);
+
+  a.splice_after(a.begin(), b);
+
+  BOOST_CHECK_EQUAL(a.getSize(), 5);
+  BOOST_CHECK_EQUAL(b.getSize(), 0);
+
+  auto it = a.begin();
+  int expected[] = {1, 10, 20, 30, 2};
+  for (auto v : expected)
+  {
+    BOOST_CHECK_EQUAL(*it, v);
+    ++it;
+  }
+
+  BOOST_CHECK(it == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(SpliceSingleTest)
+{
+  vasyakin::List< int > a;
+  a.pushBack(1);
+  a.pushBack(3);
+
+  vasyakin::List< int > b;
+  b.pushBack(10);
+  b.pushBack(20);
+
+  a.splice_after(a.begin(), b, b.begin());
+
+  BOOST_CHECK_EQUAL(a.getSize(), 3);
+  BOOST_CHECK_EQUAL(b.getSize(), 1);
+  BOOST_CHECK_EQUAL(*b.begin(), 10);
+
+  auto it = a.begin();
+  BOOST_CHECK_EQUAL(*it, 1); 
+  ++it;
+
+  BOOST_CHECK_EQUAL(*it, 20);
+  ++it;
+
+  BOOST_CHECK_EQUAL(*it, 3); 
+  ++it;
+
+  BOOST_CHECK(it == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(SpliceRangeTest)
+{
+  vasyakin::List< int > a;
+  a.pushBack(1);
+  a.pushBack(5);
+
+  vasyakin::List< int > b;
+  b.pushBack(10);
+  b.pushBack(20);
+  b.pushBack(30);
+  b.pushBack(40);
+
+  auto first = b.begin();
+  auto last = b.begin();
+  ++last;
+  ++last;
+  ++last;
+
+  a.splice_after(a.begin(), b, first, last);
+
+  BOOST_CHECK_EQUAL(a.getSize(), 4);
+  BOOST_CHECK_EQUAL(b.getSize(), 2);
+
+  auto check = a.begin();
+
+  BOOST_CHECK_EQUAL(*check, 1); 
+  ++check;
+
+  BOOST_CHECK_EQUAL(*check, 20);
+  ++check;
+
+  BOOST_CHECK_EQUAL(*check, 30);
+  ++check;
+
+  BOOST_CHECK_EQUAL(*check, 5); 
+  ++check;
+
+  BOOST_CHECK(check == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(MergeSortedTest)
+{
+  vasyakin::List< int > a;
+  a.pushBack(1);
+  a.pushBack(3);
+  a.pushBack(5);
+
+  vasyakin::List< int > b;
+  b.pushBack(2);
+  b.pushBack(4);
+  b.pushBack(6);
+
+  a.merge(b);
+  BOOST_CHECK_EQUAL(a.getSize(), 6);
+  BOOST_CHECK_EQUAL(b.getSize(), 0);
+
+  auto it = a.begin();
+  int expected[] = {1, 2, 3, 4, 5, 6};
+  for (auto v : expected)
+  {
+    BOOST_CHECK_EQUAL(*it, v);
+    ++it;
+  }
+
+  BOOST_CHECK(it == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(SortTest)
+{
+  vasyakin::List< int > list;
+  list.pushBack(5);
+  list.pushBack(1);
+  list.pushBack(4);
+  list.pushBack(2);
+  list.pushBack(3);
+
+  list.sort();
+  BOOST_CHECK_EQUAL(list.getSize(), 5);
+
+  auto it = list.begin();
+  for (int i = 1; i <= 5; ++i)
+  {
+    BOOST_CHECK_EQUAL(*it, i);
+    ++it;
+  }
+
+  BOOST_CHECK(it == list.end());
+
+  vasyakin::List< int > empty;
+  empty.sort();
+  BOOST_CHECK_EQUAL(empty.getSize(), 0);
+
+  vasyakin::List< int > single(42);
+  single.sort();
+  BOOST_CHECK_EQUAL(*single.begin(), 42);
+}
+
+BOOST_AUTO_TEST_CASE(PartitionTest)
+{
+  vasyakin::List< int > list;
+  list.pushBack(3);
+  list.pushBack(1);
+  list.pushBack(4);
+  list.pushBack(1);
+  list.pushBack(5);
+  list.pushBack(9);
+  list.pushBack(2);
+  list.pushBack(6);
+
+  auto it = list.partition(l);
+
+  int expected[] = {4, 2, 6, 3, 1, 1, 5, 9};
+  auto check = list.begin();
+  for (auto v : expected)
+  {
+    BOOST_CHECK_EQUAL(*check, v);
+    ++check;
+  }
+
+  BOOST_CHECK(check == list.end());
+  BOOST_CHECK(it != list.end());
+
+  BOOST_CHECK_EQUAL(*it, 3);
+}
+
+BOOST_AUTO_TEST_CASE(PartitionAllTrueTest)
+{
+  vasyakin::List< int > list;
+  list.pushBack(2);
+  list.pushBack(4);
+  list.pushBack(6);
+
+  auto it = list.partition(l);
+
+  auto check = list.begin();
+  BOOST_CHECK_EQUAL(*check, 2);
+  ++check;
+
+  BOOST_CHECK_EQUAL(*check, 4);
+  ++check;
+
+  BOOST_CHECK_EQUAL(*check, 6);
+  ++check;
+
+  BOOST_CHECK(check == list.end());
+  BOOST_CHECK(it == list.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
