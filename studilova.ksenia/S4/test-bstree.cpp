@@ -291,3 +291,18 @@ BOOST_AUTO_TEST_CASE(rotate_large_right)
   ++it;
   BOOST_TEST((*it).first == 30);
 }
+
+BOOST_AUTO_TEST_CASE(exceptions_test)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  BOOST_CHECK_THROW(tree.get(1), std::out_of_range);
+  BOOST_CHECK_THROW(tree.drop(1), std::out_of_range);
+
+  tree.push(10, "10");
+
+  BOOST_CHECK_THROW(tree.rotateLeft(tree.cbegin()), std::logic_error);
+  BOOST_CHECK_THROW(tree.rotateRight(tree.cbegin()), std::logic_error);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
