@@ -58,6 +58,22 @@ namespace chernov {
     detail::NodeBase * node_;
     explicit BSTIterator(detail::NodeBase * node);
   };
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >::BSTree():
+    fake_root_(nullptr),
+    fake_leaf_(nullptr),
+    cmp_(Compare{})
+  {
+    fake_leaf_ = new detail::NodeBase();
+    try {
+      fake_root_ = new detail::NodeBase(nullptr, fake_leaf_, fake_leaf_);
+    } catch (...) {
+      delete fake_leaf_;
+      throw;
+    }
+    fake_leaf_->parent = fake_root_;
+  }
 }
 
 #endif
