@@ -172,7 +172,7 @@ namespace studilova
   template< class T >
   T& List< T >::front()
   {
-    if(empty())
+    if (empty())
     {
       throw std::out_of_range("List is empty");
     }
@@ -182,7 +182,7 @@ namespace studilova
   template< class T >
   const T& List< T >::front() const
   {
-    if(empty())
+    if (empty())
     {
       throw std::out_of_range("List is empty");
     }
@@ -192,7 +192,7 @@ namespace studilova
   template< class T >
   T& List< T >::back()
   {
-    if(empty())
+    if (empty())
     {
       throw std::out_of_range("List is empty");
     }
@@ -202,7 +202,7 @@ namespace studilova
   template< class T >
   const T& List< T >::back() const
   {
-    if(empty())
+    if (empty())
     {
       throw std::out_of_range("List is empty");
     }
@@ -267,7 +267,7 @@ namespace studilova
   {
     detail::Node< T >* node = new detail::Node< T >{value, nullptr, nullptr};
 
-    if(empty())
+    if (empty())
     {
       node->next = node;
       node->prev = node;
@@ -315,7 +315,7 @@ namespace studilova
   {
     detail::Node< T >* node = new detail::Node< T >{value, nullptr, nullptr};
 
-    if(empty())
+    if (empty())
     {
       node->next = node;
       node->prev = node;
@@ -410,7 +410,9 @@ namespace studilova
       T* operator->() const;
 
       LIter& operator++();
+      LIter operator++(int);
       LIter& operator--();
+      LIter operator--(int);
 
       bool operator==(const LIter& other) const;
       bool operator!=(const LIter& other) const;
@@ -452,10 +454,26 @@ namespace studilova
   }
 
   template< class T >
+  LIter< T > LIter< T >::operator++(int)
+  {
+    LIter< T > temp(*this);
+    ++(*this);
+    return temp;
+  }
+
+  template< class T >
   LIter< T >& LIter< T >::operator--()
   {
     node_ = node_->prev;
     return *this;
+  }
+
+  template< class T >
+  LIter< T > LIter< T >::operator--(int)
+  {
+    LIter< T > temp(*this);
+    --(*this);
+    return temp;
   }
 
   template< class T >
@@ -490,7 +508,9 @@ namespace studilova
       const T* operator->() const;
 
       CLIter& operator++();
+      CLIter operator++(int);
       CLIter& operator--();
+      CLIter operator--(int);
 
       bool operator==(const CLIter& other) const;
       bool operator!=(const CLIter& other) const;
@@ -532,10 +552,26 @@ namespace studilova
   }
 
   template< class T >
+  CLIter< T > CLIter< T >::operator++(int)
+  {
+    CLIter< T > temp(*this);
+    ++(*this);
+    return temp;
+  }
+
+  template< class T >
   CLIter< T >& CLIter< T >::operator--()
   {
     node_ = node_->prev;
     return *this;
+  }
+
+  template< class T >
+  CLIter< T > CLIter< T >::operator--(int)
+  {
+    CLIter< T > temp(*this);
+    --(*this);
+    return temp;
   }
 
   template< class T >
