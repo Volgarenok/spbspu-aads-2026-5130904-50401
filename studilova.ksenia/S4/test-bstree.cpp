@@ -234,6 +234,7 @@ BOOST_AUTO_TEST_CASE(rotate_right)
   studilova::BSTree< int, std::string >::CIt root = tree.cbegin();
   ++root;
   ++root;
+  ++root;
   BOOST_TEST((*root).first == 20);
 
   studilova::BSTree< int, std::string >::CIt new_root = tree.rotateRight(root);
