@@ -11,11 +11,11 @@ namespace chernov {
   template< class T >
   class LCIter {
   public:
-    LCIter();
-    const T & operator*() const;
-    const T * operator->() const;
-    LCIter< T > & operator++();
-    LCIter< T > operator++(int);
+    LCIter() noexcept;
+    const T & operator*() const noexcept;
+    const T * operator->() const noexcept;
+    LCIter< T > & operator++() noexcept;
+    LCIter< T > operator++(int) noexcept;
     bool operator==(const LCIter< T > & other) const noexcept;
     bool operator!=(const LCIter< T > & other) const noexcept;
   private:
@@ -32,25 +32,25 @@ namespace chernov {
   {}
 
   template< class T >
-  chernov::LCIter< T >::LCIter():
+  chernov::LCIter< T >::LCIter() noexcept:
     ptr(nullptr),
     fake_(nullptr)
   {}
 
   template< class T >
-  const T & chernov::LCIter< T >::operator*() const
+  const T & chernov::LCIter< T >::operator*() const noexcept
   {
     return ptr->data;
   }
 
   template< class T >
-  const T * chernov::LCIter< T >::operator->() const
+  const T * chernov::LCIter< T >::operator->() const noexcept
   {
     return &(ptr->data);
   }
 
   template< class T >
-  chernov::LCIter< T > & chernov::LCIter< T >::operator++()
+  chernov::LCIter< T > & chernov::LCIter< T >::operator++() noexcept
   {
     ptr = ptr->next;
     if (ptr == fake_) {
@@ -60,7 +60,7 @@ namespace chernov {
   }
 
   template< class T >
-  chernov::LCIter< T > chernov::LCIter< T >::operator++(int)
+  chernov::LCIter< T > chernov::LCIter< T >::operator++(int) noexcept
   {
     LCIter old = *this;
     ++(*this);
