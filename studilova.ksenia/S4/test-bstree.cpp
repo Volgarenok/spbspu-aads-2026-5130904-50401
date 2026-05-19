@@ -1,9 +1,10 @@
 #define BOOST_TEST_MODULE BSTreeTests
 #include <boost/test/included/unit_test.hpp>
 
+#include "bstree.hpp"
+
 #include <stdexcept>
 #include <string>
-#include "bstree.hpp"
 
 BOOST_AUTO_TEST_SUITE(BSTreeTests)
 
@@ -114,4 +115,77 @@ BOOST_AUTO_TEST_CASE(iterator_change_value)
   (*it).second = "ONE";
 
   BOOST_TEST(tree.get(1) == "ONE");
+}
+
+BOOST_AUTO_TEST_CASE(drop_leaf)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  tree.push(10, "ten");
+  tree.push(5, "five");
+  tree.push(15, "fifteen");
+
+  BOOST_TEST(tree.drop(5) == "five");
+  BOOST_CHECK_THROW(tree.get(5), std::out_of_range);
+
+  studilova::BSTree< int, std::string >::CIt it = tree.cbegin();
+  BOOST_TEST((*it).first == 10);
+  ++it;
+  BOOST_TEST((*it).first == 15);
+}
+
+BOOST_AUTO_TEST_CASE(drop_one_child)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  tree.push(10, "ten");
+  tree.push(15, "fifteen");
+  tree.push(20, "twenty");
+
+  BOOST_TEST(tree.drop(15) == "fifteen");
+
+  studilova::BSTree< int, std::string >::CIt it = tree.cbegin();
+  BOOST_TEST((*it).first == 10);
+  ++it;
+  BOOST_TEST((*it).first == 20);
+  ++it;
+  BOOST_TEST(it == tree.cend());
+}
+
+BOOST_AUTO_TEST_CASE(drop_two_children)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  tree.push(10, "ten");
+  tree.push(5, "five");
+  tree.push(15, "fifteen");
+  tree.push(12, "twelve");
+  tree.push(20, "twenty");
+
+  BOOST_TEST(tree.drop(10) == "ten");
+
+  studilova::BSTree< int, std::string >::CIt it = tree.cbegin();
+
+  BOOST_TEST((*it).first == 5);
+  ++it;
+  BOOST_TEST((*it).first == 12);
+  ++it;
+  BOOST_TEST((*it).first == 15);
+  ++it;
+  BOOST_TEST((*it).first == 20);
+}
+
+BOOST_AUTO_TEST_CASE(height_test)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  BOOST_TEST(tree.height() == 0);
+
+  tree.push(10, "10");
+  BOOST_TEST(tree.height() == 1);
+
+  tree.push(20, "20");
+  tree.push(30, "30");
+
+  BOOST_TEST(tree.height() == 3);
 }
