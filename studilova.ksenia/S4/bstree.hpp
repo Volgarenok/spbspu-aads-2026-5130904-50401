@@ -30,6 +30,8 @@ namespace studilova
       Value& get(const Key& key);
       const Value& get(const Key& key) const;
 
+      Value drop(const Key& key);
+
       using It = studilova::BSTreeIt< Key, Value >;
       using CIt = studilova::BSTreeCIt< Key, Value >;
 
@@ -48,11 +50,12 @@ namespace studilova
       Compare cmp_;
 
       void clear(Node* node);
-      Node* clone(Node* node, Node* parent);
+      Node* clone(const Node* node, Node* parent);
       Node* findNode(const Key& key);
       const Node* findNode(const Key& key) const;
       Node* getMin(Node* node) const;
       const Node* getMin(const Node* node) const;
+      void replaceNode(Node* old_node, Node* new_node);
       void swap(BSTree& other) noexcept;
   };
 }
@@ -174,6 +177,29 @@ const Value& studilova::BSTree< Key, Value, Compare >::get(const Key& key) const
 }
 
 template< class Key, class Value, class Compare >
+Value studilova::BSTree< Key, Value, Compare >::drop(const Key& key)
+{
+  Node* node = findNode(key);
+  Value result = node->value_;
+
+  if (node->left_ && node->right_)
+  {
+    Node* next = getMin(node->right_);
+
+    node->key_ = next->key_;
+    node->value_ = next->value_;
+
+    node = next;
+  }
+
+  Node* child = node->left_ ? node->left_ : node->right_;
+  replaceNode(node, child);
+
+  delete node;
+  return result;
+}
+
+template< class Key, class Value, class Compare >
 typename studilova::BSTree< Key, Value, Compare >::It studilova::BSTree< Key, Value, Compare >::begin()
 {
   return It(getMin(root_), root_);
@@ -222,7 +248,7 @@ void studilova::BSTree< Key, Value, Compare >::clear(Node* node)
 }
 
 template< class Key, class Value, class Compare >
-typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare >::clone(Node* node, Node* parent)
+typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare >::clone(const Node* node, Node* parent)
 {
   if (!node)
   {
@@ -305,6 +331,26 @@ const typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree
     node = node->left_;
   }
   return node;
+}
+
+template< class Key, class Value, class Compare >
+void studilova::BSTree< Key, Value, Compare >::replaceNode(Node* old_node, Node* new_node)
+{
+  if (new_node)
+  {
+    new_node->parent_ = old_node->parent_;
+  }
+
+  if (!old_node->parent_)
+  {
+    root_ = new_node;
+  }
+  else if (old_node == old_node->parent_->left_)
+  {
+    old_node->parent_->left_ = new_node;
+  } else {
+    old_node->parent_->right_ = new_node;
+  }
 }
 
 template< class Key, class Value, class Compare >
