@@ -82,3 +82,115 @@ namespace
     }
   }
 }
+
+void zhuravleva::graphs(std::ostream& out, std::istream&, const GraphTable& graphs)
+{
+  myVector< std::string > names;
+  for (GraphTable::ConstIterator it = graphs.cbegin(); it != graphs.cend(); ++it)
+  {
+    names.pushBack(it->first);
+  }
+  sortVector(names, StringComparator());
+  for (size_t i = 0; i < names.size(); i++)
+  {
+    out << names[i] << '\n';
+  }
+}
+
+void zhuravleva::vertexes(std::ostream& out, std::istream& in, const GraphTable& graphs)
+{
+  std::string graphName;
+  if (!(in >> graphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (!graphs.has(graphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  myVector< std::string > result(graphs.get(graphName).getVertexes());
+  sortVector(result, StringComparator());
+  for (size_t i = 0; i < result.size(); i++)
+  {
+    out << result[i] << '\n';
+  }
+}
+
+void zhuravleva::outbound(std::ostream& out, std::istream& in, const GraphTable& graphs)
+{
+  std::string graphName;
+  std::string vertex;
+  if (!(in >> graphName >> vertex))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (!graphs.has(graphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  const Graph& graph = graphs.get(graphName);
+  if (!graph.hasVertex(vertex))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  myVector< std::pair< std::string, size_t > > result;
+
+  const HashTable< std::pair< std::string, std::string >, List< size_t >,
+    Blake2Hasher< std::pair< std::string, std::string > >, KeyEqual >& edges = graph.getEdges();
+
+    for (HashTable< std::pair< std::string, std::string >,
+      List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
+      KeyEqual >::ConstIterator it = edges.cbegin(); it != edges.cend(); ++it)
+  {
+    if (it->first.first == vertex)
+    {
+      const List< size_t >& weights = it->second;
+      for (LCIter< size_t > weightIt = weights.cbegin();
+        weightIt != weights.cend(); ++weightIt)
+      {
+        result.pushBack(std::make_pair(it->first.second, *weightIt));
+      }
+    }
+  }
+  printGroupedPairs(out, result);
+}
+
+void zhuravleva::inbound(std::ostream& out, std::istream& in, const GraphTable& graphs)
+{
+  std::string graphName;
+  std::string vertex;
+  if (!(in >> graphName >> vertex))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (!graphs.has(graphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  const Graph& graph = graphs.get(graphName);
+  if (!graph.hasVertex(vertex))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  myVector< std::pair< std::string, size_t > > result;
+
+  const HashTable< std::pair< std::string, std::string >, List< size_t >,
+    Blake2Hasher< std::pair< std::string, std::string > >, KeyEqual >& edges = graph.getEdges();
+
+  for (HashTable< std::pair< std::string, std::string >,
+      List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
+      KeyEqual >::ConstIterator it = edges.cbegin(); it != edges.cend(); ++it)
+  {
+    if (it->first.second == vertex)
+    {
+      const List< size_t >& weights = it->second;
+      for (LCIter< size_t > weightIt = weights.cbegin();
+          weightIt != weights.cend(); ++weightIt)
+      {
+        result.pushBack(std::make_pair(it->first.first, *weightIt));
+      }
+    }
+  }
+  printGroupedPairs(out, result);
+}
+
