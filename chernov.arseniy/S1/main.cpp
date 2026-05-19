@@ -45,20 +45,19 @@ int main()
   List < pLCIterSize > iters;
   LIter< pLCIterSize > iters_iter = iters.beforeBegin();
 
-  bool first_name = true;
   seqs_iter = sequences.begin();
-  do {
-    if (!first_name) {
-      std::cout << " ";
-    } else {
-      first_name = false;
-    }
+  std::cout << seqs_iter->first;
+  if (!seqs_iter->second.empty()) {
+    iters_iter = iters.insertAfter(iters_iter, {seqs_iter->second.cbegin(), seqs_iter->second.size()});
+  }
 
-    std::cout << seqs_iter->first;
-    if (!seqs_iter->second.empty()) {
-      iters_iter = iters.insertAfter(iters_iter, {seqs_iter->second.cbegin(), seqs_iter->second.size()});
+  auto it = seqs_iter;
+  while (++it != sequences.begin()) {
+    std::cout << " " << it->first;
+    if (!it->second.empty()) {
+      iters_iter = iters.insertAfter(iters_iter, {it->second.cbegin(), it->second.size()});
     }
-  } while (++seqs_iter != sequences.begin());
+  }
   std::cout << "\n";
 
   List< size_t > sums;
