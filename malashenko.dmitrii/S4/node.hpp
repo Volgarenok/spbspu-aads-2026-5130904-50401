@@ -16,4 +16,13 @@ namespace malashenko
   };
 }
 
+template< class Key, class Value >
+malashenko::Node< Key, Value >::Node(const Key& key, const Value& value):
+  key_(key),
+  value_(value),
+  right_(nullptr),
+  left_(nullptr),
+  parent_(nullptr)
+{}
+
 #endif
