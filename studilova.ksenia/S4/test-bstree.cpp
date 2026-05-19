@@ -189,3 +189,105 @@ BOOST_AUTO_TEST_CASE(height_test)
 
   BOOST_TEST(tree.height() == 3);
 }
+
+BOOST_AUTO_TEST_CASE(rotate_left)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  tree.push(10, "10");
+  tree.push(20, "20");
+  tree.push(15, "15");
+  tree.push(30, "30");
+
+  studilova::BSTree< int, std::string >::CIt root = tree.cbegin();
+  BOOST_TEST((*root).first == 10);
+
+  studilova::BSTree< int, std::string >::CIt new_root = tree.rotateLeft(root);
+  BOOST_TEST((*new_root).first == 20);
+
+  studilova::BSTree< int, std::string >::CIt it = tree.cbegin();
+
+  BOOST_TEST((*it).first == 10);
+  ++it;
+  BOOST_TEST((*it).first == 15);
+  ++it;
+  BOOST_TEST((*it).first == 20);
+  ++it;
+  BOOST_TEST((*it).first == 30);
+}
+
+BOOST_AUTO_TEST_CASE(rotate_right)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  tree.push(20, "20");
+  tree.push(10, "10");
+  tree.push(5, "5");
+  tree.push(15, "15");
+
+  studilova::BSTree< int, std::string >::CIt root = tree.cbegin();
+  ++root;
+  ++root;
+  BOOST_TEST((*root).first == 20);
+
+  studilova::BSTree< int, std::string >::CIt new_root = tree.rotateRight(root);
+  BOOST_TEST((*new_root).first == 10);
+
+  studilova::BSTree< int, std::string >::CIt it = tree.cbegin();
+
+  BOOST_TEST((*it).first == 5);
+  ++it;
+  BOOST_TEST((*it).first == 10);
+  ++it;
+  BOOST_TEST((*it).first == 15);
+  ++it;
+  BOOST_TEST((*it).first == 20);
+}
+
+BOOST_AUTO_TEST_CASE(rotate_large_left)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  tree.push(10, "10");
+  tree.push(30, "30");
+  tree.push(20, "20");
+
+  studilova::BSTree< int, std::string >::CIt root = tree.cbegin();
+  BOOST_TEST((*root).first == 10);
+
+  studilova::BSTree< int, std::string >::CIt new_root = tree.rotateLargeLeft(root);
+  BOOST_TEST((*new_root).first == 20);
+
+  studilova::BSTree< int, std::string >::CIt it = tree.cbegin();
+
+  BOOST_TEST((*it).first == 10);
+  ++it;
+  BOOST_TEST((*it).first == 20);
+  ++it;
+  BOOST_TEST((*it).first == 30);
+}
+
+BOOST_AUTO_TEST_CASE(rotate_large_right)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  tree.push(30, "30");
+  tree.push(10, "10");
+  tree.push(20, "20");
+
+  studilova::BSTree< int, std::string >::CIt root = tree.cbegin();
+  ++root;
+  ++root;
+  BOOST_TEST((*root).first == 30);
+
+  studilova::BSTree< int, std::string >::CIt new_root = tree.rotateLargeRight(root);
+  BOOST_TEST((*new_root).first == 20);
+
+  studilova::BSTree< int, std::string >::CIt it = tree.cbegin();
+
+  BOOST_TEST((*it).first == 10);
+  ++it;
+  BOOST_TEST((*it).first == 20);
+  ++it;
+  BOOST_TEST((*it).first == 30);
+}
