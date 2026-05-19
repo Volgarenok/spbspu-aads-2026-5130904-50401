@@ -405,8 +405,6 @@ namespace studilova
   class LIter
   {
     public:
-      LIter(detail::Node< T >* node = nullptr);
-
       T& operator*() const;
 
       LIter& operator++();
@@ -417,6 +415,8 @@ namespace studilova
 
     private:
       detail::Node< T >* node_;
+
+      explicit LIter(detail::Node< T >* node = nullptr);
 
       friend class List< T >;
   };
@@ -478,8 +478,6 @@ namespace studilova
   class CLIter
   {
     public:
-      CLIter(detail::Node< T >* node = nullptr);
-
       const T& operator*() const;
 
       CLIter& operator++();
@@ -490,6 +488,8 @@ namespace studilova
 
     private:
       detail::Node< T >* node_;
+
+      explicit CLIter(detail::Node< T >* node = nullptr);
 
       friend class List< T >;
   };
