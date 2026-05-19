@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <stdexcept>
 #include <utility>
+#include <memory>
 
 namespace studilova
 {
@@ -81,7 +82,7 @@ namespace studilova
   {
     try
     {
-      detail::NodeБ T >* curr = other.head_;
+      detail::Node< T >* curr = other.head_;
 
       for (size_t i = 0; i < other.size_; ++i)
       {
@@ -406,6 +407,7 @@ namespace studilova
   {
     public:
       T& operator*() const;
+      T* operator->() const;
 
       LIter& operator++();
       LIter& operator--();
@@ -434,6 +436,12 @@ namespace studilova
       throw std::out_of_range("Iterator dereference error");
     }
     return node_->data;
+  }
+
+  template< class T >
+  T* LIter< T >::operator->() const
+  {
+    return std::addressof(node_->data);
   }
 
   template< class T >
@@ -479,6 +487,7 @@ namespace studilova
   {
     public:
       const T& operator*() const;
+      const T* operator->() const;
 
       CLIter& operator++();
       CLIter& operator--();
@@ -507,6 +516,12 @@ namespace studilova
       throw std::out_of_range("Iterator dereference error");
     }
     return node_->data;
+  }
+
+  template< class T >
+  const T* CLIter< T >::operator->() const
+  {
+    return std::addressof(node_->data);
   }
 
   template< class T >
