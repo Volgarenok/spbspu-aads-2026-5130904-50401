@@ -461,18 +461,22 @@ namespace vasyakin
 
     List< T > second_half;
     LIter< T > mid = begin();
-    size_t half_size = size_ / 2;
+    size_t half_size = size_ / 2 - 1;
 
-    for (size_t i = 0; i < half_size - 1; ++i)
+    for (size_t i = 0; i < half_size; ++i)
     {
       ++mid;
     }
 
     splice_after(LIter< T >(second_half.fake_node_), *this, mid, end());
 
+    if (second_half.size_ == 0)
+    {
+      return;
+    }
+
     sort();
     second_half.sort();
-
     merge(second_half);
   }
 
