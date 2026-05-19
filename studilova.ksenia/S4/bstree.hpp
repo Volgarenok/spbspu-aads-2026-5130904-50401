@@ -2,6 +2,7 @@
 #define BSTREE_HPP
 
 #include "bstree_node.hpp"
+#include "bstree_iterators.hpp"
 
 #include <cstddef>
 #include <functional>
@@ -29,6 +30,17 @@ namespace studilova
       Value& get(const Key& key);
       const Value& get(const Key& key) const;
 
+      using It = studilova::BSTreeIt< Key, Value >;
+      using CIt = studilova::BSTreeCIt< Key, Value >;
+
+      It begin();
+      It end();
+
+      CIt begin() const;
+      CIt end() const;
+      CIt cbegin() const;
+      CIt cend() const;
+
     private:
       using Node = studilova::Node< Key, Value >;
 
@@ -39,6 +51,8 @@ namespace studilova
       Node* clone(Node* node, Node* parent);
       Node* findNode(const Key& key);
       const Node* findNode(const Key& key) const;
+      Node* getMin(Node* node) const;
+      const Node* getMin(const Node* node) const;
       void swap(BSTree& other) noexcept;
   };
 }
@@ -228,10 +242,42 @@ const typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree
 }
 
 template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare>::getMin(Node* node) const
+{
+  if (!node)
+  {
+    return nullptr;
+  }
+
+  while (node->left_)
+  {
+    node = node->left_;
+  }
+  return node;
+}
+
+template< class Key, class Value, class Compare >
+const typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare>::getMin(const Node* node) const
+{
+  if (!node)
+  {
+    return nullptr;
+  }
+
+  while (node->left_)
+  {
+    node = node->left_;
+  }
+  return node;
+}
+
+template< class Key, class Value, class Compare >
 void studilova::BSTree< Key, Value, Compare >::swap(BSTree& other) noexcept
 {
   std::swap(root_, other.root_);
   std::swap(cmp_, other.cmp_);
 }
+
+
 
 #endif
