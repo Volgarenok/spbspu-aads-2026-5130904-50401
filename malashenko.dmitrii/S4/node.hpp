@@ -8,7 +8,10 @@ namespace malashenko
   template< class Key, class Value>
   class Node {
   public:
+    using node_t = Node< Key, Value >;
     Node(const Key& key, const Value& value);
+    node_t* minimum(node_t* fakeLeaf);
+    node_t* maximum(node_t* fakeLeaf);
   private:
     Key key_;
     Value value_;
@@ -30,4 +33,36 @@ malashenko::Node< Key, Value >::Node(const Key& key, const Value& value):
   parent_(nullptr)
 {}
 
+template< class Key, class Value >
+malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::minimum(node_t* fakeLeaf)
+{
+  node_t root = *this;
+  if (!root)
+  {
+    return root;
+  }
+
+  while (root->left_ && root->left_ != fakeLeaf)
+  {
+    root = root->left_;
+  }
+  return root;
+}
+
+
+template< class Key, class Value >
+malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::maximum(node_t* fakeLeaf)
+{
+  node_t root = *this;
+  if (!root)
+  {
+    return root;
+  }
+
+  while (root->right_ && root->right_ != fakeLeaf)
+  {
+    root = root->right_;
+  }
+  return root;
+}
 #endif
