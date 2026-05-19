@@ -40,6 +40,7 @@ namespace chernov {
     void pushFront(const T & value);
     void pushFront(T && value);
     void popFront();
+    void swap(List< T > & other) noexcept;
   private:
     Node< T > * fake_;
     size_t size_;
@@ -117,17 +118,11 @@ namespace chernov {
   }
 
   template< class T >
-  List< T > & List< T >::operator=(List< T > && list) noexcept
+  List< T > & List< T >::operator=(List< T > && other) noexcept
   {
-    if (this == std::addressof(list)) {
-      return *this;
+    if (this != std::addressof(other)) {
+      swap(other);
     }
-    clear();
-    removeFake();
-    fake_ = list.fake_;
-    size_ = list.size_;
-    list.fake_ = nullptr;
-    list.size_ = 0;
     return *this;
   }
 
@@ -285,6 +280,13 @@ namespace chernov {
   void List< T >::popFront()
   {
     eraseAfter(beforeBegin());
+  }
+
+  template< class T >
+  void List< T >::swap(List< T > & other) noexcept
+  {
+    std::swap(fake_, other.fake_);
+    std::swap(size_, other.size_);
   }
 }
 
