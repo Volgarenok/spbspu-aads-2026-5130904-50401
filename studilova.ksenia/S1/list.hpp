@@ -51,8 +51,11 @@ namespace studilova
       void popBack() noexcept;
 
       void pushFront(const T& value);
+      void pushFront(T&& value);
       void pushBack(const T& value);
+      void pushBack(T&& value);
       void insert(LIter< T > pos, const T& value);
+      void insert(LIter< T > pos, T&& value);
 
       LIter< T > begin() noexcept;
       LIter< T > end() noexcept;
@@ -277,6 +280,30 @@ namespace studilova
   }
 
   template< class T >
+  void List< T >::pushFront(T&& value)
+  {
+    detail::Node< T >* node = new detail::Node< T >{ std::move(value), nullptr, nullptr };
+
+    if (empty())
+    {
+      node->next = node;
+      node->prev = node;
+      head_ = node;
+    } else {
+      detail::Node< T >* tail = head_->prev;
+
+      node->next = head_;
+      node->prev = tail;
+
+      tail->next = node;
+      head_->prev = node;
+
+      head_ = node;
+    }
+    ++size_;
+  }
+
+  template< class T >
   void List< T >::pushBack(const T& value)
   {
     detail::Node< T >* node = new detail::Node< T >{value, nullptr, nullptr};
@@ -296,6 +323,28 @@ namespace studilova
       head_->prev = node;
     }
     size_++;
+  }
+
+  template< class T >
+  void List< T >::pushBack(T&& value)
+  {
+    detail::Node< T >* node = new detail::Node< T >{ std::move(value), nullptr, nullptr };
+
+    if (empty())
+    {
+      node->next = node;
+      node->prev = node;
+      head_ = node;
+    } else {
+      detail::Node< T >* tail = head_->prev;
+
+      node->next = head_;
+      node->prev = tail;
+
+      tail->next = node;
+      head_->prev = node;
+    }
+    ++size_;
   }
 
   template< class T >
@@ -320,6 +369,29 @@ namespace studilova
     prev->next = node;
     curr->prev = node;
 
+    ++size_;
+  }
+
+  template< class T >
+  void List< T >::insert(LIter< T > pos, T&& value)
+  {
+    if (!pos.node_)
+    {
+      pushBack(std::move(value));
+      return;
+    }
+    if (pos.node_ == head_)
+    {
+      pushFront(std::move(value));
+      return;
+    }
+
+    detail::Node< T >* curr = pos.node_;
+    detail::Node< T >* prev = curr->prev;
+    detail::Node< T >* node = new detail::Node< T >{ std::move(value), curr, prev };
+
+    prev->next = node;
+    curr->prev = node;
     ++size_;
   }
 
