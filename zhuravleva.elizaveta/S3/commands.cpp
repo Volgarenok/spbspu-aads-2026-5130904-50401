@@ -194,3 +194,179 @@ void zhuravleva::inbound(std::ostream& out, std::istream& in, const GraphTable& 
   printGroupedPairs(out, result);
 }
 
+void zhuravleva::bind(std::ostream&, std::istream& in, GraphTable& graphs)
+{
+  std::string graphName;
+  std::string a;
+  std::string b;
+  size_t weight = 0;
+  if (!(in >> graphName >> a >> b >> weight))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (!graphs.has(graphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  graphs.get(graphName).bind(a, b, weight);
+}
+
+void zhuravleva::cut(std::ostream&, std::istream& in, GraphTable& graphs)
+{
+  std::string graphName;
+  std::string a;
+  std::string b;
+  size_t weight = 0;
+  if (!(in >> graphName >> a >> b >> weight))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (!graphs.has(graphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (!graphs.get(graphName).cut(a, b, weight))
+  {
+    throw std::runtime_error("invalid command");
+  }
+}
+
+void zhuravleva::create(std::ostream&, std::istream& in, GraphTable& graphs)
+{
+  std::string graphName;
+  size_t count = 0;
+  if (!(in >> graphName >> count))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (graphs.has(graphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  Graph graph;
+  for (size_t i = 0; i < count; i++)
+  {
+    std::string vertex;
+    if (!(in >> vertex))
+    {
+      throw std::runtime_error("invalid command");
+    }
+    graph.addVertex(vertex);
+  }
+  graphs.add(graphName, graph);
+}
+
+void zhuravleva::merge(std::ostream&, std::istream& in, GraphTable& graphs)
+{
+  std::string newGraphName;
+  std::string firstGraphName;
+  std::string secondGraphName;
+  if (!(in >> newGraphName >> firstGraphName >> secondGraphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (graphs.has(newGraphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (!graphs.has(firstGraphName) || !graphs.has(secondGraphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  const Graph& firstGraph = graphs.get(firstGraphName);
+  const Graph& secondGraph = graphs.get(secondGraphName);
+  Graph result;
+  const myVector< std::string >& firstVertexes = firstGraph.getVertexes();
+  for (size_t i = 0; i < firstVertexes.size(); i++)
+  {
+    result.addVertex(firstVertexes[i]);
+  }
+  const myVector< std::string >& secondVertexes = secondGraph.getVertexes();
+  for (size_t i = 0; i < secondVertexes.size(); i++)
+  {
+    result.addVertex(secondVertexes[i]);
+  }
+
+  const HashTable< std::pair< std::string, std::string >,
+    List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
+    KeyEqual >& firstEdges = firstGraph.getEdges();
+  for (HashTable< std::pair< std::string, std::string >,
+      List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
+      KeyEqual >::ConstIterator it = firstEdges.cbegin(); it != firstEdges.cend(); ++it)
+  {
+    for (LCIter< size_t > weightIt = it->second.cbegin();
+        weightIt != it->second.cend(); ++weightIt)
+    {
+      result.bind(it->first.first, it->first.second, *weightIt);
+    }
+  }
+  const HashTable< std::pair< std::string, std::string >,
+    List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
+    KeyEqual >& secondEdges = secondGraph.getEdges();
+  for (HashTable< std::pair< std::string, std::string >,
+      List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
+      KeyEqual >::ConstIterator it = secondEdges.cbegin(); it != secondEdges.cend(); ++it)
+  {
+    for (LCIter< size_t > weightIt = it->second.cbegin();
+        weightIt != it->second.cend(); ++weightIt)
+    {
+      result.bind(it->first.first, it->first.second, *weightIt);
+    }
+  }
+  graphs.add(newGraphName, result);
+}
+
+void zhuravleva::extract(std::ostream&, std::istream& in, GraphTable& graphs)
+{
+  std::string newGraphName;
+  std::string oldGraphName;
+  size_t count = 0;
+  if (!(in >> newGraphName >> oldGraphName >> count))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (graphs.has(newGraphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  if (!graphs.has(oldGraphName))
+  {
+    throw std::runtime_error("invalid command");
+  }
+  const Graph& oldGraph = graphs.get(oldGraphName);
+  Graph result;
+  myVector< std::string > selectedVertexes;
+  for (size_t i = 0; i < count; i++)
+  {
+    std::string vertex;
+    if (!(in >> vertex))
+    {
+      throw std::runtime_error("invalid command");
+    }
+    if (!oldGraph.hasVertex(vertex))
+    {
+      throw std::runtime_error("invalid command");
+    }
+    result.addVertex(vertex);
+    selectedVertexes.pushBack(vertex);
+  }
+  const HashTable< std::pair< std::string, std::string >,
+    List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
+    KeyEqual >& oldEdges = oldGraph.getEdges();
+  for (HashTable< std::pair< std::string, std::string >,
+      List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
+      KeyEqual >::ConstIterator it = oldEdges.cbegin(); it != oldEdges.cend(); ++it)
+  {
+    if (hasString(selectedVertexes, it->first.first) &&
+        hasString(selectedVertexes, it->first.second))
+    {
+      for (LCIter< size_t > weightIt = it->second.cbegin();
+          weightIt != it->second.cend();
+          ++weightIt)
+      {
+        result.bind(it->first.first, it->first.second, *weightIt);
+      }
+    }
+  }
+  graphs.add(newGraphName, result);
+}
