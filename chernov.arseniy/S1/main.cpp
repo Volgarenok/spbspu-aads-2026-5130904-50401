@@ -114,15 +114,13 @@ int main()
   }
 
   sums_iter = sums.begin();
-  bool first_num = true;
-  do {
-    if (!first_num) {
-      std::cout << " ";
-    } else {
-      first_num = false;
-    }
-
+  if (sums_iter != sums.end()) {
     std::cout << *sums_iter;
-  } while (++sums_iter != sums.begin());
+    auto it = sums_iter;
+    ++it;
+    for (; it != sums_iter; ++it) {
+      std::cout << " " << *it;
+    }
+  }
   std::cout << "\n";
 }
