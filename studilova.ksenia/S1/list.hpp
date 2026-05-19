@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <utility>
 
 namespace studilova
 {
@@ -29,9 +30,13 @@ namespace studilova
     public:
       List();
       List(const List& other);
+      List(List&& other) noexcept;
       ~List();
 
       List& operator=(const List& other);
+      List& operator=(List&& other) noexcept;
+
+      void swap(List& other) noexcept;
 
       bool empty() const;
       void clear();
@@ -65,12 +70,6 @@ namespace studilova
   {}
 
   template< class T >
-  List< T >::~List()
-  {
-    clear();
-  }
-
-  template< class T >
   List< T >::List(const List& other)
     : head_(nullptr), size_(0)
   {
@@ -88,25 +87,54 @@ namespace studilova
   }
 
   template< class T >
+  List< T >::List(List&& other) noexcept :
+    head_(other.head_),
+    size_(other.size_)
+  {
+    other.head_ = nullptr;
+    other.size_ = 0;
+  }
+
+  template< class T >
+  List< T >::~List()
+  {
+    clear();
+  }
+
+  template< class T >
   List< T >& List< T >::operator=(const List& other)
   {
-    if (this == &other)
+    if (this != &other)
     {
-      return *this;
-    }
-    clear();
-    if (other.empty())
-    {
-      return *this;
+      List< T > temp(other);
+      swap(temp);
     }
 
-    detail::Node< T >* curr = other.head_;
-    for (size_t i = 0; i < other.size_; ++i)
-    {
-      pushBack(curr->data);
-      curr = curr->next;
-    }
     return *this;
+  }
+
+  template< class T >
+  List< T >& List< T >::operator=(List&& other) noexcept
+  {
+    if (this != &other)
+    {
+      clear();
+
+      head_ = other.head_;
+      size_ = other.size_;
+
+      other.head_ = nullptr;
+      other.size_ = 0;
+    }
+
+    return *this;
+  }
+
+  template< class T >
+  void List< T >::swap(List& other) noexcept
+  {
+    std::swap(head_, other.head_);
+    std::swap(size_, other.size_);
   }
 
   template< class T >
