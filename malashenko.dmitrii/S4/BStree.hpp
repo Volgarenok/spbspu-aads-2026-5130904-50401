@@ -171,5 +171,35 @@ size_t malashenko::BSTree< Key, Value, Compare >::height()
   return root_->height(fakeLeaf_);
 }
 
+template< class Key, class Value, class Compare >
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateLeft(const_iterator it)
+{
+  Node< Key, Value >* rotateNode = it->first;
+  if (!rotateNode)
+  {
+    return {nullptr, nullptr};
+  }
+
+  Node< Key, Value >* parent = rotateNode->parent_;
+  if (parent && parent->parent_)
+  {
+    if (parent->parent_->left_ == parent)
+    {
+      parent->parent_->left_ = rotateNode;
+    }
+    else
+    {
+      parent->parent_->right_ = rotateNode;
+    }
+  }
+  rotateNode->parent_ = parent->parent_;
+
+  Node< Key, Value >* rightData = rotateNode->right_;
+  rotateNode->right_ = parent;
+  rotateNode->right_->left_ = rightData;
+
+}
+
+
 
 #endif
