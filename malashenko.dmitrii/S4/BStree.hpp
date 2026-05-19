@@ -58,7 +58,7 @@ malashenko::BSTree< Key, Value, Compare >::BSTree():
 template< class Key, class Value, class Compare >
 malashenko::BSTree< Key, Value, Compare >::~BSTree()
 {
-  clear(); // CLEAR FUNC
+  //clear(); // CLEAR FUNC
   ::operator delete(fakeLeaf_);
 }
 
@@ -118,7 +118,7 @@ void malashenko::BSTree< Key, Value, Compare >::push(const Key& k, const Value& 
     parent = tmp;
     tmp = cmp(k, tmp->key_) ? tmp->left_ : tmp->right_;
   }
-  Node< Key, Value > newNode = Node< Key, Value >(k, v);
+  Node< Key, Value >* newNode = new Node< Key, Value >(k, v);
   newNode->left_ = fakeLeaf_;
   newNode->right_ = fakeLeaf_;
   newNode->parent_ = parent;
@@ -143,13 +143,14 @@ void malashenko::BSTree< Key, Value, Compare >::push(const Key& k, const Value& 
 template< class Key, class Value, class Compare >
 Value& malashenko::BSTree< Key, Value, Compare >::get(const Key& k)
 {
-  BSTree< Key, Value, Compare > cthis = this;
+  const BSTree< Key, Value, Compare >* cthis = this;
   return const_cast< Value& >(cthis->get(k));
 }
 
 template< class Key, class Value, class Compare >
 const Value& malashenko::BSTree< Key, Value, Compare >::get(const Key& k) const
 {
+  Compare cmp;
   malashenko::Node< Key, Value >* tmp = root_;
   while (tmp != fakeLeaf_)
   {
@@ -167,17 +168,8 @@ const Value& malashenko::BSTree< Key, Value, Compare >::get(const Key& k) const
 template< class Key, class Value, class Compare >
 size_t malashenko::BSTree< Key, Value, Compare >::height()
 {
-  if (root_ == fakeLeaf_)
-  {
-    return 0;
-  }
-  if (root_->left_ == fakeLeaf_ && root_->right_ == fakeLeaf_)
-  {
-    return 1;
-  }
-  return std::max(height(root_->left_), height(root_->right_)) + 1;
+  return root_->height(fakeLeaf_);
 }
-
 
 
 #endif
