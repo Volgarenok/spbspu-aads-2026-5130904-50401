@@ -12,11 +12,9 @@ namespace malashenko
     BSTreeIter();
     BSTreeIter< Key, Value >& operator++();
     BSTreeIter< Key, Value > operator++(int);
-    BSTreeIter< Key, Value > operator+(size_t s);
 
     BSTreeIter< Key, Value >& operator--();
     BSTreeIter< Key, Value > operator--(int);
-    BSTreeIter< Key, Value > operator-(size_t s);
 
     std::pair< Key, Value >& operator*();
     std::pair< Key, Value >* operator->();
@@ -47,30 +45,29 @@ malashenko::BSTreeIter< Key, Value >::BSTreeIter(node_t* node, node_t* fakeLeaf)
 template< class Key, class Value >
 malashenko::BSTreeIter< Key, Value >& malashenko::BSTreeIter< Key, Value >::operator++()
 {
-  node_t* next = node_;
-  if (next->right_)
+  if (node_->right_)
   {
-    next = next->right_;
-    next = next->minimum(fakeLeaf_);
+    node_ = node_->right_;
+    node_ = node_->minimum(fakeLeaf_);
   }
   else
   {
-    node_t* parent = next->parent;
-    while (parent && parent->right_ == next)
+    node_t* parent = node_->parent;
+    while (parent && parent->right_ == node_)
     {
-      next = parent;
-      parent = next->parent;
+      node_ = parent;
+      parent = node_->parent;
     }
-    next = parent;
+    node_ = parent;
   }
-  return {next, fakeLeaf_};
+  return *this;
 }
 
 
 template< class Key, class Value >
 malashenko::BSTreeIter< Key, Value > malashenko::BSTreeIter< Key, Value >::operator++(int)
 {
-  BSTreeIter< Key, Value > tmp(*this)
+  BSTreeIter< Key, Value > tmp{*this};
   ++(*this);
   return tmp;
 }
@@ -78,31 +75,56 @@ malashenko::BSTreeIter< Key, Value > malashenko::BSTreeIter< Key, Value >::opera
 template< class Key, class Value >
 malashenko::BSTreeIter< Key, Value >& malashenko::BSTreeIter< Key, Value >::operator--()
 {
-  node_t* next = node_;
-  if (next->left_)
+  if (node_->left_)
   {
-    next = next->left_;
-    next = next->maximum(fakeLeaf_);
+    node_ = node_->left_;
+    node_ = node_->maximum(fakeLeaf_);
   }
   else
   {
-    node_t* parent = next->parent;
-    while (parent && parent->left_ == next)
+    node_t* parent = node_->parent;
+    while (parent && parent->left_ == node_)
     {
-      next = parent;
-      parent = next->parent;
+      node_ = parent;
+      parent = node_->parent;
     }
-    next = parent;
+    node_ = parent;
   }
-  return {next, fakeLeaf_};
+  return *this;
 }
 
 template< class Key, class Value >
 malashenko::BSTreeIter< Key, Value > malashenko::BSTreeIter< Key, Value >::operator--(int)
 {
-  BSTreeIter< Key, Value > tmp(*this)
+  BSTreeIter< Key, Value > tmp{*this};
   --(*this);
   return tmp;
+}
+
+template< class Key, class Value >
+std::pair< Key, Value >& malashenko::BSTreeIter< Key, Value >::operator*()
+{
+  assert(node_);
+  return {node_->key_, node_->value_};
+}
+
+template< class Key, class Value >
+std::pair< Key, Value >* malashenko::BSTreeIter< Key, Value >::operator->()
+{
+  assert(node_);
+  return std::addressof(node_->key_, node_->value_);
+}
+
+template< class Key, class Value >
+bool malashenko::BSTreeIter< Key, Value >::operator==(const BSTreeIter< Key, Value >& other) const
+{
+  return node_ == other.node_;
+}
+
+template< class Key, class Value >
+bool malashenko::BSTreeIter< Key, Value >::operator!=(const BSTreeIter< Key, Value >& other) const
+{
+  return !(node_ == other.node_);
 }
 
 

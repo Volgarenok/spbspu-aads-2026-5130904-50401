@@ -5,6 +5,12 @@ namespace malashenko
   template< class Key, class Value, class Compare >
   class BSTree;
 
+  template< class Key, class Value >
+  class BSTreeIter;
+
+  template< class Key, class Value >
+  class BSTreeCIter;
+
   template< class Key, class Value>
   class Node {
   public:
@@ -21,6 +27,9 @@ namespace malashenko
 
     template< class Compare >
     friend class BSTree;
+
+    friend class BSTreeIter< Key, Value >;
+    friend class BSTreeCIter< Key, Value >;
   };
 }
 
