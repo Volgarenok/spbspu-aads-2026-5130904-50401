@@ -60,3 +60,58 @@ BOOST_AUTO_TEST_CASE(assignment_operator)
   BOOST_TEST(second.get(2) == "two");
   BOOST_CHECK_THROW(second.get(10), std::out_of_range);
 }
+
+BOOST_AUTO_TEST_CASE(iterator_inorder)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  tree.push(10, "10");
+  tree.push(5, "5");
+  tree.push(15, "15");
+  tree.push(3, "3");
+  tree.push(7, "7");
+
+  studilova::BSTree< int, std::string >::CIt it = tree.cbegin();
+
+  BOOST_TEST((*it).first == 3);
+  ++it;
+  BOOST_TEST((*it).first == 5);
+  ++it;
+  BOOST_TEST((*it).first == 7);
+  ++it;
+  BOOST_TEST((*it).first == 10);
+  ++it;
+  BOOST_TEST((*it).first == 15);
+  ++it;
+  BOOST_TEST(it == tree.cend());
+}
+
+BOOST_AUTO_TEST_CASE(reverse_iteration)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  tree.push(10, "10");
+  tree.push(5, "5");
+  tree.push(15, "15");
+
+  studilova::BSTree< int, std::string >::It it = tree.end();
+
+  --it;
+  BOOST_TEST((*it).first == 15);
+  --it;
+  BOOST_TEST((*it).first == 10);
+  --it;
+  BOOST_TEST((*it).first == 5);
+}
+
+BOOST_AUTO_TEST_CASE(iterator_change_value)
+{
+  studilova::BSTree< int, std::string > tree;
+
+  tree.push(1, "one");
+
+  studilova::BSTree< int, std::string >::It it = tree.begin();
+  (*it).second = "ONE";
+
+  BOOST_TEST(tree.get(1) == "ONE");
+}
