@@ -1,9 +1,11 @@
 #ifndef BSTREENODE
 #define BSTREENODE
-
 namespace malashenko
 {
-  template< class Key, class Value >
+  template< class Key, class Value, class Compare >
+  class BSTree;
+
+  template< class Key, class Value>
   class Node {
   public:
     Node(const Key& key, const Value& value);
@@ -13,6 +15,9 @@ namespace malashenko
     Node* right_;
     Node* left_;
     Node* parent_;
+
+    template< class Compare >
+    friend class BSTree;
   };
 }
 

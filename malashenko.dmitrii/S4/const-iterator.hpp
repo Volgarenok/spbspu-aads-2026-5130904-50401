@@ -1,26 +1,27 @@
 #ifndef BSTREE_CONST_ITERATOR
 #define BSTREE_CONST_ITERATOR
 #include <functional>
+#include <cstddef>
 #include "node.hpp"
 namespace malashenko
 {
   template< class Key, class Value >
-  class BStreeCIter {
+  class BSTreeCIter {
   public:
-    BStreeCIter();
-    BStreeCIter< Key, Value >& operator++();
-    BStreeCIter< Key, Value > operator++(int);
-    BStreeCIter< Key, Value > operator+(size_t s);
+    BSTreeCIter();
+    BSTreeCIter< Key, Value >& operator++();
+    BSTreeCIter< Key, Value > operator++(int);
+    BSTreeCIter< Key, Value > operator+(size_t s);
 
-    BStreeCIter< Key, Value >& operator--();
-    BStreeCIter< Key, Value > operator--(int);
-    BStreeCIter< Key, Value > operator-(size_t s);
+    BSTreeCIter< Key, Value >& operator--();
+    BSTreeCIter< Key, Value > operator--(int);
+    BSTreeCIter< Key, Value > operator-(size_t s);
 
     const std::pair< Key, Value >& operator*() const;
     const std::pair< Key, Value >* operator->() const;
 
-    bool operator!=(const BStreeCIter< Key, Value >& other) const;
-    bool operator==(const BStreeCIter< Key, Value >& other) const;
+    bool operator!=(const BSTreeCIter< Key, Value >& other) const;
+    bool operator==(const BSTreeCIter< Key, Value >& other) const;
   private:
     Node< Key, Value >* node_;
     Node< Key, Value >* fakeLeaf_;
