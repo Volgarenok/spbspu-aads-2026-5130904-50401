@@ -65,6 +65,7 @@ namespace
   {
     if (result.empty())
     {
+      out << '\n';
       return;
     }
     sortVector(result, PairComparator());
@@ -90,6 +91,11 @@ void zhuravleva::graphs(std::ostream& out, std::istream&, const GraphTable& grap
   {
     names.pushBack(it->first);
   }
+  if (names.empty())
+  {
+    out << '\n';
+    return;
+  }
   sortVector(names, StringComparator());
   for (size_t i = 0; i < names.size(); i++)
   {
@@ -109,6 +115,11 @@ void zhuravleva::vertexes(std::ostream& out, std::istream& in, const GraphTable&
     throw std::runtime_error("invalid command");
   }
   myVector< std::string > result(graphs.get(graphName).getVertexes());
+  if (result.empty())
+  {
+    out << '\n';
+    return;
+  }
   sortVector(result, StringComparator());
   for (size_t i = 0; i < result.size(); i++)
   {
