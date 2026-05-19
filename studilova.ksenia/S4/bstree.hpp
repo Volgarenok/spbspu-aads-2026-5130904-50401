@@ -174,6 +174,42 @@ const Value& studilova::BSTree< Key, Value, Compare >::get(const Key& key) const
 }
 
 template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::It studilova::BSTree< Key, Value, Compare >::begin()
+{
+  return It(getMin(root_), root_);
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::It studilova::BSTree< Key, Value, Compare >::end()
+{
+  return It(nullptr, root_);
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::CIt studilova::BSTree< Key, Value, Compare >::begin() const
+{
+  return cbegin();
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::CIt studilova::BSTree< Key, Value, Compare >::end() const
+{
+  return cend();
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::CIt studilova::BSTree< Key, Value, Compare >::cbegin() const
+{
+  return CIt(getMin(root_), root_);
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::CIt studilova::BSTree< Key, Value, Compare >::cend() const
+{
+  return CIt(nullptr, root_);
+}
+
+template< class Key, class Value, class Compare >
 void studilova::BSTree< Key, Value, Compare >::clear(Node* node)
 {
   if (!node)
@@ -257,7 +293,7 @@ typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key,
 }
 
 template< class Key, class Value, class Compare >
-const typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare>::getMin(const Node* node) const
+const typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare >::getMin(const Node* node) const
 {
   if (!node)
   {
