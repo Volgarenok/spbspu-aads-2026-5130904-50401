@@ -50,7 +50,7 @@ namespace chernov {
   template< class T >
   Node< T > * List< T >::createFake()
   {
-    fake_ = new Node<T>();
+    fake_ = new Node< T >();
     return fake_;
   }
 
