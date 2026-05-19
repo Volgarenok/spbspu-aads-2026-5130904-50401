@@ -26,14 +26,11 @@ namespace studilova
   template< class T >
   class List
   {
-    private:
-      detail::Node< T >* head_;
-      size_t size_;
-
     public:
       List();
-      ~List();
       List(const List& other);
+      ~List();
+
       List& operator=(const List& other);
 
       bool empty() const;
@@ -56,6 +53,10 @@ namespace studilova
 
       CLIter< T > begin() const;
       CLIter< T > end() const;
+
+    private:
+      detail::Node< T >* head_;
+      size_t size_;
   };
 
   template< class T >
@@ -296,21 +297,21 @@ namespace studilova
   template< class T >
   class LIter
   {
-    friend class List< T >;
+    public:
+      LIter(detail::Node< T >* node = nullptr);
 
-  private:
-    detail::Node< T >* node_;
+      T& operator*() const;
 
-  public:
-    LIter(detail::Node< T >* node = nullptr);
+      LIter& operator++();
+      LIter& operator--();
 
-    T& operator*() const;
+      bool operator==(const LIter& other) const;
+      bool operator!=(const LIter& other) const;
 
-    LIter& operator++();
-    LIter& operator--();
+    private:
+      detail::Node< T >* node_;
 
-    bool operator==(const LIter& other) const;
-    bool operator!=(const LIter& other) const;
+      friend class List< T >;
   };
 
   template< class T >
@@ -369,21 +370,21 @@ namespace studilova
   template< class T >
   class CLIter
   {
-    friend class List< T >;
+    public:
+      CLIter(detail::Node< T >* node = nullptr);
 
-  private:
-    detail::Node< T >* node_;
+      const T& operator*() const;
 
-  public:
-    CLIter(detail::Node< T >* node = nullptr);
+      CLIter& operator++();
+      CLIter& operator--();
 
-    const T& operator*() const;
+      bool operator==(const CLIter& other) const;
+      bool operator!=(const CLIter& other) const;
 
-    CLIter& operator++();
-    CLIter& operator--();
+    private:
+      detail::Node< T >* node_;
 
-    bool operator==(const CLIter& other) const;
-    bool operator!=(const CLIter& other) const;
+      friend class List< T >;
   };
 
   template< class T >
