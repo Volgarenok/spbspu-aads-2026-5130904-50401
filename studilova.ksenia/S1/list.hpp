@@ -38,26 +38,27 @@ namespace studilova
 
       void swap(List& other) noexcept;
 
-      bool empty() const;
-      void clear();
-      size_t size() const;
+      bool empty() const noexcept;
+      void clear() noexcept;
+      size_t size() const noexcept;
 
       T& front();
       const T& front() const;
       T& back();
       const T& back() const;
 
-      void popFront();
-      void popBack();
+      void popFront() noexcept;
+      void popBack() noexcept;
+
       void pushFront(const T& value);
       void pushBack(const T& value);
       void insert(LIter< T > pos, const T& value);
 
-      LIter< T > begin();
-      LIter< T > end();
+      LIter< T > begin() noexcept;
+      LIter< T > end() noexcept;
 
-      CLIter< T > begin() const;
-      CLIter< T > end() const;
+      CLIter< T > begin() const noexcept;
+      CLIter< T > end() const noexcept;
 
     private:
       detail::Node< T >* head_;
@@ -138,13 +139,13 @@ namespace studilova
   }
 
   template< class T >
-  bool List< T >::empty() const
+  bool List< T >::empty() const noexcept
   {
     return size_ == 0;
   }
 
   template< class T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while(!empty())
     {
@@ -153,7 +154,7 @@ namespace studilova
   }
 
   template< class T >
-  size_t List< T >::size()const
+  size_t List< T >::size() const noexcept
   {
     return size_;
   }
@@ -199,7 +200,7 @@ namespace studilova
   }
 
   template< class T >
-  void List< T >::popFront()
+  void List< T >::popFront() noexcept
   {
     if (empty())
     {
@@ -227,7 +228,7 @@ namespace studilova
   }
 
   template< class T >
-  void List< T >::popBack()
+  void List< T >::popBack() noexcept
   {
     if (empty())
     {
@@ -384,13 +385,13 @@ namespace studilova
   }
 
   template< class T >
-  LIter< T > List< T >::begin()
+  LIter< T > List< T >::begin() noexcept
   {
     return LIter< T >(head_);
   }
 
   template< class T >
-  LIter< T > List< T >::end()
+  LIter< T > List< T >::end() noexcept
   {
     return LIter< T >(nullptr);
   }
@@ -457,13 +458,13 @@ namespace studilova
   }
 
   template< class T >
-  CLIter< T > List< T >::begin() const
+  CLIter< T > List< T >::begin() const noexcept
   {
     return CLIter< T >(head_);
   }
 
   template< class T >
-  CLIter< T > List< T >::end() const
+  CLIter< T > List< T >::end() const noexcept
   {
     return CLIter< T >(nullptr);
   }
