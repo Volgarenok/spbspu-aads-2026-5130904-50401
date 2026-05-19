@@ -349,7 +349,6 @@ BOOST_AUTO_TEST_CASE(test_many_erase_after_through_fake)
   BOOST_CHECK_EQUAL(list.size(), 2);
   BOOST_CHECK_EQUAL(*list.begin(), 3);
 
-  ++list.begin();
   BOOST_CHECK_EQUAL(*(++list.begin()), 4);
 }
 
