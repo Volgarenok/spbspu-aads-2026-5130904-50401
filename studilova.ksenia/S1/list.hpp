@@ -79,16 +79,20 @@ namespace studilova
     head_(nullptr),
     size_(0)
   {
-    if (other.empty())
+    try
     {
-      return;
-    }
-    detail::Node< T >* curr = other.head_;
+      detail::NodeБ T >* curr = other.head_;
 
-    for (size_t i = 0; i < other.size_; ++i)
+      for (size_t i = 0; i < other.size_; ++i)
+      {
+        pushBack(curr->data);
+        curr = curr->next;
+      }
+    }
+    catch (...)
     {
-      pushBack(curr->data);
-      curr = curr->next;
+      clear();
+      throw;
     }
   }
 
