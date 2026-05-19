@@ -69,13 +69,15 @@ namespace studilova
   };
 
   template< class T >
-  List< T >::List()
-    : head_(nullptr), size_(0)
+  List< T >::List() :
+    head_(nullptr),
+    size_(0)
   {}
 
   template< class T >
-  List< T >::List(const List& other)
-    : head_(nullptr), size_(0)
+  List< T >::List(const List& other) :
+    head_(nullptr),
+    size_(0)
   {
     if (other.empty())
     {
@@ -416,8 +418,8 @@ namespace studilova
   };
 
   template< class T >
-  LIter< T >::LIter(detail::Node< T >* node)
-    : node_(node)
+  LIter< T >::LIter(detail::Node< T >* node) :
+    node_(node)
   {}
 
   template< class T >
@@ -489,8 +491,8 @@ namespace studilova
   };
 
   template< class T >
-  CLIter< T >::CLIter(detail::Node< T >* node)
-    : node_(node)
+  CLIter< T >::CLIter(detail::Node< T >* node) :
+    node_(node)
   {}
 
   template< class T >
