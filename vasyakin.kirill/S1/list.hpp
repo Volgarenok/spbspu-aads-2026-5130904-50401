@@ -468,7 +468,7 @@ namespace vasyakin
       ++mid;
     }
 
-    splice_after(LIter< T >(second_half.fake_node_), *this, mid, end());
+    second_half.splice_after(LIter< T >(second_half.fake_node_), *this, mid, end());
 
     if (second_half.size_ == 0)
     {
