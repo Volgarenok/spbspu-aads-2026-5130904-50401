@@ -15,7 +15,7 @@ void studilova::Print(std::istream& in, std::ostream& out, Datasets& datasets)
 
   if (dataset.empty())
   {
-    out << "EMPTY\n";
+    out << "<EMPTY>\n";
     return;
   }
 
@@ -87,6 +87,43 @@ void studilova::Intersect(std::istream& in, std::ostream&, Datasets& datasets)
     }
     catch(const std::out_of_range&)
     {}
+  }
+  datasets.push(new_name, result);
+}
+
+void studilova::cmdUnion(std::istream& in, std::ostream&, Datasets& datasets)
+{
+  std::string new_name;
+  std::string first_name;
+  std::string second_name;
+
+  if (!(in >> new_name >> first_name >> second_name))
+  {
+    throw std::runtime_error("invalid input");
+  }
+
+  const Dataset& first = datasets.get(first_name);
+  const Dataset& second = datasets.get(second_name);
+
+  Dataset result;
+
+  for (Dataset::CIt it = first.cbegin(); it != first.cend(); ++it)
+  {
+    std::pair< const int&, const std::string& > pair = *it;
+    result.push(pair.first, pair.second);
+  }
+
+  for (Dataset::CIt it = second.cbegin(); it != second.cend(); ++it)
+  {
+    std::pair< const int&, const std::string& > pair = *it;
+    try
+    {
+      result.get(pair.first);
+    }
+    catch(const std::out_of_range&)
+    {
+      result.push(pair.first, pair.second);
+    }
   }
   datasets.push(new_name, result);
 }
