@@ -11,11 +11,11 @@ namespace chernov {
   template< class T >
   class LIter {
   public:
-    LIter();
-    T & operator*() const;
-    T * operator->() const;
-    LIter< T > & operator++();
-    LIter< T > operator++(int);
+    LIter() noexcept;
+    T & operator*() const noexcept;
+    T * operator->() const noexcept;
+    LIter< T > & operator++() noexcept;
+    LIter< T > operator++(int) noexcept;
     bool operator==(const LIter< T > & other) const noexcept;
     bool operator!=(const LIter< T > & other) const noexcept;
   private:
@@ -32,25 +32,25 @@ namespace chernov {
   {}
 
   template< class T >
-  LIter< T >::LIter():
+  LIter< T >::LIter() noexcept:
     ptr(nullptr),
     fake_(nullptr)
   {}
 
   template< class T >
-  T & LIter< T >::operator*() const
+  T & LIter< T >::operator*() const noexcept
   {
     return ptr->data;
   }
 
   template< class T >
-  T * LIter< T >::operator->() const
+  T * LIter< T >::operator->() const noexcept
   {
     return &(ptr->data);
   }
 
   template< class T >
-  LIter< T > & LIter< T >::operator++()
+  LIter< T > & LIter< T >::operator++() noexcept
   {
     ptr = ptr->next;
     if (ptr == fake_) {
@@ -60,7 +60,7 @@ namespace chernov {
   }
 
   template< class T >
-  LIter< T > LIter< T >::operator++(int)
+  LIter< T > LIter< T >::operator++(int) noexcept
   {
     LIter old = *this;
     ++(*this);
