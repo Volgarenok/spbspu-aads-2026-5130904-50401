@@ -2,17 +2,20 @@
 #define LIST_HPP
 
 #include <cstddef>
-#include<stdexcept>
+#include <stdexcept>
 
 namespace studilova
 {
-  template< class T >
-  struct Node
+  namespace detail
   {
-    T data;
-    Node* next;
-    Node* prev;
-  };
+    template< class T >
+    struct Node
+    {
+      T data;
+      Node* next;
+      Node* prev;
+    };
+  }
 
   template< class T >
   class LIter;
@@ -24,7 +27,7 @@ namespace studilova
   class List
   {
     private:
-      Node< T >* head_;
+      detail::Node< T >* head_;
       size_t size_;
 
     public:
@@ -74,7 +77,7 @@ namespace studilova
     {
       return;
     }
-    Node< T >*curr = other.head_;
+    detail::Node< T >* curr = other.head_;
 
     for (size_t i = 0; i < other.size_; ++i)
     {
@@ -96,7 +99,7 @@ namespace studilova
       return *this;
     }
 
-    Node< T >* curr = other.head_;
+    detail::Node< T >* curr = other.head_;
     for (size_t i = 0; i < other.size_; ++i)
     {
       pushBack(curr->data);
@@ -174,7 +177,7 @@ namespace studilova
       return;
     }
 
-    Node< T >* temp = head_;
+    detail::Node< T >* temp = head_;
 
     if (size_ == 1)
     {
@@ -182,7 +185,7 @@ namespace studilova
       head_ = nullptr;
       size_ = 0;
     } else {
-      Node< T >* tail = head_->prev;
+      detail::Node< T >* tail = head_->prev;
 
       head_ = head_->next;
 
@@ -208,8 +211,8 @@ namespace studilova
       head_ = nullptr;
       size_ = 0;
     } else {
-      Node< T >* tail = head_->prev;
-      Node< T >* new_tail = tail->prev;
+      detail::Node< T >* tail = head_->prev;
+      detail::Node< T >* new_tail = tail->prev;
 
       new_tail->next = head_;
       head_->prev = new_tail;
@@ -222,7 +225,7 @@ namespace studilova
   template< class T >
   void List< T >::pushFront(const T& value)
   {
-    Node< T >* node = new Node< T >{value, nullptr, nullptr};
+    detail::Node< T >* node = new detail::Node< T >{value, nullptr, nullptr};
 
     if(empty())
     {
@@ -230,7 +233,7 @@ namespace studilova
       node->prev = node;
       head_ = node;
     } else {
-      Node< T >* tail = head_->prev;
+      detail::Node< T >* tail = head_->prev;
 
       node->next = head_;
       node->prev = tail;
@@ -246,7 +249,7 @@ namespace studilova
   template< class T >
   void List< T >::pushBack(const T& value)
   {
-    Node< T >* node = new Node< T >{value, nullptr, nullptr};
+    detail::Node< T >* node = new detail::Node< T >{value, nullptr, nullptr};
 
     if(empty())
     {
@@ -254,7 +257,7 @@ namespace studilova
       node->prev = node;
       head_ = node;
     } else {
-      Node< T >* tail = head_->prev;
+      detail::Node< T >* tail = head_->prev;
 
       node->next = head_;
       node->prev = tail;
@@ -279,10 +282,10 @@ namespace studilova
       return;
     }
 
-    Node< T >* curr = pos.node_;
-    Node< T >* prev = curr->prev;
+    detail::Node< T >* curr = pos.node_;
+    detail::Node< T >* prev = curr->prev;
 
-    Node< T >* node = new Node< T >{value, curr, prev};
+    detail::Node< T >* node = new detail::Node< T >{value, curr, prev};
 
     prev->next = node;
     curr->prev = node;
@@ -296,10 +299,10 @@ namespace studilova
     friend class List< T >;
 
   private:
-    Node< T >* node_;
+    detail::Node< T >* node_;
 
   public:
-    LIter(Node< T >* node = nullptr);
+    LIter(detail::Node< T >* node = nullptr);
 
     T& operator*() const;
 
@@ -311,7 +314,7 @@ namespace studilova
   };
 
   template< class T >
-  LIter< T >::LIter(Node< T >* node)
+  LIter< T >::LIter(detail::Node< T >* node)
     : node_(node)
   {}
 
@@ -369,10 +372,10 @@ namespace studilova
     friend class List< T >;
 
   private:
-    Node< T >* node_;
+    detail::Node< T >* node_;
 
   public:
-    CLIter(Node< T >* node = nullptr);
+    CLIter(detail::Node< T >* node = nullptr);
 
     const T& operator*() const;
 
@@ -384,7 +387,7 @@ namespace studilova
   };
 
   template< class T >
-  CLIter< T >::CLIter(Node< T >* node)
+  CLIter< T >::CLIter(detail::Node< T >* node)
     : node_(node)
   {}
 
