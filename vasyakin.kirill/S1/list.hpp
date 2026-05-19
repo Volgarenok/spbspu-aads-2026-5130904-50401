@@ -92,10 +92,10 @@ namespace vasyakin
     void splice_after(LIter< T > pos, List& other, LIter< T > it) noexcept;
     void splice_after(LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept;
     void merge(List& other) noexcept;
-    void sort() noexcept;
+    void sort();
 
     template< class P >
-    LIter< T > partition(P p) noexcept;
+    LIter< T > partition(P p);
 
     LIter< T > begin() noexcept;
     LIter< T > end() noexcept;
@@ -452,7 +452,7 @@ namespace vasyakin
   }
 
   template< class T >
-  void List< T >::sort() noexcept
+  void List< T >::sort()
   {
     if (size_ <= 1)
     {
@@ -478,7 +478,7 @@ namespace vasyakin
 
   template< class T >
   template< class P >
-  LIter< T > List< T >::partition(P p) noexcept
+  LIter< T > List< T >::partition(P p)
   {
     List< T > false_list;
     LIter< T > false_tail(false_list.fake_node_);
