@@ -43,6 +43,9 @@ namespace studilova
       CIt cbegin() const;
       CIt cend() const;
 
+      size_t height() const;
+      size_t height(CIt it) const;
+
     private:
       using Node = studilova::Node< Key, Value >;
 
@@ -55,7 +58,9 @@ namespace studilova
       const Node* findNode(const Key& key) const;
       Node* getMin(Node* node) const;
       const Node* getMin(const Node* node) const;
+      Node* getMax(Node* node) const;
       void replaceNode(Node* old_node, Node* new_node);
+      size_t calcHeight(const Node* node) const;
       void swap(BSTree& other) noexcept;
   };
 }
@@ -236,6 +241,18 @@ typename studilova::BSTree< Key, Value, Compare >::CIt studilova::BSTree< Key, V
 }
 
 template< class Key, class Value, class Compare >
+size_t studilova::BSTree< Key, Value, Compare >::height() const
+{
+  return calcHeight(root_);
+}
+
+template< class Key, class Value, class Compare >
+size_t studilova::BSTree< Key, Value, Compare >::height(CIt it) const
+{
+  return calcHeight(it.node_);
+}
+
+template< class Key, class Value, class Compare >
 void studilova::BSTree< Key, Value, Compare >::clear(Node* node)
 {
   if (!node)
@@ -334,6 +351,22 @@ const typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree
 }
 
 template< class Key, class Value, class Compare >
+typename studilova::BSTree< Key, Value, Compare >::Node* studilova::BSTree< Key, Value, Compare >::getMax(Node* node) const
+{
+  if (!node)
+  {
+    return nullptr;
+  }
+
+  while (node->right_)
+  {
+    node = node->right_;
+  }
+
+  return node;
+}
+
+template< class Key, class Value, class Compare >
 void studilova::BSTree< Key, Value, Compare >::replaceNode(Node* old_node, Node* new_node)
 {
   if (new_node)
@@ -354,12 +387,24 @@ void studilova::BSTree< Key, Value, Compare >::replaceNode(Node* old_node, Node*
 }
 
 template< class Key, class Value, class Compare >
+size_t studilova::BSTree< Key, Value, Compare >::calcHeight(const Node* node) const
+{
+  if (!node)
+  {
+    return 0;
+  }
+
+  size_t left_height = calcHeight(node->left_);
+  size_t right_height = calcHeight(node->right_);
+
+  return 1 + (left_height > right_height ? left_height : right_height);
+}
+
+template< class Key, class Value, class Compare >
 void studilova::BSTree< Key, Value, Compare >::swap(BSTree& other) noexcept
 {
   std::swap(root_, other.root_);
   std::swap(cmp_, other.cmp_);
 }
-
-
 
 #endif
