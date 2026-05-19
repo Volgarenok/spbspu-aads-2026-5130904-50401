@@ -156,7 +156,7 @@ namespace studilova
   template< class T >
   void List< T >::clear() noexcept
   {
-    while(!empty())
+    while (!empty())
     {
       popFront();
     }
