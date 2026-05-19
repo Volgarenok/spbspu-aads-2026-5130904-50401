@@ -2,8 +2,10 @@
 #define LCITER_HPP
 
 namespace chernov {
-  template< class T >
-  class Node;
+  namespace detail {
+    template< class T >
+    class Node;
+  }
 
   template< class T >
   class List;
@@ -20,13 +22,13 @@ namespace chernov {
     bool operator!=(const LCIter< T > & other) const noexcept;
   private:
     friend class List< T >;
-    const Node< T > * ptr;
-    const Node< T > * fake_;
-    LCIter(const Node< T > * node, const Node< T > * fake);
+    const detail::Node< T > * ptr;
+    const detail::Node< T > * fake_;
+    LCIter(const detail::Node< T > * node, const detail::Node< T > * fake);
   };
 
   template< class T >
-  chernov::LCIter< T >::LCIter(const Node< T > * node, const Node< T > * fake):
+  chernov::LCIter< T >::LCIter(const detail::Node< T > * node, const detail::Node< T > * fake):
     ptr(node),
     fake_(fake)
   {}

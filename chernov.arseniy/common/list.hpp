@@ -8,11 +8,13 @@
 #include <lciter.hpp>
 
 namespace chernov {
-  template< class T >
-  struct Node {
-    T data;
-    Node< T > * next;
-  };
+  namespace detail {
+    template< class T >
+    struct Node {
+      T data;
+      Node< T > * next;
+    };
+  }
 
   template< class T >
   class List {
@@ -42,16 +44,16 @@ namespace chernov {
     void popFront();
     void swap(List< T > & other) noexcept;
   private:
-    Node< T > * fake_;
+    detail::Node< T > * fake_;
     size_t size_;
-    Node< T > * createFake();
+    detail::Node< T > * createFake();
     void removeFake() noexcept;
   };
 
   template< class T >
-  Node< T > * List< T >::createFake()
+  detail::Node< T > * List< T >::createFake()
   {
-    fake_ = new Node< T >();
+    fake_ = new detail::Node< T >();
     return fake_;
   }
 
@@ -186,9 +188,9 @@ namespace chernov {
     if (fake_ == nullptr) {
       return;
     }
-    Node< T > * node = fake_->next;
+    detail::Node< T > * node = fake_->next;
     while (node != fake_) {
-      Node< T > * next = node->next;
+      detail::Node< T > * next = node->next;
       delete node;
       node = next;
     }
@@ -199,7 +201,7 @@ namespace chernov {
   template< class T >
   LIter< T > List< T >::insertAfter(LIter< T > pos, const T & value)
   {
-    Node< T > * node = new Node< T >{value, pos.ptr->next};
+    detail::Node< T > * node = new detail::Node< T >{value, pos.ptr->next};
     pos.ptr->next = node;
     ++size_;
     return {node, fake_};
@@ -208,7 +210,7 @@ namespace chernov {
   template< class T >
   LIter< T > List< T >::insertAfter(LIter< T > pos, T && value)
   {
-    Node< T > * node = new Node< T >{std::move(value), pos.ptr->next};
+    detail::Node< T > * node = new detail::Node< T >{std::move(value), pos.ptr->next};
     pos.ptr->next = node;
     ++size_;
     return {node, fake_};
@@ -220,7 +222,7 @@ namespace chernov {
     if (pos.ptr == nullptr || (pos.ptr == fake_ && fake_->next == fake_)) {
       return end();
     }
-    Node< T > * del_node = pos.ptr->next;
+    detail::Node< T > * del_node = pos.ptr->next;
     if (del_node == fake_) {
       pos.ptr = fake_;
       del_node = fake_->next;
@@ -240,8 +242,8 @@ namespace chernov {
     if (first == last) {
       return last;
     }
-    Node< T > * prev = first.ptr;
-    Node< T > * curr = prev->next;
+    detail::Node< T > * prev = first.ptr;
+    detail::Node< T > * curr = prev->next;
     bool crossed_fake = false;
     while (curr != last.ptr) {
       if (curr == fake_) {
@@ -251,7 +253,7 @@ namespace chernov {
           break;
         }
       }
-      Node< T > * next = curr->next;
+      detail::Node< T > * next = curr->next;
       delete curr;
       --size_;
       curr = next;

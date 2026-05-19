@@ -2,8 +2,10 @@
 #define LITER_HPP
 
 namespace chernov {
-  template< class T >
-  class Node;
+  namespace detail {
+    template< class T >
+    class Node;
+  }
 
   template< class T >
   class List;
@@ -20,13 +22,13 @@ namespace chernov {
     bool operator!=(const LIter< T > & other) const noexcept;
   private:
     friend class List< T >;
-    Node< T > * ptr;
-    Node< T > * fake_;
-    LIter(Node< T > * node, Node< T > * fake);
+    detail::Node< T > * ptr;
+    detail::Node< T > * fake_;
+    LIter(detail::Node< T > * node, detail::Node< T > * fake);
   };
 
   template< class T >
-  LIter< T >::LIter(Node< T > * node, Node< T > * fake):
+  LIter< T >::LIter(detail::Node< T > * node, detail::Node< T > * fake):
     ptr(node),
     fake_(fake)
   {}
