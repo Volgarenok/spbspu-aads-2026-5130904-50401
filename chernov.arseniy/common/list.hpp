@@ -101,7 +101,7 @@ namespace chernov {
   template< class T >
   List< T > & List< T >::operator=(const List< T > & list)
   {
-    if (this == &list) {
+    if (this == std::addressof(list)) {
       return *this;
     }
     clear();
@@ -119,7 +119,7 @@ namespace chernov {
   template< class T >
   List< T > & List< T >::operator=(List< T > && list) noexcept
   {
-    if (this == &list) {
+    if (this == std::addressof(list)) {
       return *this;
     }
     clear();
