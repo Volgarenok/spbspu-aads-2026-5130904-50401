@@ -139,6 +139,13 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >::BSTree(BSTree && other):
+    fake_root_(std::exchange(other.fake_root_, nullptr)),
+    fake_leaf_(std::exchange(other.fake_leaf_, nullptr)),
+    cmp_(other.cmp_)
+  {}
+
+  template< class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >::~BSTree() noexcept
   {
     if (!fake_root_) {
