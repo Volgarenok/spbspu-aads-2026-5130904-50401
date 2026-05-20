@@ -36,9 +36,12 @@ namespace chernov {
   class BSTree {
   public:
     BSTree();
-    BSTree(const BSTree & bst);
-    BSTree(BSTree && bst);
+    BSTree(const BSTree & other);
+    BSTree(BSTree && other) noexcept;
     ~BSTree() noexcept;
+
+    BSTree & operator=(const BSTree & other);
+    BSTree & operator=(BSTree && other) noexcept;
 
     void push(Key k, Value v);
     Value get(Key k);
@@ -139,7 +142,7 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  BSTree< Key, Value, Compare >::BSTree(BSTree && other):
+  BSTree< Key, Value, Compare >::BSTree(BSTree && other) noexcept:
     fake_root_(std::exchange(other.fake_root_, nullptr)),
     fake_leaf_(std::exchange(other.fake_leaf_, nullptr)),
     cmp_(other.cmp_)
@@ -175,6 +178,26 @@ namespace chernov {
 
     delete fake_root_;
     delete fake_leaf_;
+  }
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare > & BSTree< Key, Value, Compare >::operator=(const BSTree & other)
+  {
+    if (this == std::addressof(other)) {
+      return *this;
+    }
+    BSTree< Key, Value, Compare > temp(other);
+    swap(temp);
+  }
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare > & BSTree< Key, Value, Compare >::operator=(BSTree && other) noexcept
+  {
+    if (this == std::addressof(other)) {
+      return *this;
+    }
+    BSTree< Key, Value, Compare > temp(std::move(other));
+    swap(temp);
   }
 
   template< class Key, class Value, class Compare >
