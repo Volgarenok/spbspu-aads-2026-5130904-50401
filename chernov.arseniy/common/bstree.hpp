@@ -4,6 +4,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <stack.hpp>
+
 namespace chernov {
   namespace detail {
     struct NodeBase {
@@ -34,6 +36,8 @@ namespace chernov {
   class BSTree {
   public:
     BSTree();
+    BSTree(const BSTree & bst);
+    BSTree(BSTree && bst);
     void push(Key k, Value v);
     Value get(Key k);
     void remove(Key k);
@@ -42,6 +46,8 @@ namespace chernov {
     detail::NodeBase * fake_root_;
     detail::NodeBase * fake_leaf_;
     Compare cmp_;
+
+    void createFakes();
   };
 
   template< class Key, class Value, bool IsConst >
@@ -60,10 +66,7 @@ namespace chernov {
   };
 
   template< class Key, class Value, class Compare >
-  BSTree< Key, Value, Compare >::BSTree():
-    fake_root_(nullptr),
-    fake_leaf_(nullptr),
-    cmp_(Compare{})
+  void BSTree< Key, Value, Compare >::createFakes()
   {
     fake_leaf_ = new detail::NodeBase();
     try {
@@ -72,7 +75,55 @@ namespace chernov {
       delete fake_leaf_;
       throw;
     }
-    fake_leaf_->parent = fake_root_;
+  }
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >::BSTree():
+    cmp_(Compare{})
+  {
+    createFakes();
+  }
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >::BSTree(const BSTree & other):
+    cmp_(other.cmp_)
+  {
+    createFakes();
+
+    Stack< std::pair< detail::NodeBase *, detail::NodeBase * > > stack;
+
+    detail::NodeBase * src_root = other.fake_root_->left;
+    const std::pair< const Key, Value > & root_kv = static_cast< detail::Node< Key, Value > * >(src_root)->key_value_;
+    detail::NodeBase * dst_root = new detail::Node< Key, Value >(root_kv.first, root_kv.second, fake_root_, nullptr, nullptr);
+    fake_root_->left = dst_root;
+    fake_root_->right = dst_root;
+    stack.push({src_root, dst_root});
+
+    while (!stack.empty()) {
+      detail::NodeBase * src = stack.top().first;
+      detail::NodeBase * dst = stack.top().second;
+      stack.pop();
+
+      if (src->left != other.fake_leaf_) {
+        const std::pair< const Key, Value > & l_kv = static_cast< detail::Node< Key, Value > * >(src->left)->key_value_;
+        detail::NodeBase * new_left = new detail::Node< Key, Value >(l_kv.first, l_kv.second, dst, nullptr, nullptr);
+        dst->left = new_left;
+        new_left->parent = dst;
+        stack.push({src->left, new_left});
+      } else {
+        dst->left = fake_leaf_;
+      }
+
+      if (src->right != other.fake_leaf_) {
+        const std::pair< const Key, Value > & r_kv = static_cast< detail::Node< Key, Value > * >(src->right)->key_value_;
+        detail::NodeBase * new_right = new detail::Node< Key, Value >(r_kv.first, r_kv.second, dst, nullptr, nullptr);
+        dst->right = new_right;
+        new_right->parent = dst;
+        stack.push({src->right, new_right});
+      } else {
+        dst->right = fake_leaf_;
+      }
+    }
   }
 }
 
