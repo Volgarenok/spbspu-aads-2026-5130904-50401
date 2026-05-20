@@ -42,6 +42,8 @@ namespace chernov {
     Value get(Key k);
     void remove(Key k);
 
+    void swap(BSTree & other) noexcept;
+
   private:
     detail::NodeBase * fake_root_;
     detail::NodeBase * fake_leaf_;
@@ -85,66 +87,61 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  BSTree< Key, Value, Compare >::BSTree(const BSTree & other):
-    cmp_(other.cmp_)
+  BSTree< Key, Value, Compare >::BSTree(const BSTree & other)
   {
     createFakes();
+
+    if (other.fake_root_->left == other.fake_leaf_) {
+      return;
+    }
+
+    BSTree< Key, Value, Compare > temp;
+    temp.cmp_ = other.cmp_;
 
     Stack< std::pair< detail::NodeBase *, detail::NodeBase * > > stack;
 
     detail::NodeBase * src_root = other.fake_root_->left;
     const std::pair< const Key, Value > & root_kv = static_cast< detail::Node< Key, Value > * >(src_root)->key_value_;
-    detail::NodeBase * dst_root = new detail::Node< Key, Value >(root_kv.first, root_kv.second, fake_root_, fake_leaf_, fake_leaf_);
-    fake_root_->left = dst_root;
-    fake_root_->right = dst_root;
+    detail::NodeBase * dst_root = new detail::Node< Key, Value >(root_kv.first, root_kv.second, temp.fake_root_, temp.fake_leaf_, temp.fake_leaf_);
+    temp.fake_root_->left = dst_root;
+    temp.fake_root_->right = dst_root;
     stack.push({src_root, dst_root});
 
-    try {
-      while (!stack.empty()) {
-        detail::NodeBase * src = stack.top().first;
-        detail::NodeBase * dst = stack.top().second;
-        stack.pop();
+    while (!stack.empty()) {
+      detail::NodeBase * src = stack.top().first;
+      detail::NodeBase * dst = stack.top().second;
+      stack.pop();
 
-        if (src->left != other.fake_leaf_) {
-          const std::pair< const Key, Value > & l_kv = static_cast< detail::Node< Key, Value > * >(src->left)->key_value_;
-          detail::NodeBase * new_left = new detail::Node< Key, Value >(l_kv.first, l_kv.second, dst, fake_leaf_, fake_leaf_);
-          dst->left = new_left;
-          new_left->parent = dst;
-          stack.push({src->left, new_left});
-        } else {
-          dst->left = fake_leaf_;
-        }
-
-        if (src->right != other.fake_leaf_) {
-          const std::pair< const Key, Value > & r_kv = static_cast< detail::Node< Key, Value > * >(src->right)->key_value_;
-          detail::NodeBase * new_right = new detail::Node< Key, Value >(r_kv.first, r_kv.second, dst, fake_leaf_, fake_leaf_);
-          dst->right = new_right;
-          new_right->parent = dst;
-          stack.push({src->right, new_right});
-        } else {
-          dst->right = fake_leaf_;
-        }
-      }
-    } catch (...) {
-      Stack< detail::NodeBase * > clean_stack;
-      clean_stack.push(fake_root_->left);
-
-      while (!clean_stack.empty()) {
-        detail::NodeBase * node = clean_stack.top();
-        clean_stack.pop();
-
-        if (node->left != fake_leaf_) {
-          clean_stack.push(node->left);
-        }
-        if (node->right != fake_leaf_) {
-          clean_stack.push(node->right);
-        }
-
-        delete node;
+      if (src->left != other.fake_leaf_) {
+        const std::pair< const Key, Value > & l_kv = static_cast< detail::Node< Key, Value > * >(src->left)->key_value_;
+        detail::NodeBase * new_left = new detail::Node< Key, Value >(l_kv.first, l_kv.second, dst, temp.fake_leaf_, temp.fake_leaf_);
+        dst->left = new_left;
+        new_left->parent = dst;
+        stack.push({src->left, new_left});
+      } else {
+        dst->left = temp.fake_leaf_;
       }
 
-      throw;
+      if (src->right != other.fake_leaf_) {
+        const std::pair< const Key, Value > & r_kv = static_cast< detail::Node< Key, Value > * >(src->right)->key_value_;
+        detail::NodeBase * new_right = new detail::Node< Key, Value >(r_kv.first, r_kv.second, dst, temp.fake_leaf_, temp.fake_leaf_);
+        dst->right = new_right;
+        new_right->parent = dst;
+        stack.push({src->right, new_right});
+      } else {
+        dst->right = temp.fake_leaf_;
+      }
     }
+
+    swap(temp);
+  }
+
+  template< class Key, class Value, class Compare >
+  void BSTree< Key, Value, Compare >::swap(BSTree & other) noexcept
+  {
+    std::swap(fake_root_, other.fake_root_);
+    std::swap(fake_leaf_, other.fake_leaf_);
+    std::swap(cmp_, other.cmp_);
   }
 }
 
