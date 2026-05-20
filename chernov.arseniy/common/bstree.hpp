@@ -38,6 +38,8 @@ namespace chernov {
     BSTree();
     BSTree(const BSTree & bst);
     BSTree(BSTree && bst);
+    ~BSTree() noexcept;
+
     void push(Key k, Value v);
     Value get(Key k);
     void remove(Key k);
@@ -134,6 +136,38 @@ namespace chernov {
     }
 
     swap(temp);
+  }
+
+  template< class Key, class Value, class Compare >
+  BSTree< Key, Value, Compare >::~BSTree() noexcept
+  {
+    if (!fake_root_) {
+      return;
+    }
+    detail::NodeBase * root = fake_root_->left;
+    if (root == fake_leaf_) {
+      delete fake_root_;
+      delete fake_leaf_;
+      return;
+    }
+
+    Stack< detail::NodeBase * > stack;
+    stack.push(root);
+
+    while (!stack.empty()) {
+      detail::NodeBase * node = stack.top();
+      stack.pop();
+      if (node->left != fake_leaf_) {
+        stack.push(node->left);
+      }
+      if (node->right != fake_leaf_) {
+        stack.push(node->right);
+      }
+      delete node;
+    }
+
+    delete fake_root_;
+    delete fake_leaf_;
   }
 
   template< class Key, class Value, class Compare >
