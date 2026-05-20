@@ -1,6 +1,7 @@
 #ifndef BSTREE_HPP
 #define BSTREE_HPP
 
+#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
@@ -51,11 +52,13 @@ namespace chernov {
     BSTree & operator=(const BSTree & other);
     BSTree & operator=(BSTree && other) noexcept;
 
+    void swap(BSTree & other) noexcept;
+
     void push(Key k, Value v);
-    Value get(Key k);
     void remove(Key k);
 
-    void swap(BSTree & other) noexcept;
+    Value & at(const Key & k);
+    const Value & at(const Key & k) const;
 
     size_t height() const noexcept;
     size_t height(const_iterator iter) const noexcept;
@@ -196,6 +199,14 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
+  void BSTree< Key, Value, Compare >::swap(BSTree & other) noexcept
+  {
+    std::swap(fake_root_, other.fake_root_);
+    std::swap(fake_leaf_, other.fake_leaf_);
+    std::swap(cmp_, other.cmp_);
+  }
+
+  template< class Key, class Value, class Compare >
   BSTree< Key, Value, Compare > & BSTree< Key, Value, Compare >::operator=(const BSTree & other)
   {
     if (this == std::addressof(other)) {
@@ -248,11 +259,27 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  void BSTree< Key, Value, Compare >::swap(BSTree & other) noexcept
+  Value & BSTree< Key, Value, Compare >::at(const Key & k)
   {
-    std::swap(fake_root_, other.fake_root_);
-    std::swap(fake_leaf_, other.fake_leaf_);
-    std::swap(cmp_, other.cmp_);
+    const BSTree< Key, Value, Compare > * cthis = this;
+    return const_cast< Value & >(cthis->at(k));
+  }
+
+  template< class Key, class Value, class Compare >
+  const Value & BSTree< Key, Value, Compare >::at(const Key & k) const
+  {
+    detail::NodeBase * node = fake_root_->left;
+    while (node != fake_leaf_) {
+      const Key & node_kv = static_cast< detail::Node< Key, Value > * >(node)->key_value_;
+      if (cmp_(k, node_kv.first)) {
+        node = node->left;
+      } else if (cmp_(node_kv.first, k)) {
+        node = node->right;
+      } else {
+        return node_kv.second;
+      }
+    }
+    throw std::out_of_range("element not found");
   }
 
   template< class Key, class Value, class Compare >
