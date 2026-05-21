@@ -669,7 +669,7 @@ namespace chernov {
   template< class Key, class Value, bool IsConst >
   BSTIterator< Key, Value, IsConst > BSTIterator< Key, Value, IsConst >::operator++(int)
   {
-    BSTIterator temp = this;
+    BSTIterator temp = *this;
     ++(*this);
     return temp;
   }
@@ -696,7 +696,7 @@ namespace chernov {
   template< class Key, class Value, bool IsConst >
   BSTIterator< Key, Value, IsConst > BSTIterator< Key, Value, IsConst >::operator--(int)
   {
-    BSTIterator temp = this;
+    BSTIterator temp = *this;
     --(*this);
     return temp;
   }

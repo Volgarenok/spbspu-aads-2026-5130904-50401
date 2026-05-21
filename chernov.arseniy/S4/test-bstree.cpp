@@ -248,3 +248,77 @@ BOOST_AUTO_TEST_CASE(test_contains)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(bstree_iterator_tests)
+
+BOOST_AUTO_TEST_CASE(test_begin_iterator)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+  BOOST_CHECK(bst.begin() == bst.end());
+
+  bst.push(123, 42);
+  bst.push(321, 52);
+
+  auto iter = bst.begin();
+  BOOST_CHECK(iter != bst.end());
+  if ((iter++)->first == 123) {
+    BOOST_CHECK_EQUAL(iter->first, 321);
+  } else {
+    BOOST_CHECK_EQUAL(iter->first, 123);
+  }
+  BOOST_CHECK(++iter == bst.end());
+}
+
+BOOST_AUTO_TEST_CASE(test_сbegin_iterator)
+{
+  chernov::BSTree< int, int, std::less< int > > bst1;
+  BOOST_CHECK(bst1.cbegin() == bst1.cend());
+
+  bst1.push(123, 42);
+  bst1.push(321, 52);
+
+  const chernov::BSTree< int, int, std::less< int > > & bst2 = bst1;
+
+  auto iter = bst2.cbegin();
+  BOOST_CHECK(iter != bst2.cend());
+  if ((iter++)->first == 123) {
+    BOOST_CHECK_EQUAL(iter->first, 321);
+  } else {
+    BOOST_CHECK_EQUAL(iter->first, 123);
+  }
+  BOOST_CHECK(++iter == bst2.end());
+}
+
+BOOST_AUTO_TEST_CASE(test_end_iterator)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+  BOOST_CHECK(bst.begin() == bst.end());
+
+  bst.push(123, 42);
+  bst.push(321, 52);
+
+  size_t count = 0;
+  for (auto iter = bst.begin(); iter != bst.end(); ++iter) {
+    ++count;
+  }
+  BOOST_CHECK_EQUAL(count, 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_cend_iterator)
+{
+  chernov::BSTree< int, int, std::less< int > > bst1;
+  BOOST_CHECK(bst1.cbegin() == bst1.cend());
+
+  bst1.push(123, 42);
+  bst1.push(321, 52);
+
+  const chernov::BSTree< int, int, std::less< int > > & bst2 = bst1;
+
+  size_t count = 0;
+  for (auto iter = bst2.cbegin(); iter != bst2.cend(); ++iter) {
+    ++count;
+  }
+  BOOST_CHECK_EQUAL(count, 2);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
