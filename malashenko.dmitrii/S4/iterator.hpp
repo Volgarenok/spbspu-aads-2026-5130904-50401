@@ -1,6 +1,7 @@
 #ifndef BSTREE_ITERATOR
 #define BSTREE_ITERATOR
 #include <functional>
+#include <cassert>
 #include <cstddef>
 #include "node.hpp"
 namespace malashenko
@@ -50,20 +51,20 @@ malashenko::BSTreeIter< Key, Value >::BSTreeIter(node_t* node, node_t* fakeLeaf)
 template< class Key, class Value >
 malashenko::BSTreeIter< Key, Value >& malashenko::BSTreeIter< Key, Value >::operator++()
 {
-  if (node_->right_)
+  if (node_->right_ && node_->right_ != fakeLeaf_)
   {
     node_ = node_->right_;
     node_ = node_->minimum(fakeLeaf_);
   }
   else
   {
-    node_t* parent = node_->parent;
+    node_t* parent = node_->parent_;
     while (parent && parent->right_ == node_)
     {
       node_ = parent;
-      parent = node_->parent;
+      parent = node_->parent_;
     }
-    node_ = parent;
+    node_ = parent ? parent : fakeLeaf_;
   }
   return *this;
 }
@@ -80,20 +81,20 @@ malashenko::BSTreeIter< Key, Value > malashenko::BSTreeIter< Key, Value >::opera
 template< class Key, class Value >
 malashenko::BSTreeIter< Key, Value >& malashenko::BSTreeIter< Key, Value >::operator--()
 {
-  if (node_->left_)
+  if (node_->left_ && node_->left_ != fakeLeaf_)
   {
     node_ = node_->left_;
     node_ = node_->maximum(fakeLeaf_);
   }
   else
   {
-    node_t* parent = node_->parent;
+    node_t* parent = node_->parent_;
     while (parent && parent->left_ == node_)
     {
       node_ = parent;
-      parent = node_->parent;
+      parent = node_->parent_;
     }
-    node_ = parent;
+    node_ = parent ? parent : fakeLeaf_;
   }
   return *this;
 }
@@ -117,7 +118,8 @@ template< class Key, class Value >
 std::pair< Key, Value >* malashenko::BSTreeIter< Key, Value >::operator->()
 {
   assert(node_);
-  return std::addressof(node_->key_, node_->value_);
+  std::pair< Key, Value > pair(node_->key_, node_->value_);
+  return std::addressof(pair);
 }
 
 template< class Key, class Value >

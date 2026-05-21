@@ -292,27 +292,29 @@ malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::
 template< class Key, class Value, class Compare >
 malashenko::BSTreeIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::begin()
 {
-  Node< Key, Value >* root = root(this);
-  return iterator(root->minimum(), fakeLeaf_);
+  Node< Key, Value >* root = root_->root();
+  return iterator(root->minimum(fakeLeaf_), fakeLeaf_);
 }
 
 template< class Key, class Value, class Compare >
 malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::begin() const
 {
-  Node< Key, Value >* root = root(this);
-  return const_iterator(root->minimum(), fakeLeaf_);
+  Node< Key, Value >* root = root_->root();
+  return const_iterator(root->minimum(fakeLeaf_), fakeLeaf_);
 }
+
 template< class Key, class Value, class Compare >
 malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::cbegin() const
 {
-  Node< Key, Value >* root = root(this);
-  return const_iterator(root->minimum(), fakeLeaf_);
+  Node< Key, Value >* root = root_->root();
+  return const_iterator(root->minimum(fakeLeaf_), fakeLeaf_);
 }
 
 
 template< class Key, class Value, class Compare >
 malashenko::BSTreeIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::end()
 {
+
   return iterator(fakeLeaf_, fakeLeaf_);
 }
 
@@ -321,10 +323,10 @@ malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::
 {
   return const_iterator(fakeLeaf_, fakeLeaf_);
 }
+
 template< class Key, class Value, class Compare >
 malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::cend() const
 {
-  Node< Key, Value >* root = root(this);
   return const_iterator(fakeLeaf_, fakeLeaf_);
 }
 

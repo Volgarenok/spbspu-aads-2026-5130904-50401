@@ -1,6 +1,7 @@
 #ifndef BSTREE_CONST_ITERATOR
 #define BSTREE_CONST_ITERATOR
 #include <functional>
+#include <cassert>
 #include <cstddef>
 #include "node.hpp"
 namespace malashenko
@@ -51,7 +52,7 @@ malashenko::BSTreeCIter< Key, Value >::BSTreeCIter(node_t* node, node_t* fakeLea
 template< class Key, class Value >
 malashenko::BSTreeCIter< Key, Value >& malashenko::BSTreeCIter< Key, Value >::operator++()
 {
-  if (node_->right_)
+  if (node_->right_ && node_->right_ != fakeLeaf_)
   {
     node_ = node_->right_;
     node_ = node_->minimum(fakeLeaf_);
@@ -64,7 +65,7 @@ malashenko::BSTreeCIter< Key, Value >& malashenko::BSTreeCIter< Key, Value >::op
       node_ = parent;
       parent = node_->parent;
     }
-    node_ = parent;
+    node_ = parent ? parent : fakeLeaf_;
   }
   return *this;
 }
@@ -81,7 +82,7 @@ malashenko::BSTreeCIter< Key, Value > malashenko::BSTreeCIter< Key, Value >::ope
 template< class Key, class Value >
 malashenko::BSTreeCIter< Key, Value >& malashenko::BSTreeCIter< Key, Value >::operator--()
 {
-  if (node_->left_)
+  if (node_->left_  && node_->left_ != fakeLeaf_)
   {
     node_ = node_->left_;
     node_ = node_->maximum(fakeLeaf_);
@@ -94,7 +95,7 @@ malashenko::BSTreeCIter< Key, Value >& malashenko::BSTreeCIter< Key, Value >::op
       node_ = parent;
       parent = node_->parent;
     }
-    node_ = parent;
+    node_ = parent ? parent : fakeLeaf_;
   }
   return *this;
 }
@@ -118,7 +119,8 @@ template< class Key, class Value >
 const std::pair< Key, Value >* malashenko::BSTreeCIter< Key, Value >::operator->() const
 {
   assert(node_);
-  return std::addressof(node_->key_, node_->value_);
+  std::pair< Key, Value > pair(node_->key_, node_->value_);
+  return std::addressof(pair);
 }
 
 template< class Key, class Value >

@@ -52,7 +52,7 @@ malashenko::Node< Key, Value >::Node(const Key& key, const Value& value):
 template< class Key, class Value >
 malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::minimum(node_t* fakeLeaf)
 {
-  node_t root = *this;
+  node_t* root = this;
   if (!root)
   {
     return root;
@@ -69,7 +69,7 @@ malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::minimum(node_t* 
 template< class Key, class Value >
 malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::maximum(node_t* fakeLeaf)
 {
-  node_t root = *this;
+  node_t* root = this;
   if (!root)
   {
     return root;
@@ -84,7 +84,7 @@ malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::maximum(node_t* 
 template< class Key, class Value >
 malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::root()
 {
-  node_t root = *this;
+  node_t* root = this;
   while (root->parent_)
   {
     root = root->parent_;

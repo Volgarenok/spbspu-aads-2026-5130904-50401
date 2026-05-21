@@ -11,12 +11,10 @@ int main()
   tree.push(30, 400);
   tree.push(50, 400);
 
-  std::cout << tree.get(20) << '\n';
-  std::cout << tree.get(10) << '\n';
-  std::cout << tree.get(40) << '\n';
-  std::cout << tree.get(30) << '\n';
-  std::cout << tree.get(50) << '\n';
-  std::cout << tree.height() << '\n';
+  for (auto b = tree.begin(); b != tree.end(); ++b)
+  {
+    std::cout << b->first << ' ' << b->second << '\n';
+  }
 
 
 }
