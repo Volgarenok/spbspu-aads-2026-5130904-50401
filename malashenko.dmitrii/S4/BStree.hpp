@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <utility>
 #include "const-iterator.hpp"
+#include "iterator.hpp"
 #include "node.hpp"
 namespace malashenko
 {
@@ -12,6 +13,7 @@ namespace malashenko
   class BSTree {
   public:
     using const_iterator = malashenko::BSTreeCIter< Key, Value >;
+    using iterator = malashenko::BSTreeIter< Key, Value >;
 
     BSTree();
     ~BSTree();
@@ -32,6 +34,15 @@ namespace malashenko
     const_iterator rotateRight(const_iterator it);
     const_iterator rotateLargeLeft(const_iterator it);
     const_iterator rotateLargeRight(const_iterator it);
+
+    iterator begin();
+    const_iterator begin() const;
+    const_iterator cbegin() const;
+
+    iterator end();
+    const_iterator end() const;
+    const_iterator cend() const;
+
     size_t height(const_iterator it);
     size_t height();
 
@@ -172,34 +183,149 @@ size_t malashenko::BSTree< Key, Value, Compare >::height()
 }
 
 template< class Key, class Value, class Compare >
+size_t malashenko::BSTree< Key, Value, Compare >::height(const_iterator it)
+{
+  return it->height(fakeLeaf_);
+}
+
+template< class Key, class Value, class Compare >
 malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateLeft(const_iterator it)
 {
-  Node< Key, Value >* rotateNode = it->first;
-  if (!rotateNode)
+  Node<Key, Value>* rotateNode = it.node_;
+  if (rotateNode == fakeLeaf_ || rotateNode->right_ == fakeLeaf_)
   {
-    return {nullptr, nullptr};
+    return it;
   }
 
-  Node< Key, Value >* parent = rotateNode->parent_;
-  if (parent && parent->parent_)
+  Node<Key, Value>* rightNode = rotateNode->right_;
+
+  rotateNode->right_ = rightNode->left_;
+  if (rightNode->left_ != fakeLeaf_)
   {
-    if (parent->parent_->left_ == parent)
-    {
-      parent->parent_->left_ = rotateNode;
-    }
-    else
-    {
-      parent->parent_->right_ = rotateNode;
-    }
+    rightNode->left_->parent_ = rotateNode;
   }
-  rotateNode->parent_ = parent->parent_;
 
-  Node< Key, Value >* rightData = rotateNode->right_;
-  rotateNode->right_ = parent;
-  rotateNode->right_->left_ = rightData;
+  rightNode->parent_ = rotateNode->parent_;
+  if (rotateNode->parent_ == fakeLeaf_)
+  {
+    root_ = rightNode;
+  }
+  else if (rotateNode == rotateNode->parent_->left_)
+  {
+    rotateNode->parent_->left_ = rightNode;
+  }
+  else
+  {
+    rotateNode->parent_->right_ = rightNode;
+  }
 
+  rightNode->left_ = rotateNode;
+  rotateNode->parent_ = rightNode;
+
+  return const_iterator(rightNode, fakeLeaf_);
+}
+
+template< class Key, class Value, class Compare >
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateRight(const_iterator it)
+{
+  Node<Key, Value>* rotateNode = it.node_;
+  if (rotateNode == fakeLeaf_ || rotateNode->left_ == fakeLeaf_)
+  {
+    return it;
+  }
+
+  Node<Key, Value>* leftNode = rotateNode->left_;
+
+  rotateNode->left_ = leftNode->right_;
+  if (leftNode->right_ != fakeLeaf_)
+  {
+    leftNode->right_->parent_ = rotateNode;
+  }
+
+  leftNode->parent_ = rotateNode->parent_;
+  if (rotateNode->parent_ == fakeLeaf_)
+  {
+    root_ = leftNode;
+  }
+  else if (rotateNode == rotateNode->parent_->left_)
+  {
+    rotateNode->parent_->left_ = leftNode;
+  }
+  else
+  {
+    rotateNode->parent_->right_ = leftNode;
+  }
+
+  leftNode->right = rotateNode;
+  rotateNode->parent_ = leftNode;
+
+  return const_iterator(leftNode, fakeLeaf_);
+}
+
+template< class Key, class Value, class Compare >
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateLargeLeft(const_iterator it)
+{
+  Node<Key, Value>* rotateNode = it.node_;
+  if (rotateNode == fakeLeaf_ || rotateNode->left_ == fakeLeaf_ || rotateNode->left_->right_ == fakeLeaf_)
+  {
+    return it;
+  }
+
+  rotateRight(const_iterator(rotateNode->left_, fakeLeaf_));
+  return rotateLeft(it);
+}
+
+template< class Key, class Value, class Compare >
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateLargeRight(const_iterator it)
+{
+  Node<Key, Value>* rotateNode = it.node_;
+  if (rotateNode == fakeLeaf_ || rotateNode->right_ == fakeLeaf_ || rotateNode->right_->left_ == fakeLeaf_)
+  {
+    return it;
+  }
+
+  rotateLeft(const_iterator(rotateNode->right_, fakeLeaf_));
+  return rotateRight(it);
 }
 
 
+template< class Key, class Value, class Compare >
+malashenko::BSTreeIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::begin()
+{
+  Node< Key, Value >* root = root(this);
+  return iterator(root->minimum(), fakeLeaf_);
+}
+
+template< class Key, class Value, class Compare >
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::begin() const
+{
+  Node< Key, Value >* root = root(this);
+  return const_iterator(root->minimum(), fakeLeaf_);
+}
+template< class Key, class Value, class Compare >
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::cbegin() const
+{
+  Node< Key, Value >* root = root(this);
+  return const_iterator(root->minimum(), fakeLeaf_);
+}
+
+
+template< class Key, class Value, class Compare >
+malashenko::BSTreeIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::end()
+{
+  return iterator(fakeLeaf_, fakeLeaf_);
+}
+
+template< class Key, class Value, class Compare >
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::end() const
+{
+  return const_iterator(fakeLeaf_, fakeLeaf_);
+}
+template< class Key, class Value, class Compare >
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::cend() const
+{
+  Node< Key, Value >* root = root(this);
+  return const_iterator(fakeLeaf_, fakeLeaf_);
+}
 
 #endif

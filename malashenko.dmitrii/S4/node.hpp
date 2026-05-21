@@ -20,6 +20,7 @@ namespace malashenko
     Node(const Key& key, const Value& value);
     node_t* minimum(node_t* fakeLeaf);
     node_t* maximum(node_t* fakeLeaf);
+    node_t* root();
     size_t height(node_t* fakeLeaf) const;
   private:
     Key key_;
@@ -80,6 +81,17 @@ malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::maximum(node_t* 
   }
   return root;
 }
+template< class Key, class Value >
+malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::root()
+{
+  node_t root = *this;
+  while (root->parent_)
+  {
+    root = root->parent_;
+  }
+  return root;
+}
+
 
 template< class Key, class Value >
 size_t malashenko::Node< Key, Value >::height(node_t* fakeLeaf) const

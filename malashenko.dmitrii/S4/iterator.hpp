@@ -5,6 +5,8 @@
 #include "node.hpp"
 namespace malashenko
 {
+  template< class Key, class Value, class Compare >
+  class BSTree;
   template< class Key, class Value >
   class BSTreeIter {
   public:
@@ -22,6 +24,9 @@ namespace malashenko
     bool operator!=(const BSTreeIter< Key, Value >& other) const;
     bool operator==(const BSTreeIter< Key, Value >& other) const;
   private:
+    template< class K, class V, class C >
+    friend class BSTree;
+
     node_t* node_;
     node_t* fakeLeaf_;
     BSTreeIter(node_t* node, node_t* fakeLeaf);
