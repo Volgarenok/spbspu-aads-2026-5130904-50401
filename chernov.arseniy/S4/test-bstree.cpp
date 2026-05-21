@@ -261,11 +261,10 @@ BOOST_AUTO_TEST_CASE(test_begin_iterator)
 
   auto iter = bst.begin();
   BOOST_CHECK(iter != bst.end());
-  if ((iter++)->first == 123) {
-    BOOST_CHECK_EQUAL(iter->first, 321);
-  } else {
-    BOOST_CHECK_EQUAL(iter->first, 123);
-  }
+  BOOST_CHECK_EQUAL(iter->first, 123);
+
+  ++iter;
+  BOOST_CHECK_EQUAL(iter->first, 321);
   BOOST_CHECK(++iter == bst.end());
 }
 
@@ -281,12 +280,11 @@ BOOST_AUTO_TEST_CASE(test_сbegin_iterator)
 
   auto iter = bst2.cbegin();
   BOOST_CHECK(iter != bst2.cend());
-  if ((iter++)->first == 123) {
-    BOOST_CHECK_EQUAL(iter->first, 321);
-  } else {
-    BOOST_CHECK_EQUAL(iter->first, 123);
-  }
-  BOOST_CHECK(++iter == bst2.end());
+  BOOST_CHECK_EQUAL(iter->first, 123);
+
+  ++iter;
+  BOOST_CHECK_EQUAL(iter->first, 321);
+  BOOST_CHECK(++iter == bst2.cend());
 }
 
 BOOST_AUTO_TEST_CASE(test_end_iterator)
