@@ -164,4 +164,17 @@ BOOST_AUTO_TEST_CASE(test_remove)
   BOOST_CHECK_THROW(bst.remove(321), std::out_of_range);
 }
 
+BOOST_AUTO_TEST_CASE(test_clear)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+  bst.clear();
+  BOOST_CHECK(bst.empty());
+
+  bst.push(123, 42);
+  bst.push(321, 52);
+  bst.clear();
+  BOOST_CHECK(bst.empty());
+  BOOST_CHECK_THROW(bst.at(123), std::out_of_range);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
