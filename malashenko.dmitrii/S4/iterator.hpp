@@ -61,7 +61,7 @@ malashenko::BSTreeIter< Key, Value >& malashenko::BSTreeIter< Key, Value >::oper
     while (parent && parent->right_ == node_)
     {
       node_ = parent;
-      parent = node_->parent_;
+      parent = parent->parent_;
     }
     node_ = parent ? parent : fakeLeaf_;
   }
@@ -91,7 +91,7 @@ malashenko::BSTreeIter< Key, Value >& malashenko::BSTreeIter< Key, Value >::oper
     while (parent && parent->left_ == node_)
     {
       node_ = parent;
-      parent = node_->parent_;
+      parent = parent->parent_;
     }
     node_ = parent ? parent : fakeLeaf_;
   }

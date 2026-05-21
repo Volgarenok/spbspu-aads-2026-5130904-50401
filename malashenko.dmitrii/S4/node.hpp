@@ -57,7 +57,7 @@ malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::minimum(node_t* 
     return root;
   }
 
-  while (root->left_ && root->left_ != fakeLeaf)
+  while (root && root->left_ && root->left_ != fakeLeaf)
   {
     root = root->left_;
   }
@@ -74,7 +74,7 @@ malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::maximum(node_t* 
     return root;
   }
 
-  while (root->right_ && root->right_ != fakeLeaf)
+  while (root && root->right_ && root->right_ != fakeLeaf)
   {
     root = root->right_;
   }

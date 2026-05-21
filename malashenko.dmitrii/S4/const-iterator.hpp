@@ -59,11 +59,11 @@ malashenko::BSTreeCIter< Key, Value >& malashenko::BSTreeCIter< Key, Value >::op
   }
   else
   {
-    node_t* parent = node_->parent;
+    node_t* parent = node_->parent_;
     while (parent && parent->right_ == node_)
     {
       node_ = parent;
-      parent = node_->parent;
+      parent = parent->parent_;
     }
     node_ = parent ? parent : fakeLeaf_;
   }
@@ -93,7 +93,7 @@ malashenko::BSTreeCIter< Key, Value >& malashenko::BSTreeCIter< Key, Value >::op
     while (parent && parent->left_ == node_)
     {
       node_ = parent;
-      parent = node_->parent;
+      parent = parent->parent_;
     }
     node_ = parent ? parent : fakeLeaf_;
   }
