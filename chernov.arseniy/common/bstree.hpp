@@ -54,7 +54,7 @@ namespace chernov {
 
     void swap(BSTree & other) noexcept;
 
-    void push(Key k, Value v);
+    void push(const Key & k, Value v);
     void remove(const Key & k);
 
     void clear() noexcept;
@@ -70,6 +70,7 @@ namespace chernov {
 
     bool empty() const noexcept;
     size_t size() const noexcept;
+    bool has(const Key & k) const noexcept;
 
     size_t height() const noexcept;
     size_t height(const_iterator iter) const noexcept;
@@ -258,7 +259,7 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  void BSTree< Key, Value, Compare >::push(Key k, Value v)
+  void BSTree< Key, Value, Compare >::push(const Key & k, Value v)
   {
     detail::NodeBase * parent = fake_root_;
     detail::NodeBase * curr = parent->left;
@@ -470,6 +471,17 @@ namespace chernov {
   size_t BSTree< Key, Value, Compare >::size() const noexcept
   {
     return size_;
+  }
+
+  template< class Key, class Value, class Compare >
+  bool BSTree< Key, Value, Compare >::has(const Key & k) const noexcept
+  {
+    try {
+      findNode(k);
+    } catch (const std::out_of_range &) {
+      return false;
+    }
+    return true;
   }
 
   template< class Key, class Value, class Compare >
