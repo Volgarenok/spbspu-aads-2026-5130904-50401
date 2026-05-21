@@ -354,9 +354,42 @@ namespace chernov {
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::rotateLeft(const_iterator iter)
+  {
+    detail::NodeBase * root = iter.node_;
+    detail::NodeBase * new_root = root->right;
+    if (new_root == fake_leaf_) {
+      throw std::logic_error("rotation is not possible");
+    }
+
+    root->right = new_root->left;
+    if (new_root->left != fake_leaf_) {
+      new_root->left->parent = root;
+    }
+
+    new_root->parent = root->parent;
+    if (root->parent == fake_root_) {
+      fake_root_->left = new_root;
+      fake_root_->right = new_root;
+    } else if (root->parent->right == root) {
+      root->parent->right = new_root;
+    } else {
+      root->parent->left = new_root;
+    }
+
+    root->parent = new_root;
+    new_root->left = root;
+
+    updateHeights(root);
+
+    return const_iterator(new_root, fake_root_, fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
   BSTree< Key, Value, Compare >::rotateRight(const_iterator iter)
   {
-    detail::NodeBase * root = iter->node_;
+    detail::NodeBase * root = iter.node_;
     detail::NodeBase * new_root = root->left;
     if (new_root == fake_leaf_) {
       throw std::logic_error("rotation is not possible");
@@ -381,7 +414,6 @@ namespace chernov {
     new_root->right = root;
 
     updateHeights(root);
-    updateHeights(new_root);
 
     return const_iterator(new_root, fake_root_, fake_leaf_);
   }
