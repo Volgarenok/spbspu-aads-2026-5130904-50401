@@ -5,7 +5,40 @@ BOOST_AUTO_TEST_SUITE(bstree_special_members_tests)
 
 BOOST_AUTO_TEST_CASE(test_default_constructor)
 {
-  chernov::BSTree< int, int, std::less< int > > bstree;
+  chernov::BSTree< int, int, std::less< int > > bst;
+  BOOST_CHECK(bst.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_copy_constructor)
+{
+  chernov::BSTree< int, int, std::less< int > > bst1;
+  bst1.push(123, 42);
+  bst1.push(321, 52);
+
+  chernov::BSTree< int, int, std::less< int > > bst2(bst1);
+  BOOST_CHECK_EQUAL(bst2.size(), 2);
+  BOOST_CHECK_EQUAL(bst2.at(123), 42);
+  BOOST_CHECK_EQUAL(bst2.at(321), 52);
+
+  bst2.push(456, 67);
+  BOOST_CHECK_EQUAL(bst1.size(), 2);
+  BOOST_CHECK_EQUAL(bst2.size(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_move_constructor)
+{
+  chernov::BSTree< int, int, std::less< int > > bst1;
+  bst1.push(123, 42);
+  bst1.push(321, 52);
+
+  chernov::BSTree< int, int, std::less< int > > bst2(std::move(bst1));
+  BOOST_CHECK_EQUAL(bst2.size(), 2);
+
+  BOOST_CHECK(bst1.empty());
+
+  bst2.push(456, 67);
+  BOOST_CHECK_EQUAL(bst1.size(), 0);
+  BOOST_CHECK_EQUAL(bst2.size(), 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
