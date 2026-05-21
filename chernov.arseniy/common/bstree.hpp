@@ -64,6 +64,10 @@ namespace chernov {
     const_iterator beforeBegin() const;
     const_iterator cbeforeBegin() const;
 
+    iterator begin();
+    const_iterator begin() const;
+    const_iterator cbegin() const;
+
     size_t height() const noexcept;
     size_t height(const_iterator iter) const noexcept;
 
@@ -354,6 +358,27 @@ namespace chernov {
   BSTree< Key, Value, Compare >::cbeforeBegin() const
   {
     return beforeBegin();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare>::iterator
+  BSTree< Key, Value, Compare >::begin()
+  {
+    return iterator(fake_root_->left, fake_root_, fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare>::const_iterator
+  BSTree< Key, Value, Compare >::begin() const
+  {
+    return const_iterator(fake_root_->left, fake_root_, fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare>::const_iterator
+  BSTree< Key, Value, Compare >::cbegin() const
+  {
+    return begin();
   }
 
   template< class Key, class Value, class Compare >
