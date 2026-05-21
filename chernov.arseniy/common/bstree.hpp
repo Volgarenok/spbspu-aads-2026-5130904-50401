@@ -62,6 +62,9 @@ namespace chernov {
     const_iterator rotateLeft(const_iterator iter);
     const_iterator rotateRight(const_iterator iter);
 
+    const_iterator rotateLargeLeft(const_iterator iter);
+    const_iterator rotateLargeRight(const_iterator iter);
+
     Value & at(const Key & k);
     const Value & at(const Key & k) const;
 
@@ -416,6 +419,19 @@ namespace chernov {
     updateHeights(root);
 
     return const_iterator(new_root, fake_root_, fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator iter)
+  {
+    detail::NodeBase * root = iter.node_;
+    if (root->right == fake_leaf_) {
+      throw std::logic_error("rotate is not possible");
+    }
+
+    rotateRight(const_iterator(root->right, fake_root_, fake_leaf_));
+    return rotateLeft(iter);
   }
 
   template< class Key, class Value, class Compare >
