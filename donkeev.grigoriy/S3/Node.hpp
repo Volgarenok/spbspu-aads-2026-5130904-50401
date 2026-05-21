@@ -1,3 +1,6 @@
+#ifndef NODE_HPP
+#define NODE_HPP
+
 #include <iostream>
 #include <utility>
 
@@ -41,3 +44,5 @@ namespace donkeev
     return tmp;
   }
 }
+
+#endif

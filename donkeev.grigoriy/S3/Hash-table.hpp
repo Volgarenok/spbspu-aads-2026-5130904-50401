@@ -1,6 +1,10 @@
+#ifndef HASH_TABLE_HPP
+#define HASH_TABLE_HPP
+
 #include "Node.hpp"
 #include "../common/top-it-vector.hpp"
 #include "../common/vector-iterators.hpp"
+#include "hashTableIt.hpp"
 
 namespace donkeev
 {
@@ -198,3 +202,5 @@ namespace donkeev
     return nullptr;
   }
 }
+
+#endif
