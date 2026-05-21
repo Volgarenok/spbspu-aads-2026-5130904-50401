@@ -54,7 +54,8 @@ namespace chernov {
 
     void swap(BSTree & other) noexcept;
 
-    void push(const Key & k, Value v);
+    template< class U >
+    void push(const Key & k, U && v);
     void remove(const Key & k);
 
     void clear() noexcept;
@@ -259,7 +260,8 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  void BSTree< Key, Value, Compare >::push(const Key & k, Value v)
+  template< class U >
+  void BSTree< Key, Value, Compare >::push(const Key & k, U && v)
   {
     detail::NodeBase * parent = fake_root_;
     detail::NodeBase * curr = parent->left;
@@ -271,12 +273,13 @@ namespace chernov {
       } else if (cmp_(curr_key, k)) {
         curr = curr->right;
       } else {
-        static_cast< detail::Node< Key, Value > * >(curr)->key_value_.second = v;
+        static_cast< detail::Node< Key, Value > * >(curr)->key_value_.second = std::forward< U >(v);
         return;
       }
     }
 
-    detail::NodeBase * new_node = new detail::Node< Key, Value >(k, v, parent, fake_leaf_, fake_leaf_, 1);
+    detail::NodeBase * new_node = new detail::Node< Key, Value >(k, std::forward< U >(v),
+      parent, fake_leaf_, fake_leaf_, 1);
     if (parent == fake_root_) {
       fake_root_->left = new_node;
       fake_root_->right = new_node;
