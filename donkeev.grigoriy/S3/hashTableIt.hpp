@@ -64,6 +64,24 @@ namespace donkeev
     return tmp;
   }
 
-  
+  template<class Key, class Value, class Hash, class Equal>
+  donkeev::HTIt< Key, Value, Hash, Equal >& donkeev::HTIt< Key, Value, Hash, Equal >::operator--() noexcept
+  {
+    --currentId_;
+    while (currentId_ < dataSize_ && (*vector_)[currentId_].isEmpty())
+    {
+      --currentId_;
+    }
+
+    return *this;
+  }
+  template<class Key, class Value, class Hash, class Equal>
+  donkeev::HTIt< Key, Value, Hash, Equal > donkeev::HTIt< Key, Value, Hash, Equal >::operator--(int) noexcept
+  {
+    HTIt< Key, Value, Hash, Equal > tmp = *this;
+
+    this->operator--();
+    return tmp;
+  }
 }
 #endif
