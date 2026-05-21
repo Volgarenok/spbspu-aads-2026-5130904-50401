@@ -134,7 +134,4 @@ bool malashenko::BSTreeIter< Key, Value >::operator!=(const BSTreeIter< Key, Val
   return !(node_ == other.node_);
 }
 
-
-
-
 #endif

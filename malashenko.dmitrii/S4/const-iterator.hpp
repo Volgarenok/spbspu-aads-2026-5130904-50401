@@ -134,4 +134,5 @@ bool malashenko::BSTreeCIter< Key, Value >::operator!=(const BSTreeCIter< Key, V
 {
   return !(node_ == other.node_);
 }
+
 #endif

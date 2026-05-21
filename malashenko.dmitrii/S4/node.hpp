@@ -106,4 +106,5 @@ size_t malashenko::Node< Key, Value >::height(node_t* fakeLeaf) const
   }
   return std::max(left_->height(fakeLeaf), right_->height(fakeLeaf)) + 1;
 }
+
 #endif

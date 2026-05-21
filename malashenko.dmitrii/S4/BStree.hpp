@@ -12,8 +12,9 @@ namespace malashenko
   template< class Key, class Value, class Compare >
   class BSTree {
   public:
-    using const_iterator = malashenko::BSTreeCIter< Key, Value >;
-    using iterator = malashenko::BSTreeIter< Key, Value >;
+    using cIter = malashenko::BSTreeCIter< Key, Value >;
+    using iter = malashenko::BSTreeIter< Key, Value >;
+    using node_t = malashenko::Node< Key, Value >;
 
     BSTree();
     ~BSTree();
@@ -30,35 +31,36 @@ namespace malashenko
 
     Value drop(const Key& k);
 
-    const_iterator rotateLeft(const_iterator it);
-    const_iterator rotateRight(const_iterator it);
-    const_iterator rotateLargeLeft(const_iterator it);
-    const_iterator rotateLargeRight(const_iterator it);
+    cIter rotateLeft(cIter it);
+    cIter rotateRight(cIter it);
+    cIter rotateLargeLeft(cIter it);
+    cIter rotateLargeRight(cIter it);
 
-    iterator begin();
-    const_iterator begin() const;
-    const_iterator cbegin() const;
+    iter begin();
+    cIter begin() const;
+    cIter cbegin() const;
 
-    iterator end();
-    const_iterator end() const;
-    const_iterator cend() const;
+    iter end();
+    cIter end() const;
+    cIter cend() const;
 
-    size_t height(const_iterator it);
+    size_t height(cIter it);
     size_t height();
 
     void swap(BSTree& other) noexcept;
   private:
-    malashenko::Node< Key, Value >* fakeLeaf_;
-    malashenko::Node< Key, Value >* root_;
+    node_t* fakeLeaf_;
+    node_t* root_;
 
-    void clear();
-    malashenko::Node< Key, Value >* cloneNode(const_iterator it);
+    void clear(node_t* root);
+    node_t* find(const Key& k) const;
+    node_t* cloneNode(node_t* it, node_t* parent, node_t* otherFake);
   };
 }
 
 template< class Key, class Value, class Compare >
 malashenko::BSTree< Key, Value, Compare >::BSTree():
-  fakeLeaf_(reinterpret_cast< Node< Key, Value >* >(::operator new(sizeof(Node< Key, Value >))))
+  fakeLeaf_(reinterpret_cast< node_t* >(::operator new(sizeof(node_t))))
 {
   fakeLeaf_->left_ = fakeLeaf_;
   fakeLeaf_->right_ = fakeLeaf_;
@@ -69,18 +71,132 @@ malashenko::BSTree< Key, Value, Compare >::BSTree():
 template< class Key, class Value, class Compare >
 malashenko::BSTree< Key, Value, Compare >::~BSTree()
 {
-  //clear(); // CLEAR FUNC
+  node_t* root = root_->root();
+  clear(root);
   ::operator delete(fakeLeaf_);
 }
+
+template< class Key, class Value, class Compare >
+void malashenko::BSTree< Key, Value, Compare >::clear(node_t* root)
+{
+  if (root == fakeLeaf_)
+  {
+    return;
+  }
+
+  clear(root->left_);
+  clear(root->right_);
+  delete root;
+}
+
 
 template< class Key, class Value, class Compare >
 malashenko::BSTree< Key, Value, Compare >::BSTree(const BSTree& other):
   BSTree()
 {
-  // CLONE NODE
+  root_ = cloneNode(other.root_, nullptr, other.fakeLeaf_);
 }
 
+template< class Key, class Value, class Compare >
+malashenko::Node< Key, Value >* malashenko::BSTree< Key, Value, Compare >::cloneNode(
+  node_t* node,
+  node_t* parent,
+  node_t* otherFake)
+{
+  if (node == otherFake)
+  {
+    return fakeLeaf_;
+  }
 
+  node_t* newNode = new node_t(node->key_, node->value_);
+  newNode->parent_ = parent;
+  newNode->left_ = cloneNode(node->left_, newNode, otherFake);
+  newNode->right_ = cloneNode(node->right_, newNode, otherFake);
+  return newNode;
+}
+
+template <class Key, class Value, class Compare>
+Value malashenko::BSTree<Key, Value, Compare>::drop(const Key& k)
+{
+  node_t* node = find(k);
+
+  if (!node)
+  {
+    throw std::invalid_argument("There is no Value with that Key");
+  }
+
+  Value deletedValue = node->value_;
+  while (node->left_ != fakeLeaf_ && node->right_ != fakeLeaf_)
+  {
+    Node<Key, Value>* tmpNode = node->right_;
+
+    node->right_ = tmpNode->left_;
+    if (tmpNode->left_ != fakeLeaf_)
+    {
+      tmpNode->left_->parent_ = node;
+    }
+
+    tmpNode->parent_ = node->parent_;
+    if (node->parent_ == fakeLeaf_)
+    {
+      root_ = tmpNode;
+    }
+    else if (node == node->parent_->left_)
+    {
+      node->parent_->left_ = tmpNode;
+    }
+    else
+    {
+      node->parent_->right_ = tmpNode;
+    }
+
+    tmpNode->left_ = node;
+    node->parent_ = tmpNode;
+  }
+
+  Node<Key, Value>* child = node->left_ == fakeLeaf_ ? node->right_ : node->left_;
+  Node<Key, Value>* parent = node->parent_;
+
+  if (parent == fakeLeaf_)
+  {
+    root_ = child;
+  }
+  else
+  {
+    if (parent->left_ == node)
+    {
+      parent->left_ = child;
+    }
+    else
+    {
+      parent->right_ = child;
+    }
+  }
+
+  if (child != fakeLeaf_)
+  {
+    child->parent_ = parent;
+  }
+
+  delete node;
+  return deletedValue;
+}
+
+template< class Key, class Value, class Compare >
+malashenko::Node< Key, Value >* malashenko::BSTree< Key, Value, Compare >::find(const Key& k) const
+{
+  Compare cmp;
+  node_t* tmp = root_;
+  while (tmp != fakeLeaf_)
+  {
+    if (!cmp(k, tmp->key_) && !cmp(tmp->key_, k))
+    {
+      return tmp;
+    }
+    tmp = cmp(k, tmp->key_) ? tmp->left_ : tmp->right_;
+  }
+  return nullptr;
+}
 
 template< class Key, class Value, class Compare >
 malashenko::BSTree< Key, Value, Compare >::BSTree(BSTree&& other) noexcept:
@@ -92,7 +208,7 @@ template< class Key, class Value, class Compare >
 malashenko::BSTree< Key, Value, Compare >& malashenko::BSTree< Key, Value, Compare >::operator=(const BSTree& other)
 {
   BSTree< Key, Value, Compare > tmp(other);
-  swap(other);
+  swap(tmp);
   return *this;
 }
 
@@ -102,22 +218,22 @@ malashenko::BSTree< Key, Value, Compare >& malashenko::BSTree< Key, Value, Compa
   assert(this == &other);
 
   BSTree< Key, Value, Compare > tmp(std::forward(other));
-  swap(other);
+  swap(tmp);
   return *this;
 }
 
 template< class Key, class Value, class Compare >
 void malashenko::BSTree< Key, Value, Compare >::swap(BSTree& other) noexcept
 {
-  swap(root_, other.root_);
-  swap(fakeLeaf_, other.fakeLeaf_);
+  std::swap(root_, other.root_);
+  std::swap(fakeLeaf_, other.fakeLeaf_);
 }
 
 template< class Key, class Value, class Compare >
 void malashenko::BSTree< Key, Value, Compare >::push(const Key& k, const Value& v)
 {
-  Node< Key, Value >* tmp = root_;
-  Node< Key, Value >* parent = nullptr;
+  node_t* tmp = root_;
+  node_t* parent = nullptr;
   Compare cmp;
   while (tmp != fakeLeaf_)
   {
@@ -129,10 +245,10 @@ void malashenko::BSTree< Key, Value, Compare >::push(const Key& k, const Value& 
     parent = tmp;
     tmp = cmp(k, tmp->key_) ? tmp->left_ : tmp->right_;
   }
-  Node< Key, Value >* newNode = new Node< Key, Value >(k, v);
+  node_t* newNode = new node_t(k, v);
   newNode->left_ = fakeLeaf_;
   newNode->right_ = fakeLeaf_;
-  newNode->parent_ = parent;
+  newNode->parent_ = parent ? parent : fakeLeaf_;
 
   if (!parent)
   {
@@ -161,18 +277,12 @@ Value& malashenko::BSTree< Key, Value, Compare >::get(const Key& k)
 template< class Key, class Value, class Compare >
 const Value& malashenko::BSTree< Key, Value, Compare >::get(const Key& k) const
 {
-  Compare cmp;
-  malashenko::Node< Key, Value >* tmp = root_;
-  while (tmp != fakeLeaf_)
+  node_t* node = find(k);
+  if (!node)
   {
-    if (!cmp(k, tmp->key_) && !cmp(tmp->key_, k))
-    {
-      return tmp->value_;
-    }
-    tmp = cmp(k, tmp->key_) ? tmp->left_ : tmp->right_;
+    throw std::invalid_argument("There is no Value with that Key");
   }
-
-  throw std::invalid_argument("There is no Value with that Key");
+  return node->value_;
 }
 
 
@@ -183,13 +293,13 @@ size_t malashenko::BSTree< Key, Value, Compare >::height()
 }
 
 template< class Key, class Value, class Compare >
-size_t malashenko::BSTree< Key, Value, Compare >::height(const_iterator it)
+size_t malashenko::BSTree< Key, Value, Compare >::height(cIter it)
 {
   return it->height(fakeLeaf_);
 }
 
 template< class Key, class Value, class Compare >
-malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateLeft(const_iterator it)
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateLeft(cIter it)
 {
   Node<Key, Value>* rotateNode = it.node_;
   if (rotateNode == fakeLeaf_ || rotateNode->right_ == fakeLeaf_)
@@ -222,11 +332,11 @@ malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::
   rightNode->left_ = rotateNode;
   rotateNode->parent_ = rightNode;
 
-  return const_iterator(rightNode, fakeLeaf_);
+  return cIter(rightNode, fakeLeaf_);
 }
 
 template< class Key, class Value, class Compare >
-malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateRight(const_iterator it)
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateRight(cIter it)
 {
   Node<Key, Value>* rotateNode = it.node_;
   if (rotateNode == fakeLeaf_ || rotateNode->left_ == fakeLeaf_)
@@ -259,11 +369,11 @@ malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::
   leftNode->right = rotateNode;
   rotateNode->parent_ = leftNode;
 
-  return const_iterator(leftNode, fakeLeaf_);
+  return cIter(leftNode, fakeLeaf_);
 }
 
 template< class Key, class Value, class Compare >
-malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateLargeLeft(const_iterator it)
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateLargeLeft(cIter it)
 {
   Node<Key, Value>* rotateNode = it.node_;
   if (rotateNode == fakeLeaf_ || rotateNode->left_ == fakeLeaf_ || rotateNode->left_->right_ == fakeLeaf_)
@@ -271,12 +381,12 @@ malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::
     return it;
   }
 
-  rotateRight(const_iterator(rotateNode->left_, fakeLeaf_));
+  rotateRight(cIter(rotateNode->left_, fakeLeaf_));
   return rotateLeft(it);
 }
 
 template< class Key, class Value, class Compare >
-malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateLargeRight(const_iterator it)
+malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::rotateLargeRight(cIter it)
 {
   Node<Key, Value>* rotateNode = it.node_;
   if (rotateNode == fakeLeaf_ || rotateNode->right_ == fakeLeaf_ || rotateNode->right_->left_ == fakeLeaf_)
@@ -284,7 +394,7 @@ malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::
     return it;
   }
 
-  rotateLeft(const_iterator(rotateNode->right_, fakeLeaf_));
+  rotateLeft(cIter(rotateNode->right_, fakeLeaf_));
   return rotateRight(it);
 }
 
@@ -292,22 +402,22 @@ malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::
 template< class Key, class Value, class Compare >
 malashenko::BSTreeIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::begin()
 {
-  Node< Key, Value >* root = root_->root();
-  return iterator(root->minimum(fakeLeaf_), fakeLeaf_);
+  node_t* root = root_->root();
+  return iter(root->minimum(fakeLeaf_), fakeLeaf_);
 }
 
 template< class Key, class Value, class Compare >
 malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::begin() const
 {
-  Node< Key, Value >* root = root_->root();
-  return const_iterator(root->minimum(fakeLeaf_), fakeLeaf_);
+  node_t* root = root_->root();
+  return cIter(root->minimum(fakeLeaf_), fakeLeaf_);
 }
 
 template< class Key, class Value, class Compare >
 malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::cbegin() const
 {
-  Node< Key, Value >* root = root_->root();
-  return const_iterator(root->minimum(fakeLeaf_), fakeLeaf_);
+  node_t* root = root_->root();
+  return cIter(root->minimum(fakeLeaf_), fakeLeaf_);
 }
 
 
@@ -315,19 +425,19 @@ template< class Key, class Value, class Compare >
 malashenko::BSTreeIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::end()
 {
 
-  return iterator(fakeLeaf_, fakeLeaf_);
+  return iter(fakeLeaf_, fakeLeaf_);
 }
 
 template< class Key, class Value, class Compare >
 malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::end() const
 {
-  return const_iterator(fakeLeaf_, fakeLeaf_);
+  return cIter(fakeLeaf_, fakeLeaf_);
 }
 
 template< class Key, class Value, class Compare >
 malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::cend() const
 {
-  return const_iterator(fakeLeaf_, fakeLeaf_);
+  return cIter(fakeLeaf_, fakeLeaf_);
 }
 
 #endif
