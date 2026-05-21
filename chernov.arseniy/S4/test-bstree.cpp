@@ -247,6 +247,49 @@ BOOST_AUTO_TEST_CASE(test_contains)
   BOOST_CHECK(bst.contains(321));
 }
 
+BOOST_AUTO_TEST_CASE(test_height)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+  BOOST_CHECK_EQUAL(bst.height(), 0);
+
+  auto iter = bst.cbeforeBegin();
+
+  bst.push(321, 52);
+  BOOST_CHECK_EQUAL(bst.height(), 1);
+  BOOST_CHECK_EQUAL(bst.height(++iter), 1);
+
+  bst.push(123, 42);
+  BOOST_CHECK_EQUAL(bst.height(), 2);
+  BOOST_CHECK_EQUAL(bst.height(iter), 2);
+  BOOST_CHECK_EQUAL(bst.height(--iter), 1);
+
+  bst.push(456, 67);
+  BOOST_CHECK_EQUAL(bst.height(), 2);
+  BOOST_CHECK_EQUAL(bst.height(iter), 1);
+  BOOST_CHECK_EQUAL(bst.height(++iter), 2);
+  BOOST_CHECK_EQUAL(bst.height(++iter), 1);
+
+  bst.push(789, 78);
+  BOOST_CHECK_EQUAL(bst.height(), 3);
+  BOOST_CHECK_EQUAL(bst.height(iter), 2);
+  BOOST_CHECK_EQUAL(bst.height(++iter), 1);
+  BOOST_CHECK_EQUAL(bst.height(++iter), 0);
+
+  bst.remove(123);
+  BOOST_CHECK_EQUAL(bst.height(), 3);
+
+  bst.remove(456);
+  BOOST_CHECK_EQUAL(bst.height(), 2);
+  BOOST_CHECK_EQUAL(bst.height(--iter), 1);
+  BOOST_CHECK_EQUAL(bst.height(--iter), 2);
+
+  bst.remove(789);
+  BOOST_CHECK_EQUAL(bst.height(), 1);
+
+  bst.remove(321);
+  BOOST_CHECK_EQUAL(bst.height(), 0);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(bstree_iterator_tests)
