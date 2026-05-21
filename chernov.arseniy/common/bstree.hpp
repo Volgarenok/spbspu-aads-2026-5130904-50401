@@ -71,7 +71,7 @@ namespace chernov {
 
     bool empty() const noexcept;
     size_t size() const noexcept;
-    bool has(const Key & k) const noexcept;
+    bool contains(const Key & k) const noexcept;
 
     size_t height() const noexcept;
     size_t height(const_iterator iter) const noexcept;
@@ -477,7 +477,7 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  bool BSTree< Key, Value, Compare >::has(const Key & k) const noexcept
+  bool BSTree< Key, Value, Compare >::contains(const Key & k) const noexcept
   {
     try {
       findNode(k);
