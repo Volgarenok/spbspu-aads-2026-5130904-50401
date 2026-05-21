@@ -200,4 +200,51 @@ BOOST_AUTO_TEST_CASE(test_at)
   BOOST_CHECK_EQUAL(bst2.at(456), 67);
 }
 
+BOOST_AUTO_TEST_CASE(test_empty)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+  BOOST_CHECK_EQUAL(bst.size(), 0);
+  BOOST_CHECK(bst.empty());
+
+  bst.push(123, 42);
+  BOOST_CHECK_EQUAL(bst.size(), 1);
+  BOOST_CHECK(!bst.empty());
+
+  bst.clear();
+  BOOST_CHECK_EQUAL(bst.size(), 0);
+  BOOST_CHECK(bst.empty());
+}
+
+BOOST_AUTO_TEST_CASE(test_size)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+  BOOST_CHECK_EQUAL(bst.size(), 0);
+
+  bst.push(123, 42);
+  BOOST_CHECK_EQUAL(bst.size(), 1);
+
+  bst.push(321, 52);
+  BOOST_CHECK_EQUAL(bst.size(), 2);
+
+  bst.remove(123);
+  BOOST_CHECK_EQUAL(bst.size(), 1);
+
+  bst.clear();
+  BOOST_CHECK_EQUAL(bst.size(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_contains)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+
+  BOOST_CHECK(!bst.contains(123));
+  bst.push(123, 42);
+  bst.push(321, 52);
+  BOOST_CHECK(bst.contains(123));
+
+  bst.remove(123);
+  BOOST_CHECK(!bst.contains(123));
+  BOOST_CHECK(bst.contains(321));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
