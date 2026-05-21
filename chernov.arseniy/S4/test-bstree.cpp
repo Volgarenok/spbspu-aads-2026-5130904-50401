@@ -178,3 +178,26 @@ BOOST_AUTO_TEST_CASE(test_clear)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(bstree_getters_tests)
+
+BOOST_AUTO_TEST_CASE(test_at)
+{
+  chernov::BSTree< int, int, std::less< int > > bst1;
+  BOOST_CHECK_THROW(bst1.at(123), std::out_of_range);
+
+  bst1.push(123, 42);
+  BOOST_CHECK_EQUAL(bst1.at(123), 42);
+
+  bst1.push(321, 52);
+  BOOST_CHECK_EQUAL(bst1.at(321), 52);
+
+  bst1.clear();
+  BOOST_CHECK_THROW(bst1.at(321), std::out_of_range);
+
+  bst1.push(456, 67);
+  const chernov::BSTree< int, int, std::less< int > > & bst2 = bst1;
+  BOOST_CHECK_EQUAL(bst2.at(456), 67);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
