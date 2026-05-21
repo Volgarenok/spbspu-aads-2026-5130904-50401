@@ -1,47 +1,43 @@
+#include <iostream>
+#include <utility>
+
 namespace donkeev
 {
-  template< class Key, class Value >
+  template<class Key, class Value>
   struct Node
   {
-    Key key_;
-    Value value_;
+    std::pair<Key, Value> data_;
     bool isOccupied_;
 
     Node();
     Node(const Key&, const Value&);
-    bool isEmpty();
+    bool isEmpty() const;
     Value dropNode();
   };
 
-  template< class Key, class Value >
-  Node< Key, Value >::Node():
-    key_(),
-    value_(),
+  template<class Key, class Value>
+  Node<Key, Value>::Node():
+    data_(),
     isOccupied_(false)
   {}
 
-  template< class Key, class Value >
-  Node< Key, Value >::Node(const Key& key, const Value& value):
-    key_(key),
-    value_(value),
+  template<class Key, class Value>
+  Node<Key, Value>::Node(const Key& key, const Value& value):
+    data_(key, value),
     isOccupied_(true)
   {}
 
-  template< class Key, class Value >
-  bool Node< Key, Value >::isEmpty()
+  template<class Key, class Value>
+  bool Node<Key, Value>::isEmpty() const
   {
-    return isOccupied_ == false;
+    return !isOccupied_;
   }
 
-  template< class Key, class Value >
-  Value Node< Key, Value >::dropNode()
+  template<class Key, class Value>
+  Value Node<Key, Value>::dropNode()
   {
-    Value tmp = value_;
-
-    key_.~Key();
-    value_.~Value();
+    Value tmp = data_.second;
     isOccupied_ = false;
-
     return tmp;
   }
 }
