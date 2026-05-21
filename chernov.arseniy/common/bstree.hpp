@@ -435,6 +435,19 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator iter)
+  {
+    detail::NodeBase * root = iter.node_;
+    if (root->left == fake_leaf_) {
+      throw std::logic_error("rotate is not possible");
+    }
+
+    rotateLeft(const_iterator(root->left, fake_root_, fake_leaf_));
+    return rotateRight(iter);
+  }
+
+  template< class Key, class Value, class Compare >
   Value & BSTree< Key, Value, Compare >::at(const Key & k)
   {
     const BSTree< Key, Value, Compare > * cthis = this;
