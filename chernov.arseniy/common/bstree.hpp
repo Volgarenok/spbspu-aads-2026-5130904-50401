@@ -406,6 +406,9 @@ namespace chernov {
       }
       next = parent;
     }
+    if (next == fake_root_) {
+      next = fake_leaf_;
+    }
     node_ = next;
     return *this;
   }
