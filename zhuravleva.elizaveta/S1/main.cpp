@@ -15,13 +15,13 @@ int main()
     size_t value = 0;
     while (std::cin >> value)
     {
-      numbers.addEnd(value);
+      numbers.pushBack(value);
     }
     if (std::cin.fail())
     {
       std::cin.clear();
     }
-    sequences.addEnd(std::make_pair(name, numbers));
+    sequences.pushBack(std::make_pair(name, numbers));
     if (std::cin.bad())
     {
       std::cerr << "bad input\n";
@@ -71,12 +71,12 @@ int main()
   }
 
   zhuravleva::List< zhuravleva::List< size_t > > transposed;
-  auto tpos = transposed.beforeStart();
+  auto tpos = transposed.beforeBegin();
 
   for (size_t column = 0; column < maxLen; ++column)
   {
     zhuravleva::List< size_t > newRow;
-    auto insertPos = newRow.beforeStart();
+    auto insertPos = newRow.beforeBegin();
     auto sit = sequences.cbegin();
     while (sit != sequences.cend())
     {
@@ -89,13 +89,13 @@ int main()
       }
       if (nit != sit->second.cend())
       {
-        insertPos = newRow.addAfter(insertPos, *nit);
+        insertPos = newRow.insertAfter(insertPos, *nit);
       }
       ++sit;
     }
     if (!newRow.empty())
     {
-      tpos = transposed.addAfter(tpos, newRow);
+      tpos = transposed.insertAfter(tpos, newRow);
     }
   }
 
@@ -118,7 +118,7 @@ int main()
   }
 
   zhuravleva::List< size_t > sums;
-  auto spos = sums.beforeStart();
+  auto spos = sums.beforeBegin();
   auto tit2 = transposed.cbegin();
 
   while (tit2 != transposed.cend())
@@ -137,13 +137,13 @@ int main()
       ++nit;
     }
 
-    spos = sums.addAfter(spos, sum);
+    spos = sums.insertAfter(spos, sum);
     ++tit2;
   }
 
   if (transposed.empty())
   {
-    sums.addEnd(0);
+    sums.pushBack(0);
   }
   auto sit2 = sums.begin();
   if (sit2 != sums.end())
