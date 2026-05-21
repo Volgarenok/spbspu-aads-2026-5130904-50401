@@ -251,6 +251,52 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(bstree_iterator_tests)
 
+BOOST_AUTO_TEST_CASE(test_before_begin_iterator)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+  BOOST_CHECK(++bst.beforeBegin() == bst.begin());
+  BOOST_CHECK(++bst.beforeBegin() == bst.end());
+
+  bst.push(123, 42);
+  bst.push(321, 52);
+
+  auto iter = bst.beforeBegin();
+  BOOST_CHECK(iter != bst.begin());
+  BOOST_CHECK(iter != bst.end());
+
+  ++iter;
+  BOOST_CHECK(iter == bst.begin());
+  BOOST_CHECK_EQUAL(iter->first, 123);
+  ++iter;
+  BOOST_CHECK_EQUAL(iter->first, 321);
+
+  BOOST_CHECK(++iter == bst.end());
+}
+
+BOOST_AUTO_TEST_CASE(test_cbefore_begin_iterator)
+{
+  chernov::BSTree< int, int, std::less< int > > bst1;
+  BOOST_CHECK(++bst1.cbeforeBegin() == bst1.cbegin());
+  BOOST_CHECK(++bst1.cbeforeBegin() == bst1.cend());
+
+  bst1.push(123, 42);
+  bst1.push(321, 52);
+
+  const chernov::BSTree< int, int, std::less< int > > & bst2 = bst1;
+
+  auto iter = bst2.cbeforeBegin();
+  BOOST_CHECK(iter != bst2.cbegin());
+  BOOST_CHECK(iter != bst2.cend());
+
+  ++iter;
+  BOOST_CHECK(iter == bst2.cbegin());
+  BOOST_CHECK_EQUAL(iter->first, 123);
+  ++iter;
+  BOOST_CHECK_EQUAL(iter->first, 321);
+
+  BOOST_CHECK(++iter == bst2.cend());
+}
+
 BOOST_AUTO_TEST_CASE(test_begin_iterator)
 {
   chernov::BSTree< int, int, std::less< int > > bst;

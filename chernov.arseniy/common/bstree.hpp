@@ -647,6 +647,10 @@ namespace chernov {
   template< class Key, class Value, bool IsConst >
   BSTIterator< Key, Value, IsConst > & BSTIterator< Key, Value, IsConst >::operator++()
   {
+    if (node_ == fake_root_) {
+      node_ = fake_root_->left;
+      return *this;
+    }
     detail::NodeBase * next = node_;
     if (next->right != fake_leaf_) {
       next = next->right;
