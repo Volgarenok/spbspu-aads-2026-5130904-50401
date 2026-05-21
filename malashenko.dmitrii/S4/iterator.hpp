@@ -27,7 +27,6 @@ namespace malashenko
   private:
     template< class K, class V, class C >
     friend class BSTree;
-
     node_t* node_;
     node_t* fakeLeaf_;
     BSTreeIter(node_t* node, node_t* fakeLeaf);
@@ -111,15 +110,14 @@ template< class Key, class Value >
 std::pair< Key, Value >& malashenko::BSTreeIter< Key, Value >::operator*()
 {
   assert(node_);
-  return {node_->key_, node_->value_};
+  return node_->data_;
 }
 
 template< class Key, class Value >
 std::pair< Key, Value >* malashenko::BSTreeIter< Key, Value >::operator->()
 {
   assert(node_);
-  std::pair< Key, Value > pair(node_->key_, node_->value_);
-  return std::addressof(pair);
+  return std::addressof(node_->data_);
 }
 
 template< class Key, class Value >
@@ -131,7 +129,7 @@ bool malashenko::BSTreeIter< Key, Value >::operator==(const BSTreeIter< Key, Val
 template< class Key, class Value >
 bool malashenko::BSTreeIter< Key, Value >::operator!=(const BSTreeIter< Key, Value >& other) const
 {
-  return !(node_ == other.node_);
+  return node_ != other.node_;
 }
 
 #endif

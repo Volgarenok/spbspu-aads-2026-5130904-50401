@@ -1,6 +1,7 @@
 #ifndef BSTREENODE
 #define BSTREENODE
 #include <algorithm>
+#include <utility>
 #include <cstddef>
 namespace malashenko
 {
@@ -23,8 +24,7 @@ namespace malashenko
     node_t* root();
     size_t height(node_t* fakeLeaf) const;
   private:
-    Key key_;
-    Value value_;
+    std::pair<Key, Value> data_;
     Node* right_;
     Node* left_;
     Node* parent_;
@@ -42,8 +42,7 @@ namespace malashenko
 
 template< class Key, class Value >
 malashenko::Node< Key, Value >::Node(const Key& key, const Value& value):
-  key_(key),
-  value_(value),
+  data_(std::pair< Key, Value >(key, value)),
   right_(nullptr),
   left_(nullptr),
   parent_(nullptr)
@@ -96,15 +95,15 @@ malashenko::Node< Key, Value >* malashenko::Node< Key, Value >::root()
 template< class Key, class Value >
 size_t malashenko::Node< Key, Value >::height(node_t* fakeLeaf) const
 {
-  if (this == fakeLeaf)
-  {
-    return 0;
-  }
   if (left_ == fakeLeaf && right_ == fakeLeaf)
   {
     return 1;
   }
-  return std::max(left_->height(fakeLeaf), right_->height(fakeLeaf)) + 1;
+
+  size_t lh = (left_ != fakeLeaf) ? left_->height(fakeLeaf) : 0;
+  size_t rh = (right_ != fakeLeaf) ? right_->height(fakeLeaf) : 0;
+
+  return std::max(lh, rh) + 1;
 }
 
 #endif

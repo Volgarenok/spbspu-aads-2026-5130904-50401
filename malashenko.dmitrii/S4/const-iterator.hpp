@@ -112,15 +112,14 @@ template< class Key, class Value >
 const std::pair< Key, Value >& malashenko::BSTreeCIter< Key, Value >::operator*() const
 {
   assert(node_);
-  return {node_->key_, node_->value_};
+  return node_->data_;
 }
 
 template< class Key, class Value >
 const std::pair< Key, Value >* malashenko::BSTreeCIter< Key, Value >::operator->() const
 {
   assert(node_);
-  std::pair< Key, Value > pair(node_->key_, node_->value_);
-  return std::addressof(pair);
+  return std::addressof(node_->data_);
 }
 
 template< class Key, class Value >

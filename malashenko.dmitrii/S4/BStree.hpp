@@ -9,7 +9,7 @@
 namespace malashenko
 {
 
-  template< class Key, class Value, class Compare >
+  template< class Key, class Value, class Compare = std::less< Key > >
   class BSTree {
   public:
     using cIter = malashenko::BSTreeCIter< Key, Value >;
@@ -48,6 +48,7 @@ namespace malashenko
     size_t height();
 
     void swap(BSTree& other) noexcept;
+    bool empty() const;
   private:
     node_t* fakeLeaf_;
     node_t* root_;
@@ -71,8 +72,7 @@ malashenko::BSTree< Key, Value, Compare >::BSTree():
 template< class Key, class Value, class Compare >
 malashenko::BSTree< Key, Value, Compare >::~BSTree()
 {
-  node_t* root = root_->root();
-  clear(root);
+  clear(root_);
   ::operator delete(fakeLeaf_);
 }
 
@@ -108,7 +108,7 @@ malashenko::Node< Key, Value >* malashenko::BSTree< Key, Value, Compare >::clone
     return fakeLeaf_;
   }
 
-  node_t* newNode = new node_t(node->key_, node->value_);
+  node_t* newNode = new node_t(node->data_.first, node->data_.second);
   newNode->parent_ = parent;
   newNode->left_ = cloneNode(node->left_, newNode, otherFake);
   newNode->right_ = cloneNode(node->right_, newNode, otherFake);
@@ -122,10 +122,10 @@ Value malashenko::BSTree<Key, Value, Compare>::drop(const Key& k)
 
   if (!node)
   {
-    throw std::invalid_argument("There is no Value with that Key");
+    throw std::out_of_range("There is no Value with that Key");
   }
 
-  Value deletedValue = node->value_;
+  Value deletedValue = node->data_.second;
   while (node->left_ != fakeLeaf_ && node->right_ != fakeLeaf_)
   {
     Node<Key, Value>* tmpNode = node->right_;
@@ -187,21 +187,30 @@ malashenko::Node< Key, Value >* malashenko::BSTree< Key, Value, Compare >::find(
 {
   Compare cmp;
   node_t* tmp = root_;
-  while (tmp != fakeLeaf_)
+
+  while (tmp && tmp != fakeLeaf_)
   {
-    if (!cmp(k, tmp->key_) && !cmp(tmp->key_, k))
+    if (!cmp(k, tmp->data_.first) && !cmp(tmp->data_.first, k))
     {
       return tmp;
     }
-    tmp = cmp(k, tmp->key_) ? tmp->left_ : tmp->right_;
+
+    if (cmp(k, tmp->data_.first))
+    {
+      tmp = tmp->left_;
+    }
+    else
+    {
+      tmp = tmp->right_;
+    }
   }
   return nullptr;
 }
 
 template< class Key, class Value, class Compare >
 malashenko::BSTree< Key, Value, Compare >::BSTree(BSTree&& other) noexcept:
-  fakeLeaf_(std::exchange(fakeLeaf_, nullptr)),
-  root_(std::exchange(fakeLeaf_, nullptr))
+  fakeLeaf_(std::exchange(other.fakeLeaf_, nullptr)),
+  root_(std::exchange(other.fakeLeaf_, nullptr))
 {}
 
 template< class Key, class Value, class Compare >
@@ -215,7 +224,7 @@ malashenko::BSTree< Key, Value, Compare >& malashenko::BSTree< Key, Value, Compa
 template< class Key, class Value, class Compare >
 malashenko::BSTree< Key, Value, Compare >& malashenko::BSTree< Key, Value, Compare >::operator=(BSTree&& other) noexcept
 {
-  assert(this == &other);
+  assert(this != &other);
 
   BSTree< Key, Value, Compare > tmp(std::forward(other));
   swap(tmp);
@@ -237,13 +246,13 @@ void malashenko::BSTree< Key, Value, Compare >::push(const Key& k, const Value& 
   Compare cmp;
   while (tmp != fakeLeaf_)
   {
-    if (!cmp(k, tmp->key_) && !cmp(tmp->key_, k))
+    if (!cmp(k, tmp->data_.first) && !cmp(tmp->data_.first, k))
     {
-      tmp->value_ =  v;
+      tmp->data_.second =  v;
       return;
     }
     parent = tmp;
-    tmp = cmp(k, tmp->key_) ? tmp->left_ : tmp->right_;
+    tmp = cmp(k, tmp->data_.first) ? tmp->left_ : tmp->right_;
   }
   node_t* newNode = new node_t(k, v);
   newNode->left_ = fakeLeaf_;
@@ -256,7 +265,7 @@ void malashenko::BSTree< Key, Value, Compare >::push(const Key& k, const Value& 
   }
   else
   {
-    if (parent->left_ == tmp)
+    if (cmp(k, parent->data_.first))
     {
       parent->left_ = newNode;
     }
@@ -280,9 +289,9 @@ const Value& malashenko::BSTree< Key, Value, Compare >::get(const Key& k) const
   node_t* node = find(k);
   if (!node)
   {
-    throw std::invalid_argument("There is no Value with that Key");
+    throw std::out_of_range("There is no Value with that Key: " + k);
   }
-  return node->value_;
+  return node->data_.second;
 }
 
 
@@ -438,6 +447,12 @@ template< class Key, class Value, class Compare >
 malashenko::BSTreeCIter< Key, Value > malashenko::BSTree< Key, Value, Compare>::cend() const
 {
   return cIter(fakeLeaf_, fakeLeaf_);
+}
+
+template< class Key, class Value, class Compare >
+bool malashenko::BSTree< Key, Value, Compare>::empty() const
+{
+  return root_ == fakeLeaf_;
 }
 
 #endif
