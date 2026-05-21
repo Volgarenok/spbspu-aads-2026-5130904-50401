@@ -11,7 +11,7 @@ void malashenko::print(std::istream& in, std::ostream& out, Collection& datasets
   Dataset ds = datasets.get(datasetName);
   if (ds.empty())
   {
-    out << " <EMPTY>\n";
+    out << "<EMPTY>\n";
     return;
   }
 
