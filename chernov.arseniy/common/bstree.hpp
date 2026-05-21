@@ -90,6 +90,12 @@ namespace chernov {
     BSTIterator & operator--();
     BSTIterator operator--(int);
 
+    template< bool OtherConst >
+    bool operator==(const BSTIterator< Key, Value, OtherConst > & other) const noexcept;
+
+    template< bool OtherConst >
+    bool operator!=(const BSTIterator< Key, Value, OtherConst > & other) const noexcept;
+
   private:
     template< class, class, class >
     friend class BSTree;
@@ -437,6 +443,22 @@ namespace chernov {
     BSTIterator temp = this;
     --(*this);
     return temp;
+  }
+
+  template< class Key, class Value, bool IsConst >
+  template< bool OtherConst >
+  bool BSTIterator< Key, Value, IsConst >::
+  operator==(const BSTIterator< Key, Value, OtherConst > & other) const noexcept
+  {
+    return node_ == other.node_;
+  }
+
+  template< class Key, class Value, bool IsConst >
+  template< bool OtherConst >
+  bool BSTIterator< Key, Value, IsConst >::
+  operator!=(const BSTIterator< Key, Value, OtherConst > & other) const noexcept
+  {
+    return !(*this == other);
   }
 
   template< class Key, class Value, bool IsConst >
