@@ -90,10 +90,41 @@ namespace donkeev
   {
     return (*vector_)[currentId_].data_;
   }
-    template<class Key, class Value, class Hash, class Equal>
-    std::pair< Key, Value >* HTIt< Key, Value, Hash, Equal >::operator->() const noexcept
-    {
-      return  &((*vector_)[currentId_]);
-    }
+  template<class Key, class Value, class Hash, class Equal>
+  std::pair< Key, Value >* HTIt< Key, Value, Hash, Equal >::operator->() const noexcept
+  {
+    return  &((*vector_)[currentId_]);
+  }
+
+  template<class Key, class Value, class Hash, class Equal>
+  bool HTIt< Key, Value, Hash, Equal >::operator==(const HTIt< Key, Value, Hash, Equal >& otherIt) const noexcept
+  {
+    return currentId_ == otherIt.currentId_ && vector_ == otherIt.vector_;
+  }
+  template<class Key, class Value, class Hash, class Equal>
+  bool HTIt< Key, Value, Hash, Equal >::operator==(const HTIt< Key, Value, Hash, Equal >& otherIt) const noexcept
+  {
+    return !(this == otherIt);
+  }
+  template<class Key, class Value, class Hash, class Equal>
+  bool HTIt< Key, Value, Hash, Equal >::operator>(const HTIt< Key, Value, Hash, Equal >& otherIt) const noexcept
+  {
+    return vector_ == otherIt.vector_ && currentId_ > otherIt.currentId_;
+  }
+  template<class Key, class Value, class Hash, class Equal>
+  bool HTIt< Key, Value, Hash, Equal >::operator>=(const HTIt< Key, Value, Hash, Equal >& otherIt) const noexcept
+  {
+    return vector_ == otherIt.vector_ && currentId_ >= otherIt.currentId_;
+  }
+  template<class Key, class Value, class Hash, class Equal>
+  bool HTIt< Key, Value, Hash, Equal >::operator<(const HTIt< Key, Value, Hash, Equal >& otherIt) const noexcept
+  {
+    return vector_ == otherIt.vector_ && currentId_ < otherIt.currentId_;
+  }
+  template<class Key, class Value, class Hash, class Equal>
+  bool HTIt< Key, Value, Hash, Equal >::operator<=(const HTIt< Key, Value, Hash, Equal >& otherIt) const noexcept
+  {
+    return vector_ == otherIt.vector_ && currentId_ <= otherIt.currentId_;
+  }
 }
 #endif
