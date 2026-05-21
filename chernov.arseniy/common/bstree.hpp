@@ -149,6 +149,8 @@ namespace chernov {
 
   template< class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >::BSTree():
+    fake_root_(nullptr),
+    fake_leaf_(nullptr),
     cmp_(Compare{}),
     size_(0)
   {
@@ -156,7 +158,11 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  BSTree< Key, Value, Compare >::BSTree(const BSTree & other)
+  BSTree< Key, Value, Compare >::BSTree(const BSTree & other):
+    fake_root_(nullptr),
+    fake_leaf_(nullptr),
+    cmp_(),
+    size_(0)
   {
     createFakes();
 
@@ -247,6 +253,7 @@ namespace chernov {
     }
     BSTree< Key, Value, Compare > temp(other);
     swap(temp);
+    return *this;
   }
 
   template< class Key, class Value, class Compare >
@@ -257,6 +264,7 @@ namespace chernov {
     }
     BSTree< Key, Value, Compare > temp(std::move(other));
     swap(temp);
+    return *this;
   }
 
   template< class Key, class Value, class Compare >
