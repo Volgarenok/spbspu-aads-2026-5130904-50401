@@ -70,7 +70,7 @@ namespace chernov {
 
     void createFakes();
     void updateHeights(detail::NodeBase * node) noexcept;
-    detail::NodeBase * findNode(const Key & k);
+    detail::NodeBase * findNode(const Key & k) const;
   };
 
   template< class Key, class Value, bool IsConst >
@@ -79,6 +79,11 @@ namespace chernov {
     using value_type = std::pair< const Key, Value >;
     using reference = std::conditional_t< IsConst, const value_type &, value_type & >;
     using pointer = std::conditional_t< IsConst, const value_type *, value_type * >;
+
+    BSTIterator() = delete;
+
+    reference operator*() const;
+    pointer operator->() const;
 
   private:
     template< class, class, class >
@@ -334,7 +339,7 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  detail::NodeBase * BSTree< Key, Value, Compare >::findNode(const Key & k)
+  detail::NodeBase * BSTree< Key, Value, Compare >::findNode(const Key & k) const
   {
     detail::NodeBase * node = fake_root_->left;
     while (node != fake_leaf_) {
@@ -348,6 +353,18 @@ namespace chernov {
       }
     }
     throw std::out_of_range("element not found");
+  }
+
+  template< class Key, class Value, bool IsConst >
+  typename BSTIterator< Key, Value, IsConst >::reference BSTIterator< Key, Value, IsConst >::operator*() const
+  {
+    return static_cast< detail::Node< Key, Value > * >(node_)->key_value_;
+  }
+
+  template< class Key, class Value, bool IsConst >
+  typename BSTIterator< Key, Value, IsConst >::pointer BSTIterator< Key, Value, IsConst >::operator->() const
+  {
+    return std::addressof(static_cast< detail::Node< Key, Value > * >(node_)->key_value_);
   }
 }
 
