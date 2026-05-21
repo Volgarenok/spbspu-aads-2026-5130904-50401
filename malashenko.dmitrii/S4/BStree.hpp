@@ -289,7 +289,7 @@ const Value& malashenko::BSTree< Key, Value, Compare >::get(const Key& k) const
   node_t* node = find(k);
   if (!node)
   {
-    throw std::out_of_range("There is no Value with that Key: " + k);
+    throw std::out_of_range("There is no Value with that Key");
   }
   return node->data_.second;
 }

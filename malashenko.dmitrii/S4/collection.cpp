@@ -97,5 +97,3 @@ void malashenko::unionCollections(std::istream& in, std::ostream&, Collection& d
   datasets.push(newDsName, newDs);
 }
 
-
-
