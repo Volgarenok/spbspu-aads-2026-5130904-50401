@@ -60,6 +60,12 @@ namespace chernov {
     Value & at(const Key & k);
     const Value & at(const Key & k) const;
 
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+
+    size_t height() const noexcept;
+    size_t height(const_iterator iter) const noexcept;
+
     iterator beforeBegin();
     const_iterator beforeBegin() const;
     const_iterator cbeforeBegin() const;
@@ -72,13 +78,11 @@ namespace chernov {
     const_iterator end() const;
     const_iterator cend() const;
 
-    size_t height() const noexcept;
-    size_t height(const_iterator iter) const noexcept;
-
   private:
     detail::NodeBase * fake_root_;
     detail::NodeBase * fake_leaf_;
     Compare cmp_;
+    size_t size_;
 
     void createFakes();
     void updateHeights(detail::NodeBase * node) noexcept;
@@ -135,7 +139,8 @@ namespace chernov {
 
   template< class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >::BSTree():
-    cmp_(Compare{})
+    cmp_(Compare{}),
+    size_(0)
   {
     createFakes();
   }
@@ -151,6 +156,7 @@ namespace chernov {
 
     BSTree< Key, Value, Compare > temp;
     temp.cmp_ = other.cmp_;
+    temp.size_ = other.size_;
 
     Stack< std::pair< detail::NodeBase *, detail::NodeBase * > > stack;
 
@@ -197,7 +203,8 @@ namespace chernov {
   BSTree< Key, Value, Compare >::BSTree(BSTree && other) noexcept:
     fake_root_(std::exchange(other.fake_root_, nullptr)),
     fake_leaf_(std::exchange(other.fake_leaf_, nullptr)),
-    cmp_(other.cmp_)
+    cmp_(other.cmp_),
+    size_(std::exchange(other.size_, 0))
   {}
 
   template< class Key, class Value, class Compare >
@@ -238,6 +245,7 @@ namespace chernov {
     std::swap(fake_root_, other.fake_root_);
     std::swap(fake_leaf_, other.fake_leaf_);
     std::swap(cmp_, other.cmp_);
+    std::swap(size_, other.size_);
   }
 
   template< class Key, class Value, class Compare >
@@ -289,6 +297,7 @@ namespace chernov {
       parent->right = new_node;
     }
 
+    ++size_;
     updateHeights(new_node);
   }
 
@@ -326,7 +335,7 @@ namespace chernov {
     }
 
     delete moved_node;
-
+    --size_;
     updateHeights(moved_node->parent);
   }
 
@@ -341,6 +350,30 @@ namespace chernov {
   const Value & BSTree< Key, Value, Compare >::at(const Key & k) const
   {
     return static_cast< detail::Node< Key, Value > * >(findNode(k))->key_value_.second;
+  }
+
+  template< class Key, class Value, class Compare >
+  bool BSTree< Key, Value, Compare >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t BSTree< Key, Value, Compare >::size() const noexcept
+  {
+    return size_;
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t BSTree< Key, Value, Compare >::height() const noexcept
+  {
+    return fake_root_->left->height;
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t BSTree< Key, Value, Compare >::height(const_iterator iter) const noexcept
+  {
+    return iter.node_->height;
   }
 
   template< class Key, class Value, class Compare >
@@ -404,18 +437,6 @@ namespace chernov {
   BSTree< Key, Value, Compare >::cend() const
   {
     return end();
-  }
-
-  template< class Key, class Value, class Compare >
-  size_t BSTree< Key, Value, Compare >::height() const noexcept
-  {
-    return fake_root_->left->height;
-  }
-
-  template< class Key, class Value, class Compare >
-  size_t BSTree< Key, Value, Compare >::height(const_iterator iter) const noexcept
-  {
-    return iter.node_->height;
   }
 
   template< class Key, class Value, class Compare >
