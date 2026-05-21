@@ -1,6 +1,8 @@
 #ifndef HASHTABLEIT_HPP
 #define HASHTABLEIT_HPP
 
+#include "iostream"
+#include "top-it-vector.hpp"
 #include "Node.hpp"
 
 namespace donkeev
@@ -12,7 +14,7 @@ namespace donkeev
   struct HTIt
   {
     HTIt() = default;
-    explicit HTIt(donkeev::Node< Key, Value >*);
+    explicit HTIt(const topit::Vector< donkeev::Node< Key, Value > >*, size_t);
 
     HTIt< Key, Value, Hash, Equal >& operator++() noexcept;
     HTIt< Key, Value, Hash, Equal > operator++(int) noexcept;
@@ -30,7 +32,38 @@ namespace donkeev
     bool operator<(const HTIt< Key, Value, Hash, Equal >&) const noexcept;
     bool operator<=(const HTIt< Key, Value, Hash, Equal >&) const noexcept;
   private:
-    donkeev::Node< Key, Value >* node_;
+    const topit::Vector< donkeev::Node< Key, Value > >* vector_;
+    size_t currentId_;
+    size_t dataSize_;
   };
+
+  template<class Key, class Value, class Hash, class Equal>
+  donkeev::HTIt< Key, Value, Hash, Equal >::HTIt(const topit::Vector< donkeev::Node< Key, Value > >* data, size_t currentId):
+    vector_(data),
+    currentId_(currentId),
+    dataSize_(vector_->getSize())
+  {}
+
+  template<class Key, class Value, class Hash, class Equal>
+  donkeev::HTIt< Key, Value, Hash, Equal >& donkeev::HTIt< Key, Value, Hash, Equal >::operator++() noexcept
+  {
+    ++currentId_;
+    while (currentId_ < dataSize_ && (*vector_)[currentId_].isEmpty())
+    {
+      ++currentId_;
+    }
+
+    return *this;
+  }
+  template<class Key, class Value, class Hash, class Equal>
+  donkeev::HTIt< Key, Value, Hash, Equal > donkeev::HTIt< Key, Value, Hash, Equal >::operator++(int) noexcept
+  {
+    HTIt< Key, Value, Hash, Equal > tmp = *this;
+
+    this->operator++();
+    return tmp;
+  }
+
+  
 }
 #endif
