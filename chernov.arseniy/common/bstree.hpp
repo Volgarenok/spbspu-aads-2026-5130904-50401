@@ -55,7 +55,7 @@ namespace chernov {
     void swap(BSTree & other) noexcept;
 
     void push(Key k, Value v);
-    void remove(Key k);
+    void remove(const Key & k);
 
     Value & at(const Key & k);
     const Value & at(const Key & k) const;
@@ -70,6 +70,7 @@ namespace chernov {
 
     void createFakes();
     void updateHeights(detail::NodeBase * node) noexcept;
+    detail::NodeBase * findNode(const Key & k);
   };
 
   template< class Key, class Value, bool IsConst >
@@ -259,6 +260,44 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
+  void BSTree< Key, Value, Compare >::remove(const Key & k)
+  {
+    detail::NodeBase * node = findNode(k);
+
+    detail::NodeBase * moved_node = node;
+    detail::NodeBase * child = fake_leaf_;
+
+    if (node->left != fake_leaf_ && node->right != fake_leaf_) {
+      moved_node = node->right;
+      while (moved_node->left != fake_leaf_) {
+        moved_node = moved_node->left;
+      }
+      std::swap(static_cast< detail::Node< Key, Value > * >(node)->key_value_,
+        static_cast< detail::Node< Key, Value > * >(moved_node)->key_value_);
+    }
+
+    child = (moved_node->left != fake_leaf_) ? moved_node->left : moved_node->right;
+
+    if (child != fake_leaf_) {
+      child->parent = moved_node->parent;
+    }
+    if (moved_node->parent->left == moved_node) {
+      moved_node->parent->left = child;
+    } else {
+      moved_node->parent->right = child;
+    }
+
+    if (moved_node->parent == fake_root_) {
+      fake_root_->left = child;
+      fake_root_->right = child;
+    }
+
+    delete moved_node;
+
+    updateHeights(moved_node->parent);
+  }
+
+  template< class Key, class Value, class Compare >
   Value & BSTree< Key, Value, Compare >::at(const Key & k)
   {
     const BSTree< Key, Value, Compare > * cthis = this;
@@ -268,18 +307,7 @@ namespace chernov {
   template< class Key, class Value, class Compare >
   const Value & BSTree< Key, Value, Compare >::at(const Key & k) const
   {
-    detail::NodeBase * node = fake_root_->left;
-    while (node != fake_leaf_) {
-      const Key & node_kv = static_cast< detail::Node< Key, Value > * >(node)->key_value_;
-      if (cmp_(k, node_kv.first)) {
-        node = node->left;
-      } else if (cmp_(node_kv.first, k)) {
-        node = node->right;
-      } else {
-        return node_kv.second;
-      }
-    }
-    throw std::out_of_range("element not found");
+    return static_cast< detail::Node< Key, Value > * >(findNode(k))->key_value_.second;
   }
 
   template< class Key, class Value, class Compare >
@@ -303,6 +331,23 @@ namespace chernov {
       node->parent->height = (lh > rh ? lh : rh) + 1;
       node = node->parent;
     }
+  }
+
+  template< class Key, class Value, class Compare >
+  detail::NodeBase * BSTree< Key, Value, Compare >::findNode(const Key & k)
+  {
+    detail::NodeBase * node = fake_root_->left;
+    while (node != fake_leaf_) {
+      const Key & node_key = static_cast< detail::Node< Key, Value > * >(node)->key_value_.first;
+      if (cmp_(k, node_key)) {
+        node = node->left;
+      } else if (cmp_(node_key, k)) {
+        node = node->right;
+      } else {
+        return node;
+      }
+    }
+    throw std::out_of_range("element not found");
   }
 }
 
