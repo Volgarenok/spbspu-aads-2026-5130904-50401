@@ -140,7 +140,7 @@ namespace chernov {
   {
     fake_leaf_ = new detail::NodeBase();
     try {
-      fake_root_ = new detail::NodeBase(nullptr, fake_leaf_, fake_leaf_, 1);
+      fake_root_ = new detail::NodeBase(nullptr, fake_leaf_, fake_leaf_, 0);
     } catch (...) {
       delete fake_leaf_;
       throw;
@@ -288,11 +288,11 @@ namespace chernov {
 
     detail::NodeBase * new_node = new detail::Node< Key, Value >(k, std::forward< U >(v),
       parent, fake_leaf_, fake_leaf_, 1);
+
     if (parent == fake_root_) {
       fake_root_->left = new_node;
       fake_root_->right = new_node;
-    }
-    if (cmp_(k, static_cast< detail::Node< Key, Value > * >(parent)->key_value_.first)) {
+    } else if (cmp_(k, static_cast< detail::Node< Key, Value > * >(parent)->key_value_.first)) {
       parent->left = new_node;
     } else {
       parent->right = new_node;
@@ -315,8 +315,6 @@ namespace chernov {
       while (moved_node->left != fake_leaf_) {
         moved_node = moved_node->left;
       }
-      std::swap(static_cast< detail::Node< Key, Value > * >(node)->key_value_,
-        static_cast< detail::Node< Key, Value > * >(moved_node)->key_value_);
     }
 
     child = (moved_node->left != fake_leaf_) ? moved_node->left : moved_node->right;
@@ -329,15 +327,43 @@ namespace chernov {
     } else {
       moved_node->parent->right = child;
     }
-
     if (moved_node->parent == fake_root_) {
       fake_root_->left = child;
       fake_root_->right = child;
     }
 
-    delete moved_node;
+    detail::NodeBase * parent_for_height = moved_node->parent;
+
+    if (moved_node == node) {
+      delete node;
+      --size_;
+      updateHeights(parent_for_height);
+      return;
+    }
+
+    detail::NodeBase * node_left   = node->left;
+    detail::NodeBase * node_right  = node->right;
+    detail::NodeBase * node_parent = node->parent;
+
+    moved_node->parent = node_parent;
+    if (node_parent == fake_root_) {
+      fake_root_->left = moved_node;
+      fake_root_->right = moved_node;
+    } else if (node_parent->left == node) {
+      node_parent->left = moved_node;
+    } else {
+      node_parent->right = moved_node;
+    }
+
+    moved_node->left = node_left;
+    if (node_left != fake_leaf_) node_left->parent = moved_node;
+
+    moved_node->right = node_right;
+    if (node_right != fake_leaf_) node_right->parent = moved_node;
+
+    delete node;
     --size_;
-    updateHeights(moved_node->parent);
+    updateHeights(moved_node);
   }
 
   template< class Key, class Value, class Compare >
@@ -573,10 +599,10 @@ namespace chernov {
   template< class Key, class Value, class Compare >
   void BSTree< Key, Value, Compare >::updateHeights(detail::NodeBase * node) noexcept
   {
-    while (node != fake_root_) {
-      size_t lh = node->parent->left->height;
-      size_t rh = node->parent->right->height;
-      node->parent->height = (lh > rh ? lh : rh) + 1;
+    while (node != fake_root_ && node != nullptr) {
+      size_t lh = node->left->height;
+      size_t rh = node->right->height;
+      node->height = (lh > rh ? lh : rh) + 1;
       node = node->parent;
     }
   }
@@ -698,7 +724,7 @@ namespace chernov {
       return node;
     }
     while (node->left != fake_leaf_) {
-      node = node_->left;
+      node = node->left;
     }
     return node;
   }
@@ -710,7 +736,7 @@ namespace chernov {
       return node;
     }
     while (node->right != fake_leaf_) {
-      node = node_->right;
+      node = node->right;
     }
     return node;
   }

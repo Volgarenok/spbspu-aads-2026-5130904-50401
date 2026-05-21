@@ -142,4 +142,26 @@ BOOST_AUTO_TEST_CASE(test_push)
   BOOST_CHECK_EQUAL(bst.at(456), 67);
 }
 
+BOOST_AUTO_TEST_CASE(test_remove)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+  BOOST_CHECK_THROW(bst.remove(123), std::out_of_range);
+
+  bst.push(123, 42);
+  bst.remove(123);
+  BOOST_CHECK(bst.empty());
+
+  bst.push(123, 42);
+  bst.push(321, 52);
+  bst.push(456, 67);
+
+  bst.remove(456);
+  bst.remove(123);
+  BOOST_CHECK_EQUAL(bst.size(), 1);
+  BOOST_CHECK_EQUAL(bst.at(321), 52);
+  bst.remove(321);
+  BOOST_CHECK(bst.empty());
+  BOOST_CHECK_THROW(bst.remove(321), std::out_of_range);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
