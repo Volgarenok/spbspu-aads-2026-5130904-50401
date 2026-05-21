@@ -87,6 +87,8 @@ namespace chernov {
 
     BSTIterator & operator++();
     BSTIterator operator++(int);
+    BSTIterator & operator--();
+    BSTIterator operator--(int);
 
   private:
     template< class, class, class >
@@ -407,6 +409,33 @@ namespace chernov {
   {
     BSTIterator temp = this;
     ++(*this);
+    return temp;
+  }
+
+  template< class Key, class Value, bool IsConst >
+  BSTIterator< Key, Value, IsConst > & BSTIterator< Key, Value, IsConst >::operator--()
+  {
+    detail::NodeBase * prev = node_;
+    if (prev->left != fake_leaf_) {
+      prev = prev->left;
+      prev = fallMaximum(prev);
+    } else {
+      detail::NodeBase * parent = prev->parent;
+      while (parent != fake_root_ && parent->right != prev) {
+        prev = parent;
+        parent = prev->parent;
+      }
+      prev = parent;
+    }
+    node_ = prev;
+    return *this;
+  }
+
+  template< class Key, class Value, bool IsConst >
+  BSTIterator< Key, Value, IsConst > BSTIterator< Key, Value, IsConst >::operator--(int)
+  {
+    BSTIterator temp = this;
+    --(*this);
     return temp;
   }
 
