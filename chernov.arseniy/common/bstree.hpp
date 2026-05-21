@@ -85,12 +85,20 @@ namespace chernov {
     reference operator*() const;
     pointer operator->() const;
 
+    BSTIterator & operator++();
+    BSTIterator operator++(int);
+
   private:
     template< class, class, class >
     friend class BSTree;
 
     detail::NodeBase * node_;
-    explicit BSTIterator(detail::NodeBase * node);
+    detail::NodeBase * fake_root_;
+    detail::NodeBase * fake_leaf_;
+
+    explicit BSTIterator(detail::NodeBase * node, detail::NodeBase * fake_root, detail::NodeBase * fake_leaf);
+    detail::NodeBase * fallMinimum(detail::NodeBase * node) const noexcept;
+    detail::NodeBase * fallMaximum(detail::NodeBase * node) const noexcept;
   };
 
   template< class Key, class Value, class Compare >
@@ -356,6 +364,14 @@ namespace chernov {
   }
 
   template< class Key, class Value, bool IsConst >
+  BSTIterator< Key, Value, IsConst >::BSTIterator(detail::NodeBase * node,
+    detail::NodeBase * fake_root, detail::NodeBase * fake_leaf):
+    node_(node),
+    fake_root_(fake_root),
+    fake_leaf_(fake_leaf)
+  {}
+
+  template< class Key, class Value, bool IsConst >
   typename BSTIterator< Key, Value, IsConst >::reference BSTIterator< Key, Value, IsConst >::operator*() const
   {
     return static_cast< detail::Node< Key, Value > * >(node_)->key_value_;
@@ -365,6 +381,57 @@ namespace chernov {
   typename BSTIterator< Key, Value, IsConst >::pointer BSTIterator< Key, Value, IsConst >::operator->() const
   {
     return std::addressof(static_cast< detail::Node< Key, Value > * >(node_)->key_value_);
+  }
+
+  template< class Key, class Value, bool IsConst >
+  BSTIterator< Key, Value, IsConst > & BSTIterator< Key, Value, IsConst >::operator++()
+  {
+    detail::NodeBase * next = node_;
+    if (next->right != fake_leaf_) {
+      next = next->right;
+      next = fallMinimum(next);
+    } else {
+      detail::NodeBase * parent = next->parent;
+      while (parent != fake_root_ && parent->left != next) {
+        next = parent;
+        parent = next->parent;
+      }
+      next = parent;
+    }
+    node_ = next;
+    return *this;
+  }
+
+  template< class Key, class Value, bool IsConst >
+  BSTIterator< Key, Value, IsConst > BSTIterator< Key, Value, IsConst >::operator++(int)
+  {
+    BSTIterator temp = this;
+    ++(*this);
+    return temp;
+  }
+
+  template< class Key, class Value, bool IsConst >
+  detail::NodeBase * BSTIterator< Key, Value, IsConst >::fallMinimum(detail::NodeBase * node) const noexcept
+  {
+    if (node == fake_leaf_) {
+      return node;
+    }
+    while (node->left != fake_leaf_) {
+      node = node_->left;
+    }
+    return node;
+  }
+
+  template< class Key, class Value, bool IsConst >
+  detail::NodeBase * BSTIterator< Key, Value, IsConst >::fallMaximum(detail::NodeBase * node) const noexcept
+  {
+    if (node == fake_leaf_) {
+      return node;
+    }
+    while (node->right != fake_leaf_) {
+      node = node_->right;
+    }
+    return node;
   }
 }
 
