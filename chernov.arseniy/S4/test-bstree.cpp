@@ -365,4 +365,37 @@ BOOST_AUTO_TEST_CASE(test_cend_iterator)
   BOOST_CHECK_EQUAL(count, 2);
 }
 
+BOOST_AUTO_TEST_CASE(test_operator_double_minus)
+{
+  chernov::BSTree< int, int, std::less< int > > bst1;
+  BOOST_CHECK(--bst1.begin() == bst1.beforeBegin());
+  BOOST_CHECK(--bst1.end() == bst1.beforeBegin());
+
+  bst1.push(123, 42);
+  bst1.push(321, 52);
+
+  auto iter1 = bst1.begin();
+  ++iter1;
+  --iter1;
+  BOOST_CHECK_EQUAL(iter1->first, 123);
+
+  ++iter1;
+  ++iter1;
+  --iter1;
+  BOOST_CHECK_EQUAL(iter1->first, 321);
+
+  iter1--;
+  BOOST_CHECK_EQUAL(iter1->first, 123);
+
+  iter1--;
+  BOOST_CHECK(iter1 == bst1.beforeBegin());
+
+  const chernov::BSTree< int, int, std::less< int > > & bst2 = bst1;
+
+  auto iter2 = bst2.cbegin();
+  ++iter2;
+  --iter2;
+  BOOST_CHECK_EQUAL(iter2->first, 123);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

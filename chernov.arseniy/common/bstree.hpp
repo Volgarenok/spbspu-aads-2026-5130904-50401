@@ -681,6 +681,10 @@ namespace chernov {
   template< class Key, class Value, bool IsConst >
   BSTIterator< Key, Value, IsConst > & BSTIterator< Key, Value, IsConst >::operator--()
   {
+    if (node_ == fake_leaf_) {
+      node_ = fallMaximum(fake_root_);
+      return *this;
+    }
     detail::NodeBase * prev = node_;
     if (prev->left != fake_leaf_) {
       prev = prev->left;
