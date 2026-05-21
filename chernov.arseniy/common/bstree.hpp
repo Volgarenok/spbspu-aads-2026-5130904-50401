@@ -57,6 +57,8 @@ namespace chernov {
     void push(Key k, Value v);
     void remove(const Key & k);
 
+    void clear() noexcept;
+
     Value & at(const Key & k);
     const Value & at(const Key & k) const;
 
@@ -213,27 +215,8 @@ namespace chernov {
     if (!fake_root_) {
       return;
     }
-    detail::NodeBase * root = fake_root_->left;
-    if (root == fake_leaf_) {
-      delete fake_root_;
-      delete fake_leaf_;
-      return;
-    }
 
-    Stack< detail::NodeBase * > stack;
-    stack.push(root);
-
-    while (!stack.empty()) {
-      detail::NodeBase * node = stack.top();
-      stack.pop();
-      if (node->left != fake_leaf_) {
-        stack.push(node->left);
-      }
-      if (node->right != fake_leaf_) {
-        stack.push(node->right);
-      }
-      delete node;
-    }
+    clear();
 
     delete fake_root_;
     delete fake_leaf_;
@@ -337,6 +320,33 @@ namespace chernov {
     delete moved_node;
     --size_;
     updateHeights(moved_node->parent);
+  }
+
+  template< class Key, class Value, class Compare >
+  void BSTree< Key, Value, Compare >::clear() noexcept
+  {
+    detail::NodeBase * root = fake_root_->left;
+    if (root == fake_leaf_) {
+      return;
+    }
+
+    Stack< detail::NodeBase * > stack;
+    stack.push(root);
+
+    while (!stack.empty()) {
+      detail::NodeBase * node = stack.top();
+      stack.pop();
+      if (node->left != fake_leaf_) {
+        stack.push(node->left);
+      }
+      if (node->right != fake_leaf_) {
+        stack.push(node->right);
+      }
+      delete node;
+    }
+    fake_root_->left = fake_leaf_;
+    fake_root_->right = fake_leaf_;
+    size_ = 0;
   }
 
   template< class Key, class Value, class Compare >
