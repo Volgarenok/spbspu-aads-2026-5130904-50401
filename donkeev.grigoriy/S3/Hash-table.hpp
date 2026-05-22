@@ -11,6 +11,24 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   class HashTable
   {
+  public:
+    using iterator = donkeev::HTIt< Key, Value >;
+    using constIterator = donkeev::HTCIt< Key, Value >;
+
+    HashTable() = delete;
+    HashTable(const size_t, const size_t);
+
+    iterator begin();
+    constIterator begin() const;
+    iterator end();
+    constIterator end() const;
+
+    void add(const Key&, const Value&);
+    Value drop(const Key&);
+    bool has(const Key&);
+    void rehash(size_t);
+
+  private:
     topit::Vector< Node< Key, Value > > data_;
     size_t bucketCount_;
     size_t bucketSize_;
@@ -19,16 +37,6 @@ namespace donkeev
     Hash hashFunc_;
     Equal equalFunc_;
 
-  public:
-    HashTable() = delete;
-    HashTable(const size_t, const size_t);
-
-    void add(const Key&, const Value&);
-    Value drop(const Key&);
-    bool has(const Key&);
-    void rehash(size_t);
-
-  private:
     Node<Key, Value>* findNode(const Key& key);
   };
 
@@ -42,6 +50,39 @@ namespace donkeev
     hashFunc_(),
     equalFunc_()
   {}
+
+  template< class Key, class Value, class Hash, class Equal >
+  typename HashTable< Key, Value, Hash, Equal >::iterator donkeev::HashTable< Key, Value, Hash, Equal >::begin()
+  {
+    iterator it{&data_, 0};
+    if (it != end() && data_[0].isEmpty())
+    {
+      ++it;
+    }
+
+    return it;
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  typename HashTable< Key, Value, Hash, Equal >::constIterator donkeev::HashTable< Key, Value, Hash, Equal >::begin() const
+  {
+    constIterator it{&data_, 0};
+    if (it != end() && data_[0].isEmpty())
+    {
+      ++it;
+    }
+
+    return it;
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  typename HashTable< Key, Value, Hash, Equal >::iterator donkeev::HashTable< Key, Value, Hash, Equal >::end()
+  {
+    return {&data_, data_.getSize()};
+  }
+  template< class Key, class Value, class Hash, class Equal >
+  typename HashTable< Key, Value, Hash, Equal >::constIterator donkeev::HashTable< Key, Value, Hash, Equal >::end() const
+  {
+    return constIterator{&data_, data_.getSize()};
+  }
 
   template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::add(const Key& key, const Value& value)
