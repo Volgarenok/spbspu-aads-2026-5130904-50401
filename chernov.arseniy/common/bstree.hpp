@@ -22,6 +22,8 @@ namespace chernov {
         right(r),
         height(h)
       {}
+
+      virtual ~NodeBase() = default;
     };
 
     template< class Key, class Value >
