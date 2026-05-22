@@ -100,6 +100,15 @@ namespace sedov
     void clear() noexcept;
     size_t size() const noexcept;
     void swap(List & h) noexcept;
+
+    void splice(LIter<T> pos, List& other) noexcept;
+    void splice(LIter<T> pos, List& other, LIter<T> it) noexcept;
+    void splice(LIter<T> pos, List& other, LIter<T> first, LIter<T> last) noexcept;
+    void merge(List& other) noexcept;
+    void sort();
+
+    template<class P>
+    LIter<T> partition(P p);
   private:
     detail::Node< T > * head_;
     detail::Node< T > * tail_;
@@ -492,6 +501,172 @@ namespace sedov
     std::swap(head_, h.head_);
     std::swap(tail_, h.tail_);
     std::swap(size_, h.size_);
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List & other) noexcept
+  {
+    if (other.size_ == 0 || this == &other)
+    {
+      return;
+    }
+    splice(pos, other, other.begin(), other.end());
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List & other, LIter< T > it) noexcept
+  {
+    if (it.ptr_ == nullptr || this == &other && pos.ptr_ == it.ptr_)
+    {
+      return;
+    }
+    LIter< T > next = it;
+    ++next;
+    splice(pos, other, it, next);
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List & other, LIter< T > first, LIter< T > last) noexcept
+  {
+    if (first == last || other.size_ == 0)
+    {
+      return;
+    }
+    size_t count = 0;
+    for (LIter< T > it = first; it != last; ++it)
+    {
+      ++count;
+    }
+    detail::Node< T > * first_node = first.ptr_;
+    detail::Node< T > * last_node = (last.ptr_ == nullptr) ? other.tail_ : last.ptr_->prev_;
+    if (first_node->prev_)
+    {
+      first_node->prev_->next_ = last.ptr_;
+    }
+    else
+    {
+      other.head_ = last.ptr_;
+    }
+    if (last.ptr_)
+    {
+      last.ptr_->prev_ = first_node->prev_;
+    }
+    else
+    {
+      other.tail_ = first_node->prev_;
+    }
+    detail::Node< T > * pos_node = pos.ptr_;
+    detail::Node< T > * pos_next = (pos_node) ? pos_node->next_ : head_;
+    first_node->prev_ = pos_node;
+    last_node->next_ = pos_next;
+    if (pos_node)
+    {
+      pos_node->next_ = first_node;
+    }
+    else
+    {
+      head_ = first_node;
+    }
+    if (pos_next)
+    {
+      pos_next->prev_ = last_node;
+    }
+    else
+    {
+      tail_ = last_node;
+    }
+    size_ += count;
+    other.size_ -= count;
+  }
+
+  template< class T >
+  void List< T >::merge(List & other) noexcept
+  {
+    if (this == &other || other.size_ == 0)
+    {
+      return;
+    }
+    LIter< T > this_it = begin();
+    LIter< T > other_it = other.begin();
+    while (this_it != end() && other_it != other.end())
+    {
+      if (other_it.ptr_->val_ < this_it.ptr_->val_)
+      {
+        LIter< T > to_move = other_it;
+        ++other_it;
+        splice(this_it, other, to_move);
+      }
+      else
+      {
+        ++this_it;
+      }
+    }
+    if (other_it != other.end())
+    {
+      splice(end(), other, other_it, other.end());
+    }
+  }
+
+  template< class T >
+  static void mergeSort(List< T > & list)
+  {
+    if (list.size() <= 1)
+    {
+      return;
+    }
+    List< T > right;
+    size_t half = list.size() / 2;
+    LIter< T > mid = list.begin();
+    for (size_t i = 0; i < half; ++i)
+    {
+      ++mid;
+    }
+    right.splice(right.begin(), list, mid, list.end());
+    mergeSort(list);
+    mergeSort(right);
+    list.merge(right);
+  }
+
+  template< class T >
+  void List< T >::sort()
+  {
+    if (size_ <= 1)
+    {
+      return;
+    }
+    mergeSort(*this);
+  }
+
+  template< class T >
+  template< class P >
+  LIter< T > List< T >::partition(P p)
+  {
+    if (size_ == 0)
+    {
+      return end();
+    }
+    List< T > false_list;
+    LIter< T > it = begin();
+    while (it != end())
+    {
+      if (!p(*it))
+      {
+        LIter< T > to_move = it;
+        ++it;
+        false_list.splice(false_list.end(), *this, to_move);
+      }
+      else
+      {
+        ++it;
+      }
+    }
+    splice(end(), false_list);
+    LIter< T > result = begin();
+    for (size_t i = 0; i < size_ - false_list.size(); ++i)
+    {
+      ++result;
+    }
+    return result;
   }
 }
 

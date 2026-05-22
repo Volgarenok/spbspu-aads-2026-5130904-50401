@@ -302,4 +302,260 @@ BOOST_AUTO_TEST_CASE(ConstIterTest)
   BOOST_CHECK(empty.cbegin() == empty.cend());
 }
 
+BOOST_AUTO_TEST_CASE(SpliceAllTest)
+{
+  sedov::List< int > a;
+  a.pushBack(1);
+  a.pushBack(2);
+  sedov::List< int > b;
+  b.pushBack(10);
+  b.pushBack(20);
+  b.pushBack(30);
+  auto pos = a.begin();
+  ++pos;
+  a.splice(pos, b);
+  BOOST_CHECK_EQUAL(a.size(), 5);
+  BOOST_CHECK_EQUAL(b.size(), 0);
+  auto it = a.begin();
+  int expected[] = {1, 10, 20, 30, 2};
+  for (size_t i = 0; i < 5; ++i)
+  {
+    BOOST_CHECK_EQUAL(*it, expected[i]);
+    ++it;
+  }
+  BOOST_CHECK(it == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(SpliceSingleTest)
+{
+  sedov::List< int > a;
+  a.pushBack(1);
+  a.pushBack(3);
+  sedov::List< int > b;
+  b.pushBack(10);
+  b.pushBack(20);
+  b.pushBack(30);
+  auto pos = a.begin();
+  ++pos;
+  auto it = b.begin();
+  ++it;
+  a.splice(pos, b, it);
+  BOOST_CHECK_EQUAL(a.size(), 3);
+  BOOST_CHECK_EQUAL(b.size(), 2);
+  auto check = a.begin();
+  BOOST_CHECK_EQUAL(*check, 1);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 20);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 3);
+  ++check;
+  BOOST_CHECK(check == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(SpliceRangeTest)
+{
+  sedov::List< int > a;
+  a.pushBack(1);
+  a.pushBack(5);
+  sedov::List< int > b;
+  b.pushBack(10);
+  b.pushBack(20);
+  b.pushBack(30);
+  b.pushBack(40);
+  auto pos = a.begin();
+  ++pos;
+  auto first = b.begin();
+  ++first;
+  auto last = b.begin();
+  ++last;
+  ++last;
+  ++last;
+  a.splice(pos, b, first, last);
+  BOOST_CHECK_EQUAL(a.size(), 4);
+  BOOST_CHECK_EQUAL(b.size(), 2);
+  auto check = a.begin();
+  BOOST_CHECK_EQUAL(*check, 1);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 20);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 30);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 5);
+  ++check;
+  BOOST_CHECK(check == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(SpliceToBeginTest)
+{
+  sedov::List< int > a;
+  a.pushBack(1);
+  a.pushBack(2);
+  sedov::List< int > b;
+  b.pushBack(10);
+  b.pushBack(20);
+  a.splice(a.begin(), b);
+  BOOST_CHECK_EQUAL(a.size(), 4);
+  BOOST_CHECK_EQUAL(b.size(), 0);
+  auto it = a.begin();
+  BOOST_CHECK_EQUAL(*it, 10);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 20);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 1);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 2);
+}
+
+BOOST_AUTO_TEST_CASE(SpliceToEndTest)
+{
+  sedov::List< int > a;
+  a.pushBack(1);
+  a.pushBack(2);
+  sedov::List< int > b;
+  b.pushBack(10);
+  b.pushBack(20);
+  a.splice(a.end(), b);
+  BOOST_CHECK_EQUAL(a.size(), 4);
+  BOOST_CHECK_EQUAL(b.size(), 0);
+  auto it = a.begin();
+  BOOST_CHECK_EQUAL(*it, 1);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 2);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 10);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 20);
+}
+
+BOOST_AUTO_TEST_CASE(MergeSortedTest)
+{
+  sedov::List< int > a;
+  a.pushBack(1);
+  a.pushBack(3);
+  a.pushBack(5);
+  sedov::List< int > b;
+  b.pushBack(2);
+  b.pushBack(4);
+  b.pushBack(6);
+  a.merge(b);
+  BOOST_CHECK_EQUAL(a.size(), 6);
+  BOOST_CHECK_EQUAL(b.size(), 0);
+  auto it = a.begin();
+  int expected[] = {1, 2, 3, 4, 5, 6};
+  for (size_t i = 0; i < 6; ++i)
+  {
+    BOOST_CHECK_EQUAL(*it, expected[i]);
+    ++it;
+  }
+
+  BOOST_CHECK(it == a.end());
+}
+
+BOOST_AUTO_TEST_CASE(MergeWithEmptyTest)
+{
+  sedov::List< int > a;
+  a.pushBack(1);
+  a.pushBack(2);
+  a.pushBack(3);
+  sedov::List< int > b;
+  size_t old_size = a.size();
+  a.merge(b);
+  BOOST_CHECK_EQUAL(a.size(), old_size);
+  BOOST_CHECK_EQUAL(b.size(), 0);
+  auto it = a.begin();
+  BOOST_CHECK_EQUAL(*it, 1);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 2);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 3);
+}
+
+BOOST_AUTO_TEST_CASE(MergeWithDuplicatesTest)
+{
+  sedov::List< int > a;
+  a.pushBack(1);
+  a.pushBack(3);
+  a.pushBack(5);
+  sedov::List< int > b;
+  b.pushBack(1);
+  b.pushBack(3);
+  b.pushBack(5);
+  a.merge(b);
+  BOOST_CHECK_EQUAL(a.size(), 6);
+  BOOST_CHECK_EQUAL(b.size(), 0);
+  auto it = a.begin();
+  int expected[] = {1, 1, 3, 3, 5, 5};
+  for (size_t i = 0; i < 6; ++i)
+  {
+    BOOST_CHECK_EQUAL(*it, expected[i]);
+    ++it;
+  }
+}
+
+BOOST_AUTO_TEST_CASE(SortTest)
+{
+  sedov::List< int > list;
+  list.pushBack(5);
+  list.pushBack(1);
+  list.pushBack(4);
+  list.pushBack(2);
+  list.pushBack(3);
+  list.sort();
+  BOOST_CHECK_EQUAL(list.size(), 5);
+  auto it = list.begin();
+  for (int i = 1; i <= 5; ++i)
+  {
+    BOOST_CHECK_EQUAL(*it, i);
+    ++it;
+  }
+  BOOST_CHECK(it == list.end());
+}
+
+bool isEven(int x)
+{
+  return x % 2 == 0;
+}
+
+BOOST_AUTO_TEST_CASE(PartitionTest)
+{
+  sedov::List< int > list;
+  list.pushBack(3);
+  list.pushBack(1);
+  list.pushBack(4);
+  list.pushBack(1);
+  list.pushBack(5);
+  list.pushBack(9);
+  list.pushBack(2);
+  list.pushBack(6);
+  auto it = list.partition(isEven);
+  int expected[] = {4, 2, 6, 3, 1, 1, 5, 9};
+  auto check = list.begin();
+  for (size_t i = 0; i < 8; ++i)
+  {
+    BOOST_CHECK_EQUAL(*check, expected[i]);
+    ++check;
+  }
+  BOOST_CHECK(check == list.end());
+  BOOST_CHECK(it != list.end());
+  BOOST_CHECK_EQUAL(*it, 3);
+}
+
+BOOST_AUTO_TEST_CASE(PartitionAllTrueTest)
+{
+  sedov::List< int > list;
+  list.pushBack(2);
+  list.pushBack(4);
+  list.pushBack(6);
+  auto it = list.partition(isEven);
+  auto check = list.begin();
+  BOOST_CHECK_EQUAL(*check, 2);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 4);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 6);
+  ++check;
+  BOOST_CHECK(check == list.end());
+  BOOST_CHECK(it == list.end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
