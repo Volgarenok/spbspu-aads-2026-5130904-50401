@@ -562,14 +562,26 @@ namespace chernov {
   typename BSTree< Key, Value, Compare>::iterator
   BSTree< Key, Value, Compare >::begin() noexcept
   {
-    return iterator(fake_root_->left, fake_root_, fake_leaf_);
+    detail::NodeBase * first = fake_root_->left;
+    if (first != fake_leaf_) {
+      while (first->left != fake_leaf_) {
+        first = first->left;
+      }
+    }
+    return iterator(first, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare>::const_iterator
   BSTree< Key, Value, Compare >::begin() const noexcept
   {
-    return const_iterator(fake_root_->left, fake_root_, fake_leaf_);
+    detail::NodeBase * first = fake_root_->left;
+    if (first != fake_leaf_) {
+      while (first->left != fake_leaf_) {
+        first = first->left;
+      }
+    }
+    return const_iterator(first, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
@@ -681,7 +693,7 @@ namespace chernov {
   BSTIterator< Key, Value, IsConst > & BSTIterator< Key, Value, IsConst >::operator++()
   {
     if (node_ == fake_root_) {
-      node_ = fake_root_->left;
+      node_ = fallMinimum(fake_root_->left);
       return *this;
     }
     detail::NodeBase * next = node_;
