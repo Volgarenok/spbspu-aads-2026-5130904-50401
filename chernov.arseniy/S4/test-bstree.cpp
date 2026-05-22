@@ -191,7 +191,13 @@ BOOST_AUTO_TEST_CASE(test_rotate_left)
   bst.push(9, 209);
 
   auto iter = bst.cfindIter(4);
+  BOOST_CHECK_EQUAL(bst.height(iter), 4);
+  BOOST_CHECK_EQUAL(bst.height(bst.cfindIter(8)), 3);
+
   auto new_iter = bst.rotateLeft(iter);
+
+  BOOST_CHECK_EQUAL(bst.height(iter), 3);
+  BOOST_CHECK_EQUAL(bst.height(new_iter), 4);
 
   BOOST_CHECK_EQUAL(iter->first, 4);
   BOOST_CHECK_EQUAL(new_iter->first, 8);
@@ -217,7 +223,13 @@ BOOST_AUTO_TEST_CASE(test_rotate_right)
   bst.push(9, 209);
 
   auto iter = bst.cfindIter(8);
+  BOOST_CHECK_EQUAL(bst.height(iter), 3);
+  BOOST_CHECK_EQUAL(bst.height(bst.cfindIter(6)), 2);
+
   auto new_iter = bst.rotateRight(iter);
+
+  BOOST_CHECK_EQUAL(bst.height(iter), 2);
+  BOOST_CHECK_EQUAL(bst.height(new_iter), 3);
 
   BOOST_CHECK_EQUAL(iter->first, 8);
   BOOST_CHECK_EQUAL(new_iter->first, 6);
@@ -243,7 +255,15 @@ BOOST_AUTO_TEST_CASE(test_rotate_large_left)
   bst.push(9, 209);
 
   auto iter = bst.cfindIter(4);
+  BOOST_CHECK_EQUAL(bst.height(iter), 4);
+  BOOST_CHECK_EQUAL(bst.height(bst.cfindIter(6)), 2);
+  BOOST_CHECK_EQUAL(bst.height(bst.cfindIter(8)), 3);
+
   auto new_iter = bst.rotateLargeLeft(iter);
+
+  BOOST_CHECK_EQUAL(bst.height(iter), 3);
+  BOOST_CHECK_EQUAL(bst.height(new_iter), 4);
+  BOOST_CHECK_EQUAL(bst.height(bst.cfindIter(8)), 2);
 
   BOOST_CHECK_EQUAL(iter->first, 4);
   BOOST_CHECK_EQUAL(new_iter->first, 6);
@@ -271,7 +291,15 @@ BOOST_AUTO_TEST_CASE(test_rotate_large_right)
   bst.push(3, 203);
 
   auto iter = bst.cfindIter(6);
+  BOOST_CHECK_EQUAL(bst.height(iter), 4);
+  BOOST_CHECK_EQUAL(bst.height(bst.cfindIter(4)), 2);
+  BOOST_CHECK_EQUAL(bst.height(bst.cfindIter(2)), 3);
+
   auto new_iter = bst.rotateLargeRight(iter);
+
+  BOOST_CHECK_EQUAL(bst.height(iter), 4);
+  BOOST_CHECK_EQUAL(bst.height(new_iter), 5);
+  BOOST_CHECK_EQUAL(bst.height(bst.cfindIter(2)), 2);
 
   BOOST_CHECK_EQUAL(iter->first, 6);
   BOOST_CHECK_EQUAL(new_iter->first, 4);
