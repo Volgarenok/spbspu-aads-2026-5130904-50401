@@ -10,6 +10,7 @@ namespace chernov {
   using cmd_t = void(*)(std::istream & input, std::ostream & output, dicts_t & dicts);
 
   void cmdPrint(std::istream & input, std::ostream & output, dicts_t & dicts);
+  void cmdComplement(std::istream & input, std::ostream & output, dicts_t & dicts);
 }
 
 #endif

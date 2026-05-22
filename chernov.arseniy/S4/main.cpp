@@ -42,6 +42,7 @@ int main(int argc, char ** argv)
 
   chernov::BSTree< std::string, chernov::cmd_t, std::less< std::string > > cmds;
   cmds.push("print", chernov::cmdPrint);
+  cmds.push("complement", chernov::cmdComplement);
 
   std::string cmd;
   while (input >> cmd) {
