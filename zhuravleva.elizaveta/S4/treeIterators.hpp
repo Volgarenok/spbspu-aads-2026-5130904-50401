@@ -15,6 +15,8 @@ namespace zhuravleva
   template< class Key, class Value >
   class BSTIterator
   {
+    template< class K, class V, class C >
+    friend class BSTree;
     friend class BSTConstIterator< Key, Value >;
   public:
     BSTIterator() noexcept;
@@ -33,6 +35,8 @@ namespace zhuravleva
   template< class Key, class Value >
   class BSTConstIterator
   {
+    template< class K, class V, class C >
+    friend class BSTree;
   public:
     BSTConstIterator() noexcept;
     explicit BSTConstIterator(const TreeNode< Key, Value >* node) noexcept;
