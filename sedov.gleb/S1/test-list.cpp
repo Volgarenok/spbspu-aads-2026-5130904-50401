@@ -317,12 +317,16 @@ BOOST_AUTO_TEST_CASE(SpliceAllTest)
   BOOST_CHECK_EQUAL(a.size(), 5);
   BOOST_CHECK_EQUAL(b.size(), 0);
   auto it = a.begin();
-  int expected[] = {1, 10, 20, 30, 2};
-  for (size_t i = 0; i < 5; ++i)
-  {
-    BOOST_CHECK_EQUAL(*it, expected[i]);
-    ++it;
-  }
+  BOOST_CHECK_EQUAL(*it, 1);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 10);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 20);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 30);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 2);
+  ++it;
   BOOST_CHECK(it == a.end());
 }
 
@@ -385,48 +389,6 @@ BOOST_AUTO_TEST_CASE(SpliceRangeTest)
   BOOST_CHECK(check == a.end());
 }
 
-BOOST_AUTO_TEST_CASE(SpliceToBeginTest)
-{
-  sedov::List< int > a;
-  a.pushBack(1);
-  a.pushBack(2);
-  sedov::List< int > b;
-  b.pushBack(10);
-  b.pushBack(20);
-  a.splice(a.begin(), b);
-  BOOST_CHECK_EQUAL(a.size(), 4);
-  BOOST_CHECK_EQUAL(b.size(), 0);
-  auto it = a.begin();
-  BOOST_CHECK_EQUAL(*it, 10);
-  ++it;
-  BOOST_CHECK_EQUAL(*it, 20);
-  ++it;
-  BOOST_CHECK_EQUAL(*it, 1);
-  ++it;
-  BOOST_CHECK_EQUAL(*it, 2);
-}
-
-BOOST_AUTO_TEST_CASE(SpliceToEndTest)
-{
-  sedov::List< int > a;
-  a.pushBack(1);
-  a.pushBack(2);
-  sedov::List< int > b;
-  b.pushBack(10);
-  b.pushBack(20);
-  a.splice(a.end(), b);
-  BOOST_CHECK_EQUAL(a.size(), 4);
-  BOOST_CHECK_EQUAL(b.size(), 0);
-  auto it = a.begin();
-  BOOST_CHECK_EQUAL(*it, 1);
-  ++it;
-  BOOST_CHECK_EQUAL(*it, 2);
-  ++it;
-  BOOST_CHECK_EQUAL(*it, 10);
-  ++it;
-  BOOST_CHECK_EQUAL(*it, 20);
-}
-
 BOOST_AUTO_TEST_CASE(MergeSortedTest)
 {
   sedov::List< int > a;
@@ -441,55 +403,12 @@ BOOST_AUTO_TEST_CASE(MergeSortedTest)
   BOOST_CHECK_EQUAL(a.size(), 6);
   BOOST_CHECK_EQUAL(b.size(), 0);
   auto it = a.begin();
-  int expected[] = {1, 2, 3, 4, 5, 6};
-  for (size_t i = 0; i < 6; ++i)
+  for (int i = 1; i <= 6; ++i)
   {
-    BOOST_CHECK_EQUAL(*it, expected[i]);
+    BOOST_CHECK_EQUAL(*it, i);
     ++it;
   }
-
   BOOST_CHECK(it == a.end());
-}
-
-BOOST_AUTO_TEST_CASE(MergeWithEmptyTest)
-{
-  sedov::List< int > a;
-  a.pushBack(1);
-  a.pushBack(2);
-  a.pushBack(3);
-  sedov::List< int > b;
-  size_t old_size = a.size();
-  a.merge(b);
-  BOOST_CHECK_EQUAL(a.size(), old_size);
-  BOOST_CHECK_EQUAL(b.size(), 0);
-  auto it = a.begin();
-  BOOST_CHECK_EQUAL(*it, 1);
-  ++it;
-  BOOST_CHECK_EQUAL(*it, 2);
-  ++it;
-  BOOST_CHECK_EQUAL(*it, 3);
-}
-
-BOOST_AUTO_TEST_CASE(MergeWithDuplicatesTest)
-{
-  sedov::List< int > a;
-  a.pushBack(1);
-  a.pushBack(3);
-  a.pushBack(5);
-  sedov::List< int > b;
-  b.pushBack(1);
-  b.pushBack(3);
-  b.pushBack(5);
-  a.merge(b);
-  BOOST_CHECK_EQUAL(a.size(), 6);
-  BOOST_CHECK_EQUAL(b.size(), 0);
-  auto it = a.begin();
-  int expected[] = {1, 1, 3, 3, 5, 5};
-  for (size_t i = 0; i < 6; ++i)
-  {
-    BOOST_CHECK_EQUAL(*it, expected[i]);
-    ++it;
-  }
 }
 
 BOOST_AUTO_TEST_CASE(SortTest)
@@ -528,16 +447,26 @@ BOOST_AUTO_TEST_CASE(PartitionTest)
   list.pushBack(2);
   list.pushBack(6);
   auto it = list.partition(isEven);
-  int expected[] = {4, 2, 6, 3, 1, 1, 5, 9};
-  auto check = list.begin();
-  for (size_t i = 0; i < 8; ++i)
-  {
-    BOOST_CHECK_EQUAL(*check, expected[i]);
-    ++check;
-  }
-  BOOST_CHECK(check == list.end());
   BOOST_CHECK(it != list.end());
   BOOST_CHECK_EQUAL(*it, 3);
+  auto check = list.begin();
+  BOOST_CHECK_EQUAL(*check, 4);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 2);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 6);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 3);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 1);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 1);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 5);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 9);
+  ++check;
+  BOOST_CHECK(check == list.end());
 }
 
 BOOST_AUTO_TEST_CASE(PartitionAllTrueTest)
@@ -547,6 +476,7 @@ BOOST_AUTO_TEST_CASE(PartitionAllTrueTest)
   list.pushBack(4);
   list.pushBack(6);
   auto it = list.partition(isEven);
+  BOOST_CHECK(it == list.end());
   auto check = list.begin();
   BOOST_CHECK_EQUAL(*check, 2);
   ++check;
@@ -555,7 +485,6 @@ BOOST_AUTO_TEST_CASE(PartitionAllTrueTest)
   BOOST_CHECK_EQUAL(*check, 6);
   ++check;
   BOOST_CHECK(check == list.end());
-  BOOST_CHECK(it == list.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

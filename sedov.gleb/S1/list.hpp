@@ -516,7 +516,7 @@ namespace sedov
   template< class T >
   void List< T >::splice(LIter< T > pos, List & h, LIter< T > it) noexcept
   {
-    if (it.ptr_ == nullptr)
+    if (it.ptr_ == nullptr || h.size_ == 0)
     {
       return;
     }
@@ -556,20 +556,20 @@ namespace sedov
       h.tail_ = firstNode->prev_;
     }
     detail::Node< T > * posNode = pos.ptr_;
-    detail::Node< T > * posNext = (posNode) ? posNode->next_ : head_;
-    firstNode->prev_ = posNode;
-    lastNode->next_ = posNext;
-    if (posNode)
+    detail::Node< T > * posPrev = (posNode) ? posNode->prev_ : tail_;
+    firstNode->prev_ = posPrev;
+    lastNode->next_ = posNode;
+    if (posPrev)
     {
-      posNode->next_ = firstNode;
+      posPrev->next_ = firstNode;
     }
     else
     {
       head_ = firstNode;
     }
-    if (posNext)
+    if (posNode)
     {
-      posNext->prev_ = lastNode;
+      posNode->prev_ = lastNode;
     }
     else
     {
@@ -660,13 +660,17 @@ namespace sedov
         ++it;
       }
     }
-    splice(end(), falseList);
-    if (falseList.size() == 0)
+    size_t falseCount = falseList.size();
+    if (falseCount > 0)
+    {
+      splice(end(), falseList);
+    }
+    if (falseCount == 0)
     {
       return end();
     }
     LIter< T > result = begin();
-    for (size_t i = 0; i < size_ - falseList.size(); ++i)
+    for (size_t i = 0; i < size_ - falseCount; ++i)
     {
       ++result;
     }
