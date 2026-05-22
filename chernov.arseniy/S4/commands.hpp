@@ -12,6 +12,7 @@ namespace chernov {
   void cmdPrint(std::istream & input, std::ostream & output, dicts_t & dicts);
   void cmdComplement(std::istream & input, std::ostream & output, dicts_t & dicts);
   void cmdIntersect(std::istream & input, std::ostream & output, dicts_t & dicts);
+  void cmdUnion(std::istream & input, std::ostream & output, dicts_t & dicts);
 }
 
 #endif

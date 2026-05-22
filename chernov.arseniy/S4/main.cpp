@@ -44,6 +44,7 @@ int main(int argc, char ** argv)
   cmds.push("print", chernov::cmdPrint);
   cmds.push("complement", chernov::cmdComplement);
   cmds.push("intersect", chernov::cmdIntersect);
+  cmds.push("union", chernov::cmdUnion);
 
   std::string cmd;
   while (input >> cmd) {
