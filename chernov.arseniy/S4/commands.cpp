@@ -25,10 +25,6 @@ void chernov::cmdComplement(std::istream & input, std::ostream &, dicts_t & dict
   std::string newdataset, dataset1, dataset2;
   input >> newdataset >> dataset1 >> dataset2;
 
-  if (dicts.contains(newdataset)) {
-    throw std::runtime_error(newdataset + " already exists");
-  }
-
   dict_t & dict1 = dicts.at(dataset1);
   dict_t & dict2 = dicts.at(dataset2);
   dict_t new_dict;
@@ -47,10 +43,6 @@ void chernov::cmdIntersect(std::istream & input, std::ostream &, dicts_t & dicts
   std::string newdataset, dataset1, dataset2;
   input >> newdataset >> dataset1 >> dataset2;
 
-  if (dicts.contains(newdataset)) {
-    throw std::runtime_error(newdataset + " already exists");
-  }
-
   dict_t & dict1 = dicts.at(dataset1);
   dict_t & dict2 = dicts.at(dataset2);
   dict_t new_dict;
@@ -68,10 +60,6 @@ void chernov::cmdUnion(std::istream & input, std::ostream &, dicts_t & dicts)
 {
   std::string newdataset, dataset1, dataset2;
   input >> newdataset >> dataset1 >> dataset2;
-
-  if (dicts.contains(newdataset)) {
-    throw std::runtime_error(newdataset + " already exists");
-  }
 
   dict_t & dict1 = dicts.at(dataset1);
   dict_t & dict2 = dicts.at(dataset2);
