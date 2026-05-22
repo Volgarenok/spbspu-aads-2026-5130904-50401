@@ -180,123 +180,107 @@ BOOST_AUTO_TEST_CASE(test_clear)
 BOOST_AUTO_TEST_CASE(test_rotate_left)
 {
   chernov::BSTree< int, int, std::less< int > > bst;
-  bst.push(10, 210);
-  bst.push(5, 205);
+  bst.push(4, 204);
   bst.push(2, 202);
+  bst.push(1, 201);
+  bst.push(3, 203);
+  bst.push(8, 208);
+  bst.push(6, 206);
+  bst.push(5, 205);
+  bst.push(7, 207);
   bst.push(9, 209);
-  bst.push(15, 215);
-  bst.push(13, 213);
-  bst.push(12, 212);
-  bst.push(14, 214);
-  bst.push(16, 216);
 
-  auto iter = bst.cfindIter(10);
+  auto iter = bst.cfindIter(4);
   auto new_iter = bst.rotateLeft(iter);
 
-  BOOST_CHECK_EQUAL(iter->first, 10);
-  BOOST_CHECK_EQUAL((--iter)->first, 9);
-  BOOST_CHECK_EQUAL((--iter)->first, 5);
-  ++iter;
-  ++iter;
+  BOOST_CHECK_EQUAL(iter->first, 4);
+  BOOST_CHECK_EQUAL(new_iter->first, 8);
 
-  BOOST_CHECK_EQUAL((++iter)->first, 12);
-  BOOST_CHECK_EQUAL((++iter)->first, 13);
-  BOOST_CHECK_EQUAL((++iter)->first, 14);
-  BOOST_CHECK((++iter) == new_iter);
-
-  BOOST_CHECK_EQUAL(new_iter->first, 15);
-  BOOST_CHECK_EQUAL((++new_iter)->first, 16);
+  int i = 1;
+  iter = bst.cbegin();
+  for (; iter != bst.cend(); ++iter, ++i) {
+    BOOST_CHECK_EQUAL(iter->first, i);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(test_rotate_right)
 {
   chernov::BSTree< int, int, std::less< int > > bst;
-  bst.push(10, 210);
-  bst.push(5, 205);
+  bst.push(4, 204);
   bst.push(2, 202);
+  bst.push(1, 201);
+  bst.push(3, 203);
+  bst.push(8, 208);
+  bst.push(6, 206);
+  bst.push(5, 205);
+  bst.push(7, 207);
   bst.push(9, 209);
-  bst.push(15, 215);
-  bst.push(13, 213);
-  bst.push(12, 212);
-  bst.push(14, 214);
-  bst.push(16, 216);
 
-  auto iter = bst.cfindIter(15);
+  auto iter = bst.cfindIter(8);
   auto new_iter = bst.rotateRight(iter);
 
-  BOOST_CHECK_EQUAL(iter->first, 15);
-  BOOST_CHECK_EQUAL((++iter)->first, 16);
-  --iter;
-  BOOST_CHECK_EQUAL((--iter)->first, 14);
-  BOOST_CHECK((--iter) == new_iter);
+  BOOST_CHECK_EQUAL(iter->first, 8);
+  BOOST_CHECK_EQUAL(new_iter->first, 6);
 
-  BOOST_CHECK_EQUAL(new_iter->first, 13);
-  BOOST_CHECK_EQUAL((--new_iter)->first, 12);
+  int i = 1;
+  iter = bst.cbegin();
+  for (; iter != bst.cend(); ++iter, ++i) {
+    BOOST_CHECK_EQUAL(iter->first, i);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(test_rotate_large_left)
 {
   chernov::BSTree< int, int, std::less< int > > bst;
-  bst.push(10, 210);
-  bst.push(5, 205);
+  bst.push(4, 204);
   bst.push(2, 202);
+  bst.push(1, 201);
+  bst.push(3, 203);
+  bst.push(8, 208);
+  bst.push(6, 206);
+  bst.push(5, 205);
+  bst.push(7, 207);
   bst.push(9, 209);
-  bst.push(15, 215);
-  bst.push(13, 213);
-  bst.push(12, 212);
-  bst.push(14, 214);
-  bst.push(16, 216);
 
-  auto iter = bst.cfindIter(10);
+  auto iter = bst.cfindIter(4);
   auto new_iter = bst.rotateLargeLeft(iter);
 
-  BOOST_CHECK_EQUAL(iter->first, 10);
-  BOOST_CHECK_EQUAL((--iter)->first, 9);
-  BOOST_CHECK_EQUAL((--iter)->first, 5);
-  ++iter;
-  ++iter;
-  BOOST_CHECK_EQUAL((++iter)->first, 12);
-  BOOST_CHECK((++iter) == new_iter);
+  BOOST_CHECK_EQUAL(iter->first, 4);
+  BOOST_CHECK_EQUAL(new_iter->first, 6);
 
-  BOOST_CHECK_EQUAL(new_iter->first, 13);
-  BOOST_CHECK_EQUAL((++new_iter)->first, 14);
-  BOOST_CHECK_EQUAL((++new_iter)->first, 15);
-  BOOST_CHECK_EQUAL((++new_iter)->first, 16);
+  int i = 1;
+  iter = bst.cbegin();
+  for (; iter != bst.cend(); ++iter, ++i) {
+    BOOST_CHECK_EQUAL(iter->first, i);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(test_rotate_large_right)
 {
   chernov::BSTree< int, int, std::less< int > > bst;
-  bst.push(10, 210);
-  bst.push(5, 205);
+  bst.push(6, 206);
   bst.push(2, 202);
+  bst.push(1, 201);
+  bst.push(4, 204);
+  bst.push(10, 210);
   bst.push(8, 208);
-  bst.push(15, 215);
-  bst.push(13, 213);
-  bst.push(12, 212);
-  bst.push(14, 214);
-  bst.push(16, 216);
-  bst.push(9, 209);
   bst.push(7, 207);
+  bst.push(9, 209);
+  bst.push(11, 211);
+  bst.push(5, 205);
+  bst.push(3, 203);
 
-  auto iter = bst.cfindIter(10);
+  auto iter = bst.cfindIter(6);
   auto new_iter = bst.rotateLargeRight(iter);
 
-  BOOST_CHECK_EQUAL(iter->first, 10);
-  BOOST_CHECK_EQUAL((--iter)->first, 9);
-  ++iter;
-  BOOST_CHECK_EQUAL((++iter)->first, 12);
-  BOOST_CHECK_EQUAL((++iter)->first, 13);
-  BOOST_CHECK_EQUAL((++iter)->first, 14);
-  BOOST_CHECK_EQUAL((++iter)->first, 15);
-  for (size_t i = 0; i < 5; ++i) {
-    --iter;
-  }
-  BOOST_CHECK((--iter) == new_iter);
+  BOOST_CHECK_EQUAL(iter->first, 6);
+  BOOST_CHECK_EQUAL(new_iter->first, 4);
 
-  BOOST_CHECK_EQUAL(new_iter->first, 8);
-  BOOST_CHECK_EQUAL((--iter)->first, 7);
-  BOOST_CHECK_EQUAL((--iter)->first, 5);
+  int i = 1;
+  iter = bst.cbegin();
+  for (; iter != bst.cend(); ++iter, ++i) {
+    BOOST_CHECK_EQUAL(iter->first, i);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
