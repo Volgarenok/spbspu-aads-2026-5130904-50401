@@ -516,7 +516,7 @@ namespace sedov
   template< class T >
   void List< T >::splice(LIter< T > pos, List & h, LIter< T > it) noexcept
   {
-    if ((it.ptr_ == nullptr || this == &h) && pos.ptr_ == it.ptr_)
+    if (it.ptr_ == nullptr)
     {
       return;
     }
@@ -537,11 +537,11 @@ namespace sedov
     {
       ++count;
     }
-    detail::Node< T > * first_node = first.ptr_;
-    detail::Node< T > * last_node = (last.ptr_ == nullptr) ? h.tail_ : last.ptr_->prev_;
-    if (first_node->prev_)
+    detail::Node< T > * firstNode = first.ptr_;
+    detail::Node< T > * lastNode = (last.ptr_ == nullptr) ? h.tail_ : last.ptr_->prev_;
+    if (firstNode->prev_)
     {
-      first_node->prev_->next_ = last.ptr_;
+      firstNode->prev_->next_ = last.ptr_;
     }
     else
     {
@@ -549,31 +549,31 @@ namespace sedov
     }
     if (last.ptr_)
     {
-      last.ptr_->prev_ = first_node->prev_;
+      last.ptr_->prev_ = firstNode->prev_;
     }
     else
     {
-      h.tail_ = first_node->prev_;
+      h.tail_ = firstNode->prev_;
     }
-    detail::Node< T > * pos_node = pos.ptr_;
-    detail::Node< T > * pos_next = (pos_node) ? pos_node->next_ : head_;
-    first_node->prev_ = pos_node;
-    last_node->next_ = pos_next;
-    if (pos_node)
+    detail::Node< T > * posNode = pos.ptr_;
+    detail::Node< T > * posNext = (posNode) ? posNode->next_ : head_;
+    firstNode->prev_ = posNode;
+    lastNode->next_ = posNext;
+    if (posNode)
     {
-      pos_node->next_ = first_node;
-    }
-    else
-    {
-      head_ = first_node;
-    }
-    if (pos_next)
-    {
-      pos_next->prev_ = last_node;
+      posNode->next_ = firstNode;
     }
     else
     {
-      tail_ = last_node;
+      head_ = firstNode;
+    }
+    if (posNext)
+    {
+      posNext->prev_ = lastNode;
+    }
+    else
+    {
+      tail_ = lastNode;
     }
     size_ += count;
     h.size_ -= count;
@@ -586,24 +586,24 @@ namespace sedov
     {
       return;
     }
-    LIter< T > this_it = begin();
-    LIter< T > h_it = h.begin();
-    while (this_it != end() && h_it != h.end())
+    LIter< T > thisIt = begin();
+    LIter< T > hIt = h.begin();
+    while (thisIt != end() && hIt != h.end())
     {
-      if (h_it.ptr_->val_ < this_it.ptr_->val_)
+      if (*hIt < *thisIt)
       {
-        LIter< T > to_move = h_it;
-        ++h_it;
-        splice(this_it, h, to_move);
+        LIter< T > toMove = hIt;
+        ++hIt;
+        splice(thisIt, h, toMove);
       }
       else
       {
-        ++this_it;
+        ++thisIt;
       }
     }
-    if (h_it != h.end())
+    if (hIt != h.end())
     {
-      splice(end(), h, h_it, h.end());
+      splice(end(), h, hIt, h.end());
     }
   }
 
@@ -645,24 +645,28 @@ namespace sedov
     {
       return end();
     }
-    List< T > false_list;
+    List< T > falseList;
     LIter< T > it = begin();
     while (it != end())
     {
       if (!p(*it))
       {
-        LIter< T > to_move = it;
+        LIter< T > toMove = it;
         ++it;
-        false_list.splice(false_list.end(), *this, to_move);
+        falseList.splice(falseList.end(), *this, toMove);
       }
       else
       {
         ++it;
       }
     }
-    splice(end(), false_list);
+    splice(end(), falseList);
+    if (falseList.size() == 0)
+    {
+      return end();
+    }
     LIter< T > result = begin();
-    for (size_t i = 0; i < size_ - false_list.size(); ++i)
+    for (size_t i = 0; i < size_ - falseList.size(); ++i)
     {
       ++result;
     }
