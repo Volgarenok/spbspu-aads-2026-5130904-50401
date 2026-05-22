@@ -81,26 +81,6 @@ BOOST_AUTO_TEST_CASE(test_copy_operator)
   ht1.add(123, 42);
   ht1.add(321, 52);
 
-  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht2;
-  ht2 = std::move(ht1);
-
-  BOOST_CHECK(ht1.empty());
-
-  BOOST_CHECK_EQUAL(ht2.size(), 2);
-  BOOST_CHECK_EQUAL(ht2.at(123), 42);
-  BOOST_CHECK_EQUAL(ht2.at(321), 52);
-
-  ht2.add(456, 67);
-  BOOST_CHECK_EQUAL(ht1.size(), 0);
-  BOOST_CHECK_EQUAL(ht2.size(), 3);
-}
-
-BOOST_AUTO_TEST_CASE(test_move_operator)
-{
-  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht1(64);
-  ht1.add(123, 42);
-  ht1.add(321, 52);
-
   ht1 = ht1;
   BOOST_CHECK_EQUAL(ht1.size(), 2);
   BOOST_CHECK_EQUAL(ht1.at(123), 42);
@@ -120,6 +100,26 @@ BOOST_AUTO_TEST_CASE(test_move_operator)
   BOOST_CHECK_EQUAL(ht1.size(), 0);
   ht2 = ht1;
   BOOST_CHECK_EQUAL(ht2.size(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(test_move_operator)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht1(64);
+  ht1.add(123, 42);
+  ht1.add(321, 52);
+
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht2;
+  ht2 = std::move(ht1);
+
+  BOOST_CHECK(ht1.empty());
+
+  BOOST_CHECK_EQUAL(ht2.size(), 2);
+  BOOST_CHECK_EQUAL(ht2.at(123), 42);
+  BOOST_CHECK_EQUAL(ht2.at(321), 52);
+
+  ht2.add(456, 67);
+  BOOST_CHECK_EQUAL(ht1.size(), 0);
+  BOOST_CHECK_EQUAL(ht2.size(), 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
