@@ -208,6 +208,32 @@ BOOST_AUTO_TEST_CASE(test_rotate_left)
   BOOST_CHECK_EQUAL((++new_iter)->first, 16);
 }
 
+BOOST_AUTO_TEST_CASE(test_rotate_right)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+  bst.push(10, 210);
+  bst.push(5, 205);
+  bst.push(2, 202);
+  bst.push(9, 209);
+  bst.push(15, 215);
+  bst.push(13, 213);
+  bst.push(12, 212);
+  bst.push(14, 214);
+  bst.push(16, 216);
+
+  auto iter = bst.cfindIter(15);
+  auto new_iter = bst.rotateRight(iter);
+
+  BOOST_CHECK_EQUAL(iter->first, 15);
+  BOOST_CHECK_EQUAL((++iter)->first, 16);
+  --iter;
+  BOOST_CHECK_EQUAL((--iter)->first, 14);
+  BOOST_CHECK((--iter) == new_iter);
+
+  BOOST_CHECK_EQUAL(new_iter->first, 13);
+  BOOST_CHECK_EQUAL((--new_iter)->first, 12);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(bstree_getters_tests)
