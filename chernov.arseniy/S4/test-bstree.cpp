@@ -439,6 +439,40 @@ BOOST_AUTO_TEST_CASE(test_cend_iterator)
   BOOST_CHECK_EQUAL(count, 2);
 }
 
+BOOST_AUTO_TEST_CASE(test_find_iterator)
+{
+  chernov::BSTree< int, int, std::less< int > > bst;
+  bst.push(321, 52);
+  bst.push(123, 42);
+  bst.push(456, 67);
+  bst.push(789, 78);
+
+  auto iter = bst.findIter(456);
+  BOOST_CHECK_EQUAL(iter->first, 456);
+  BOOST_CHECK_EQUAL((++iter)->first, 789);
+  BOOST_CHECK((++iter) == bst.end());
+
+  BOOST_CHECK(bst.findIter(234) == bst.end());
+}
+
+BOOST_AUTO_TEST_CASE(test_cfind_iterator)
+{
+  chernov::BSTree< int, int, std::less< int > > bst1;
+  bst1.push(321, 52);
+  bst1.push(123, 42);
+  bst1.push(456, 67);
+  bst1.push(789, 78);
+
+  const chernov::BSTree< int, int, std::less< int > > & bst2 = bst1;
+
+  auto iter = bst2.findIter(456);
+  BOOST_CHECK_EQUAL(iter->first, 456);
+  BOOST_CHECK_EQUAL((++iter)->first, 789);
+  BOOST_CHECK((++iter) == bst2.cend());
+
+  BOOST_CHECK(bst2.cfindIter(234) == bst2.cend());
+}
+
 BOOST_AUTO_TEST_CASE(test_operator_double_minus)
 {
   chernov::BSTree< int, int, std::less< int > > bst1;

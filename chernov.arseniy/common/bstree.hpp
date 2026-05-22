@@ -76,17 +76,21 @@ namespace chernov {
     size_t height() const noexcept;
     size_t height(const_iterator iter) const noexcept;
 
-    iterator beforeBegin();
-    const_iterator beforeBegin() const;
-    const_iterator cbeforeBegin() const;
+    iterator beforeBegin() noexcept;
+    const_iterator beforeBegin() const noexcept;
+    const_iterator cbeforeBegin() const noexcept;
 
-    iterator begin();
-    const_iterator begin() const;
-    const_iterator cbegin() const;
+    iterator begin() noexcept;
+    const_iterator begin() const noexcept;
+    const_iterator cbegin() const noexcept;
 
-    iterator end();
-    const_iterator end() const;
-    const_iterator cend() const;
+    iterator end() noexcept;
+    const_iterator end() const noexcept;
+    const_iterator cend() const noexcept;
+
+    iterator findIter(const Key & k) noexcept;
+    const_iterator findIter(const Key & k) const noexcept;
+    const_iterator cfindIter(const Key & k) const noexcept;
 
   private:
     detail::NodeBase * fake_root_;
@@ -535,65 +539,94 @@ namespace chernov {
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare>::iterator
-  BSTree< Key, Value, Compare >::beforeBegin()
+  BSTree< Key, Value, Compare >::beforeBegin() noexcept
   {
     return iterator(fake_root_, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::beforeBegin() const
+  BSTree< Key, Value, Compare >::beforeBegin() const noexcept
   {
     return const_iterator(fake_root_, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::cbeforeBegin() const
+  BSTree< Key, Value, Compare >::cbeforeBegin() const noexcept
   {
     return beforeBegin();
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare>::iterator
-  BSTree< Key, Value, Compare >::begin()
+  BSTree< Key, Value, Compare >::begin() noexcept
   {
     return iterator(fake_root_->left, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::begin() const
+  BSTree< Key, Value, Compare >::begin() const noexcept
   {
     return const_iterator(fake_root_->left, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::cbegin() const
+  BSTree< Key, Value, Compare >::cbegin() const noexcept
   {
     return begin();
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare>::iterator
-  BSTree< Key, Value, Compare >::end()
+  BSTree< Key, Value, Compare >::end() noexcept
   {
     return iterator(fake_leaf_, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::end() const
+  BSTree< Key, Value, Compare >::end() const noexcept
   {
     return const_iterator(fake_leaf_, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::cend() const
+  BSTree< Key, Value, Compare >::cend() const noexcept
   {
     return end();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare>::iterator
+  BSTree< Key, Value, Compare >::findIter(const Key & k) noexcept
+  {
+    try {
+      return iterator(findNode(k), fake_root_, fake_leaf_);
+    } catch (...) {
+      return end();
+    }
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare>::const_iterator
+  BSTree< Key, Value, Compare >::findIter(const Key & k) const noexcept
+  {
+    try {
+      return const_iterator(findNode(k), fake_root_, fake_leaf_);
+    } catch (...) {
+      return cend();
+    }
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare>::const_iterator
+  BSTree< Key, Value, Compare >::cfindIter(const Key & k) const noexcept
+  {
+    return findIter(k);
   }
 
   template< class Key, class Value, class Compare >
