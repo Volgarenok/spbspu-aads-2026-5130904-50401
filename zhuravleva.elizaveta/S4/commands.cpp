@@ -94,7 +94,7 @@ void zhuravleva::unite(
   const std::string& secondName
 )
 {
-    if (dictionaries.contains(newName))
+  if (dictionaries.contains(newName))
   {
     throw std::runtime_error("dataset already exists");
   }
@@ -194,7 +194,7 @@ void zhuravleva::processCommand(
       out << "<INVALID COMMAND>" << '\n';
     }
   }
-  catch(const std::exception& e)
+  catch (const std::exception&)
   {
     out << "<INVALID COMMAND>" << '\n';
   }
