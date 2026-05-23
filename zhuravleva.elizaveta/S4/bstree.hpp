@@ -111,8 +111,9 @@ zhuravleva::BSTree< Key, Value, Compare >::operator=(const BSTree& other)
 {
   if (this != &other)
   {
+    zhuravleva::TreeNode< Key, Value >* newRoot = copy(other.root_, nullptr);
     clear();
-    root_ = copy(other.root_, nullptr);
+    root_ = newRoot;
     size_ = other.size_;
     compare_ = other.compare_;
   }
@@ -284,21 +285,23 @@ void zhuravleva::BSTree< Key, Value, Compare >::push(const Key& key, const Value
 template< class Key, class Value, class Compare >
 Value& zhuravleva::BSTree< Key, Value, Compare >::get(const Key& key)
 {
-  if (find(key) == end())
+  zhuravleva::BSTIterator< Key, Value > it = find(key);
+  if (it == end())
   {
     throw std::runtime_error("key not found");
   }
-  return find(key)->second;
+  return it->second;
 }
 
 template< class Key, class Value, class Compare >
 const Value& zhuravleva::BSTree< Key, Value, Compare >::get(const Key& key) const
 {
-  if (find(key) == cend())
+  zhuravleva::BSTConstIterator< Key, Value > it = find(key);
+  if (it == cend())
   {
     throw std::runtime_error("key not found");
   }
-  return find(key)->second;
+  return it->second;
 }
 
 template< class Key, class Value, class Compare >
@@ -384,7 +387,7 @@ zhuravleva::BSTConstIterator< Key, Value >
 zhuravleva::BSTree< Key, Value, Compare >::rotateLeft(constIterator it) noexcept
 {
   zhuravleva::TreeNode< Key, Value >* node = const_cast< zhuravleva::TreeNode< Key, Value >* >(it.current_);
-  if (!node || !node->parent)
+  if (!node || !node->parent_)
   {
     return cend();
   }
@@ -521,8 +524,7 @@ zhuravleva::TreeNode< Key, Value >* zhuravleva::BSTree< Key, Value, Compare >::c
     return nullptr;
   }
   zhuravleva::TreeNode< Key, Value >* newNode = new zhuravleva::TreeNode< Key, Value >
-    (node->data_.first,
-    node->data_.second, parent);
+    (node->data_.first, node->data_.second, parent);
   newNode->left_ = copy(node->left_, newNode);
   newNode->right_ = copy(node->right_, newNode);
   return newNode;
