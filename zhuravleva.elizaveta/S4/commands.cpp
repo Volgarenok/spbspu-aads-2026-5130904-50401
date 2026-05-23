@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
+#include <limits>
 
 void zhuravleva::print(
   std::ostream& out,
@@ -37,10 +38,6 @@ void zhuravleva::complement(
   const std::string& secondName
 )
 {
-  if (dictionaries.contains(newName))
-  {
-    throw std::runtime_error("dataset already exists");
-  }
   DictionaryStorage::iterator firstIt = dictionaries.find(firstName);
   DictionaryStorage::iterator secondIt = dictionaries.find(secondName);
   if (firstIt == dictionaries.end() || secondIt == dictionaries.end())
@@ -56,6 +53,10 @@ void zhuravleva::complement(
       result.push(it1->first, it1->second);
     }
   }
+  if (dictionaries.contains(newName))
+  {
+    dictionaries.drop(newName);
+  }
   dictionaries.push(newName, result);
 }
 
@@ -66,10 +67,6 @@ void zhuravleva::intersect(
   const std::string& secondName
 )
 {
-  if (dictionaries.contains(newName))
-  {
-    throw std::runtime_error("dataset already exists");
-  }
   DictionaryStorage::iterator firstIt = dictionaries.find(firstName);
   DictionaryStorage::iterator secondIt = dictionaries.find(secondName);
   if (firstIt == dictionaries.end() || secondIt == dictionaries.end())
@@ -84,6 +81,10 @@ void zhuravleva::intersect(
       result.push(it1->first, it1->second);
     }
   }
+  if (dictionaries.contains(newName))
+  {
+    dictionaries.drop(newName);
+  }
   dictionaries.push(newName, result);
 }
 
@@ -94,10 +95,6 @@ void zhuravleva::unite(
   const std::string& secondName
 )
 {
-  if (dictionaries.contains(newName))
-  {
-    throw std::runtime_error("dataset already exists");
-  }
   DictionaryStorage::iterator firstIt = dictionaries.find(firstName);
   DictionaryStorage::iterator secondIt = dictionaries.find(secondName);
   if (firstIt == dictionaries.end() || secondIt == dictionaries.end())
@@ -115,6 +112,10 @@ void zhuravleva::unite(
     {
       result.push(it2->first, it2->second);
     }
+  }
+  if (dictionaries.contains(newName))
+  {
+    dictionaries.drop(newName);
   }
   dictionaries.push(newName, result);
 }
@@ -192,6 +193,7 @@ void zhuravleva::processCommand(
     else
     {
       out << "<INVALID COMMAND>" << '\n';
+      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
   catch (const std::exception&)

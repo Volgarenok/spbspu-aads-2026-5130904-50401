@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_CASE(default_constructor_test)
   BOOST_TEST(tree.size() == 0);
   BOOST_TEST(tree.empty());
   BOOST_TEST(tree.height() == 0);
-  BOOST_TEST(tree.begin() == tree.end());
+  BOOST_CHECK(tree.begin() == tree.end());
 }
 
 BOOST_AUTO_TEST_CASE(push_get_contains_test)
