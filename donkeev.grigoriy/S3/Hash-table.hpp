@@ -1,7 +1,7 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
 
-#include "Node.hpp"
+#include "HTNode.hpp"
 #include "../common/top-it-vector.hpp"
 #include "../common/vector-iterators.hpp"
 #include "hashTableIt.hpp"
@@ -24,12 +24,14 @@ namespace donkeev
     constIterator end() const;
 
     void add(const Key&, const Value&);
+    Value& get(const Key&);
+    Value* find(const Key&);
     Value drop(const Key&);
     bool has(const Key&);
     void rehash(size_t);
 
   private:
-    topit::Vector< Node< Key, Value > > data_;
+    topit::Vector< HTNode< Key, Value > > data_;
     size_t bucketCount_;
     size_t bucketSize_;
     size_t reserveBucketSize_;
@@ -37,12 +39,12 @@ namespace donkeev
     Hash hashFunc_;
     Equal equalFunc_;
 
-    Node<Key, Value>* findNode(const Key& key);
+    HTNode<Key, Value>* findNode(const Key& key);
   };
 
   template< class Key, class Value, class Hash, class Equal >
   HashTable< Key, Value, Hash, Equal >::HashTable(const size_t bucketCount, const size_t bucketSize):
-    data_((bucketCount + 1) * bucketSize, Node< Key, Value >()),
+    data_((bucketCount + 1) * bucketSize, HTNode< Key, Value >()),
     bucketCount_(bucketCount),
     bucketSize_(bucketSize),
     reserveBucketSize_(bucketSize),
@@ -92,13 +94,13 @@ namespace donkeev
     size_t startId = bucketId * bucketSize_;
     size_t endId = startId + bucketSize_;
 
-    topit::VIter< Node< Key, Value > > begin = data_.begin() + startId;
-    topit::VIter< Node< Key, Value > > end = data_.begin() + endId;
+    topit::VIter< HTNode< Key, Value > > begin = data_.begin() + startId;
+    topit::VIter< HTNode< Key, Value > > end = data_.begin() + endId;
     while (begin != end)
     {
       if (begin->isEmpty())
       {
-        *begin = Node< Key, Value >(key, value);
+        *begin = HTNode< Key, Value >(key, value);
         ++totalElements_;
         return;
       }
@@ -112,7 +114,7 @@ namespace donkeev
     {
       if (begin->isEmpty())
       {
-        *begin = Node< Key, Value >(key, value);
+        *begin = HTNode< Key, Value >(key, value);
         ++totalElements_;
         return;
       }
@@ -124,9 +126,33 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  Value& HashTable< Key, Value, Hash, Equal >::get(const Key& key)
+  {
+    HTNode< Key, Value >* node = findNode(key);
+    if (node == nullptr)
+    {
+      throw std::out_of_range("No such element");
+    }
+
+    return node->data_.second;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  Value* HashTable< Key, Value, Hash, Equal >::find(const Key& key)
+  {
+    HTNode< Key, Value >* node = findNode(key);
+    if (node == nullptr)
+    {
+      return nullptr;
+    }
+
+    return &((*node).data_.second);
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
   Value HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
   {
-    Node<Key, Value>* node = findNode(key);
+    HTNode<Key, Value>* node = findNode(key);
     if (!node)
     {
       throw std::out_of_range("No such element");
@@ -139,7 +165,7 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   bool HashTable< Key, Value, Hash, Equal >::has(const Key& key)
   {
-    Node< Key, Value >* node = findNode(key);
+    HTNode< Key, Value >* node = findNode(key);
     if (!node)
     {
       return false;
@@ -150,10 +176,10 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::rehash(size_t newBucketCount)
   {
-    topit::Vector< Node< Key, Value > > newData((newBucketCount + 1) * bucketSize_, Node< Key, Value >());
+    topit::Vector< HTNode< Key, Value > > newData((newBucketCount + 1) * bucketSize_, HTNode< Key, Value >());
 
-    topit::VIter< Node< Key, Value > > oldDataBegin = data_.begin();
-    topit::VIter< Node< Key, Value > > oldDataEnd = data_.end();
+    topit::VIter< HTNode< Key, Value > > oldDataBegin = data_.begin();
+    topit::VIter< HTNode< Key, Value > > oldDataEnd = data_.end();
     while (oldDataBegin != oldDataEnd)
     {
       if (oldDataBegin->isEmpty())
@@ -166,8 +192,8 @@ namespace donkeev
       size_t startId = bucketId * bucketSize_;
       size_t endId = startId + bucketSize_;
 
-      topit::VIter< Node< Key, Value > > newDataBegin = newData.begin() + startId;
-      topit::VIter< Node< Key, Value > > newDataEnd = newData.begin() + endId;
+      topit::VIter< HTNode< Key, Value > > newDataBegin = newData.begin() + startId;
+      topit::VIter< HTNode< Key, Value > > newDataEnd = newData.begin() + endId;
       bool tookPlace = false;
       while (newDataBegin != newDataEnd)
       {
@@ -211,15 +237,15 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Node<Key, Value>* HashTable< Key, Value, Hash, Equal >::findNode(const Key& key)
+  HTNode<Key, Value>* HashTable< Key, Value, Hash, Equal >::findNode(const Key& key)
   {
     size_t hash = hashFunc_(key);
     size_t bucketId = hash % bucketCount_;
     size_t startId = bucketId * bucketSize_;
     size_t endId = startId + bucketSize_;
 
-    topit::VIter< Node< Key, Value > > begin = data_.begin() + startId;
-    topit::VIter< Node< Key, Value > > end = data_.begin() + endId;
+    topit::VIter< HTNode< Key, Value > > begin = data_.begin() + startId;
+    topit::VIter< HTNode< Key, Value > > end = data_.begin() + endId;
     while (begin != end)
     {
       if (equalFunc_(key, begin->key))
