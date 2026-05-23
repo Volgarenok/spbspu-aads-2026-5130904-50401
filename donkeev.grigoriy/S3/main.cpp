@@ -29,14 +29,15 @@ void readGraphs(const std::string& filename, donkeev::HashTable<std::string, don
   }
 
   std::string line;
-  while (std::getline(file, line)) {
+  while (std::getline(file, line))
+  {
     if (line.empty())
     {
       continue;
     }
 
     size_t position = 0;
-    std::string grapgName = nextWord(line, position);
+    std::string graphName = nextWord(line, position);
 
     std::string edgesCountStr = nextWord(line, position);
     if (edgesCountStr.empty())
@@ -71,6 +72,8 @@ void readGraphs(const std::string& filename, donkeev::HashTable<std::string, don
       size_t weight = std::stoull(weightStr);
       graph.addEdge(from, to, weight);
     }
+
+    graphs.add(graphName, graph);
   }
 }
 int main(int argc, char* argv[])
