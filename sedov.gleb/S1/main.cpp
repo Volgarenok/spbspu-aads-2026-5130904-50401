@@ -7,7 +7,7 @@
 
 int main()
 {
-  sedov::List< std::pair< std::string, sedov::List< size_t > > > sequnces;
+  sedov::List< std::pair< std::string, sedov::List< size_t > > > sequences;
   std::string str;
 
   while (std::cin >> str)
@@ -19,19 +19,19 @@ int main()
       numbers.pushBack(num);
     }
     std::cin.clear();
-    sequnces.pushBack(std::make_pair(str, std::move(numbers)));
+    sequences.pushBack(std::make_pair(str, std::move(numbers)));
   }
 
-  if (sequnces.begin() == sequnces.end())
+  if (sequences.begin() == sequences.end())
   {
     std::cout << "0\n";
     return 0;
   }
 
-  auto seq_it = sequnces.begin();
+  auto seq_it = sequences.begin();
   std::cout << seq_it->first;
   ++seq_it;
-  while (seq_it != sequnces.end())
+  while (seq_it != sequences.end())
   {
     std::cout << " " << seq_it->first;
     ++seq_it;
@@ -39,7 +39,7 @@ int main()
   std::cout << "\n";
 
   size_t maxLen = 0;
-  for (auto it = sequnces.cbegin(); it != sequnces.cend(); ++it)
+  for (auto it = sequences.cbegin(); it != sequences.cend(); ++it)
   {
     size_t len = 0;
     for (auto nit = it->second.cbegin(); nit != it->second.cend(); ++nit)
@@ -57,7 +57,7 @@ int main()
   for (size_t pos = 0; pos < maxLen; ++pos)
   {
     sedov::List< size_t > newSeq;
-    for (auto sit = sequnces.cbegin(); sit != sequnces.cend(); ++sit)
+    for (auto sit = sequences.cbegin(); sit != sequences.cend(); ++sit)
     {
       auto nit = sit->second.cbegin();
       size_t cur = 0;
@@ -82,15 +82,16 @@ int main()
   {
     for (auto tit = transpose.begin(); tit != transpose.end(); ++tit)
     {
-      bool f = true;
-      for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)
+      if (tit->cbegin() != tit->cend())
       {
-        if (!f)
-        {
-          std::cout << " ";
-        }
+        auto nit = tit->cbegin();
         std::cout << *nit;
-        f = false;
+        ++nit;
+        while (nit != tit->cend())
+        {
+          std::cout << " " << *nit;
+          ++nit;
+        }
       }
       std::cout << "\n";
     }
@@ -99,36 +100,30 @@ int main()
     for (auto tit = transpose.cbegin(); tit != transpose.cend(); ++tit)
     {
       size_t sum = 0;
-      try
+      for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)
       {
-        for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)
+        if (sum > sedov::MAX - *nit)
         {
-          if (sum > sedov::MAX - *nit)
-          {
-            throw std::overflow_error("Sum overflow");
-          }
-          sum += *nit;
+          std::cerr << "Sum overflow\n";
+          return 1;
         }
-      }
-      catch (const std::overflow_error & e)
-      {
-        std::cerr << e.what() << "\n";
-        return 1;
+        sum += *nit;
       }
       sums.pushBack(sum);
     }
 
-    bool f = true;
-    for (auto sit = sums.begin(); sit != sums.end(); ++sit)
+    if (sums.size())
     {
-      if (!f)
-      {
-        std::cout << " ";
-      }
+      auto sit = sums.cbegin();
       std::cout << *sit;
-      f = false;
+      ++sit;
+      while (sit != sums.cend())
+      {
+        std::cout << " " << *sit;
+        ++sit;
+      }
+      std::cout << "\n";
     }
-    std::cout << "\n";
   }
   else
   {
