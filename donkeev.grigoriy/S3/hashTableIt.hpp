@@ -3,7 +3,7 @@
 
 #include "iostream"
 #include "top-it-vector.hpp"
-#include "Node.hpp"
+#include "HTNode.hpp"
 
 namespace donkeev
 {
@@ -31,11 +31,11 @@ namespace donkeev
     bool operator<(const HTIt<Key, Value>&) const noexcept;
     bool operator<=(const HTIt<Key, Value>&) const noexcept;
   private:
-    const topit::Vector<donkeev::Node<Key, Value>>* vector_;
+    const topit::Vector<donkeev::HTNode<Key, Value>>* vector_;
     size_t currentId_;
     size_t dataSize_;
 
-    explicit HTIt(const topit::Vector<donkeev::Node<Key, Value>>*, size_t);
+    explicit HTIt(const topit::Vector<donkeev::HTNode<Key, Value>>*, size_t);
   };
 
   template<class Key, class Value>
@@ -59,15 +59,15 @@ namespace donkeev
     bool operator<(const HTCIt<Key, Value>&) const noexcept;
     bool operator<=(const HTCIt<Key, Value>&) const noexcept;
   private:
-    const topit::Vector<donkeev::Node<Key, Value>>* vector_;
+    const topit::Vector<donkeev::HTNode<Key, Value>>* vector_;
     size_t currentId_;
     size_t dataSize_;
 
-    explicit HTCIt(const topit::Vector<donkeev::Node<Key, Value>>*, size_t);
+    explicit HTCIt(const topit::Vector<donkeev::HTNode<Key, Value>>*, size_t);
   };
 
   template<class Key, class Value>
-  HTIt<Key, Value>::HTIt(const topit::Vector<donkeev::Node<Key, Value>>* data, size_t currentId):
+  HTIt<Key, Value>::HTIt(const topit::Vector<donkeev::HTNode<Key, Value>>* data, size_t currentId):
     vector_(data),
     currentId_(currentId),
     dataSize_(vector_->getSize())
