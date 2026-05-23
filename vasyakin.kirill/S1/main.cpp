@@ -14,22 +14,14 @@ int main()
   {
     vasyakin::List< size_t > numbers;
     size_t num = 0;
-    vasyakin::Node< size_t >* last_num = nullptr;
 
     while (std::cin >> num)
     {
-      if (last_num == nullptr)
-      {
-        last_num = numbers.insert(numbers.get_fake(), num);
-      }
-      else
-      {
-        last_num = numbers.insert(last_num, num);
-      }
+      numbers.pushBack(num);
     }
     std::cin.clear();
 
-    sequences.push_back(std::make_pair(name, std::move(numbers)));
+    sequences.pushBack(std::make_pair(name, std::move(numbers)));
   }
 
   if (sequences.begin() == sequences.end())
@@ -56,14 +48,10 @@ int main()
     {
       ++len;
     }
-    if (len > max_len)
-    {
-      max_len = len;
-    }
+    max_len = std::max(max_len, len);
   }
 
   vasyakin::List< vasyakin::List< size_t > > transposed;
-  vasyakin::Node< vasyakin::List< size_t > >* last_trans = nullptr;
   bool hasNumbers = false;
 
   for (size_t pos = 0; pos < max_len; ++pos)
@@ -82,21 +70,14 @@ int main()
 
       if (nit != sit->second.cend())
       {
-        new_seq.push_back(*nit);
+        new_seq.pushBack(*nit);
         hasNumbers = true;
       }
     }
 
     if (new_seq.begin() != new_seq.end())
     {
-      if (last_trans == nullptr)
-      {
-        last_trans = transposed.insert(transposed.get_fake(), std::move(new_seq));
-      }
-      else
-      {
-        last_trans = transposed.insert(last_trans, std::move(new_seq));
-      }
+      transposed.pushBack(std::move(new_seq));
     }
   }
 
@@ -104,15 +85,14 @@ int main()
   {
     for (auto tit = transposed.begin(); tit != transposed.end(); ++tit)
     {
-      bool first = true;
-      for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)
+      auto nit = tit->cbegin();
+      if (nit != tit->cend())
       {
-        if (!first)
-        {
-          std::cout << " ";
-        }
         std::cout << *nit;
-        first = false;
+        for (++nit; nit != tit->cend(); ++nit)
+        {
+          std::cout << " " << *nit;
+        }
       }
       std::cout << '\n';
     }
@@ -125,30 +105,29 @@ int main()
       {
         for (auto nit = tit->cbegin(); nit != tit->cend(); ++nit)
         {
-          if (sum > vasyakin::MAX - *nit)
+          if (sum > vasyakin::max - *nit)
           {
             throw std::overflow_error("Sum overflow");
           }
           sum += *nit;
         }
       }
-      catch(std::overflow_error& e)
+      catch (const std::overflow_error& e)
       {
         std::cerr << e.what() << "\n";
         return 1;
       }
-      sums.push_back(sum);
+      sums.pushBack(sum);
     }
 
-    bool first = true;
-    for (auto sit = sums.begin(); sit != sums.end(); ++sit)
+    auto sit = sums.begin();
+    if (sit != sums.end())
     {
-      if (!first)
-      {
-        std::cout << " ";
-      }
       std::cout << *sit;
-      first = false;
+      for (++sit; sit != sums.end(); ++sit)
+      {
+        std::cout << " " << *sit;
+      }
     }
     std::cout << '\n';
   }
