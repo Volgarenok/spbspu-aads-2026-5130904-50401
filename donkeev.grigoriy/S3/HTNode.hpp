@@ -20,7 +20,7 @@ namespace donkeev
 
   template<class Key, class Value>
   HTNode<Key, Value>::HTNode():
-    data_(),
+    data_(std::make_pair(Key(), Value())),
     isOccupied_(false)
   {}
 
