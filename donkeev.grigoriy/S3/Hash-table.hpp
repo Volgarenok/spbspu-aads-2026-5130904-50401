@@ -246,9 +246,11 @@ namespace donkeev
 
     topit::VIter< HTNode< Key, Value > > begin = data_.begin() + startId;
     topit::VIter< HTNode< Key, Value > > end = data_.begin() + endId;
+    HTNode< Key, Value > thisHTNode;
     while (begin != end)
     {
-      if (equalFunc_(key, begin->key))
+      thisHTNode = *begin;
+      if (equalFunc_(key, thisHTNode.data_.first))
       {
         return &(*begin);
       }
@@ -257,9 +259,10 @@ namespace donkeev
 
     begin = data_.begin() + bucketCount_ * bucketSize_;
     end = begin + bucketSize_;
+    thisHTNode = *begin;
     while (begin != end)
     {
-      if (equalFunc_(key, begin->key))
+      if (equalFunc_(key, thisHTNode.data_.first))
       {
         return &(*begin);
       }
