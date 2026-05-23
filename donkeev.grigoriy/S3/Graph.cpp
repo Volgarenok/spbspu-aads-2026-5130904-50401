@@ -1,5 +1,10 @@
 #include "Graph.hpp"
 
+donkeev::Graph::Graph():
+  edgesCount_(0),
+  table_(1, 1)
+{}
+
 donkeev::Graph::Graph(const size_t bucketCount, const size_t bucketSize):
   edgesCount_(0),
   table_(bucketCount, bucketSize)
