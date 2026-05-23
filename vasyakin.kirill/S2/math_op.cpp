@@ -191,7 +191,7 @@ long long vasyakin::calculate(long long a, long long b, const std::string& op)
   throw std::runtime_error("Unknown operator: " + op);
 }
 
-void vasyakin::processToken(const std::string& token, vasyakin::Stack< std::string >& opStack,
+static void processToken(const std::string& token, vasyakin::Stack< std::string >& opStack,
   vasyakin::Queue< std::string >& postfix)
 {
   if (token.empty())
@@ -290,7 +290,7 @@ long long vasyakin::evaluatePostfix(vasyakin::Queue< std::string >& postfix)
       temp.pop();
 
       long long a = temp.top();
-      temp.top();
+      temp.pop();
 
       long long res = vasyakin::calculate(a, b, token);
       temp.push(res);
