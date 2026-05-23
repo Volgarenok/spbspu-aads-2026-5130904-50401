@@ -1,3 +1,6 @@
+#ifndef HASH_STRUCTS_HPP
+#define HASH_STRUCTS_HPP
+
 #include "iostream"
 
 namespace donkeev
@@ -22,3 +25,5 @@ namespace donkeev
     bool operator()(const std::string&, const std::string&) const;
   };
 }
+
+#endif
