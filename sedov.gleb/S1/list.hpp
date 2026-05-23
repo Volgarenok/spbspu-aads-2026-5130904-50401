@@ -91,6 +91,7 @@ namespace sedov
 
     void pushFront(const T & v);
     void pushBack(const T & v);
+    void pushBack(T && v);
     LIter< T > insert(LIter< T > p, const T & v);
 
     void popFront();
@@ -124,7 +125,7 @@ namespace sedov
 
   template< class T >
   detail::Node< T >::Node(T && value):
-    val_(value),
+    val_(std::move(value)),
     next_(nullptr),
     prev_(nullptr)
   {}
@@ -367,6 +368,23 @@ namespace sedov
   void List< T >::pushBack(const T & v)
   {
     detail::Node< T > * newNode = new detail::Node< T >(v);
+    newNode->prev_ = tail_;
+    if (tail_)
+    {
+      tail_->next_ = newNode;
+    }
+    else
+    {
+      head_ = newNode;
+    }
+    tail_ = newNode;
+    ++size_;
+  }
+
+  template< class T >
+  void List< T >::pushBack(T && v)
+  {
+    detail::Node< T > * newNode = new detail::Node< T >(std::move(v));
     newNode->prev_ = tail_;
     if (tail_)
     {
