@@ -34,16 +34,7 @@ int main(int argc, char** argv)
   {
     while (std::getline(*input, line))
     {
-      bool empty = true;
-      for (char c : line)
-      {
-        if (!std::isspace(static_cast< unsigned char >(c)))
-        {
-          empty = false;
-          break;
-        }
-      }
-      if (empty)
+      if (line.empty())
       {
         continue;
       }
@@ -58,15 +49,16 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  bool first = true;
-  while (!results.empty())
+  if (!results.empty())
   {
-    if (!first)
+    std::cout << results.top();
+    results.pop();
+
+    while (!results.empty())
     {
-      std::cout << " ";
+      std::cout << " " << results.top();
+      results.pop();
     }
-    std::cout << results.drop();
-    first = false;
   }
   std::cout << '\n';
 

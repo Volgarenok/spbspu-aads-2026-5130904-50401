@@ -1,48 +1,19 @@
 #include "math_op.hpp"
-#include "stack.hpp"
 #include <limits>
 #include <cstddef>
 #include <stdexcept>
 #include <string>
 #include <cmath>
 
-bool vasyakin::isNumber(const std::string& s)
+bool vasyakin::isOperation(const std::string& s)
 {
   if (s.empty())
   {
     return false;
   }
 
-  size_t start = 0;
-
-  if (s[start] == '-')
-  {
-    if (s.length() == 1)
-    {
-      return false;
-    }
-    ++start;
-  }
-
-  for (size_t i = start; i < s.length(); ++i)
-  {
-    if (!std::isdigit(static_cast< unsigned char >(s[i])))
-    {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool vasyakin::isOperator(const std::string& s)
-{
-  if (s.empty())
-  {
-    return false;
-  }
-
-  if (s.length() == 1 && ((s[0] == '-') || (s[0] == '+') || (s[0] == '/') || (s[0] == '*') || (s[0] == '%')))
+  if (s.length() == 1 && ((s[0] == '-') || (s[0] == '+') ||
+    (s[0] == '/') || (s[0] == '*') || (s[0] == '%')))
   {
     return true;
   }
@@ -100,7 +71,7 @@ long long vasyakin::lcm(long long a, long long b)
   long long abs_a = std::abs(a);
   long long abs_b = std::abs(b);
 
-  if (abs_a / g > vasyakin::MAX / abs_b)
+  if (abs_a / g > vasyakin::maxLL / abs_b)
   {
     throw std::overflow_error("LCM overflow");
   }
@@ -109,11 +80,11 @@ long long vasyakin::lcm(long long a, long long b)
 
 long long vasyakin::sum(long long a, long long b)
 {
-  if (b > 0 && a > vasyakin::MAX - b)
+  if (b > 0 && a > vasyakin::maxLL - b)
   {
     throw std::overflow_error("Sum overflow");
   }
-  else if (b < 0 && a < vasyakin::MIN - b)
+  else if (b < 0 && a < vasyakin::min - b)
   {
     throw std::overflow_error("Sum underflow");
   }
@@ -122,11 +93,11 @@ long long vasyakin::sum(long long a, long long b)
 
 long long vasyakin::subtract(long long a, long long b)
 {
-  if (b > 0 && a < vasyakin::MIN + b)
+  if (b > 0 && a < vasyakin::min + b)
   {
     throw std::overflow_error("Subtract underflow");
   }
-  else if (b < 0 && a > vasyakin::MAX + b)
+  else if (b < 0 && a > vasyakin::maxLL + b)
   {
     throw std::overflow_error("Subtract overflow");
   }
@@ -142,22 +113,22 @@ long long vasyakin::multiply(long long a, long long b)
 
   if (a > 0)
   {
-    if (b > 0 && a > vasyakin::MAX / b)
+    if (b > 0 && a > vasyakin::maxLL / b)
     {
       throw std::overflow_error("Mult overflow");
     }
-    else if (b < 0 && b < vasyakin::MIN / a)
+    else if (b < 0 && b < vasyakin::min / a)
     {
       throw std::overflow_error("Mult underflow");
     }
   }
   else
   {
-    if (b > 0 && a < vasyakin::MIN / b)
+    if (b > 0 && a < vasyakin::min / b)
     {
       throw std::overflow_error("Mult underflow");
     }
-    else if (b < 0 && a < vasyakin::MAX / b)
+    else if (b < 0 && a < vasyakin::maxLL / b)
     {
       throw std::overflow_error("Mult overflow");
     }
@@ -172,7 +143,7 @@ long long vasyakin::divide(long long a, long long b)
     throw std::runtime_error("Division by zero");
   }
 
-  if (a == vasyakin::MIN && b == -1)
+  if (a == vasyakin::min && b == -1)
   {
     throw std::overflow_error("Division overflow");
   }
@@ -220,6 +191,49 @@ long long vasyakin::calculate(long long a, long long b, const std::string& op)
   throw std::runtime_error("Unknown operator: " + op);
 }
 
+void vasyakin::processToken(const std::string& token, vasyakin::Stack< std::string >& opStack,
+  vasyakin::Queue< std::string >& postfix)
+{
+  if (token.empty())
+  {
+    return;
+  }
+
+  if (token == "(")
+  {
+    opStack.push(token);
+  }
+  else if (token == ")")
+  {
+    while (!opStack.empty() && opStack.top() != "(")
+    {
+      postfix.push(opStack.top());
+      opStack.pop();
+    }
+    if (opStack.empty())
+    {
+      throw std::runtime_error("Mismatched parentheses");
+    }
+
+    opStack.pop();
+  }
+  else if (vasyakin::isOperation(token))
+  {
+    while (!opStack.empty() && opStack.top() != "(" &&
+      vasyakin::getPrecedence(opStack.top()) >= vasyakin::getPrecedence(token))
+    {
+      postfix.push(opStack.top());
+      opStack.pop();
+    }
+
+    opStack.push(token);
+  }
+  else
+  {
+    postfix.push(token);
+  }
+}
+
 vasyakin::Queue< std::string > vasyakin::infixToPostfix(const std::string& line)
 {
   vasyakin::Stack< std::string > opStack;
@@ -231,42 +245,8 @@ vasyakin::Queue< std::string > vasyakin::infixToPostfix(const std::string& line)
   {
     if (line[i] == ' ')
     {
-      if (!token.empty())
-      {
-        if (vasyakin::isNumber(token))
-        {
-          postfix.push(token);
-        }
-        else if (token == "(")
-        {
-          opStack.push(token);
-        }
-        else if (token == ")")
-        {
-          while (!opStack.empty() && opStack.peek() != "(")
-          {
-            postfix.push(opStack.drop());
-          }
-          if (opStack.empty())
-          {
-            throw std::runtime_error("Mismatched parentheses");
-          }
-          opStack.drop();
-        }
-        else if (vasyakin::isOperator(token))
-        {
-          while (!opStack.empty() && opStack.peek() != "(" && vasyakin::getPrecedence(opStack.peek()) >= vasyakin::getPrecedence(token))
-          {
-            postfix.push(opStack.drop());
-          }
-          opStack.push(token);
-        }
-        else
-        {
-          throw std::runtime_error("Invalid token: " + token);
-        }
-        token.clear();
-      }
+      processToken(token, opStack, postfix);
+      token.clear();
     }
     else
     {
@@ -274,48 +254,17 @@ vasyakin::Queue< std::string > vasyakin::infixToPostfix(const std::string& line)
     }
   }
 
-  if (!token.empty())
-  {
-    if (vasyakin::isNumber(token))
-    {
-      postfix.push(token);
-    }
-    else if (token == "(")
-    {
-      opStack.push(token);
-    }
-    else if (token == ")")
-    {
-      while (!opStack.empty() && opStack.peek() != "(")
-      {
-        postfix.push(opStack.drop());
-      }
-      if (opStack.empty())
-      {
-        throw std::runtime_error("Mismatched parentheses");
-      }
-      opStack.drop();
-    }
-    else if (vasyakin::isOperator(token))
-    {
-      while (!opStack.empty() && opStack.peek() != "(" && vasyakin::getPrecedence(opStack.peek()) >= vasyakin::getPrecedence(token))
-      {
-        postfix.push(opStack.drop());
-      }
-      opStack.push(token);
-    }
-    else
-    {
-      throw std::runtime_error("Invalid token: " + token);
-    }
-  }
+  processToken(token, opStack, postfix);
+
   while (!opStack.empty())
   {
-    std::string op = opStack.drop();
+    std::string op = opStack.top();
+    opStack.pop();
     if (op == "(" || op == ")")
     {
       throw std::runtime_error("Mismatched parentheses");
     }
+
     postfix.push(op);
   }
   return postfix;
@@ -327,27 +276,28 @@ long long vasyakin::evaluatePostfix(vasyakin::Queue< std::string >& postfix)
 
   while (!postfix.empty())
   {
-    std::string token = postfix.drop();
+    std::string token = postfix.front();
+    postfix.pop();
 
-    if (vasyakin::isNumber(token))
-    {
-      temp.push(std::stoll(token));
-    }
-    else if (vasyakin::isOperator(token))
+    if (vasyakin::isOperation(token))
     {
       if (temp.size() < 2)
       {
         throw std::runtime_error("Invalid expression: not enough operands");
       }
 
-      long long b = temp.drop();
-      long long a = temp.drop();
+      long long b = temp.top();
+      temp.pop();
+
+      long long a = temp.top();
+      temp.top();
+
       long long res = vasyakin::calculate(a, b, token);
       temp.push(res);
     }
     else
     {
-      throw std::runtime_error("Invalid token in evaluation: " + token);
+      temp.push(std::stoll(token));
     }
   }
 
@@ -356,7 +306,7 @@ long long vasyakin::evaluatePostfix(vasyakin::Queue< std::string >& postfix)
     throw std::runtime_error("Invalid expression: stack not empty");
   }
 
-  return temp.drop();
+  return temp.top();
 }
 
 long long vasyakin::evaluateExpression(const std::string& line)
