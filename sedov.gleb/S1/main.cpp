@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <utility>
 #include <string>
+#include <stdexcept>
 #include "list.hpp"
 
 int main()
