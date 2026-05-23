@@ -11,21 +11,17 @@ BOOST_AUTO_TEST_CASE(ConstructAndOperatorsTests)
   sedov::Queue< int > q2(q1);
   BOOST_CHECK(q2.size() == 1);
   BOOST_CHECK(q2.front() == 1);
-  BOOST_CHECK(q2.back() == 1);
   q2.push(2);
   sedov::Queue< int > q3(std::move(q2));
   BOOST_CHECK(q3.size() == 2);
   BOOST_CHECK(q3.front() == 1);
-  BOOST_CHECK(q3.back() == 2);
   q3.push(3);
   sedov::Queue< int > q4 = q3;
   BOOST_CHECK(q4.size() == 3);
   BOOST_CHECK(q4.front() == 1);
-  BOOST_CHECK(q4.back() == 3);
   sedov::Queue< int > q5 = std::move(q4);
   BOOST_CHECK(q5.size() == 3);
   BOOST_CHECK(q5.front() == 1);
-  BOOST_CHECK(q5.back() == 3);
 }
 
 BOOST_AUTO_TEST_CASE(EmptyAndSizeTests)
@@ -39,15 +35,13 @@ BOOST_AUTO_TEST_CASE(EmptyAndSizeTests)
   BOOST_CHECK(q.size() == 2);
 }
 
-BOOST_AUTO_TEST_CASE(PushPopFrontBackTests)
+BOOST_AUTO_TEST_CASE(PushPopFrontTests)
 {
   sedov::Queue< int > q;
   q.push(1);
-  BOOST_CHECK(q.back() == 1);
   q.push(2);
-  BOOST_CHECK(q.back() == 2);
   q.push(3);
-  BOOST_CHECK(q.back() == 3);
+  BOOST_CHECK(q.front() == 1);
   q.pop();
   BOOST_CHECK(q.front() == 2);
   q.pop();
@@ -66,7 +60,8 @@ BOOST_AUTO_TEST_CASE(SwapTests)
   BOOST_CHECK(q2.front() == 1);
   BOOST_CHECK(q1.size() == 2);
   BOOST_CHECK(q2.size() == 1);
-  BOOST_CHECK(q1.back() == 3);
+  q1.pop();
+  BOOST_CHECK(q1.front() == 3);
 }
 
 BOOST_AUTO_TEST_CASE(ClearTests)
@@ -78,5 +73,19 @@ BOOST_AUTO_TEST_CASE(ClearTests)
   BOOST_CHECK(q.size() == 3);
   q.clear();
   BOOST_CHECK(q.size() == 0);
+  BOOST_CHECK(q.empty());
 }
+
+BOOST_AUTO_TEST_CASE(PushAfterClearTest)
+{
+  sedov::Queue< int > q;
+  q.push(1);
+  q.push(2);
+  q.clear();
+  BOOST_CHECK(q.empty());
+  q.push(3);
+  BOOST_CHECK(q.front() == 3);
+  BOOST_CHECK(q.size() == 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

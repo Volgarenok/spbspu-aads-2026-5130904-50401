@@ -297,6 +297,10 @@ std::string sedov::calculate(const Expression & postfix)
       {
         throw std::invalid_argument("Input error: invalid number");
       }
+      catch (const std::out_of_range &)
+      {
+        throw std::out_of_range("Input error: number out of range");
+      }
     }
     else
     {

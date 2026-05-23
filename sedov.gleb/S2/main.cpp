@@ -51,9 +51,22 @@ int main(int argc, char ** argv)
   {
     Expression inf = infix.top();
     infix.pop();
-    Expression postfix = convertInfToPost(inf);
-    std::string res = calculate(postfix);
-    out.pushBack(res);
+    try
+    {
+      Expression postfix = convertInfToPost(inf);
+      std::string res = calculate(postfix);
+      out.pushBack(res);
+    }
+    catch (const std::exception & e)
+    {
+      std::cerr << e.what() << "\n";
+      return 1;
+    }
+    catch (...)
+    {
+      std::cerr << "Unknown error during calculation\n";
+      return 1;
+    }
   }
   LIter< std::string > it = out.begin();
   std::cout << *it;
