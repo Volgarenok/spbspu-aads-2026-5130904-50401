@@ -3,6 +3,7 @@
 #include <utility>
 #include <cstddef>
 #include <limits>
+#include <cassert>
 
 namespace sedov
 {
@@ -11,365 +12,688 @@ namespace sedov
   template< class T >
   class List;
 
-  template< class T >
-  struct Node
+  namespace detail
   {
-    T val_;
-    Node< T > * next_;
-    Node< T > * prev_;
-    Node(const T & value):
-      val_(value), next_(nullptr), prev_(nullptr)
-    {}
-    Node(T && value):
-      val_(value), next_(nullptr), prev_(nullptr)
-    {}
-  };
+    template< class T >
+    struct Node
+    {
+      T val_;
+      Node< T > * next_;
+      Node< T > * prev_;
+      Node(const T & value);
+      Node(T && value);
+    };
+  }
 
   template< class T >
   class LIter
   {
-    friend class List< T >;
-    Node< T > * ptr_;
   public:
-    LIter(Node< T > * p = nullptr):
-      ptr_(p)
-    {}
+    LIter(detail::Node< T > * p = nullptr);
 
-    T & operator*() const
-    {
-      return ptr_->val_;
-    }
+    T & operator*();
+    T * operator->();
 
-    T * operator->() const
-    {
-      return &ptr_->val_;
-    }
+    LIter & operator++();
+    LIter operator++(int);
+    LIter & operator--();
+    LIter operator--(int);
 
-    LIter & operator++()
-    {
-      ptr_ = ptr_->next_;
-      return *this;
-    }
-
-    LIter operator++(int)
-    {
-      LIter temp = *this;
-      ptr_ = ptr_->next_;
-      return temp;
-    }
-
-    LIter & operator--()
-    {
-      ptr_ = ptr_->prev_;
-      return *this;
-    }
-
-    LIter operator--(int)
-    {
-      LIter temp = *this;
-      ptr_ = ptr_->prev_;
-      return temp;
-    }
-
-    bool operator==(const LIter & other) const
-    {
-      return ptr_ == other.ptr_;
-    }
-
-    bool operator!=(const LIter & other) const
-    {
-      return !(ptr_ == other.ptr_);
-    }
+    bool operator==(const LIter & h) const;
+    bool operator!=(const LIter & h) const;
+  private:
+    friend class List< T >;
+    detail::Node< T > * ptr_;
   };
 
   template< class T >
   class LCIter
   {
-    friend class List< T >;
-    const Node< T > * ptr_;
   public:
-    LCIter(const Node< T > * p = nullptr):
-      ptr_(p)
-    {}
+    LCIter(const detail::Node< T > * p = nullptr);
 
-    const T & operator*() const
-    {
-        return ptr_->val_;
-    }
+    const T & operator*() const;
+    const T * operator->() const;
 
-    const T * operator->() const
-    {
-        return &ptr_->val_;
-    }
+    LCIter & operator++();
+    LCIter operator++(int);
+    LCIter & operator--();
+    LCIter operator--(int);
 
-    LCIter & operator++()
-    {
-        ptr_ = ptr_->next_;
-        return *this;
-    }
-
-    LCIter operator++(int)
-    {
-        LCIter tmp = *this;
-        ptr_ = ptr_->next_;
-        return tmp;
-    }
-
-    LCIter & operator--()
-    {
-        ptr_ = ptr_->prev_;
-        return *this;
-    }
-
-    LCIter operator--(int)
-    {
-        LCIter tmp = *this;
-        ptr_ = ptr_->prev_;
-        return tmp;
-    }
-
-    bool operator==(const LCIter & other) const
-    {
-        return ptr_ == other.ptr_;
-    }
-
-    bool operator!=(const LCIter & other) const
-    {
-        return !(ptr_ == other.ptr_);
-    }
+    bool operator==(const LCIter & h) const;
+    bool operator!=(const LCIter & h) const;
+  private:
+    friend class List< T >;
+    const detail::Node< T > * ptr_;
   };
 
   template< class T >
   class List
   {
-    Node< T > * head_;
-    Node< T > * tail_;
-    size_t size_;
   public:
-    List():
-      head_(nullptr), tail_(nullptr), size_(0)
-    {}
+    List();
+    List(const List & h);
+    List(List && h) noexcept;
+    ~List() noexcept;
 
-    List(const List & h):
-      List()
+    List & operator=(const List & h);
+    List & operator=(List && h) noexcept;
+
+    LIter< T > begin();
+    LIter< T > end();
+    LCIter< T > cbegin() const;
+    LCIter< T > cend() const;
+
+    T & front();
+    const T & front() const;
+    T & back();
+    const T & back() const;
+
+    void pushFront(const T & v);
+    void pushBack(const T & v);
+    void pushBack(T && v);
+    LIter< T > insert(LIter< T > p, const T & v);
+
+    void popFront();
+    void popBack();
+    LIter< T > erase(LIter< T > p);
+
+    void clear() noexcept;
+    size_t size() const noexcept;
+    void swap(List & h) noexcept;
+
+    void splice(LIter<T> pos, List& h) noexcept;
+    void splice(LIter<T> pos, List& h, LIter<T> it) noexcept;
+    void splice(LIter<T> pos, List& h, LIter<T> first, LIter<T> last) noexcept;
+    void merge(List& h) noexcept;
+    void sort();
+
+    template<class P>
+    LIter<T> partition(P p);
+  private:
+    detail::Node< T > * head_;
+    detail::Node< T > * tail_;
+    size_t size_;
+  };
+
+  template< class T >
+  detail::Node< T >::Node(const T & value):
+    val_(value),
+    next_(nullptr),
+    prev_(nullptr)
+  {}
+
+  template< class T >
+  detail::Node< T >::Node(T && value):
+    val_(std::move(value)),
+    next_(nullptr),
+    prev_(nullptr)
+  {}
+
+  template< class T >
+  LIter< T >::LIter(detail::Node< T > * p):
+    ptr_(p)
+  {}
+
+  template< class T >
+  T & LIter< T >::operator*()
+  {
+    return ptr_->val_;
+  }
+
+  template< class T >
+  T * LIter< T >::operator->()
+  {
+    return &ptr_->val_;
+  }
+
+  template< class T >
+  LIter< T > & LIter< T >::operator++()
+  {
+    ptr_ = ptr_->next_;
+    return *this;
+  }
+
+  template< class T >
+  LIter< T > LIter< T >::operator++(int)
+  {
+    LIter temp = *this;
+    ptr_ = ptr_->next_;
+    return temp;
+  }
+
+  template< class T >
+  LIter< T > & LIter< T >::operator--()
+  {
+    ptr_ = ptr_->prev_;
+    return *this;
+  }
+
+  template< class T >
+  LIter< T > LIter< T >::operator--(int)
+  {
+    LIter temp = *this;
+    ptr_ = ptr_->prev_;
+    return temp;
+  }
+
+  template< class T >
+  bool LIter< T >::operator==(const LIter & h) const
+  {
+    return ptr_ == h.ptr_;
+  }
+
+  template< class T >
+  bool LIter< T >::operator!=(const LIter & h) const
+  {
+    return !(ptr_ == h.ptr_);
+  }
+
+  template< class T >
+  LCIter< T >::LCIter(const detail::Node< T > * p):
+    ptr_(p)
+  {}
+
+  template< class T >
+  const T & LCIter< T >::operator*() const
+  {
+    return ptr_->val_;
+  }
+
+  template< class T >
+  const T * LCIter< T >::operator->() const
+  {
+    return &ptr_->val_;
+  }
+
+  template< class T >
+  LCIter< T > & LCIter< T >::operator++()
+  {
+    ptr_ = ptr_->next_;
+    return *this;
+  }
+
+  template< class T >
+  LCIter< T > LCIter< T >::operator++(int)
+  {
+    LCIter tmp = *this;
+    ptr_ = ptr_->next_;
+    return tmp;
+  }
+
+  template< class T >
+  LCIter< T > & LCIter< T >::operator--()
+  {
+    ptr_ = ptr_->prev_;
+    return *this;
+  }
+
+  template< class T >
+  LCIter< T > LCIter< T >::operator--(int)
+  {
+    LCIter tmp = *this;
+    ptr_ = ptr_->prev_;
+    return tmp;
+  }
+
+  template< class T >
+  bool LCIter< T >::operator==(const LCIter & h) const
+  {
+    return ptr_ == h.ptr_;
+  }
+
+  template< class T >
+  bool LCIter< T >::operator!=(const LCIter & h) const
+  {
+    return !(ptr_ == h.ptr_);
+  }
+
+  template< class T >
+  List< T >::List():
+    head_(nullptr),
+    tail_(nullptr),
+    size_(0)
+  {}
+
+  template< class T >
+  List< T >::List(const List & h):
+    List()
+  {
+    for (detail::Node< T > * cur = h.head_; cur != nullptr; cur = cur->next_)
     {
-      for (Node< T > * cur = h.head_; cur != nullptr; cur = cur->next_)
-      {
-        pushBack(cur->val_);
-      }
+      pushBack(cur->val_);
     }
+  }
 
-    List(List && h) noexcept:
-      head_(h.head_), tail_(h.tail_), size_(h.size_)
+  template< class T >
+  List< T >::List(List && h) noexcept:
+    head_(std::exchange(h.head_, nullptr)),
+    tail_(std::exchange(h.tail_, nullptr)),
+    size_(std::exchange(h.size_, 0))
+  {}
+
+  template< class T >
+  List< T >::~List() noexcept
+  {
+    clear();
+  }
+
+  template< class T >
+  List< T > & List< T >::operator=(const List & h)
+  {
+    assert(this != &h);
+
+    List temp(h);
+    swap(temp);
+    return *this;
+  }
+
+  template<class T>
+  List< T > & List< T >::operator=(List && h) noexcept
+  {
+    assert(this != &h);
+    clear();
+    head_ = std::exchange(h.head_, nullptr);
+    tail_ = std::exchange(h.tail_, nullptr);
+    size_ = std::exchange(h.size_, 0);
+    return *this;
+  }
+
+  template< class T >
+  LIter< T > List< T >::begin()
+  {
+    return LIter< T >(head_);
+  }
+
+  template< class T >
+  LIter< T > List< T >::end()
+  {
+    return LIter< T >(nullptr);
+  }
+
+  template< class T >
+  LCIter< T > List< T >::cbegin() const
+  {
+    return LCIter< T >(head_);
+  }
+
+  template< class T >
+  LCIter< T > List< T >::cend() const
+  {
+    return LCIter< T >(nullptr);
+  }
+
+  template< class T >
+  T & List< T >::front()
+  {
+    return head_->val_;
+  }
+
+  template< class T >
+  const T & List< T >::front() const
+  {
+    return head_->val_;
+  }
+
+  template< class T >
+  T & List< T >::back()
+  {
+    return tail_->val_;
+  }
+
+  template< class T >
+  const T & List< T >::back() const
+  {
+    return tail_->val_;
+  }
+
+  template< class T >
+  void List< T >::pushFront(const T & v)
+  {
+    detail::Node< T > * newNode = new detail::Node< T >(v);
+    newNode->next_ = head_;
+    if (head_)
     {
-      h.head_ = nullptr;
-      h.tail_ = nullptr;
-      h.size_ = 0;
+      head_->prev_ = newNode;
     }
-
-    ~List()
+    else
     {
-      clear();
+      tail_ = newNode;
     }
+    head_ = newNode;
+    ++size_;
+  }
 
-    List & operator=(const List & h)
+  template< class T >
+  void List< T >::pushBack(const T & v)
+  {
+    detail::Node< T > * newNode = new detail::Node< T >(v);
+    newNode->prev_ = tail_;
+    if (tail_)
     {
-      if (this != &h)
-      {
-        List temp(h);
-        swap(temp);
-      }
-      return *this;
+      tail_->next_ = newNode;
     }
-
-    LIter< T > begin()
+    else
     {
+      head_ = newNode;
+    }
+    tail_ = newNode;
+    ++size_;
+  }
+
+  template< class T >
+  void List< T >::pushBack(T && v)
+  {
+    detail::Node< T > * newNode = new detail::Node< T >(std::move(v));
+    newNode->prev_ = tail_;
+    if (tail_)
+    {
+      tail_->next_ = newNode;
+    }
+    else
+    {
+      head_ = newNode;
+    }
+    tail_ = newNode;
+    ++size_;
+  }
+
+  template< class T >
+  LIter< T > List< T >::insert(LIter< T > p, const T & v)
+  {
+    if (!p.ptr_)
+    {
+      pushBack(v);
+      return LIter< T >(tail_);
+    }
+    if (p.ptr_ == head_)
+    {
+      pushFront(v);
       return LIter< T >(head_);
     }
+    detail::Node< T > * newNode = new detail::Node< T >(v);
+    detail::Node< T > * next = p.ptr_;
+    detail::Node< T > * prev = next->prev_;
+    newNode->prev_ = prev;
+    newNode->next_ = next;
+    prev->next_ = newNode;
+    next->prev_ = newNode;
+    ++size_;
+    return LIter< T >(newNode);
+  }
 
-    LIter< T > end()
+  template< class T >
+  void List< T >::popFront()
+  {
+    if (!head_)
     {
-      return LIter< T >(nullptr);
+      return;
     }
-
-    LCIter< T > cbegin() const
+    detail::Node< T > * temp = head_;
+    head_ = head_->next_;
+    if (head_)
     {
-      return LCIter< T >(head_);
+      head_->prev_ = nullptr;
     }
-
-    LCIter< T > cend() const
+    else
     {
-      return LCIter< T >(nullptr);
-    }
-
-    T & front()
-    {
-      return head_->val_;
-    }
-
-    const T & front() const
-    {
-      return head_->val_;
-    }
-
-    T & back()
-    {
-      return tail_->val_;
-    }
-
-    const T & back() const
-    {
-      return tail_->val_;
-    }
-
-    void pushFront(const T & v)
-    {
-      Node< T > * newNode = new Node< T >(v);
-      newNode->next_ = head_;
-      if (head_)
-      {
-        head_->prev_ = newNode;
-      }
-      else
-      {
-        tail_ = newNode;
-      }
-      head_ = newNode;
-      ++size_;
-    }
-
-    void pushBack(const T & v)
-    {
-      Node< T > * newNode = new Node< T >(v);
-      newNode->prev_ = tail_;
-      if (tail_)
-      {
-        tail_->next_ = newNode;
-      }
-      else
-      {
-        head_ = newNode;
-      }
-      tail_ = newNode;
-      ++size_;
-    }
-
-    LIter< T > insert(LIter< T > p, const T & v)
-    {
-      if (!p.ptr_)
-      {
-        pushBack(v);
-        return LIter< T >(tail_);
-      }
-      if (p.ptr_ == head_)
-      {
-        pushFront(v);
-        return LIter< T >(head_);
-      }
-      Node< T > * newNode = new Node< T >(v);
-      Node< T > * next = p.ptr_;
-      Node< T > * prev = next->prev_;
-      newNode->prev_ = prev;
-      newNode->next_ = next;
-      prev->next_ = newNode;
-      next->prev_ = newNode;
-      ++size_;
-      return LIter< T >(newNode);
-    }
-
-    void popFront()
-    {
-      if (!head_)
-      {
-        return;
-      }
-      Node< T > * temp = head_;
-      head_ = head_->next_;
-      if (head_)
-      {
-        head_->prev_ = nullptr;
-      }
-      else
-      {
-        tail_ = nullptr;
-      }
-      delete temp;
-      --size_;
-    }
-
-    void popBack()
-    {
-      if (!tail_)
-      {
-        return;
-      }
-      Node< T > * temp = tail_;
-      tail_ = tail_->prev_;
-      if (tail_)
-      {
-        tail_->next_ = nullptr;
-      }
-      else
-      {
-        head_ = nullptr;
-      }
-      delete temp;
-      --size_;
-    }
-
-    LIter< T > erase(LIter< T > p)
-    {
-      if (!p.ptr_)
-      {
-        return end();
-      }
-      Node< T > * next = p.ptr_->next_;
-      Node< T > * prev = p.ptr_->prev_;
-      if (prev)
-      {
-        prev->next_ = next;
-      }
-      else
-      {
-        head_ = next;
-      }
-      if (next)
-      {
-        next->prev_ = prev;
-      }
-      else
-      {
-        tail_ = prev;
-      }
-      delete p.ptr_;
-      --size_;
-      return LIter< T >(next);
-    }
-
-    void clear()
-    {
-      while (head_)
-      {
-        Node< T > * temp = head_;
-        head_ = head_->next_;
-        delete temp;
-      }
       tail_ = nullptr;
-      size_ = 0;
     }
+    delete temp;
+    --size_;
+  }
 
-    size_t size() const
+  template< class T >
+  void List< T >::popBack()
+  {
+    if (!tail_)
     {
-      return size_;
+      return;
     }
+    detail::Node< T > * temp = tail_;
+    tail_ = tail_->prev_;
+    if (tail_)
+    {
+      tail_->next_ = nullptr;
+    }
+    else
+    {
+      head_ = nullptr;
+    }
+    delete temp;
+    --size_;
+  }
 
-    void swap(List & h) noexcept
+  template< class T >
+  LIter< T > List< T >::erase(LIter< T > p)
+  {
+    if (!p.ptr_)
     {
-      std::swap(head_, h.head_);
-      std::swap(tail_, h.tail_);
-      std::swap(size_, h.size_);
+      return end();
     }
-  };
+    detail::Node< T > * next = p.ptr_->next_;
+    detail::Node< T > * prev = p.ptr_->prev_;
+    if (prev)
+    {
+      prev->next_ = next;
+    }
+    else
+    {
+      head_ = next;
+    }
+    if (next)
+    {
+      next->prev_ = prev;
+    }
+    else
+    {
+      tail_ = prev;
+    }
+    delete p.ptr_;
+    --size_;
+    return LIter< T >(next);
+  }
+
+  template< class T >
+  void List< T >::clear() noexcept
+  {
+    while (head_)
+    {
+      detail::Node< T > * temp = head_;
+      head_ = head_->next_;
+      delete temp;
+    }
+    tail_ = nullptr;
+    size_ = 0;
+  }
+
+  template< class T >
+  size_t List< T >::size() const noexcept
+  {
+    return size_;
+  }
+
+  template< class T >
+  void List< T >::swap(List & h) noexcept
+  {
+    std::swap(head_, h.head_);
+    std::swap(tail_, h.tail_);
+    std::swap(size_, h.size_);
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List & h) noexcept
+  {
+    if (h.size_ == 0 || this == &h)
+    {
+      return;
+    }
+    splice(pos, h, h.begin(), h.end());
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List & h, LIter< T > it) noexcept
+  {
+    if (it.ptr_ == nullptr || h.size_ == 0)
+    {
+      return;
+    }
+    LIter< T > next = it;
+    ++next;
+    splice(pos, h, it, next);
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List & h, LIter< T > first, LIter< T > last) noexcept
+  {
+    if (first == last || h.size_ == 0)
+    {
+      return;
+    }
+    size_t count = 0;
+    for (LIter< T > it = first; it != last; ++it)
+    {
+      ++count;
+    }
+    detail::Node< T > * firstNode = first.ptr_;
+    detail::Node< T > * lastNode = (last.ptr_ == nullptr) ? h.tail_ : last.ptr_->prev_;
+    if (firstNode->prev_)
+    {
+      firstNode->prev_->next_ = last.ptr_;
+    }
+    else
+    {
+      h.head_ = last.ptr_;
+    }
+    if (last.ptr_)
+    {
+      last.ptr_->prev_ = firstNode->prev_;
+    }
+    else
+    {
+      h.tail_ = firstNode->prev_;
+    }
+    detail::Node< T > * posNode = pos.ptr_;
+    detail::Node< T > * posPrev = (posNode) ? posNode->prev_ : tail_;
+    firstNode->prev_ = posPrev;
+    lastNode->next_ = posNode;
+    if (posPrev)
+    {
+      posPrev->next_ = firstNode;
+    }
+    else
+    {
+      head_ = firstNode;
+    }
+    if (posNode)
+    {
+      posNode->prev_ = lastNode;
+    }
+    else
+    {
+      tail_ = lastNode;
+    }
+    size_ += count;
+    h.size_ -= count;
+  }
+
+  template< class T >
+  void List< T >::merge(List & h) noexcept
+  {
+    if (this == &h || h.size_ == 0)
+    {
+      return;
+    }
+    LIter< T > thisIt = begin();
+    LIter< T > hIt = h.begin();
+    while (thisIt != end() && hIt != h.end())
+    {
+      if (*hIt < *thisIt)
+      {
+        LIter< T > toMove = hIt;
+        ++hIt;
+        splice(thisIt, h, toMove);
+      }
+      else
+      {
+        ++thisIt;
+      }
+    }
+    if (hIt != h.end())
+    {
+      splice(end(), h, hIt, h.end());
+    }
+  }
+
+  template< class T >
+  static void mergeSort(List< T > & list)
+  {
+    if (list.size() <= 1)
+    {
+      return;
+    }
+    List< T > right;
+    size_t half = list.size() / 2;
+    LIter< T > mid = list.begin();
+    for (size_t i = 0; i < half; ++i)
+    {
+      ++mid;
+    }
+    right.splice(right.begin(), list, mid, list.end());
+    mergeSort(list);
+    mergeSort(right);
+    list.merge(right);
+  }
+
+  template< class T >
+  void List< T >::sort()
+  {
+    if (size_ <= 1)
+    {
+      return;
+    }
+    mergeSort(*this);
+  }
+
+  template< class T >
+  template< class P >
+  LIter< T > List< T >::partition(P p)
+  {
+    if (size_ == 0)
+    {
+      return end();
+    }
+    List< T > falseList;
+    LIter< T > it = begin();
+    while (it != end())
+    {
+      if (!p(*it))
+      {
+        LIter< T > toMove = it;
+        ++it;
+        falseList.splice(falseList.end(), *this, toMove);
+      }
+      else
+      {
+        ++it;
+      }
+    }
+    size_t falseCount = falseList.size();
+    if (falseCount > 0)
+    {
+      splice(end(), falseList);
+    }
+    if (falseCount == 0)
+    {
+      return end();
+    }
+    LIter< T > result = begin();
+    for (size_t i = 0; i < size_ - falseCount; ++i)
+    {
+      ++result;
+    }
+    return result;
+  }
 }
 
 #endif

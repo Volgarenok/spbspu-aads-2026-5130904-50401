@@ -1,6 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include "../common/list.hpp"
+#include "list.hpp"
 
 namespace sedov
 {
@@ -8,79 +8,82 @@ namespace sedov
   class Stack
   {
   public:
-    Stack():
-      list_()
-    {}
-
-    Stack(const Stack & s):
-      list_(s.list_)
-    {}
-
-    Stack(Stack< T > && s):
-      list_(std::move(s.list_))
-    {}
-
+    Stack() = default;
+    Stack(const Stack & s) = default;
+    Stack(Stack< T > && s) = default;
     ~Stack() = default;
 
-    Stack & operator=(const Stack< T > & s)
-    {
-      Stack< T > temp(s);
-      swap(temp);
-      return *this;
-    }
+    Stack & operator=(const Stack< T > & s) = default;
+    Stack & operator=(Stack< T > && s) = default;
 
-    Stack & operator=(Stack< T > && s)
-    {
-      if (this == &s)
-      {
-        return *this;
-      }
-      list_ = std::move(s.list_);
-      return *this;
-    }
+    T & top();
+    const T & top() const;
 
-    T & top()
-    {
-      return list_.back();
-    }
+    bool empty() const;
+    size_t size() const;
 
-    const T & top() const
-    {
-      return list_.back();
-    }
-
-    bool empty() const
-    {
-      return list_.size() == 0;
-    }
-
-    size_t size() const
-    {
-      return list_.size();
-    }
-
-    void push(const T & v)
-    {
-      list_.pushBack(v);
-    }
-
-    void pop()
-    {
-      list_.popBack();
-    }
-
-    void swap(Stack & s)
-    {
-      list_.swap(s.list_);
-    }
-
-    void clear()
-    {
-      list_.clear();
-    }
+    void push(const T & v);
+    void push(T && v);
+    void pop() noexcept;
+    void swap(Stack & s) noexcept;
+    void clear() noexcept;
   private:
     List< T > list_;
   };
+
+  template< class T >
+  T & Stack< T >::top()
+  {
+    return list_.back();
+  }
+
+  template< class T >
+  const T & Stack< T >::top() const
+  {
+    return list_.back();
+  }
+
+  template< class T >
+  bool Stack< T >::empty() const
+  {
+    return list_.size() == 0;
+  }
+
+  template< class T >
+  size_t Stack< T >::size() const
+  {
+    return list_.size();
+  }
+
+  template< class T >
+  void Stack< T >::push(const T & v)
+  {
+    list_.pushBack(v);
+  }
+
+  template< class T >
+  void Stack< T >::push(T && v)
+  {
+    list_.pushBack(std::move(v));
+  }
+
+  template< class T >
+  void Stack< T >::pop() noexcept
+  {
+    list_.popBack();
+  }
+
+  template< class T >
+  void Stack< T >::swap(Stack & s) noexcept
+  {
+    list_.swap(s.list_);
+  }
+
+  template< class T >
+  void Stack< T >::clear() noexcept
+  {
+    list_.clear();
+  }
 }
 
 #endif

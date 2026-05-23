@@ -2,42 +2,45 @@
 #include <fstream>
 #include "queue.hpp"
 #include "math_func.hpp"
+#include "expression.hpp"
 
 int main(int argc, char ** argv)
 {
   using namespace sedov;
-  Stack< Queue< std::string > > infix;
+  Stack< Expression > infix;
+  std::istream * inputStream = nullptr;
+  std::ifstream file;
+
   if (argc < 2)
   {
-    try
-    {
-      getInfix(std::cin, infix);
-    }
-    catch (...)
-    {
-      std::cerr << "Input errors\n";
-      return 1;
-    }
+    inputStream = &std::cin;
   }
   else if (argc == 2)
   {
-    std::ifstream input(argv[1]);
-    if (!input)
+    file.open(argv[1]);
+    if (!file)
     {
       std::cerr << "Bad input file\n";
       return 1;
     }
-    try
-    {
-      getInfix(input, infix);
-    }
-    catch (...)
-    {
-      std::cerr << "Bad reading file\n";
-      return 1;
-    }
-    input.close();
+    inputStream = &file;
   }
+  else
+  {
+    std::cerr << "Usage: " << argv[0] << " [filename]\n";
+    return 1;
+  }
+
+  try
+  {
+    getInfix(*inputStream, infix);
+  }
+  catch (...)
+  {
+    std::cerr << "Input errors\n";
+    return 1;
+  }
+
   if (infix.empty())
   {
     std::cout << "\n";
@@ -46,23 +49,12 @@ int main(int argc, char ** argv)
   List< std::string > out;
   while (!infix.empty())
   {
-    Queue< std::string > inf = infix.top();
+    Expression inf = infix.top();
     infix.pop();
-    Queue< std::string > postfix;
-    convertInfToPost(inf, postfix);
-    std::string res;
-    try
-    {
-      res = calculate(postfix);
-    }
-    catch (const std::exception & e)
-    {
-      std::cerr << e.what() << "\n";
-      return 1;
-    }
+    Expression postfix = convertInfToPost(inf);
+    std::string res = calculate(postfix);
     out.pushBack(res);
   }
-
   LIter< std::string > it = out.begin();
   std::cout << *it;
   ++it;
@@ -71,4 +63,5 @@ int main(int argc, char ** argv)
     std::cout << " " << *it;
   }
   std::cout << "\n";
+  return 0;
 }

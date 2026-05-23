@@ -1,6 +1,6 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
-#include "../common/list.hpp"
+#include "list.hpp"
 
 namespace sedov
 {
@@ -8,88 +8,81 @@ namespace sedov
   class Queue
   {
   public:
-    Queue():
-      list_()
-    {}
-
-    Queue(const Queue< T > & q):
-      list_(q.list_)
-    {}
-
-    Queue(Queue< T > && q):
-      list_(std::move(q.list_))
-    {}
-
+    Queue() = default;
+    Queue(const Queue< T > & q) = default;
+    Queue(Queue< T > && q) = default;
     ~Queue() = default;
 
-    Queue & operator=(const Queue< T > & q)
-    {
-      Queue< T > temp(q);
-      swap(temp);
-      return *this;
-    }
+    Queue & operator=(const Queue< T > & q) = default;
+    Queue & operator=(Queue< T > && q) = default;
 
-    Queue & operator=(Queue< T > && q)
-    {
-      if (this == &q)
-      {
-        return *this;
-      }
-      list_ = std::move(q.list_);
-      return *this;
-    }
+    T & front();
+    const T & front() const;
 
-    T & front()
-    {
-      return list_.front();
-    }
+    bool empty() const;
+    size_t size() const;
 
-    const T & front() const
-    {
-      return list_.front();
-    }
-
-    T & back()
-    {
-      return list_.back();
-    }
-
-    const T & back() const
-    {
-      return list_.back();
-    }
-
-    bool empty() const
-    {
-      return list_.size() == 0;
-    }
-
-    size_t size() const
-    {
-      return list_.size();
-    }
-
-    void push(const T& v)
-    {
-      list_.pushBack(v);
-    }
-
-    void pop()
-    {
-      list_.popFront();
-    }
-
-    void swap(Queue< T > & q)
-    {
-      list_.swap(q.list_);
-    }
-
-    void clear()
-    {
-      list_.clear();
-    }
+    void push(const T& v);
+    void push(T && v);
+    void pop() noexcept;
+    void swap(Queue< T > & q) noexcept;
+    void clear() noexcept;
   private:
     List< T > list_;
   };
+
+  template< class T >
+  T & Queue< T >::front()
+  {
+    return list_.front();
+  }
+
+  template< class T >
+  const T & Queue< T >::front() const
+  {
+    return list_.front();
+  }
+
+  template< class T >
+  bool Queue< T >::empty() const
+  {
+    return list_.size() == 0;
+  }
+
+  template< class T >
+  size_t Queue< T >::size() const
+  {
+    return list_.size();
+  }
+
+  template< class T >
+  void Queue< T >::push(const T& v)
+  {
+    list_.pushBack(v);
+  }
+
+  template< class T >
+  void Queue< T >::push(T && v)
+  {
+    list_.pushBack(std::move(v));
+  }
+
+  template< class T >
+  void Queue< T >::pop() noexcept
+  {
+    list_.popFront();
+  }
+
+  template< class T >
+  void Queue< T >::swap(Queue< T > & q) noexcept
+  {
+    list_.swap(q.list_);
+  }
+
+  template< class T >
+  void Queue< T >::clear() noexcept
+  {
+    list_.clear();
+  }
 }
 #endif
