@@ -16,3 +16,14 @@
   {
     return from.first == to.first && from.second == to.second;
   }
+
+  size_t donkeev::GraphNameHash::operator()(const std::string& str) const
+  {
+    boost::hash<std::string> hasher;
+    return hasher(str);
+  }
+
+  bool donkeev::GraphEqual::operator()(const std::string& first, const std::string& second) const
+  {
+    return first == second;
+  }

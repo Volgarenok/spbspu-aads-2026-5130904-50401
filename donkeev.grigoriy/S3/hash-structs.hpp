@@ -11,4 +11,14 @@ namespace donkeev
   {
     bool operator()(const std::pair< std::string, std::string >&, const std::pair< std::string, std::string >&) const;
   };
+
+  struct GraphNameHash
+  {
+    size_t operator()(const std::string&) const;
+  };
+
+  struct GraphEqual
+  {
+    bool operator()(const std::string&, const std::string&) const;
+  };
 }
