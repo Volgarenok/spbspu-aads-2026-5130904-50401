@@ -50,10 +50,6 @@ void readGraphs(const std::string& filename, donkeev::HashTable<std::string, don
     
     for (size_t i = 0; i < edgesCount; ++i)
     {
-      if (!std::getline(file, line))
-      {
-        throw std::runtime_error("Bad input file");
-      }
       do
       {
         std::getline(file, line);
@@ -66,7 +62,8 @@ void readGraphs(const std::string& filename, donkeev::HashTable<std::string, don
 
       if (from.empty() || to.empty() || weightStr.empty())
       {
-        throw std::runtime_error("Bad input file");
+        
+        throw std::runtime_error("Bad input filee");
       }
 
       size_t weight = std::stoull(weightStr);
@@ -87,6 +84,4 @@ int main(int argc, char* argv[])
 
   donkeev::HashTable< std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual> graphsTable(16, 4);
   readGraphs(filename, graphsTable);
-  size_t a;
-  std::cin >> a;
 }
