@@ -21,63 +21,58 @@ void lukashevich::getData(std::istream& in, List< pair_t >& res)
   }
 }
 
-void lukashevich::printSeqName(const List< pair_t >& data)
+void lukashevich::printSeqName(std::ostream& out, const List< pair_t >& data)
 {
   bool first = true;
 
   LCIter< pair_t > it = data.begin();
   LCIter< pair_t > end = data.end();
 
+  if (it != end) {
+  out << it->first;
+  ++it;
+  }
+
   while (it != end) {
-    if (!first) {
-      std::cout << ' ';
-    }
-
-    std::cout << it->first;
-
-    first = false;
+    out << ' ' << it->first;
     ++it;
   }
-  std::cout << '\n';
 }
 
-size_t lukashevich::printOneRow(List< pair_t >& data)
+size_t lukashevich::printOneRow(std::ostream& out, List< pair_t >& data)
 {
   LIter< pair_t > it = data.begin();
   LIter< pair_t > end = data.end();
 
-  bool first = true;
   bool overflow = false;
-
   size_t sum = 0;
 
+  bool printed = false;
+
   while (it != end) {
-    if (!(it->second.empty())) {
+    if (!it->second.empty()) {
       size_t value = it->second.front();
 
-      if (!first) {
-        std::cout << ' ';
+      if (printed) {
+        out << ' ';
       }
 
-      std::cout << value;
+      out << value;
+      printed = true;
 
       if (!overflow) {
         if (sum > std::numeric_limits< size_t >::max() - value) {
           overflow = true;
-        }
-        else {
+        } else {
           sum += value;
         }
       }
 
       it->second.popFront();
-      first = false;
     }
 
     ++it;
   }
-
-  std::cout << '\n';
 
   if (overflow) {
     throw std::overflow_error("overflow");
@@ -104,32 +99,27 @@ bool lukashevich::hasNum(const List< pair_t >& data)
 void lukashevich::printAll(List< pair_t >& data, List< size_t >& sums)
 {
   while (hasNum(data)) {
-    size_t sum = printOneRow(data);
+    size_t sum = printOneRow(std::cout, data);
     sums.pushBack(sum);
   }
 }
 
-void lukashevich::printSum(const List< size_t >& sums)
+void lukashevich::printSum(std::ostream& out, const List< size_t >& sums)
 {
+  
   if (sums.empty()) {
-    std::cout << 0;
+    out << 0;
+    return;
   }
-
-  bool first = true;
 
   LCIter< size_t > it = sums.begin();
   LCIter< size_t > end = sums.end();
 
+  out << *it;
+  ++it;
+
   while (it != end) {
-    if (!first) {
-      std::cout << ' ';
-    }
-
-    std::cout << *it;
-
-    first = false;
-    it++;
+    out << ' ' << *it;
+    ++it;
   }
-
-  std::cout << '\n';
 }

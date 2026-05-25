@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "list.hpp"
 #include "functions.hpp"
 
@@ -13,7 +14,8 @@ int main()
     return 0;
   }
 
-  lukashevich::printSeqName(data);
+  lukashevich::printSeqName(std::cout, data);
+  std::cout << '\n';
 
   lukashevich::List< lukashevich::pair_t > copy(data);
   lukashevich::List< size_t > sums;
@@ -28,7 +30,8 @@ int main()
     return 1;
   }
 
-  lukashevich::printSum(sums);
+  lukashevich::printSum(std::cout, sums);
+  std::cout << '\n';
 
   return 0;
 }
