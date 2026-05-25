@@ -68,7 +68,7 @@ namespace lukashevich
       size_t size() const noexcept;
       bool empty() const noexcept;
 
-      void swap(List< T > & list) noexcept
+      void swap(List< T > & list) noexcept;
 
     private:
       detail::Node< T >* fake_;
