@@ -46,16 +46,26 @@ size_t lukashevich::printOneRow(std::ostream& out, List< pair_t >& data)
   size_t sum = 0;
   bool printed = false;
 
-  while (it != end)
+  LIter< pair_t > check = data.begin();
+  while (check != end)
   {
-    if (!it->second.empty()) {
-      size_t value = it->second.front();
+    if (!check->second.empty()) {
+      size_t value = check->second.front();
 
       if (sum > std::numeric_limits< size_t >::max() - value) {
         throw std::overflow_error("overflow");
       }
 
       sum += value;
+    }
+
+    ++check;
+  }
+
+  while (it != end)
+  {
+    if (!it->second.empty()) {
+      size_t value = it->second.front();
 
       if (printed) {
         out << ' ';
@@ -66,6 +76,7 @@ size_t lukashevich::printOneRow(std::ostream& out, List< pair_t >& data)
 
       it->second.popFront();
     }
+
     ++it;
   }
 
