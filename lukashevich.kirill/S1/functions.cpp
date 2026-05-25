@@ -106,7 +106,7 @@ void lukashevich::printAll(List< pair_t >& data, List< size_t >& sums)
 
 void lukashevich::printSum(std::ostream& out, const List< size_t >& sums)
 {
-  
+
   if (sums.empty()) {
     out << 0;
     return;
