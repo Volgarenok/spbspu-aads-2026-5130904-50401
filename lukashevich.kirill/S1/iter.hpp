@@ -5,8 +5,11 @@
 
 namespace lukashevich
 {
-  template< class T >
-  class Node;
+  namespace detail
+  {
+    template< class T >
+    class Node;
+  }
 
   template< class T >
   class List;
@@ -30,7 +33,7 @@ namespace lukashevich
       T* operator->();
 
     private:
-      explicit LIter(Node< T >* node):
+      explicit LIter(detail::Node< T >* node):
         node_(node)
       {}
       Node< T >* node_;

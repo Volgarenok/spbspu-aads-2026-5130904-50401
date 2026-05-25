@@ -5,8 +5,11 @@
 
 namespace lukashevich
 {
-  template< class T >
-  class Node;
+  namespace detail
+  {
+    template< class T >
+    class Node;
+  }
 
   template< class T >
   class List;
@@ -28,13 +31,13 @@ namespace lukashevich
       const T* operator->() const noexcept;
 
     private:
-      explicit LCIter(Node< T >* node) noexcept;
-      Node< T >* node_;
+      explicit LCIter(detail::Node< T >* node) noexcept;
+      detail::Node< T >* node_;
       friend class List< T >;
   };
 
   template< class T >
-  LCIter< T >::LCIter(Node< T >* node) noexcept:
+  LCIter< T >::LCIter(detail::Node< T >* node) noexcept:
         node_(node)
   {}
 
