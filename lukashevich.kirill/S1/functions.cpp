@@ -23,7 +23,6 @@ void lukashevich::getData(std::istream& in, List< pair_t >& res)
 
 void lukashevich::printSeqName(std::ostream& out, const List< pair_t >& data)
 {
-  bool first = true;
 
   LCIter< pair_t > it = data.begin();
   LCIter< pair_t > end = data.end();
