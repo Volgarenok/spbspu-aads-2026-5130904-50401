@@ -74,7 +74,7 @@ size_t lukashevich::printOneRow(std::ostream& out, List< pair_t >& data)
   }
 
   std::cout << '\n';
-  
+
   if (overflow) {
     throw std::overflow_error("overflow");
   }
