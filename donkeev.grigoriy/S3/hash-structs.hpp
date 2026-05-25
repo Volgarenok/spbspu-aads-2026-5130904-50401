@@ -24,6 +24,16 @@ namespace donkeev
   {
     bool operator()(const std::string&, const std::string&) const;
   };
+
+  struct CommandsHash
+  {
+    size_t operator()(const std::string&) const;
+  };
+
+  struct CommandsEqual
+  {
+    bool operator()(const std::string&, const std::string&) const;
+  };
 }
 
 #endif
