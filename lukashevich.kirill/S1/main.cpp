@@ -26,7 +26,7 @@ int main()
   }
   catch (const std::overflow_error&)
   {
-    std::cerr << "erorr\n";
+    std::cerr << "error\n";
     return 1;
   }
 
