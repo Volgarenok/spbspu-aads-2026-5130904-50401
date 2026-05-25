@@ -306,7 +306,7 @@ namespace lukashevich
   {
     assert(this != &list);
     List< T > temp(list);
-    swap(*this, temp);
+    swap(temp);
     return *this;
   }
 
@@ -321,7 +321,7 @@ namespace lukashevich
   {
     assert(this != &list);
     List< T > temp(std::move(list));
-    swap(*this, temp);
+    swap(temp);
     return *this;
   }
 }
