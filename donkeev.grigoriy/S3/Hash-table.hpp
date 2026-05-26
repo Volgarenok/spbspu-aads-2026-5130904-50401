@@ -23,6 +23,7 @@ namespace donkeev
     iterator end();
     constIterator end() const;
 
+    size_t size();
     void add(const Key&, const Value&);
     Value& get(const Key&);
     Value* find(const Key&);
@@ -86,6 +87,12 @@ namespace donkeev
     return constIterator{&data_, data_.getSize()};
   }
 
+  template< class Key, class Value, class Hash, class Equal >
+  size_t HashTable< Key, Value, Hash, Equal >::size()
+  {
+    return totalElements_;
+  }
+  
   template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::add(const Key& key, const Value& value)
   {
