@@ -79,7 +79,7 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::iterator donkeev::HashTable< Key, Value, Hash, Equal >::end()
   {
-    return {&data_, data_.getSize()};
+    return iterator{&data_, data_.getSize()};
   }
   template< class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::constIterator donkeev::HashTable< Key, Value, Hash, Equal >::end() const
@@ -92,7 +92,7 @@ namespace donkeev
   {
     return totalElements_;
   }
-  
+
   template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::add(const Key& key, const Value& value)
   {

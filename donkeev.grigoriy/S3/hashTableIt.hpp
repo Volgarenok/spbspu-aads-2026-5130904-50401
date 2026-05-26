@@ -7,12 +7,12 @@
 
 namespace donkeev
 {
-  template<class Key, class Value, class Hash, class Equal>
-  class HashTable;
-
   template<class Key, class Value>
   struct HTIt
   {
+    template<class K, class V, class H, class E>
+    friend class HashTable;
+
     HTIt() = default;
 
     HTIt<Key, Value>& operator++() noexcept;
@@ -31,16 +31,19 @@ namespace donkeev
     bool operator<(const HTIt<Key, Value>&) const noexcept;
     bool operator<=(const HTIt<Key, Value>&) const noexcept;
   private:
-    const topit::Vector<donkeev::HTNode<Key, Value>>* vector_;
+    topit::Vector<donkeev::HTNode<Key, Value>>* vector_;
     size_t currentId_;
     size_t dataSize_;
 
-    explicit HTIt(const topit::Vector<donkeev::HTNode<Key, Value>>*, size_t);
+    explicit HTIt(topit::Vector<donkeev::HTNode<Key, Value>>*, size_t);
   };
 
   template<class Key, class Value>
   struct HTCIt
   {
+    template<class K, class V, class H, class E>
+    friend class HashTable;
+
     HTCIt() = default;
 
     HTCIt<Key, Value>& operator++() noexcept;
@@ -67,7 +70,7 @@ namespace donkeev
   };
 
   template<class Key, class Value>
-  HTIt<Key, Value>::HTIt(const topit::Vector<donkeev::HTNode<Key, Value>>* data, size_t currentId):
+  HTIt<Key, Value>::HTIt(topit::Vector<donkeev::HTNode<Key, Value>>* data, size_t currentId):
     vector_(data),
     currentId_(currentId),
     dataSize_(vector_->getSize())
