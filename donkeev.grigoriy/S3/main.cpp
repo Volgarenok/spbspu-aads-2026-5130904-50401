@@ -15,19 +15,21 @@ namespace donkeev
   using graphsHashTable_t = donkeev::HashTable< std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>;
   using commandFunc = void (*)(graphsHashTable_t, const std::string&, std::ostream&);
 }
+
 const topit::Vector< std::pair< std::string, donkeev::commandFunc > > commandsVector{
   std::initializer_list<std::pair<std::string, donkeev::commandFunc>>{
   {"graphs", donkeev::printGrapsNames},
-  {"vertexes", donkeev::printVertexesNames},
+  /*{"vertexes", donkeev::printVertexesNames},
   {"outbound", donkeev::printOutboundVertexesNames},
   {"inbound", donkeev::printInboundVertexesNames},
   {"bind", donkeev::createEdge},
   {"cut", donkeev::deleteEdge},
   {"create", donkeev::createGraph},
   {"merge", donkeev::mergeGraphs},
-  {"extract", donkeev::extractGraph}
+  {"extract", donkeev::extractGraph}*/
   }
 };
+
 
 std::string nextWord(const std::string& line, size_t& position)
 {
@@ -110,13 +112,33 @@ int main(int argc, char* argv[])
   {
     readGraphs(filename, graphsTable);
   }
+  catch (const std::overflow_error& e)
+  {
+    std::cerr << e.what() << '\n';
+  }
   catch (const std::runtime_error& e)
   {
     std::cerr << e.what() << '\n';
   }
-  catch (const std::overflow_error& e)
+  
+  std::string commandLine;
+  while (std::getline(std::cin, commandLine))
   {
-    std::cerr << e.what() << '\n';
+    size_t readingPosition = 0; 
+    std::string command = nextWord(commandLine, readingPosition);
+
+    if (commandLine.empty())
+    {
+      continue;
+    }
+    else if (command == "graphs")
+    {
+      donkeev::printGrapsNames(graphsTable, std::string(""),std::cout);
+    }
+    else
+    {
+      std::cout << "INVALID COMMAND" << '\n';
+    }
   }
   
   donkeev::HashTable< std::string, void (*)(), donkeev::CommandsHash, donkeev::CommandsEqual > commands(16, 4);

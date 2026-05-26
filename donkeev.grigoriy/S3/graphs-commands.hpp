@@ -5,13 +5,17 @@
 #include "Hash-table.hpp"
 #include "Graph.hpp"
 #include "hash-structs.hpp"
+#include "../common/top-it-vector.hpp"
+#include "../common/vector-iterators.hpp"
 
 namespace donkeev
 {
   using graphsHashTable_t = donkeev::HashTable< std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>;
   
+  void sortNames(topit::Vector< std::string >&);
+
   void printGrapsNames(graphsHashTable_t, const std::string&, std::ostream&);
-  
+  /*
   void printVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
 
   void printOutboundVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
@@ -26,6 +30,6 @@ namespace donkeev
 
   void mergeGraphs(graphsHashTable_t, const std::string&, std::ostream&);
 
-  void extractGraph(graphsHashTable_t, const std::string&, std::ostream&);
+  void extractGraph(graphsHashTable_t, const std::string&, std::ostream&);*/
 }
 #endif
