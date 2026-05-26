@@ -12,12 +12,14 @@ namespace donkeev
 {
   using graphsHashTable_t = donkeev::HashTable< std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>;
   
+  std::string nextWord(const std::string&, size_t&);
+
   void sortNames(topit::Vector< std::string >&);
 
   void printGrapsNames(graphsHashTable_t, const std::string&, std::ostream&);
-  /*
+  
   void printVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
-
+/*
   void printOutboundVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
 
   void printInboundVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);

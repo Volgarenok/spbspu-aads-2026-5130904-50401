@@ -30,21 +30,6 @@ const topit::Vector< std::pair< std::string, donkeev::commandFunc > > commandsVe
   }
 };
 
-
-std::string nextWord(const std::string& line, size_t& position)
-{
-  while (position < line.size() && line[position] == ' ')
-  {
-    ++position;
-  }
-  size_t start = position;
-  while (position < line.size() && line[position] != ' ')
-  {
-    ++position;
-  }
-
-  return line.substr(start, position - start);
-}
 void readGraphs(const std::string& filename, donkeev::HashTable<std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>& graphs)
 {
   std::ifstream file(filename);
@@ -62,9 +47,9 @@ void readGraphs(const std::string& filename, donkeev::HashTable<std::string, don
     }
 
     size_t position = 0;
-    std::string graphName = nextWord(line, position);
+    std::string graphName = donkeev::nextWord(line, position);
 
-    std::string edgesCountStr = nextWord(line, position);
+    std::string edgesCountStr = donkeev::nextWord(line, position);
     if (edgesCountStr.empty())
     {
       throw std::runtime_error("Bad input file");
@@ -81,9 +66,9 @@ void readGraphs(const std::string& filename, donkeev::HashTable<std::string, don
       } while (line.empty());
 
       position = 0;
-      std::string from = nextWord(line, position);
-      std::string to = nextWord(line, position);
-      std::string weightStr = nextWord(line, position);
+      std::string from = donkeev::nextWord(line, position);
+      std::string to = donkeev::nextWord(line, position);
+      std::string weightStr = donkeev::nextWord(line, position);
 
       if (from.empty() || to.empty() || weightStr.empty())
       {
@@ -125,7 +110,7 @@ int main(int argc, char* argv[])
   while (std::getline(std::cin, commandLine))
   {
     size_t readingPosition = 0; 
-    std::string command = nextWord(commandLine, readingPosition);
+    std::string command = donkeev::nextWord(commandLine, readingPosition);
 
     if (commandLine.empty())
     {
@@ -134,6 +119,16 @@ int main(int argc, char* argv[])
     else if (command == "graphs")
     {
       donkeev::printGrapsNames(graphsTable, std::string(""),std::cout);
+    }
+    else if (command == "vertexes")
+    {
+      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
+      if (graphName.empty())
+      {
+        std::cout << "INVALID COMMAND\n";
+        continue;
+      }
+      donkeev::printVertexesNames(graphsTable, graphName, std::cout);
     }
     else
     {
