@@ -25,6 +25,7 @@ namespace topit
     Vector< T >& operator=(Vector< T >&&);
     Vector< T >& operator=(const Vector< T >&);
 
+    bool has(const T&) const;
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
@@ -165,6 +166,20 @@ bool topit::operator==(const Vector< T >& lhs, const Vector< T >& rhs)
   bool isEqual = lhs.getSize() == rhs.getSize();
   for (size_t i = 0; (i < lhs.getSize()) && (isEqual = isEqual && lhs[i] == rhs[i]); ++i);
   return isEqual;
+}
+
+template< class T >
+bool topit::Vector< T >::has(const T& value) const
+{
+  for (size_t i = 0; i < size_; ++i)
+  {
+    if (data_[i] == value)
+    {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 template< class T >
