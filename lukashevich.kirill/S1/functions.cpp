@@ -101,7 +101,6 @@ void lukashevich::printAll(List< pair_t >& data, List< size_t >& sums)
 {
   while (hasNum(data)) {
     size_t sum = printOneRow(std::cout, data);
-    //std::cout << '\n';
     sums.pushBack(sum);
   }
 }
