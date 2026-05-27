@@ -16,12 +16,14 @@ namespace donkeev
 
   void sortNames(topit::Vector< std::string >&);
 
+  void sortNumbers(topit::Vector< size_t >&);
+
   void printGrapsNames(graphsHashTable_t, const std::string&, std::ostream&);
   
   void printVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
-/*
-  void printOutboundVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
 
+  void printOutboundVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
+/*
   void printInboundVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
 
   void createEdge(graphsHashTable_t, const std::string&, std::ostream&);

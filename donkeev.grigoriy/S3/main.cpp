@@ -130,6 +130,25 @@ int main(int argc, char* argv[])
       }
       donkeev::printVertexesNames(graphsTable, graphName, std::cout);
     }
+    else if (command == "outbound")
+    {
+      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
+      std::string vertexName = donkeev::nextWord(commandLine, readingPosition);
+      if (graphName.empty() || vertexName.empty())
+      {
+        std::cout << "INVALID COMMAND\n";
+        continue;
+      }
+      std::string parametrs(graphName + " " + vertexName);
+      try
+      {
+        donkeev::printOutboundVertexesNames(graphsTable, parametrs, std::cout);
+      }
+      catch (...)
+      {
+        std::cout << "INVALID COMMAND\n"; 
+      }
+    }
     else
     {
       std::cout << "INVALID COMMAND" << '\n';
