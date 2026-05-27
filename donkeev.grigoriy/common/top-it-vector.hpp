@@ -26,6 +26,7 @@ namespace topit
     Vector< T >& operator=(const Vector< T >&);
 
     bool has(const T&) const;
+    T& find(const T&) const;
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
@@ -166,6 +167,20 @@ bool topit::operator==(const Vector< T >& lhs, const Vector< T >& rhs)
   bool isEqual = lhs.getSize() == rhs.getSize();
   for (size_t i = 0; (i < lhs.getSize()) && (isEqual = isEqual && lhs[i] == rhs[i]); ++i);
   return isEqual;
+}
+
+template< class T >
+T& topit::Vector< T >::find(const T& value) const
+{
+  for (size_t i = 0; i < size_; ++i)
+  {
+    if (data_[i] == value)
+    {
+      return data_[i];
+    }
+  }
+
+  throw std::runtime_error("No such element");
 }
 
 template< class T >
