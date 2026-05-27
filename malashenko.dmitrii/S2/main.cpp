@@ -5,35 +5,27 @@ int main(int argc, char ** argv)
 {
   using namespace malashenko;
   Calculator calc;
-  if (argc < 2)
+  std::istream* in = &std::cin;
+  std::ifstream input;
+  if (argc == 2)
   {
-    try
-    {
-      calc.getInfixData(std::cin);
-    }
-    catch (...)
-    {
-      std::cerr << "Input problem\n";
-      return 1;
-    }
-  }
-  else if (argc == 2)
-  {
-    std::ifstream input(argv[1]);
+    input.open(argv[1]);
     if (!input)
     {
       std::cerr << "Problem with input file opening\n";
       return 1;
     }
-    try
-    {
-      calc.getInfixData(input);
-    }
-    catch (...)
-    {
-      std::cerr << "Problem with file reading\n";
-      return 1;
-    }
+    in = &input;
+  }
+
+  try
+  {
+    calc.getInfixData(*in);
+  }
+  catch (...)
+  {
+    std::cerr << "Input problem\n";
+    return 1;
   }
 
   if (calc.isInfixAllDataEmpty())
