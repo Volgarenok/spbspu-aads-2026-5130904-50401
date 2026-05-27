@@ -1,74 +1,63 @@
 #include <iostream>
 #include <fstream>
-#include "queue.hpp"
-#include "math_functions.hpp"
+#include "calculator.hpp"
 int main(int argc, char ** argv)
 {
   using namespace malashenko;
-  Stack< Queue< std::string > > infixAllData;
-
+  Calculator calc;
   if (argc < 2)
   {
     try
     {
-      getInfixData(std::cin, infixAllData);
-    } catch (...)
+      calc.getInfixData(std::cin);
+    }
+    catch (...)
     {
       std::cerr << "Input problem\n";
       return 1;
     }
-  } else if (argc == 2)
+  }
+  else if (argc == 2)
   {
     std::ifstream input(argv[1]);
-     if (!input)
-     {
+    if (!input)
+    {
       std::cerr << "Problem with input file opening\n";
       return 1;
     }
     try
     {
-      getInfixData(input, infixAllData);
-    } catch (...)
+      calc.getInfixData(input);
+    }
+    catch (...)
     {
       std::cerr << "Problem with file reading\n";
       return 1;
     }
-    input.close();
   }
 
-  if (infixAllData.empty())
+  if (calc.isInfixAllDataEmpty())
   {
     std::cout << '\n';
     return 0;
   }
-  List< std::string > out;
 
-  while (!infixAllData.empty())
+  while (!calc.isInfixAllDataEmpty())
   {
-    Queue< std::string > infixData = infixAllData.top();
-    infixAllData.pop();
-    Queue< std::string > postfixData;
-    converInfixToPostfix(infixData, postfixData);
-    std::string res;
+    calc.convertInfixToPostfix();
     try
     {
-      res = calculate(postfixData);
+      calc.calculateFromPostfix();
     }
-    catch(const std::exception& e)
+    catch (const std::exception& e)
     {
       std::cerr << e.what() << '\n';
       return 1;
     }
 
-    out.push_back(res);
+    calc.pushToOut();
   }
 
-  LIter< std::string > it = out.begin();
-  std::cout << *it;
-  ++it;
-  for (; it != out.end(); ++it)
-  {
-    std::cout << ' ' << *it;
-  }
+  calc.printOutList(std::cout);
   std::cout << '\n';
 }

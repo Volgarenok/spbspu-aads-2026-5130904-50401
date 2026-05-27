@@ -7,75 +7,44 @@ namespace malashenko
   template< class T >
   class Queue {
   public:
-    Queue();
-    Queue(const Queue< T >& other);
-    Queue(Queue< T >&& other);
+    Queue() = default;
+    Queue(const Queue< T >& other) = default;
+    Queue(Queue< T >&& other) = default;
 
-    Queue& operator=(const Queue< T >& other);
-    Queue& operator=(Queue< T >&& other);
+    Queue& operator=(const Queue< T >& other) = default;
+    Queue& operator=(Queue< T >&& other) = default;
 
-    T& front() const;
-    T& back() const;
+    ~Queue() = default;
+
+    T& front();
+    const T& front() const;
+
 
     bool empty() const;
     size_t size() const;
 
 
     void push(const T& value);
+    void push(T&& value);
     void pop();
     void swap(Queue< T >& other);
     void clear();
 
-    ~Queue() = default;
   private:
     List< T > list_;
   };
 
-  template< class T >
-  Queue< T >::Queue():
-    list_()
-  {}
 
   template< class T >
-  Queue< T >::Queue(const Queue< T >& other):
-    list_(other.list_)
-  {}
-
-  template< class T >
-  Queue< T >::Queue(Queue< T >&& other):
-    list_(std::move(other.list_))
-  {}
-
-  template< class T >
-  Queue< T >& Queue< T >::operator=(const Queue< T >& other)
-  {
-    Queue< T > temp(other);
-    swap(temp);
-    return *this;
-  }
-
-  template< class T >
-  Queue< T >& Queue< T >::operator=(Queue< T >&& other)
-  {
-    if (this == &other)
-    {
-      return *this;
-    }
-
-    list_ = std::move(other.list_);
-    return *this;
-  }
-
-  template< class T >
-  T& Queue< T >::front() const
+  T& Queue< T >::front()
   {
     return list_.front();
   }
 
   template< class T >
-  T& Queue< T >::back() const
+  const T& Queue< T >::front() const
   {
-    return list_.back();
+    return list_.front();
   }
 
   template< class T >
@@ -92,6 +61,12 @@ namespace malashenko
 
   template< class T >
   void Queue< T >::push(const T& value)
+  {
+    list_.push_back(value);
+  }
+
+  template< class T >
+  void Queue< T >::push(T&& value)
   {
     list_.push_back(value);
   }
