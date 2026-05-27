@@ -33,6 +33,7 @@ namespace malashenko {
     T& back();
 
     LIter< T > insert(LIter< T > h, const T& value);
+    LIter< T > insert(LIter< T > h, T&& value);
     void push_back(const T& value);
     void push_back(T&& value);
 
@@ -100,9 +101,9 @@ namespace malashenko {
   template< class T >
   List< T >& List< T >::operator=(List< T >&& other) noexcept
   {
-    assert(this == &other);
+    assert(this != &other);
 
-    List< T > temp(std::forward(other));
+    List< T > temp(std::forward< List< T > >(other));
     swap(temp);
     return *this;
   }
@@ -182,6 +183,16 @@ namespace malashenko {
   }
 
   template< class T >
+  LIter< T > List< T >::insert(LIter< T > h, T&& value)
+  {
+    detail::Node< T >* newNode = new detail::Node< T >{std::move(value), h.node_->next, h.node_};
+    h.node_->next = newNode;
+    newNode->next->prev = newNode;
+    ++s_;
+    return {newNode};
+  }
+
+  template< class T >
   void List< T >::push_back(const T& value)
   {
     LIter< T > itBack = end().node_->prev;
@@ -214,6 +225,7 @@ namespace malashenko {
     {
       return end();
     }
+
     LIter< T > ret = h + 1;
     h.node_->prev->next = ret.node_;
     ret.node_->prev = h.node_->prev;
