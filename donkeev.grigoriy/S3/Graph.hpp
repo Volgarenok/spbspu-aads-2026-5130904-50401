@@ -11,10 +11,12 @@ namespace donkeev
   {
     size_t edgesCount_;
     donkeev::HashTable< std::pair< std::string, std::string >, donkeev::List< size_t >, donkeev::VertexPairHash, donkeev::VertexPairEqual > table_;
+    topit::Vector< std::string > uniqueVertexes_;
 
     Graph();
     Graph(size_t, size_t);
     void addEdge(const std::string, const std::string, const size_t);
+    void addVertex(const std::string&);
   };
 }
 
