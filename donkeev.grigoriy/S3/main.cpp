@@ -149,6 +149,26 @@ int main(int argc, char* argv[])
         std::cout << "INVALID COMMAND\n"; 
       }
     }
+    else if (command == "inbound")
+    {
+      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
+      std::string vertexName = donkeev::nextWord(commandLine, readingPosition);
+      if (graphName.empty() || vertexName.empty())
+      {
+        std::cout << "INVALID COMMAND\n";
+        continue;
+      }
+      std::string parametrs(graphName + " " + vertexName);
+      donkeev::printInboundVertexesNames(graphsTable, parametrs, std::cout);
+      try
+      {
+        
+      }
+      catch (...)
+      {
+        std::cout << "INVALID COMMAND\n"; 
+      }
+    }
     else
     {
       std::cout << "INVALID COMMAND" << '\n';

@@ -14,6 +14,15 @@ donkeev::Graph::Graph(const size_t bucketCount, const size_t bucketSize):
 
 void donkeev::Graph::addEdge(const std::string from, const std::string to, const size_t weight)
 {
+  if (!uniqueVertexes_.has(from))
+  {
+    uniqueVertexes_.pushBack(from);
+  }
+  if (!uniqueVertexes_.has(to))
+  {
+    uniqueVertexes_.pushBack(to);
+  }
+  
   std::pair< std::string, std::string > thisKey = std::make_pair(from, to);
   donkeev::List< size_t >* thisValue = table_.find(thisKey);
   if (thisValue == nullptr)
@@ -26,15 +35,6 @@ void donkeev::Graph::addEdge(const std::string from, const std::string to, const
   }
   
   thisValue->pushBack(weight);
-
-  if (!uniqueVertexes_.has(from))
-  {
-    uniqueVertexes_.pushBack(from);
-  }
-  if (!uniqueVertexes_.has(to))
-  {
-    uniqueVertexes_.pushBack(to);
-  }
 }
 
 void donkeev::Graph::addVertex(const std::string& vertexName)

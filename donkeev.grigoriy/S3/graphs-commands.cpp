@@ -32,6 +32,23 @@ void donkeev::sortNames(topit::Vector< std::string >& vector)
   }
 }
 
+void donkeev::sortNames(topit::Vector< std::pair< std::string, donkeev::List< size_t > > >& vector)
+{
+  for (size_t i = 0; i < vector.getSize(); ++i)
+  {
+    size_t minId = i;
+    for (size_t j = i + 1; j < vector.getSize(); ++j)
+    {
+      if (vector[j].first < vector[minId].first)
+      {
+        minId = j;
+      }
+    }
+
+    std::swap(vector[i], vector[minId]);
+  }
+}
+
 void donkeev::sortNumbers(topit::Vector< size_t >& vector)
 {
   for (size_t i = 0; i < vector.getSize(); ++i)
@@ -183,5 +200,73 @@ void donkeev::printOutboundVertexesNames(graphsHashTable_t graphsTable, const st
       }
     }
     ++Vbegin;
+  }
+}
+
+void donkeev::printInboundVertexesNames(graphsHashTable_t graphsTable, const std::string& parametrs, std::ostream& out)
+{
+  size_t readingPosition = 0;
+  std::string graphName = donkeev::nextWord(parametrs, readingPosition);
+  std::string vertexName = donkeev::nextWord(parametrs, readingPosition);
+
+  donkeev::Graph* graph_ptr = graphsTable.find(graphName);
+  if (graph_ptr == nullptr)
+  {
+    throw std::runtime_error("Bad input");
+  }
+
+  donkeev::Graph graph = *graph_ptr;
+
+  if (!graph.uniqueVertexes_.has(vertexName))
+  {
+    throw std::runtime_error("No such vertex");
+  }
+
+  donkeev::HashTable< std::pair< std::string, std::string >, donkeev::List< size_t >, donkeev::VertexPairHash, donkeev::VertexPairEqual > graphHT = graph.table_; 
+  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > graphHTBegin = graphHT.begin();
+  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > graphHTEnd = graphHT.end();
+  
+  topit::Vector< std::pair< std::string, donkeev::List< size_t > > > sortedInboundVertexesNames;
+  while (graphHTBegin != graphHTEnd)
+  {
+    if ((*graphHTBegin).first.second == vertexName)
+    {
+      std::string inboundVertex = (*graphHTBegin).first.first;
+      donkeev::List< size_t >& inboundWeights = (*graphHTBegin).second;
+      sortedInboundVertexesNames.pushBack({inboundVertex, inboundWeights});
+    }
+
+    ++graphHTBegin;
+  }
+
+  sortNames(sortedInboundVertexesNames);
+
+  if (sortedInboundVertexesNames.isEmpty())
+  {
+    out << '\n';
+    return;
+  }
+
+  for (size_t i = 0; i < sortedInboundVertexesNames.getSize(); ++i)
+  {
+    out << sortedInboundVertexesNames[i].first << " ";
+
+    topit::Vector< size_t > sortedWeights;
+    donkeev::List< size_t > weightsList = sortedInboundVertexesNames[i].second;
+    donkeev::LIter< size_t > weightsListBegin = weightsList.begin();
+    for (size_t j = 0; j < weightsList.size(); ++j)
+    {
+      sortedWeights.pushBack(*weightsListBegin);
+      ++weightsListBegin;
+    }
+
+    sortNumbers(sortedWeights);
+
+    size_t j = 0;
+    for (; j < sortedWeights.getSize() - 1; ++j)
+    {
+      out << sortedWeights[j] << " ";
+    }
+    out << sortedWeights[j] << '\n';
   }
 }

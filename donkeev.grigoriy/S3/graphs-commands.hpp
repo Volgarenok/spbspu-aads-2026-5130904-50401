@@ -14,6 +14,8 @@ namespace donkeev
   
   std::string nextWord(const std::string&, size_t&);
 
+  void sortNames(topit::Vector< std::pair< std::string, donkeev::List< size_t > > >&);
+
   void sortNames(topit::Vector< std::string >&);
 
   void sortNumbers(topit::Vector< size_t >&);
@@ -23,9 +25,9 @@ namespace donkeev
   void printVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
 
   void printOutboundVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
-/*
-  void printInboundVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
 
+  void printInboundVertexesNames(graphsHashTable_t, const std::string&, std::ostream&);
+/*
   void createEdge(graphsHashTable_t, const std::string&, std::ostream&);
 
   void deleteEdge(graphsHashTable_t, const std::string&, std::ostream&);
