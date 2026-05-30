@@ -272,6 +272,8 @@ namespace vasyakin
     fake_node_(new detail::Node< T >(T{})),
     size_(0)
   {
+    fake_node_->next_ = fake_node_;
+
     try
     {
       pushBack(value);
