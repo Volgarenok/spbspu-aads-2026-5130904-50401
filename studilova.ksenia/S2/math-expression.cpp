@@ -4,32 +4,6 @@
 
 #include "stack.hpp"
 
-bool studilova::isNumber(const std::string& s)
-{
-  if (s.empty())
-  {
-    return false;
-  }
-
-  size_t start = 0;
-  if (s[start] == '-')
-  {
-    if (s.length() == 1)
-    {
-      return false;
-    }
-    ++start;
-  }
-  for (size_t i = start; i < s.length(); ++i)
-  {
-    if (s[i] < '0' || s[i] > '9')
-    {
-      return false;
-    }
-  }
-  return true;
-}
-
 bool studilova::isOperator(const std::string& s)
 {
   return s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "**";
@@ -57,20 +31,29 @@ bool studilova::isRightAssociative(const std::string& op)
   return op == "**";
 }
 
-void studilova::processToken(const std::string& token,
-  studilova::Stack< std::string >& ops, studilova::Queue< std::string >& output)
+long long studilova::toNumber(const std::string& token)
 {
-  if (isNumber(token))
+  size_t pos = 0;
+  long long value = std::stoll(token, &pos);
+
+  if (pos != token.length())
   {
-    output.push(token);
+    throw std::runtime_error("Invalid number");
   }
-  else if (isOperator(token))
+  return value;
+}
+
+void studilova::processToken(const std::string& token, studilova::Stack< std::string >& ops,
+  studilova::Queue< std::string >& output)
+{
+  if (isOperator(token))
   {
     while (!ops.empty() && isOperator(ops.top()))
     {
       std::string topOp = ops.top();
       int p1 = getPrecedence(token);
       int p2 = getPrecedence(topOp);
+
       if ((!isRightAssociative(token) && p1 <= p2) || (isRightAssociative(token) && p1 < p2))
       {
         output.push(topOp);
@@ -81,7 +64,8 @@ void studilova::processToken(const std::string& token,
     }
     ops.push(token);
   } else {
-    throw std::runtime_error("Invalid token: " + token);
+      toNumber(token);
+      output.push(token);
   }
 }
 
@@ -280,11 +264,7 @@ long long studilova::evaluatePostfix(studilova::Queue< std::string >& postfix)
     std::string token = postfix.front();
     postfix.pop();
 
-    if (isNumber(token))
-    {
-      values.push(std::stoll(token));
-    }
-    else if (isOperator(token))
+    if (isOperator(token))
     {
       if (values.size() < 2)
       {
@@ -300,7 +280,7 @@ long long studilova::evaluatePostfix(studilova::Queue< std::string >& postfix)
       long long res = applyOperator(a, b, token);
       values.push(res);
     } else {
-      throw std::runtime_error("Invalid token");
+      values.push(std::stoll(token));
     }
   }
 

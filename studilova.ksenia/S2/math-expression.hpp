@@ -9,11 +9,11 @@
 
 namespace studilova
 {
-  bool isNumber(const std::string& s);
   bool isOperator(const std::string& s);
   int getPrecedence(const std::string& op);
   bool isRightAssociative(const std::string& op);
   long long applyOperator(long long a, long long b, const std::string& op);
+  long long toNumber(const std::string& token);
   void processToken(const std::string& token, studilova::Stack< std::string >& ops,
     studilova::Queue< std::string >& output);
 
