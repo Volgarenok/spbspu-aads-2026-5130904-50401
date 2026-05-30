@@ -288,7 +288,7 @@ namespace vasyakin
   template< class T >
   List< T >& List< T >::operator=(const List& other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       List tmp(other);
       swap(tmp);
@@ -299,7 +299,7 @@ namespace vasyakin
   template< class T >
   List< T >& List< T >::operator=(List&& other) noexcept
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       List tmp(std::move(other));
       swap(tmp);
