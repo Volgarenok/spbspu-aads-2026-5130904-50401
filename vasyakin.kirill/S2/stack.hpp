@@ -29,7 +29,7 @@ namespace vasyakin
   template< class T >
   void Stack< T >::pop()
   {
-    if (list_.getSize() == 0)
+    if (list_.getsize() == 0)
     {
       throw std::runtime_error ("Stack is empty");
     }
@@ -39,7 +39,7 @@ namespace vasyakin
   template< class T >
   T& Stack< T >::top()
   {
-    if (list_.getSize() == 0)
+    if (list_.getsize() == 0)
     {
       throw std::runtime_error("Stack is empty");
     }
@@ -49,7 +49,7 @@ namespace vasyakin
   template< class T >
   const T& Stack< T >::top() const
   {
-    if (list_.getSize() == 0)
+    if (list_.getsize() == 0)
     {
       throw std::runtime_error("Stack is empty");
     }
@@ -59,13 +59,13 @@ namespace vasyakin
   template< class T >
   bool Stack< T >::empty() const noexcept
   {
-    return list_.getSize() == 0;
+    return list_.getsize() == 0;
   }
 
   template< class T >
   size_t Stack< T >::size() const noexcept
   {
-    return list_.getSize();
+    return list_.getsize();
   }
 }
 

@@ -30,7 +30,7 @@ namespace vasyakin
   template< class T >
   void Queue< T >::pop()
   {
-    if (list_.getSize() == 0)
+    if (list_.getsize() == 0)
     {
       throw std::runtime_error("Queue is empty");
     }
@@ -40,7 +40,7 @@ namespace vasyakin
   template< class T >
   T& Queue< T >::front()
   {
-    if (list_.getSize() == 0)
+    if (list_.getsize() == 0)
     {
       throw std::runtime_error("Queue is empty");
     }
@@ -50,7 +50,7 @@ namespace vasyakin
   template< class T >
   const T& Queue< T >::front() const
   {
-    if (list_.getSize() == 0)
+    if (list_.getsize() == 0)
     {
       throw std::runtime_error("Queue is empty");
     }
@@ -60,13 +60,13 @@ namespace vasyakin
   template< class T >
   bool Queue< T >::empty() const noexcept
   {
-    return list_.getSize() == 0;
+    return list_.getsize() == 0;
   }
 
   template< class T >
   size_t Queue< T >::size() const noexcept
   {
-    return list_.getSize();
+    return list_.getsize();
   }
 }
 
