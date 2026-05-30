@@ -56,7 +56,8 @@ bool studilova::isRightAssociative(const std::string& op)
   return op == "**";
 }
 
-void studilova::processToken(const std::string& token, studilova::Stack<std::string>& ops, studilova::Queue<std::string>& output)
+void studilova::processToken(const std::string& token,
+  studilova::Stack< std::string >& ops, studilova::Queue< std::string >& output)
 {
   if (isNumber(token))
   {
@@ -174,7 +175,7 @@ long long studilova::power(long long a, long long b)
   return res;
 }
 
-long long studilova::applyOperator( long long a, long long b, const std::string& op)
+long long studilova::applyOperator(long long a, long long b, const std::string& op)
 {
   if (op == "+")
   {
