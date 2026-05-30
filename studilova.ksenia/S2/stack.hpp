@@ -4,6 +4,7 @@
 #include "../common/list.hpp"
 #include <cstddef>
 #include <stdexcept>
+#include <utility>
 
 namespace studilova
 {
@@ -12,6 +13,7 @@ namespace studilova
   {
     public:
       void push(const T& value);
+      void push(T&& value);
       void pop();
       T& top();
 
@@ -27,6 +29,12 @@ template< class T >
 void studilova::Stack< T >::push(const T& value)
 {
   data_.pushBack(value);
+}
+
+template< class T >
+void studilova::Stack< T >::push(T&& value)
+{
+  data_.pushBack(std::move(value));
 }
 
 template< class T >
