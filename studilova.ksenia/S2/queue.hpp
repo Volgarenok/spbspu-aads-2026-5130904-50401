@@ -1,10 +1,11 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 
-#include "../common/list.hpp"
 #include <cstddef>
 #include <stdexcept>
 #include <utility>
+
+#include "list.hpp"
 
 namespace studilova
 {

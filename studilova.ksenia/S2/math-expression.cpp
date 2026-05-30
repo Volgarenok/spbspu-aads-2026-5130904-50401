@@ -1,7 +1,8 @@
 #include "math-expression.hpp"
-#include "stack.hpp"
 
 #include <stdexcept>
+
+#include "stack.hpp"
 
 bool studilova::isNumber(const std::string& s)
 {
