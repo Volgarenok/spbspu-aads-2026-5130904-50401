@@ -500,7 +500,7 @@ namespace vasyakin
   LIter< T > List< T >::partition(P p)
   {
     List< T > false_list;
-    LIter< T > false_tail = false_list.end();;
+    LIter< T > false_tail = false_list.end();
     LIter< T > curr = end();
 
     while (curr.ptr_->next_ != fake_node_)
