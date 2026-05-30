@@ -368,7 +368,7 @@ namespace vasyakin
       return;
     }
 
-    splice_after(pos, other, LIter< T >(other.fake_node_), LIter< T >(other.fake_node_));
+    splice_after(pos, other, other.end(), other.end());
   }
 
   template< class T >
@@ -423,8 +423,8 @@ namespace vasyakin
       return;
     }
 
-    LIter< T > curr(fake_node_);
-    LIter< T > prev(other.fake_node_);
+    LIter< T > curr = end();
+    LIter< T > prev = other.end();
 
     while (prev.ptr_->next_ != other.fake_node_)
     {
@@ -461,7 +461,7 @@ namespace vasyakin
       ++mid;
     }
 
-    second_half.splice_after(LIter< T >(second_half.fake_node_), *this, mid, end());
+    second_half.splice_after(second_half.end(), *this, mid, end());
 
     if (second_half.size_ == 0)
     {
@@ -478,8 +478,8 @@ namespace vasyakin
   LIter< T > List< T >::partition(P p)
   {
     List< T > false_list;
-    LIter< T > false_tail(false_list.fake_node_);
-    LIter< T > curr(fake_node_);
+    LIter< T > false_tail = false_list.end();;
+    LIter< T > curr = end();
 
     while (curr.ptr_->next_ != fake_node_)
     {
