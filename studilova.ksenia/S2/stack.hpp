@@ -16,6 +16,7 @@ namespace studilova
       void push(T&& value);
       void pop();
       T& top();
+      const T& top() const;
 
       bool empty() const;
       size_t size() const;
@@ -49,6 +50,16 @@ void studilova::Stack< T >::pop()
 
 template< class T >
 T& studilova::Stack< T >::top()
+{
+  if (empty())
+  {
+    throw std::out_of_range("Stack is empty");
+  }
+  return data_.back();
+}
+
+template< class T >
+const T& studilova::Stack< T >::top() const
 {
   if (empty())
   {
