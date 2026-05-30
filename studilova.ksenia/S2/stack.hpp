@@ -16,12 +16,13 @@ namespace studilova
       void push(T&& value);
 
       void pop();
-      
+
       T& top();
       const T& top() const;
 
       bool empty() const noexcept;
       size_t size() const noexcept;
+      void clear() noexcept;
 
     private:
       List< T > data_;
@@ -80,6 +81,12 @@ template< class T >
 size_t studilova::Stack< T >::size() const noexcept
 {
   return data_.size();
+}
+
+template< class T >
+void studilova::Stack< T >::clear() noexcept
+{
+  data_.clear();
 }
 
 #endif
