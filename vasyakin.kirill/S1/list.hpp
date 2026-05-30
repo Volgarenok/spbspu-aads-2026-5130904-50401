@@ -238,9 +238,19 @@ namespace vasyakin
   {
     fake_node_->next_ = fake_node_;
 
-    for (auto it = other.cbegin(); it != other.cend(); ++it)
+    try
     {
-      pushBack(*it);
+      for (auto it = other.cbegin(); it != other.cend(); ++it)
+      {
+        pushBack(*it);
+      }
+    }
+    catch (...)
+    {
+      clear();
+      delete fake_node_;
+      fake_node_ = nullptr;
+      throw;
     }
   }
 
