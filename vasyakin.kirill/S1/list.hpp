@@ -83,7 +83,7 @@ namespace vasyakin
     List& operator=(List&& other) noexcept;
 
     LIter< T > insert(LIter< T > it, const T& value);
-    LIter< T > erase(LIter< T > it);
+    LIter< T > erase(LIter< T > it) noexcept;
     void pushBack(const T& value);
     void swap(List& other) noexcept;
     void clear() noexcept;
@@ -310,25 +310,10 @@ namespace vasyakin
   template< class T >
   void List< T >::clear() noexcept
   {
-    if (!fake_node_)
+    while (size_ > 0)
     {
-      return;
+      erase(end());
     }
-    if (fake_node_->next_ == fake_node_)
-    {
-      size_ = 0;
-      return;
-    }
-
-    detail::Node< T >* current = fake_node_->next_;
-    while (current != fake_node_)
-    {
-      detail::Node< T >* next = current->next_;
-      delete current;
-      current = next;
-    }
-    fake_node_->next_ = fake_node_;
-    size_ = 0;
   }
 
   template< class T >
@@ -351,7 +336,7 @@ namespace vasyakin
   }
 
   template< class T >
-  LIter< T > List< T >::erase(LIter< T > it)
+  LIter< T > List< T >::erase(LIter< T > it) noexcept
   {
     if (!fake_node_ || it.ptr_->next_ == fake_node_)
     {
