@@ -16,6 +16,7 @@ namespace studilova
       void push(T&& value);
       void pop();
       T& front();
+      const T& front() const;
 
       bool empty() const;
       size_t size() const;
@@ -49,6 +50,16 @@ void studilova::Queue< T >::pop()
 
 template< class T >
 T& studilova::Queue< T >::front()
+{
+  if (empty())
+  {
+    throw std::out_of_range("Queue is empty");
+  }
+  return data_.front();
+}
+
+template< class T >
+const T& studilova::Queue< T >::front() const
 {
   if (empty())
   {
