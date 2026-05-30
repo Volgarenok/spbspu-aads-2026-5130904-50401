@@ -44,7 +44,7 @@ void studilova::Stack< T >::push(T&& value)
 template< class T >
 void studilova::Stack< T >::pop()
 {
-  if(empty())
+  if (empty())
   {
     throw std::out_of_range("Stack is empty");
   }
