@@ -5,6 +5,7 @@
 #include <utility>
 #include <limits>
 #include <memory>
+#include <functional>
 
 namespace vasyakin
 {
@@ -91,8 +92,14 @@ namespace vasyakin
     void splice_after(LIter< T > pos, List& other) noexcept;
     void splice_after(LIter< T > pos, List& other, LIter< T > it) noexcept;
     void splice_after(LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept;
+
     void merge(List& other) noexcept;
+    template< class Compare >
+    void merge(List& other, Compare comp) noexcept;
+
     void sort();
+    template< class Compare >
+    void sort(Compare comp);
 
     template< class P >
     LIter< T > partition(P p);
@@ -418,6 +425,13 @@ namespace vasyakin
   template< class T >
   void List< T >::merge(List& other) noexcept
   {
+    merge(other, std::less< T >{});
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::merge(List& other, Compare comp) noexcept
+  {
     if (other.size_ == 0)
     {
       return;
@@ -428,7 +442,8 @@ namespace vasyakin
 
     while (prev.ptr_->next_ != other.fake_node_)
     {
-      while (curr.ptr_->next_ != fake_node_ && curr.ptr_->next_->val_ < prev.ptr_->next_->val_)
+      while (curr.ptr_->next_ != fake_node_ &&
+        comp(curr.ptr_->next_->val_, prev.ptr_->next_->val_))
       {
         ++curr;
       }
@@ -446,6 +461,13 @@ namespace vasyakin
 
   template< class T >
   void List< T >::sort()
+  {
+    sort(std::less< T >{});
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::sort(Compare comp)
   {
     if (size_ <= 1)
     {
@@ -468,9 +490,9 @@ namespace vasyakin
       return;
     }
 
-    sort();
-    second_half.sort();
-    merge(second_half);
+    sort(comp);
+    second_half.sort(comp);
+    merge(second_half, comp);
   }
 
   template< class T >
