@@ -14,12 +14,14 @@ namespace studilova
     public:
       void push(const T& value);
       void push(T&& value);
+
       void pop();
+      
       T& top();
       const T& top() const;
 
-      bool empty() const;
-      size_t size() const;
+      bool empty() const noexcept;
+      size_t size() const noexcept;
 
     private:
       List< T > data_;
@@ -69,13 +71,14 @@ const T& studilova::Stack< T >::top() const
 }
 
 template< class T >
-bool studilova::Stack< T >::empty() const
+bool studilova::Stack< T >::empty() const noexcept
 {
   return data_.empty();
 }
 
 template< class T >
-size_t studilova::Stack< T >::size() const{
+size_t studilova::Stack< T >::size() const noexcept
+{
   return data_.size();
 }
 
