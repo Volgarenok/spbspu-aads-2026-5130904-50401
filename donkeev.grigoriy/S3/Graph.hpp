@@ -9,7 +9,6 @@ namespace donkeev
 {
   struct Graph
   {
-    size_t edgesCount_;
     donkeev::HashTable< std::pair< std::string, std::string >, donkeev::List< size_t >, donkeev::VertexPairHash, donkeev::VertexPairEqual > table_;
     topit::Vector< std::string > uniqueVertexes_;
 
@@ -22,6 +21,8 @@ namespace donkeev
 
     void addEdge(const std::string, const std::string, const size_t);
     void addVertex(const std::string&);
+
+    void deleteEdge(const std::string, const std::string, const size_t);
   };
 }
 

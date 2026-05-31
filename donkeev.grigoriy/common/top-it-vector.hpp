@@ -27,6 +27,7 @@ namespace topit
 
     bool has(const T&) const;
     T& find(const T&) const;
+    size_t findId(const T&) const;
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
@@ -177,6 +178,20 @@ T& topit::Vector< T >::find(const T& value) const
     if (data_[i] == value)
     {
       return data_[i];
+    }
+  }
+
+  throw std::runtime_error("No such element");
+}
+
+template< class T >
+size_t topit::Vector< T >::findId(const T& value) const
+{
+  for (size_t i = 0; i < size_; ++i)
+  {
+    if (data_[i] == value)
+    {
+      return i;
     }
   }
 

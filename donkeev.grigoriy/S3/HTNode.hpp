@@ -14,6 +14,9 @@ namespace donkeev
 
     HTNode();
     HTNode(const Key&, const Value&);
+    HTNode(const Key&, Value&&);
+    HTNode& operator=(const HTNode& other);
+    HTNode& operator=(HTNode&&) noexcept;
     bool isEmpty() const;
     Value dropNode();
   };
@@ -29,6 +32,28 @@ namespace donkeev
     data_(key, value),
     isOccupied_(true)
   {}
+
+  template<class Key, class Value>
+  HTNode<Key, Value>::HTNode(const Key& key, Value&& value):
+    data_(key, std::move(value)),
+    isOccupied_(true)
+  {}
+
+  template< class Key, class Value >
+  HTNode< Key, Value >& HTNode< Key, Value >::operator=(const HTNode& other)
+  {
+    data_ = other.data_;
+    isOccupied_ = other.isOccupied_;
+    return *this;
+  }
+
+  template< class Key, class Value >
+  HTNode< Key, Value >& HTNode< Key, Value >::operator=(HTNode&& other) noexcept
+  {
+    data_ = std::move(other.data_);
+    isOccupied_ = other.isOccupied_;
+    return *this;
+  }
 
   template<class Key, class Value>
   bool HTNode<Key, Value>::isEmpty() const

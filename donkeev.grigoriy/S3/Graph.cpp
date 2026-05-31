@@ -1,36 +1,29 @@
 #include "Graph.hpp"
 
 donkeev::Graph::Graph():
-  edgesCount_(0),
   table_(1, 1),
   uniqueVertexes_()
 {}
 
 donkeev::Graph::Graph(const size_t bucketCount, const size_t bucketSize):
-  edgesCount_(0),
   table_(bucketCount, bucketSize),
   uniqueVertexes_()
 {}
 
 donkeev::Graph::Graph(const Graph& other):
-  edgesCount_(other.edgesCount_),
   table_(other.table_),
   uniqueVertexes_(other.uniqueVertexes_)
 {}
 
 donkeev::Graph::Graph(Graph&& other) noexcept:
-  edgesCount_(other.edgesCount_),
   table_(std::move(other.table_)),
   uniqueVertexes_(std::move(other.uniqueVertexes_))
-{
-  other.edgesCount_ = 0;
-}
+{}
 
 donkeev::Graph& donkeev::Graph::operator=(const Graph& other)
 {
   if (this == &other) return *this;
 
-  edgesCount_ = other.edgesCount_;
   table_ = other.table_;
   uniqueVertexes_ = other.uniqueVertexes_;
 
@@ -41,11 +34,9 @@ donkeev::Graph& donkeev::Graph::operator=(Graph&& other) noexcept
 {
   if (this == &other) return *this;
 
-  edgesCount_ = other.edgesCount_;
   table_ = std::move(other.table_);
   uniqueVertexes_ = std::move(other.uniqueVertexes_);
-  other.edgesCount_ = 0;
-  
+
   return *this;
 }
 
@@ -67,7 +58,8 @@ void donkeev::Graph::addEdge(const std::string from, const std::string to, const
     donkeev::List< size_t > weights;
     weights.pushBack(weight);
 
-    table_.add(std::make_pair(from, to), std::move(weights));
+    table_.add(thisKey, weights);
+  
     return;
   }
   
@@ -77,4 +69,55 @@ void donkeev::Graph::addEdge(const std::string from, const std::string to, const
 void donkeev::Graph::addVertex(const std::string& vertexName)
 {
   uniqueVertexes_.pushBack(vertexName);
+}
+
+void donkeev::Graph::deleteEdge(const std::string from, const std::string to, const size_t weight)
+{
+  std::pair< std::string, std::string > thisKey = std::make_pair(from, to);
+  donkeev::List< size_t >* thisValue_ptr = table_.find(thisKey);
+  if (thisValue_ptr == nullptr)
+  {
+    throw std::runtime_error("Bad input");
+  }
+
+  donkeev::List< size_t >& thisValue = *thisValue_ptr;
+  if(thisValue.has(weight))
+  {
+    thisValue.deleteNode(weight);
+  }
+  else
+  {
+    throw std::runtime_error("Bad input");
+  }
+  
+  if (thisValue.size() == 0)
+  {
+    table_.drop(thisKey);
+  }
+  bool hasYAFrom = false;
+  bool hasYATo = false;
+  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > begin = table_.begin();
+  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > end = table_.end();
+  while (begin != end)
+  {
+    if ((*begin).first.first == from || (*begin).first.second == from)
+    {
+      hasYAFrom = true;
+    }
+    if ((*begin).first.first == to || (*begin).first.second == to)
+    {
+      hasYATo = true;
+    }
+
+    ++begin;
+  }
+
+  if (!hasYAFrom)
+  {
+    uniqueVertexes_.erase(uniqueVertexes_.findId(from));
+  }
+  if (!hasYATo)
+  {
+    uniqueVertexes_.erase(uniqueVertexes_.findId(to));
+  }
 }

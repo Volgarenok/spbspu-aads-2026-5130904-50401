@@ -16,19 +16,19 @@ namespace donkeev
   using commandFunc = void (*)(graphsHashTable_t, const std::string&, std::ostream&);
 }
 
-const topit::Vector< std::pair< std::string, donkeev::commandFunc > > commandsVector{
+/*const topit::Vector< std::pair< std::string, donkeev::commandFunc > > commandsVector{
   std::initializer_list<std::pair<std::string, donkeev::commandFunc>>{
-  {"graphs", donkeev::printGrapsNames},
-  /*{"vertexes", donkeev::printVertexesNames},
+  std::make_pair("graphs", donkeev::printGrapsNames),
+  {"vertexes", donkeev::printVertexesNames},
   {"outbound", donkeev::printOutboundVertexesNames},
   {"inbound", donkeev::printInboundVertexesNames},
   {"bind", donkeev::createEdge},
   {"cut", donkeev::deleteEdge},
   {"create", donkeev::createGraph},
   {"merge", donkeev::mergeGraphs},
-  {"extract", donkeev::extractGraph}*/
+  {"extract", donkeev::extractGraph
   }
-};
+};*/
 
 void readGraphs(const std::string& filename, donkeev::HashTable<std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>& graphs)
 {
@@ -159,10 +159,53 @@ int main(int argc, char* argv[])
         continue;
       }
       std::string parametrs(graphName + " " + vertexName);
-      donkeev::printInboundVertexesNames(graphsTable, parametrs, std::cout);
       try
       {
-        
+        donkeev::printInboundVertexesNames(graphsTable, parametrs, std::cout);
+      }
+      catch (...)
+      {
+        std::cout << "INVALID COMMAND\n"; 
+      }
+    }
+    else if (command == "bind")
+    {
+      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
+      std::string vertexFromName = donkeev::nextWord(commandLine, readingPosition);
+      std::string vertexToName = donkeev::nextWord(commandLine, readingPosition);
+      std::string weight = donkeev::nextWord(commandLine, readingPosition);
+      if (graphName.empty() || vertexFromName.empty() || vertexToName.empty())
+      {
+        std::cout << "INVALID COMMAND\n";
+        continue;
+      }
+
+      std::string parametrs(graphName + " " + vertexFromName + " " + vertexToName + " " + weight);
+      try
+      {
+        donkeev::createEdge(graphsTable, parametrs, std::cout);
+      }
+      catch (...)
+      {
+        std::cout << "INVALID COMMAND\n"; 
+      }
+    }
+    else if (command == "cut")
+    {
+      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
+      std::string vertexFromName = donkeev::nextWord(commandLine, readingPosition);
+      std::string vertexToName = donkeev::nextWord(commandLine, readingPosition);
+      std::string weight = donkeev::nextWord(commandLine, readingPosition);
+      if (graphName.empty() || vertexFromName.empty() || vertexToName.empty())
+      {
+        std::cout << "INVALID COMMAND\n";
+        continue;
+      }
+
+      std::string parametrs(graphName + " " + vertexFromName + " " + vertexToName + " " + weight);
+      try
+      {
+        donkeev::deleteEdge(graphsTable, parametrs, std::cout);
       }
       catch (...)
       {

@@ -39,6 +39,8 @@ namespace donkeev
     void popFront();
     void cutAfter(LIter< T >&);
     void clearAll();
+    void deleteNode(const T&);
+    bool has(const T&);
 
     bool isEmpty() const;
     size_t size() const;
@@ -222,6 +224,42 @@ namespace donkeev
       cutAfter(it);
     }
     head_ = nullptr;
+  }
+  template< class T >
+  void List< T >::deleteNode(const T& value)
+  {
+    Node< T >* node = head_;
+    if (node->val == value)
+    {
+      head_ = head_->next;
+      tail_ = head_;
+      --length_;
+      return;
+    }
+    donkeev::LIter< T > it = begin();
+    for (size_t i = 0; i < length_; ++i)
+    {
+      if (*it == value)
+      {
+        cutAfter(it);
+      }
+      ++it;
+    }
+  }
+  template< class T >
+  bool List< T >::has(const T& value)
+  {
+    Node< T >* it = head_;
+    for (size_t i = 0; i < length_; ++i)
+    {
+      if (it->val == value)
+      {
+        return true;
+      }
+
+      ++it;
+    }
+    return false;
   }
 
   template< class T >
