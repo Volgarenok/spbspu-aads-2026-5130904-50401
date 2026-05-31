@@ -50,18 +50,17 @@ int main(int argc, char* argv[])
     }
   }
 
-  bool first = true;
-  while (!results.empty())
+  if (!results.empty())
   {
-    if (!first)
-    {
-      std::cout << " ";
-    }
     std::cout << results.top();
     results.pop();
 
-    first = false;
+    while (!results.empty())
+    {
+      std::cout << " " << results.top();
+      results.pop();
+    }
   }
-  std::cout << "\n";
+  std::cout << '\n';
   return 0;
 }
