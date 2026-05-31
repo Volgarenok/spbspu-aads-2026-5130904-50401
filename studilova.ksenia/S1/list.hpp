@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <utility>
 #include <memory>
+#include <functional>
 
 namespace studilova
 {
@@ -57,6 +58,21 @@ namespace studilova
       void pushBack(T&& value);
       void insert(LIter< T > pos, const T& value);
       void insert(LIter< T > pos, T&& value);
+
+      void splice(LIter< T > pos, List& other) noexcept;
+      void splice(LIter< T > pos, List& other, LIter< T > it) noexcept;
+      void splice(LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept;
+
+      void sort();
+      template< class Cmp >
+      void sort(Cmp cmp);
+
+      void merge(List& other);
+      template< class Cmp >
+      void merge(List& other, Cmp cmp);
+
+      template< class P >
+      LIter< T > partition(P pred);
 
       LIter< T > begin() noexcept;
       LIter< T > end() noexcept;
@@ -400,6 +416,279 @@ namespace studilova
     prev->next = node;
     curr->prev = node;
     ++size_;
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List& other) noexcept
+  {
+    if (other.empty() || this == &other)
+    {
+      return;
+    }
+
+    detail::Node< T >* first = other.head_;
+    detail::Node< T >* last = other.head_->prev;
+
+    if (empty())
+    {
+      head_ = first;
+    }
+    else if (pos.node_ == nullptr)
+    {
+      detail::Node< T >* tail = head_->prev;
+
+      tail->next = first;
+      first->prev = tail;
+
+      last->next = head_;
+      head_->prev = last;
+    } else {
+      detail::Node< T >* curr = pos.node_;
+      detail::Node< T >* prev = curr->prev;
+
+      prev->next = first;
+      first->prev = prev;
+
+      last->next = curr;
+      curr->prev = last;
+
+      if (curr == head_)
+      {
+        head_ = first;
+      }
+    }
+    size_ += other.size_;
+    other.head_ = nullptr;
+    other.size_ = 0;
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List& other, LIter< T > it) noexcept
+  {
+    if (other.empty() || it.node_ == nullptr || this == &other)
+    {
+      return;
+    }
+
+    detail::Node< T >* node = it.node_;
+
+    if (other.size_ == 1)
+    {
+      other.head_ = nullptr;
+    } else {
+      node->prev->next = node->next;
+      node->next->prev = node->prev;
+
+      if (other.head_ == node)
+      {
+        other.head_ = node->next;
+      }
+    }
+    --other.size_;
+
+    if (empty())
+    {
+      node->next = node;
+      node->prev = node;
+      head_ = node;
+    }
+    else if (pos.node_ == nullptr)
+    {
+      detail::Node< T >* tail = head_->prev;
+
+      node->next = head_;
+      node->prev = tail;
+
+      tail->next = node;
+      head_->prev = node;
+    } else {
+      detail::Node< T >* curr = pos.node_;
+      detail::Node< T >* prev = curr->prev;
+
+      node->next = curr;
+      node->prev = prev;
+
+      prev->next = node;
+      curr->prev = node;
+
+      if (curr == head_)
+      {
+        head_ = node;
+      }
+    }
+    ++size_;
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept
+  {
+    if (other.empty() || first.node_ == last.node_ || first.node_ == nullptr || this == &other)
+    {
+      return;
+    }
+
+    detail::Node< T >* rangeFirst = first.node_;
+    detail::Node< T >* rangeLast = first.node_;
+    size_t count = 1;
+
+    while (rangeLast->next != other.head_ && rangeLast->next != last.node_)
+    {
+      rangeLast = rangeLast->next;
+      ++count;
+    }
+
+    detail::Node< T >* beforeRange = rangeFirst->prev;
+    detail::Node< T >* afterRange = rangeLast->next;
+
+    beforeRange->next = afterRange;
+    afterRange->prev = beforeRange;
+
+    if (other.head_ == rangeFirst)
+    {
+      other.head_ = afterRange;
+    }
+
+    other.size_ -= count;
+
+    if (other.size_ == 0)
+    {
+      other.head_ = nullptr;
+    }
+
+    if (empty())
+    {
+      rangeFirst->prev = rangeLast;
+      rangeLast->next = rangeFirst;
+      head_ = rangeFirst;
+    }
+    else if (pos.node_ == nullptr)
+    {
+      detail::Node< T >* tail = head_->prev;
+
+      tail->next = rangeFirst;
+      rangeFirst->prev = tail;
+
+      rangeLast->next = head_;
+      head_->prev = rangeLast;
+    } else {
+      detail::Node< T >* curr = pos.node_;
+      detail::Node< T >* prev = curr->prev;
+
+      prev->next = rangeFirst;
+      rangeFirst->prev = prev;
+
+      rangeLast->next = curr;
+      curr->prev = rangeLast;
+
+      if (curr == head_)
+      {
+        head_ = rangeFirst;
+      }
+    }
+    size_ += count;
+  }
+
+  template< class T >
+  void List< T >::sort()
+  {
+    sort(std::less< T >{});
+  }
+
+  template< class T >
+  template< class Cmp >
+  void List< T >::sort(Cmp cmp)
+  {
+    if (size_ <= 1)
+    {
+      return;
+    }
+
+    List< T > second;
+
+    size_t half = size_ / 2;
+    LIter< T > mid = begin();
+
+    for (size_t i = 0; i < half; ++i)
+    {
+      ++mid;
+    }
+
+    second.splice(second.end(), *this, mid, end());
+
+    sort(cmp);
+    second.sort(cmp);
+
+    merge(second, cmp);
+  }
+
+  template< class T >
+  void List< T >::merge(List& other)
+  {
+    merge(other, std::less< T >{});
+  }
+
+  template< class T >
+  template< class Cmp >
+  void List< T >::merge(List& other, Cmp cmp)
+  {
+    if (this == &other || other.empty())
+    {
+      return;
+    }
+
+    LIter< T > pos = begin();
+    size_t posIndex = 0;
+
+    while (!other.empty())
+    {
+      LIter< T > otherIt = other.begin();
+
+      while (posIndex < size_ && !cmp(*otherIt, *pos))
+      {
+        ++pos;
+        ++posIndex;
+      }
+
+      if (posIndex == size_)
+      {
+        splice(end(), other, otherIt);
+      } else {
+        splice(pos, other, otherIt);
+        ++posIndex;
+      }
+    }
+  }
+
+  template< class T >
+  template< class P >
+  LIter< T > List< T >::partition(P pred)
+  {
+    List< T > secondList;
+
+    size_t count = size_;
+    LIter< T > it = begin();
+
+    for (size_t i = 0; i < count;)
+    {
+      LIter< T > current = it;
+      ++it;
+      ++i;
+
+      if (!pred(*current))
+      {
+        secondList.splice(secondList.end(), *this, current);
+      }
+    }
+
+    LIter< T > border = end();
+
+    if (!secondList.empty())
+    {
+      border = secondList.begin();
+      splice(end(), secondList);
+    }
+
+    return border;
   }
 
   template< class T >
