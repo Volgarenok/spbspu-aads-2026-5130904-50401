@@ -64,8 +64,8 @@ void studilova::processToken(const std::string& token, studilova::Stack< std::st
     }
     ops.push(token);
   } else {
-      toNumber(token);
-      output.push(token);
+    toNumber(token);
+    output.push(token);
   }
 }
 

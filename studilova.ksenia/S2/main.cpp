@@ -5,11 +5,11 @@
 #include "math-expression.hpp"
 #include "stack.hpp"
 
-int main (int argc, char* argv[])
+int main(int argc, char* argv[])
 {
   if (argc > 2)
   {
-    std::cerr << "Too mane arguments\n";
+    std::cerr << "Too many arguments\n";
     return 1;
   }
 
@@ -34,16 +34,7 @@ int main (int argc, char* argv[])
 
   while (std::getline(*input, line))
   {
-    bool empty = true;
-    for (size_t i = 0; i < line.length(); ++i)
-    {
-      if (line[i] != ' ' && line[i] != '\t')
-      {
-        empty = false;
-        break;
-      }
-    }
-    if (empty)
+    if (line.empty())
     {
       continue;
     }
