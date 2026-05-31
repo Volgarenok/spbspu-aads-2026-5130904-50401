@@ -15,6 +15,11 @@ namespace donkeev
 
     Graph();
     Graph(size_t, size_t);
+    Graph(const Graph&);
+    Graph(Graph&&) noexcept;
+    Graph& operator=(const Graph&);
+    Graph& operator=(Graph&&) noexcept;
+
     void addEdge(const std::string, const std::string, const size_t);
     void addVertex(const std::string&);
   };
