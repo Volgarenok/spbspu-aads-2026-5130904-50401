@@ -18,6 +18,11 @@ namespace donkeev
     HashTable() = delete;
     HashTable(const size_t, const size_t);
 
+    HashTable(const HashTable&);
+    HashTable(HashTable&&) noexcept;
+    HashTable& operator=(const HashTable&);
+    HashTable& operator=(HashTable&&) noexcept;
+
     iterator begin();
     constIterator begin() const;
     iterator end();
@@ -25,6 +30,7 @@ namespace donkeev
 
     size_t size();
     void add(const Key&, const Value&);
+    void add(const Key&, Value&&);
     Value& get(const Key&);
     Value* find(const Key&);
     Value drop(const Key&);
@@ -53,6 +59,73 @@ namespace donkeev
     hashFunc_(),
     equalFunc_()
   {}
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable& other):
+    data_(other.data_),
+    bucketCount_(other.bucketCount_),
+    bucketSize_(other.bucketSize_),
+    reserveBucketSize_(other.reserveBucketSize_),
+    totalElements_(other.totalElements_),
+    hashFunc_(other.hashFunc_),
+    equalFunc_(other.equalFunc_)
+  {}
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& other) noexcept:
+    data_(std::move(other.data_)),
+    bucketCount_(other.bucketCount_),
+    bucketSize_(other.bucketSize_),
+    reserveBucketSize_(other.reserveBucketSize_),
+    totalElements_(other.totalElements_),
+    hashFunc_(std::move(other.hashFunc_)),
+    equalFunc_(std::move(other.equalFunc_))
+  {
+    other.bucketCount_ = 0;
+    other.bucketSize_ = 0;
+    other.reserveBucketSize_ = 0;
+    other.totalElements_ = 0;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& other)
+  {
+    if (this == &other)
+    {
+      return *this;
+    }
+
+    data_ = other.data_;
+    bucketCount_ = other.bucketCount_;
+    bucketSize_ = other.bucketSize_;
+    reserveBucketSize_ = other.reserveBucketSize_;
+    totalElements_ = other.totalElements_;
+    hashFunc_ = other.hashFunc_;
+    equalFunc_ = other.equalFunc_;
+
+    return *this;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashTable< Key, Value, Hash, Equal >& HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& other) noexcept
+  {
+    if (this == &other) return *this
+    ;
+    data_ = std::move(other.data_);
+    bucketCount_ = other.bucketCount_;
+    bucketSize_ = other.bucketSize_;
+    reserveBucketSize_ = other.reserveBucketSize_;
+    totalElements_ = other.totalElements_;
+    hashFunc_ = std::move(other.hashFunc_);
+    equalFunc_ = std::move(other.equalFunc_);
+    
+    other.bucketCount_ = 0;
+    other.bucketSize_ = 0;
+    other.reserveBucketSize_ = 0;
+    other.totalElements_ = 0;
+    
+    return *this;
+  }
 
   template< class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::iterator donkeev::HashTable< Key, Value, Hash, Equal >::begin()
@@ -122,6 +195,45 @@ namespace donkeev
       if (begin->isEmpty())
       {
         *begin = HTNode< Key, Value >(key, value);
+        ++totalElements_;
+        return;
+      }
+
+      ++begin;
+    }
+
+    throw std::out_of_range("Can't add becaause of overflow");
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void HashTable< Key, Value, Hash, Equal >::add(const Key& key, Value&& value)
+  {
+    size_t hash = hashFunc_(key);
+    size_t bucketId = hash % bucketCount_;
+    size_t startId = bucketId * bucketSize_;
+    size_t endId = startId + bucketSize_;
+
+    topit::VIter< HTNode< Key, Value > > begin = data_.begin() + startId;
+    topit::VIter< HTNode< Key, Value > > end = data_.begin() + endId;
+    while (begin != end)
+    {
+      if (begin->isEmpty())
+      {
+        *begin = HTNode< Key, Value >(key, std::move(value));
+        ++totalElements_;
+        return;
+      }
+
+      ++begin;
+    }
+
+    begin = data_.begin() + bucketCount_ * bucketSize_;
+    end = begin + bucketSize_;
+    while (begin != end)
+    {
+      if (begin->isEmpty())
+      {
+        *begin = HTNode< Key, Value >(key, std::move(value));
         ++totalElements_;
         return;
       }
