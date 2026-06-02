@@ -77,6 +77,7 @@ namespace vasyakin
     private:
       alignas(T) unsigned char storage_[sizeof(T)];
       Node< T >* next_;
+
       friend class List< T >;
       friend class LIter< T >;
       friend class LCIter< T >;
@@ -304,6 +305,7 @@ namespace vasyakin
     catch (...)
     {
       clear();
+
       fake_node_->~Node();
       ::operator delete(mem);
       fake_node_ = nullptr;
@@ -399,6 +401,7 @@ namespace vasyakin
       it.ptr_->next_ = new_node;
     }
     ++size_;
+
     return LIter< T >(new_node);
   }
 
@@ -609,7 +612,7 @@ namespace vasyakin
     }
     ++size_;
 
-    return LIter< T >(new_node); 
+    return LIter< T >(new_node);
   }
 
   template< class T >
