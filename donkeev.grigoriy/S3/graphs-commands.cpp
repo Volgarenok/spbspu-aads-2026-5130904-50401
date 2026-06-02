@@ -87,7 +87,6 @@ void donkeev::printGrapsNames(graphsHashTable_t& graphsTable, const std::string&
 void donkeev::printVertexesNames(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream& out)
 {
   std::string graphName(parametrs);
-  topit::Vector< std::string > sortedVector;
 
   donkeev::Graph* graph_ptr = graphsTable.find(graphName);
   if (graph_ptr == nullptr)
@@ -97,22 +96,7 @@ void donkeev::printVertexesNames(graphsHashTable_t& graphsTable, const std::stri
   }
 
   donkeev::Graph& graph = *graph_ptr;
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > begin = graph.table_.begin();
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > end = graph.table_.end();
-
-  for (; begin != end; ++begin)
-  {
-    std::pair< std::pair< std::string, std::string >, donkeev::List< size_t > > graphPair = *begin;
-    if (!sortedVector.has(graphPair.first.first))
-    {
-      sortedVector.pushBack(graphPair.first.first);
-    }
-    if (!sortedVector.has(graphPair.first.second))
-    {
-      sortedVector.pushBack(graphPair.first.second);
-    }
-  }
-
+  topit::Vector< std::string > sortedVector(graph.uniqueVertexes_);
   sortNames(sortedVector);
   for (size_t i = 0; i < sortedVector.getSize(); ++i)
   {
@@ -300,3 +284,43 @@ void donkeev::deleteEdge(graphsHashTable_t& graphsTable, const std::string& para
   }
   graph_ptr->deleteEdge(vertexFromName, vertexToName, weight);
 }
+
+void donkeev::createGraph(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream&)
+{
+  size_t readingPosition = 0;
+  donkeev::nextWord(parametrs, readingPosition);
+  std::string graphName = donkeev::nextWord(parametrs, readingPosition);
+  std::string countStr = donkeev::nextWord(parametrs, readingPosition);
+  
+  donkeev::Graph* graph_ptr = graphsTable.find(graphName);
+  if (graph_ptr != nullptr)
+  {
+    throw std::runtime_error("Bad input");
+  }
+
+  donkeev::Graph thisGraph(16, 4);
+  if (countStr.empty() || countStr == "0")
+  {
+    graphsTable.add(graphName, thisGraph);
+    return;
+  }
+
+  size_t count = std::stoull(countStr);
+  for (size_t i = 0; i < count; ++i)
+  {
+    std::string vertexName = donkeev::nextWord(parametrs, readingPosition);
+    if (vertexName.empty())
+    {
+      throw std::runtime_error("Bad input");
+    }
+    thisGraph.uniqueVertexes_.pushBack(vertexName);
+  }
+  std::string extra = donkeev::nextWord(parametrs, readingPosition);
+  if (!extra.empty())
+  {
+    throw std::runtime_error("Bad input");
+  }
+
+  graphsTable.add(graphName, thisGraph);
+}
+

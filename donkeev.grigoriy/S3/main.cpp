@@ -212,6 +212,24 @@ int main(int argc, char* argv[])
         std::cout << "INVALID COMMAND\n"; 
       }
     }
+    else if (command == "create")
+    {
+      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
+      if (graphName.empty())
+      {
+        std::cout << "INVALID COMMAND\n";
+        continue;
+      }
+
+      try
+      {
+        donkeev::createGraph(graphsTable, commandLine, std::cout);
+      }
+      catch (...)
+      {
+        std::cout << "INVALID COMMAND\n"; 
+      }
+    }
     else
     {
       std::cout << "INVALID COMMAND" << '\n';
