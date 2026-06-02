@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include <string>
+#include "test.hpp"
 #include "queue.hpp"
 
 BOOST_AUTO_TEST_SUITE(QueueTests)
@@ -57,6 +57,18 @@ BOOST_AUTO_TEST_CASE(queue_with_strings)
 
   BOOST_CHECK_EQUAL(queue.front(), "second");
   queue.pop();
+}
+
+BOOST_AUTO_TEST_CASE(queue_emplace)
+{
+  vasyakin::Queue< TestNoDefault > queue;
+
+  queue.emplace(67, "sixseven");
+  queue.emplace(52, "ayyy");
+
+  BOOST_CHECK_EQUAL(queue.size(), 2);
+  BOOST_CHECK_EQUAL(queue.front().val_, 67);
+  BOOST_CHECK_EQUAL(queue.front().str_, "sixseven");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

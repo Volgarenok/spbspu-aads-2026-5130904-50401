@@ -16,6 +16,9 @@ namespace vasyakin
     const T& top() const;
     bool empty() const noexcept;
     size_t size() const noexcept;
+
+    template< class... Args >
+    void emplace(Args&&... args);
   private:
     vasyakin::List< T > list_;
   };
@@ -66,6 +69,13 @@ namespace vasyakin
   size_t Stack< T >::size() const noexcept
   {
     return list_.getsize();
+  }
+
+  template< class T >
+  template< class... Args >
+  void Stack< T >::emplace(Args&&... args)
+  {
+    list_.emplace_front(std::forward< Args >(args)...);
   }
 }
 

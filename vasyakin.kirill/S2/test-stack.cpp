@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include <string>
+#include "test.hpp"
 #include "stack.hpp"
 
 BOOST_AUTO_TEST_SUITE(StackTests)
@@ -57,6 +57,17 @@ BOOST_AUTO_TEST_CASE(stack_with_strings)
 
   BOOST_CHECK_EQUAL(stack.top(), "hello");
   stack.pop();
+}
+
+BOOST_AUTO_TEST_CASE(stack_emplace)
+{
+  vasyakin::Stack< TestNoDefault > stack;
+
+  stack.emplace(1, "top");
+
+  BOOST_CHECK_EQUAL(stack.size(), 1);
+  BOOST_CHECK_EQUAL(stack.top().val_, 1);
+  BOOST_CHECK_EQUAL(stack.top().str_, "top");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

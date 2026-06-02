@@ -6,6 +6,19 @@ auto l = [](int x)
   return x % 2 == 0;
 };
 
+struct TestNoDefault
+{
+  int val_;
+  std::string str_;
+
+  TestNoDefault(int val, std::string str);
+};
+
+TestNoDefault::TestNoDefault(int val, std::string str):
+  val_(val),
+  str_(str)
+{}
+
 BOOST_AUTO_TEST_SUITE(ListTests)
 
 BOOST_AUTO_TEST_CASE(DefConstructTest)
@@ -437,6 +450,96 @@ BOOST_AUTO_TEST_CASE(PartitionAllTrueTest)
 
   BOOST_CHECK(check == list.end());
   BOOST_CHECK(it == list.end());
+}
+
+BOOST_AUTO_TEST_CASE(list_emplace_back_and_front)
+{
+  vasyakin::List< TestNoDefault > list;
+
+  list.emplace_back(1, "first");
+  list.emplace_back(2, "second");
+  list.emplace_front(0, "zero");
+
+  BOOST_CHECK_EQUAL(list.getsize(), 3);
+
+  auto it = list.begin();
+
+  BOOST_CHECK_EQUAL(it->val_, 0);
+  BOOST_CHECK_EQUAL(it->str_, "zero");
+  ++it;
+
+  BOOST_CHECK_EQUAL(it->val_, 1);
+  BOOST_CHECK_EQUAL(it->str_, "first");
+  ++it;
+
+  BOOST_CHECK_EQUAL(it->val_, 2);
+  BOOST_CHECK_EQUAL(it->str_, "second");
+}
+
+BOOST_AUTO_TEST_CASE(emplace_after_middle)
+{
+  vasyakin::List< TestNoDefault > list;
+
+  list.emplace_back(1, "A");
+  list.emplace_back(3, "C");
+
+  auto it = list.begin();
+  list.emplace_after(it, 2, "B");
+
+  BOOST_CHECK_EQUAL(list.getsize(), 3);
+
+  it = list.begin();
+
+  BOOST_CHECK_EQUAL(it->val_, 1);
+  ++it;
+
+  BOOST_CHECK_EQUAL(it->val_, 2);
+  ++it;
+
+  BOOST_CHECK_EQUAL(it->val_, 3);
+}
+
+BOOST_AUTO_TEST_CASE(emplace_on_empty_list)
+{
+  vasyakin::List< TestNoDefault > list;
+
+  list.emplace_back(10, "ten");
+  BOOST_CHECK_EQUAL(list.getsize(), 1);
+  BOOST_CHECK_EQUAL(list.begin()->val_, 10);
+
+  list.emplace_front(20, "twenty");
+  BOOST_CHECK_EQUAL(list.getsize(), 2);
+  BOOST_CHECK_EQUAL(list.begin()->val_, 20);
+
+  vasyakin::List< TestNoDefault > list2;
+
+  list2.emplace_after(list2.end(), 30, "thirty");
+  BOOST_CHECK_EQUAL(list2.getsize(), 1);
+  BOOST_CHECK_EQUAL(list2.begin()->val_, 30);
+}
+
+BOOST_AUTO_TEST_CASE(emplace_perfect_forwarding)
+{
+  vasyakin::List< TestNoDefault > list;
+
+  int val = 52;
+  std::string str = "lvalue";
+
+  list.emplace_back(val, str);
+  list.emplace_back(std::move(val), std::move(str));
+  list.emplace_front(67, std::string("prvalue"));
+
+  BOOST_CHECK_EQUAL(list.getsize(), 3);
+
+  auto it = list.begin();
+
+  BOOST_CHECK_EQUAL(it->val_, 67);
+  ++it;
+
+  BOOST_CHECK_EQUAL(it->val_, 52);
+  ++it;
+
+  BOOST_CHECK_EQUAL(it->val_, 52);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
