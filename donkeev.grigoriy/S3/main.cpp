@@ -230,6 +230,46 @@ int main(int argc, char* argv[])
         std::cout << "INVALID COMMAND\n"; 
       }
     }
+    else if (command == "merge")
+    {
+      std::string targetGraphName = donkeev::nextWord(commandLine, readingPosition);
+      std::string firstGraphName = donkeev::nextWord(commandLine, readingPosition);
+      std::string secondGraphName = donkeev::nextWord(commandLine, readingPosition);
+      if (firstGraphName.empty() || secondGraphName.empty())
+      {
+        std::cout << "INVALID COMMAND\n";
+        continue;
+      }
+
+      std::string parametrs(targetGraphName + " " + firstGraphName + " " + secondGraphName);
+      try
+      {
+        donkeev::mergeGraphs(graphsTable, parametrs, std::cout);
+      }
+      catch (...)
+      {
+        std::cout << "INVALID COMMAND\n"; 
+      }
+    }
+    else if (command == "extract")
+    {
+      std::string targetGraphName = donkeev::nextWord(commandLine, readingPosition);
+      std::string templateGraphName = donkeev::nextWord(commandLine, readingPosition);
+      if (targetGraphName.empty() || templateGraphName.empty())
+      {
+        std::cout << "INVALID COMMAND\n";
+        continue;
+      }
+
+      try
+      {
+        donkeev::extractGraph(graphsTable, commandLine, std::cout);
+      }
+      catch (...)
+      {
+        std::cout << "INVALID COMMAND\n"; 
+      }
+    }
     else
     {
       std::cout << "INVALID COMMAND" << '\n';

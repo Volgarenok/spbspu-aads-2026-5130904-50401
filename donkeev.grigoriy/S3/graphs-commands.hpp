@@ -33,9 +33,9 @@ namespace donkeev
   void deleteEdge(graphsHashTable_t&, const std::string&, std::ostream&);
 
   void createGraph(graphsHashTable_t&, const std::string&, std::ostream&);
-/*
+
   void mergeGraphs(graphsHashTable_t&, const std::string&, std::ostream&);
 
-  void extractGraph(graphsHashTable_t&, const std::string&, std::ostream&);*/
+  void extractGraph(graphsHashTable_t&, const std::string&, std::ostream&);
 }
 #endif

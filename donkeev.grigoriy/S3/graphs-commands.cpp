@@ -321,6 +321,137 @@ void donkeev::createGraph(graphsHashTable_t& graphsTable, const std::string& par
     throw std::runtime_error("Bad input");
   }
 
-  graphsTable.add(graphName, thisGraph);
+  graphsTable.add(graphName, std::move(thisGraph));
 }
 
+void donkeev::mergeGraphs(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream&)
+{
+  size_t readingPosition = 0;
+  std::string targetGraphName = donkeev::nextWord(parametrs, readingPosition);
+  std::string firstGraphName = donkeev::nextWord(parametrs, readingPosition);
+  std::string secondGraphName = donkeev::nextWord(parametrs, readingPosition);
+
+  if (graphsTable.has(targetGraphName))
+  {
+    throw std::runtime_error("Bad input");
+  }
+
+  donkeev::Graph* firstGraph_ptr = graphsTable.find(firstGraphName);
+  donkeev::Graph* secondGraph_ptr = graphsTable.find(secondGraphName);
+  if (firstGraph_ptr == nullptr || secondGraph_ptr == nullptr)
+  {
+    throw std::runtime_error("Bad input");
+  }
+
+  donkeev::Graph thisGraph(16, 4);
+  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > firstBegin = firstGraph_ptr->table_.begin();
+  for (size_t i = 0; i < firstGraph_ptr->table_.size(); ++i)
+  {
+    donkeev::LIter< size_t > pairListIt = (*firstBegin).second.begin();
+    for (size_t j = 0; j < (*firstBegin).second.size(); ++j)
+    {
+      thisGraph.addEdge((*firstBegin).first.first, (*firstBegin).first.second, *pairListIt);
+      ++pairListIt;
+    }
+    ++firstBegin;
+  }
+  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > secondBegin = secondGraph_ptr->table_.begin();
+  for (size_t i = 0; i < secondGraph_ptr->table_.size(); ++i)
+  {
+    donkeev::LIter< size_t > pairListIt = (*secondBegin).second.begin();
+    for (size_t j = 0; j < (*secondBegin).second.size(); ++j)
+    {
+      thisGraph.addEdge((*secondBegin).first.first, (*secondBegin).first.second, *pairListIt);
+      ++pairListIt;
+    }
+    ++secondBegin;
+  }
+
+  topit::Vector< std::string >& firstVector = firstGraph_ptr->uniqueVertexes_;
+  topit::Vector< std::string >& secondVector = secondGraph_ptr->uniqueVertexes_;
+  for (size_t i = 0; i < firstVector.getSize(); ++i)
+  {
+    if (!thisGraph.uniqueVertexes_.has(firstVector[i]))
+    {
+      thisGraph.uniqueVertexes_.pushBack(firstVector[i]);
+    }
+  }
+  for (size_t i = 0; i < secondVector.getSize(); ++i)
+  {
+    if (!thisGraph.uniqueVertexes_.has(secondVector[i]))
+    {
+      thisGraph.uniqueVertexes_.pushBack(secondVector[i]);
+    }
+  }
+
+  graphsTable.add(targetGraphName, std::move(thisGraph));
+}
+
+void donkeev::extractGraph(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream&)
+{
+  size_t readingPosition = 0;
+  donkeev::nextWord(parametrs, readingPosition);
+  std::string targetGraphName = donkeev::nextWord(parametrs, readingPosition);
+  std::string templateGraphName = donkeev::nextWord(parametrs, readingPosition);
+  std::string countStr = donkeev::nextWord(parametrs, readingPosition);
+
+  if (graphsTable.has(targetGraphName))
+  {
+    throw std::runtime_error("Bad input");
+  }
+  
+  donkeev::Graph* templateGraph_ptr = graphsTable.find(templateGraphName);
+  if (templateGraph_ptr == nullptr)
+  {
+    throw std::runtime_error("Bad input");
+  }
+  
+  donkeev::Graph thisGraph(16, 4);
+  if (countStr.empty() || countStr == "0")
+  {
+    graphsTable.add(targetGraphName, std::move(thisGraph));
+    return;
+  }
+  
+  size_t count = std::stoull(countStr);
+  topit::Vector< std::string > vertexes;
+  for (size_t i = 0; i < count; ++i)
+  {
+    std::string vertex = donkeev::nextWord(parametrs, readingPosition);
+    if (vertex.empty() || !templateGraph_ptr->uniqueVertexes_.has(vertex))
+    {
+      throw std::runtime_error("Bad input");
+    }
+    vertexes.pushBack(vertex);
+  }
+  
+  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > templateIt = templateGraph_ptr->table_.begin();
+  for (size_t i = 0; i < templateGraph_ptr->table_.size(); ++i)
+  {
+    if (vertexes.has((*templateIt).first.first) && vertexes.has((*templateIt).first.second))
+    {
+      std::string firstVert = (*templateIt).first.first;
+      std::string secondVer = (*templateIt).first.second;
+      donkeev::LIter< size_t > it = (*templateIt).second.begin();
+      for (size_t j = 0; j < (*templateIt).second.size(); ++j)
+      {
+        thisGraph.addEdge(firstVert, secondVer, *it);
+        ++it;
+      }
+      ++templateIt;
+    }
+  }
+
+  if (thisGraph.uniqueVertexes_.getSize() != vertexes.getSize())
+  {
+    for (size_t i = 0; i < vertexes.getSize(); ++i)
+    {
+      if (!thisGraph.uniqueVertexes_.has(vertexes[i]))
+      {
+        thisGraph.uniqueVertexes_.pushBack(vertexes[i]);
+      }
+    }
+  }
+
+  graphsTable.add(targetGraphName, std::move(thisGraph));
+}
