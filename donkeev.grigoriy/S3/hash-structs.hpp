@@ -5,14 +5,16 @@
 
 namespace donkeev
 {
+  using edgesPair_t = std::pair< std::string, std::string >;
+
   struct VertexPairHash
   {
-    size_t operator()(const std::pair< std::string, std::string >&) const;
+    size_t operator()(const edgesPair_t&) const;
   };
 
   struct VertexPairEqual
   {
-    bool operator()(const std::pair< std::string, std::string >&, const std::pair< std::string, std::string >&) const;
+    bool operator()(const edgesPair_t&, const edgesPair_t&) const;
   };
 
   struct GraphNameHash

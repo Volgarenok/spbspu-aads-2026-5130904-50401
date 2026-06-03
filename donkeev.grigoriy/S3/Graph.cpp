@@ -50,7 +50,7 @@ void donkeev::Graph::addEdge(const std::string from, const std::string to, const
   {
     uniqueVertexes_.pushBack(to);
   }
-  
+
   edgesPair_t thisKey = std::make_pair(from, to);
   donkeev::List< size_t >* thisValue = table_.find(thisKey);
   if (thisValue == nullptr)
@@ -59,10 +59,10 @@ void donkeev::Graph::addEdge(const std::string from, const std::string to, const
     weights.pushBack(weight);
 
     table_.add(thisKey, weights);
-  
+
     return;
   }
-  
+
   thisValue->pushBack(weight);
 }
 
@@ -89,7 +89,7 @@ void donkeev::Graph::deleteEdge(const std::string from, const std::string to, co
   {
     throw std::runtime_error("Bad input");
   }
-  
+
   if (thisValue.size() == 0)
   {
     table_.drop(thisKey);

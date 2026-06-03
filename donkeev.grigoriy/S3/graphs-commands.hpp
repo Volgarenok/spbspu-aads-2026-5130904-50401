@@ -11,7 +11,7 @@
 namespace donkeev
 {
   using GraphTable_t = donkeev::HashTable< std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>;
-  
+
   std::string nextWord(const std::string&, size_t&);
 
   void sortNames(topit::Vector< std::pair< std::string, donkeev::List< size_t > > >&);
@@ -21,7 +21,7 @@ namespace donkeev
   void sortNumbers(topit::Vector< size_t >&);
 
   void printGrapsNames(GraphTable_t&, const std::string&, std::ostream&);
-  
+
   void printVertexesNames(GraphTable_t&, const std::string&, std::ostream&);
 
   void printOutboundVertexesNames(GraphTable_t&, const std::string&, std::ostream&);

@@ -97,7 +97,7 @@ void donkeev::printVertexesNames(GraphTable_t& graphsTable, const std::string& p
   donkeev::Graph* graph_ptr = graphsTable.find(graphName);
   if (graph_ptr == nullptr)
   {
-    std::cout << "INVALID COMMAND\n"; 
+    std::cout << "INVALID COMMAND\n";
     throw std::runtime_error("Bad input");
   }
 
@@ -122,14 +122,14 @@ void donkeev::printOutboundVertexesNames(GraphTable_t& graphsTable, const std::s
     throw std::runtime_error("Bad input");
   }
 
-  donkeev::Graph& graph = *graph_ptr; 
+  donkeev::Graph& graph = *graph_ptr;
   donkeev::EdgeTable_t::iterator HTbegin = graph.table_.begin();
   donkeev::EdgeTable_t::iterator HTend = graph.table_.end();
 
   donkeev::EdgeVector_t outboundVertexes;
   for (; HTbegin != HTend; ++HTbegin)
   {
-    std::pair< donkeev::edgesPair_t, donkeev::List< size_t > > edgePair = *HTbegin; 
+    std::pair< donkeev::edgesPair_t, donkeev::List< size_t > > edgePair = *HTbegin;
     if (edgePair.first.first == vertexName)
     {
       outboundVertexes.pushBack(std::make_pair(edgePair.first.second, edgePair.second));

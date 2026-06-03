@@ -3,7 +3,7 @@
 #include <boost/functional/hash.hpp>
 #include "hash-structs.hpp"
 
-  size_t donkeev::VertexPairHash::operator()(const std::pair< std::string, std::string >& namePair) const
+  size_t donkeev::VertexPairHash::operator()(const edgesPair_t& namePair) const
   {
     boost::hash<std::string> hasher;
     size_t h1 = hasher(namePair.first);
@@ -12,7 +12,7 @@
     return h1 ^ (h2 << 1);
   }
 
-  bool donkeev::VertexPairEqual::operator()(const std::pair< std::string, std::string >& from, const std::pair< std::string, std::string >& to) const
+  bool donkeev::VertexPairEqual::operator()(const edgesPair_t& from, const edgesPair_t& to) const
   {
     return from.first == to.first && from.second == to.second;
   }

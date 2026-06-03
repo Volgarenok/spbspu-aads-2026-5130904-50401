@@ -1,6 +1,6 @@
 #ifndef VECTOR_ITERATORS_HPP
 #define VECTOR_ITERATORS_HPP
-#include <cstddef> 
+#include <cstddef>
 namespace topit
 {
   template< class T > struct Vector;
@@ -10,7 +10,7 @@ namespace topit
   {
     VIter() = default;
     explicit VIter(T*);
-    
+
     VIter< T >& operator++() noexcept;
     VIter< T > operator++(int) noexcept;
     VIter< T >& operator+=(int) noexcept;
@@ -41,7 +41,7 @@ namespace topit
   {
     VCIter() = default;
     explicit VCIter(const T*);
-    
+
     VCIter< T >& operator++() noexcept;
     VCIter< T > operator++(int) noexcept;
     VCIter< T >& operator+=(int) noexcept;

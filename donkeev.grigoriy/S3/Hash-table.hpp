@@ -118,12 +118,12 @@ namespace donkeev
     totalElements_ = other.totalElements_;
     hashFunc_ = std::move(other.hashFunc_);
     equalFunc_ = std::move(other.equalFunc_);
-    
+
     other.bucketCount_ = 0;
     other.bucketSize_ = 0;
     other.reserveBucketSize_ = 0;
     other.totalElements_ = 0;
-    
+
     return *this;
   }
 

@@ -7,28 +7,11 @@
 #include "hash-structs.hpp"
 #include "graphs-commands.hpp"
 
-//(graphsHashTable_t, const std::string&, const std::string&, const size_t, 
-//const topit::Vector< std::string >&, std::ostream&
-
 namespace donkeev
 {
   using graphsHashTable_t = donkeev::HashTable< std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>;
   using commandFunc = void (*)(graphsHashTable_t, const std::string&, std::ostream&);
 }
-
-/*const topit::Vector< std::pair< std::string, donkeev::commandFunc > > commandsVector{
-  std::initializer_list<std::pair<std::string, donkeev::commandFunc>>{
-  std::make_pair("graphs", donkeev::printGrapsNames),
-  {"vertexes", donkeev::printVertexesNames},
-  {"outbound", donkeev::printOutboundVertexesNames},
-  {"inbound", donkeev::printInboundVertexesNames},
-  {"bind", donkeev::createEdge},
-  {"cut", donkeev::deleteEdge},
-  {"create", donkeev::createGraph},
-  {"merge", donkeev::mergeGraphs},
-  {"extract", donkeev::extractGraph
-  }
-};*/
 
 void readGraphs(const std::string& filename, donkeev::graphsHashTable_t& graphs)
 {
@@ -57,7 +40,7 @@ void readGraphs(const std::string& filename, donkeev::graphsHashTable_t& graphs)
     size_t edgesCount = std::stoull(edgesCountStr);
 
     donkeev::Graph graph(16, 4);
-    
+
     for (size_t i = 0; i < edgesCount; ++i)
     {
       do
@@ -72,7 +55,7 @@ void readGraphs(const std::string& filename, donkeev::graphsHashTable_t& graphs)
 
       if (from.empty() || to.empty() || weightStr.empty())
       {
-        
+
         throw std::runtime_error("Bad input filee");
       }
 
@@ -105,11 +88,11 @@ int main(int argc, char* argv[])
   {
     std::cerr << e.what() << '\n';
   }
-  
+
   std::string commandLine;
   while (std::getline(std::cin, commandLine))
   {
-    size_t readingPosition = 0; 
+    size_t readingPosition = 0;
     std::string command = donkeev::nextWord(commandLine, readingPosition);
 
     if (commandLine.empty())
@@ -146,7 +129,7 @@ int main(int argc, char* argv[])
       }
       catch (...)
       {
-        std::cout << "INVALID COMMAND\n"; 
+        std::cout << "INVALID COMMAND\n";
       }
     }
     else if (command == "inbound")
@@ -165,7 +148,7 @@ int main(int argc, char* argv[])
       }
       catch (...)
       {
-        std::cout << "INVALID COMMAND\n"; 
+        std::cout << "INVALID COMMAND\n";
       }
     }
     else if (command == "bind")
@@ -187,7 +170,7 @@ int main(int argc, char* argv[])
       }
       catch (...)
       {
-        std::cout << "INVALID COMMAND\n"; 
+        std::cout << "INVALID COMMAND\n";
       }
     }
     else if (command == "cut")
@@ -209,7 +192,7 @@ int main(int argc, char* argv[])
       }
       catch (...)
       {
-        std::cout << "INVALID COMMAND\n"; 
+        std::cout << "INVALID COMMAND\n";
       }
     }
     else if (command == "create")
@@ -227,7 +210,7 @@ int main(int argc, char* argv[])
       }
       catch (...)
       {
-        std::cout << "INVALID COMMAND\n"; 
+        std::cout << "INVALID COMMAND\n";
       }
     }
     else if (command == "merge")
@@ -248,7 +231,7 @@ int main(int argc, char* argv[])
       }
       catch (...)
       {
-        std::cout << "INVALID COMMAND\n"; 
+        std::cout << "INVALID COMMAND\n";
       }
     }
     else if (command == "extract")
@@ -267,7 +250,7 @@ int main(int argc, char* argv[])
       }
       catch (...)
       {
-        std::cout << "INVALID COMMAND\n"; 
+        std::cout << "INVALID COMMAND\n";
       }
     }
     else
@@ -275,7 +258,8 @@ int main(int argc, char* argv[])
       std::cout << "INVALID COMMAND" << '\n';
     }
   }
-  
+
   donkeev::HashTable< std::string, void (*)(), donkeev::CommandsHash, donkeev::CommandsEqual > commands(16, 4);
 
 }
+
