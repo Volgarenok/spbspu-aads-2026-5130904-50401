@@ -40,7 +40,6 @@ namespace topit
     const T& at(size_t) const;
 
     void pushBack(const T&);
-    void pushBackCount(size_t, const T&);
     void popBack();
 
     void insert(size_t, const T&);
