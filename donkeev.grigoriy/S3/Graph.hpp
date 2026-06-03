@@ -7,9 +7,11 @@
 
 namespace donkeev
 {
+  using edgesPair_t = std::pair< std::string, std::string >;
+  using EdgeTable_t = HashTable< edgesPair_t, List< size_t >, VertexPairHash, VertexPairEqual >;
   struct Graph
   {
-    donkeev::HashTable< std::pair< std::string, std::string >, donkeev::List< size_t >, donkeev::VertexPairHash, donkeev::VertexPairEqual > table_;
+    EdgeTable_t table_;
     topit::Vector< std::string > uniqueVertexes_;
 
     Graph();

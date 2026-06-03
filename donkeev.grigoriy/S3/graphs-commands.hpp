@@ -10,7 +10,7 @@
 
 namespace donkeev
 {
-  using graphsHashTable_t = donkeev::HashTable< std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>;
+  using GraphTable_t = donkeev::HashTable< std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>;
   
   std::string nextWord(const std::string&, size_t&);
 
@@ -20,22 +20,22 @@ namespace donkeev
 
   void sortNumbers(topit::Vector< size_t >&);
 
-  void printGrapsNames(graphsHashTable_t&, const std::string&, std::ostream&);
+  void printGrapsNames(GraphTable_t&, const std::string&, std::ostream&);
   
-  void printVertexesNames(graphsHashTable_t&, const std::string&, std::ostream&);
+  void printVertexesNames(GraphTable_t&, const std::string&, std::ostream&);
 
-  void printOutboundVertexesNames(graphsHashTable_t&, const std::string&, std::ostream&);
+  void printOutboundVertexesNames(GraphTable_t&, const std::string&, std::ostream&);
 
-  void printInboundVertexesNames(graphsHashTable_t&, const std::string&, std::ostream&);
+  void printInboundVertexesNames(GraphTable_t&, const std::string&, std::ostream&);
 
-  void createEdge(graphsHashTable_t&, const std::string&, std::ostream&);
+  void createEdge(GraphTable_t&, const std::string&, std::ostream&);
 
-  void deleteEdge(graphsHashTable_t&, const std::string&, std::ostream&);
+  void deleteEdge(GraphTable_t&, const std::string&, std::ostream&);
 
-  void createGraph(graphsHashTable_t&, const std::string&, std::ostream&);
+  void createGraph(GraphTable_t&, const std::string&, std::ostream&);
 
-  void mergeGraphs(graphsHashTable_t&, const std::string&, std::ostream&);
+  void mergeGraphs(GraphTable_t&, const std::string&, std::ostream&);
 
-  void extractGraph(graphsHashTable_t&, const std::string&, std::ostream&);
+  void extractGraph(GraphTable_t&, const std::string&, std::ostream&);
 }
 #endif

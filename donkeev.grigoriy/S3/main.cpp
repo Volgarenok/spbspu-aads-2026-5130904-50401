@@ -30,7 +30,7 @@ namespace donkeev
   }
 };*/
 
-void readGraphs(const std::string& filename, donkeev::HashTable<std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>& graphs)
+void readGraphs(const std::string& filename, donkeev::graphsHashTable_t& graphs)
 {
   std::ifstream file(filename);
   if (!file.is_open())
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
   }
   std::string filename(argv[1]);
 
-  donkeev::HashTable< std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual> graphsTable(16, 4);
+  donkeev::graphsHashTable_t graphsTable(16, 4);
   try
   {
     readGraphs(filename, graphsTable);

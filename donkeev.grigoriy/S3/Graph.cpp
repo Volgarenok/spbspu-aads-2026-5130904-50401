@@ -51,7 +51,7 @@ void donkeev::Graph::addEdge(const std::string from, const std::string to, const
     uniqueVertexes_.pushBack(to);
   }
   
-  std::pair< std::string, std::string > thisKey = std::make_pair(from, to);
+  edgesPair_t thisKey = std::make_pair(from, to);
   donkeev::List< size_t >* thisValue = table_.find(thisKey);
   if (thisValue == nullptr)
   {
@@ -73,7 +73,7 @@ void donkeev::Graph::addVertex(const std::string& vertexName)
 
 void donkeev::Graph::deleteEdge(const std::string from, const std::string to, const size_t weight)
 {
-  std::pair< std::string, std::string > thisKey = std::make_pair(from, to);
+  edgesPair_t thisKey = std::make_pair(from, to);
   donkeev::List< size_t >* thisValue_ptr = table_.find(thisKey);
   if (thisValue_ptr == nullptr)
   {
@@ -96,8 +96,8 @@ void donkeev::Graph::deleteEdge(const std::string from, const std::string to, co
   }
   bool hasYAFrom = false;
   bool hasYATo = false;
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > begin = table_.begin();
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > end = table_.end();
+  EdgeTable_t::iterator begin = table_.begin();
+  EdgeTable_t::iterator end = table_.end();
   while (begin != end)
   {
     if ((*begin).first.first == from || (*begin).first.second == from)

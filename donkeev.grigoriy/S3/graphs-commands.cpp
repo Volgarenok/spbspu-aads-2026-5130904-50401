@@ -1,5 +1,11 @@
 #include "graphs-commands.hpp"
 
+namespace donkeev
+{
+  using EdgeVector_t = topit::Vector< std::pair< std::string, donkeev::List< size_t > > >;
+  using EdgeVectorIt_t = topit::VIter< std::pair< std::string, donkeev::List< size_t > > >;
+}
+
 std::string donkeev::nextWord(const std::string& line, size_t& position)
 {
   while (position < line.size() && line[position] == ' ')
@@ -32,7 +38,7 @@ void donkeev::sortNames(topit::Vector< std::string >& vector)
   }
 }
 
-void donkeev::sortNames(topit::Vector< std::pair< std::string, donkeev::List< size_t > > >& vector)
+void donkeev::sortNames(donkeev::EdgeVector_t& vector)
 {
   for (size_t i = 0; i < vector.getSize(); ++i)
   {
@@ -66,12 +72,12 @@ void donkeev::sortNumbers(topit::Vector< size_t >& vector)
   }
 }
 
-void donkeev::printGrapsNames(graphsHashTable_t& graphsTable, const std::string&, std::ostream& out)
+void donkeev::printGrapsNames(GraphTable_t& graphsTable, const std::string&, std::ostream& out)
 {
   topit::Vector< std::string > sortedVector;
 
-  donkeev::HTIt< std::string, donkeev::Graph > begin = graphsTable.begin();
-  donkeev::HTIt< std::string, donkeev::Graph > end = graphsTable.end();
+  donkeev::GraphTable_t::iterator begin = graphsTable.begin();
+  donkeev::GraphTable_t::iterator end = graphsTable.end();
   for (; begin != end; ++begin)
   {
     sortedVector.pushBack((*begin).first);
@@ -84,7 +90,7 @@ void donkeev::printGrapsNames(graphsHashTable_t& graphsTable, const std::string&
   }
 }
 
-void donkeev::printVertexesNames(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream& out)
+void donkeev::printVertexesNames(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream& out)
 {
   std::string graphName(parametrs);
 
@@ -104,7 +110,7 @@ void donkeev::printVertexesNames(graphsHashTable_t& graphsTable, const std::stri
   }
 }
 
-void donkeev::printOutboundVertexesNames(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream& out)
+void donkeev::printOutboundVertexesNames(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream& out)
 {
   size_t readingPosition = 0;
   std::string graphName = donkeev::nextWord(parametrs, readingPosition);
@@ -117,13 +123,13 @@ void donkeev::printOutboundVertexesNames(graphsHashTable_t& graphsTable, const s
   }
 
   donkeev::Graph& graph = *graph_ptr; 
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > HTbegin = graph.table_.begin();
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > HTend = graph.table_.end();
+  donkeev::EdgeTable_t::iterator HTbegin = graph.table_.begin();
+  donkeev::EdgeTable_t::iterator HTend = graph.table_.end();
 
-  topit::Vector< std::pair< std::string, donkeev::List< size_t > > > outboundVertexes;
+  donkeev::EdgeVector_t outboundVertexes;
   for (; HTbegin != HTend; ++HTbegin)
   {
-    std::pair< std::pair< std::string, std::string >, donkeev::List< size_t > > edgePair = *HTbegin; 
+    std::pair< donkeev::edgesPair_t, donkeev::List< size_t > > edgePair = *HTbegin; 
     if (edgePair.first.first == vertexName)
     {
       outboundVertexes.pushBack(std::make_pair(edgePair.first.second, edgePair.second));
@@ -145,8 +151,8 @@ void donkeev::printOutboundVertexesNames(graphsHashTable_t& graphsTable, const s
   }
 
   topit::Vector< std::string > sortedVertexes;
-  topit::VIter< std::pair< std::string, donkeev::List< size_t > > > Ebegin = outboundVertexes.begin();
-  topit::VIter< std::pair< std::string, donkeev::List< size_t > > > Eend = outboundVertexes.end();
+  donkeev::EdgeVectorIt_t Ebegin = outboundVertexes.begin();
+  donkeev::EdgeVectorIt_t Eend = outboundVertexes.end();
   while (Ebegin != Eend)
   {
     sortedVertexes.pushBack((*Ebegin).first);
@@ -185,7 +191,7 @@ void donkeev::printOutboundVertexesNames(graphsHashTable_t& graphsTable, const s
   }
 }
 
-void donkeev::printInboundVertexesNames(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream& out)
+void donkeev::printInboundVertexesNames(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream& out)
 {
   size_t readingPosition = 0;
   std::string graphName = donkeev::nextWord(parametrs, readingPosition);
@@ -204,8 +210,8 @@ void donkeev::printInboundVertexesNames(graphsHashTable_t& graphsTable, const st
     throw std::runtime_error("No such vertex");
   }
 
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > graphHTBegin = graph.table_.begin();
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > graphHTEnd = graph.table_.end();
+  EdgeTable_t::iterator graphHTBegin = graph.table_.begin();
+  EdgeTable_t::iterator graphHTEnd = graph.table_.end();
   
   topit::Vector< std::pair< std::string, donkeev::List< size_t > > > sortedInboundVertexesNames;
   while (graphHTBegin != graphHTEnd)
@@ -252,7 +258,7 @@ void donkeev::printInboundVertexesNames(graphsHashTable_t& graphsTable, const st
   }
 }
 
-void donkeev::createEdge(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream&)
+void donkeev::createEdge(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream&)
 {
   size_t readingPosition = 0;
   std::string graphName = donkeev::nextWord(parametrs, readingPosition);
@@ -269,7 +275,7 @@ void donkeev::createEdge(graphsHashTable_t& graphsTable, const std::string& para
 
 }
 
-void donkeev::deleteEdge(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream&)
+void donkeev::deleteEdge(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream&)
 {
   size_t readingPosition = 0;
   std::string graphName = donkeev::nextWord(parametrs, readingPosition);
@@ -285,7 +291,7 @@ void donkeev::deleteEdge(graphsHashTable_t& graphsTable, const std::string& para
   graph_ptr->deleteEdge(vertexFromName, vertexToName, weight);
 }
 
-void donkeev::createGraph(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream&)
+void donkeev::createGraph(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream&)
 {
   size_t readingPosition = 0;
   donkeev::nextWord(parametrs, readingPosition);
@@ -324,7 +330,7 @@ void donkeev::createGraph(graphsHashTable_t& graphsTable, const std::string& par
   graphsTable.add(graphName, std::move(thisGraph));
 }
 
-void donkeev::mergeGraphs(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream&)
+void donkeev::mergeGraphs(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream&)
 {
   size_t readingPosition = 0;
   std::string targetGraphName = donkeev::nextWord(parametrs, readingPosition);
@@ -344,7 +350,7 @@ void donkeev::mergeGraphs(graphsHashTable_t& graphsTable, const std::string& par
   }
 
   donkeev::Graph thisGraph(16, 4);
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > firstBegin = firstGraph_ptr->table_.begin();
+  EdgeTable_t::iterator firstBegin = firstGraph_ptr->table_.begin();
   for (size_t i = 0; i < firstGraph_ptr->table_.size(); ++i)
   {
     donkeev::LIter< size_t > pairListIt = (*firstBegin).second.begin();
@@ -355,7 +361,7 @@ void donkeev::mergeGraphs(graphsHashTable_t& graphsTable, const std::string& par
     }
     ++firstBegin;
   }
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > secondBegin = secondGraph_ptr->table_.begin();
+  EdgeTable_t::iterator secondBegin = secondGraph_ptr->table_.begin();
   for (size_t i = 0; i < secondGraph_ptr->table_.size(); ++i)
   {
     donkeev::LIter< size_t > pairListIt = (*secondBegin).second.begin();
@@ -387,7 +393,7 @@ void donkeev::mergeGraphs(graphsHashTable_t& graphsTable, const std::string& par
   graphsTable.add(targetGraphName, std::move(thisGraph));
 }
 
-void donkeev::extractGraph(graphsHashTable_t& graphsTable, const std::string& parametrs, std::ostream&)
+void donkeev::extractGraph(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream&)
 {
   size_t readingPosition = 0;
   donkeev::nextWord(parametrs, readingPosition);
@@ -425,7 +431,7 @@ void donkeev::extractGraph(graphsHashTable_t& graphsTable, const std::string& pa
     vertexes.pushBack(vertex);
   }
   
-  donkeev::HTIt< std::pair< std::string, std::string >, donkeev::List< size_t > > templateIt = templateGraph_ptr->table_.begin();
+  EdgeTable_t::iterator templateIt = templateGraph_ptr->table_.begin();
   for (size_t i = 0; i < templateGraph_ptr->table_.size(); ++i)
   {
     if (vertexes.has((*templateIt).first.first) && vertexes.has((*templateIt).first.second))
