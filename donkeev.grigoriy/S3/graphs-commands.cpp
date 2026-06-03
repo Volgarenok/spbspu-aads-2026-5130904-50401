@@ -146,7 +146,7 @@ void donkeev::printOutboundVertexesNames(GraphTable_t& graphsTable, const std::s
         return;
       }
     }
-    
+
     throw std::runtime_error("No such vertex");
   }
 
@@ -212,7 +212,7 @@ void donkeev::printInboundVertexesNames(GraphTable_t& graphsTable, const std::st
 
   EdgeTable_t::iterator graphHTBegin = graph.table_.begin();
   EdgeTable_t::iterator graphHTEnd = graph.table_.end();
-  
+
   topit::Vector< std::pair< std::string, donkeev::List< size_t > > > sortedInboundVertexesNames;
   while (graphHTBegin != graphHTEnd)
   {
@@ -297,7 +297,7 @@ void donkeev::createGraph(GraphTable_t& graphsTable, const std::string& parametr
   donkeev::nextWord(parametrs, readingPosition);
   std::string graphName = donkeev::nextWord(parametrs, readingPosition);
   std::string countStr = donkeev::nextWord(parametrs, readingPosition);
-  
+
   donkeev::Graph* graph_ptr = graphsTable.find(graphName);
   if (graph_ptr != nullptr)
   {
@@ -405,20 +405,20 @@ void donkeev::extractGraph(GraphTable_t& graphsTable, const std::string& paramet
   {
     throw std::runtime_error("Bad input");
   }
-  
+
   donkeev::Graph* templateGraph_ptr = graphsTable.find(templateGraphName);
   if (templateGraph_ptr == nullptr)
   {
     throw std::runtime_error("Bad input");
   }
-  
+
   donkeev::Graph thisGraph(16, 4);
   if (countStr.empty() || countStr == "0")
   {
     graphsTable.add(targetGraphName, std::move(thisGraph));
     return;
   }
-  
+
   size_t count = std::stoull(countStr);
   topit::Vector< std::string > vertexes;
   for (size_t i = 0; i < count; ++i)
@@ -430,7 +430,7 @@ void donkeev::extractGraph(GraphTable_t& graphsTable, const std::string& paramet
     }
     vertexes.pushBack(vertex);
   }
-  
+
   EdgeTable_t::iterator templateIt = templateGraph_ptr->table_.begin();
   for (size_t i = 0; i < templateGraph_ptr->table_.size(); ++i)
   {
