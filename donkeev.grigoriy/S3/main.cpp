@@ -28,7 +28,6 @@ void readGraphs(const std::string& filename, donkeev::graphsHashTable_t& graphs)
     {
       continue;
     }
-
     size_t position = 0;
     std::string graphName = donkeev::nextWord(line, position);
 
