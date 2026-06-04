@@ -594,4 +594,74 @@ BOOST_AUTO_TEST_CASE(test_merge)
   BOOST_CHECK(list2.empty());
 }
 
+BOOST_AUTO_TEST_CASE(test_partition)
+{
+  chernov::List< int > list;
+  auto isEven = [](int x)
+  {
+    return x % 2 == 0;
+  };
+
+  BOOST_CHECK(list.partition(list.begin(), list.end(), isEven) == list.end());
+
+  list.pushFront(2);
+  auto it = list.partition(list.begin(), list.end(), isEven);
+  BOOST_CHECK(it == list.end());
+  BOOST_CHECK_EQUAL(*list.begin(), 2);
+
+  list.clear();
+  list.pushFront(1);
+  it = list.partition(list.begin(), list.end(), isEven);
+  BOOST_CHECK(it == list.begin());
+  BOOST_CHECK_EQUAL(*it, 1);
+
+  list.clear();
+  list.pushFront(6);
+  list.pushFront(5);
+  list.pushFront(4);
+  list.pushFront(3);
+  list.pushFront(2);
+  list.pushFront(1);
+  it = list.partition(list.begin(), list.end(), isEven);
+  BOOST_CHECK_EQUAL(list.size(), 6);
+
+  chernov::LIter< int > iter = list.begin();
+  BOOST_CHECK_EQUAL(*iter++, 2);
+  BOOST_CHECK_EQUAL(*iter++, 4);
+  BOOST_CHECK_EQUAL(*iter++, 6);
+  BOOST_CHECK_EQUAL(*iter++, 1);
+  BOOST_CHECK_EQUAL(*iter++, 3);
+  BOOST_CHECK_EQUAL(*iter++, 5);
+  BOOST_CHECK(iter == list.begin());
+
+  auto expected_false = list.begin();
+  ++expected_false;
+  ++expected_false;
+  ++expected_false;
+  BOOST_CHECK(it == expected_false);
+
+  list.clear();
+  list.pushFront(5);
+  list.pushFront(4);
+  list.pushFront(3);
+  list.pushFront(2);
+  list.pushFront(1);
+  auto first = list.begin();
+  ++first;
+  auto last = first;
+  ++last; ++last; ++last;
+  it = list.partition(first, last, isEven);
+
+  iter = list.begin();
+  BOOST_CHECK_EQUAL(*iter++, 1);
+  BOOST_CHECK_EQUAL(*iter++, 2);
+  BOOST_CHECK_EQUAL(*iter++, 4);
+  BOOST_CHECK_EQUAL(*iter++, 3);
+  BOOST_CHECK_EQUAL(*iter++, 5);
+  BOOST_CHECK(iter == list.begin());
+  expected_false = list.begin();
+  ++expected_false; ++expected_false; ++expected_false;
+  BOOST_CHECK(it == expected_false);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
