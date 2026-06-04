@@ -14,7 +14,7 @@ int main(int args, char ** argv)
 
   std::istream * input = &std::cin;
   std::ifstream file_input;
-  if (args > 1) {
+  if (args == 2) {
     file_input.open(argv[1]);
     input = &file_input;
   }
