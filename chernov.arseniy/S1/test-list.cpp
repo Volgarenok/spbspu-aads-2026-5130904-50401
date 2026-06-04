@@ -392,4 +392,112 @@ BOOST_AUTO_TEST_CASE(test_pop_front)
   BOOST_CHECK(list.empty());
 }
 
+BOOST_AUTO_TEST_CASE(test_splice_after_all)
+{
+  chernov::List< int > list1;
+  list1.pushFront(10);
+  list1.pushFront(20);
+  chernov::List< int > list2;
+  list2.pushFront(1);
+  list2.pushFront(2);
+  list2.pushFront(3);
+
+  chernov::LIter< int > pos = list1.beforeBegin();
+  list1.splice_after(pos, list2);
+
+  BOOST_CHECK_EQUAL(list1.size(), 5);
+  BOOST_CHECK_EQUAL(list2.size(), 0);
+  BOOST_CHECK(list2.empty());
+
+  chernov::LIter< int > iter = list1.begin();
+  BOOST_CHECK_EQUAL(*iter, 3);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 2);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 1);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 20);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 10);
+  ++iter;
+  BOOST_CHECK(iter == list1.begin());
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_after_single)
+{
+  chernov::List< int > list1;
+  list1.pushFront(100);
+  chernov::List< int > list2;
+  list2.pushFront(1);
+  list2.pushFront(2);
+  list2.pushFront(3);
+
+  chernov::LIter< int > it = list2.begin();
+  chernov::LIter< int > pos = list1.beforeBegin();
+  list1.splice_after(pos, list2, it);
+
+  BOOST_CHECK_EQUAL(list1.size(), 2);
+  BOOST_CHECK_EQUAL(list2.size(), 2);
+
+  chernov::LIter< int > iter = list1.begin();
+  BOOST_CHECK_EQUAL(*iter, 2);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 100);
+  ++iter;
+  BOOST_CHECK(iter == list1.begin());
+
+  iter = list2.begin();
+  BOOST_CHECK_EQUAL(*iter, 3);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 1);
+  ++iter;
+  BOOST_CHECK(iter == list2.begin());
+}
+
+BOOST_AUTO_TEST_CASE(test_splice_after_range)
+{
+  chernov::List< int > list1;
+  list1.pushFront(10);
+  list1.pushFront(20);
+  chernov::List< int > list2;
+  list2.pushFront(1);
+  list2.pushFront(2);
+  list2.pushFront(3);
+  list2.pushFront(4);
+  list2.pushFront(5);
+
+  chernov::LIter< int > first = list2.begin();
+  ++first;
+  chernov::LIter< int > last = first;
+  ++last;
+  ++last;
+  ++last;
+
+  chernov::LIter< int > pos = list1.beforeBegin();
+  list1.splice_after(pos, list2, first, last);
+
+  BOOST_CHECK_EQUAL(list1.size(), 4);
+  BOOST_CHECK_EQUAL(list2.size(), 3);
+
+  chernov::LIter< int > iter = list1.begin();
+  BOOST_CHECK_EQUAL(*iter, 3);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 2);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 20);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 10);
+  ++iter;
+  BOOST_CHECK(iter == list1.begin());
+
+  iter = list2.begin();
+  BOOST_CHECK_EQUAL(*iter, 5);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 4);
+  ++iter;
+  BOOST_CHECK_EQUAL(*iter, 1);
+  ++iter;
+  BOOST_CHECK(iter == list2.begin());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
