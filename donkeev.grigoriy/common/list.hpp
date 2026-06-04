@@ -4,6 +4,7 @@
 #include <cstddef>
 #include "node.hpp"
 #include "iterator.hpp"
+#include <iostream>
 
 namespace donkeev
 {
@@ -21,6 +22,10 @@ namespace donkeev
     List();
     List(size_t, T);
     List(const List< T >&);
+    List(List< T >&&) noexcept;
+
+    List< T >& operator=(const List< T >&);
+    List< T >& operator=(List&&) noexcept;
 
     ~List();
 
@@ -34,9 +39,13 @@ namespace donkeev
     void popFront();
     void cutAfter(LIter< T >&);
     void clearAll();
+    void deleteNode(const T&);
+    bool has(const T&);
 
     bool isEmpty() const;
     size_t size() const;
+
+    void swap(List< T >&) noexcept;
   };
 
   template< class T >
@@ -83,6 +92,31 @@ namespace donkeev
       pushBack(*it);
       ++it;
     }
+  }
+  template< class T >
+  List< T >::List(List< T >&& other) noexcept:
+    head_(other.head_),
+    tail_(other.tail_),
+    length_(other.length_)
+  {
+    other.head_ = nullptr;
+    other.tail_ = nullptr;
+    other.length_ = 0;
+  }
+
+  template< class T >
+  donkeev::List< T >& List< T >::operator=(const List< T >& other)
+  {
+    List< T > cpy{other};
+    swap(cpy);
+    return *this;
+  }
+  template< class T >
+  donkeev::List< T >& List< T >::operator=(List< T >&& other) noexcept
+  {
+    List< T > cpy{std::move(other)};
+    swap(cpy);
+    return *this;
   }
 
   template< class T >
@@ -191,6 +225,42 @@ namespace donkeev
     }
     head_ = nullptr;
   }
+  template< class T >
+  void List< T >::deleteNode(const T& value)
+  {
+    Node< T >* node = head_;
+    if (node->val == value)
+    {
+      head_ = head_->next;
+      tail_ = head_;
+      --length_;
+      return;
+    }
+    donkeev::LIter< T > it = begin();
+    for (size_t i = 0; i < length_; ++i)
+    {
+      if (*it == value)
+      {
+        cutAfter(it);
+      }
+      ++it;
+    }
+  }
+  template< class T >
+  bool List< T >::has(const T& value)
+  {
+    Node< T >* it = head_;
+    for (size_t i = 0; i < length_; ++i)
+    {
+      if (it->val == value)
+      {
+        return true;
+      }
+
+      ++it;
+    }
+    return false;
+  }
 
   template< class T >
   bool List< T >::isEmpty() const
@@ -201,6 +271,14 @@ namespace donkeev
   size_t List< T >::size() const
   {
     return length_;
+  }
+
+  template< class T >
+  void donkeev::List< T >::swap(List< T >& other) noexcept
+  {
+    std::swap(head_, other.head_);
+    std::swap(tail_, other.tail_);
+    std::swap(length_, other.length_);
   }
 }
 #endif
