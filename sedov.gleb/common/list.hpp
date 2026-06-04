@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <limits>
 #include <cassert>
+#include <new>
 
 namespace sedov
 {
@@ -17,11 +18,16 @@ namespace sedov
     template< class T >
     struct Node
     {
-      T val_;
+      alignas(T) unsigned char storage_[sizeof(T)];
       Node< T > * next_;
       Node< T > * prev_;
       Node(const T & value);
       Node(T && value);
+      template< class... Args >
+      explicit Node(Args&&... args);
+      ~Node();
+      T & getValue();
+      const T & getValue() const;
     };
   }
 
@@ -90,8 +96,22 @@ namespace sedov
     const T & back() const;
 
     void pushFront(const T & v);
+    void pushFront(T && v);
     void pushBack(const T & v);
     void pushBack(T && v);
+
+    template< class... Args >
+    LIter< T > emplaceFront(Args&&... args);
+
+    template< class... Args >
+    LIter< T > emplaceBack(Args&&... args);
+
+    template< class... Args >
+    LIter< T > emplace(LIter< T > p, Args&&... args);
+
+    template< class... Args >
+    LIter< T > emplaceAfter(LIter< T > p, Args&&... args);
+
     LIter< T > insert(LIter< T > p, const T & v);
 
     void popFront();
@@ -118,17 +138,46 @@ namespace sedov
 
   template< class T >
   detail::Node< T >::Node(const T & value):
-    val_(value),
     next_(nullptr),
     prev_(nullptr)
-  {}
+  {
+    new (storage_) T(value);
+  }
 
   template< class T >
   detail::Node< T >::Node(T && value):
-    val_(std::move(value)),
     next_(nullptr),
     prev_(nullptr)
-  {}
+  {
+    new (storage_) T(std::move(value));
+  }
+
+  template< class T >
+  template< class... Args >
+  detail::Node< T >::Node(Args&&... args):
+    next_(nullptr),
+    prev_(nullptr)
+  {
+    new (storage_) T(std::forward< Args >(args)...);
+  }
+
+  template< class T >
+  detail::Node< T >::~Node()
+  {
+    getValue().~T();
+  }
+
+  template< class T >
+  T & detail::Node< T >::getValue()
+  {
+    return *reinterpret_cast< T * >(storage_);
+  }
+
+  template< class T >
+  const T & detail::Node< T >::getValue() const
+  {
+    return *reinterpret_cast< const T * >(storage_);
+  }
 
   template< class T >
   LIter< T >::LIter(detail::Node< T > * p):
@@ -138,13 +187,13 @@ namespace sedov
   template< class T >
   T & LIter< T >::operator*()
   {
-    return ptr_->val_;
+    return ptr_->getValue();
   }
 
   template< class T >
   T * LIter< T >::operator->()
   {
-    return &ptr_->val_;
+    return &ptr_->getValue();
   }
 
   template< class T >
@@ -197,13 +246,13 @@ namespace sedov
   template< class T >
   const T & LCIter< T >::operator*() const
   {
-    return ptr_->val_;
+    return ptr_->getValue();
   }
 
   template< class T >
   const T * LCIter< T >::operator->() const
   {
-    return &ptr_->val_;
+    return &ptr_->getValue();
   }
 
   template< class T >
@@ -261,7 +310,7 @@ namespace sedov
   {
     for (detail::Node< T > * cur = h.head_; cur != nullptr; cur = cur->next_)
     {
-      pushBack(cur->val_);
+      pushBack(cur->getValue());
     }
   }
 
@@ -326,31 +375,48 @@ namespace sedov
   template< class T >
   T & List< T >::front()
   {
-    return head_->val_;
+    return head_->getValue();
   }
 
   template< class T >
   const T & List< T >::front() const
   {
-    return head_->val_;
+    return head_->getValue();
   }
 
   template< class T >
   T & List< T >::back()
   {
-    return tail_->val_;
+    return tail_->getValue();
   }
 
   template< class T >
   const T & List< T >::back() const
   {
-    return tail_->val_;
+    return tail_->getValue();
   }
 
   template< class T >
   void List< T >::pushFront(const T & v)
   {
     detail::Node< T > * newNode = new detail::Node< T >(v);
+    newNode->next_ = head_;
+    if (head_)
+    {
+      head_->prev_ = newNode;
+    }
+    else
+    {
+      tail_ = newNode;
+    }
+    head_ = newNode;
+    ++size_;
+  }
+
+  template< class T >
+  void List< T >::pushFront(T && v)
+  {
+    detail::Node< T > * newNode = new detail::Node< T >(std::move(v));
     newNode->next_ = head_;
     if (head_)
     {
@@ -399,19 +465,56 @@ namespace sedov
   }
 
   template< class T >
-  LIter< T > List< T >::insert(LIter< T > p, const T & v)
+  template< class... Args >
+  LIter< T > List< T >::emplaceFront(Args&&... args)
+  {
+    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
+    newNode->next_ = head_;
+    if (head_)
+    {
+      head_->prev_ = newNode;
+    }
+    else
+    {
+      tail_ = newNode;
+    }
+    head_ = newNode;
+    ++size_;
+    return LIter< T >(newNode);
+  }
+
+  template< class T >
+  template< class... Args >
+  LIter< T > List< T >::emplaceBack(Args&&... args)
+  {
+    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
+    newNode->prev_ = tail_;
+    if (tail_)
+    {
+      tail_->next_ = newNode;
+    }
+    else
+    {
+      head_ = newNode;
+    }
+    tail_ = newNode;
+    ++size_;
+    return LIter< T >(newNode);
+  }
+
+  template< class T >
+  template< class... Args >
+  LIter< T > List< T >::emplace(LIter< T > p, Args&&... args)
   {
     if (!p.ptr_)
     {
-      pushBack(v);
-      return LIter< T >(tail_);
+      return emplaceBack(std::forward< Args >(args)...);
     }
     if (p.ptr_ == head_)
     {
-      pushFront(v);
-      return LIter< T >(head_);
+      return emplaceFront(std::forward< Args >(args)...);
     }
-    detail::Node< T > * newNode = new detail::Node< T >(v);
+    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
     detail::Node< T > * next = p.ptr_;
     detail::Node< T > * prev = next->prev_;
     newNode->prev_ = prev;
@@ -420,6 +523,38 @@ namespace sedov
     next->prev_ = newNode;
     ++size_;
     return LIter< T >(newNode);
+  }
+
+  template< class T >
+  template< class... Args >
+  LIter< T > List< T >::emplaceAfter(LIter< T > p, Args&&... args)
+  {
+    if (!p.ptr_)
+    {
+      return emplaceBack(std::forward< Args >(args)...);
+    }
+    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
+    detail::Node< T > * current = p.ptr_;
+    detail::Node< T > * next = current->next_;
+    newNode->prev_ = current;
+    newNode->next_ = next;
+    current->next_ = newNode;
+    if (next)
+    {
+      next->prev_ = newNode;
+    }
+    else
+    {
+      tail_ = newNode;
+    }
+    ++size_;
+    return LIter< T >(newNode);
+  }
+
+  template< class T >
+  LIter< T > List< T >::insert(LIter< T > p, const T & v)
+  {
+    return emplace(p, v);
   }
 
   template< class T >

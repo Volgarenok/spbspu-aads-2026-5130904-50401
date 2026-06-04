@@ -24,6 +24,10 @@ namespace sedov
 
     void push(const T & v);
     void push(T && v);
+
+    template< class... Args >
+    LIter< T > emplace(Args&&... args);
+
     void pop() noexcept;
     void swap(Stack & s) noexcept;
     void clear() noexcept;
@@ -65,6 +69,13 @@ namespace sedov
   void Stack< T >::push(T && v)
   {
     list_.pushBack(std::move(v));
+  }
+
+  template< class T >
+  template< class... Args >
+  LIter< T > Stack< T >::emplace(Args&&... args)
+  {
+    return list_.emplaceBack(std::forward< Args >(args)...);
   }
 
   template< class T >

@@ -487,4 +487,191 @@ BOOST_AUTO_TEST_CASE(PartitionAllTrueTest)
   BOOST_CHECK(check == list.end());
 }
 
+BOOST_AUTO_TEST_CASE(EmplaceFrontIntTest)
+{
+  sedov::List< int > list;
+  list.emplaceFront(1);
+  list.emplaceFront(2);
+  list.emplaceFront(3);
+  auto it = list.begin();
+  BOOST_CHECK_EQUAL(*it, 3);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 2);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 1);
+  BOOST_CHECK_EQUAL(list.size(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceFrontPairTest)
+{
+  sedov::List< std::pair< int, double > > list;
+  list.emplaceFront(1, 2.5);
+  list.emplaceFront(3, 4.5);
+  list.emplaceFront(5, 6.5);
+  auto it = list.begin();
+  BOOST_CHECK_EQUAL(it->first, 5);
+  BOOST_CHECK_EQUAL(it->second, 6.5);
+  ++it;
+  BOOST_CHECK_EQUAL(it->first, 3);
+  BOOST_CHECK_EQUAL(it->second, 4.5);
+  ++it;
+  BOOST_CHECK_EQUAL(it->first, 1);
+  BOOST_CHECK_EQUAL(it->second, 2.5);
+  BOOST_CHECK_EQUAL(list.size(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceBackIntTest)
+{
+  sedov::List< int > list;
+  list.emplaceBack(1);
+  list.emplaceBack(2);
+  list.emplaceBack(3);
+  auto it = list.begin();
+  BOOST_CHECK_EQUAL(*it, 1);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 2);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 3);
+  BOOST_CHECK_EQUAL(list.size(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceBackPairTest)
+{
+  sedov::List< std::pair< int, double > > list;
+  list.emplaceBack(1, 2.5);
+  list.emplaceBack(3, 4.5);
+  list.emplaceBack(5, 6.5);
+  auto it = list.begin();
+  BOOST_CHECK_EQUAL(it->first, 1);
+  BOOST_CHECK_EQUAL(it->second, 2.5);
+  ++it;
+  BOOST_CHECK_EQUAL(it->first, 3);
+  BOOST_CHECK_EQUAL(it->second, 4.5);
+  ++it;
+  BOOST_CHECK_EQUAL(it->first, 5);
+  BOOST_CHECK_EQUAL(it->second, 6.5);
+  BOOST_CHECK_EQUAL(list.size(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceBeforeTest)
+{
+  sedov::List< int > list;
+  list.emplaceBack(1);
+  list.emplaceBack(2);
+  list.emplaceBack(4);
+  list.emplaceBack(5);
+  auto it = list.begin();
+  ++it;
+  ++it;
+  list.emplace(it, 3);
+  auto check = list.begin();
+  BOOST_CHECK_EQUAL(*check, 1);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 2);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 3);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 4);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 5);
+  BOOST_CHECK_EQUAL(list.size(), 5);
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceBeforeBeginTest)
+{
+  sedov::List< int > list;
+  list.emplaceBack(2);
+  list.emplaceBack(3);
+  auto it = list.begin();
+  list.emplace(it, 1);
+  auto check = list.begin();
+  BOOST_CHECK_EQUAL(*check, 1);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 2);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 3);
+  BOOST_CHECK_EQUAL(list.size(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceBeforeEndTest)
+{
+  sedov::List< int > list;
+  list.emplaceBack(1);
+  list.emplaceBack(2);
+  list.emplaceBack(3);
+  list.emplace(list.end(), 4);
+  auto check = list.begin();
+  BOOST_CHECK_EQUAL(*check, 1);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 2);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 3);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 4);
+  BOOST_CHECK_EQUAL(list.size(), 4);
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceAfterTest)
+{
+  sedov::List< int > list;
+  list.emplaceBack(1);
+  list.emplaceBack(2);
+  list.emplaceBack(4);
+  list.emplaceBack(5);
+  auto it = list.begin();
+  ++it;
+  ++it;
+  list.emplaceAfter(it, 10);
+  auto check = list.begin();
+  BOOST_CHECK_EQUAL(*check, 1);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 2);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 4);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 10);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 5);
+  BOOST_CHECK_EQUAL(list.size(), 5);
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceAfterLastTest)
+{
+  sedov::List< int > list;
+  list.emplaceBack(1);
+  list.emplaceBack(2);
+  list.emplaceBack(3);
+  auto it = list.begin();
+  ++it;
+  ++it;
+  list.emplaceAfter(it, 4);
+  auto check = list.begin();
+  BOOST_CHECK_EQUAL(*check, 1);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 2);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 3);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 4);
+  BOOST_CHECK_EQUAL(list.size(), 4);
+}
+
+BOOST_AUTO_TEST_CASE(EmplaceAfterNullptrTest)
+{
+  sedov::List< int > list;
+  list.emplaceBack(1);
+  list.emplaceBack(2);
+  list.emplaceBack(3);
+  list.emplaceAfter(nullptr, 4);
+  auto check = list.begin();
+  BOOST_CHECK_EQUAL(*check, 1);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 2);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 3);
+  ++check;
+  BOOST_CHECK_EQUAL(*check, 4);
+  BOOST_CHECK_EQUAL(list.size(), 4);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

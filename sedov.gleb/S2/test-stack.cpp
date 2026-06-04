@@ -74,4 +74,22 @@ BOOST_AUTO_TEST_CASE(ClearTests)
   s.clear();
   BOOST_CHECK(s.size() == 0);
 }
+
+BOOST_AUTO_TEST_CASE(EmplaceTest)
+{
+  sedov::Stack< std::pair< int, double > > s;
+  s.emplace(1, 2.5);
+  s.emplace(3, 4.5);
+  s.emplace(5, 6.5);
+  BOOST_CHECK_EQUAL(s.top().first, 5);
+  BOOST_CHECK_EQUAL(s.top().second, 6.5);
+  s.pop();
+  BOOST_CHECK_EQUAL(s.top().first, 3);
+  BOOST_CHECK_EQUAL(s.top().second, 4.5);
+  s.pop();
+  BOOST_CHECK_EQUAL(s.top().first, 1);
+  BOOST_CHECK_EQUAL(s.top().second, 2.5);
+  BOOST_CHECK_EQUAL(s.size(), 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

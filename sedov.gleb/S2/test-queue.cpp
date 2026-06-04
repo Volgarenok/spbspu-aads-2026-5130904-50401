@@ -88,4 +88,21 @@ BOOST_AUTO_TEST_CASE(PushAfterClearTest)
   BOOST_CHECK(q.size() == 1);
 }
 
+BOOST_AUTO_TEST_CASE(EmplaceTest)
+{
+  sedov::Queue< std::pair< int, double > > q;
+  q.emplace(1, 2.5);
+  q.emplace(3, 4.5);
+  q.emplace(5, 6.5);
+  BOOST_CHECK_EQUAL(q.front().first, 1);
+  BOOST_CHECK_EQUAL(q.front().second, 2.5);
+  q.pop();
+  BOOST_CHECK_EQUAL(q.front().first, 3);
+  BOOST_CHECK_EQUAL(q.front().second, 4.5);
+  q.pop();
+  BOOST_CHECK_EQUAL(q.front().first, 5);
+  BOOST_CHECK_EQUAL(q.front().second, 6.5);
+  BOOST_CHECK_EQUAL(q.size(), 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
