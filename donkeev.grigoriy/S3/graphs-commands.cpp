@@ -431,7 +431,7 @@ void donkeev::extractGraph(GraphTable_t& graphsTable, const std::string& paramet
   {
     throw std::runtime_error("Bad input");
   }
-  
+
   if (graphsTable.has(targetGraphName))
   {
     throw std::runtime_error("Bad input");
