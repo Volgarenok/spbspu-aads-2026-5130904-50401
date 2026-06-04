@@ -15,29 +15,29 @@ namespace chernov {
     Stack< T > & operator=(const Stack< T > &) = default;
     Stack< T > & operator=(Stack< T > &&) = default;
 
-    T & top();
-    const T & top() const;
+    T & top() noexcept;
+    const T & top() const noexcept;
 
     template< class U >
     void push(U && value);
 
-    void pop();
+    void pop() noexcept;
     bool empty() const noexcept;
     size_t size() const noexcept;
-    void clear();
+    void clear() noexcept;
   private:
     List< T > list_;
   };
 }
 
 template< class T >
-T & chernov::Stack< T >::top()
+T & chernov::Stack< T >::top() noexcept
 {
   return list_.first();
 }
 
 template< class T >
-const T & chernov::Stack< T >::top() const
+const T & chernov::Stack< T >::top() const noexcept
 {
   return list_.first();
 }
@@ -50,7 +50,7 @@ void chernov::Stack< T >::push(U && value)
 }
 
 template< class T >
-void chernov::Stack< T >::pop()
+void chernov::Stack< T >::pop() noexcept
 {
   list_.popFront();
 }
@@ -68,7 +68,7 @@ size_t chernov::Stack< T >::size() const noexcept
 }
 
 template< class T >
-void chernov::Stack< T >::clear()
+void chernov::Stack< T >::clear() noexcept
 {
   list_.clear();
 }
