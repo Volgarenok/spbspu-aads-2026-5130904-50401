@@ -61,7 +61,6 @@ namespace topit
     T* data_;
     size_t size_, capacity_;
     explicit Vector(size_t size);
-    void unsafePuchBack(const T&);
   };
   template< class T >
   bool operator==(const Vector< T >& lhs, const Vector< T >& rhs);
