@@ -45,8 +45,11 @@ namespace chernov {
     void popFront();
     void swap(List< T > & other) noexcept;
     void splice_after(LCIter< T > pos, List< T > & other);
+    void splice_after(LCIter< T > pos, List< T > && other);
     void splice_after(LCIter< T > pos, List< T > & other, LCIter< T > it);
+    void splice_after(LCIter< T > pos, List< T > && other, LCIter< T > it);
     void splice_after(LCIter< T > pos, List< T > & other, LCIter< T > first, LCIter< T > last);
+    void splice_after(LCIter< T > pos, List< T > && other, LCIter< T > first, LCIter< T > last);
   private:
     detail::Node< T > * fake_;
     size_t size_;
@@ -309,6 +312,12 @@ void chernov::List< T >::splice_after(LCIter< T > pos, List< T > & other)
 }
 
 template< class T >
+void chernov::List< T >::splice_after(LCIter< T > pos, List< T > && other)
+{
+  splice_after(pos, other);
+}
+
+template< class T >
 void chernov::List< T >::splice_after(LCIter< T > pos, List< T > & other, LCIter< T > it)
 {
   if (other.empty() || it.ptr->next == other.fake_) {
@@ -322,6 +331,12 @@ void chernov::List< T >::splice_after(LCIter< T > pos, List< T > & other, LCIter
   LCIter< T > last{last_ptr, other.fake_};
 
   splice_after(pos, other, first, last);
+}
+
+template< class T >
+void chernov::List< T >::splice_after(LCIter< T > pos, List< T > && other, LCIter< T > it)
+{
+  splice_after(pos, other, it);
 }
 
 template< class T >
@@ -359,6 +374,12 @@ void chernov::List< T >::splice_after(LCIter< T > pos, List< T > & other, LCIter
 
   size_ += count;
   other.size_ -= count;
+}
+
+template< class T >
+void chernov::List< T >::splice_after(LCIter< T > pos, List< T > && other, LCIter< T > first, LCIter< T > last)
+{
+  splice_after(pos, other, first, last);
 }
 
 #endif
