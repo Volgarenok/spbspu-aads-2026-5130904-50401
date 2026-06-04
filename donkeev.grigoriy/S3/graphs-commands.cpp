@@ -72,8 +72,12 @@ void donkeev::sortNumbers(topit::Vector< size_t >& vector)
   }
 }
 
-void donkeev::printGrapsNames(GraphTable_t& graphsTable, const std::string&, std::ostream& out)
+void donkeev::printGrapsNames(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream& out)
 {
+  if (!parametrs.empty())
+  {
+    throw std::runtime_error("Bad input");
+  }
   topit::Vector< std::string > sortedVector;
 
   donkeev::GraphTable_t::iterator begin = graphsTable.begin();
@@ -92,12 +96,16 @@ void donkeev::printGrapsNames(GraphTable_t& graphsTable, const std::string&, std
 
 void donkeev::printVertexesNames(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream& out)
 {
-  std::string graphName(parametrs);
+  size_t readingPosition = 0;
+  std::string graphName = nextWord(parametrs, readingPosition);
+  if (graphName.empty())
+  {
+    throw std::runtime_error("Bad input");
+  }
 
   donkeev::Graph* graph_ptr = graphsTable.find(graphName);
   if (graph_ptr == nullptr)
   {
-    std::cout << "INVALID COMMAND\n";
     throw std::runtime_error("Bad input");
   }
 
@@ -115,6 +123,10 @@ void donkeev::printOutboundVertexesNames(GraphTable_t& graphsTable, const std::s
   size_t readingPosition = 0;
   std::string graphName = donkeev::nextWord(parametrs, readingPosition);
   std::string vertexName = donkeev::nextWord(parametrs, readingPosition);
+  if (graphName.empty() || vertexName.empty())
+  {
+    throw std::runtime_error("Bad input");
+  }
 
   donkeev::Graph* graph_ptr = graphsTable.find(graphName);
   if (graph_ptr == nullptr)
@@ -196,6 +208,10 @@ void donkeev::printInboundVertexesNames(GraphTable_t& graphsTable, const std::st
   size_t readingPosition = 0;
   std::string graphName = donkeev::nextWord(parametrs, readingPosition);
   std::string vertexName = donkeev::nextWord(parametrs, readingPosition);
+  if (graphName.empty() || vertexName.empty())
+  {
+    throw std::runtime_error("Bad input");
+  }
 
   donkeev::Graph* graph_ptr = graphsTable.find(graphName);
   if (graph_ptr == nullptr)
@@ -264,7 +280,12 @@ void donkeev::createEdge(GraphTable_t& graphsTable, const std::string& parametrs
   std::string graphName = donkeev::nextWord(parametrs, readingPosition);
   std::string vertexFromName = donkeev::nextWord(parametrs, readingPosition);
   std::string vertexToName = donkeev::nextWord(parametrs, readingPosition);
-  size_t weight = std::stoull(donkeev::nextWord(parametrs, readingPosition));
+  std::string weightStr = donkeev::nextWord(parametrs, readingPosition);
+  if (graphName.empty() || vertexFromName.empty() || vertexToName.empty() || weightStr.empty())
+  {
+    throw std::runtime_error("Bad input");
+  }
+  size_t weight = std::stoull(weightStr);
 
   donkeev::Graph* graph_ptr = graphsTable.find(graphName);
   if (graph_ptr == nullptr)
@@ -281,7 +302,12 @@ void donkeev::deleteEdge(GraphTable_t& graphsTable, const std::string& parametrs
   std::string graphName = donkeev::nextWord(parametrs, readingPosition);
   std::string vertexFromName = donkeev::nextWord(parametrs, readingPosition);
   std::string vertexToName = donkeev::nextWord(parametrs, readingPosition);
-  size_t weight = std::stoull(donkeev::nextWord(parametrs, readingPosition));
+  std::string weightStr = donkeev::nextWord(parametrs, readingPosition);
+  if (graphName.empty() || vertexFromName.empty() || vertexToName.empty() || weightStr.empty())
+  {
+    throw std::runtime_error("Bad input");
+  }
+  size_t weight = std::stoull(weightStr);
 
   donkeev::Graph* graph_ptr = graphsTable.find(graphName);
   if (graph_ptr == nullptr)
@@ -294,9 +320,12 @@ void donkeev::deleteEdge(GraphTable_t& graphsTable, const std::string& parametrs
 void donkeev::createGraph(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream&)
 {
   size_t readingPosition = 0;
-  donkeev::nextWord(parametrs, readingPosition);
   std::string graphName = donkeev::nextWord(parametrs, readingPosition);
   std::string countStr = donkeev::nextWord(parametrs, readingPosition);
+  if (graphName.empty() || countStr.empty())
+  {
+    throw std::runtime_error("Bad input");
+  }
 
   donkeev::Graph* graph_ptr = graphsTable.find(graphName);
   if (graph_ptr != nullptr)
@@ -321,11 +350,6 @@ void donkeev::createGraph(GraphTable_t& graphsTable, const std::string& parametr
     }
     thisGraph.uniqueVertexes_.pushBack(vertexName);
   }
-  std::string extra = donkeev::nextWord(parametrs, readingPosition);
-  if (!extra.empty())
-  {
-    throw std::runtime_error("Bad input");
-  }
 
   graphsTable.add(graphName, std::move(thisGraph));
 }
@@ -336,6 +360,10 @@ void donkeev::mergeGraphs(GraphTable_t& graphsTable, const std::string& parametr
   std::string targetGraphName = donkeev::nextWord(parametrs, readingPosition);
   std::string firstGraphName = donkeev::nextWord(parametrs, readingPosition);
   std::string secondGraphName = donkeev::nextWord(parametrs, readingPosition);
+  if (targetGraphName.empty() || firstGraphName.empty() || secondGraphName.empty())
+  {
+    throw std::runtime_error("Bad input");
+  }
 
   if (graphsTable.has(targetGraphName))
   {
@@ -396,11 +424,14 @@ void donkeev::mergeGraphs(GraphTable_t& graphsTable, const std::string& parametr
 void donkeev::extractGraph(GraphTable_t& graphsTable, const std::string& parametrs, std::ostream&)
 {
   size_t readingPosition = 0;
-  donkeev::nextWord(parametrs, readingPosition);
   std::string targetGraphName = donkeev::nextWord(parametrs, readingPosition);
   std::string templateGraphName = donkeev::nextWord(parametrs, readingPosition);
   std::string countStr = donkeev::nextWord(parametrs, readingPosition);
-
+  if (targetGraphName.empty() || templateGraphName.empty() || countStr.empty())
+  {
+    throw std::runtime_error("Bad input");
+  }
+  
   if (graphsTable.has(targetGraphName))
   {
     throw std::runtime_error("Bad input");

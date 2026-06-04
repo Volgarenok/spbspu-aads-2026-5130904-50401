@@ -10,7 +10,8 @@
 namespace donkeev
 {
   using graphsHashTable_t = donkeev::HashTable< std::string, donkeev::Graph, donkeev::GraphNameHash, donkeev::GraphEqual>;
-  using commandFunc = void (*)(graphsHashTable_t, const std::string&, std::ostream&);
+  using commandFunc = void (*)(graphsHashTable_t&, const std::string&, std::ostream&);
+  using commandsTable_t = donkeev::HashTable< std::string, commandFunc, donkeev::CommandsHash, donkeev::CommandsEqual>;
 }
 
 void readGraphs(const std::string& filename, donkeev::graphsHashTable_t& graphs)
@@ -88,6 +89,17 @@ int main(int argc, char* argv[])
     std::cerr << e.what() << '\n';
   }
 
+  donkeev::commandsTable_t cmdTable(16, 4);
+  cmdTable.add("graphs", donkeev::printGrapsNames);
+  cmdTable.add("vertexes", donkeev::printVertexesNames);
+  cmdTable.add("outbound", donkeev::printOutboundVertexesNames);
+  cmdTable.add("inbound", donkeev::printInboundVertexesNames);
+  cmdTable.add("bind", donkeev::createEdge);
+  cmdTable.add("cut", donkeev::deleteEdge);
+  cmdTable.add("create", donkeev::createGraph);
+  cmdTable.add("merge", donkeev::mergeGraphs);
+  cmdTable.add("extract", donkeev::extractGraph);
+
   std::string commandLine;
   while (std::getline(std::cin, commandLine))
   {
@@ -98,154 +110,14 @@ int main(int argc, char* argv[])
     {
       continue;
     }
-    else if (command == "graphs")
-    {
-      donkeev::printGrapsNames(graphsTable, std::string(""),std::cout);
-    }
-    else if (command == "vertexes")
-    {
-      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
-      if (graphName.empty())
-      {
-        std::cout << "INVALID COMMAND\n";
-        continue;
-      }
-      donkeev::printVertexesNames(graphsTable, graphName, std::cout);
-    }
-    else if (command == "outbound")
-    {
-      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
-      std::string vertexName = donkeev::nextWord(commandLine, readingPosition);
-      if (graphName.empty() || vertexName.empty())
-      {
-        std::cout << "INVALID COMMAND\n";
-        continue;
-      }
-      std::string parametrs(graphName + " " + vertexName);
-      try
-      {
-        donkeev::printOutboundVertexesNames(graphsTable, parametrs, std::cout);
-      }
-      catch (...)
-      {
-        std::cout << "INVALID COMMAND\n";
-      }
-    }
-    else if (command == "inbound")
-    {
-      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
-      std::string vertexName = donkeev::nextWord(commandLine, readingPosition);
-      if (graphName.empty() || vertexName.empty())
-      {
-        std::cout << "INVALID COMMAND\n";
-        continue;
-      }
-      std::string parametrs(graphName + " " + vertexName);
-      try
-      {
-        donkeev::printInboundVertexesNames(graphsTable, parametrs, std::cout);
-      }
-      catch (...)
-      {
-        std::cout << "INVALID COMMAND\n";
-      }
-    }
-    else if (command == "bind")
-    {
-      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
-      std::string vertexFromName = donkeev::nextWord(commandLine, readingPosition);
-      std::string vertexToName = donkeev::nextWord(commandLine, readingPosition);
-      std::string weight = donkeev::nextWord(commandLine, readingPosition);
-      if (graphName.empty() || vertexFromName.empty() || vertexToName.empty())
-      {
-        std::cout << "INVALID COMMAND\n";
-        continue;
-      }
 
-      std::string parametrs(graphName + " " + vertexFromName + " " + vertexToName + " " + weight);
-      try
-      {
-        donkeev::createEdge(graphsTable, parametrs, std::cout);
-      }
-      catch (...)
-      {
-        std::cout << "INVALID COMMAND\n";
-      }
-    }
-    else if (command == "cut")
+    std::string argc = (readingPosition < commandLine.size() ? commandLine.substr(readingPosition): "");
+    donkeev::commandFunc* func_ptr = cmdTable.find(command);
+    if (func_ptr)
     {
-      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
-      std::string vertexFromName = donkeev::nextWord(commandLine, readingPosition);
-      std::string vertexToName = donkeev::nextWord(commandLine, readingPosition);
-      std::string weight = donkeev::nextWord(commandLine, readingPosition);
-      if (graphName.empty() || vertexFromName.empty() || vertexToName.empty())
-      {
-        std::cout << "INVALID COMMAND\n";
-        continue;
-      }
-
-      std::string parametrs(graphName + " " + vertexFromName + " " + vertexToName + " " + weight);
       try
       {
-        donkeev::deleteEdge(graphsTable, parametrs, std::cout);
-      }
-      catch (...)
-      {
-        std::cout << "INVALID COMMAND\n";
-      }
-    }
-    else if (command == "create")
-    {
-      std::string graphName = donkeev::nextWord(commandLine, readingPosition);
-      if (graphName.empty())
-      {
-        std::cout << "INVALID COMMAND\n";
-        continue;
-      }
-
-      try
-      {
-        donkeev::createGraph(graphsTable, commandLine, std::cout);
-      }
-      catch (...)
-      {
-        std::cout << "INVALID COMMAND\n";
-      }
-    }
-    else if (command == "merge")
-    {
-      std::string targetGraphName = donkeev::nextWord(commandLine, readingPosition);
-      std::string firstGraphName = donkeev::nextWord(commandLine, readingPosition);
-      std::string secondGraphName = donkeev::nextWord(commandLine, readingPosition);
-      if (firstGraphName.empty() || secondGraphName.empty())
-      {
-        std::cout << "INVALID COMMAND\n";
-        continue;
-      }
-
-      std::string parametrs(targetGraphName + " " + firstGraphName + " " + secondGraphName);
-      try
-      {
-        donkeev::mergeGraphs(graphsTable, parametrs, std::cout);
-      }
-      catch (...)
-      {
-        std::cout << "INVALID COMMAND\n";
-      }
-    }
-    else if (command == "extract")
-    {
-      std::string targetGraphName = donkeev::nextWord(commandLine, readingPosition);
-      std::string templateGraphName = donkeev::nextWord(commandLine, readingPosition);
-      if (targetGraphName.empty() || templateGraphName.empty())
-      {
-        std::cout << "INVALID COMMAND\n";
-        continue;
-      }
-
-      try
-      {
-        donkeev::extractGraph(graphsTable, commandLine, std::cout);
+        (*func_ptr)(graphsTable, argc, std::cout);
       }
       catch (...)
       {
@@ -254,11 +126,8 @@ int main(int argc, char* argv[])
     }
     else
     {
-      std::cout << "INVALID COMMAND" << '\n';
+      std::cout << "INVALID COMMAND\n";
     }
   }
-
-  donkeev::HashTable< std::string, void (*)(), donkeev::CommandsHash, donkeev::CommandsEqual > commands(16, 4);
-
 }
 
