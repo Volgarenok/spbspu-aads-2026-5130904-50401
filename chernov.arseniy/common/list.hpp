@@ -421,16 +421,16 @@ void chernov::List< T >::sort(Compare comp)
     fake_->next = node->next;
     --size_;
 
-    auto prev = temp.beforeBegin();
-    auto it = temp.begin();
-    while (it != temp.end() && comp(*it, node->data))
+    detail::Node< T > * prev = temp.fake_;
+    detail::Node< T > * curr = prev->next;
+    while (curr != temp.fake_ && comp(curr->data, node->data))
     {
-      ++prev;
-      ++it;
+      prev = curr;
+      curr = curr->next;
     }
 
-    node->next = prev.ptr->next;
-    prev.ptr->next = node;
+    node->next = curr;
+    prev->next = node;
     ++temp.size_;
   }
   swap(temp);
