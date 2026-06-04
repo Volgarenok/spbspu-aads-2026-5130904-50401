@@ -25,6 +25,7 @@ namespace chernov {
     ~List() noexcept;
     List< T > & operator=(const List< T > & list);
     List< T > & operator=(List< T > && list) noexcept;
+    T & first();
     const T & first() const;
     LIter< T > beforeBegin() const noexcept;
     LCIter< T > cbeforeBegin() const noexcept;
@@ -126,6 +127,12 @@ namespace chernov {
       swap(other);
     }
     return *this;
+  }
+
+  template< class T >
+  T & List< T >::first()
+  {
+    return fake_->next->data;
   }
 
   template< class T >
