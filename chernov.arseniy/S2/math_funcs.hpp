@@ -21,7 +21,6 @@ namespace chernov {
   long long lcm(long long a, long long b);
 
   bool isOperator(const std::string & str);
-  bool isOperand(const std::string & str);
   size_t getPriority(const std::string & oper);
 }
 

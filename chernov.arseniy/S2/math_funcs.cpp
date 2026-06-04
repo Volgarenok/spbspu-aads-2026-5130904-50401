@@ -106,22 +106,6 @@ bool chernov::isOperator(const std::string & str)
   return false;
 }
 
-bool chernov::isOperand(const std::string & str)
-{
-  if (str == "" || str == "-") {
-    return false;
-  }
-  size_t i = 0;
-  i += str[0] == '-';
-  while (str[i] != '\0') {
-    if (!std::isdigit(str[i])) {
-      return false;
-    }
-    ++i;
-  }
-  return true;
-}
-
 size_t chernov::getPriority(const std::string & oper)
 {
   if (oper == "lcm") {

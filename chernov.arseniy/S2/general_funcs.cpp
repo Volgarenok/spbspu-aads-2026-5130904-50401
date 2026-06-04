@@ -62,7 +62,17 @@ long long chernov::calculateMathExpression(Queue< std::string > math_expression)
     std::string element = math_expression.front();
     math_expression.pop();
 
-    if (element == "(") {
+    long long operand = 0;
+    bool is_operand = true;
+    try {
+      operand = std::stoll(element);
+    } catch (...) {
+      is_operand = false;
+    }
+
+    if (is_operand) {
+      result.push(operand);
+    } else if (element == "(") {
       stack.push(element);
     } else if (element == ")") {
       while (!stack.empty() && stack.top() != "(") {
@@ -73,8 +83,6 @@ long long chernov::calculateMathExpression(Queue< std::string > math_expression)
         throw std::runtime_error("invalid math expression: opening bracket is missing");
       }
       stack.pop();
-    } else if (isOperand(element)) {
-      result.push(std::stoll(element));
     } else if (!isOperator(element)) {
       throw std::runtime_error("invalid math expression: element is not operator or operand");
     } else {
