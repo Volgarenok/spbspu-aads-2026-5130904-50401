@@ -56,6 +56,11 @@ namespace chernov {
 
     template< class Compare >
     void sort(Compare comp);
+
+    void merge(List< T > & other);
+
+    template < class Compare >
+    void merge(List< T > & other, Compare comp);
   private:
     detail::Node< T > * fake_;
     size_t size_;
@@ -415,16 +420,14 @@ template< class Compare >
 void chernov::List< T >::sort(Compare comp)
 {
   List< T > temp;
-  while (!empty())
-  {
+  while (!empty()) {
     detail::Node< T > * node = fake_->next;
     fake_->next = node->next;
     --size_;
 
     detail::Node< T > * prev = temp.fake_;
     detail::Node< T > * curr = prev->next;
-    while (curr != temp.fake_ && comp(curr->data, node->data))
-    {
+    while (curr != temp.fake_ && comp(curr->data, node->data)) {
       prev = curr;
       curr = curr->next;
     }
@@ -434,6 +437,56 @@ void chernov::List< T >::sort(Compare comp)
     ++temp.size_;
   }
   swap(temp);
+}
+
+template< class T >
+void chernov::List< T >::merge(List< T > & other)
+{
+  merge(other, std::less< T >{});
+}
+
+template< class T >
+template< class Compare >
+void chernov::List< T >::merge(List< T > & other, Compare comp)
+{
+  if (other.empty()) {
+    return;
+  }
+  if (empty()) {
+    swap(other);
+    return;
+  }
+
+  detail::Node< T > * tail = fake_;
+  detail::Node< T > * cur1 = fake_->next;
+  detail::Node< T > * prev2 = other.fake_;
+  detail::Node< T > * cur2 = other.fake_->next;
+
+  while (cur1 != fake_ && cur2 != other.fake_) {
+    if (comp(cur2->data, cur1->data)) {
+      prev2->next = cur2->next;
+      cur2->next = cur1;
+      tail->next = cur2;
+      tail = cur2;
+      cur2 = prev2->next;
+    } else {
+      tail = cur1;
+      cur1 = cur1->next;
+    }
+  }
+
+  if (cur2 != other.fake_) {
+    tail->next = cur2;
+    detail::Node< T > * last = cur2;
+    while (last->next != other.fake_) {
+      last = last->next;
+    }
+    last->next = fake_;
+  }
+
+  size_ += other.size_;
+  other.size_ = 0;
+  other.fake_->next = other.fake_;
 }
 
 #endif
