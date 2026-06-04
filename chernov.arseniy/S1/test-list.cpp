@@ -403,7 +403,7 @@ BOOST_AUTO_TEST_CASE(test_splice_after_all)
   list2.pushFront(3);
 
   chernov::LIter< int > pos = list1.beforeBegin();
-  list1.splice_after(pos, list2);
+  list1.spliceAfter(pos, list2);
 
   BOOST_CHECK_EQUAL(list1.size(), 5);
   BOOST_CHECK_EQUAL(list2.size(), 0);
@@ -434,7 +434,7 @@ BOOST_AUTO_TEST_CASE(test_splice_after_single)
 
   chernov::LIter< int > it = list2.begin();
   chernov::LIter< int > pos = list1.beforeBegin();
-  list1.splice_after(pos, list2, it);
+  list1.spliceAfter(pos, list2, it);
 
   BOOST_CHECK_EQUAL(list1.size(), 2);
   BOOST_CHECK_EQUAL(list2.size(), 2);
@@ -474,7 +474,7 @@ BOOST_AUTO_TEST_CASE(test_splice_after_range)
   ++last;
 
   chernov::LIter< int > pos = list1.beforeBegin();
-  list1.splice_after(pos, list2, first, last);
+  list1.spliceAfter(pos, list2, first, last);
 
   BOOST_CHECK_EQUAL(list1.size(), 4);
   BOOST_CHECK_EQUAL(list2.size(), 3);
