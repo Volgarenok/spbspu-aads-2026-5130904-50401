@@ -308,7 +308,23 @@ namespace chernov {
 template< class T >
 void chernov::List< T >::splice_after(LIter< T > pos, List< T > & other)
 {
-  splice_after(pos, other, other.beforeBegin(), other.end());
+  if (other.empty()) {
+    return;
+  }
+
+  detail::Node< T > * other_first = other.fake_->next;
+  detail::Node< T > * other_last = other_first;
+  while (other_last->next != other.fake_) {
+    other_last = other_last->next;
+  }
+
+  detail::Node< T > * after_pos = pos.ptr->next;
+  pos.ptr->next = other_first;
+  other_last->next = after_pos;
+
+  size_ += other.size_;
+  other.size_ = 0;
+  other.fake_->next = other.fake_;
 }
 
 template< class T >
