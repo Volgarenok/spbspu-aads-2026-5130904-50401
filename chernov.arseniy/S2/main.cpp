@@ -38,15 +38,12 @@ int main(int args, char ** argv)
     results.push(result);
   }
 
-  bool first_result = true;
-  while (!results.empty()) {
-    if (first_result) {
-      first_result = false;
-    } else {
-      std::cout << " ";
-    }
-
+  if (!results.empty()) {
     std::cout << results.top();
+    results.pop();
+  }
+  while (!results.empty()) {
+    std::cout << " " << results.top();
     results.pop();
   }
   std::cout << "\n";
