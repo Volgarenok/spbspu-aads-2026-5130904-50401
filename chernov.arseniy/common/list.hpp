@@ -61,6 +61,9 @@ namespace chernov {
 
     template < class Compare >
     void merge(List< T > & other, Compare comp);
+
+    template< class UnaryPredicate >
+    LIter< T > partition(LIter< T > first, LIter< T > last, UnaryPredicate pred);
   private:
     detail::Node< T > * fake_;
     size_t size_;
@@ -487,6 +490,65 @@ void chernov::List< T >::merge(List< T > & other, Compare comp)
   size_ += other.size_;
   other.size_ = 0;
   other.fake_->next = other.fake_;
+}
+
+template< class T >
+template< class UnaryPredicate >
+chernov::LIter< T > chernov::List< T >::partition(LIter< T > first, LIter< T > last, UnaryPredicate pred)
+{
+  if (first == last) {
+    return first;
+  }
+
+  detail::Node< T > * prev_first = fake_;
+  if (fake_->next != first.ptr) {
+    detail::Node< T > * curr = fake_->next;
+    while (curr != fake_ && curr->next != first.ptr) {
+      curr = curr->next;
+    }
+    prev_first = curr;
+  }
+
+  detail::Node< T > * head_true = nullptr;
+  detail::Node< T > * tail_true = nullptr;
+  detail::Node< T > * head_false = nullptr;
+  detail::Node< T > * tail_false = nullptr;
+
+  detail::Node< T > * curr = first.ptr;
+  while (curr != last.ptr) {
+    detail::Node< T > * next_node = curr->next;
+    if (pred(curr->data)) {
+      if (!head_true) {
+        head_true = curr;
+        tail_true = curr;
+      } else {
+        tail_true->next = curr;
+        tail_true = curr;
+      }
+    } else {
+      if (!head_false) {
+        head_false = curr;
+        tail_false = curr;
+      } else {
+        tail_false->next = curr;
+        tail_false = curr;
+      }
+    }
+    curr = next_node;
+  }
+
+  if (head_true) {
+    prev_first->next = head_true;
+    tail_true->next = (head_false ? head_false : last.ptr);
+  } else {
+    prev_first->next = (head_false ? head_false : last.ptr);
+  }
+
+  if (head_false) {
+    tail_false->next = last.ptr;
+  }
+
+  return (head_false ? LIter< T >(head_false, fake_) : last);
 }
 
 #endif
