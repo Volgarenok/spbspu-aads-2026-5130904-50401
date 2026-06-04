@@ -19,8 +19,6 @@ namespace chernov {
 
     T & front();
     const T & front() const;
-    T & back();
-    const T & back() const;
     void push(const T & value);
     void push(T && value);
     void pop();
@@ -107,18 +105,6 @@ template< class T >
 const T & chernov::Queue< T >::front() const
 {
   return list_.first();
-}
-
-template< class T >
-T & chernov::Queue< T >::back()
-{
-  return *last_;
-}
-
-template< class T >
-const T & chernov::Queue< T >::back() const
-{
-  return *last_;
 }
 
 template< class T >

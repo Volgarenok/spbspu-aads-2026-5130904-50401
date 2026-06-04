@@ -18,7 +18,6 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor)
   chernov::Queue< int > queue2(queue1);
   BOOST_CHECK_EQUAL(queue2.size(), 2);
   BOOST_CHECK_EQUAL(queue2.front(), 1);
-  BOOST_CHECK_EQUAL(queue2.back(), 2);
 
   queue2.push(3);
   BOOST_CHECK_EQUAL(queue1.size(), 2);
@@ -112,29 +111,6 @@ BOOST_AUTO_TEST_CASE(test_const_front)
   BOOST_CHECK_EQUAL(const_queue.front(), 1);
 }
 
-BOOST_AUTO_TEST_CASE(test_back)
-{
-  chernov::Queue< int > queue;
-  queue.push(1);
-  BOOST_CHECK_EQUAL(queue.back(), 1);
-
-  queue.push(2);
-  BOOST_CHECK_EQUAL(queue.back(), 2);
-
-  queue.pop();
-  BOOST_CHECK_EQUAL(queue.back(), 2);
-}
-
-BOOST_AUTO_TEST_CASE(test_const_back)
-{
-  chernov::Queue< int > queue;
-  queue.push(1);
-  queue.push(2);
-
-  const chernov::Queue< int > & const_queue = queue;
-  BOOST_CHECK_EQUAL(const_queue.back(), 2);
-}
-
 BOOST_AUTO_TEST_CASE(test_size)
 {
   chernov::Queue< int > queue;
@@ -179,12 +155,16 @@ BOOST_AUTO_TEST_CASE(test_push)
   queue.push(2);
   queue.push(3);
   BOOST_CHECK_EQUAL(queue.size(), 3);
-  BOOST_CHECK_EQUAL(queue.back(), 3);
+  queue.pop();
+  BOOST_CHECK_EQUAL(queue.front(), 2);
+  queue.pop();
+  BOOST_CHECK_EQUAL(queue.front(), 3);
 
   int value = 4;
   queue.push(value);
-  BOOST_CHECK_EQUAL(queue.size(), 4);
-  BOOST_CHECK_EQUAL(queue.back(), 4);
+  BOOST_CHECK_EQUAL(queue.size(), 2);
+  queue.pop();
+  BOOST_CHECK_EQUAL(queue.front(), 4);
 }
 
 BOOST_AUTO_TEST_CASE(test_pop)
