@@ -22,14 +22,15 @@ int main(int args, char ** argv)
   std::string line;
   while (*input) {
     std::getline(*input, line);
-    Queue< std::string > math_expression = processLine(line);
+    MathExpression math_expression;
+    math_expression.processLine(line);
     if (math_expression.size() == 0) {
       continue;
     }
 
     long long result = 0;
     try {
-      result = calculateMathExpression(math_expression);
+      result = math_expression.calculateMathExpression();
     } catch (const std::exception & e) {
       std::cerr << e.what() << "\n";
       return 1;

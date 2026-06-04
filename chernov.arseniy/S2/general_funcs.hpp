@@ -7,9 +7,15 @@
 #include <queue.hpp>
 
 namespace chernov {
-  Queue< std::string > processLine(const std::string & line);
-  void executeOperation(Stack< long long > & result, const std::string & oper);
-  long long calculateMathExpression(Queue< std::string > math_expression);
+  class MathExpression {
+  public:
+    size_t size() const noexcept;
+    void processLine(const std::string & line);
+    long long calculateMathExpression();
+  private:
+    Queue< std::string > queue_;
+    void executeOperation(Stack< long long > & result, const std::string & oper);
+  };
 }
 
 #endif

@@ -5,7 +5,12 @@
 
 #include "math_funcs.hpp"
 
-chernov::Queue< std::string > chernov::processLine(const std::string & line)
+size_t chernov::MathExpression::size() const noexcept
+{
+  return queue_.size();
+}
+
+void chernov::MathExpression::processLine(const std::string & line)
 {
   Queue< std::string > math_expression;
   size_t i = 0;
@@ -19,10 +24,10 @@ chernov::Queue< std::string > chernov::processLine(const std::string & line)
     }
     i = j + 1;
   }
-  return math_expression;
+  queue_ = std::move(math_expression);
 }
 
-void chernov::executeOperation(Stack< long long > & result, const std::string & oper)
+void chernov::MathExpression::executeOperation(Stack< long long > & result, const std::string & oper)
 {
   if (result.size() < 2) {
     throw std::runtime_error("invalid math expression: few operands");
@@ -53,14 +58,14 @@ void chernov::executeOperation(Stack< long long > & result, const std::string & 
   result.push(c);
 }
 
-long long chernov::calculateMathExpression(Queue< std::string > math_expression)
+long long chernov::MathExpression::calculateMathExpression()
 {
   Stack< long long > result;
   Stack< std::string > stack;
 
-  while (!math_expression.empty()) {
-    std::string element = math_expression.front();
-    math_expression.pop();
+  while (!queue_.empty()) {
+    std::string element = queue_.front();
+    queue_.pop();
 
     if (element == "(") {
       stack.push(element);
