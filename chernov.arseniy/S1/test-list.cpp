@@ -500,4 +500,41 @@ BOOST_AUTO_TEST_CASE(test_splice_after_range)
   BOOST_CHECK(iter == list2.begin());
 }
 
+BOOST_AUTO_TEST_CASE(test_sort)
+{
+  chernov::List< int > list;
+  list.sort();
+  BOOST_CHECK(list.empty());
+  BOOST_CHECK(list.begin() == list.end());
+
+  list.pushFront(1);
+  list.sort();
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(*list.begin(), 1);
+  BOOST_CHECK(++list.begin() == list.begin());
+
+  list.pushFront(3);
+  list.pushFront(2);
+  list.sort();
+  BOOST_CHECK_EQUAL(list.size(), 3);
+  chernov::LIter< int > it = list.begin();
+  BOOST_CHECK_EQUAL(*it++, 1);
+  BOOST_CHECK_EQUAL(*it++, 2);
+  BOOST_CHECK_EQUAL(*it++, 3);
+  BOOST_CHECK(it == list.begin());
+  BOOST_CHECK(++list.end() == list.begin());
+
+  list.clear();
+  list.pushFront(1);
+  list.pushFront(2);
+  list.pushFront(1);
+  list.sort();
+  BOOST_CHECK_EQUAL(list.size(), 3);
+  it = list.begin();
+  BOOST_CHECK_EQUAL(*it++, 1);
+  BOOST_CHECK_EQUAL(*it++, 1);
+  BOOST_CHECK_EQUAL(*it++, 2);
+  BOOST_CHECK(it == list.begin());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
