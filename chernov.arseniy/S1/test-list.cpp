@@ -537,4 +537,61 @@ BOOST_AUTO_TEST_CASE(test_sort)
   BOOST_CHECK(it == list.begin());
 }
 
+BOOST_AUTO_TEST_CASE(test_merge)
+{
+  chernov::List< int > list1;
+  chernov::List< int > list2;
+  list1.merge(list2);
+  BOOST_CHECK(list1.empty());
+  BOOST_CHECK(list2.empty());
+
+  list1.pushFront(1);
+  list1.merge(list2);
+  BOOST_CHECK_EQUAL(list1.size(), 1);
+  BOOST_CHECK_EQUAL(*list1.begin(), 1);
+  BOOST_CHECK(list2.empty());
+
+  list2.pushFront(2);
+  list1.merge(list2);
+  BOOST_CHECK_EQUAL(list1.size(), 2);
+  chernov::LIter< int > it = list1.begin();
+  BOOST_CHECK_EQUAL(*it++, 1);
+  BOOST_CHECK_EQUAL(*it++, 2);
+  BOOST_CHECK(it == list1.begin());
+  BOOST_CHECK(list2.empty());
+
+  list1.clear();
+  list2.clear();
+  list1.pushFront(3);
+  list1.pushFront(1);
+  list2.pushFront(4);
+  list2.pushFront(2);
+  list1.merge(list2);
+  BOOST_CHECK_EQUAL(list1.size(), 4);
+  it = list1.begin();
+  BOOST_CHECK_EQUAL(*it++, 1);
+  BOOST_CHECK_EQUAL(*it++, 2);
+  BOOST_CHECK_EQUAL(*it++, 3);
+  BOOST_CHECK_EQUAL(*it++, 4);
+  BOOST_CHECK(it == list1.begin());
+  BOOST_CHECK(++list1.end() == list1.begin());
+  BOOST_CHECK(list2.empty());
+  BOOST_CHECK_EQUAL(list2.size(), 0);
+  BOOST_CHECK(++list2.end() == list2.begin());
+
+  list2.pushFront(6);
+  list2.pushFront(5);
+  list2.pushFront(0);
+  list1.merge(list2);
+  BOOST_CHECK_EQUAL(list1.size(), 7);
+  it = list1.begin();
+  int expected[] = {0, 1, 2, 3, 4, 5, 6};
+  for (int i = 0; i < 7; ++i) {
+    BOOST_CHECK_EQUAL(*it, expected[i]);
+    ++it;
+  }
+  BOOST_CHECK(it == list1.begin());
+  BOOST_CHECK(list2.empty());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
