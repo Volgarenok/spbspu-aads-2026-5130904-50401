@@ -2,6 +2,7 @@
 #define LIST_HPP
 
 #include <cstddef>
+#include <functional>
 #include <utility>
 
 #include <liter.hpp>
@@ -50,6 +51,11 @@ namespace chernov {
     void spliceAfter(LIter< T > pos, List< T > && other, LIter< T > it);
     void spliceAfter(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last);
     void spliceAfter(LIter< T > pos, List< T > && other, LIter< T > first, LIter< T > last);
+
+    void sort();
+
+    template< class Compare >
+    void sort(Compare comp);
   private:
     detail::Node< T > * fake_;
     size_t size_;
@@ -396,6 +402,38 @@ template< class T >
 void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > first, LIter< T > last)
 {
   spliceAfter(pos, other, first, last);
+}
+
+template< class T >
+void chernov::List< T >::sort()
+{
+  sort(std::less< T >{});
+}
+
+template< class T >
+template< class Compare >
+void chernov::List< T >::sort(Compare comp)
+{
+  List< T > temp;
+  while (!empty())
+  {
+    detail::Node< T > * node = fake_->next;
+    fake_->next = node->next;
+    --size_;
+
+    auto prev = temp.beforeBegin();
+    auto it = temp.begin();
+    while (it != temp.end() && comp(*it, node->data))
+    {
+      ++prev;
+      ++it;
+    }
+
+    node->next = prev.ptr->next;
+    prev.ptr->next = node;
+    ++temp.size_;
+  }
+  swap(temp);
 }
 
 #endif
