@@ -13,8 +13,9 @@ int main(int args, char ** argv)
   Stack< long long > results;
 
   std::istream * input = &std::cin;
+  std::ifstream file_input;
   if (args > 1) {
-    static std::ifstream file_input(argv[1]);
+    file_input.open(argv[1]);
     input = &file_input;
   }
 
