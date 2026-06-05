@@ -58,7 +58,7 @@ void donkeev::Graph::addEdge(const std::string from, const std::string to, const
     donkeev::List< size_t > weights;
     weights.pushBack(weight);
 
-    table_.add(thisKey, weights);
+    table_.add(thisKey, std::move(weights));
 
     return;
   }
