@@ -39,6 +39,14 @@ BOOST_AUTO_TEST_CASE(bit_not_with_addition)
   BOOST_CHECK_EQUAL(res, (~5) + 2);
 }
 
+BOOST_AUTO_TEST_CASE(bit_not_with_parentheses)
+{
+  auto q = zhuravleva::infToPostfix("! ( 1 + 2 )");
+  auto res = zhuravleva::calcPostfix(q);
+
+  BOOST_CHECK_EQUAL(res, ~(1 + 2));
+}
+
 BOOST_AUTO_TEST_CASE(error_expression)
 {
   BOOST_CHECK_THROW(
