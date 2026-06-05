@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(rehashMethod)
   testTable table(1, 1);
   table.add("first", 1);
   table.add("second", 2);
-  
+
   table.rehash(3);
   table.add("third", 3);
 }
