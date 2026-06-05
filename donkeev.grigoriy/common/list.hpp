@@ -220,10 +220,9 @@ namespace donkeev
   template< class T >
   void List< T >::clearAll()
   {
-    LIter< T > it{head_};
     while (length_)
     {
-      cutAfter(it);
+      popFront();
     }
     head_ = nullptr;
     tail_ = nullptr;
