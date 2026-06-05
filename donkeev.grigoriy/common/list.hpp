@@ -188,7 +188,7 @@ namespace donkeev
       return;
     }
     Node< T >* tmp = head_->next;
-    head_->next - nullptr;
+    head_->next = nullptr;
     delete head_;
     head_ = tmp;
     head_->next = tmp->next;
