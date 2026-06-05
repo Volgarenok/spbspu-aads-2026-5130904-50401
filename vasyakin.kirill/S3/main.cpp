@@ -36,12 +36,12 @@ int main(int argc, char* argv[])
       auto& g = graphs.get(graph_name);
       if (g.adj.has(u))
       {
-        g.adj.get(u).push_back({v, w});
+        g.adj.get(u).pushBack({v, w});
       }
       else
       {
         vasyakin::List< vasyakin::Edge > edges;
-        edges.push_back({v, w});
+        edges.pushBack({v, w});
         g.adj.add(u, std::move(edges));
       }
     }

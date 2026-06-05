@@ -53,7 +53,7 @@ namespace vasyakin
     vasyakin::List< std::string > names;
     for (auto it = graphs.begin(); it != graphs.end(); ++it)
     {
-      names.push_back(it->first);
+      names.pushBack(it->first);
     }
 
     if (names.begin() == names.end())
@@ -86,11 +86,11 @@ namespace vasyakin
 
     for (auto it = graph.adj.begin(); it != graph.adj.end(); ++it)
     {
-      vertices.push_back(it->first);
+      vertices.pushBack(it->first);
       const auto& edges = it->second;
       for (auto eit = edges.begin(); eit != edges.end(); ++eit)
       {
-        vertices.push_back(eit->to);
+        vertices.pushBack(eit->to);
       }
     }
 
@@ -167,7 +167,7 @@ namespace vasyakin
       {
         if (lit->name == it->to)
         {
-          lit->weights.push_back(it->weight);
+          lit->weights.pushBack(it->weight);
           found = true;
           break;
         }
@@ -176,8 +176,8 @@ namespace vasyakin
       {
         OutputLine nl;
         nl.name = it->to;
-        nl.weights.push_back(it->weight);
-        lines.push_back(nl);
+        nl.weights.pushBack(it->weight);
+        lines.pushBack(nl);
       }
     }
 
@@ -240,7 +240,7 @@ namespace vasyakin
           {
             if (source == lit->name)
             {
-              lit->weights.push_back(eit->weight);
+              lit->weights.pushBack(eit->weight);
               found = true;
               break;
             }
@@ -249,8 +249,8 @@ namespace vasyakin
           {
             OutputLine nl;
             nl.name = source;
-            nl.weights.push_back(eit->weight);
-            lines.push_back(nl);
+            nl.weights.pushBack(eit->weight);
+            lines.pushBack(nl);
           }
         }
       }
@@ -289,12 +289,12 @@ namespace vasyakin
 
     if (graph.adj.has(vertex_name))
     {
-      graph.adj.get(vertex_name).push_back({vertex_name_to, w});
+      graph.adj.get(vertex_name).pushBack({vertex_name_to, w});
     }
     else
     {
       vasyakin::List< Edge > edges;
-      edges.push_back({vertex_name_to, w});
+      edges.pushBack({vertex_name_to, w});
       graph.adj.add(vertex_name, edges);
     }
   }
@@ -452,7 +452,7 @@ namespace vasyakin
         auto& edges = graph.adj.get(vertex);
         for (auto it = src_edges.begin(); it != src_edges.end(); ++it)
         {
-          edges.push_back(*it);
+          edges.pushBack(*it);
         }
       }
     };
@@ -482,10 +482,10 @@ namespace vasyakin
     vasyakin::List< std::string > all_vertices;
     for (auto it = old_graph.adj.begin(); it != old_graph.adj.end(); ++it)
     {
-      all_vertices.push_back(it->first);
+      all_vertices.pushBack(it->first);
       for (auto eit = it->second.begin(); eit != it->second.end(); ++eit)
       {
-        all_vertices.push_back(eit->to);
+        all_vertices.pushBack(eit->to);
       }
     }
 
@@ -533,7 +533,7 @@ namespace vasyakin
       {
         if (new_graph.adj.has(it->to))
         {
-          new_graph.adj.get(vertex_name).push_back(*it);
+          new_graph.adj.get(vertex_name).pushBack(*it);
         }
       }
     }

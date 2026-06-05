@@ -4,8 +4,8 @@
 #include <stdexcept>
 #include <utility>
 #include <cstddef>
-#include "../common/vector.hpp"
-#include "../common/list.hpp"
+#include "vector.hpp"
+#include "list.hpp"
 
 namespace vasyakin
 {
@@ -29,8 +29,8 @@ namespace vasyakin
 
     HashIter& operator++();
     HashIter operator++(int);
-    PairType& operator*() const;
-    PairType* operator->() const;
+    PairType& operator*();
+    PairType* operator->();
     bool operator==(const HashIter& other) const;
     bool operator!=(const HashIter& other) const;
 
@@ -108,7 +108,7 @@ namespace vasyakin
     Hash hasher_;
     Equal equal_;
 
-    std::pair< bool, vasyakin::Node< PairType >* > find_node(size_t ind, const Key& key) const;
+    std::pair< bool, vasyakin::detail::Node< PairType >* > find_node(size_t ind, const Key& key) const;
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -146,8 +146,8 @@ namespace vasyakin
     }
 
     buckets_ = nullptr;
-    list_it_ = LIter< PairType >(nullptr);
-    list_end_ = LIter< PairType >(nullptr);
+    list_it_ = LIter< PairType >();
+    list_end_ = LIter< PairType >();
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -180,13 +180,15 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  typename HashIter< Key, Value, Hash, Equal >::PairType& HashIter< Key, Value, Hash, Equal >::operator*() const
+  typename HashIter< Key, Value, Hash, Equal >::PairType&
+  HashIter< Key, Value, Hash, Equal >::operator*()
   {
     return *list_it_;
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  typename HashIter< Key, Value, Hash, Equal >::PairType* HashIter< Key, Value, Hash, Equal >::operator->() const
+  typename HashIter< Key, Value, Hash, Equal >::PairType*
+  HashIter< Key, Value, Hash, Equal >::operator->()
   {
     return &(*list_it_);
   }
@@ -252,11 +254,11 @@ namespace vasyakin
       ++bucket_idx_;
     }
     buckets_ = nullptr;
-    list_it_ = LCIter< PairType >(nullptr);
-    list_end_ = LCIter< PairType >(nullptr);
+    list_it_ = LCIter< PairType >();
+    list_end_ = LCIter< PairType >();
   }
 
-    template< class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   HashConstIter< Key, Value, Hash, Equal >& HashConstIter< Key, Value, Hash, Equal >::operator++()
   {
     if (!buckets_)
@@ -349,7 +351,7 @@ namespace vasyakin
       }
     }
 
-    buckets_[idx].push_back(std::make_pair(key, value));
+    buckets_[idx].pushBack(std::make_pair(key, value));
     ++size_;
   }
 
@@ -365,9 +367,9 @@ namespace vasyakin
     }
 
     Value extracted_value;
-    std::swap(res.second->next->val.second, extracted_value);
+    std::swap(res.second->getNext()->value().second, extracted_value);
 
-    buckets_[ind].erase(res.second);
+    buckets_[ind].erase(LIter< PairType >(res.second));
     --size_;
 
     return extracted_value;
@@ -393,7 +395,7 @@ namespace vasyakin
     {
       for (auto it = buckets_[i].begin(); it != buckets_[i].end(); ++it)
       {
-        tmp[hasher_(it->first) % slots].push_back(*it);
+        tmp[hasher_(it->first) % slots].pushBack(*it);
       }
     }
 
@@ -411,7 +413,7 @@ namespace vasyakin
       throw std::out_of_range("Key not found");
     }
 
-    return res.second->next->val.second;
+    return res.second->getNext()->value().second;
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -425,24 +427,24 @@ namespace vasyakin
       throw std::out_of_range("Key not found");
     }
 
-    return res.second->next->val.second;
+    return res.second->getNext()->value().second;
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  std::pair< bool, vasyakin::Node< std::pair< Key, Value > >* >
+  std::pair< bool, vasyakin::detail::Node< std::pair< Key, Value > >* >
     HashTable< Key, Value, Hash, Equal >::find_node(size_t ind, const Key& key) const
   {
     const auto& chain = buckets_[ind];
-    auto prev = chain.get_fake();
-    auto curr = prev->next;
+    auto prev = chain.fake_node_;
+    auto curr = prev->getNext();
 
-    while (curr != chain.get_fake())
+    while (curr != chain.fake_node_)
     {
-      if (equal_(curr->val.first, key))
+      if (equal_(curr->value().first, key))
       {
         return {true, prev};
       }
-      prev = curr; curr = curr->next;
+      prev = curr; curr = curr->getNext();
     }
 
     return {false, nullptr};

@@ -24,6 +24,8 @@ namespace vasyakin
   class LIter
   {
   public:
+    LIter() noexcept;
+
     T& operator*() noexcept;
     T* operator->() noexcept;
     const T& operator*() const noexcept;
@@ -37,12 +39,23 @@ namespace vasyakin
     friend class List< T >;
     detail::Node< T >* ptr_;
     explicit LIter(detail::Node< T >* p) noexcept;
+
+    template< class Key, class Value, class Hash, class Equal >
+    friend class HashIter;
+
+    template< class Key, class Value, class Hash, class Equal >
+    friend class HashConstIter;
+
+    template< class Key, class Value, class Hash, class Equal >
+    friend class HashTable;
   };
 
   template< class T >
   class LCIter
   {
   public:
+    LCIter() noexcept;
+
     const T& operator*() const noexcept;
     const T* operator->() const noexcept;
     LCIter& operator++() noexcept;
@@ -55,6 +68,15 @@ namespace vasyakin
     const detail::Node< T >* ptr_;
     explicit LCIter(const detail::Node< T >* p) noexcept;
     explicit LCIter(const LIter< T >& it) noexcept;
+
+    template< class Key, class Value, class Hash, class Equal >
+    friend class HashIter;
+
+    template< class Key, class Value, class Hash, class Equal >
+    friend class HashConstIter;
+
+    template< class Key, class Value, class Hash, class Equal >
+    friend class HashTable;
   };
 
   namespace detail
@@ -74,6 +96,9 @@ namespace vasyakin
       T& value() noexcept;
       const T& value() const noexcept;
 
+      Node< T >* getNext() noexcept;
+      const Node< T >* getNext() const noexcept;
+
     private:
       alignas(T) unsigned char storage_[sizeof(T)];
       Node< T >* next_;
@@ -81,6 +106,15 @@ namespace vasyakin
       friend class List< T >;
       friend class LIter< T >;
       friend class LCIter< T >;
+
+      template< class Key, class Value, class Hash, class Equal >
+      friend class HashTable;
+
+      template< class Key, class Value, class Hash, class Equal >
+      friend class HashIter;
+
+      template< class Key, class Value, class Hash, class Equal >
+      friend class HashConstIter;
     };
   }
 
@@ -136,10 +170,27 @@ namespace vasyakin
     size_t getsize() const noexcept;
     detail::Node< T >* getfirst() const noexcept;
 
+    template< class P >
+    bool erase_if(P p);
+
   private:
     detail::Node< T >* fake_node_;
     size_t size_;
+
+    template< class Key, class Value, class Hash, class Equal >
+    friend class HashTable;
+    
+    template< class Key, class Value, class Hash, class Equal >
+    friend class HashIter;
+    
+    template< class Key, class Value, class Hash, class Equal >
+    friend class HashConstIter;
   };
+  
+  template< class T >
+  LIter< T >::LIter() noexcept:
+    ptr_(nullptr)
+  {}
 
   template< class T >
   LIter< T >::LIter(detail::Node< T >* p) noexcept:
@@ -196,6 +247,11 @@ namespace vasyakin
   {
     return ptr_ != other.ptr_;
   }
+
+  template< class T >
+  LCIter< T >::LCIter() noexcept:
+    ptr_(nullptr)
+  {}
 
   template< class T >
   LCIter< T >::LCIter(const detail::Node< T >* p) noexcept:
@@ -276,6 +332,18 @@ namespace vasyakin
   const T& detail::Node< T >::value() const noexcept
   {
     return *reinterpret_cast< const T* >(storage_);
+  }
+
+  template< class T >
+  detail::Node< T >* detail::Node< T >::getNext() noexcept
+  {
+    return next_;
+  }
+
+  template< class T >
+  const detail::Node< T >* detail::Node< T >::getNext() const noexcept
+  {
+    return next_;
   }
 
   template< class T >
@@ -682,6 +750,31 @@ namespace vasyakin
   detail::Node< T >* List< T >::getfirst() const noexcept
   {
     return fake_node_->next_;
+  }
+
+  template< class T >
+  template< class P >
+  bool List< T >::erase_if(P p)
+  {
+    bool was_erased = false;
+    detail::Node< T >* prev = fake_node_;
+    detail::Node< T >* curr = prev->next_;
+
+    while (curr != fake_node_)
+    {
+      if (p(curr->value()))
+      {
+        erase(LIter< T >(prev));
+        curr = prev->next_;
+        was_erased = true;
+      }
+      else
+      {
+        prev = curr;
+        curr = curr->next_;
+      }
+    }
+    return was_erased;
   }
 }
 
