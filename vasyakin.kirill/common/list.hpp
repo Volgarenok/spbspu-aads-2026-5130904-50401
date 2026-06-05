@@ -179,14 +179,14 @@ namespace vasyakin
 
     template< class Key, class Value, class Hash, class Equal >
     friend class HashTable;
-    
+
     template< class Key, class Value, class Hash, class Equal >
     friend class HashIter;
-    
+
     template< class Key, class Value, class Hash, class Equal >
     friend class HashConstIter;
   };
-  
+
   template< class T >
   LIter< T >::LIter() noexcept:
     ptr_(nullptr)
