@@ -3,116 +3,147 @@
 
 #include <stdexcept>
 #include "node.hpp"
+
 namespace zhuravleva
 {
-  template<class T>
+  template< class T >
   class List;
 
-  template<class T>
+  template< class T >
   class LIter
   {
-    friend class List<T>;
-
-  private:
-    Node<T>* current;
+    friend class List< T >;
 
   public:
 
     LIter() noexcept:
-      current(nullptr)
+      current_(nullptr)
     {}
 
-    LIter(Node<T>* ptr) noexcept:
-      current(ptr)
+    LIter(detail::Node< T >* ptr) noexcept:
+      current_(ptr)
     {}
 
     bool hasNext() const noexcept
     {
-      return current != nullptr;
+      return current_ != nullptr;
     }
 
     LIter next() const
     {
-      if(!current)
+      if (!current_)
       {
         throw std::runtime_error("null iterator");
       }
-      return LIter(current->next);
+      return LIter(current_->next);
+    }
+
+    LIter& operator++()
+    {
+      if (!current_)
+      {
+        throw std::runtime_error("null iterator");
+      }
+      current_ = current_->next;
+      return *this;
+    }
+
+    LIter operator++(int)
+    {
+      LIter result(*this);
+      ++(*this);
+      return result;
     }
 
     T& operator*() const
     {
-      if(!current)
+      if (!current_)
       {
         throw std::runtime_error("null iterator");
       }
-      return current->data;
+      return current_->data;
     }
 
     bool operator==(const LIter& other) const noexcept
     {
-      return current == other.current;
+      return current_ == other.current_;
     }
 
     bool operator!=(const LIter& other) const noexcept
     {
-      return current != other.current;
+      return current_ != other.current_;
     }
-  };
-
-
-  template<class T>
-  class LCIter
-  {
-    friend class List<T>;
 
   private:
-    const Node<T>* current;
+    detail::Node< T >* current_;
+  };
+
+  template< class T >
+  class LCIter
+  {
+    friend class List< T >;
 
   public:
-
     LCIter() noexcept:
-      current(nullptr)
+      current_(nullptr)
     {}
 
-    LCIter(const Node<T>* ptr) noexcept:
-      current(ptr)
+    LCIter(const detail::Node< T >* ptr) noexcept:
+      current_(ptr)
     {}
 
     bool hasNext() const noexcept
     {
-      return current != nullptr;
+      return current_ != nullptr;
     }
 
     LCIter next() const
     {
-      if(!current)
+      if (!current_)
       {
         throw std::runtime_error("null iterator");
       }
-      return LCIter(current->next);
+      return LCIter(current_->next);
+    }
+
+    LCIter& operator++()
+    {
+      if (!current_)
+      {
+        throw std::runtime_error("null iterator");
+      }
+      current_ = current_->next;
+      return *this;
+    }
+
+    LCIter operator++(int)
+    {
+      LCIter result(*this);
+      ++(*this);
+      return result;
     }
 
     const T& operator*() const
     {
-      if(!current)
+      if (!current_)
       {
         throw std::runtime_error("null iterator");
       }
-      return current->data;
+      return current_->data;
     }
 
     bool operator==(const LCIter& other) const noexcept
     {
-      return current == other.current;
+      return current_ == other.current_;
     }
 
     bool operator!=(const LCIter& other) const noexcept
     {
-      return current != other.current;
+      return current_ != other.current_;
     }
+
+  private:
+    const detail::Node< T >* current_;
   };
-
-
 }
 #endif
