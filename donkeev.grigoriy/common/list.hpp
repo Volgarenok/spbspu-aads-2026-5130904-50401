@@ -199,6 +199,8 @@ namespace donkeev
     {
       delete it.n;
       it.n = nullptr;
+      head_ = nullptr;
+      tail_ = nullptr;
       --length_;
       return;
     }
@@ -224,6 +226,7 @@ namespace donkeev
       cutAfter(it);
     }
     head_ = nullptr;
+    tail_ = nullptr;
   }
   template< class T >
   void List< T >::deleteNode(const T& value)
