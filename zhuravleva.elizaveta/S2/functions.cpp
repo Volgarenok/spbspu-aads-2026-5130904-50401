@@ -56,6 +56,11 @@ zhuravleva::Queue< std::string > zhuravleva::infToPostfix(const std::string& lin
           throw std::runtime_error("brackets error");
         }
         operations.pop();
+        if (!operations.empty() && operations.top() == "!")
+        {
+          output.push(operations.top());
+          operations.pop();
+        }
       }
       else if (isOperator(part))
       {
