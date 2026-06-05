@@ -22,6 +22,7 @@ namespace
   {
     if (results.empty())
     {
+      std::cout << "\n";
       return;
     }
     std::cout << results.drop();
