@@ -311,4 +311,5 @@ namespace donkeev
     std::swap(length_, other.length_);
   }
 }
+
 #endif
