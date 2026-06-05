@@ -1,77 +1,98 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 
+#include <cstddef>
+#include <utility>
 #include <stdexcept>
-#include "../common/list.hpp"
-#include "../common/node.hpp"
-#include "../common/iterator.hpp"
+#include "list.hpp"
 
 namespace zhuravleva
 {
-  template<class T>
+  template< class T >
   class Stack
   {
-  private:
-    List<T> data;
-
   public:
     void push(const T& value);
+    void push(T&& value);
     void pop();
     T& top();
+    const T& top() const;
     T drop();
-    bool empty() const;
-    void clear();
+    bool empty() const noexcept;
+    void clear() noexcept;
+    size_t size() const noexcept;
+
+  private:
+    List< T > data_;
   };
 }
 
 template< class T >
 void zhuravleva::Stack< T >::push(const T& value)
 {
-  data.AddStart(value);
+  data_.pushFront(value);
+}
+
+template< class T >
+void zhuravleva::Stack< T >::push(T&& value)
+{
+  data_.pushFront(std::move(value));
 }
 
 template< class T >
 void zhuravleva::Stack< T >::pop()
 {
-  if(data.empty())
+  if (data_.empty())
   {
     throw std::runtime_error("empty data error");
   }
-  data.deleteStart();
+  data_.popFront();
 }
 
 template< class T >
 T& zhuravleva::Stack< T >::top()
 {
-  if(data.empty())
+  if (data_.empty())
   {
     throw std::runtime_error("empty data error");
   }
-  return *data.begin();
+  return *data_.begin();
+}
+
+template< class T >
+const T& zhuravleva::Stack< T >::top() const
+{
+  if (data_.empty())
+  {
+    throw std::runtime_error("empty stack");
+  }
+  return *data_.cbegin();
 }
 
 template< class T >
 T zhuravleva::Stack< T >::drop()
 {
-  if (data.empty())
-  {
-    throw std::runtime_error("empty data error when drop");
-  }
-  T val = *data.begin();
-  data.deleteStart();
-  return val;
+  T result = top();
+  pop();
+  return result;
 }
 
 template< class T >
-bool zhuravleva::Stack< T >::empty() const
+bool zhuravleva::Stack< T >::empty() const noexcept
 {
-  return data.empty();
+  return data_.empty();
 }
 
 template< class T >
-void zhuravleva::Stack< T >::clear()
+void zhuravleva::Stack< T >::clear() noexcept
 {
-  data.clear();
+  data_.clear();
+}
+
+template< class T >
+size_t zhuravleva::Stack< T >::size() const noexcept
+{
+  return data_.size();
 }
 
 #endif
