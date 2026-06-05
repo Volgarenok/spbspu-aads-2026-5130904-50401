@@ -35,9 +35,11 @@ namespace donkeev
 
   template<class Key, class Value>
   HTNode<Key, Value>::HTNode(const Key& key, Value&& value):
-    data_(key, std::move(value)),
-    isOccupied_(true)
-  {}
+  data_(key, Value{}),  
+  isOccupied_(true)
+  {
+    data_.second = std::move(value);
+  }
 
   template< class Key, class Value >
   HTNode< Key, Value >& HTNode< Key, Value >::operator=(const HTNode& other)
