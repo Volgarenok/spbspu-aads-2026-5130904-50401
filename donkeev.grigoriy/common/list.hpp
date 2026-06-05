@@ -35,7 +35,7 @@ namespace donkeev
     LIter< T > pushAfter(LIter< T >, const T&);
     void pushFront(const T&);
     void pushBack(const T&);
-    void pushBack(const T);
+    void pushBack(T&&);
 
     void popFront();
     void cutAfter(LIter< T >&);
@@ -181,9 +181,9 @@ namespace donkeev
     ++length_;
   }
   template< class T >
-  void List< T >::pushBack(const T value)
+  void List< T >::pushBack(T&& value)
   {
-    Node< T >* tmp = new Node< T >{value, head_};
+    Node< T >* tmp = new Node< T >{std::move(value), head_};
     if (length_ == 0)
     {
       head_ = tmp;
