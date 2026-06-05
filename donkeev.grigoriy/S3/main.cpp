@@ -63,7 +63,7 @@ void readGraphs(const std::string& filename, donkeev::graphsHashTable_t& graphs)
       graph.addEdge(from, to, weight);
     }
 
-    graphs.add(graphName, graph);
+    graphs.add(graphName, std::move(graph));
   }
 }
 int main(int argc, char* argv[])
