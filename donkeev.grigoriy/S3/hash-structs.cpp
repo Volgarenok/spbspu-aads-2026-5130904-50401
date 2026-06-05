@@ -38,3 +38,14 @@
   {
     return first == second;
   }
+
+  size_t donkeev::TestStructHash::operator()(const std::string& str) const
+  {
+    boost::hash<std::string> hasher;
+    return hasher(str);
+  }
+
+  bool donkeev::TestStructEqual::operator()(const std::string& first, const std::string& second) const
+  {
+    return first == second;
+  }

@@ -36,6 +36,16 @@ namespace donkeev
   {
     bool operator()(const std::string&, const std::string&) const;
   };
+
+  struct TestStructHash
+  {
+    size_t operator()(const std::string&) const;
+  };
+
+  struct TestStructEqual
+  {
+    bool operator()(const std::string&, const std::string&) const;
+  };
 }
 
 #endif

@@ -167,6 +167,13 @@ namespace donkeev
   }
 
   template<class Key, class Value>
+  HTCIt<Key, Value>::HTCIt(const topit::Vector<donkeev::HTNode<Key, Value>>* data, size_t currentId):
+    vector_(data),
+    currentId_(currentId),
+    dataSize_(vector_->getSize())
+  {}
+
+  template<class Key, class Value>
   HTCIt<Key, Value>& HTCIt<Key, Value>::operator++() noexcept
   {
     ++currentId_;

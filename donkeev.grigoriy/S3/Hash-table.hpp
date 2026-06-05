@@ -306,7 +306,7 @@ namespace donkeev
         ++oldDataBegin;
         continue;
       }
-      size_t hash = hashFunc_(oldDataBegin->key_);
+      size_t hash = hashFunc_(oldDataBegin->data_.first);
       size_t bucketId = hash % newBucketCount;
       size_t startId = bucketId * bucketSize_;
       size_t endId = startId + bucketSize_;
