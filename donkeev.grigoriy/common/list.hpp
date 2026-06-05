@@ -107,8 +107,14 @@ namespace donkeev
   template< class T >
   donkeev::List< T >& List< T >::operator=(const List< T >& other)
   {
-    List< T > cpy{other};
-    swap(cpy);
+    clearAll();
+    LCIter<T> it = other.cbegin();
+    for (size_t i = 0; i < other.size(); ++i)
+    {
+      pushBack(*it);
+      ++it;
+    }
+
     return *this;
   }
   template< class T >
