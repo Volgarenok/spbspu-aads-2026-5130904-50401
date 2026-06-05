@@ -179,6 +179,8 @@ namespace donkeev
   {
     if (length_ == 1)
     {
+      head_->next = nullptr;
+      tail_->next = nullptr;
       delete head_;
       head_ = nullptr;
       tail_ = nullptr;
@@ -186,8 +188,10 @@ namespace donkeev
       return;
     }
     Node< T >* tmp = head_->next;
+    head_->next - nullptr;
     delete head_;
     head_ = tmp;
+    head_->next = tmp->next;
     tail_->next = head_;
     --length_;
   }
