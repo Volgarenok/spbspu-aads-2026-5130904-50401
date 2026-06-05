@@ -3,16 +3,20 @@
 
 namespace zhuravleva
 {
-  template<class T>
-  struct Node
+  namespace detail
   {
-    T data;
-    Node<T>* next;
+    template< class T >
+    struct Node
+    {
+      T data;
+      Node< T > * next;
 
-    Node(const T& value, Node<T>* n = nullptr):
-      data(value),
-      next(n)
-    {}
-  };
+      Node(const T & value, Node< T >* n = nullptr):
+        data(value),
+        next(n)
+      {}
+    };
+  }
 }
+
 #endif
