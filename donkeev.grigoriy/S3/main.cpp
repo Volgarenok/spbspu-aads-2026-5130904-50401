@@ -121,12 +121,12 @@ int main(int argc, char* argv[])
       }
       catch (...)
       {
-        std::cout << "INVALID COMMAND\n";
+        std::cout << "<INVALID COMMAND>\n";
       }
     }
     else
     {
-      std::cout << "INVALID COMMAND\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
 }
