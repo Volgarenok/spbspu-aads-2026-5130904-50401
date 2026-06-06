@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cassert>
 #include <utility>
+#include <stdexcept>
 
 namespace madieva {
   template< class T > class List;
@@ -81,6 +82,7 @@ namespace madieva {
     void splice(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last);
     void splice(LIter< T > pos, List< T > & other, LIter< T > it, size_t size);
     void sort();
+    template< class Compare >
     void sort(Compare cmp);
     void merge(List< T > & other);
     template<class Compare>
@@ -530,6 +532,56 @@ namespace madieva {
       ++pos;
     }
   }
+
+  template< class T >
+  void List< T >::sort()
+  {
+    if (size_ <= 1) {
+      return;
+    }
+    size_t unsorted = size_;
+    LIter<T> marker = end();
+    while (unsorted > 1) {
+      LIter< T > maxIt = begin();
+      LIter< T > it = begin();
+      for (size_t i = 1; i < unsorted; ++i) {
+        ++it;
+        if (*maxIt < *it) {
+          maxIt = it;
+        }
+      }
+      splice(marker, *this, maxIt);
+      --marker;
+      --unsorted;
+    }
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::sort(Compare cmp)
+  {
+    if (size_ <= 1) {
+      return;
+    }
+    size_t unsorted = size_;
+    LIter<T> marker = end();
+    while (unsorted > 1) {
+      LIter< T > maxIt = begin();
+      LIter< T > it = begin();
+      for (size_t i = 1; i < unsorted; ++i) {
+        ++it;
+        if (cmp(*maxIt, *it)) {
+          maxIt = it;
+        }
+      }
+      splice(marker, *this, maxIt);
+      --marker;
+      --unsorted;
+    }
+  }
+
+
+
 }
 
 #endif
