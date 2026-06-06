@@ -1,6 +1,6 @@
 #ifndef NODE_HPP
 #define NODE_HPP
-namespace donkeev
+namespace detail
 {
   template< class T >
   struct Node

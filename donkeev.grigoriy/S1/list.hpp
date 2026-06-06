@@ -13,10 +13,6 @@ namespace donkeev
   template< class T >
   class List
   {
-    Node< T >* head_;
-    Node< T >* tail_;
-    size_t length_;
-
   public:
     List();
     List(size_t, T);
@@ -37,6 +33,11 @@ namespace donkeev
 
     bool isEmpty() const;
     size_t size() const;
+
+  private:
+    Node< T >* head_;
+    Node< T >* tail_;
+    size_t length_;
   };
 
   template< class T >
