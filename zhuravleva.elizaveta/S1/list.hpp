@@ -45,6 +45,9 @@ namespace zhuravleva
     template< class Compare >
     void sort(Compare comp);
 
+    template< class Predicate >
+    void partition(Predicate pred);
+
     void popFront() noexcept;
     void popBack() noexcept;
     void eraseAfter(LIter< T > pos);
@@ -313,6 +316,29 @@ namespace zhuravleva
       tail->next = right;
     }
     return result;
+  }
+
+  template< class T >
+  template< class Predicate >
+  void List< T >::partition(Predicate pred)
+  {
+    List< T > selected;
+    detail::Node< T >* selectedTail = selected.fake_;
+    detail::Node< T >* prev = fake_;
+    while (prev->next != fake_)
+    {
+      if (pred(prev->next->data))
+      {
+        detail::Node< T >* node = unlinkAfter(prev);
+        selected.linkAfter(selectedTail, node);
+        selectedTail = selectedTail->next;
+      }
+      else
+      {
+        prev = prev->next;
+      }
+    }
+    spliceAfter(beforeBegin(), selected);
   }
 
   template< class T >

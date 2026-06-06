@@ -391,3 +391,30 @@ BOOST_AUTO_TEST_CASE(sort_one_element_test)
   BOOST_CHECK(list.size() == 1);
   BOOST_CHECK(*list.begin() == 10);
 }
+
+bool isLessThanFour(int value)
+{
+  return value < 4;
+}
+
+BOOST_AUTO_TEST_CASE(partition_test)
+{
+  zhuravleva::List< int > list;
+  list.pushBack(1);
+  list.pushBack(5);
+  list.pushBack(3);
+  list.pushBack(4);
+  list.pushBack(2);
+  list.partition(isLessThanFour);
+  zhuravleva::LIter< int > it = list.begin();
+
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 5);
+  ++it;
+  BOOST_CHECK(*it == 4);
+}
