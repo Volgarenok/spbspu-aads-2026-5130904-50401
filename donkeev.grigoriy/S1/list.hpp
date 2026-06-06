@@ -18,21 +18,26 @@ namespace donkeev
     List() noexcept;
     List(size_t, T);
     List(const List< T >&);
+    List(List< T >&&) noexcept;
+
+    List< T >& operator=(const List< T >&);
+    List< T >& operator=(List&&) noexcept;
 
     ~List() noexcept;
 
     LIter< T > begin() noexcept;
     LCIter< T > cbegin() const noexcept;
 
-    LIter< T > pushAfter(LIter< T >, const T&);
+    LIter< T > insertAfter(LIter< T >, const T&);
     void pushFront(const T&);
     void pushBack(const T&);
+    void pushBack(T&&);
 
     void popFront() noexcept;
-    void cutAfter(LIter< T >&) noexcept;
-    void clearAll() noexcept;
+    void eraseAfter(LIter< T >&) noexcept;
+    void clear() noexcept;
 
-    bool isEmpty() const noexcept;
+    bool empty() const noexcept;
     size_t size() const noexcept;
 
   private:
@@ -86,11 +91,42 @@ namespace donkeev
       ++it;
     }
   }
+  template< class T >
+  List< T >::List(List< T >&& other) noexcept:
+    head_(other.head_),
+    tail_(other.tail_),
+    length_(other.length_)
+  {
+    other.head_ = nullptr;
+    other.tail_ = nullptr;
+    other.length_ = 0;
+  }
+
+  template< class T >
+  donkeev::List< T >& List< T >::operator=(const List< T >& other)
+  {
+    clear();
+    LCIter<T> it = other.cbegin();
+    for (size_t i = 0; i < other.size(); ++i)
+    {
+      pushBack(*it);
+      ++it;
+    }
+
+    return *this;
+  }
+  template< class T >
+  donkeev::List< T >& List< T >::operator=(List< T >&& other) noexcept
+  {
+    List< T > cpy{std::move(other)};
+    swap(cpy);
+    return *this;
+  }
 
   template< class T >
   donkeev::List< T >::~List() noexcept
   {
-    clearAll();
+    clear();
   }
 
   template< class T >
@@ -105,7 +141,7 @@ namespace donkeev
   }
 
   template< class T >
-  LIter< T > List< T >::pushAfter(LIter< T > it, const T& value)
+  LIter< T > List< T >::insertAfter(LIter< T > it, const T& value)
   {
     Node< T >* tmp = new Node< T >{value, it.n->next};
     it.n->next = tmp;
@@ -137,6 +173,23 @@ namespace donkeev
     tail_ = tmp;
     ++length_;
   }
+  template< class T >
+  void List< T >::pushBack(T&& value)
+  {
+    Node< T >* tmp = new Node< T >{std::move(value), head_};
+    if (length_ == 0)
+    {
+      head_ = tmp;
+      tail_ = tmp;
+      tail_->next = tmp;
+      head_->next = tmp;
+      ++length_;
+      return;
+    }
+    tail_->next = tmp;
+    tail_ = tmp;
+    ++length_;
+  }
 
   template< class T >
   void List< T >::popFront() noexcept
@@ -148,7 +201,7 @@ namespace donkeev
     --length_;
   }
   template< class T >
-  void List< T >::cutAfter(LIter< T >& it) noexcept
+  void List< T >::eraseAfter(LIter< T >& it) noexcept
   {
     Node< T >* deleteNode = it.n->next;
     if (length_ == 1)
@@ -172,18 +225,18 @@ namespace donkeev
     --length_;
   }
   template< class T >
-  void List< T >::clearAll() noexcept
+  void List< T >::clear() noexcept
   {
     LIter< T > it{head_};
     while (length_)
     {
-      cutAfter(it);
+      eraseAfter(it);
     }
     head_ = nullptr;
   }
 
   template< class T >
-  bool List< T >::isEmpty() const noexcept
+  bool List< T >::empty() const noexcept
   {
     return (length_ == 0);
   }

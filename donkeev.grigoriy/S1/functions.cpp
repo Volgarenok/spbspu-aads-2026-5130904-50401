@@ -34,7 +34,7 @@ namespace donkeev
     LCIter< std::pair< std::string, List< size_t > > > outIt = data.cbegin();
     for (size_t i = 0; i < data.size(); ++i)
     {
-      if (!outIt->second.isEmpty())
+      if (!outIt->second.empty())
       {
         return true;
       }
@@ -82,7 +82,7 @@ namespace donkeev
   }
   void printInfo(const List< std::pair< std::string, List< size_t > > >& data, std::ostream& output)
   {
-    if (data.isEmpty())
+    if (data.empty())
     {
       output << "0" << "\n";
       return;
