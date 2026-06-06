@@ -19,7 +19,6 @@ namespace donkeev
   public:
     LIter();
     LIter(const LIter&);
-    LIter(Node< T >*);
 
     LIter< T > operator+(size_t) noexcept;
 
@@ -37,6 +36,7 @@ namespace donkeev
 
   private:
     Node< T >* n;
+    LIter(Node< T >*);
   };
 
   template< class T >
