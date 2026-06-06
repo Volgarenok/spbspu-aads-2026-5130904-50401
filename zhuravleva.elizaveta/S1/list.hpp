@@ -38,6 +38,10 @@ namespace zhuravleva
 
     void spliceAfter(LIter< T > pos, List& other, LIter< T > beforeElement) noexcept;
     void spliceAfter(LIter< T > pos, List& other) noexcept;
+
+    template< class Compare >
+    void merge(List& other, Compare comp) noexcept;
+
     void popFront() noexcept;
     void popBack() noexcept;
     void eraseAfter(LIter< T > pos);
@@ -179,6 +183,31 @@ namespace zhuravleva
   LCIter< T > List< T >::cend() const noexcept
   {
     return LCIter< T >(fake_);
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::merge(List& other, Compare comp) noexcept
+  {
+    if (this == &other)
+    {
+      return;
+    }
+    detail::Node< T >* thisPrev = fake_;
+    detail::Node< T >* otherPrev = other.fake_;
+    while ((thisPrev->next != fake_) && (otherPrev->next != other.fake_))
+    {
+      if (comp(otherPrev->next->data, thisPrev->next->data))
+      {
+        detail::Node< T >* node = other.unlinkAfter(otherPrev);
+        linkAfter(thisPrev, node);
+      }
+      thisPrev = thisPrev->next;
+    }
+    if (otherPrev->next != other.fake_)
+    {
+      spliceAfter(LIter< T >(thisPrev), other);
+    }
   }
 
   template< class T >

@@ -1,4 +1,5 @@
 #include "list.hpp"
+#include <functional>
 #include <boost/test/unit_test.hpp>
 #include <utility>
 
@@ -298,4 +299,58 @@ BOOST_AUTO_TEST_CASE(splice_after_full_list_test)
   BOOST_CHECK(*it == 30);
   ++it;
   BOOST_CHECK(*it == 2);
+}
+
+BOOST_AUTO_TEST_CASE(merge_sorted_lists_test)
+{
+  zhuravleva::List< int > first;
+  first.pushBack(1);
+  first.pushBack(3);
+  first.pushBack(5);
+  zhuravleva::List< int > second;
+  second.pushBack(2);
+  second.pushBack(4);
+  second.pushBack(6);
+  first.merge(second, std::less< int >());
+
+  BOOST_CHECK(second.empty());
+  BOOST_CHECK(first.size() == 6);
+
+  zhuravleva::LIter< int > it = first.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 4);
+  ++it;
+  BOOST_CHECK(*it == 5);
+  ++it;
+  BOOST_CHECK(*it == 6);
+}
+
+BOOST_AUTO_TEST_CASE(merge_before_first_element_test)
+{
+  zhuravleva::List< int > first;
+  first.pushBack(4);
+  first.pushBack(5);
+  zhuravleva::List< int > second;
+  second.pushBack(1);
+  second.pushBack(2);
+  second.pushBack(3);
+  first.merge(second, std::less< int >());
+  BOOST_CHECK(second.empty());
+  BOOST_CHECK(first.size() == 5);
+  zhuravleva::LIter< int > it = first.begin();
+
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 4);
+  ++it;
+  BOOST_CHECK(*it == 5);
 }
