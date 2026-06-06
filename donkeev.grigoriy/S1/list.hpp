@@ -113,11 +113,21 @@ namespace donkeev
     {
       return;
     }
+
     LCIter< T > it{yaList.head_};
-    for (size_t i = 0; i < yaList.size(); ++i)
+    size_t i = 0;
+    try
     {
-      pushBack(*it);
-      ++it;
+      for (; i < yaList.size(); ++i)
+      {
+        pushBack(*it);
+        ++it;
+      }
+    }
+    catch (...)
+    {
+      clear();
+      throw;
     }
   }
   template< class T >
@@ -261,7 +271,9 @@ namespace donkeev
     {
       eraseAfter(it);
     }
+    
     head_ = nullptr;
+    tail_ = nullptr;
   }
 
   template< class T >
