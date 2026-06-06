@@ -117,7 +117,7 @@ namespace donkeev
   template< class T >
   T& LIter< T >::operator*() noexcept
   {
-    assert(n != nullptr);
+    assert(n != nullptr && "fake iterator");
     return n->val;
   }
   template< class T >
