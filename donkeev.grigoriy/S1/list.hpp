@@ -15,25 +15,25 @@ namespace donkeev
   class List
   {
   public:
-    List();
+    List() noexcept;
     List(size_t, T);
     List(const List< T >&);
 
-    ~List();
+    ~List() noexcept;
 
-    LIter< T > begin();
-    LCIter< T > cbegin() const;
+    LIter< T > begin() noexcept;
+    LCIter< T > cbegin() const noexcept;
 
     LIter< T > pushAfter(LIter< T >, const T&);
     void pushFront(const T&);
     void pushBack(const T&);
 
-    void popFront();
-    void cutAfter(LIter< T >&);
-    void clearAll();
+    void popFront() noexcept;
+    void cutAfter(LIter< T >&) noexcept;
+    void clearAll() noexcept;
 
-    bool isEmpty() const;
-    size_t size() const;
+    bool isEmpty() const noexcept;
+    size_t size() const noexcept;
 
   private:
     Node< T >* head_;
@@ -42,7 +42,7 @@ namespace donkeev
   };
 
   template< class T >
-  List< T >::List():
+  List< T >::List() noexcept:
     head_(nullptr),
     tail_(nullptr),
     length_(0)
@@ -88,18 +88,18 @@ namespace donkeev
   }
 
   template< class T >
-  donkeev::List< T >::~List()
+  donkeev::List< T >::~List() noexcept
   {
     clearAll();
   }
 
   template< class T >
-  LIter< T > List< T >::begin()
+  LIter< T > List< T >::begin() noexcept
   {
     return LIter< T >{head_};
   }
   template< class T >
-  LCIter< T > List< T >::cbegin() const
+  LCIter< T > List< T >::cbegin() const noexcept
   {
     return LCIter< T >{head_};
   }
@@ -139,7 +139,7 @@ namespace donkeev
   }
 
   template< class T >
-  void List< T >::popFront()
+  void List< T >::popFront() noexcept
   {
     Node< T >* tmp = head_->next;
     delete head_;
@@ -148,7 +148,7 @@ namespace donkeev
     --length_;
   }
   template< class T >
-  void List< T >::cutAfter(LIter< T >& it)
+  void List< T >::cutAfter(LIter< T >& it) noexcept
   {
     Node< T >* deleteNode = it.n->next;
     if (length_ == 1)
@@ -172,7 +172,7 @@ namespace donkeev
     --length_;
   }
   template< class T >
-  void List< T >::clearAll()
+  void List< T >::clearAll() noexcept
   {
     LIter< T > it{head_};
     while (length_)
@@ -183,12 +183,12 @@ namespace donkeev
   }
 
   template< class T >
-  bool List< T >::isEmpty() const
+  bool List< T >::isEmpty() const noexcept
   {
     return (length_ == 0);
   }
   template< class T >
-  size_t List< T >::size() const
+  size_t List< T >::size() const noexcept
   {
     return length_;
   }
