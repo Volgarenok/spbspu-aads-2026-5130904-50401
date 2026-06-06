@@ -271,7 +271,7 @@ namespace donkeev
     {
       eraseAfter(it);
     }
-    
+
     head_ = nullptr;
     tail_ = nullptr;
   }
