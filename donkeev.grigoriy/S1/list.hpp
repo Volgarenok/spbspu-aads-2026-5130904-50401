@@ -53,7 +53,7 @@ namespace donkeev
     length_(0)
   {}
   template< class T >
-  List< T >::List(size_t size, T& data):
+  List< T >::List(size_t size, const T& data):
     head_(nullptr),
     tail_(nullptr),
     length_(size)
