@@ -625,6 +625,40 @@ namespace madieva {
     }
   }
 
+  template< class T >
+  LIter< T > List< T >::partition(const T & pivot)
+  {
+    LIter< T > it = begin();
+    LIter< T > it_sort = begin();
+    while (it != end()) {
+      LIter< T > next = it;
+      ++next;
+      if (*it < pivot) {
+        splice(it_sort, *this, it);
+        ++it_sort;
+      }
+      it = next;
+    }
+    return it_sort;
+  }
+
+  template< class T >
+  template< class Predicate >
+  LIter< T > List< T >::partition(Predicate pred)
+  {
+    LIter< T > it = begin();
+    LIter< T > it_sort = begin();
+    while (it != end()) {
+      LIter< T > next = it;
+      ++next;
+      if (pred(*it)) {
+        splice(it_sort, *this, it);
+        ++it_sort;
+      }
+      it = next;
+    }
+    return it_sort;
+  }
 }
 
 #endif
