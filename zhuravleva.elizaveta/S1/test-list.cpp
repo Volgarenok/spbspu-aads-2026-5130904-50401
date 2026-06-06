@@ -216,3 +216,61 @@ BOOST_AUTO_TEST_CASE(const_iterator_test)
 
   BOOST_CHECK(*it == 1);
 }
+
+BOOST_AUTO_TEST_CASE(spliceAfter_one_element_test)
+{
+  zhuravleva::List< int > first;
+  first.pushBack(1);
+  first.pushBack(2);
+  first.pushBack(3);
+  zhuravleva::List< int > second;
+  second.pushBack(10);
+  second.pushBack(20);
+  second.pushBack(30);
+  zhuravleva::LIter< int > pos = first.begin();
+  zhuravleva::LIter< int > beforeElement = second.begin();
+  first.spliceAfter(pos, second, beforeElement);
+  zhuravleva::LIter< int > firstIt = first.begin();
+
+  BOOST_CHECK(*firstIt == 1);
+  ++firstIt;
+  BOOST_CHECK(*firstIt == 20);
+  ++firstIt;
+  BOOST_CHECK(*firstIt == 2);
+  ++firstIt;
+  BOOST_CHECK(*firstIt == 3);
+
+  zhuravleva::LIter< int > secondIt = second.begin();
+  BOOST_CHECK(*secondIt == 10);
+  ++secondIt;
+  BOOST_CHECK(*secondIt == 30);
+}
+
+BOOST_AUTO_TEST_CASE(spliceAfter_to_empty_list_test)
+{
+  zhuravleva::List< int > first;
+  zhuravleva::List< int > second;
+  second.pushBack(10);
+  second.pushBack(20);
+  zhuravleva::LIter< int > pos = first.beforeBegin();
+  zhuravleva::LIter< int > beforeElement = second.beforeBegin();
+
+  first.spliceAfter(pos, second, beforeElement);
+  BOOST_CHECK(first.size() == 1);
+  BOOST_CHECK(second.size() == 1);
+  BOOST_CHECK(*first.begin() == 10);
+  BOOST_CHECK(*second.begin() == 20);
+}
+
+BOOST_AUTO_TEST_CASE(spliceAfter_no_element_test)
+{
+  zhuravleva::List< int > first;
+  first.pushBack(1);
+  zhuravleva::List< int > second;
+  second.pushBack(10);
+  zhuravleva::LIter< int > pos = first.begin();
+  zhuravleva::LIter< int > beforeElement = second.begin();
+  first.spliceAfter(pos, second, beforeElement);
+  BOOST_CHECK(first.size() == 1);
+  BOOST_CHECK(second.size() == 1);
+}
