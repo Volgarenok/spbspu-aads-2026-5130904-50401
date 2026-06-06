@@ -63,7 +63,7 @@ namespace donkeev
       return;
     }
 
-    size_t created = 1;
+    size_t created = 0;
     try
     {
       head_ = new Node< T >{data, nullptr};
