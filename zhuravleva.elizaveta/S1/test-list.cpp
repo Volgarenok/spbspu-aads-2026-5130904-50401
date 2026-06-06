@@ -418,3 +418,37 @@ BOOST_AUTO_TEST_CASE(partition_test)
   ++it;
   BOOST_CHECK(*it == 4);
 }
+
+BOOST_AUTO_TEST_CASE(partition_all_selected_test)
+{
+  zhuravleva::List< int > list;
+  list.pushBack(1);
+  list.pushBack(2);
+  list.pushBack(3);
+  list.partition(isLessThanFour);
+  BOOST_CHECK(list.size() == 3);
+  zhuravleva::LIter< int > it = list.begin();
+
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 3);
+}
+
+BOOST_AUTO_TEST_CASE(partition_none_selected_test)
+{
+  zhuravleva::List< int > list;
+  list.pushBack(5);
+  list.pushBack(6);
+  list.pushBack(7);
+  list.partition(isLessThanFour);
+  BOOST_CHECK(list.size() == 3);
+  zhuravleva::LIter< int > it = list.begin();
+
+  BOOST_CHECK(*it == 5);
+  ++it;
+  BOOST_CHECK(*it == 6);
+  ++it;
+  BOOST_CHECK(*it == 7);
+}
