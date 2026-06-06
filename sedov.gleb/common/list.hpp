@@ -122,14 +122,14 @@ namespace sedov
     size_t size() const noexcept;
     void swap(List & h) noexcept;
 
-    void splice(LIter<T> pos, List& h) noexcept;
-    void splice(LIter<T> pos, List& h, LIter<T> it) noexcept;
-    void splice(LIter<T> pos, List& h, LIter<T> first, LIter<T> last) noexcept;
-    void merge(List& h) noexcept;
+    void splice(LIter< T > pos, List & h) noexcept;
+    void splice(LIter< T > pos, List & h, LIter< T > it) noexcept;
+    void splice(LIter< T > pos, List & h, LIter< T > first, LIter< T > last) noexcept;
+    void merge(List & h) noexcept;
     void sort();
 
-    template<class P>
-    LIter<T> partition(P p);
+    template< class P >
+    LIter< T > partition(P p);
   private:
     detail::Node< T > * head_;
     detail::Node< T > * tail_;
@@ -337,7 +337,7 @@ namespace sedov
     return *this;
   }
 
-  template<class T>
+  template< class T >
   List< T > & List< T >::operator=(List && h) noexcept
   {
     assert(this != &h);
