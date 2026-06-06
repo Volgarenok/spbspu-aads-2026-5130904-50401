@@ -85,7 +85,7 @@ namespace madieva {
     template< class Compare >
     void sort(Compare cmp);
     void merge(List< T > & other);
-    template<class Compare>
+    template< class Compare >
     void merge(List< T > & other, Compare cmp);
     LIter< T > partition(const T & pivot);
     template< class Predicate >
@@ -540,7 +540,7 @@ namespace madieva {
       return;
     }
     size_t unsorted = size_;
-    LIter<T> marker = end();
+    LIter< T > marker = end();
     while (unsorted > 1) {
       LIter< T > maxIt = begin();
       LIter< T > it = begin();
@@ -580,7 +580,50 @@ namespace madieva {
     }
   }
 
+  template< class T >
+  void List< T >::merge(List< T > & other)
+  {
+    if (this == & other) {
+      return;
+    }
 
+    LIter< T > it = begin();
+    LIter< T > it_other = other.begin();
+
+    while (it_other != other.end()) {
+        if (it == end() || !(*it < *it_other)) {
+            LIter< T > next = it_other;
+            ++next;
+            splice(it, other, it_other);
+            it_other = next;
+        } else {
+            ++it;
+        }
+    }
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::merge(List< T > & other, Compare cmp)
+  {
+    if (this == & other) {
+      return;
+    }
+
+    LIter< T > it = begin();
+    LIter< T > it_other = other.begin();
+
+    while (it_other != other.end()) {
+        if (it == end() || !cmp(*it, *it_other)) {
+            LIter< T > next = it_other;
+            ++next;
+            splice(it, other, it_other);
+            it_other = next;
+        } else {
+            ++it;
+        }
+    }
+  }
 
 }
 
