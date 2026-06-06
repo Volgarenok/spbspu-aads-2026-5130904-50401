@@ -16,7 +16,7 @@ namespace donkeev
   {
   public:
     List() noexcept;
-    List(size_t, T);
+    List(size_t, T&);
     List(const List< T >&);
     List(List< T >&&) noexcept;
 
@@ -53,7 +53,7 @@ namespace donkeev
     length_(0)
   {}
   template< class T >
-  List< T >::List(size_t size, T data):
+  List< T >::List(size_t size, T& data):
     head_(nullptr),
     tail_(nullptr),
     length_(size)
