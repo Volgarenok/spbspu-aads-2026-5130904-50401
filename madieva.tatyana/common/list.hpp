@@ -204,7 +204,7 @@ namespace madieva {
   {
     assert(it != head_);
     LCIter< T > temp = *this;
-    --(*this);
+    ++(*this);
     return temp;
   }
 
@@ -511,7 +511,6 @@ namespace madieva {
       ++next;
       splice(pos, other, first);
       first = next;
-      ++pos;
     }
   }
 
@@ -536,23 +535,20 @@ namespace madieva {
   template< class T >
   void List< T >::sort()
   {
-    if (size_ <= 1) {
+    if (size_ < 2) {
       return;
     }
-    size_t unsorted = size_;
-    LIter< T > marker = end();
-    while (unsorted > 1) {
-      LIter< T > maxIt = begin();
-      LIter< T > it = begin();
-      for (size_t i = 1; i < unsorted; ++i) {
-        ++it;
-        if (*maxIt < *it) {
-          maxIt = it;
+
+    for (LIter<T> i = begin(); i != end(); ++i) {
+      LIter<T> min = i;
+
+      for (LIter<T> j = i; j != end(); ++j) {
+        if (*j < *min) {
+          min = j;
         }
       }
-      splice(marker, *this, maxIt);
-      --marker;
-      --unsorted;
+
+      std::swap(*i, *min);
     }
   }
 
@@ -560,23 +556,20 @@ namespace madieva {
   template< class Compare >
   void List< T >::sort(Compare cmp)
   {
-    if (size_ <= 1) {
+    if (size_ < 2) {
       return;
     }
-    size_t unsorted = size_;
-    LIter<T> marker = end();
-    while (unsorted > 1) {
-      LIter< T > maxIt = begin();
-      LIter< T > it = begin();
-      for (size_t i = 1; i < unsorted; ++i) {
-        ++it;
-        if (cmp(*maxIt, *it)) {
-          maxIt = it;
+
+    for (LIter<T> i = begin(); i != end(); ++i) {
+      LIter<T> min = i;
+
+      for (LIter<T> j = i; j != end(); ++j) {
+        if (cmp(*j, *min)) {
+          min = j;
         }
       }
-      splice(marker, *this, maxIt);
-      --marker;
-      --unsorted;
+
+      std::swap(*i, *min);
     }
   }
 
@@ -591,14 +584,14 @@ namespace madieva {
     LIter< T > it_other = other.begin();
 
     while (it_other != other.end()) {
-        if (it == end() || !(*it < *it_other)) {
-            LIter< T > next = it_other;
-            ++next;
-            splice(it, other, it_other);
-            it_other = next;
-        } else {
-            ++it;
-        }
+      if (it == end() || !(*it < *it_other)) {
+        LIter< T > next = it_other;
+        ++next;
+        splice(it, other, it_other);
+        it_other = next;
+      } else {
+        ++it;
+      }
     }
   }
 
@@ -614,14 +607,14 @@ namespace madieva {
     LIter< T > it_other = other.begin();
 
     while (it_other != other.end()) {
-        if (it == end() || !cmp(*it, *it_other)) {
-            LIter< T > next = it_other;
-            ++next;
-            splice(it, other, it_other);
-            it_other = next;
-        } else {
-            ++it;
-        }
+      if (it == end() || !cmp(*it, *it_other)) {
+        LIter< T > next = it_other;
+        ++next;
+        splice(it, other, it_other);
+        it_other = next;
+      } else {
+        ++it;
+      }
     }
   }
 
@@ -629,17 +622,13 @@ namespace madieva {
   LIter< T > List< T >::partition(const T & pivot)
   {
     LIter< T > it = begin();
-    LIter< T > it_sort = begin();
-    while (it != end()) {
-      LIter< T > next = it;
-      ++next;
-      if (*it < pivot) {
-        splice(it_sort, *this, it);
-        ++it_sort;
+    for (LIter< T > scan = begin(); scan != end(); ++scan) {
+      if (*scan < pivot) {
+        std::swap(*it, *scan);
+        ++it;
       }
-      it = next;
     }
-    return it_sort;
+    return it;
   }
 
   template< class T >
@@ -647,17 +636,13 @@ namespace madieva {
   LIter< T > List< T >::partition(Predicate pred)
   {
     LIter< T > it = begin();
-    LIter< T > it_sort = begin();
-    while (it != end()) {
-      LIter< T > next = it;
-      ++next;
-      if (pred(*it)) {
-        splice(it_sort, *this, it);
-        ++it_sort;
+    for (LIter< T > scan = begin(); scan != end(); ++scan) {
+      if (pred(*scan)) {
+        std::swap(*it, *scan);
+        ++it;
       }
-      it = next;
     }
-    return it_sort;
+    return it;
   }
 }
 

@@ -429,4 +429,237 @@ BOOST_AUTO_TEST_CASE(postfixDecrementBoundary)
   BOOST_CHECK(*it == 5);
 }
 
+BOOST_AUTO_TEST_CASE(splice_one_element)
+{
+  madieva::List< int > list1;
+  list1.pushBack(1);
+  list1.pushBack(2);
+  list1.pushBack(3);
+
+  madieva::List< int > list2;
+  list2.pushBack(10);
+  list2.pushBack(20);
+
+  madieva::LIter< int > it = list1.end();
+
+  list1.splice(it, list2, list2.begin());
+
+  BOOST_CHECK_EQUAL(list1.getSize(), 4);
+  BOOST_CHECK_EQUAL(list2.getSize(), 1);
+
+  madieva::LIter< int > check = list1.begin();
+  BOOST_CHECK(*check == 1);
+  ++check;
+  BOOST_CHECK(*check == 2);
+  ++check;
+  BOOST_CHECK(*check == 3);
+  ++check;
+  BOOST_CHECK(*check == 10);
+
+  BOOST_CHECK(*list2.begin() == 20);
+}
+
+BOOST_AUTO_TEST_CASE(splice_whole_list)
+{
+  madieva::List< int > list1;
+  list1.pushBack(1);
+  list1.pushBack(2);
+
+  madieva::List< int > list2;
+  list2.pushBack(10);
+  list2.pushBack(20);
+  list2.pushBack(30);
+
+  madieva::LIter< int > pos = list1.begin();
+  list1.splice(pos, list2);
+
+  BOOST_CHECK_EQUAL(list1.getSize(), 5);
+  BOOST_CHECK(list2.isEmpty());
+
+  madieva::LIter< int > it = list1.begin();
+  BOOST_CHECK(*it == 10);
+  ++it;
+  BOOST_CHECK(*it == 20);
+  ++it;
+  BOOST_CHECK(*it == 30);
+  ++it;
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+}
+
+BOOST_AUTO_TEST_CASE(splice_range)
+{
+  madieva::List< int > list1;
+  list1.pushBack(1);
+  list1.pushBack(5);
+
+  madieva::List< int > list2;
+  list2.pushBack(2);
+  list2.pushBack(3);
+  list2.pushBack(4);
+  list2.pushBack(6);
+
+  madieva::LIter< int > first = list2.begin();
+  madieva::LIter< int > last = list2.begin();
+  ++last;
+  ++last;
+
+  madieva::LIter< int > pos = list1.begin();
+  ++pos;
+
+  list1.splice(pos, list2, first, last);
+
+  BOOST_CHECK_EQUAL(list1.getSize(), 4);
+  BOOST_CHECK_EQUAL(list2.getSize(), 2);
+
+  madieva::LIter< int > it = list1.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 5);
+}
+
+BOOST_AUTO_TEST_CASE(sort_ascending)
+{
+  madieva::List< int > list;
+  list.pushBack(5);
+  list.pushBack(2);
+  list.pushBack(1);
+
+  list.sort();
+
+  madieva::LIter< int > it = list.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 5);
+}
+
+BOOST_AUTO_TEST_CASE(sort_descending_comparator)
+{
+  madieva::List< int > list;
+  list.pushBack(5);
+  list.pushBack(2);
+  list.pushBack(8);
+  list.pushBack(1);
+  list.pushBack(3);
+
+  list.sort([](int a, int b) { return a > b; });
+
+  madieva::LIter< int > it = list.begin();
+  BOOST_CHECK(*it == 8);
+  ++it;
+  BOOST_CHECK(*it == 5);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 1);
+}
+
+BOOST_AUTO_TEST_CASE(merge_two_sorted_lists)
+{
+  madieva::List< int > list1;
+  list1.pushBack(1);
+  list1.pushBack(3);
+  list1.pushBack(5);
+
+  madieva::List< int > list2;
+  list2.pushBack(2);
+  list2.pushBack(4);
+  list2.pushBack(6);
+
+  list1.merge(list2);
+
+  BOOST_CHECK(list2.isEmpty());
+  BOOST_CHECK_EQUAL(list1.getSize(), 6);
+
+  madieva::LIter< int > it = list1.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 4);
+  ++it;
+  BOOST_CHECK(*it == 5);
+  ++it;
+  BOOST_CHECK(*it == 6);
+}
+
+BOOST_AUTO_TEST_CASE(merge_with_duplicates)
+{
+  madieva::List< int > list1;
+  list1.pushBack(1);
+  list1.pushBack(3);
+  list1.pushBack(5);
+
+  madieva::List< int > list2;
+  list2.pushBack(3);
+  list2.pushBack(4);
+
+  list1.merge(list2);
+
+  madieva::LIter< int > it = list1.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 4);
+  ++it;
+  BOOST_CHECK(*it == 5);
+}
+
+BOOST_AUTO_TEST_CASE(partition_by_value)
+{
+  madieva::List< int > list;
+  list.pushBack(5);
+  list.pushBack(2);
+  list.pushBack(9);
+  list.pushBack(1);
+  list.pushBack(7);
+  list.pushBack(3);
+
+  madieva::LIter< int > boundary = list.partition(4);
+
+  madieva::LIter< int > it = list.begin();
+  for (; it != boundary; ++it) {
+    BOOST_CHECK(*it < 4);
+  }
+  for (; it != list.end(); ++it) {
+    BOOST_CHECK(*it >= 4);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(partition_by_predicate)
+{
+  madieva::List< int > list;
+  list.pushBack(5);
+  list.pushBack(2);
+  list.pushBack(9);
+  list.pushBack(1);
+  list.pushBack(7);
+  list.pushBack(3);
+
+  madieva::LIter< int > boundary = list.partition([](int x) { return x % 2 == 0; });
+
+  madieva::LIter< int > it = list.begin();
+  for (; it != boundary; ++it) {
+    BOOST_CHECK(*it % 2 == 0);
+  }
+  for (; it != list.end(); ++it) {
+    BOOST_CHECK(*it % 2 != 0);
+  }
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
