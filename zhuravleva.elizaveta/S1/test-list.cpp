@@ -354,3 +354,40 @@ BOOST_AUTO_TEST_CASE(merge_before_first_element_test)
   ++it;
   BOOST_CHECK(*it == 5);
 }
+
+BOOST_AUTO_TEST_CASE(sort_test)
+{
+  zhuravleva::List< int > list;
+  list.pushBack(1);
+  list.pushBack(5);
+  list.pushBack(3);
+  list.pushBack(4);
+  list.pushBack(2);
+  list.sort(std::less< int >());
+  zhuravleva::LIter< int > it = list.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 4);
+  ++it;
+  BOOST_CHECK(*it == 5);
+}
+
+BOOST_AUTO_TEST_CASE(sort_empty_test)
+{
+  zhuravleva::List< int > list;
+  list.sort(std::less< int >());
+  BOOST_CHECK(list.empty());
+}
+
+BOOST_AUTO_TEST_CASE(sort_one_element_test)
+{
+  zhuravleva::List< int > list;
+  list.pushBack(10);
+  list.sort(std::less< int >());
+  BOOST_CHECK(list.size() == 1);
+  BOOST_CHECK(*list.begin() == 10);
+}

@@ -42,6 +42,9 @@ namespace zhuravleva
     template< class Compare >
     void merge(List& other, Compare comp) noexcept;
 
+    template< class Compare >
+    void sort(Compare comp);
+
     void popFront() noexcept;
     void popBack() noexcept;
     void eraseAfter(LIter< T > pos);
@@ -53,13 +56,18 @@ namespace zhuravleva
     detail::Node< T >* createFake();
     detail::Node< T >* unlinkAfter(detail::Node< T >* pos) noexcept;
     void linkAfter(detail::Node< T >* pos, detail::Node< T >* node) noexcept;
+    template< class Compare >
+    detail::Node< T >* sortNodes(detail::Node< T >* head, Compare comp);
+
+    template< class Compare >
+    detail::Node< T >* mergeNodes(detail::Node< T >* left, detail::Node< T >* right,
+        Compare comp);
   };
 
   template< class T >
   List< T >::List():
     fake_(createFake())
   {}
-
 
   template< class T >
   List< T >::~List() noexcept
@@ -208,6 +216,103 @@ namespace zhuravleva
     {
       spliceAfter(LIter< T >(thisPrev), other);
     }
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::sort(Compare comp)
+  {
+    if ((fake_->next == fake_) || (fake_->next->next == fake_))
+    {
+      return;
+    }
+    detail::Node< T >* head = fake_->next;
+    detail::Node< T >* tail = head;
+    while (tail->next != fake_)
+    {
+      tail = tail->next;
+    }
+    tail->next = nullptr;
+    head = sortNodes(head, comp);
+    fake_->next = head;
+    tail = head;
+    while (tail->next)
+    {
+      tail = tail->next;
+    }
+    tail->next = fake_;
+  }
+
+  template< class T >
+  template< class Compare >
+  detail::Node< T >* List< T >::sortNodes(detail::Node< T >* head, Compare comp)
+  {
+    if (!head || !head->next)
+    {
+      return head;
+    }
+    detail::Node< T >* slow = head;
+    detail::Node< T >* fast = head->next;
+    while (fast && fast->next)
+    {
+      slow = slow->next;
+      fast = fast->next->next;
+    }
+    detail::Node< T >* right = slow->next;
+    slow->next = nullptr;
+    detail::Node< T >* left = sortNodes(head, comp);
+    right = sortNodes(right, comp);
+    return mergeNodes(left, right, comp);
+  }
+
+  template< class T >
+  template< class Compare >
+  detail::Node< T >* List< T >::mergeNodes(detail::Node< T >* left, detail::Node< T >* right,
+      Compare comp)
+  {
+    if (!left)
+    {
+      return right;
+    }
+    if (!right)
+    {
+      return left;
+    }
+    detail::Node< T >* result = nullptr;
+    if (comp(right->data, left->data))
+    {
+      result = right;
+      right = right->next;
+    }
+    else
+    {
+      result = left;
+      left = left->next;
+    }
+    detail::Node< T >* tail = result;
+    while (left && right)
+    {
+      if (comp(right->data, left->data))
+      {
+        tail->next = right;
+        right = right->next;
+      }
+      else
+      {
+        tail->next = left;
+        left = left->next;
+      }
+      tail = tail->next;
+    }
+    if (left)
+    {
+      tail->next = left;
+    }
+    else
+    {
+      tail->next = right;
+    }
+    return result;
   }
 
   template< class T >
