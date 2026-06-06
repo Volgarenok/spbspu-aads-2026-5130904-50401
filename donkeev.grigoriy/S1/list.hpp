@@ -16,7 +16,7 @@ namespace donkeev
   {
   public:
     List() noexcept;
-    List(size_t, T&);
+    List(size_t, const T&);
     List(const List< T >&);
     List(List< T >&&) noexcept;
 
@@ -62,17 +62,46 @@ namespace donkeev
     {
       return;
     }
-    head_ = new Node< T >{data, nullptr};
-    head_->next = head_;
-    tail_ = head_;
-    Node< T >* tmp = head_;
-    for (size_t i = 1; i < length_; ++i)
+
+    size_t created = 1;
+    try
     {
-      tmp->next = new Node< T >{data, nullptr};
-      tmp = tmp->next;
+      head_ = new Node< T >{data, nullptr};
+      ++created;
+
+      head_->next = head_;
+      tail_ = head_;
+      Node< T >* tmp = head_;
+      for (; created < length_; ++created)
+      {
+        tmp->next = new Node< T >{data, nullptr};
+        tmp = tmp->next;
+      }
+      tail_ = tmp;
+      tail_->next = head_;
     }
-    tail_ = tmp;
-    tail_->next = head_;
+    catch (...)
+    {
+      if (created == 1)
+      {
+        delete head_;
+      }
+      else
+      {
+        Node<T>* current = head_;
+        for (size_t i = 0; i < created; ++i)
+        {
+            Node<T>* next = current->next;
+            delete current;
+            current = next;
+        }
+      }
+
+      head_ = nullptr;
+      tail_ = nullptr;
+      length_ = 0;
+      throw;
+    }
   }
   template< class T >
   List< T >::List(const List< T >& yaList):
