@@ -20,10 +20,10 @@ namespace madieva {
   template< class T >
   class LIter {
   public:
-    LIter<T> & operator++() noexcept;
-    LIter<T> & operator--() noexcept;
-    LIter<T> operator++(int) noexcept;
-    LIter<T> operator--(int) noexcept;
+    LIter< T > & operator++() noexcept;
+    LIter< T > & operator--() noexcept;
+    LIter< T > operator++(int) noexcept;
+    LIter< T > operator--(int) noexcept;
     bool operator==(const LIter< T > & a) const noexcept;
     bool operator!=(const LIter< T > & a) const noexcept;
     T & operator*() noexcept;
@@ -38,10 +38,10 @@ namespace madieva {
   template< class T >
   class LCIter {
   public:
-    LCIter<T> & operator++() noexcept;
-    LCIter<T> & operator--() noexcept;
-    LCIter<T> operator++(int) noexcept;
-    LCIter<T> operator--(int) noexcept;
+    LCIter< T > & operator++() noexcept;
+    LCIter< T > & operator--() noexcept;
+    LCIter< T > operator++(int) noexcept;
+    LCIter< T > operator--(int) noexcept;
     bool operator==(const LCIter< T > & a) const noexcept;
     bool operator!=(const LCIter< T > & a) const noexcept;
     const T & operator*() const noexcept;
@@ -76,6 +76,18 @@ namespace madieva {
     LCIter< T > end() const noexcept;
     LCIter< T > cend() const noexcept;
     void swap(List& other) noexcept;
+    void splice(LIter< T > pos, List< T > & other);
+    void splice(LIter< T > pos, List< T > & other, LIter< T > it);
+    void splice(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last);
+    void splice(LIter< T > pos, List< T > & other, LIter< T > it, size_t size);
+    void sort();
+    void sort(Compare cmp);
+    void merge(List< T > & other);
+    template<class Compare>
+    void merge(List< T > & other, Compare cmp);
+    LIter< T > partition(const T & pivot);
+    template< class Predicate >
+    LIter< T > partition(Predicate pred);
   private:
     detail::node_t< T > * head_;
     size_t size_;
@@ -88,7 +100,7 @@ namespace madieva {
   {}
 
   template< class T >
-  LIter<T> & LIter< T >::operator++() noexcept
+  LIter< T > & LIter< T >::operator++() noexcept
   {
     assert(it != nullptr);
     if (it->next == head_) {
@@ -100,7 +112,7 @@ namespace madieva {
   }
 
   template< class T >
-  LIter<T> & LIter< T >::operator--() noexcept
+  LIter< T > & LIter< T >::operator--() noexcept
   {
     assert(it != head_);
     if (it == nullptr) {
@@ -112,16 +124,16 @@ namespace madieva {
   }
 
   template< class T >
-  LIter<T> LIter< T >::operator++(int) noexcept
+  LIter< T > LIter< T >::operator++(int) noexcept
   {
     assert(it != nullptr);
-    LIter<T> temp = *this;
+    LIter< T > temp = *this;
     ++(*this);
     return temp;
   }
 
   template< class T >
-  LIter<T> LIter< T >::operator--(int) noexcept
+  LIter< T > LIter< T >::operator--(int) noexcept
   {
     assert(it != head_);
     LIter< T > temp = *this;
@@ -162,7 +174,7 @@ namespace madieva {
   {}
 
   template< class T >
-  LCIter<T> & LCIter< T >::operator++() noexcept
+  LCIter< T > & LCIter< T >::operator++() noexcept
   {
     assert(it != nullptr);
     if (it->next == head_) {
@@ -174,7 +186,7 @@ namespace madieva {
   }
 
   template< class T >
-  LCIter<T> & LCIter< T >::operator--() noexcept
+  LCIter< T > & LCIter< T >::operator--() noexcept
   {
     assert(it != head_);
     if (it == nullptr) {
@@ -186,7 +198,7 @@ namespace madieva {
   }
 
   template< class T >
-  LCIter<T> LCIter< T >::operator++(int) noexcept
+  LCIter< T > LCIter< T >::operator++(int) noexcept
   {
     assert(it != head_);
     LCIter< T > temp = *this;
@@ -195,10 +207,10 @@ namespace madieva {
   }
 
   template< class T >
-  LCIter<T> LCIter< T >::operator--(int) noexcept
+  LCIter< T > LCIter< T >::operator--(int) noexcept
   {
     assert(it != head_);
-    LCIter<T> temp = *this;
+    LCIter< T > temp = *this;
     --(*this);
     return temp;
   }
@@ -260,7 +272,7 @@ namespace madieva {
   List< T > & List< T >::operator=(const List< T > & a)
   {
     assert(this != & a);
-    List<T> tmp(a);
+    List< T > tmp(a);
     this->swap(tmp);
     return *this;
   }
@@ -437,6 +449,86 @@ namespace madieva {
   {
     std::swap(head_, other.head_);
     std::swap(size_, other.size_);
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List< T > & other)
+  {
+    splice(pos, other, other.begin(), other.end());
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List< T > & other, LIter< T > it)
+  {
+    if (other.isEmpty() || it == other.end()) {
+      return;
+    }
+    detail::node_t< T > * node = it.it;
+    detail::node_t< T > * prev_node = node->prev;
+    detail::node_t< T > * next_node = node->next;
+
+    prev_node->next = next_node;
+    next_node->prev = prev_node;
+    if (other.head_ == node) {
+      if (other.size_ == 1) {
+        other.head_ = nullptr;
+      } else {
+        other.head_ = next_node;
+      }
+    }
+    if (pos.it == nullptr) {
+      if (head_ == nullptr) {
+        head_ = node;
+        node->next = node;
+        node->prev = node;
+      } else {
+        detail::node_t< T > * tail = head_->prev;
+        node->next = head_;
+        node->prev = tail;
+        tail->next = node;
+        head_->prev = node;
+      }
+    } else {
+      node->next = pos.it;
+      node->prev = pos.it->prev;
+      pos.it->prev->next = node;
+      pos.it->prev = node;
+      if (head_ == pos.it) {
+        head_ = node;
+      }
+    }
+    size_++;
+    other.size_--;
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last)
+  {
+    while (first != last) {
+      LIter< T > next = first;
+      ++next;
+      splice(pos, other, first);
+      first = next;
+      ++pos;
+    }
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List< T > & other, LIter< T > it, size_t size)
+  {
+    if (size == 0) {
+        return;
+    }
+    if (it == other.end() || other.size_ < size) {
+      throw std::out_of_range("not enough elements in other");
+    }
+    for (size_t i = 0; i < size; ++i) {
+      LIter< T > next = it;
+      ++next;
+      splice(pos, other, it);
+      it = next;
+      ++pos;
+    }
   }
 }
 
