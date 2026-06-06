@@ -37,6 +37,7 @@ namespace zhuravleva
     LIter< T > beforeBegin();
 
     void spliceAfter(LIter< T > pos, List& other, LIter< T > beforeElement) noexcept;
+    void spliceAfter(LIter< T > pos, List& other) noexcept;
     void popFront() noexcept;
     void popBack() noexcept;
     void eraseAfter(LIter< T > pos);
@@ -202,6 +203,24 @@ namespace zhuravleva
     }
     detail::Node< T >* node = other.unlinkAfter(beforeElement.current_);
     linkAfter(pos.current_, node);
+  }
+
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List& other) noexcept
+  {
+    if (!pos.current_ || other.empty())
+    {
+      return;
+    }
+    detail::Node< T >* first = other.fake_->next;
+    detail::Node< T >* last = first;
+    while (last->next != other.fake_)
+    {
+      last = last->next;
+    }
+    last->next = pos.current_->next;
+    pos.current_->next = first;
+    other.fake_->next = other.fake_;
   }
 
   template< class T >

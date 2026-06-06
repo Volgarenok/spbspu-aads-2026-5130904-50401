@@ -274,3 +274,28 @@ BOOST_AUTO_TEST_CASE(spliceAfter_no_element_test)
   BOOST_CHECK(first.size() == 1);
   BOOST_CHECK(second.size() == 1);
 }
+
+BOOST_AUTO_TEST_CASE(splice_after_full_list_test)
+{
+  zhuravleva::List< int > first;
+  first.pushBack(1);
+  first.pushBack(2);
+  zhuravleva::List< int > second;
+  second.pushBack(10);
+  second.pushBack(20);
+  second.pushBack(30);
+  first.spliceAfter(first.begin(), second);
+
+  BOOST_CHECK(second.empty());
+  BOOST_CHECK(first.size() == 5);
+  zhuravleva::LIter< int > it = first.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 10);
+  ++it;
+  BOOST_CHECK(*it == 20);
+  ++it;
+  BOOST_CHECK(*it == 30);
+  ++it;
+  BOOST_CHECK(*it == 2);
+}
