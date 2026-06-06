@@ -61,6 +61,7 @@ int main()
     delete [] sumArray;
 
     std::cerr << "Sum of elements is overflow\n";
+    return 1;
   }
   size_t iterationCount = 0;
   while (iterationCount < maximumIteration)
