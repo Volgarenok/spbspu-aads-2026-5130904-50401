@@ -7,6 +7,8 @@
 
 namespace donkeev
 {
+  using detail::Node;
+  
   template< class T > class List;
 
   template< class T >
