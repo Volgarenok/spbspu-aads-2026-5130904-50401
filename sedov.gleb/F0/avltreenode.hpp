@@ -13,16 +13,17 @@ namespace sedov
   private:
       Key key_;
       Value value_;
-      AVLTreeNode* left_;
-      AVLTreeNode* right_;
-      AVLTreeNode* parent_;
+      AVLTreeNode * left_;
+      AVLTreeNode * right_;
+      AVLTreeNode * parent_;
       int height_;
+
       void updateHeight() noexcept;
       int balanceFactor() const noexcept;
-      explicit AVLTreeNode(const Key& k, const Value& v, AVLTreeNode* parent);
-      explicit AVLTreeNode(Key&& k, Value&& v, AVLTreeNode* parent);
+      explicit AVLTreeNode(const Key & k, const Value & v, AVLTreeNode * parent);
+      explicit AVLTreeNode(Key && k, Value && v, AVLTreeNode * parent);
 
-      template<class K, class V, class C>
+      template< class K, class V, class C >
       friend class AVLTree;
   };
 
