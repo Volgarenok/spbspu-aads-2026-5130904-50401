@@ -30,6 +30,7 @@ namespace donkeev
 
     LIter< T > insertAfter(LIter< T >, const T&);
     void pushFront(const T&);
+    void pushFront(T&&);
     void pushBack(const T&);
     void pushBack(T&&);
 
@@ -200,6 +201,24 @@ namespace donkeev
       ++length_;
       return;
     }
+    head_ = tmp;
+    tail_->next = head_;
+    ++length_;
+  }
+  template< class T >
+  void List< T >::pushFront(T&& value)
+  {
+    Node < T >* tmp = new Node< T >{std::move(value), head_};
+    if (length_ == 0)
+    {
+      head_ = tmp;
+      tail_ = tmp;
+      tail_->next = head_;
+      head_->next = tail_;
+      ++length_;
+      return;
+    }
+    tmp->next = head_;
     head_ = tmp;
     tail_->next = head_;
     ++length_;
