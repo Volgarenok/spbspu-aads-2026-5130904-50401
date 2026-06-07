@@ -128,7 +128,7 @@ namespace studilova
   template< class T >
   List< T >& List< T >::operator=(const List& other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       List< T > temp(other);
       swap(temp);
@@ -140,12 +140,10 @@ namespace studilova
   template< class T >
   List< T >& List< T >::operator=(List&& other) noexcept
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
-      clear();
-
-      head_ = std::exchange(other.head_, nullptr);
-      size_ = std::exchange(other.size_, 0);
+      List< T > temp(std::move(other));
+      swap(temp);
     }
 
     return *this;
