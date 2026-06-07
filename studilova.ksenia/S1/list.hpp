@@ -611,15 +611,15 @@ namespace studilova
   {
     public:
       T& operator*() const;
-      T* operator->() const;
+      T* operator->() const noexcept;
 
-      LIter& operator++();
-      LIter operator++(int);
-      LIter& operator--();
-      LIter operator--(int);
+      LIter& operator++() noexcept;
+      LIter operator++(int) noexcept;
+      LIter& operator--() noexcept;
+      LIter operator--(int) noexcept;
 
-      bool operator==(const LIter& other) const;
-      bool operator!=(const LIter& other) const;
+      bool operator==(const LIter& other) const noexcept;
+      bool operator!=(const LIter& other) const noexcept;
 
     private:
       detail::Node< T >* node_;
@@ -645,20 +645,20 @@ namespace studilova
   }
 
   template< class T >
-  T* LIter< T >::operator->() const
+  T* LIter< T >::operator->() const noexcept
   {
     return std::addressof(node_->data);
   }
 
   template< class T >
-  LIter< T >& LIter< T >::operator++()
+  LIter< T >& LIter< T >::operator++() noexcept
   {
     node_ = node_->next;
     return *this;
   }
 
   template< class T >
-  LIter< T > LIter< T >::operator++(int)
+  LIter< T > LIter< T >::operator++(int) noexcept
   {
     LIter< T > temp(*this);
     ++(*this);
@@ -666,14 +666,14 @@ namespace studilova
   }
 
   template< class T >
-  LIter< T >& LIter< T >::operator--()
+  LIter< T >& LIter< T >::operator--() noexcept
   {
     node_ = node_->prev;
     return *this;
   }
 
   template< class T >
-  LIter< T > LIter< T >::operator--(int)
+  LIter< T > LIter< T >::operator--(int) noexcept
   {
     LIter< T > temp(*this);
     --(*this);
@@ -681,13 +681,13 @@ namespace studilova
   }
 
   template< class T >
-  bool LIter< T >::operator==(const LIter& other) const
+  bool LIter< T >::operator==(const LIter& other) const noexcept
   {
     return node_ == other.node_;
   }
 
   template< class T >
-  bool LIter< T >::operator!=(const LIter& other) const
+  bool LIter< T >::operator!=(const LIter& other) const noexcept
   {
     return !(*this == other);
   }
@@ -709,15 +709,15 @@ namespace studilova
   {
     public:
       const T& operator*() const;
-      const T* operator->() const;
+      const T* operator->() const noexcept;
 
-      CLIter& operator++();
-      CLIter operator++(int);
-      CLIter& operator--();
-      CLIter operator--(int);
+      CLIter& operator++() noexcept;
+      CLIter operator++(int) noexcept;
+      CLIter& operator--() noexcept;
+      CLIter operator--(int) noexcept;
 
-      bool operator==(const CLIter& other) const;
-      bool operator!=(const CLIter& other) const;
+      bool operator==(const CLIter& other) const noexcept;
+      bool operator!=(const CLIter& other) const noexcept;
 
     private:
       detail::Node< T >* node_;
@@ -743,20 +743,20 @@ namespace studilova
   }
 
   template< class T >
-  const T* CLIter< T >::operator->() const
+  const T* CLIter< T >::operator->() const noexcept
   {
     return std::addressof(node_->data);
   }
 
   template< class T >
-  CLIter< T >& CLIter< T >::operator++()
+  CLIter< T >& CLIter< T >::operator++() noexcept
   {
     node_ = node_->next;
     return *this;
   }
 
   template< class T >
-  CLIter< T > CLIter< T >::operator++(int)
+  CLIter< T > CLIter< T >::operator++(int) noexcept
   {
     CLIter< T > temp(*this);
     ++(*this);
@@ -764,14 +764,14 @@ namespace studilova
   }
 
   template< class T >
-  CLIter< T >& CLIter< T >::operator--()
+  CLIter< T >& CLIter< T >::operator--() noexcept
   {
     node_ = node_->prev;
     return *this;
   }
 
   template< class T >
-  CLIter< T > CLIter< T >::operator--(int)
+  CLIter< T > CLIter< T >::operator--(int) noexcept
   {
     CLIter< T > temp(*this);
     --(*this);
@@ -779,13 +779,13 @@ namespace studilova
   }
 
   template< class T >
-  bool CLIter< T >::operator==(const CLIter& other) const
+  bool CLIter< T >::operator==(const CLIter& other) const noexcept
   {
     return node_ == other.node_;
   }
 
   template< class T >
-  bool CLIter< T >::operator!=(const CLIter& other) const
+  bool CLIter< T >::operator!=(const CLIter& other) const noexcept
   {
     return !(*this == other);
   }
