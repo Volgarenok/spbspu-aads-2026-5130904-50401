@@ -22,7 +22,7 @@ namespace donkeev
     T& front();
     const T& front() const;
 
-    size_t size() const;  
+    size_t size() const;
     bool empty() const;
     void clear();
   };
