@@ -60,7 +60,8 @@ namespace vasyakin
     class Node
     {
     public:
-      explicit Node(const T& value);
+      template< class V >
+      explicit Node(V&& value);
 
     private:
       T val_;
@@ -78,14 +79,21 @@ namespace vasyakin
     List();
     List(const List& other);
     List(List&& other) noexcept;
-    explicit List(const T& value);
+
+    template< class U >
+    explicit List(U&& value);
+
     ~List() noexcept;
     List& operator=(const List& other);
     List& operator=(List&& other) noexcept;
 
-    LIter< T > insert(LIter< T > it, const T& value);
+    template< class U >
+    LIter< T > insert(LIter< T > it, U&& value);
+
+    template< class U >
+    void pushBack(U&& value);
+
     LIter< T > erase(LIter< T > it) noexcept;
-    void pushBack(const T& value);
     void swap(List& other) noexcept;
     void clear() noexcept;
 
@@ -225,8 +233,9 @@ namespace vasyakin
   }
 
   template< class T >
-  detail::Node< T >::Node(const T& value):
-    val_(value),
+  template< class V >
+  detail::Node< T >::Node(V&& value):
+    val_(std::forward< V >(value)),
     next_(nullptr)
   {}
 
@@ -268,7 +277,8 @@ namespace vasyakin
   {}
 
   template< class T >
-  List< T >::List(const T& value):
+  template< class U >
+  List< T >::List(U&& value):
     fake_node_(new detail::Node< T >(T{})),
     size_(0)
   {
@@ -276,7 +286,7 @@ namespace vasyakin
 
     try
     {
-      pushBack(value);
+      pushBack(std::forward< U >(value));
     }
     catch (...)
     {
@@ -326,9 +336,10 @@ namespace vasyakin
   }
 
   template< class T >
-  LIter< T > List< T >::insert(LIter< T > it, const T& value)
+  template< class U >
+  LIter< T > List< T >::insert(LIter< T > it, U&& value)
   {
-    detail::Node< T >* new_node = new detail::Node< T >(value);
+    detail::Node< T >* new_node = new detail::Node< T >(std::forward< U >(value));
 
     if (fake_node_->next_ == fake_node_)
     {
@@ -359,14 +370,15 @@ namespace vasyakin
   }
 
   template< class T >
-  void List< T >::pushBack(const T& value)
+  template< class U >
+  void List< T >::pushBack(U&& value)
   {
     detail::Node< T >* last = fake_node_;
     while (last->next_ != fake_node_)
     {
       last = last->next_;
     }
-    insert(LIter< T >(last), value);
+    insert(LIter< T >(last), std::forward< U >(value));
   }
 
   template< class T >
