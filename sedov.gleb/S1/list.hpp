@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <limits>
 #include <cassert>
+#include <functional>
+#include <memory>
 
 namespace sedov
 {
@@ -17,9 +19,9 @@ namespace sedov
     template< class T >
     struct Node
     {
-      T val_;
-      Node< T > * next_;
-      Node< T > * prev_;
+      T val;
+      Node< T > * next;
+      Node< T > * prev;
       Node(const T & value);
       Node(T && value);
     };
@@ -29,49 +31,47 @@ namespace sedov
   class LIter
   {
   public:
-    LIter(detail::Node< T > * p = nullptr);
+    T & operator*() noexcept;
+    T * operator->() noexcept;
 
-    T & operator*();
-    T * operator->();
+    LIter & operator++() noexcept;
+    LIter operator++(int) noexcept;
+    LIter & operator--() noexcept;
+    LIter operator--(int) noexcept;
 
-    LIter & operator++();
-    LIter operator++(int);
-    LIter & operator--();
-    LIter operator--(int);
-
-    bool operator==(const LIter & h) const;
-    bool operator!=(const LIter & h) const;
+    bool operator==(const LIter & h) const noexcept;
+    bool operator!=(const LIter & h) const noexcept;
   private:
     friend class List< T >;
     detail::Node< T > * ptr_;
+    explicit LIter(detail::Node< T > * p = nullptr) noexcept;
   };
 
   template< class T >
   class LCIter
   {
   public:
-    LCIter(const detail::Node< T > * p = nullptr);
+    const T & operator*() const noexcept;
+    const T * operator->() const noexcept;
 
-    const T & operator*() const;
-    const T * operator->() const;
+    LCIter & operator++() noexcept;
+    LCIter operator++(int) noexcept;
+    LCIter & operator--() noexcept;
+    LCIter operator--(int) noexcept;
 
-    LCIter & operator++();
-    LCIter operator++(int);
-    LCIter & operator--();
-    LCIter operator--(int);
-
-    bool operator==(const LCIter & h) const;
-    bool operator!=(const LCIter & h) const;
+    bool operator==(const LCIter & h) const noexcept;
+    bool operator!=(const LCIter & h) const noexcept;
   private:
     friend class List< T >;
     const detail::Node< T > * ptr_;
+    LCIter(const detail::Node< T > * p = nullptr) noexcept;
   };
 
   template< class T >
   class List
   {
   public:
-    List();
+    List() noexcept;
     List(const List & h);
     List(List && h) noexcept;
     ~List() noexcept;
@@ -79,10 +79,10 @@ namespace sedov
     List & operator=(const List & h);
     List & operator=(List && h) noexcept;
 
-    LIter< T > begin();
-    LIter< T > end();
-    LCIter< T > cbegin() const;
-    LCIter< T > cend() const;
+    LIter< T > begin() noexcept;
+    LIter< T > end() noexcept;
+    LCIter< T > cbegin() const noexcept;
+    LCIter< T > cend() const noexcept;
 
     T & front();
     const T & front() const;
@@ -90,13 +90,15 @@ namespace sedov
     const T & back() const;
 
     void pushFront(const T & v);
+    void pushFront(T && v);
     void pushBack(const T & v);
     void pushBack(T && v);
     LIter< T > insert(LIter< T > p, const T & v);
+    LIter< T > insert(LIter< T > p, T && v);
 
-    void popFront();
-    void popBack();
-    LIter< T > erase(LIter< T > p);
+    void popFront() noexcept;
+    void popBack() noexcept;
+    LIter< T > erase(LIter< T > p) noexcept;
 
     void clear() noexcept;
     size_t size() const noexcept;
@@ -106,7 +108,11 @@ namespace sedov
     void splice(LIter< T > pos, List & h, LIter< T > it) noexcept;
     void splice(LIter< T > pos, List & h, LIter< T > first, LIter< T > last) noexcept;
     void merge(List & h) noexcept;
+    template< class Comp >
+    void merge(List & h, Comp c) noexcept;
     void sort();
+    template< class Comp >
+    void sort(Comp c);
 
     template< class P >
     LIter< T > partition(P p);
@@ -114,142 +120,145 @@ namespace sedov
     detail::Node< T > * head_;
     detail::Node< T > * tail_;
     size_t size_;
+
+    template< class Comp >
+    void mergeSort(List< T > & list, Comp c);
   };
 
   template< class T >
   detail::Node< T >::Node(const T & value):
-    val_(value),
-    next_(nullptr),
-    prev_(nullptr)
+    val(value),
+    next(nullptr),
+    prev(nullptr)
   {}
 
   template< class T >
   detail::Node< T >::Node(T && value):
-    val_(std::move(value)),
-    next_(nullptr),
-    prev_(nullptr)
+    val(std::forward< T >(value)),
+    next(nullptr),
+    prev(nullptr)
   {}
 
   template< class T >
-  LIter< T >::LIter(detail::Node< T > * p):
+  LIter< T >::LIter(detail::Node< T > * p) noexcept:
     ptr_(p)
   {}
 
   template< class T >
-  T & LIter< T >::operator*()
+  T & LIter< T >::operator*() noexcept
   {
-    return ptr_->val_;
+    return ptr_->val;
   }
 
   template< class T >
-  T * LIter< T >::operator->()
+  T * LIter< T >::operator->() noexcept
   {
-    return &ptr_->val_;
+    return std::addressof(ptr_->val);
   }
 
   template< class T >
-  LIter< T > & LIter< T >::operator++()
+  LIter< T > & LIter< T >::operator++() noexcept
   {
-    ptr_ = ptr_->next_;
+    ptr_ = ptr_->next;
     return *this;
   }
 
   template< class T >
-  LIter< T > LIter< T >::operator++(int)
+  LIter< T > LIter< T >::operator++(int) noexcept
   {
     LIter temp = *this;
-    ptr_ = ptr_->next_;
+    ptr_ = ptr_->next;
     return temp;
   }
 
   template< class T >
-  LIter< T > & LIter< T >::operator--()
+  LIter< T > & LIter< T >::operator--() noexcept
   {
-    ptr_ = ptr_->prev_;
+    ptr_ = ptr_->prev;
     return *this;
   }
 
   template< class T >
-  LIter< T > LIter< T >::operator--(int)
+  LIter< T > LIter< T >::operator--(int) noexcept
   {
     LIter temp = *this;
-    ptr_ = ptr_->prev_;
+    ptr_ = ptr_->prev;
     return temp;
   }
 
   template< class T >
-  bool LIter< T >::operator==(const LIter & h) const
+  bool LIter< T >::operator==(const LIter & h) const noexcept
   {
     return ptr_ == h.ptr_;
   }
 
   template< class T >
-  bool LIter< T >::operator!=(const LIter & h) const
+  bool LIter< T >::operator!=(const LIter & h) const noexcept
   {
     return !(ptr_ == h.ptr_);
   }
 
   template< class T >
-  LCIter< T >::LCIter(const detail::Node< T > * p):
+  LCIter< T >::LCIter(const detail::Node< T > * p) noexcept:
     ptr_(p)
   {}
 
   template< class T >
-  const T & LCIter< T >::operator*() const
+  const T & LCIter< T >::operator*() const noexcept
   {
-    return ptr_->val_;
+    return ptr_->val;
   }
 
   template< class T >
-  const T * LCIter< T >::operator->() const
+  const T * LCIter< T >::operator->() const noexcept
   {
-    return &ptr_->val_;
+    return std::addressof(ptr_->val);
   }
 
   template< class T >
-  LCIter< T > & LCIter< T >::operator++()
+  LCIter< T > & LCIter< T >::operator++() noexcept
   {
-    ptr_ = ptr_->next_;
+    ptr_ = ptr_->next;
     return *this;
   }
 
   template< class T >
-  LCIter< T > LCIter< T >::operator++(int)
+  LCIter< T > LCIter< T >::operator++(int) noexcept
   {
     LCIter tmp = *this;
-    ptr_ = ptr_->next_;
+    ptr_ = ptr_->next;
     return tmp;
   }
 
   template< class T >
-  LCIter< T > & LCIter< T >::operator--()
+  LCIter< T > & LCIter< T >::operator--() noexcept
   {
-    ptr_ = ptr_->prev_;
+    ptr_ = ptr_->prev;
     return *this;
   }
 
   template< class T >
-  LCIter< T > LCIter< T >::operator--(int)
+  LCIter< T > LCIter< T >::operator--(int) noexcept
   {
     LCIter tmp = *this;
-    ptr_ = ptr_->prev_;
+    ptr_ = ptr_->prev;
     return tmp;
   }
 
   template< class T >
-  bool LCIter< T >::operator==(const LCIter & h) const
+  bool LCIter< T >::operator==(const LCIter & h) const noexcept
   {
     return ptr_ == h.ptr_;
   }
 
   template< class T >
-  bool LCIter< T >::operator!=(const LCIter & h) const
+  bool LCIter< T >::operator!=(const LCIter & h) const noexcept
   {
     return !(ptr_ == h.ptr_);
   }
 
   template< class T >
-  List< T >::List():
+  List< T >::List() noexcept:
     head_(nullptr),
     tail_(nullptr),
     size_(0)
@@ -259,9 +268,9 @@ namespace sedov
   List< T >::List(const List & h):
     List()
   {
-    for (detail::Node< T > * cur = h.head_; cur != nullptr; cur = cur->next_)
+    for (detail::Node< T > * cur = h.head_; cur != nullptr; cur = cur->next)
     {
-      pushBack(cur->val_);
+      pushBack(cur->val);
     }
   }
 
@@ -292,33 +301,31 @@ namespace sedov
   List< T > & List< T >::operator=(List && h) noexcept
   {
     assert(this != &h);
-    clear();
-    head_ = std::exchange(h.head_, nullptr);
-    tail_ = std::exchange(h.tail_, nullptr);
-    size_ = std::exchange(h.size_, 0);
+    List temp(std::move(h));
+    swap(temp);
     return *this;
   }
 
   template< class T >
-  LIter< T > List< T >::begin()
+  LIter< T > List< T >::begin() noexcept
   {
     return LIter< T >(head_);
   }
 
   template< class T >
-  LIter< T > List< T >::end()
+  LIter< T > List< T >::end() noexcept
   {
     return LIter< T >(nullptr);
   }
 
   template< class T >
-  LCIter< T > List< T >::cbegin() const
+  LCIter< T > List< T >::cbegin() const noexcept
   {
     return LCIter< T >(head_);
   }
 
   template< class T >
-  LCIter< T > List< T >::cend() const
+  LCIter< T > List< T >::cend() const noexcept
   {
     return LCIter< T >(nullptr);
   }
@@ -326,35 +333,52 @@ namespace sedov
   template< class T >
   T & List< T >::front()
   {
-    return head_->val_;
+    return head_->val;
   }
 
   template< class T >
   const T & List< T >::front() const
   {
-    return head_->val_;
+    return head_->val;
   }
 
   template< class T >
   T & List< T >::back()
   {
-    return tail_->val_;
+    return tail_->val;
   }
 
   template< class T >
   const T & List< T >::back() const
   {
-    return tail_->val_;
+    return tail_->val;
   }
 
   template< class T >
   void List< T >::pushFront(const T & v)
   {
     detail::Node< T > * newNode = new detail::Node< T >(v);
-    newNode->next_ = head_;
+    newNode->next = head_;
     if (head_)
     {
-      head_->prev_ = newNode;
+      head_->prev = newNode;
+    }
+    else
+    {
+      tail_ = newNode;
+    }
+    head_ = newNode;
+    ++size_;
+  }
+
+  template< class T >
+  void List< T >::pushFront(T && v)
+  {
+    detail::Node< T >* newNode = new detail::Node< T >(std::forward< T >(v));
+    newNode->next = head_;
+    if (head_)
+    {
+      head_->prev = newNode;
     }
     else
     {
@@ -368,10 +392,10 @@ namespace sedov
   void List< T >::pushBack(const T & v)
   {
     detail::Node< T > * newNode = new detail::Node< T >(v);
-    newNode->prev_ = tail_;
+    newNode->prev = tail_;
     if (tail_)
     {
-      tail_->next_ = newNode;
+      tail_->next = newNode;
     }
     else
     {
@@ -384,11 +408,11 @@ namespace sedov
   template< class T >
   void List< T >::pushBack(T && v)
   {
-    detail::Node< T > * newNode = new detail::Node< T >(std::move(v));
-    newNode->prev_ = tail_;
+    detail::Node< T > * newNode = new detail::Node< T >(std::forward< T >(v));
+    newNode->prev = tail_;
     if (tail_)
     {
-      tail_->next_ = newNode;
+      tail_->next = newNode;
     }
     else
     {
@@ -413,69 +437,69 @@ namespace sedov
     }
     detail::Node< T > * newNode = new detail::Node< T >(v);
     detail::Node< T > * next = p.ptr_;
-    detail::Node< T > * prev = next->prev_;
-    newNode->prev_ = prev;
-    newNode->next_ = next;
-    prev->next_ = newNode;
-    next->prev_ = newNode;
+    detail::Node< T > * prev = next->prev;
+    newNode->prev = prev;
+    newNode->next = next;
+    prev->next = newNode;
+    next->prev = newNode;
     ++size_;
     return LIter< T >(newNode);
   }
 
   template< class T >
-  void List< T >::popFront()
+  LIter< T > List< T >::insert(LIter< T > p, T && v)
   {
-    if (!head_)
+    if (!p.ptr_)
     {
-      return;
+      pushBack(std::move(v));
+      return LIter< T >(tail_);
     }
-    detail::Node< T > * temp = head_;
-    head_ = head_->next_;
+    if (p.ptr_ == head_)
+    {
+      pushFront(std::move(v));
+      return LIter< T >(head_);
+    }
+    detail::Node< T >* newNode = new detail::Node< T >(std::forward< T >(v));
+    detail::Node< T >* next = p.ptr_;
+    detail::Node< T >* prev = next->prev;
+    newNode->prev = prev;
+    newNode->next = next;
+    prev->next = newNode;
+    next->prev = newNode;
+    ++size_;
+    return LIter< T >(newNode);
+  }
+
+  template< class T >
+  void List< T >::popFront() noexcept
+  {
     if (head_)
     {
-      head_->prev_ = nullptr;
+      erase(begin());
     }
-    else
-    {
-      tail_ = nullptr;
-    }
-    delete temp;
-    --size_;
   }
 
   template< class T >
-  void List< T >::popBack()
+  void List< T >::popBack() noexcept
   {
-    if (!tail_)
-    {
-      return;
-    }
-    detail::Node< T > * temp = tail_;
-    tail_ = tail_->prev_;
     if (tail_)
     {
-      tail_->next_ = nullptr;
+      erase(LIter< T >(tail_));
     }
-    else
-    {
-      head_ = nullptr;
-    }
-    delete temp;
-    --size_;
   }
 
   template< class T >
-  LIter< T > List< T >::erase(LIter< T > p)
+  LIter< T > List< T >::erase(LIter< T > p) noexcept
   {
     if (!p.ptr_)
     {
       return end();
     }
-    detail::Node< T > * next = p.ptr_->next_;
-    detail::Node< T > * prev = p.ptr_->prev_;
+    detail::Node< T > * next = p.ptr_->next;
+    detail::Node< T > * prev = p.ptr_->prev;
     if (prev)
     {
-      prev->next_ = next;
+      prev->next = next;
     }
     else
     {
@@ -483,7 +507,7 @@ namespace sedov
     }
     if (next)
     {
-      next->prev_ = prev;
+      next->prev = prev;
     }
     else
     {
@@ -500,7 +524,7 @@ namespace sedov
     while (head_)
     {
       detail::Node< T > * temp = head_;
-      head_ = head_->next_;
+      head_ = head_->next;
       delete temp;
     }
     tail_ = nullptr;
@@ -556,10 +580,10 @@ namespace sedov
       ++count;
     }
     detail::Node< T > * firstNode = first.ptr_;
-    detail::Node< T > * lastNode = (last.ptr_ == nullptr) ? h.tail_ : last.ptr_->prev_;
-    if (firstNode->prev_)
+    detail::Node< T > * lastNode = (last.ptr_ == nullptr) ? h.tail_ : last.ptr_->prev;
+    if (firstNode->prev)
     {
-      firstNode->prev_->next_ = last.ptr_;
+      firstNode->prev->next = last.ptr_;
     }
     else
     {
@@ -567,19 +591,19 @@ namespace sedov
     }
     if (last.ptr_)
     {
-      last.ptr_->prev_ = firstNode->prev_;
+      last.ptr_->prev = firstNode->prev;
     }
     else
     {
-      h.tail_ = firstNode->prev_;
+      h.tail_ = firstNode->prev;
     }
     detail::Node< T > * posNode = pos.ptr_;
-    detail::Node< T > * posPrev = (posNode) ? posNode->prev_ : tail_;
-    firstNode->prev_ = posPrev;
-    lastNode->next_ = posNode;
+    detail::Node< T > * posPrev = (posNode) ? posNode->prev : tail_;
+    firstNode->prev = posPrev;
+    lastNode->next = posNode;
     if (posPrev)
     {
-      posPrev->next_ = firstNode;
+      posPrev->next = firstNode;
     }
     else
     {
@@ -587,7 +611,7 @@ namespace sedov
     }
     if (posNode)
     {
-      posNode->prev_ = lastNode;
+      posNode->prev = lastNode;
     }
     else
     {
@@ -600,6 +624,13 @@ namespace sedov
   template< class T >
   void List< T >::merge(List & h) noexcept
   {
+    merge(h, std::less< T >());
+  }
+
+  template< class T >
+  template< class Comp >
+  void List< T >::merge(List & h, Comp c) noexcept
+  {
     if (this == &h || h.size_ == 0)
     {
       return;
@@ -608,7 +639,7 @@ namespace sedov
     LIter< T > hIt = h.begin();
     while (thisIt != end() && hIt != h.end())
     {
-      if (*hIt < *thisIt)
+      if (c(*hIt, *thisIt))
       {
         LIter< T > toMove = hIt;
         ++hIt;
@@ -626,7 +657,8 @@ namespace sedov
   }
 
   template< class T >
-  static void mergeSort(List< T > & list)
+  template< class Comp >
+  void List< T >::mergeSort(List< T > & list, Comp c)
   {
     if (list.size() <= 1)
     {
@@ -640,19 +672,26 @@ namespace sedov
       ++mid;
     }
     right.splice(right.begin(), list, mid, list.end());
-    mergeSort(list);
-    mergeSort(right);
-    list.merge(right);
+    mergeSort(list, c);
+    mergeSort(right, c);
+    list.merge(right, c);
   }
 
   template< class T >
   void List< T >::sort()
   {
+    sort(std::less< T >());
+  }
+
+  template< class T >
+  template< class Comp >
+  void List< T >::sort(Comp c)
+  {
     if (size_ <= 1)
     {
       return;
     }
-    mergeSort(*this);
+    mergeSort(*this, c);
   }
 
   template< class T >

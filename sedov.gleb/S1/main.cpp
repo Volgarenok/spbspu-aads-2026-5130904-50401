@@ -3,6 +3,7 @@
 #include <utility>
 #include <string>
 #include <stdexcept>
+#include <algorithm>
 #include "list.hpp"
 
 int main()
@@ -46,10 +47,7 @@ int main()
     {
       ++len;
     }
-    if (len > maxLen)
-    {
-      maxLen = len;
-    }
+    maxLen = std::max(maxLen, len);
   }
 
   sedov::List< sedov::List< size_t > > transpose;
