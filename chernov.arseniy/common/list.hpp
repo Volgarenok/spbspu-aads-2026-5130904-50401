@@ -128,15 +128,8 @@ namespace chernov {
     if (this == std::addressof(list)) {
       return *this;
     }
-    clear();
-    if (!list.empty()) {
-      LIter< T > pos = beforeBegin();
-      LIter< T > iter = list.begin();
-      do {
-        pos = insertAfter(pos, *iter);
-        ++iter;
-      } while (iter != list.begin());
-    }
+    List< T > new_list = list;
+    swap(new_list);
     return *this;
   }
 
