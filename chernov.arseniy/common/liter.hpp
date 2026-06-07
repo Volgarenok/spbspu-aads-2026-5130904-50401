@@ -22,41 +22,41 @@ namespace chernov {
     bool operator!=(const LIter< T > & other) const noexcept;
   private:
     friend class List< T >;
-    detail::Node< T > * ptr;
+    detail::Node< T > * ptr_;
     detail::Node< T > * fake_;
     LIter(detail::Node< T > * node, detail::Node< T > * fake);
   };
 
   template< class T >
   LIter< T >::LIter(detail::Node< T > * node, detail::Node< T > * fake):
-    ptr(node),
+    ptr_(node),
     fake_(fake)
   {}
 
   template< class T >
   LIter< T >::LIter() noexcept:
-    ptr(nullptr),
+    ptr_(nullptr),
     fake_(nullptr)
   {}
 
   template< class T >
   T & LIter< T >::operator*() const noexcept
   {
-    return ptr->data;
+    return ptr_->data;
   }
 
   template< class T >
   T * LIter< T >::operator->() const noexcept
   {
-    return &(ptr->data);
+    return &(ptr_->data);
   }
 
   template< class T >
   LIter< T > & LIter< T >::operator++() noexcept
   {
-    ptr = ptr->next;
-    if (ptr == fake_) {
-      ptr = fake_->next;
+    ptr_ = ptr_->next;
+    if (ptr_ == fake_) {
+      ptr_ = fake_->next;
     }
     return *this;
   }
@@ -72,7 +72,7 @@ namespace chernov {
   template< class T >
   bool LIter< T >::operator==(const LIter< T > & other) const noexcept
   {
-    return ptr == other.ptr;
+    return ptr_ == other.ptr_;
   }
 
   template< class T >
