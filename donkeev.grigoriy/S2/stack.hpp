@@ -17,6 +17,7 @@ namespace donkeev
     ~Stack() = default;
 
     void push(const T&);
+    void push(T&&);
     void pop();
 
     T& top();
@@ -44,6 +45,11 @@ namespace donkeev
   void Stack< T >::push(const T& value)
   {
     list_.pushFront(value);
+  }
+  template< class T >
+  void Stack< T >::push(T&& value)
+  {
+    list_.pushFront(std::move(value));
   }
   template< class T >
   void Stack< T >::pop()
