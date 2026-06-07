@@ -33,7 +33,7 @@ namespace studilova
       List() noexcept;
       List(const List& other);
       List(List&& other) noexcept;
-      ~List();
+      ~List() noexcept;
 
       List& operator=(const List& other);
       List& operator=(List&& other) noexcept;
@@ -123,7 +123,7 @@ namespace studilova
   {}
 
   template< class T >
-  List< T >::~List()
+  List< T >::~List() noexcept
   {
     clear();
   }
@@ -408,108 +408,26 @@ namespace studilova
   template< class T >
   void List< T >::splice(LIter< T > pos, List& other) noexcept
   {
-    if (other.empty() || this == &other)
-    {
-      return;
-    }
-
-    detail::Node< T >* first = other.head_;
-    detail::Node< T >* last = other.head_->prev;
-
-    if (empty())
-    {
-      head_ = first;
-    }
-    else if (pos.node_ == nullptr)
-    {
-      detail::Node< T >* tail = head_->prev;
-
-      tail->next = first;
-      first->prev = tail;
-
-      last->next = head_;
-      head_->prev = last;
-    }
-    else
-    {
-      detail::Node< T >* curr = pos.node_;
-      detail::Node< T >* prev = curr->prev;
-
-      prev->next = first;
-      first->prev = prev;
-
-      last->next = curr;
-      curr->prev = last;
-
-      if (curr == head_)
-      {
-        head_ = first;
-      }
-    }
-    size_ += other.size_;
-    other.head_ = nullptr;
-    other.size_ = 0;
+    splice(pos, other, other.begin(), other.end());
   }
 
   template< class T >
   void List< T >::splice(LIter< T > pos, List& other, LIter< T > it) noexcept
   {
-    if (other.empty() || it.node_ == nullptr || this == &other)
+    if (it.node_ == nullptr)
     {
       return;
     }
 
-    detail::Node< T >* node = it.node_;
+    LIter< T > next = it;
+    ++next;
 
-    if (other.size_ == 1)
+    if (next.node_ == other.head_)
     {
-      other.head_ = nullptr;
+      next = other.end();
     }
-    else
-    {
-      node->prev->next = node->next;
-      node->next->prev = node->prev;
 
-      if (other.head_ == node)
-      {
-        other.head_ = node->next;
-      }
-    }
-    --other.size_;
-
-    if (empty())
-    {
-      node->next = node;
-      node->prev = node;
-      head_ = node;
-    }
-    else if (pos.node_ == nullptr)
-    {
-      detail::Node< T >* tail = head_->prev;
-
-      node->next = head_;
-      node->prev = tail;
-
-      tail->next = node;
-      head_->prev = node;
-    }
-    else
-    {
-      detail::Node< T >* curr = pos.node_;
-      detail::Node< T >* prev = curr->prev;
-
-      node->next = curr;
-      node->prev = prev;
-
-      prev->next = node;
-      curr->prev = node;
-
-      if (curr == head_)
-      {
-        head_ = node;
-      }
-    }
-    ++size_;
+    splice(pos, other, it, next);
   }
 
   template< class T >
