@@ -307,7 +307,7 @@ namespace chernov {
 template< class T >
 void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other)
 {
-  if (other.empty()) {
+  if (other.empty() || std::addressof(other) == this) {
     return;
   }
 
