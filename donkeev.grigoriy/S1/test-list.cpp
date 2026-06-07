@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(beginMethod)
 BOOST_AUTO_TEST_CASE(pushAfterMethod)
 {
   donkeev::List< int > list{2, 4};
-  list.pushAfter(++list.begin(), 3);
+  list.insertAfter(++list.begin(), 3);
   BOOST_TEST(*(list.begin() + 2) == 3);
 }
 BOOST_AUTO_TEST_CASE(pushFrontMethod)
@@ -59,19 +59,19 @@ BOOST_AUTO_TEST_CASE(cutAfterMethod)
 {
   donkeev::List< int > list{2, 4};
   donkeev::LIter< int > iter{list.begin()};
-  list.cutAfter(iter);
+  list.eraseAfter(iter);
   BOOST_TEST((*(list.begin()) == 4 && list.size() == 1));
 }
 BOOST_AUTO_TEST_CASE(clearAllMethod)
 {
   donkeev::List< int > list{2, 4};
-  list.clearAll();
+  list.clear();
   BOOST_CHECK(list.begin() == nullptr);
 }
 BOOST_AUTO_TEST_CASE(isEmptyMethod)
 {
   donkeev::List< int > list{};
-  BOOST_CHECK(list.isEmpty());
+  BOOST_CHECK(list.empty());
 }
 BOOST_AUTO_TEST_CASE(sizeMethod)
 {
@@ -207,4 +207,5 @@ BOOST_AUTO_TEST_CASE(ConstIterOperatorNonEqual)
   donkeev::LCIter< int > secondIter{list.cbegin() + 1};
   BOOST_CHECK(firstIter != secondIter);
 }
+
 BOOST_AUTO_TEST_SUITE_END()

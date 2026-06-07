@@ -4,59 +4,56 @@
 #include <cstddef>
 #include "node.hpp"
 #include "iterator.hpp"
-#include <iostream>
 
 namespace donkeev
 {
+  using detail::Node;
+
   template< class T > class LIter;
-  template< class T > class Node;
 
   template< class T >
   class List
   {
-    Node< T >* head_;
-    Node< T >* tail_;
-    size_t length_;
-
   public:
-    List();
-    List(size_t, T);
+    List() noexcept;
+    List(size_t, const T&);
     List(const List< T >&);
     List(List< T >&&) noexcept;
 
     List< T >& operator=(const List< T >&);
     List< T >& operator=(List&&) noexcept;
 
-    ~List();
+    ~List() noexcept;
 
-    LIter< T > begin();
-    LCIter< T > cbegin() const;
+    LIter< T > begin() noexcept;
+    LCIter< T > cbegin() const noexcept;
 
-    LIter< T > pushAfter(LIter< T >, const T&);
+    LIter< T > insertAfter(LIter< T >, const T&);
     void pushFront(const T&);
     void pushBack(const T&);
     void pushBack(T&&);
 
-    void popFront();
-    void cutAfter(LIter< T >&);
-    void clearAll();
-    void deleteNode(const T&);
-    bool has(const T&);
+    void popFront() noexcept;
+    void eraseAfter(LIter< T >&) noexcept;
+    void clear() noexcept;
 
-    bool isEmpty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
-    void swap(List< T >&) noexcept;
+  private:
+    Node< T >* head_;
+    Node< T >* tail_;
+    size_t length_;
   };
 
   template< class T >
-  List< T >::List():
+  List< T >::List() noexcept:
     head_(nullptr),
     tail_(nullptr),
     length_(0)
   {}
   template< class T >
-  List< T >::List(size_t size, T data):
+  List< T >::List(size_t size, const T& data):
     head_(nullptr),
     tail_(nullptr),
     length_(size)
@@ -65,17 +62,46 @@ namespace donkeev
     {
       return;
     }
-    head_ = new Node< T >{data, nullptr};
-    head_->next = head_;
-    tail_ = head_;
-    Node< T >* tmp = head_;
-    for (size_t i = 1; i < length_; ++i)
+
+    size_t created = 0;
+    try
     {
-      tmp->next = new Node< T >{data, nullptr};
-      tmp = tmp->next;
+      head_ = new Node< T >{data, nullptr};
+      ++created;
+
+      head_->next = head_;
+      tail_ = head_;
+      Node< T >* tmp = head_;
+      for (; created < length_; ++created)
+      {
+        tmp->next = new Node< T >{data, nullptr};
+        tmp = tmp->next;
+      }
+      tail_ = tmp;
+      tail_->next = head_;
     }
-    tail_ = tmp;
-    tail_->next = head_;
+    catch (...)
+    {
+      if (created == 1)
+      {
+        delete head_;
+      }
+      else
+      {
+        Node<T>* current = head_;
+        for (size_t i = 0; i < created; ++i)
+        {
+            Node<T>* next = current->next;
+            delete current;
+            current = next;
+        }
+      }
+
+      head_ = nullptr;
+      tail_ = nullptr;
+      length_ = 0;
+      throw;
+    }
   }
   template< class T >
   List< T >::List(const List< T >& yaList):
@@ -87,11 +113,21 @@ namespace donkeev
     {
       return;
     }
+
     LCIter< T > it{yaList.head_};
-    for (size_t i = 0; i < yaList.size(); ++i)
+    size_t i = 0;
+    try
     {
-      pushBack(*it);
-      ++it;
+      for (; i < yaList.size(); ++i)
+      {
+        pushBack(*it);
+        ++it;
+      }
+    }
+    catch (...)
+    {
+      clear();
+      throw;
     }
   }
   template< class T >
@@ -108,7 +144,7 @@ namespace donkeev
   template< class T >
   donkeev::List< T >& List< T >::operator=(const List< T >& other)
   {
-    clearAll();
+    clear();
     LCIter<T> it = other.cbegin();
     for (size_t i = 0; i < other.size(); ++i)
     {
@@ -127,24 +163,24 @@ namespace donkeev
   }
 
   template< class T >
-  donkeev::List< T >::~List()
+  donkeev::List< T >::~List() noexcept
   {
-    clearAll();
+    clear();
   }
 
   template< class T >
-  LIter< T > List< T >::begin()
+  LIter< T > List< T >::begin() noexcept
   {
     return LIter< T >{head_};
   }
   template< class T >
-  LCIter< T > List< T >::cbegin() const
+  LCIter< T > List< T >::cbegin() const noexcept
   {
     return LCIter< T >{head_};
   }
 
   template< class T >
-  LIter< T > List< T >::pushAfter(LIter< T > it, const T& value)
+  LIter< T > List< T >::insertAfter(LIter< T > it, const T& value)
   {
     Node< T >* tmp = new Node< T >{value, it.n->next};
     it.n->next = tmp;
@@ -155,10 +191,6 @@ namespace donkeev
   void List< T >::pushFront(const T& value)
   {
     Node < T >* tmp = new Node< T >{value, head_};
-    if (length_ == 0)
-    {
-      tail_ = tmp;
-    }
     head_ = tmp;
     tail_->next = head_;
     ++length_;
@@ -199,36 +231,22 @@ namespace donkeev
   }
 
   template< class T >
-  void List< T >::popFront()
+  void List< T >::popFront() noexcept
   {
-    if (length_ == 1)
-    {
-      head_->next = nullptr;
-      tail_->next = nullptr;
-      delete head_;
-      head_ = nullptr;
-      tail_ = nullptr;
-      --length_;
-      return;
-    }
     Node< T >* tmp = head_->next;
-    head_->next = nullptr;
     delete head_;
     head_ = tmp;
-    head_->next = tmp->next;
     tail_->next = head_;
     --length_;
   }
   template< class T >
-  void List< T >::cutAfter(LIter< T >& it)
+  void List< T >::eraseAfter(LIter< T >& it) noexcept
   {
     Node< T >* deleteNode = it.n->next;
     if (length_ == 1)
     {
       delete it.n;
       it.n = nullptr;
-      head_ = nullptr;
-      tail_ = nullptr;
       --length_;
       return;
     }
@@ -246,70 +264,27 @@ namespace donkeev
     --length_;
   }
   template< class T >
-  void List< T >::clearAll()
+  void List< T >::clear() noexcept
   {
+    LIter< T > it{head_};
     while (length_)
     {
-      popFront();
+      eraseAfter(it);
     }
+
     head_ = nullptr;
     tail_ = nullptr;
   }
-  template< class T >
-  void List< T >::deleteNode(const T& value)
-  {
-    Node< T >* node = head_;
-    if (node->val == value)
-    {
-      head_ = head_->next;
-      tail_ = head_;
-      --length_;
-      return;
-    }
-    donkeev::LIter< T > it = begin();
-    for (size_t i = 0; i < length_; ++i)
-    {
-      if (*it == value)
-      {
-        cutAfter(it);
-      }
-      ++it;
-    }
-  }
-  template< class T >
-  bool List< T >::has(const T& value)
-  {
-    Node< T >* it = head_;
-    for (size_t i = 0; i < length_; ++i)
-    {
-      if (it->val == value)
-      {
-        return true;
-      }
-
-      ++it;
-    }
-    return false;
-  }
 
   template< class T >
-  bool List< T >::isEmpty() const
+  bool List< T >::empty() const noexcept
   {
     return (length_ == 0);
   }
   template< class T >
-  size_t List< T >::size() const
+  size_t List< T >::size() const noexcept
   {
     return length_;
   }
-
-  template< class T >
-  void donkeev::List< T >::swap(List< T >& other) noexcept
-  {
-    std::swap(head_, other.head_);
-    std::swap(tail_, other.tail_);
-    std::swap(length_, other.length_);
-  }
 }
-
 #endif

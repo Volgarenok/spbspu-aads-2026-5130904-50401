@@ -7,18 +7,18 @@
 
 namespace donkeev
 {
+  using detail::Node;
+
   template< class T > class List;
 
   template< class T >
   class LIter
   {
     friend class List< T >;
-    Node< T >* n;
 
   public:
     LIter();
     LIter(const LIter&);
-    LIter(Node< T >*);
 
     LIter< T > operator+(size_t) noexcept;
 
@@ -33,6 +33,10 @@ namespace donkeev
     bool operator==(std::nullptr_t) const noexcept;
     bool operator!=(const LIter< T >&) const noexcept;
     bool operator!=(std::nullptr_t) const noexcept;
+
+  private:
+    Node< T >* n;
+    LIter(Node< T >*);
   };
 
   template< class T >
@@ -113,7 +117,7 @@ namespace donkeev
   template< class T >
   T& LIter< T >::operator*() noexcept
   {
-    assert(n != nullptr);
+    assert(n != nullptr && "fake iterator");
     return n->val;
   }
   template< class T >
