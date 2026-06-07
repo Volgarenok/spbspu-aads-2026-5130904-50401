@@ -11,14 +11,14 @@ BOOST_AUTO_TEST_SUITE(ListTests)
 BOOST_AUTO_TEST_CASE(DefConstructTest)
 {
   vasyakin::List< int > list;
-  BOOST_CHECK_EQUAL(list.getsize(), 0);
+  BOOST_CHECK_EQUAL(list.size(), 0);
   BOOST_CHECK(list.begin() == list.end());
 }
 
 BOOST_AUTO_TEST_CASE(ValConstructTest)
 {
   vasyakin::List< int > list(52);
-  BOOST_CHECK_EQUAL(list.getsize(), 1);
+  BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK(list.begin() != list.end());
   BOOST_CHECK_EQUAL(*list.begin(), 52);
 }
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(DestructEmptyListTest)
 BOOST_AUTO_TEST_CASE(DestructSingleElemTest)
 {
   vasyakin::List< int > list(52);
-  BOOST_CHECK_EQUAL(list.getsize(), 1);
+  BOOST_CHECK_EQUAL(list.size(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(DestructMultElemTest)
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(DestructMultElemTest)
   {
     list.pushBack(i);
   }
-  BOOST_CHECK_EQUAL(list.getsize(), 10);
+  BOOST_CHECK_EQUAL(list.size(), 10);
 }
 
 BOOST_AUTO_TEST_CASE(DestructAfterCopyTest)
@@ -50,8 +50,8 @@ BOOST_AUTO_TEST_CASE(DestructAfterCopyTest)
   list.pushBack(1);
   list.pushBack(2);
   vasyakin::List< int > copy(list);
-  BOOST_CHECK_EQUAL(list.getsize(), 2);
-  BOOST_CHECK_EQUAL(copy.getsize(), 2);
+  BOOST_CHECK_EQUAL(list.size(), 2);
+  BOOST_CHECK_EQUAL(copy.size(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(DestructAfterMoveTest)
@@ -59,8 +59,8 @@ BOOST_AUTO_TEST_CASE(DestructAfterMoveTest)
   vasyakin::List< int > list;
   list.pushBack(52);
   vasyakin::List< int > moved(std::move(list));
-  BOOST_CHECK_EQUAL(list.getsize(), 0);
-  BOOST_CHECK_EQUAL(moved.getsize(), 1);
+  BOOST_CHECK_EQUAL(list.size(), 0);
+  BOOST_CHECK_EQUAL(moved.size(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(CopyConstructTest)
@@ -70,9 +70,9 @@ BOOST_AUTO_TEST_CASE(CopyConstructTest)
   list.pushBack(2);
   vasyakin::List< int > copy(list);
   list.pushBack(3);
-  BOOST_CHECK_EQUAL(copy.getsize(), 2);
+  BOOST_CHECK_EQUAL(copy.size(), 2);
   copy.pushBack(52);
-  BOOST_CHECK_EQUAL(list.getsize(), 3);
+  BOOST_CHECK_EQUAL(list.size(), 3);
   auto it = copy.begin();
   BOOST_CHECK_EQUAL(*it, 1);
   ++it;
@@ -87,15 +87,15 @@ BOOST_AUTO_TEST_CASE(MoveConstructTest)
   list.pushBack(1);
   list.pushBack(2);
   vasyakin::List< int > moved(std::move(list));
-  BOOST_CHECK_EQUAL(list.getsize(), 0);
-  BOOST_CHECK_EQUAL(moved.getsize(), 2);
+  BOOST_CHECK_EQUAL(list.size(), 0);
+  BOOST_CHECK_EQUAL(moved.size(), 2);
   auto it = moved.begin();
   BOOST_CHECK_EQUAL(*it, 1);
   ++it;
   BOOST_CHECK_EQUAL(*it, 2);
   moved.pushBack(99);
-  BOOST_CHECK_EQUAL(list.getsize(), 0);
-  BOOST_CHECK_EQUAL(moved.getsize(), 3);
+  BOOST_CHECK_EQUAL(list.size(), 0);
+  BOOST_CHECK_EQUAL(moved.size(), 3);
 }
 
 BOOST_AUTO_TEST_CASE(CopyAssignTest)
@@ -106,13 +106,13 @@ BOOST_AUTO_TEST_CASE(CopyAssignTest)
   vasyakin::List< int > list2;
   list2.pushBack(10);
   list2 = list1;
-  BOOST_CHECK_EQUAL(list2.getsize(), 2);
+  BOOST_CHECK_EQUAL(list2.size(), 2);
   auto it = list2.begin();
   BOOST_CHECK_EQUAL(*it, 1);
   ++it;
   BOOST_CHECK_EQUAL(*it, 2);
   list1 = list1;
-  BOOST_CHECK_EQUAL(list1.getsize(), 2);
+  BOOST_CHECK_EQUAL(list1.size(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(MoveAssignTest)
@@ -122,8 +122,8 @@ BOOST_AUTO_TEST_CASE(MoveAssignTest)
   list.pushBack(2);
   vasyakin::List< int > moved;
   moved = std::move(list);
-  BOOST_CHECK_EQUAL(list.getsize(), 0);
-  BOOST_CHECK_EQUAL(moved.getsize(), 2);
+  BOOST_CHECK_EQUAL(list.size(), 0);
+  BOOST_CHECK_EQUAL(moved.size(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(EraseTest)
@@ -133,21 +133,21 @@ BOOST_AUTO_TEST_CASE(EraseTest)
   list.pushBack(2);
   list.pushBack(3);
   list.erase(list.end());
-  BOOST_CHECK_EQUAL(list.getsize(), 2);
+  BOOST_CHECK_EQUAL(list.size(), 2);
   BOOST_CHECK_EQUAL(*list.begin(), 2);
   auto it = list.begin();
-  for (size_t i = 0; i < list.getsize() - 2; ++i)
+  for (size_t i = 0; i < list.size() - 2; ++i)
   {
     ++it;
   }
   list.erase(it);
-  BOOST_CHECK_EQUAL(list.getsize(), 1);
+  BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(*list.begin(), 2);
   list.erase(list.end());
-  BOOST_CHECK_EQUAL(list.getsize(), 0);
+  BOOST_CHECK_EQUAL(list.size(), 0);
   BOOST_CHECK(list.begin() == list.end());
   list.erase(list.end());
-  BOOST_CHECK_EQUAL(list.getsize(), 0);
+  BOOST_CHECK_EQUAL(list.size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(ClearTest)
@@ -157,12 +157,12 @@ BOOST_AUTO_TEST_CASE(ClearTest)
   list.pushBack(2);
   list.pushBack(3);
   list.clear();
-  BOOST_CHECK_EQUAL(list.getsize(), 0);
+  BOOST_CHECK_EQUAL(list.size(), 0);
   BOOST_CHECK(list.begin() == list.end());
   list.clear();
-  BOOST_CHECK_EQUAL(list.getsize(), 0);
+  BOOST_CHECK_EQUAL(list.size(), 0);
   list.pushBack(42);
-  BOOST_CHECK_EQUAL(list.getsize(), 1);
+  BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(*list.begin(), 42);
 }
 
@@ -170,11 +170,11 @@ BOOST_AUTO_TEST_CASE(PushBackTest)
 {
   vasyakin::List< int > list;
   list.pushBack(10);
-  BOOST_CHECK_EQUAL(list.getsize(), 1);
+  BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(*list.begin(), 10);
   list.pushBack(20);
   list.pushBack(30);
-  BOOST_CHECK_EQUAL(list.getsize(), 3);
+  BOOST_CHECK_EQUAL(list.size(), 3);
   auto it = list.begin();
   BOOST_CHECK_EQUAL(*it, 10);
   ++it;
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(PushBackTest)
   BOOST_CHECK(it == list.end());
   list.clear();
   list.pushBack(42);
-  BOOST_CHECK_EQUAL(list.getsize(), 1);
+  BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(*list.begin(), 42);
 }
 
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(InsertTest)
   auto it = list.begin();
   ++it;
   BOOST_CHECK_EQUAL(*it, 1);
-  BOOST_CHECK_EQUAL(list.getsize(), 2);
+  BOOST_CHECK_EQUAL(list.size(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(SwapTest)
@@ -210,9 +210,9 @@ BOOST_AUTO_TEST_CASE(SwapTest)
   vasyakin::List< int > list2;
   list2.pushBack(10);
   list1.swap(list2);
-  BOOST_CHECK_EQUAL(list1.getsize(), 1);
+  BOOST_CHECK_EQUAL(list1.size(), 1);
   BOOST_CHECK_EQUAL(*list1.begin(), 10);
-  BOOST_CHECK_EQUAL(list2.getsize(), 2);
+  BOOST_CHECK_EQUAL(list2.size(), 2);
   BOOST_CHECK_EQUAL(*list2.begin(), 1);
 }
 
@@ -248,8 +248,8 @@ BOOST_AUTO_TEST_CASE(SpliceAllTest)
 
   a.splice_after(a.begin(), b);
 
-  BOOST_CHECK_EQUAL(a.getsize(), 5);
-  BOOST_CHECK_EQUAL(b.getsize(), 0);
+  BOOST_CHECK_EQUAL(a.size(), 5);
+  BOOST_CHECK_EQUAL(b.size(), 0);
 
   auto it = a.begin();
   int expected[] = {1, 10, 20, 30, 2};
@@ -274,8 +274,8 @@ BOOST_AUTO_TEST_CASE(SpliceSingleTest)
 
   a.splice_after(a.begin(), b, b.begin());
 
-  BOOST_CHECK_EQUAL(a.getsize(), 3);
-  BOOST_CHECK_EQUAL(b.getsize(), 1);
+  BOOST_CHECK_EQUAL(a.size(), 3);
+  BOOST_CHECK_EQUAL(b.size(), 1);
   BOOST_CHECK_EQUAL(*b.begin(), 10);
 
   auto it = a.begin();
@@ -311,8 +311,8 @@ BOOST_AUTO_TEST_CASE(SpliceRangeTest)
 
   a.splice_after(a.begin(), b, first, last);
 
-  BOOST_CHECK_EQUAL(a.getsize(), 4);
-  BOOST_CHECK_EQUAL(b.getsize(), 2);
+  BOOST_CHECK_EQUAL(a.size(), 4);
+  BOOST_CHECK_EQUAL(b.size(), 2);
 
   auto check = a.begin();
 
@@ -344,8 +344,8 @@ BOOST_AUTO_TEST_CASE(MergeSortedTest)
   b.pushBack(6);
 
   a.merge(b);
-  BOOST_CHECK_EQUAL(a.getsize(), 6);
-  BOOST_CHECK_EQUAL(b.getsize(), 0);
+  BOOST_CHECK_EQUAL(a.size(), 6);
+  BOOST_CHECK_EQUAL(b.size(), 0);
 
   auto it = a.begin();
   int expected[] = {1, 2, 3, 4, 5, 6};
@@ -368,7 +368,7 @@ BOOST_AUTO_TEST_CASE(SortTest)
   list.pushBack(3);
 
   list.sort();
-  BOOST_CHECK_EQUAL(list.getsize(), 5);
+  BOOST_CHECK_EQUAL(list.size(), 5);
 
   auto it = list.begin();
   for (int i = 1; i <= 5; ++i)
@@ -381,7 +381,7 @@ BOOST_AUTO_TEST_CASE(SortTest)
 
   vasyakin::List< int > empty;
   empty.sort();
-  BOOST_CHECK_EQUAL(empty.getsize(), 0);
+  BOOST_CHECK_EQUAL(empty.size(), 0);
 
   vasyakin::List< int > single(42);
   single.sort();

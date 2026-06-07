@@ -111,9 +111,9 @@ namespace vasyakin
     LCIter< T > cbegin() const noexcept;
     LCIter< T > cend() const noexcept;
 
-    size_t getsize() const noexcept;
-    detail::Node< T >* getfirst() const noexcept;
-
+    size_t size() const noexcept;
+    T& front() noexcept;
+    const T& front() const noexcept;
   private:
     detail::Node< T >* fake_node_;
     size_t size_;
@@ -566,15 +566,21 @@ namespace vasyakin
   }
 
   template< class T >
-  size_t List< T >::getsize() const noexcept
+  size_t List< T >::size() const noexcept
   {
     return size_;
   }
 
   template< class T >
-  detail::Node< T >* List< T >::getfirst() const noexcept
+  T& List< T >::front() noexcept
   {
-    return fake_node_->next_;
+    return fake_node_->next_->val_;
+  }
+
+  template< class T >
+  const T& List< T >::front() const noexcept
+  {
+    return fake_node_->next_->val_;
   }
 }
 
