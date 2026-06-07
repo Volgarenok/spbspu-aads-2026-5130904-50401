@@ -77,7 +77,7 @@ int main()
     ++outIt;
 
     for (size_t i = 1; i < data.size(); ++i)
-    { 
+    {
       if (outIt->second.size() > iterationCount)
       {
         innerIt += iterationCount;
