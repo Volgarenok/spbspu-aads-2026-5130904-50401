@@ -30,7 +30,7 @@ namespace studilova
   class List
   {
     public:
-      List();
+      List() noexcept;
       List(const List& other);
       List(List&& other) noexcept;
       ~List();
@@ -86,13 +86,13 @@ namespace studilova
   };
 
   template< class T >
-  List< T >::List() :
+  List< T >::List() noexcept:
     head_(nullptr),
     size_(0)
   {}
 
   template< class T >
-  List< T >::List(const List& other) :
+  List< T >::List(const List& other):
     head_(nullptr),
     size_(0)
   {
@@ -114,13 +114,10 @@ namespace studilova
   }
 
   template< class T >
-  List< T >::List(List&& other) noexcept :
-    head_(other.head_),
-    size_(other.size_)
-  {
-    other.head_ = nullptr;
-    other.size_ = 0;
-  }
+  List< T >::List(List&& other) noexcept:
+    head_(std::exchange(other.head_, nullptr)),
+    size_(std::exchange(other.size_, 0))
+  {}
 
   template< class T >
   List< T >::~List()
@@ -147,11 +144,8 @@ namespace studilova
     {
       clear();
 
-      head_ = other.head_;
-      size_ = other.size_;
-
-      other.head_ = nullptr;
-      other.size_ = 0;
+      head_ = std::exchange(other.head_, nullptr);
+      size_ = std::exchange(other.size_, 0);
     }
 
     return *this;
@@ -715,7 +709,7 @@ namespace studilova
   };
 
   template< class T >
-  LIter< T >::LIter(detail::Node< T >* node) :
+  LIter< T >::LIter(detail::Node< T >* node):
     node_(node)
   {}
 
@@ -813,7 +807,7 @@ namespace studilova
   };
 
   template< class T >
-  CLIter< T >::CLIter(detail::Node< T >* node) :
+  CLIter< T >::CLIter(detail::Node< T >* node):
     node_(node)
   {}
 
