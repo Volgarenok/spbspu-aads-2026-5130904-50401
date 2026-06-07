@@ -6,11 +6,11 @@ BOOST_AUTO_TEST_CASE(defaultConstruct)
 {
   donkeev::Stack< int > stack;
   BOOST_TEST(stack.size() == 0);
-  BOOST_TEST(stack.isEmpty());
+  BOOST_TEST(stack.empty());
 }
 BOOST_AUTO_TEST_CASE(initializerListConstruct)
 {
-  donkeev::Stack< int > stack{1, 2};
+  donkeev::Stack< int > stack(std::initializer_list< int >{1, 2});
   BOOST_TEST(stack.size() == 2);
   BOOST_TEST(stack.top() == 2);
 }
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(isEmptyTest)
 {
   donkeev::Stack< int > stack{1};
   stack.pop();
-  BOOST_TEST(stack.isEmpty());
+  BOOST_TEST(stack.empty());
 }
 BOOST_AUTO_TEST_CASE(sizeTest)
 {
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(clearTest)
   BOOST_TEST(stack.size() == 2);
   stack.clear();
   BOOST_TEST(stack.size() == 0);
-  BOOST_TEST(stack.isEmpty());
+  BOOST_TEST(stack.empty());
 }
 
 BOOST_AUTO_TEST_CASE(stackDestruct)
@@ -73,6 +73,6 @@ BOOST_AUTO_TEST_CASE(stackDestruct)
   BOOST_TEST(stack.size() == 2);
   stack.~Stack();
   BOOST_TEST(stack.size() == 0);
-  BOOST_TEST(stack.isEmpty());
+  BOOST_TEST(stack.empty());
 }
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,19 +1,20 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include "../common/list.hpp"
+
 #include <initializer_list>
 #include <stdexcept>
+#include "../common/list.hpp"
 
 namespace donkeev
 {
   template< class T >
   class Stack
   {
-    List< T > list_;
-
   public:
     Stack() = default;
     explicit Stack(std::initializer_list< T >);
+
+    ~Stack() = default;
 
     void push(const T&);
     void pop();
@@ -21,11 +22,12 @@ namespace donkeev
     T& top();
     const T& top() const;
 
-    bool isEmpty() const;
+    bool empty() const;
     size_t size() const;
     void clear();
 
-    ~Stack() = default;
+  private:
+    List< T > list_;
   };
 
   template< class T >
@@ -46,7 +48,7 @@ namespace donkeev
   template< class T >
   void Stack< T >::pop()
   {
-    if (list_.isEmpty())
+    if (list_.empty())
     {
       throw std::underflow_error("Empty queue");
     }
@@ -56,7 +58,7 @@ namespace donkeev
   template< class T >
   T& Stack< T >::top()
   {
-    if (list_.isEmpty())
+    if (list_.empty())
     {
       throw std::underflow_error("Empty queue");
     }
@@ -65,7 +67,7 @@ namespace donkeev
   template< class T >
   const T& Stack< T >::top() const
   {
-    if (list_.isEmpty())
+    if (list_.empty())
     {
       throw std::underflow_error("Empty queue");
     }
@@ -73,9 +75,9 @@ namespace donkeev
   }
 
   template< class T >
-  bool Stack< T >::isEmpty() const
+  bool Stack< T >::empty() const
   {
-    return list_.isEmpty();
+    return list_.empty();
   }
   template< class T >
   size_t Stack< T >::size() const
@@ -85,7 +87,7 @@ namespace donkeev
   template< class T >
   void Stack< T >::clear()
   {
-    return list_.clearAll();
+    return list_.clear();
   }
 }
 #endif

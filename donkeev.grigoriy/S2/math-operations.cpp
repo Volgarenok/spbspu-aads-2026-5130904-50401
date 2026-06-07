@@ -108,7 +108,7 @@ namespace donkeev
     operand = 0;
     Queue<char> temp = q;
 
-    while (!temp.isEmpty())
+    while (!temp.empty())
     {
       char ch = temp.front();
       temp.pop();
@@ -237,14 +237,14 @@ namespace donkeev
   }
   void calculate(Stack< llint_t >& result, Queue< Queue< char > >& expressionsQueue)
   {
-    while (!expressionsQueue.isEmpty())
+    while (!expressionsQueue.empty())
     {
       Queue< char > innerQueue = expressionsQueue.front();
       Stack< char > operatorStack;
       Stack< llint_t > finishStack;
 
       char test;
-      while (!innerQueue.isEmpty())
+      while (!innerQueue.empty())
       {
         test = innerQueue.front();
         innerQueue.pop();
@@ -260,7 +260,7 @@ namespace donkeev
         {
           Queue< char > charQueue;
           charQueue.push(test);
-          while (!innerQueue.isEmpty() && std::isdigit(static_cast<unsigned char>(innerQueue.front())))
+          while (!innerQueue.empty() && std::isdigit(static_cast<unsigned char>(innerQueue.front())))
           {
             charQueue.push(innerQueue.front());
             innerQueue.pop();
@@ -275,7 +275,7 @@ namespace donkeev
         }
         else if (isOperator(test))
         {
-          while (!operatorStack.isEmpty() && operatorStack.top() != '(' && getPriority(test) <= getPriority(operatorStack.top()))
+          while (!operatorStack.empty() && operatorStack.top() != '(' && getPriority(test) <= getPriority(operatorStack.top()))
           {
             if (finishStack.size() < 2)
             {
@@ -294,7 +294,7 @@ namespace donkeev
         }
         else if (test == ')')
         {
-          while(!operatorStack.isEmpty() && operatorStack.top() != '(')
+          while(!operatorStack.empty() && operatorStack.top() != '(')
           {
             if (finishStack.size() < 2)
             {
@@ -317,7 +317,7 @@ namespace donkeev
         }
       }
 
-      while (!operatorStack.isEmpty())
+      while (!operatorStack.empty())
       {
         if (finishStack.size() < 2)
         {
@@ -344,12 +344,12 @@ namespace donkeev
 
   std::ostream& printResult(Stack< llint_t >& result, std::ostream& out)
   {
-    if (!result.isEmpty())
+    if (!result.empty())
     {
       out << result.top();
       result.pop();
     }
-    while (!result.isEmpty())
+    while (!result.empty())
     {
       out << " " << result.top();
       result.pop();

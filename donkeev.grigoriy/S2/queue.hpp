@@ -14,17 +14,17 @@ namespace donkeev
     Queue() = default;
     explicit Queue(std::initializer_list< T >);
 
+    ~Queue() = default;
+
     void push(const T&);
     void pop();
 
     T& front();
     const T& front() const;
 
-    size_t size() const;
-    bool isEmpty() const;
+    size_t size() const;  
+    bool empty() const;
     void clear();
-
-    ~Queue() = default;
   };
 
   template< class T >
@@ -45,7 +45,7 @@ namespace donkeev
   template< class T >
   void Queue< T >::pop()
   {
-    if (list_.isEmpty())
+    if (list_.empty())
     {
       throw std::underflow_error("Empty queue");
     }
@@ -55,7 +55,7 @@ namespace donkeev
   template< class T >
   T& Queue< T >::front()
   {
-    if (list_.isEmpty())
+    if (list_.empty())
     {
       throw std::logic_error("Empty queue");
     }
@@ -64,7 +64,7 @@ namespace donkeev
   template< class T >
   const T& Queue< T >::front() const
   {
-    if (list_.isEmpty())
+    if (list_.empty())
     {
       throw std::logic_error("Empty queue");
     }
@@ -77,14 +77,14 @@ namespace donkeev
     return list_.size();
   }
   template< class T >
-  bool Queue< T >::isEmpty() const
+  bool Queue< T >::empty() const
   {
-    return list_.isEmpty();
+    return list_.empty();
   }
   template< class T >
   void Queue< T >::clear()
   {
-    list_.clearAll();
+    list_.clear();
   }
 }
 #endif

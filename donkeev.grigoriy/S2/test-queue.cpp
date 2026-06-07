@@ -6,7 +6,7 @@ BOOST_AUTO_TEST_CASE(defaultConstruct)
 {
   donkeev::Queue< int > queue;
   BOOST_TEST(queue.size() == 0);
-  BOOST_TEST(queue.isEmpty());
+  BOOST_TEST(queue.empty());
 }
 BOOST_AUTO_TEST_CASE(initializerListConstruct)
 {
@@ -56,9 +56,9 @@ BOOST_AUTO_TEST_CASE(sizeTest)
 BOOST_AUTO_TEST_CASE(isEmptyTest)
 {
   donkeev::Queue< int > queue{1};
-  BOOST_TEST(!queue.isEmpty());
+  BOOST_TEST(!queue.empty());
   queue.pop();
-  BOOST_TEST(queue.isEmpty());
+  BOOST_TEST(queue.empty());
 }
 BOOST_AUTO_TEST_CASE(clearTest)
 {
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(clearTest)
   BOOST_TEST(queue.size() == 2);
   queue.clear();
   BOOST_TEST(queue.size() == 0);
-  BOOST_TEST(queue.isEmpty());
+  BOOST_TEST(queue.empty());
 }
 
 BOOST_AUTO_TEST_CASE(destructTest)
@@ -74,6 +74,6 @@ BOOST_AUTO_TEST_CASE(destructTest)
   donkeev::Queue< int > queue{1, 2};
   queue.~Queue();
   BOOST_TEST(queue.size() == 0);
-  BOOST_TEST(queue.isEmpty());
+  BOOST_TEST(queue.empty());
 }
 BOOST_AUTO_TEST_SUITE_END()
