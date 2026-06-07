@@ -24,7 +24,7 @@ int main()
       seq_iter = sequence.insertAfter(seq_iter, num);
     }
 
-    seqs_iter = sequences.insertAfter(seqs_iter, {name, sequence});
+    seqs_iter = sequences.insertAfter(seqs_iter, pStrList{name, sequence});
     if (std::cin.bad()) {
       std::cerr << "bad input\n";
       return 1;
@@ -48,14 +48,14 @@ int main()
   seqs_iter = sequences.begin();
   std::cout << seqs_iter->first;
   if (!seqs_iter->second.empty()) {
-    iters_iter = iters.insertAfter(iters_iter, {seqs_iter->second.cbegin(), seqs_iter->second.size()});
+    iters_iter = iters.insertAfter(iters_iter, pLCIterSize{seqs_iter->second.cbegin(), seqs_iter->second.size()});
   }
 
   auto it = seqs_iter;
   while (++it != sequences.begin()) {
     std::cout << " " << it->first;
     if (!it->second.empty()) {
-      iters_iter = iters.insertAfter(iters_iter, {it->second.cbegin(), it->second.size()});
+      iters_iter = iters.insertAfter(iters_iter, pLCIterSize{it->second.cbegin(), it->second.size()});
     }
   }
   std::cout << "\n";

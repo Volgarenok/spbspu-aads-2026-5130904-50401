@@ -37,8 +37,8 @@ namespace chernov {
     bool empty() const noexcept;
     size_t size() const noexcept;
     void clear() noexcept;
-    LIter< T > insertAfter(LIter< T > pos, const T & value);
-    LIter< T > insertAfter(LIter< T > pos, T && value);
+    template< class U >
+    LIter< T > insertAfter(LIter< T > pos, U && value);
     LIter< T > eraseAfter(LIter< T > pos);
     LIter< T > eraseAfter(LIter< T > first, LIter< T > last);
     void pushFront(const T & value);
@@ -219,18 +219,10 @@ namespace chernov {
   }
 
   template< class T >
-  LIter< T > List< T >::insertAfter(LIter< T > pos, const T & value)
+  template< class U >
+  LIter< T > List< T >::insertAfter(LIter< T > pos, U && value)
   {
-    detail::Node< T > * node = new detail::Node< T >{value, pos.ptr_->next};
-    pos.ptr_->next = node;
-    ++size_;
-    return {node, fake_};
-  }
-
-  template< class T >
-  LIter< T > List< T >::insertAfter(LIter< T > pos, T && value)
-  {
-    detail::Node< T > * node = new detail::Node< T >{std::move(value), pos.ptr_->next};
+    detail::Node< T > * node = new detail::Node< T >{std::forward< U >(value), pos.ptr_->next};
     pos.ptr_->next = node;
     ++size_;
     return {node, fake_};
