@@ -48,7 +48,7 @@ namespace chernov {
   template< class T >
   T * LIter< T >::operator->() const noexcept
   {
-    return &(ptr_->data);
+    return std::addressof(ptr_->data);
   }
 
   template< class T >
