@@ -67,26 +67,24 @@ int main()
   while (iterationCount < maximumIteration)
   {
     outIt = data.cbegin();
-    bool firstPrint = true;
-    for (size_t i = 0; i < data.size(); ++i)
+    LCIter< size_t > innerIt = outIt->second.cbegin();
+    if (outIt->second.size() > iterationCount)
     {
-      LCIter< size_t > innerIt = outIt->second.cbegin();
+      innerIt += iterationCount;
+      sumArray[sumIteration] += *innerIt;
+      std::cout << *innerIt;
+    }
+    ++outIt;
+
+    for (size_t i = 1; i < data.size(); ++i)
+    { 
       if (outIt->second.size() > iterationCount)
       {
-        if (firstPrint)
-        {
-          innerIt += iterationCount;
-          sumArray[sumIteration] += *innerIt;
-          std::cout << *innerIt;
-          firstPrint = false;
-        }
-        else
-        {
-          innerIt += iterationCount;
-          sumArray[sumIteration] += *innerIt;
-          std::cout << " " << *innerIt;
-        }
+        innerIt += iterationCount;
+        sumArray[sumIteration] += *innerIt;
+        std::cout << " " << *innerIt;
       }
+
       ++outIt;
     }
     ++sumIteration;
