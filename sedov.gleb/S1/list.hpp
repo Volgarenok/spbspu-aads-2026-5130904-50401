@@ -123,6 +123,9 @@ namespace sedov
 
     template< class Comp >
     void mergeSort(List< T > & list, Comp c);
+
+    void insertNodeBeforeHead(detail::Node< T > * newNode) noexcept;
+    void insertNodeAfterTail(detail::Node< T > * newNode) noexcept;
   };
 
   template< class T >
@@ -290,7 +293,7 @@ namespace sedov
   template< class T >
   List< T > & List< T >::operator=(const List & h)
   {
-    assert(this != &h);
+    assert(this != std::addressof(h));
 
     List temp(h);
     swap(temp);
@@ -300,7 +303,7 @@ namespace sedov
   template< class T >
   List< T > & List< T >::operator=(List && h) noexcept
   {
-    assert(this != &h);
+    assert(this != std::addressof(h));
     List temp(std::move(h));
     swap(temp);
     return *this;
@@ -355,9 +358,8 @@ namespace sedov
   }
 
   template< class T >
-  void List< T >::pushFront(const T & v)
+  void List< T >::insertNodeBeforeHead(detail::Node< T > * newNode) noexcept
   {
-    detail::Node< T > * newNode = new detail::Node< T >(v);
     newNode->next = head_;
     if (head_)
     {
@@ -372,54 +374,47 @@ namespace sedov
   }
 
   template< class T >
-  void List< T >::pushFront(T && v)
+  void List< T >::insertNodeAfterTail(detail::Node< T > * newNode) noexcept
   {
-    detail::Node< T >* newNode = new detail::Node< T >(std::forward< T >(v));
-    newNode->next = head_;
-    if (head_)
+    newNode->prev = tail_;
+    if (tail_)
     {
-      head_->prev = newNode;
+      tail_->next = newNode;
     }
     else
     {
-      tail_ = newNode;
+      head_ = newNode;
     }
-    head_ = newNode;
+    tail_ = newNode;
     ++size_;
+  }
+
+  template< class T >
+  void List< T >::pushFront(const T & v)
+  {
+    detail::Node< T > * newNode = new detail::Node< T >(v);
+    insertNodeBeforeHead(newNode);
+  }
+
+  template< class T >
+  void List< T >::pushFront(T && v)
+  {
+    detail::Node< T > * newNode = new detail::Node< T >(std::forward< T >(v));
+    insertNodeBeforeHead(newNode);
   }
 
   template< class T >
   void List< T >::pushBack(const T & v)
   {
     detail::Node< T > * newNode = new detail::Node< T >(v);
-    newNode->prev = tail_;
-    if (tail_)
-    {
-      tail_->next = newNode;
-    }
-    else
-    {
-      head_ = newNode;
-    }
-    tail_ = newNode;
-    ++size_;
+    insertNodeAfterTail(newNode);
   }
 
   template< class T >
   void List< T >::pushBack(T && v)
   {
     detail::Node< T > * newNode = new detail::Node< T >(std::forward< T >(v));
-    newNode->prev = tail_;
-    if (tail_)
-    {
-      tail_->next = newNode;
-    }
-    else
-    {
-      head_ = newNode;
-    }
-    tail_ = newNode;
-    ++size_;
+    insertNodeAfterTail(newNode);
   }
 
   template< class T >
@@ -451,12 +446,12 @@ namespace sedov
   {
     if (!p.ptr_)
     {
-      pushBack(std::move(v));
+      pushBack(std::forward< T >(v));
       return LIter< T >(tail_);
     }
     if (p.ptr_ == head_)
     {
-      pushFront(std::move(v));
+      pushFront(std::forward< T >(v));
       return LIter< T >(head_);
     }
     detail::Node< T >* newNode = new detail::Node< T >(std::forward< T >(v));
@@ -548,7 +543,7 @@ namespace sedov
   template< class T >
   void List< T >::splice(LIter< T > pos, List & h) noexcept
   {
-    if (h.size_ == 0 || this == &h)
+    if (h.size_ == 0 || this == std::addressof(h))
     {
       return;
     }
@@ -570,7 +565,7 @@ namespace sedov
   template< class T >
   void List< T >::splice(LIter< T > pos, List & h, LIter< T > first, LIter< T > last) noexcept
   {
-    if (first == last || h.size_ == 0)
+    if (first == last || h.size_ == 0 || this == std::addressof(h))
     {
       return;
     }
