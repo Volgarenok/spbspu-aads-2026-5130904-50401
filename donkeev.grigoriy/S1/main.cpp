@@ -77,7 +77,7 @@ int main()
     ++outIt;
 
     for (size_t i = 1; i < data.size(); ++i)
-    { 
+    {
       LCIter< size_t > innerIt = outIt->second.cbegin();
       if (outIt->second.size() > iterationCount)
       {
