@@ -23,9 +23,9 @@ namespace donkeev
     T& top();
     const T& top() const;
 
-    bool empty() const;
-    size_t size() const;
-    void clear();
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+    void clear() noexcept;
 
   private:
     List< T > list_;
@@ -81,17 +81,17 @@ namespace donkeev
   }
 
   template< class T >
-  bool Stack< T >::empty() const
+  bool Stack< T >::empty() const noexcept
   {
     return list_.empty();
   }
   template< class T >
-  size_t Stack< T >::size() const
+  size_t Stack< T >::size() const noexcept
   {
     return list_.size();
   }
   template< class T >
-  void Stack< T >::clear()
+  void Stack< T >::clear() noexcept
   {
     return list_.clear();
   }
