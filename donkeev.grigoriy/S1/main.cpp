@@ -14,12 +14,6 @@ int main()
     return 0;
   }
 
-  if (checkOnOverflow(data))
-  {
-    std::cerr << "Sum of elements is overflow\n";
-    return 1;
-  }
-
   size_t maximumIteration = getMaxSize(data);
   size_t* sumArray = nullptr;
   if (maximumIteration)
@@ -81,6 +75,13 @@ int main()
     std::cout << "\n";
     ++iterationCount;
     ++sumIteration;
+  }
+
+  if (checkOnOverflow(data))
+  {
+    std::cerr << "Sum of elements is overflow\n";
+    delete [] sumArray;
+    return 1;
   }
 
   if (!areAnyvalues(data))
