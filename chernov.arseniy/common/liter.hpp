@@ -1,6 +1,8 @@
 #ifndef LITER_HPP
 #define LITER_HPP
 
+#include <memory>
+
 namespace chernov {
   namespace detail {
     template< class T >

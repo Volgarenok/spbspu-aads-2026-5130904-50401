@@ -1,6 +1,8 @@
 #ifndef LCITER_HPP
 #define LCITER_HPP
 
+#include <memory>
+
 namespace chernov {
   namespace detail {
     template< class T >
