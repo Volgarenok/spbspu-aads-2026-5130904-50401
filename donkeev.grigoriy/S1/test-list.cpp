@@ -207,4 +207,5 @@ BOOST_AUTO_TEST_CASE(ConstIterOperatorNonEqual)
   donkeev::LCIter< int > secondIter{list.cbegin() + 1};
   BOOST_CHECK(firstIter != secondIter);
 }
+
 BOOST_AUTO_TEST_SUITE_END()
