@@ -22,6 +22,9 @@ namespace zhuravleva
     void clear() noexcept;
     size_t size() const noexcept;
 
+    template< class... Args >
+    void emplace(Args&&... args);
+
   private:
     List< T > data_;
   };
@@ -93,6 +96,13 @@ template< class T >
 size_t zhuravleva::Queue< T >::size() const noexcept
 {
   return data_.size();
+}
+
+template< class T >
+template< class... Args >
+void zhuravleva::Queue< T >::emplace(Args&&... args)
+{
+  data_.emplaceBack(std::forward< Args >(args)...);
 }
 
 #endif
