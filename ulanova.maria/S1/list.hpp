@@ -29,7 +29,7 @@ namespace ulanova
   private:
     detail::Node< T >* node_;
     detail::Node< T >* head_;
-    LIter(detail::Node< T >* n = nullptr, detail::Node< T >* h = nullptr);
+    LIter(detail::Node< T >* n = nullptr, detail::Node< T >* h = nullptr) noexcept;
     friend class List< T >;
   };
 
@@ -46,7 +46,7 @@ namespace ulanova
   private:
     detail::Node< T >* node_;
     detail::Node< T >* head_;
-    LCIter(detail::Node< T >* n = nullptr, detail::Node< T >* h = nullptr);
+    LCIter(detail::Node< T >* n = nullptr, detail::Node< T >* h = nullptr) noexcept;
     friend class List< T >;
   };
 
@@ -54,7 +54,7 @@ namespace ulanova
   class List
   {
   public:
-    List();
+    List() noexcept;
     List(const List& other);
     List(List&& other) noexcept;
     ~List();
@@ -137,7 +137,7 @@ namespace ulanova
   }
 
   template< class T >
-  LIter< T >::LIter(detail::Node< T >* n, detail::Node< T >* h):
+  LIter< T >::LIter(detail::Node< T >* n, detail::Node< T >* h) noexcept:
     node_(n),
     head_(h)
   {}
@@ -190,14 +190,14 @@ namespace ulanova
   }
 
   template< class T >
-  LCIter< T >::LCIter(detail::Node< T >* n, detail::Node< T >* h):
+  LCIter< T >::LCIter(detail::Node< T >* n, detail::Node< T >* h) noexcept:
     node_(n),
     head_(h)
   {}
-
-
   template< class T >
-  List< T >::List() : head_(nullptr) {}
+  List< T >::List() noexcept :
+    head_(nullptr)
+  {}
   template< class T >
   List< T >::List(const List& other):
     head_(nullptr)
@@ -406,35 +406,35 @@ namespace ulanova
   template < class T >
   LIter< T > List< T >::insert_after(LIter< T > pos, const T& value)
   {
-    if (!pos.node)
+    if (!pos.node_)
     {
       return end();
     }
-    detail::Node< T >* new_node = new detail::Node< T >{value, pos.node->next};
-    pos.node->next = new_node;
+    detail::Node< T >* new_node = new detail::Node< T >{value, pos.node_->next};
+    pos.node_->next = new_node;
     return LIter< T >(new_node, head_);
   }
 
   template< class T >
   LIter< T > List< T >::insert_after(LIter< T > pos, T&& value)
   {
-    if (!pos.node)
+    if (!pos.node_)
     {
       return end();
     }
-    detail::Node< T >* new_node = new detail::Node< T >{std::move(value), pos.node->next};
-    pos.node->next = new_node;
+    detail::Node< T >* new_node = new detail::Node< T >{std::move(value), pos.node_->next};
+    pos.node_->next = new_node;
     return LIter< T >(new_node, head_);
   }
 
   template < class T >
   void List< T >::erase_after(LIter< T > pos) noexcept
   {
-    if (!pos.node)
+    if (!pos.node_)
     {
       return;
     }
-    detail::Node< T >* temp = pos.node->next;
+    detail::Node< T >* temp = pos.node_->next;
     if (!temp)
     {
       return;
@@ -449,7 +449,7 @@ namespace ulanova
       }
       head_ = head_->next;
     }
-    pos.node->next = temp->next;
+    pos.node_->next = temp->next;
     delete temp;
   }
 }
