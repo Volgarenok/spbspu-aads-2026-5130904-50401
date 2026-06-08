@@ -26,11 +26,9 @@ namespace ulanova
     bool operator==(const LIter& other) const noexcept;
     T* operator->() noexcept;
   private:
+    detail::Node< T >* node_;
+    detail::Node< T >* head_;
     LIter(detail::Node< T >* n = nullptr, detail::Node< T >* h = nullptr);
-
-    detail::Node< T >* node;
-    detail::Node< T >* head;
-
     friend class List< T >;
   };
 
@@ -45,11 +43,9 @@ namespace ulanova
     bool operator==(const LCIter& other) const noexcept;
     const T* operator->() const noexcept;
   private:
+    detail::Node< T >* node_;
+    detail::Node< T >* head_;
     LCIter(detail::Node< T >* n = nullptr, detail::Node< T >* h = nullptr);
-
-    detail::Node< T >* node;
-    detail::Node< T >* head;
-
     friend class List< T >;
   };
 
@@ -89,26 +85,26 @@ namespace ulanova
 
     T& front();
   private:
-    detail::Node< T >* head;
+    detail::Node< T >* head_;
   };
 
   template < class T >
   T& LIter< T>::operator*() noexcept
   {
-    return node->data;
+    return node_->data;
   }
 
   template < class T >
   LIter< T >& LIter< T >::operator++() noexcept
   {
-    if (!node)
+    if (!node_)
     {
       return *this;
     }
-    node = node->next;
-    if (node == head)
+    node_ = node_->next;
+    if (node_ == head_)
     {
-      node = nullptr;
+      node_ = nullptr;
     }
     return *this;
   }
@@ -124,44 +120,44 @@ namespace ulanova
   template < class T >
   bool LIter< T >::operator!=(const LIter& other) const noexcept
   {
-    return node != other.node;
+    return node_ != other.node_;
   }
 
   template < class T >
   bool LIter< T >::operator==(const LIter& other) const noexcept
   {
-    return node == other.node;
+    return node_ == other.node_;
   }
 
   template < class T >
   T* LIter< T >::operator->() noexcept
   {
-    return &(node->data);
+    return &(node_->data);
   }
 
   template< class T >
   LIter< T >::LIter(detail::Node< T >* n, detail::Node< T >* h):
-    node(n),
-    head(h)
+    node_(n),
+    head_(h)
   {}
 
   template < class T >
   const T& LCIter< T >::operator*() const noexcept
   {
-    return node->data;
+    return node_->data;
   }
 
   template < class T >
   LCIter< T> & LCIter< T >::operator++() noexcept
   {
-    if (!node)
+    if (!node_)
     {
       return *this;
     }
-    node = node->next;
-    if (node == head)
+    node_ = node_->next;
+    if (node_ == head_)
     {
-      node = nullptr;
+      node_ = nullptr;
     }
     return *this;
   }
@@ -177,33 +173,33 @@ namespace ulanova
   template < class T >
   bool LCIter< T >::operator!=(const LCIter& other) const noexcept
   {
-    return node != other.node;
+    return node_ != other.node_;
   }
 
   template < class T >
   bool LCIter< T >::operator==(const LCIter& other) const noexcept
   {
-    return node == other.node;
+    return node_ == other.node_;
   }
 
   template < class T >
   const T* LCIter< T >::operator->() const noexcept
   {
-    return &(node->data);
+    return &(node_->data);
   }
 
   template< class T >
   LCIter< T >::LCIter(detail::Node< T >* n, detail::Node< T >* h):
-    node(n),
-    head(h)
+    node_(n),
+    head_(h)
   {}
 
 
   template< class T >
-  List< T >::List() : head(nullptr) {}
+  List< T >::List() : head_(nullptr) {}
   template< class T >
   List< T >::List(const List& other):
-    head(nullptr)
+    head_(nullptr)
   {
     try
     {
@@ -221,9 +217,9 @@ namespace ulanova
 
   template< class T >
   List< T >::List(List< T >&& other) noexcept:
-    head(other.head)
+    head_(other.head)
   {
-    other.head = nullptr;
+    other.head_ = nullptr;
   }
 
   template< class T >
@@ -249,8 +245,8 @@ namespace ulanova
     if (this != &other)
     {
       clear();
-      head = other.head;
-      other.head = nullptr;
+      head_ = other.head_;
+      other.head_ = nullptr;
     }
     return *this;
   }
@@ -259,10 +255,10 @@ namespace ulanova
   void List< T >::push_front(const T& value)
   {
     detail::Node< T >* new_node = new detail::Node< T >{value,nullptr};
-    if (!head)
+    if (!head_)
     {
-      head = new_node;
-      head->next = head;
+      head_ = new_node;
+      head_->next = head;
       return;
     }
     detail::Node< T >* last = head;
@@ -270,129 +266,129 @@ namespace ulanova
     {
       last = last->next;
     }
-    new_node->next = head;
+    new_node->next = head_;
     last->next = new_node;
-    head = new_node;
+    head_ = new_node;
   }
 
   template< class T >
   void List< T >::push_front(T&& value)
   {
     detail::Node< T >* new_node = new detail::Node< T >{std::move(value), nullptr};
-    if (!head)
+    if (!head_)
     {
-      head = new_node;
-      head->next = head;
+      head_ = new_node;
+      head_->next = head_;
       return;
     }
-    detail::Node< T >* last = head;
-    while (last->next != head)
+    detail::Node< T >* last = head_;
+    while (last->next != head_)
     {
       last = last->next;
     }
-    new_node->next = head;
+    new_node->next = head_;
     last->next = new_node;
-    head = new_node;
+    head_ = new_node;
   }
 
   template < class T >
   void List< T >::push_back(const T& value)
   {
     detail::Node< T >* new_node = new detail::Node< T >{value,nullptr};
-    if(!head)
+    if(!head_)
     {
-      head = new_node;
-      head->next = head;
+      head_ = new_node;
+      head_->next = head_;
       return;
     }
-    detail::Node< T >* last = head;
-    while (last ->next != head)
+    detail::Node< T >* last = head_;
+    while (last ->next != head_)
     {
       last = last->next;
     }
     last->next = new_node;
-    new_node->next = head;
+    new_node->next = head_;
   }
 
   template< class T >
   void List< T >::push_back(T&& value)
   {
     detail::Node< T >* new_node = new detail::Node< T >{std::move(value), nullptr};
-    if (!head)
+    if (!head_)
     {
-      head = new_node;
-      head->next = head;
+      head_ = new_node;
+      head_->next = head_;
       return;
     }
-    detail::Node< T >* last = head;
-    while (last->next != head)
+    detail::Node< T >* last = head_;
+    while (last->next != head_)
     {
       last = last->next;
     }
     last->next = new_node;
-    new_node->next = head;
+    new_node->next = head_;
   }
 
   template < class T >
   void List< T >::pop_front() noexcept
   {
-    if (!head)
+    if (!head_)
     {
       return;
     }
-    if (head->next == head)
+    if (head_->next == head_)
     {
-      delete head;
-      head = nullptr;
+      delete head_;
+      head_ = nullptr;
       return;
     }
-    detail::Node< T >* last = head;
-    while (last->next != head)
+    detail::Node< T >* last = head_;
+    while (last->next != head_)
     {
       last = last->next;
     }
-    detail::Node< T >* temp = head;
-    head = head->next;
-    last->next = head;
+    detail::Node< T >* temp = head_;
+    head_ = head_->next;
+    last->next = head_;
     delete temp;
   }
 
   template < class T >
   T& List< T >::front()
   {
-    if (!head)
+    if (!head_)
     {
       throw std::logic_error("empty list");
     }
-    return head->data;
+    return head_->data;
   }
 
   template < class T >
   LIter< T > List< T >::begin() noexcept
   {
-    return LIter< T >(head,head);
+    return LIter< T >(head_,head_);
   }
   template < class T >
   LIter< T > List< T >::end() noexcept
   {
-    return LIter< T >(nullptr,head);
+    return LIter< T >(nullptr,head_);
   }
 
   template < class T >
   LCIter< T > List< T >::cbegin() const noexcept
   {
-    return LCIter< T >(head,head);
+    return LCIter< T >(head_,head_);
   }
   template < class T >
   LCIter< T > List< T >::cend() const noexcept
   {
-    return LCIter< T >(nullptr,head);
+    return LCIter< T >(nullptr,head_);
   }
 
   template < class T >
   void List< T >::clear()
   {
-    while (head)
+    while (head_)
     {
       pop_front();
     }
@@ -401,9 +397,9 @@ namespace ulanova
   template< class T >
   void ulanova::List< T >::swap(List< T >& other) noexcept
   {
-    detail::Node< T >* temp = head;
-    head = other.head;
-    other.head = temp;
+    detail::Node< T >* temp = head_;
+    head_ = other.head_;
+    other.head_ = temp;
   }
 
   template < class T >
@@ -415,7 +411,7 @@ namespace ulanova
     }
     detail::Node< T >* new_node = new detail::Node< T >{value, pos.node->next};
     pos.node->next = new_node;
-    return LIter< T >(new_node, head);
+    return LIter< T >(new_node, head_);
   }
 
   template< class T >
@@ -427,7 +423,7 @@ namespace ulanova
     }
     detail::Node< T >* new_node = new detail::Node< T >{std::move(value), pos.node->next};
     pos.node->next = new_node;
-    return LIter< T >(new_node, head);
+    return LIter< T >(new_node, head_);
   }
 
   template < class T >
@@ -442,15 +438,15 @@ namespace ulanova
     {
       return;
     }
-    if (temp == head)
+    if (temp == head_)
     {
-      if (head->next == head)
+      if (head_->next == head_)
       {
-        delete head;
-        head = nullptr;
+        delete head_;
+        head_ = nullptr;
         return;
       }
-      head = head->next;
+      head_ = head_->next;
     }
     pos.node->next = temp->next;
     delete temp;
