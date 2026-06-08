@@ -19,8 +19,9 @@ namespace chernov {
 
     T & front();
     const T & front() const;
-    void push(const T & value);
-    void push(T && value);
+
+    template< class U >
+    void push(U && value);
     void pop();
 
     template< class... Args >
@@ -112,15 +113,10 @@ const T & chernov::Queue< T >::front() const
 }
 
 template< class T >
-void chernov::Queue< T >::push(const T & value)
+template< class U >
+void chernov::Queue< T >::push(U && value)
 {
-  last_ = list_.insertAfter(last_, value);
-}
-
-template< class T >
-void chernov::Queue< T >::push(T && value)
-{
-  last_ = list_.insertAfter(last_, std::move(value));
+  emplace(std::forward< U >(value));
 }
 
 template< class T >
