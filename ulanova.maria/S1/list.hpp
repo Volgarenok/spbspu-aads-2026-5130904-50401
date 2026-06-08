@@ -217,7 +217,7 @@ namespace ulanova
 
   template< class T >
   List< T >::List(List< T >&& other) noexcept:
-    head_(other.head)
+    head_(other.head_)
   {
     other.head_ = nullptr;
   }
@@ -258,10 +258,10 @@ namespace ulanova
     if (!head_)
     {
       head_ = new_node;
-      head_->next = head;
+      head_->next = head_;
       return;
     }
-    detail::Node< T >* last = head;
+    detail::Node< T >* last = head_;
     while (last->next != head)
     {
       last = last->next;
