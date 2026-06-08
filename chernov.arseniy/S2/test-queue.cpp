@@ -188,6 +188,38 @@ BOOST_AUTO_TEST_CASE(test_pop)
   BOOST_CHECK(queue.empty());
 }
 
+BOOST_AUTO_TEST_CASE(test_emplace)
+{
+  struct Point {
+    int x = 0;
+    int y = 0;
+    Point() = default;
+    Point(int x_, int y_):
+      x(x_),
+      y(y_)
+    {}
+  };
+
+  chernov::Queue< Point > queue;
+  queue.emplace(1, 2);
+  BOOST_CHECK_EQUAL(queue.size(), 1);
+  BOOST_CHECK_EQUAL(queue.front().x, 1);
+  BOOST_CHECK_EQUAL(queue.front().y, 2);
+
+  queue.emplace(3, 4);
+  BOOST_CHECK_EQUAL(queue.size(), 2);
+  BOOST_CHECK_EQUAL(queue.front().x, 1);
+  BOOST_CHECK_EQUAL(queue.front().y, 2);
+
+  queue.pop();
+  BOOST_CHECK_EQUAL(queue.size(), 1);
+  BOOST_CHECK_EQUAL(queue.front().x, 3);
+  BOOST_CHECK_EQUAL(queue.front().y, 4);
+
+  queue.pop();
+  BOOST_CHECK(queue.empty());
+}
+
 BOOST_AUTO_TEST_CASE(test_clear)
 {
   chernov::Queue< int > queue;
