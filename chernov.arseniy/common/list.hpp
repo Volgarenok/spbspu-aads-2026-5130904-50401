@@ -110,7 +110,13 @@ namespace chernov {
       LIter< T > pos = beforeBegin();
       LIter< T > iter = list.begin();
       do {
-        pos = insertAfter(pos, *iter);
+        try {
+          pos = insertAfter(pos, *iter);
+        } catch (...) {
+          clear();
+          removeFake();
+          throw;
+        }
         ++iter;
       } while (iter != list.begin());
     }
