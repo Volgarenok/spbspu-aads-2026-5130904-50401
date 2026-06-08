@@ -45,12 +45,12 @@ namespace chernov {
     void pushFront(T && value);
     void popFront();
     void swap(List< T > & other) noexcept;
-    void spliceAfter(LIter< T > pos, List< T > & other);
-    void spliceAfter(LIter< T > pos, List< T > && other);
-    void spliceAfter(LIter< T > pos, List< T > & other, LIter< T > it);
-    void spliceAfter(LIter< T > pos, List< T > && other, LIter< T > it);
-    void spliceAfter(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last);
-    void spliceAfter(LIter< T > pos, List< T > && other, LIter< T > first, LIter< T > last);
+    void spliceAfter(LIter< T > pos, List< T > & other) noexcept;
+    void spliceAfter(LIter< T > pos, List< T > && other) noexcept;
+    void spliceAfter(LIter< T > pos, List< T > & other, LIter< T > it) noexcept;
+    void spliceAfter(LIter< T > pos, List< T > && other, LIter< T > it) noexcept;
+    void spliceAfter(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last) noexcept;
+    void spliceAfter(LIter< T > pos, List< T > && other, LIter< T > first, LIter< T > last) noexcept;
 
     void sort();
 
@@ -305,7 +305,7 @@ namespace chernov {
 }
 
 template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other)
+void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other) noexcept
 {
   if (other.empty() || std::addressof(other) == this) {
     return;
@@ -327,13 +327,13 @@ void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other)
 }
 
 template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > && other)
+void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > && other) noexcept
 {
   spliceAfter(pos, other);
 }
 
 template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T > it)
+void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T > it) noexcept
 {
   if (other.empty() || it.ptr_->next == other.fake_) {
     return;
@@ -349,13 +349,13 @@ void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T
 }
 
 template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > it)
+void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > it) noexcept
 {
   spliceAfter(pos, other, it);
 }
 
 template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last)
+void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last) noexcept
 {
   if (first == last) {
     return;
@@ -392,7 +392,7 @@ void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T
 }
 
 template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > first, LIter< T > last)
+void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > first, LIter< T > last) noexcept
 {
   spliceAfter(pos, other, first, last);
 }
