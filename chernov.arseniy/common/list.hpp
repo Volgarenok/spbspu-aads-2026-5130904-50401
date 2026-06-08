@@ -248,7 +248,8 @@ namespace chernov {
   template< class... Args >
   LIter< T > List< T >::emplaceAfter(LIter< T > pos, Args &&... args)
   {
-    detail::Node< T > * node = new detail::Node< T >{std::forward< Args >(args)..., pos.ptr_->next};
+    T value(std::forward< Args >(args)...);
+    detail::Node< T > * node = new detail::Node< T >{std::move(value), pos.ptr_->next};
     pos.ptr_->next = node;
     ++size_;
     return {node, fake_};
