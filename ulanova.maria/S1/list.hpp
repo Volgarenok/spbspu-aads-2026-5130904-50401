@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <utility>
+#include <memory>
 
 namespace ulanova
 {
@@ -132,7 +133,7 @@ namespace ulanova
   template < class T >
   T* LIter< T >::operator->() noexcept
   {
-    return &(node_->data);
+    return std::addressof(node_->data);
   }
 
   template< class T >
@@ -185,7 +186,7 @@ namespace ulanova
   template < class T >
   const T* LCIter< T >::operator->() const noexcept
   {
-    return &(node_->data);
+    return std::addressof(node_->data);
   }
 
   template< class T >
@@ -262,7 +263,7 @@ namespace ulanova
       return;
     }
     detail::Node< T >* last = head_;
-    while (last->next != head)
+    while (last->next != head_)
     {
       last = last->next;
     }
