@@ -1,9 +1,13 @@
 #ifndef LITER_HPP
 #define LITER_HPP
 
+#include <memory>
+
 namespace chernov {
-  template< class T >
-  class Node;
+  namespace detail {
+    template< class T >
+    class Node;
+  }
 
   template< class T >
   class List;
@@ -11,56 +15,56 @@ namespace chernov {
   template< class T >
   class LIter {
   public:
-    LIter();
-    T & operator*() const;
-    T * operator->() const;
-    LIter< T > & operator++();
-    LIter< T > operator++(int);
+    LIter() noexcept;
+    T & operator*() noexcept;
+    T * operator->() noexcept;
+    LIter< T > & operator++() noexcept;
+    LIter< T > operator++(int) noexcept;
     bool operator==(const LIter< T > & other) const noexcept;
     bool operator!=(const LIter< T > & other) const noexcept;
   private:
     friend class List< T >;
-    Node< T > * ptr;
-    Node< T > * fake_;
-    LIter(Node< T > * node, Node< T > * fake);
+    detail::Node< T > * ptr_;
+    detail::Node< T > * fake_;
+    LIter(detail::Node< T > * node, detail::Node< T > * fake);
   };
 
   template< class T >
-  LIter< T >::LIter(Node< T > * node, Node< T > * fake):
-    ptr(node),
+  LIter< T >::LIter(detail::Node< T > * node, detail::Node< T > * fake):
+    ptr_(node),
     fake_(fake)
   {}
 
   template< class T >
-  LIter< T >::LIter():
-    ptr(nullptr),
+  LIter< T >::LIter() noexcept:
+    ptr_(nullptr),
     fake_(nullptr)
   {}
 
   template< class T >
-  T & LIter< T >::operator*() const
+  T & LIter< T >::operator*() noexcept
   {
-    return ptr->data;
+    return ptr_->data;
   }
 
   template< class T >
-  T * LIter< T >::operator->() const
+  T * LIter< T >::operator->() noexcept
   {
-    return &(ptr->data);
+    return std::addressof(ptr_->data);
   }
 
   template< class T >
-  LIter< T > & LIter< T >::operator++()
+  LIter< T > & LIter< T >::operator++() noexcept
   {
-    ptr = ptr->next;
-    if (ptr == fake_) {
-      ptr = fake_->next;
+    ptr_ = ptr_->next;
+    if (ptr_ == fake_) {
+      ptr_ = fake_->next;
     }
     return *this;
   }
 
   template< class T >
-  LIter< T > LIter< T >::operator++(int)
+  LIter< T > LIter< T >::operator++(int) noexcept
   {
     LIter old = *this;
     ++(*this);
@@ -70,7 +74,7 @@ namespace chernov {
   template< class T >
   bool LIter< T >::operator==(const LIter< T > & other) const noexcept
   {
-    return ptr == other.ptr;
+    return ptr_ == other.ptr_;
   }
 
   template< class T >
