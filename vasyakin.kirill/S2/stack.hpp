@@ -1,8 +1,8 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include "list.hpp"
 #include <cstddef>
 #include <stdexcept>
+#include "list.hpp"
 
 namespace vasyakin
 {
@@ -11,6 +11,8 @@ namespace vasyakin
   {
   public:
     void push(const T& value);
+    void push(T&& value);
+
     void pop();
     T& top();
     const T& top() const;
@@ -26,13 +28,19 @@ namespace vasyakin
   template< class T >
   void Stack< T >::push(const T& value)
   {
-    list_.insert(list_.end(), value);
+    list_.emplace_front(value);
+  }
+
+  template< class T >
+  void Stack< T >::push(T&& value)
+  {
+    list_.emplace_front(std::move(value));
   }
 
   template< class T >
   void Stack< T >::pop()
   {
-    if (list_.getsize() == 0)
+    if (list_.size() == 0)
     {
       throw std::runtime_error ("Stack is empty");
     }
@@ -42,7 +50,7 @@ namespace vasyakin
   template< class T >
   T& Stack< T >::top()
   {
-    if (list_.getsize() == 0)
+    if (list_.size() == 0)
     {
       throw std::runtime_error("Stack is empty");
     }
@@ -52,7 +60,7 @@ namespace vasyakin
   template< class T >
   const T& Stack< T >::top() const
   {
-    if (list_.getsize() == 0)
+    if (list_.size() == 0)
     {
       throw std::runtime_error("Stack is empty");
     }
@@ -62,13 +70,13 @@ namespace vasyakin
   template< class T >
   bool Stack< T >::empty() const noexcept
   {
-    return list_.getsize() == 0;
+    return list_.size() == 0;
   }
 
   template< class T >
   size_t Stack< T >::size() const noexcept
   {
-    return list_.getsize();
+    return list_.size();
   }
 
   template< class T >
