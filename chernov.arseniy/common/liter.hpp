@@ -16,8 +16,8 @@ namespace chernov {
   class LIter {
   public:
     LIter() noexcept;
-    T & operator*() const noexcept;
-    T * operator->() const noexcept;
+    T & operator*() noexcept;
+    T * operator->() noexcept;
     LIter< T > & operator++() noexcept;
     LIter< T > operator++(int) noexcept;
     bool operator==(const LIter< T > & other) const noexcept;
@@ -42,13 +42,13 @@ namespace chernov {
   {}
 
   template< class T >
-  T & LIter< T >::operator*() const noexcept
+  T & LIter< T >::operator*() noexcept
   {
     return ptr_->data;
   }
 
   template< class T >
-  T * LIter< T >::operator->() const noexcept
+  T * LIter< T >::operator->() noexcept
   {
     return std::addressof(ptr_->data);
   }
