@@ -288,6 +288,45 @@ BOOST_AUTO_TEST_CASE(test_insert_after)
   BOOST_CHECK_EQUAL(*iter, 1);
 }
 
+BOOST_AUTO_TEST_CASE(test_emplace_after)
+{
+  chernov::List< int > list;
+
+  chernov::LIter< int > it = list.emplaceAfter(list.beforeBegin(), 42);
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(*it, 42);
+  BOOST_CHECK_EQUAL(*list.begin(), 42);
+
+  it = list.emplaceAfter(it, 100);
+  BOOST_CHECK_EQUAL(list.size(), 2);
+  BOOST_CHECK_EQUAL(*it, 100);
+
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 42);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 100);
+}
+
+BOOST_AUTO_TEST_CASE(test_emplace_front)
+{
+  chernov::List< int > list;
+
+  list.emplaceFront(10);
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.first(), 10);
+  BOOST_CHECK_EQUAL(*list.begin(), 10);
+
+  list.emplaceFront(20);
+  BOOST_CHECK_EQUAL(list.size(), 2);
+  BOOST_CHECK_EQUAL(list.first(), 20);
+  BOOST_CHECK_EQUAL(*list.begin(), 20);
+
+  chernov::LIter< int > it = list.begin();
+  BOOST_CHECK_EQUAL(*it, 20);
+  ++it;
+  BOOST_CHECK_EQUAL(*it, 10);
+}
+
 BOOST_AUTO_TEST_CASE(test_one_erase_after)
 {
   chernov::List< int > list;
