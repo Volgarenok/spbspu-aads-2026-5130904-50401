@@ -24,6 +24,9 @@ namespace sedov
       Node< T > * prev;
       Node(const T & value);
       Node(T && value);
+
+      template< class... Args >
+      explicit Node(Args&&... args);
     };
   }
 
@@ -151,6 +154,14 @@ namespace sedov
   template< class T >
   detail::Node< T >::Node(T && value):
     val(std::forward< T >(value)),
+    next(nullptr),
+    prev(nullptr)
+  {}
+
+  template< class T >
+  template< class... Args >
+  detail::Node< T >::Node(Args&&... args) :
+    val(std::forward< Args >(args)...),
     next(nullptr),
     prev(nullptr)
   {}
@@ -434,11 +445,11 @@ namespace sedov
   template< class... Args >
   LIter< T > List< T >::emplaceFront(Args&&... args)
   {
-    detail::Node< T > * newNode = new detail::Node< T >{T(std::forward< Args >(args)...), 0, 0};
-    newNode->next_ = head_;
+    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
+    newNode->next = head_;
     if (head_)
     {
-      head_->prev_ = newNode;
+      head_->prev = newNode;
     }
     else
     {
@@ -453,11 +464,11 @@ namespace sedov
   template< class... Args >
   LIter< T > List< T >::emplaceBack(Args&&... args)
   {
-    detail::Node< T > * newNode = new detail::Node< T >{T(std::forward< Args >(args)...), 0, 0};
-    newNode->prev_ = tail_;
+    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
+    newNode->prev = tail_;
     if (tail_)
     {
-      tail_->next_ = newNode;
+      tail_->next = newNode;
     }
     else
     {
@@ -480,7 +491,7 @@ namespace sedov
     {
       return emplaceFront(std::forward< Args >(args)...);
     }
-    detail::Node< T > * newNode = new detail::Node< T >{T(std::forward< Args >(args)...), 0, 0};
+    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
     detail::Node< T > * next = p.ptr_;
     detail::Node< T > * prev = next->prev;
     newNode->prev = prev;
@@ -499,15 +510,15 @@ namespace sedov
     {
       return emplaceBack(std::forward< Args >(args)...);
     }
-    detail::Node< T > * newNode = new detail::Node< T >{T(std::forward< Args >(args)...), 0, 0};
+    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
     detail::Node< T > * current = p.ptr_;
-    detail::Node< T > * next = current->next_;
-    newNode->prev_ = current;
-    newNode->next_ = next;
-    current->next_ = newNode;
+    detail::Node< T > * next = current->next;
+    newNode->prev = current;
+    newNode->next = next;
+    current->next = newNode;
     if (next)
     {
-      next->prev_ = newNode;
+      next->prev = newNode;
     }
     else
     {
