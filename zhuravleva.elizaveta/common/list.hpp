@@ -40,6 +40,15 @@ namespace zhuravleva
     LIter< T > pushBack(T&& value);
     LIter< T > pushFront(T&& value);
 
+    template< class... Args >
+    LIter< T > emplaceAfter(LIter< T > pos, Args&&... args);
+
+    template< class... Args >
+    LIter< T > emplaceFront(Args&&... args);
+
+    template< class... Args >
+    LIter< T > emplaceBack(Args&&... args);
+
     void spliceAfter(LIter< T > pos, List& other, LIter< T > beforeElement) noexcept;
     void spliceAfter(LIter< T > pos, List& other) noexcept;
     void spliceAfter(LIter< T > pos, List& other,
@@ -506,6 +515,39 @@ namespace zhuravleva
   LIter< T > List< T >::pushFront(T&& value)
   {
     return insertAfter(beforeBegin(), std::move(value));
+  }
+
+  template< class T >
+  template< class... Args >
+  LIter< T > List< T >::emplaceAfter(LIter< T > pos, Args&&... args)
+  {
+    if (!pos.current_)
+    {
+      throw std::runtime_error("invalid iterator");
+    }
+    detail::Node< T >* node = new detail::Node< T >(pos.current_->next,
+        std::forward< Args >(args)...);
+    pos.current_->next = node;
+    return LIter< T >(node);
+  }
+
+  template< class T >
+  template< class... Args >
+  LIter< T > List< T >::emplaceFront(Args&&... args)
+  {
+    return emplaceAfter(beforeBegin(), std::forward< Args >(args)...);
+  }
+
+  template< class T >
+  template< class... Args >
+  LIter< T > List< T >::emplaceBack(Args&&... args)
+  {
+    detail::Node< T >* cur = fake_;
+    while (cur->next != fake_)
+    {
+      cur = cur->next;
+    }
+    return emplaceAfter(LIter< T >(cur), std::forward< Args >(args)...);
   }
 
   template< class T >
