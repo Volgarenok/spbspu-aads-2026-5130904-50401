@@ -405,7 +405,7 @@ namespace vasyakin
   template< class T >
   LIter< T > List< T >::insert(LIter< T > it, T&& value)
   {
-    return emplace_after(it, std::move(value));
+    return emplace_after(it, std::forward< T >(value));
   }
 
   template< class T >
@@ -434,7 +434,7 @@ namespace vasyakin
   template< class T >
   void List< T >::pushBack(T&& value)
   {
-    emplace_back(std::move(value));
+    emplace_back(std::forward< T >(value));
   }
 
   template< class T >

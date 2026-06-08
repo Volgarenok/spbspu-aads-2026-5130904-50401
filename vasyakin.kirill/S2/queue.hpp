@@ -35,7 +35,7 @@ namespace vasyakin
   template< class T >
   void Queue< T >::push(T&& value)
   {
-    list_.emplace_back(std::move(value));
+    list_.emplace_back(std::forward< T >(value));
   }
 
   template< class T >

@@ -34,7 +34,7 @@ namespace vasyakin
   template< class T >
   void Stack< T >::push(T&& value)
   {
-    list_.emplace_front(std::move(value));
+    list_.emplace_front(std::forward< T >(value));
   }
 
   template< class T >
