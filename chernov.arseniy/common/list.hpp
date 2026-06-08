@@ -2,17 +2,20 @@
 #define LIST_HPP
 
 #include <cstddef>
+#include <functional>
 #include <utility>
 
-#include "liter.hpp"
-#include "lciter.hpp"
+#include <liter.hpp>
+#include <lciter.hpp>
 
 namespace chernov {
-  template< class T >
-  struct Node {
-    T data;
-    Node< T > * next;
-  };
+  namespace detail {
+    template< class T >
+    struct Node {
+      T data;
+      Node< T > * next;
+    };
+  }
 
   template< class T >
   class List {
@@ -75,16 +78,16 @@ namespace chernov {
     template< class UnaryPredicate >
     LIter< T > partition(LIter< T > first, LIter< T > last, UnaryPredicate pred);
   private:
-    Node< T > * fake_;
+    detail::Node< T > * fake_;
     size_t size_;
-    Node< T > * createFake();
+    detail::Node< T > * createFake();
     void removeFake() noexcept;
   };
 
   template< class T >
-  Node< T > * List< T >::createFake()
+  detail::Node< T > * List< T >::createFake()
   {
-    fake_ = new Node<T>();
+    fake_ = new detail::Node< T >();
     return fake_;
   }
 
@@ -96,10 +99,9 @@ namespace chernov {
 
   template< class T >
   List< T >::List():
-    fake_(nullptr),
+    fake_(createFake()),
     size_(0)
   {
-    createFake();
     fake_->next = fake_;
   }
 
@@ -121,7 +123,13 @@ namespace chernov {
       LIter< T > pos = beforeBegin();
       LIter< T > iter = list.begin();
       do {
-        pos = insertAfter(pos, *iter);
+        try {
+          pos = insertAfter(pos, *iter);
+        } catch (...) {
+          clear();
+          removeFake();
+          throw;
+        }
         ++iter;
       } while (iter != list.begin());
     }
@@ -129,43 +137,27 @@ namespace chernov {
 
   template< class T >
   List< T >::List(List< T > && list) noexcept:
-    fake_(list.fake_),
-    size_(list.size_)
-  {
-    list.fake_ = nullptr;
-    list.size_ = 0;
-  }
+    fake_(std::exchange(list.fake_, nullptr)),
+    size_(std::exchange(list.size_, 0))
+  {}
 
   template< class T >
   List< T > & List< T >::operator=(const List< T > & list)
   {
-    if (this == &list) {
+    if (this == std::addressof(list)) {
       return *this;
     }
-    clear();
-    if (!list.empty()) {
-      LIter< T > pos = beforeBegin();
-      LIter< T > iter = list.begin();
-      do {
-        pos = insertAfter(pos, *iter);
-        ++iter;
-      } while (iter != list.begin());
-    }
+    List< T > new_list = list;
+    swap(new_list);
     return *this;
   }
 
   template< class T >
-  List< T > & List< T >::operator=(List< T > && list) noexcept
+  List< T > & List< T >::operator=(List< T > && other) noexcept
   {
-    if (this == &list) {
-      return *this;
+    if (this != std::addressof(other)) {
+      swap(other);
     }
-    clear();
-    removeFake();
-    fake_ = list.fake_;
-    size_ = list.size_;
-    list.fake_ = nullptr;
-    list.size_ = 0;
     return *this;
   }
 
@@ -230,14 +222,14 @@ namespace chernov {
   }
 
   template< class T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     if (fake_ == nullptr) {
       return;
     }
-    Node< T > * node = fake_->next;
+    detail::Node< T > * node = fake_->next;
     while (node != fake_) {
-      Node< T > * next = node->next;
+      detail::Node< T > * next = node->next;
       delete node;
       node = next;
     }
@@ -246,16 +238,8 @@ namespace chernov {
   }
 
   template< class T >
-  LIter< T > List< T >::insertAfter(LIter< T > pos, const T & value)
-  {
-    Node< T > * node = new Node< T >{value, pos.ptr->next};
-    pos.ptr->next = node;
-    ++size_;
-    return {node, fake_};
-  }
-
-  template< class T >
-  LIter< T > List< T >::insertAfter(LIter< T > pos, T && value)
+  template< class U >
+  LIter< T > List< T >::insertAfter(LIter< T > pos, U && value)
   {
     return emplaceAfter(pos, std::forward< U >(value));
   }
@@ -280,21 +264,21 @@ namespace chernov {
   template< class T >
   LIter< T > List< T >::eraseAfter(LIter< T > pos)
   {
-    if (pos.ptr == nullptr || (pos.ptr == fake_ && fake_->next == fake_)) {
+    if (pos.ptr_ == nullptr || (pos.ptr_ == fake_ && fake_->next == fake_)) {
       return end();
     }
-    Node< T > * del_node = pos.ptr->next;
+    detail::Node< T > * del_node = pos.ptr_->next;
     if (del_node == fake_) {
-      pos.ptr = fake_;
+      pos.ptr_ = fake_;
       del_node = fake_->next;
       if (del_node == fake_) {
         return end();
       }
     }
-    pos.ptr->next = del_node->next;
+    pos.ptr_->next = del_node->next;
     delete del_node;
     --size_;
-    return {pos.ptr->next, fake_};
+    return {pos.ptr_->next, fake_};
   }
 
   template< class T >
@@ -303,46 +287,280 @@ namespace chernov {
     if (first == last) {
       return last;
     }
-    Node< T > * prev = first.ptr;
-    Node< T > * curr = prev->next;
+    detail::Node< T > * prev = first.ptr_;
+    detail::Node< T > * curr = prev->next;
     bool crossed_fake = false;
-    while (curr != last.ptr) {
+    while (curr != last.ptr_) {
       if (curr == fake_) {
         crossed_fake = true;
         curr = fake_->next;
-        if (curr == last.ptr) {
+        if (curr == last.ptr_) {
           break;
         }
       }
-      Node< T > * next = curr->next;
+      detail::Node< T > * next = curr->next;
       delete curr;
       --size_;
       curr = next;
     }
-    prev->next = last.ptr;
+    prev->next = last.ptr_;
     if (crossed_fake) {
-      last.ptr->next = fake_;
-      fake_->next = first.ptr;
+      last.ptr_->next = fake_;
+      fake_->next = first.ptr_;
     }
     return last;
   }
 
   template< class T >
-  void List< T >::pushFront(const T & value)
+  template< class U >
+  void List< T >::pushFront(U && value)
   {
-    insertAfter(beforeBegin(), value);
-  }
-
-  template< class T >
-  void List< T >::pushFront(T && value)
-  {
-    insertAfter(beforeBegin(), std::move(value));
+    insertAfter(beforeBegin(), std::forward< U >(value));
   }
 
   template< class T >
   void List< T >::popFront()
   {
     eraseAfter(beforeBegin());
+  }
+
+  template< class T >
+  void List< T >::swap(List< T > & other) noexcept
+  {
+    std::swap(fake_, other.fake_);
+    std::swap(size_, other.size_);
+  }
+
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > & other) noexcept
+  {
+    if (other.empty() || std::addressof(other) == this) {
+      return;
+    }
+
+    detail::Node< T > * other_first = other.fake_->next;
+    detail::Node< T > * other_last = other_first;
+    while (other_last->next != other.fake_) {
+      other_last = other_last->next;
+    }
+
+    detail::Node< T > * after_pos = pos.ptr_->next;
+    pos.ptr_->next = other_first;
+    other_last->next = after_pos;
+
+    size_ += other.size_;
+    other.size_ = 0;
+    other.fake_->next = other.fake_;
+  }
+
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > && other) noexcept
+  {
+    spliceAfter(pos, other);
+  }
+
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T > it) noexcept
+  {
+    if (other.empty() || it.ptr_->next == other.fake_) {
+      return;
+    }
+
+    detail::Node< T > * first_ptr = it.ptr_;
+    detail::Node< T > * last_ptr = it.ptr_->next->next;
+
+    LIter< T > first{first_ptr, other.fake_};
+    LIter< T > last{last_ptr, other.fake_};
+
+    spliceAfter(pos, other, first, last);
+  }
+
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > it) noexcept
+  {
+    spliceAfter(pos, other, it);
+  }
+
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last) noexcept
+  {
+    if (first == last) {
+      return;
+    }
+
+    detail::Node< T > * other_next = first.ptr_->next;
+    if (other_next == last.ptr_) {
+      return;
+    }
+
+    detail::Node< T > * prev = first.ptr_;
+    detail::Node< T > * curr = other_next;
+    size_t count = 0;
+
+    while (curr != last.ptr_) {
+      prev = curr;
+      curr = curr->next;
+      ++count;
+
+      if (curr == other.fake_ && last.ptr_ != other.fake_) {
+        return;
+      }
+    }
+
+    detail::Node< T > * curr_next = pos.ptr_->next;
+
+    pos.ptr_->next = other_next;
+    prev->next = curr_next;
+
+    first.ptr_->next = last.ptr_;
+
+    size_ += count;
+    other.size_ -= count;
+  }
+
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > first, LIter< T > last) noexcept
+  {
+    spliceAfter(pos, other, first, last);
+  }
+
+  template< class T >
+  void List< T >::sort()
+  {
+    sort(std::less< T >{});
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::sort(Compare comp)
+  {
+    List< T > temp;
+    while (!empty()) {
+      detail::Node< T > * node = fake_->next;
+      fake_->next = node->next;
+      --size_;
+
+      detail::Node< T > * prev = temp.fake_;
+      detail::Node< T > * curr = prev->next;
+      while (curr != temp.fake_ && comp(curr->data, node->data)) {
+        prev = curr;
+        curr = curr->next;
+      }
+
+      node->next = curr;
+      prev->next = node;
+      ++temp.size_;
+    }
+    swap(temp);
+  }
+
+  template< class T >
+  void List< T >::merge(List< T > & other)
+  {
+    merge(other, std::less< T >{});
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::merge(List< T > & other, Compare comp)
+  {
+    if (other.empty()) {
+      return;
+    }
+    if (empty()) {
+      swap(other);
+      return;
+    }
+
+    detail::Node< T > * tail = fake_;
+    detail::Node< T > * cur1 = fake_->next;
+    detail::Node< T > * prev2 = other.fake_;
+    detail::Node< T > * cur2 = other.fake_->next;
+
+    while (cur1 != fake_ && cur2 != other.fake_) {
+      if (comp(cur2->data, cur1->data)) {
+        prev2->next = cur2->next;
+        cur2->next = cur1;
+        tail->next = cur2;
+        tail = cur2;
+        cur2 = prev2->next;
+      } else {
+        tail = cur1;
+        cur1 = cur1->next;
+      }
+    }
+
+    if (cur2 != other.fake_) {
+      tail->next = cur2;
+      detail::Node< T > * last = cur2;
+      while (last->next != other.fake_) {
+        last = last->next;
+      }
+      last->next = fake_;
+    }
+
+    size_ += other.size_;
+    other.size_ = 0;
+    other.fake_->next = other.fake_;
+  }
+
+  template< class T >
+  template< class UnaryPredicate >
+  LIter< T > List< T >::partition(LIter< T > first, LIter< T > last, UnaryPredicate pred)
+  {
+    if (first == last) {
+      return first;
+    }
+
+    detail::Node< T > * prev_first = fake_;
+    if (fake_->next != first.ptr_) {
+      detail::Node< T > * curr = fake_->next;
+      while (curr != fake_ && curr->next != first.ptr_) {
+        curr = curr->next;
+      }
+      prev_first = curr;
+    }
+
+    detail::Node< T > * head_true = nullptr;
+    detail::Node< T > * tail_true = nullptr;
+    detail::Node< T > * head_false = nullptr;
+    detail::Node< T > * tail_false = nullptr;
+
+    detail::Node< T > * curr = first.ptr_;
+    while (curr != last.ptr_) {
+      detail::Node< T > * next_node = curr->next;
+      if (pred(curr->data)) {
+        if (!head_true) {
+          head_true = curr;
+          tail_true = curr;
+        } else {
+          tail_true->next = curr;
+          tail_true = curr;
+        }
+      } else {
+        if (!head_false) {
+          head_false = curr;
+          tail_false = curr;
+        } else {
+          tail_false->next = curr;
+          tail_false = curr;
+        }
+      }
+      curr = next_node;
+    }
+
+    if (head_true) {
+      prev_first->next = head_true;
+      tail_true->next = (head_false ? head_false : last.ptr_);
+    } else {
+      prev_first->next = (head_false ? head_false : last.ptr_);
+    }
+
+    if (head_false) {
+      tail_false->next = last.ptr_;
+    }
+
+    return (head_false ? LIter< T >(head_false, fake_) : last);
   }
 }
 
