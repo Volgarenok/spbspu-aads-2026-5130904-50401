@@ -662,7 +662,7 @@ BOOST_AUTO_TEST_CASE(EmplaceAfterNullptrTest)
   list.emplaceBack(1);
   list.emplaceBack(2);
   list.emplaceBack(3);
-  list.emplaceAfter(nullptr, 4);
+  list.emplaceAfter(list.end(), 4);
   auto check = list.begin();
   BOOST_CHECK_EQUAL(*check, 1);
   ++check;
