@@ -41,8 +41,8 @@ namespace chernov {
     LIter< T > insertAfter(LIter< T > pos, U && value);
     LIter< T > eraseAfter(LIter< T > pos);
     LIter< T > eraseAfter(LIter< T > first, LIter< T > last);
-    void pushFront(const T & value);
-    void pushFront(T && value);
+    template< class U >
+    void pushFront(U && value);
     void popFront();
     void swap(List< T > & other) noexcept;
     void spliceAfter(LIter< T > pos, List< T > & other) noexcept;
@@ -285,15 +285,10 @@ namespace chernov {
   }
 
   template< class T >
-  void List< T >::pushFront(const T & value)
+  template< class U >
+  void List< T >::pushFront(U && value)
   {
-    insertAfter(beforeBegin(), value);
-  }
-
-  template< class T >
-  void List< T >::pushFront(T && value)
-  {
-    insertAfter(beforeBegin(), std::move(value));
+    insertAfter(beforeBegin(), std::forward< U >(value));
   }
 
   template< class T >

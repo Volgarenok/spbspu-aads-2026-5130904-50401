@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(test_arrow_operator)
   };
 
   chernov::List< Point > list;
-  list.pushFront({1, 2});
+  list.pushFront(Point{1, 2});
 
   chernov::LIter< Point > iter = list.begin();
   BOOST_CHECK_EQUAL(iter->x, 1);
