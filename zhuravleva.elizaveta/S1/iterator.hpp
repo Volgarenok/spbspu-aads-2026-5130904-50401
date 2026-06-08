@@ -1,6 +1,7 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 #include <stdexcept>
+#include <memory>
 #include "node.hpp"
 
 namespace zhuravleva
@@ -11,13 +12,8 @@ namespace zhuravleva
   template< class T >
   class LIter
   {
-    friend class List< T >;
-
   public:
     LIter() noexcept;
-    explicit LIter(detail::Node< T > * ptr) noexcept;
-    bool hasNext() const noexcept;
-    LIter next() const;
     LIter & operator++();
     LIter operator++(int);
     T & operator*();
@@ -28,19 +24,16 @@ namespace zhuravleva
     bool operator!=(const LIter & other) const noexcept;
 
   private:
+    friend class List< T >;
+    explicit LIter(detail::Node< T > * ptr) noexcept;
     detail::Node< T > * current_;
   };
 
   template< class T >
   class LCIter
   {
-    friend class List< T >;
-
   public:
     LCIter() noexcept;
-    explicit LCIter(const detail::Node< T > * ptr) noexcept;
-    bool hasNext() const noexcept;
-    LCIter next() const;
     LCIter & operator++();
     LCIter operator++(int);
     const T & operator*() const;
@@ -49,6 +42,8 @@ namespace zhuravleva
     bool operator!=(const LCIter & other) const noexcept;
 
   private:
+    friend class List< T >;
+    explicit LCIter(const detail::Node< T > * ptr) noexcept;
     const detail::Node< T > * current_;
   };
 
@@ -61,22 +56,6 @@ namespace zhuravleva
   LIter< T >::LIter(detail::Node< T > * ptr) noexcept:
     current_(ptr)
   {}
-
-  template< class T >
-  bool LIter< T >::hasNext() const noexcept
-  {
-    return current_ != nullptr;
-  }
-
-  template< class T >
-  LIter< T > LIter< T >::next() const
-  {
-    if (!current_)
-    {
-      throw std::runtime_error("null iterator");
-    }
-    return LIter< T >(current_->next);
-  }
 
   template< class T >
   LIter< T > & LIter< T >::operator++()
@@ -120,13 +99,13 @@ namespace zhuravleva
   template< class T >
   T * LIter< T >::operator->()
   {
-    return &(**this);
+    return std::addressof(**this);
   }
 
   template< class T >
   const T * LIter< T >::operator->() const
   {
-    return &(**this);
+    return std::addressof(**this);
   }
 
   template< class T >
@@ -150,22 +129,6 @@ namespace zhuravleva
   LCIter< T >::LCIter(const detail::Node< T > * ptr) noexcept:
     current_(ptr)
   {}
-
-  template< class T >
-  bool LCIter< T >::hasNext() const noexcept
-  {
-    return current_ != nullptr;
-  }
-
-  template< class T >
-  LCIter< T > LCIter< T >::next() const
-  {
-    if (!current_)
-    {
-      throw std::runtime_error("null iterator");
-    }
-    return LCIter< T >(current_->next);
-  }
 
   template< class T >
   LCIter< T > & LCIter< T >::operator++()
@@ -199,7 +162,7 @@ namespace zhuravleva
   template< class T >
   const T * LCIter< T >::operator->() const
   {
-    return &(**this);
+    return std::addressof(**this);
   }
 
   template< class T >
