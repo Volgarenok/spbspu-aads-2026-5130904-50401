@@ -24,8 +24,10 @@ namespace chernov {
     List(const List< T > & list);
     List(List< T > && list) noexcept;
     ~List() noexcept;
+
     List< T > & operator=(const List< T > & list);
     List< T > & operator=(List< T > && list) noexcept;
+
     T & first();
     const T & first() const;
     LIter< T > beforeBegin() const noexcept;
@@ -34,17 +36,28 @@ namespace chernov {
     LCIter< T > cbegin() const noexcept;
     LIter< T > end() const noexcept;
     LCIter< T > cend() const noexcept;
+
     bool empty() const noexcept;
     size_t size() const noexcept;
     void clear() noexcept;
+
     template< class U >
     LIter< T > insertAfter(LIter< T > pos, U && value);
+
+    template< class... Args >
+    LIter< T > emplaceAfter(LIter< T > pos, Args &&... args);
+    template< class... Args >
+    void emplaceFront(Args &&... args);
+
     LIter< T > eraseAfter(LIter< T > pos);
     LIter< T > eraseAfter(LIter< T > first, LIter< T > last);
+
     template< class U >
     void pushFront(U && value);
     void popFront();
+
     void swap(List< T > & other) noexcept;
+
     void spliceAfter(LIter< T > pos, List< T > & other) noexcept;
     void spliceAfter(LIter< T > pos, List< T > && other) noexcept;
     void spliceAfter(LIter< T > pos, List< T > & other, LIter< T > it) noexcept;
@@ -228,10 +241,24 @@ namespace chernov {
   template< class U >
   LIter< T > List< T >::insertAfter(LIter< T > pos, U && value)
   {
-    detail::Node< T > * node = new detail::Node< T >{std::forward< U >(value), pos.ptr_->next};
+    return emplaceAfter(pos, std::forward< U >(value));
+  }
+
+  template< class T >
+  template< class... Args >
+  LIter< T > List< T >::emplaceAfter(LIter< T > pos, Args &&... args)
+  {
+    detail::Node< T > * node = new detail::Node< T >{std::forward< Args >(args)..., pos.ptr_->next};
     pos.ptr_->next = node;
     ++size_;
     return {node, fake_};
+  }
+
+  template< class T >
+  template< class... Args >
+  void List< T >::emplaceFront(Args &&... args)
+  {
+    emplaceAfter(beforeBegin(), std::forward< Args >(args)...);
   }
 
   template< class T >
