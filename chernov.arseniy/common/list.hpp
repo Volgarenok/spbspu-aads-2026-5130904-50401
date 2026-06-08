@@ -330,238 +330,238 @@ namespace chernov {
     std::swap(fake_, other.fake_);
     std::swap(size_, other.size_);
   }
-}
 
-template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other) noexcept
-{
-  if (other.empty() || std::addressof(other) == this) {
-    return;
-  }
-
-  detail::Node< T > * other_first = other.fake_->next;
-  detail::Node< T > * other_last = other_first;
-  while (other_last->next != other.fake_) {
-    other_last = other_last->next;
-  }
-
-  detail::Node< T > * after_pos = pos.ptr_->next;
-  pos.ptr_->next = other_first;
-  other_last->next = after_pos;
-
-  size_ += other.size_;
-  other.size_ = 0;
-  other.fake_->next = other.fake_;
-}
-
-template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > && other) noexcept
-{
-  spliceAfter(pos, other);
-}
-
-template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T > it) noexcept
-{
-  if (other.empty() || it.ptr_->next == other.fake_) {
-    return;
-  }
-
-  detail::Node< T > * first_ptr = it.ptr_;
-  detail::Node< T > * last_ptr = it.ptr_->next->next;
-
-  LIter< T > first{first_ptr, other.fake_};
-  LIter< T > last{last_ptr, other.fake_};
-
-  spliceAfter(pos, other, first, last);
-}
-
-template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > it) noexcept
-{
-  spliceAfter(pos, other, it);
-}
-
-template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last) noexcept
-{
-  if (first == last) {
-    return;
-  }
-
-  detail::Node< T > * other_next = first.ptr_->next;
-  if (other_next == last.ptr_) {
-    return;
-  }
-
-  detail::Node< T > * prev = first.ptr_;
-  detail::Node< T > * curr = other_next;
-  size_t count = 0;
-
-  while (curr != last.ptr_) {
-    prev = curr;
-    curr = curr->next;
-    ++count;
-
-    if (curr == other.fake_ && last.ptr_ != other.fake_) {
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > & other) noexcept
+  {
+    if (other.empty() || std::addressof(other) == this) {
       return;
     }
+
+    detail::Node< T > * other_first = other.fake_->next;
+    detail::Node< T > * other_last = other_first;
+    while (other_last->next != other.fake_) {
+      other_last = other_last->next;
+    }
+
+    detail::Node< T > * after_pos = pos.ptr_->next;
+    pos.ptr_->next = other_first;
+    other_last->next = after_pos;
+
+    size_ += other.size_;
+    other.size_ = 0;
+    other.fake_->next = other.fake_;
   }
 
-  detail::Node< T > * curr_next = pos.ptr_->next;
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > && other) noexcept
+  {
+    spliceAfter(pos, other);
+  }
 
-  pos.ptr_->next = other_next;
-  prev->next = curr_next;
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T > it) noexcept
+  {
+    if (other.empty() || it.ptr_->next == other.fake_) {
+      return;
+    }
 
-  first.ptr_->next = last.ptr_;
+    detail::Node< T > * first_ptr = it.ptr_;
+    detail::Node< T > * last_ptr = it.ptr_->next->next;
 
-  size_ += count;
-  other.size_ -= count;
-}
+    LIter< T > first{first_ptr, other.fake_};
+    LIter< T > last{last_ptr, other.fake_};
 
-template< class T >
-void chernov::List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > first, LIter< T > last) noexcept
-{
-  spliceAfter(pos, other, first, last);
-}
+    spliceAfter(pos, other, first, last);
+  }
 
-template< class T >
-void chernov::List< T >::sort()
-{
-  sort(std::less< T >{});
-}
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > it) noexcept
+  {
+    spliceAfter(pos, other, it);
+  }
 
-template< class T >
-template< class Compare >
-void chernov::List< T >::sort(Compare comp)
-{
-  List< T > temp;
-  while (!empty()) {
-    detail::Node< T > * node = fake_->next;
-    fake_->next = node->next;
-    --size_;
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last) noexcept
+  {
+    if (first == last) {
+      return;
+    }
 
-    detail::Node< T > * prev = temp.fake_;
-    detail::Node< T > * curr = prev->next;
-    while (curr != temp.fake_ && comp(curr->data, node->data)) {
+    detail::Node< T > * other_next = first.ptr_->next;
+    if (other_next == last.ptr_) {
+      return;
+    }
+
+    detail::Node< T > * prev = first.ptr_;
+    detail::Node< T > * curr = other_next;
+    size_t count = 0;
+
+    while (curr != last.ptr_) {
       prev = curr;
       curr = curr->next;
+      ++count;
+
+      if (curr == other.fake_ && last.ptr_ != other.fake_) {
+        return;
+      }
     }
 
-    node->next = curr;
-    prev->next = node;
-    ++temp.size_;
-  }
-  swap(temp);
-}
+    detail::Node< T > * curr_next = pos.ptr_->next;
 
-template< class T >
-void chernov::List< T >::merge(List< T > & other)
-{
-  merge(other, std::less< T >{});
-}
+    pos.ptr_->next = other_next;
+    prev->next = curr_next;
 
-template< class T >
-template< class Compare >
-void chernov::List< T >::merge(List< T > & other, Compare comp)
-{
-  if (other.empty()) {
-    return;
-  }
-  if (empty()) {
-    swap(other);
-    return;
+    first.ptr_->next = last.ptr_;
+
+    size_ += count;
+    other.size_ -= count;
   }
 
-  detail::Node< T > * tail = fake_;
-  detail::Node< T > * cur1 = fake_->next;
-  detail::Node< T > * prev2 = other.fake_;
-  detail::Node< T > * cur2 = other.fake_->next;
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List< T > && other, LIter< T > first, LIter< T > last) noexcept
+  {
+    spliceAfter(pos, other, first, last);
+  }
 
-  while (cur1 != fake_ && cur2 != other.fake_) {
-    if (comp(cur2->data, cur1->data)) {
-      prev2->next = cur2->next;
-      cur2->next = cur1;
+  template< class T >
+  void List< T >::sort()
+  {
+    sort(std::less< T >{});
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::sort(Compare comp)
+  {
+    List< T > temp;
+    while (!empty()) {
+      detail::Node< T > * node = fake_->next;
+      fake_->next = node->next;
+      --size_;
+
+      detail::Node< T > * prev = temp.fake_;
+      detail::Node< T > * curr = prev->next;
+      while (curr != temp.fake_ && comp(curr->data, node->data)) {
+        prev = curr;
+        curr = curr->next;
+      }
+
+      node->next = curr;
+      prev->next = node;
+      ++temp.size_;
+    }
+    swap(temp);
+  }
+
+  template< class T >
+  void List< T >::merge(List< T > & other)
+  {
+    merge(other, std::less< T >{});
+  }
+
+  template< class T >
+  template< class Compare >
+  void List< T >::merge(List< T > & other, Compare comp)
+  {
+    if (other.empty()) {
+      return;
+    }
+    if (empty()) {
+      swap(other);
+      return;
+    }
+
+    detail::Node< T > * tail = fake_;
+    detail::Node< T > * cur1 = fake_->next;
+    detail::Node< T > * prev2 = other.fake_;
+    detail::Node< T > * cur2 = other.fake_->next;
+
+    while (cur1 != fake_ && cur2 != other.fake_) {
+      if (comp(cur2->data, cur1->data)) {
+        prev2->next = cur2->next;
+        cur2->next = cur1;
+        tail->next = cur2;
+        tail = cur2;
+        cur2 = prev2->next;
+      } else {
+        tail = cur1;
+        cur1 = cur1->next;
+      }
+    }
+
+    if (cur2 != other.fake_) {
       tail->next = cur2;
-      tail = cur2;
-      cur2 = prev2->next;
-    } else {
-      tail = cur1;
-      cur1 = cur1->next;
-    }
-  }
-
-  if (cur2 != other.fake_) {
-    tail->next = cur2;
-    detail::Node< T > * last = cur2;
-    while (last->next != other.fake_) {
-      last = last->next;
-    }
-    last->next = fake_;
-  }
-
-  size_ += other.size_;
-  other.size_ = 0;
-  other.fake_->next = other.fake_;
-}
-
-template< class T >
-template< class UnaryPredicate >
-chernov::LIter< T > chernov::List< T >::partition(LIter< T > first, LIter< T > last, UnaryPredicate pred)
-{
-  if (first == last) {
-    return first;
-  }
-
-  detail::Node< T > * prev_first = fake_;
-  if (fake_->next != first.ptr_) {
-    detail::Node< T > * curr = fake_->next;
-    while (curr != fake_ && curr->next != first.ptr_) {
-      curr = curr->next;
-    }
-    prev_first = curr;
-  }
-
-  detail::Node< T > * head_true = nullptr;
-  detail::Node< T > * tail_true = nullptr;
-  detail::Node< T > * head_false = nullptr;
-  detail::Node< T > * tail_false = nullptr;
-
-  detail::Node< T > * curr = first.ptr_;
-  while (curr != last.ptr_) {
-    detail::Node< T > * next_node = curr->next;
-    if (pred(curr->data)) {
-      if (!head_true) {
-        head_true = curr;
-        tail_true = curr;
-      } else {
-        tail_true->next = curr;
-        tail_true = curr;
+      detail::Node< T > * last = cur2;
+      while (last->next != other.fake_) {
+        last = last->next;
       }
-    } else {
-      if (!head_false) {
-        head_false = curr;
-        tail_false = curr;
-      } else {
-        tail_false->next = curr;
-        tail_false = curr;
-      }
+      last->next = fake_;
     }
-    curr = next_node;
+
+    size_ += other.size_;
+    other.size_ = 0;
+    other.fake_->next = other.fake_;
   }
 
-  if (head_true) {
-    prev_first->next = head_true;
-    tail_true->next = (head_false ? head_false : last.ptr_);
-  } else {
-    prev_first->next = (head_false ? head_false : last.ptr_);
-  }
+  template< class T >
+  template< class UnaryPredicate >
+  LIter< T > List< T >::partition(LIter< T > first, LIter< T > last, UnaryPredicate pred)
+  {
+    if (first == last) {
+      return first;
+    }
 
-  if (head_false) {
-    tail_false->next = last.ptr_;
-  }
+    detail::Node< T > * prev_first = fake_;
+    if (fake_->next != first.ptr_) {
+      detail::Node< T > * curr = fake_->next;
+      while (curr != fake_ && curr->next != first.ptr_) {
+        curr = curr->next;
+      }
+      prev_first = curr;
+    }
 
-  return (head_false ? LIter< T >(head_false, fake_) : last);
+    detail::Node< T > * head_true = nullptr;
+    detail::Node< T > * tail_true = nullptr;
+    detail::Node< T > * head_false = nullptr;
+    detail::Node< T > * tail_false = nullptr;
+
+    detail::Node< T > * curr = first.ptr_;
+    while (curr != last.ptr_) {
+      detail::Node< T > * next_node = curr->next;
+      if (pred(curr->data)) {
+        if (!head_true) {
+          head_true = curr;
+          tail_true = curr;
+        } else {
+          tail_true->next = curr;
+          tail_true = curr;
+        }
+      } else {
+        if (!head_false) {
+          head_false = curr;
+          tail_false = curr;
+        } else {
+          tail_false->next = curr;
+          tail_false = curr;
+        }
+      }
+      curr = next_node;
+    }
+
+    if (head_true) {
+      prev_first->next = head_true;
+      tail_true->next = (head_false ? head_false : last.ptr_);
+    } else {
+      prev_first->next = (head_false ? head_false : last.ptr_);
+    }
+
+    if (head_false) {
+      tail_false->next = last.ptr_;
+    }
+
+    return (head_false ? LIter< T >(head_false, fake_) : last);
+  }
 }
 
 #endif
