@@ -460,7 +460,7 @@ BOOST_AUTO_TEST_CASE(list_emplace_back_and_front)
   list.emplace_back(2, "second");
   list.emplace_front(0, "zero");
 
-  BOOST_CHECK_EQUAL(list.getsize(), 3);
+  BOOST_CHECK_EQUAL(list.size(), 3);
 
   auto it = list.begin();
 
@@ -486,7 +486,7 @@ BOOST_AUTO_TEST_CASE(emplace_after_middle)
   auto it = list.begin();
   list.emplace_after(it, 2, "B");
 
-  BOOST_CHECK_EQUAL(list.getsize(), 3);
+  BOOST_CHECK_EQUAL(list.size(), 3);
 
   it = list.begin();
 
@@ -504,17 +504,17 @@ BOOST_AUTO_TEST_CASE(emplace_on_empty_list)
   vasyakin::List< TestNoDefault > list;
 
   list.emplace_back(10, "ten");
-  BOOST_CHECK_EQUAL(list.getsize(), 1);
+  BOOST_CHECK_EQUAL(list.size(), 1);
   BOOST_CHECK_EQUAL(list.begin()->val_, 10);
 
   list.emplace_front(20, "twenty");
-  BOOST_CHECK_EQUAL(list.getsize(), 2);
+  BOOST_CHECK_EQUAL(list.size(), 2);
   BOOST_CHECK_EQUAL(list.begin()->val_, 20);
 
   vasyakin::List< TestNoDefault > list2;
 
   list2.emplace_after(list2.end(), 30, "thirty");
-  BOOST_CHECK_EQUAL(list2.getsize(), 1);
+  BOOST_CHECK_EQUAL(list2.size(), 1);
   BOOST_CHECK_EQUAL(list2.begin()->val_, 30);
 }
 
@@ -529,7 +529,7 @@ BOOST_AUTO_TEST_CASE(emplace_perfect_forwarding)
   list.emplace_back(std::move(val), std::move(str));
   list.emplace_front(67, std::string("prvalue"));
 
-  BOOST_CHECK_EQUAL(list.getsize(), 3);
+  BOOST_CHECK_EQUAL(list.size(), 3);
 
   auto it = list.begin();
 
