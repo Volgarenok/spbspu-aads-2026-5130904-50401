@@ -21,8 +21,10 @@ namespace chernov {
     List(const List< T > & list);
     List(List< T > && list) noexcept;
     ~List() noexcept;
+
     List< T > & operator=(const List< T > & list);
     List< T > & operator=(List< T > && list) noexcept;
+
     T & first();
     const T & first() const;
     LIter< T > beforeBegin() const noexcept;
@@ -31,16 +33,47 @@ namespace chernov {
     LCIter< T > cbegin() const noexcept;
     LIter< T > end() const noexcept;
     LCIter< T > cend() const noexcept;
+
     bool empty() const noexcept;
     size_t size() const noexcept;
-    void clear();
-    LIter< T > insertAfter(LIter< T > pos, const T & value);
-    LIter< T > insertAfter(LIter< T > pos, T && value);
+    void clear() noexcept;
+
+    template< class U >
+    LIter< T > insertAfter(LIter< T > pos, U && value);
+
+    template< class... Args >
+    LIter< T > emplaceAfter(LIter< T > pos, Args &&... args);
+    template< class... Args >
+    void emplaceFront(Args &&... args);
+
     LIter< T > eraseAfter(LIter< T > pos);
     LIter< T > eraseAfter(LIter< T > first, LIter< T > last);
-    void pushFront(const T & value);
-    void pushFront(T && value);
+
+    template< class U >
+    void pushFront(U && value);
     void popFront();
+
+    void swap(List< T > & other) noexcept;
+
+    void spliceAfter(LIter< T > pos, List< T > & other) noexcept;
+    void spliceAfter(LIter< T > pos, List< T > && other) noexcept;
+    void spliceAfter(LIter< T > pos, List< T > & other, LIter< T > it) noexcept;
+    void spliceAfter(LIter< T > pos, List< T > && other, LIter< T > it) noexcept;
+    void spliceAfter(LIter< T > pos, List< T > & other, LIter< T > first, LIter< T > last) noexcept;
+    void spliceAfter(LIter< T > pos, List< T > && other, LIter< T > first, LIter< T > last) noexcept;
+
+    void sort();
+
+    template< class Compare >
+    void sort(Compare comp);
+
+    void merge(List< T > & other);
+
+    template < class Compare >
+    void merge(List< T > & other, Compare comp);
+
+    template< class UnaryPredicate >
+    LIter< T > partition(LIter< T > first, LIter< T > last, UnaryPredicate pred);
   private:
     Node< T > * fake_;
     size_t size_;
@@ -224,10 +257,24 @@ namespace chernov {
   template< class T >
   LIter< T > List< T >::insertAfter(LIter< T > pos, T && value)
   {
-    Node< T > * node = new Node< T >{std::move(value), pos.ptr->next};
-    pos.ptr->next = node;
+    return emplaceAfter(pos, std::forward< U >(value));
+  }
+
+  template< class T >
+  template< class... Args >
+  LIter< T > List< T >::emplaceAfter(LIter< T > pos, Args &&... args)
+  {
+    detail::Node< T > * node = new detail::Node< T >{std::forward< Args >(args)..., pos.ptr_->next};
+    pos.ptr_->next = node;
     ++size_;
     return {node, fake_};
+  }
+
+  template< class T >
+  template< class... Args >
+  void List< T >::emplaceFront(Args &&... args)
+  {
+    emplaceAfter(beforeBegin(), std::forward< Args >(args)...);
   }
 
   template< class T >
