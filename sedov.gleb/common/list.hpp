@@ -24,11 +24,6 @@ namespace sedov
       Node< T > * prev;
       Node(const T & value);
       Node(T && value);
-      template< class... Args >
-      explicit Node(Args&&... args);
-      ~Node();
-      T & getValue();
-      const T & getValue() const;
     };
   }
 
@@ -439,7 +434,7 @@ namespace sedov
   template< class... Args >
   LIter< T > List< T >::emplaceFront(Args&&... args)
   {
-    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
+    detail::Node< T > * newNode = new detail::Node< T >{T(std::forward< Args >(args)...), 0, 0};
     newNode->next_ = head_;
     if (head_)
     {
@@ -458,7 +453,7 @@ namespace sedov
   template< class... Args >
   LIter< T > List< T >::emplaceBack(Args&&... args)
   {
-    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
+    detail::Node< T > * newNode = new detail::Node< T >{T(std::forward< Args >(args)...), 0, 0};
     newNode->prev_ = tail_;
     if (tail_)
     {
@@ -485,7 +480,7 @@ namespace sedov
     {
       return emplaceFront(std::forward< Args >(args)...);
     }
-    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
+    detail::Node< T > * newNode = new detail::Node< T >{T(std::forward< Args >(args)...), 0, 0};
     detail::Node< T > * next = p.ptr_;
     detail::Node< T > * prev = next->prev;
     newNode->prev = prev;
@@ -504,7 +499,7 @@ namespace sedov
     {
       return emplaceBack(std::forward< Args >(args)...);
     }
-    detail::Node< T > * newNode = new detail::Node< T >(std::forward< Args >(args)...);
+    detail::Node< T > * newNode = new detail::Node< T >{T(std::forward< Args >(args)...), 0, 0};
     detail::Node< T > * current = p.ptr_;
     detail::Node< T > * next = current->next_;
     newNode->prev_ = current;
