@@ -22,6 +22,10 @@ namespace chernov {
     void push(const T & value);
     void push(T && value);
     void pop();
+
+    template< class... Args >
+    void emplace(Args &&... args);
+
     bool empty() const noexcept;
     size_t size() const noexcept;
     void clear();
@@ -128,6 +132,13 @@ void chernov::Queue< T >::pop()
   } else {
     list_.popFront();
   }
+}
+
+template< class T >
+template< class... Args >
+void chernov::Queue< T >::emplace(Args &&... args)
+{
+  last_ = list_.emplaceAfter(last_, std::forward< Args >(args)...);
 }
 
 template< class T >
