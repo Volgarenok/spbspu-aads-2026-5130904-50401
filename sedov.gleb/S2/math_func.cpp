@@ -24,17 +24,23 @@ namespace
     }
   }
 
-  size_t getIndex(const std::string & sign, sedov::List< std::string > & funcs)
+  sedov::func_t getFunction(const std::string & sign, const sedov::List< std::string > & funcNames,
+    const sedov::List< sedov::func_t > & funcs)
   {
     size_t i = 0;
-    for (sedov::LIter< std::string > it = funcs.begin(); it != funcs.end(); ++it, ++i)
+    for (sedov::LCIter< std::string > it = funcNames.cbegin(); it != funcNames.cend(); ++it, ++i)
     {
       if ((*it) == sign)
       {
-        return i;
+        auto fit = funcs.cbegin();
+        for (size_t j = 0; j < i; ++j)
+        {
+          ++fit;
+        }
+        return *fit;
       }
     }
-    return funcs.size();
+    return nullptr;
   }
 }
 
@@ -216,7 +222,7 @@ sedov::Expression sedov::convertInfToPost(const Expression & infix)
 {
   const Queue< std::string > & infixTokens = infix.getTokens();
   Queue< std::string > infixNew = infixTokens;
-  Queue< std::string > postfixTokens;
+  Expression result;
   Stack< std::string > stack;
   while (!infixNew.empty())
   {
@@ -230,7 +236,7 @@ sedov::Expression sedov::convertInfToPost(const Expression & infix)
     {
       while (stack.top() != "(")
       {
-        postfixTokens.push(stack.top());
+        result.addToken(stack.top());
         stack.pop();
       }
       stack.pop();
@@ -239,32 +245,25 @@ sedov::Expression sedov::convertInfToPost(const Expression & infix)
     {
       while (!stack.empty() && stack.top() != "(" && getPriority(stack.top()) >= getPriority(sym))
       {
-        postfixTokens.push(stack.top());
+        result.addToken(stack.top());
         stack.pop();
       }
       stack.push(sym);
     }
     else
     {
-      postfixTokens.push(sym);
+      result.addToken(sym);
     }
   }
   while (!stack.empty())
   {
-    postfixTokens.push(stack.top());
+    result.addToken(stack.top());
     stack.pop();
-  }
-  Expression result;
-  Queue< std::string > temp = postfixTokens;
-  while (!temp.empty())
-  {
-    result.addToken(temp.front());
-    temp.pop();
   }
   return result;
 }
 
-std::string sedov::calculate(const Expression & postfix)
+sedov::lli_t sedov::calculate(const Expression & postfix)
 {
   const Queue< std::string > & postfixTokens = postfix.getTokens();
   Queue< std::string > postfixNew = postfixTokens;
@@ -289,32 +288,26 @@ std::string sedov::calculate(const Expression & postfix)
     postfixNew.pop();
     if (!isOperation(sym))
     {
-      try
-      {
-        nums.push(std::stoll(sym));
-      }
-      catch (const std::invalid_argument &)
-      {
-        throw std::invalid_argument("Input error: invalid number");
-      }
-      catch (const std::out_of_range &)
-      {
-        throw std::out_of_range("Input error: number out of range");
-      }
+      nums.push(std::stoll(sym));
     }
     else
     {
-      size_t ind = getIndex(sym, funcNames);
+      if (nums.size() < 2)
+      {
+        throw std::invalid_argument("Input error: not enough operands");
+      }
+
+      sedov::func_t op = getFunction(sym, funcNames, funcs);
+      if (!op)
+      {
+        throw std::invalid_argument("Input error: unknown operation");
+      }
+
       lli_t right = nums.top();
       nums.pop();
       lli_t left = nums.top();
       nums.pop();
-      auto it = funcs.begin();
-      for (size_t i = 0; i < ind; ++i)
-      {
-        ++it;
-      }
-      lli_t newNum = (*it)(left, right);
+      lli_t newNum = op(left, right);
       nums.push(newNum);
     }
   }
@@ -322,5 +315,5 @@ std::string sedov::calculate(const Expression & postfix)
   {
     throw std::invalid_argument("Input error: invalid expression");
   }
-  return std::to_string(nums.top());
+  return nums.top();
 }

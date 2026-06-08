@@ -54,8 +54,8 @@ int main(int argc, char ** argv)
     try
     {
       Expression postfix = convertInfToPost(inf);
-      std::string res = calculate(postfix);
-      out.pushBack(res);
+      lli_t res = calculate(postfix);
+      out.pushBack(std::to_string(res));
     }
     catch (const std::exception & e)
     {

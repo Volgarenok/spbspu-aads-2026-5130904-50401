@@ -9,10 +9,10 @@ namespace sedov
   {
   public:
     void addToken(const std::string & token);
-    bool empty() const;
-    size_t size() const;
-    void clear();
-    const Queue< std::string > & getTokens() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+    void clear() noexcept;
+    const Queue< std::string > & getTokens() const noexcept;
 
   private:
     Queue< std::string > tokens_;

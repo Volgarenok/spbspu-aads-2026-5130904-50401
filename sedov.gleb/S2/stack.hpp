@@ -1,6 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include "list.hpp"
+#include <list.hpp>
 
 namespace sedov
 {
@@ -16,14 +16,14 @@ namespace sedov
     Stack & operator=(const Stack< T > & s) = default;
     Stack & operator=(Stack< T > && s) = default;
 
-    T & top();
-    const T & top() const;
+    T & top() noexcept;
+    const T & top() const noexcept;
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
     void push(const T & v);
-    void push(T && v);
+    void push(T && v) noexcept;
 
     template< class... Args >
     LIter< T > emplace(Args&&... args);
@@ -36,25 +36,25 @@ namespace sedov
   };
 
   template< class T >
-  T & Stack< T >::top()
+  T & Stack< T >::top() noexcept
   {
     return list_.back();
   }
 
   template< class T >
-  const T & Stack< T >::top() const
+  const T & Stack< T >::top() const noexcept
   {
     return list_.back();
   }
 
   template< class T >
-  bool Stack< T >::empty() const
+  bool Stack< T >::empty() const noexcept
   {
     return list_.size() == 0;
   }
 
   template< class T >
-  size_t Stack< T >::size() const
+  size_t Stack< T >::size() const noexcept
   {
     return list_.size();
   }
@@ -66,9 +66,9 @@ namespace sedov
   }
 
   template< class T >
-  void Stack< T >::push(T && v)
+  void Stack< T >::push(T && v) noexcept
   {
-    list_.pushBack(std::move(v));
+    list_.pushBack(std::forward< T >(v));
   }
 
   template< class T >

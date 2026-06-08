@@ -15,8 +15,8 @@ BOOST_AUTO_TEST_CASE(BitRightShiftBasicTest)
     sedov::Expression inf = infix.top();
     infix.pop();
     sedov::Expression postfix = sedov::convertInfToPost(inf);
-    std::string res = sedov::calculate(postfix);
-    out.pushBack(res);
+    sedov::lli_t res = sedov::calculate(postfix);
+    out.pushBack(std::to_string(res));
   }
 
   std::string result;
@@ -40,8 +40,8 @@ BOOST_AUTO_TEST_CASE(BitRightShiftCornerCases)
     sedov::Stack< sedov::Expression > infix;
     sedov::getInfix(iss, infix);
     sedov::Expression postfix = sedov::convertInfToPost(infix.top());
-    std::string res = sedov::calculate(postfix);
-    BOOST_CHECK(res == "0");
+    sedov::lli_t res = sedov::calculate(postfix);
+    BOOST_CHECK(res == 0);
   }
 
   {
@@ -50,8 +50,8 @@ BOOST_AUTO_TEST_CASE(BitRightShiftCornerCases)
     sedov::Stack< sedov::Expression > infix;
     sedov::getInfix(iss, infix);
     sedov::Expression postfix = sedov::convertInfToPost(infix.top());
-    std::string res = sedov::calculate(postfix);
-    BOOST_CHECK(res == "42");
+    sedov::lli_t res = sedov::calculate(postfix);
+    BOOST_CHECK(res == 42);
   }
 
   {
@@ -60,8 +60,8 @@ BOOST_AUTO_TEST_CASE(BitRightShiftCornerCases)
     sedov::Stack< sedov::Expression > infix;
     sedov::getInfix(iss, infix);
     sedov::Expression postfix = sedov::convertInfToPost(infix.top());
-    std::string res = sedov::calculate(postfix);
-    BOOST_CHECK(res == "-2");
+    sedov::lli_t res = sedov::calculate(postfix);
+    BOOST_CHECK(res == -2);
   }
 
   {
@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_CASE(BitRightShiftCornerCases)
     sedov::Stack< sedov::Expression > infix;
     sedov::getInfix(iss, infix);
     sedov::Expression postfix = sedov::convertInfToPost(infix.top());
-    std::string res = sedov::calculate(postfix);
-    BOOST_CHECK(res == "4611686018427387903");
+    sedov::lli_t res = sedov::calculate(postfix);
+    BOOST_CHECK(res == 4611686018427387903LL);
   }
 
   {
@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_CASE(BitRightShiftCornerCases)
     sedov::Stack< sedov::Expression > infix;
     sedov::getInfix(iss, infix);
     sedov::Expression postfix = sedov::convertInfToPost(infix.top());
-    std::string res = sedov::calculate(postfix);
-    BOOST_CHECK(res == "12");
+    sedov::lli_t res = sedov::calculate(postfix);
+    BOOST_CHECK(res == 12);
   }
 
   {
@@ -90,8 +90,8 @@ BOOST_AUTO_TEST_CASE(BitRightShiftCornerCases)
     sedov::Stack< sedov::Expression > infix;
     sedov::getInfix(iss, infix);
     sedov::Expression postfix = sedov::convertInfToPost(infix.top());
-    std::string res = sedov::calculate(postfix);
-    BOOST_CHECK(res == "4");
+    sedov::lli_t res = sedov::calculate(postfix);
+    BOOST_CHECK(res == 4);
   }
 }
 

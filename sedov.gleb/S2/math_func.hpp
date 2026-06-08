@@ -21,7 +21,7 @@ namespace sedov
 
   void getInfix(std::istream & in, Stack< Expression > & infix);
   Expression convertInfToPost(const Expression & infix);
-  std::string calculate(const Expression & postfix);
+  lli_t calculate(const Expression & postfix);
 }
 
 #endif

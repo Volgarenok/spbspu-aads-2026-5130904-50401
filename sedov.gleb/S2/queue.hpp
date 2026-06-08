@@ -1,6 +1,6 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
-#include "list.hpp"
+#include <list.hpp>
 
 namespace sedov
 {
@@ -16,14 +16,14 @@ namespace sedov
     Queue & operator=(const Queue< T > & q) = default;
     Queue & operator=(Queue< T > && q) = default;
 
-    T & front();
-    const T & front() const;
+    T & front() noexcept;
+    const T & front() const noexcept;
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
     void push(const T& v);
-    void push(T && v);
+    void push(T && v) noexcept;
 
     template< class... Args >
     LIter< T > emplace(Args&&... args);
@@ -36,25 +36,25 @@ namespace sedov
   };
 
   template< class T >
-  T & Queue< T >::front()
+  T & Queue< T >::front() noexcept
   {
     return list_.front();
   }
 
   template< class T >
-  const T & Queue< T >::front() const
+  const T & Queue< T >::front() const noexcept
   {
     return list_.front();
   }
 
   template< class T >
-  bool Queue< T >::empty() const
+  bool Queue< T >::empty() const noexcept
   {
     return list_.size() == 0;
   }
 
   template< class T >
-  size_t Queue< T >::size() const
+  size_t Queue< T >::size() const noexcept
   {
     return list_.size();
   }
@@ -66,9 +66,9 @@ namespace sedov
   }
 
   template< class T >
-  void Queue< T >::push(T && v)
+  void Queue< T >::push(T && v) noexcept
   {
-    list_.pushBack(std::move(v));
+    list_.pushBack(std::forward< T >(v));
   }
 
   template< class T >
