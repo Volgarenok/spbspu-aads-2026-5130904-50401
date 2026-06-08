@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <stdexcept>
+#include <utility>
 #include "node.hpp"
 #include "iterator.hpp"
 
@@ -14,10 +15,9 @@ namespace zhuravleva
   {
   public:
     List();
-    ~List() noexcept;
-
     List(const List& other);
-    List(List&& other) noexcept;
+    List(List&& other);
+    ~List() noexcept;
 
     List& operator=(const List& other);
     List& operator=(List&& other) noexcept;
@@ -36,8 +36,14 @@ namespace zhuravleva
     LIter< T > pushFront(const T& value);
     LIter< T > beforeBegin();
 
+    LIter< T > insertAfter(LIter< T > pos, T&& value);
+    LIter< T > pushBack(T&& value);
+    LIter< T > pushFront(T&& value);
+
     void spliceAfter(LIter< T > pos, List& other, LIter< T > beforeElement) noexcept;
     void spliceAfter(LIter< T > pos, List& other) noexcept;
+    void spliceAfter(LIter< T > pos, List& other,
+        LIter< T > first, LIter< T > last) noexcept;
 
     template< class Compare >
     void merge(List& other, Compare comp) noexcept;
@@ -75,8 +81,11 @@ namespace zhuravleva
   template< class T >
   List< T >::~List() noexcept
   {
-    clear();
-    delete fake_;
+    if (fake_)
+    {
+      clear();
+      delete fake_;
+    }
   }
 
   template< class T >
@@ -99,11 +108,9 @@ namespace zhuravleva
   }
 
   template< class T >
-  List< T >::List(List&& other) noexcept:
-    fake_(other.fake_)
-  {
-    other.fake_ = createFake();
-  }
+  List< T >::List(List&& other):
+    fake_(std::exchange(other.fake_, createFake()))
+  {}
 
   template< class T >
   List< T >& List< T >::operator=(const List& other)
@@ -122,9 +129,17 @@ namespace zhuravleva
     if (this != &other)
     {
       clear();
-      delete fake_;
-      fake_ = other.fake_;
-      other.fake_ = createFake();
+      if (!other.empty())
+      {
+        fake_->next = other.fake_->next;
+        other.fake_->next = other.fake_;
+        detail::Node< T > * cur = fake_->next;
+        while (cur->next != other.fake_)
+        {
+          cur = cur->next;
+        }
+        cur->next = fake_;
+      }
     }
     return *this;
   }
@@ -344,14 +359,12 @@ namespace zhuravleva
   template< class T >
   LIter< T > List< T >::pushFront(const T& value)
   {
-    detail::Node< T >* node = new detail::Node< T >(value, fake_->next);
-    fake_->next = node;
-    return LIter< T >(node);
+    return insertAfter(beforeBegin(), value);
   }
 
   template< class T >
   void List< T >::spliceAfter(LIter< T > pos, List& other,
-    LIter< T > beforeElement) noexcept
+      LIter< T > beforeElement) noexcept
   {
     if (!pos.current_ || !beforeElement.current_)
     {
@@ -381,6 +394,29 @@ namespace zhuravleva
     last->next = pos.current_->next;
     pos.current_->next = first;
     other.fake_->next = other.fake_;
+  }
+
+  template< class T >
+  void List< T >::spliceAfter(LIter< T > pos, List& other,
+      LIter< T > first, LIter< T > last) noexcept
+  {
+    if (!pos.current_ || !first.current_ || !last.current_)
+    {
+      return;
+    }
+    if (first.current_->next == last.current_)
+    {
+      return;
+    }
+    detail::Node< T > * rangeFirst = first.current_->next;
+    detail::Node< T > * rangeLast = rangeFirst;
+    while (rangeLast->next != last.current_)
+    {
+      rangeLast = rangeLast->next;
+    }
+    first.current_->next = last.current_;
+    rangeLast->next = pos.current_->next;
+    pos.current_->next = rangeFirst;
   }
 
   template< class T >
@@ -455,6 +491,35 @@ namespace zhuravleva
   }
 
   template< class T >
+  LIter< T > List< T >::insertAfter(LIter< T > pos, T&& value)
+  {
+    if (!pos.current_)
+    {
+      throw std::runtime_error("invalid iterator");
+    }
+    detail::Node< T > * node = new detail::Node< T >(std::move(value), pos.current_->next);
+    pos.current_->next = node;
+    return LIter< T >(node);
+  }
+
+  template< class T >
+  LIter< T > List< T >::pushFront(T&& value)
+  {
+    return insertAfter(beforeBegin(), std::move(value));
+  }
+
+  template< class T >
+  LIter< T > List< T >::pushBack(T&& value)
+  {
+    detail::Node< T > * cur = fake_;
+    while (cur->next != fake_)
+    {
+      cur = cur->next;
+    }
+    return insertAfter(LIter< T >(cur), std::move(value));
+  }
+
+  template< class T >
   void List< T >::clear() noexcept
   {
     detail::Node< T >* cur = fake_->next;
@@ -470,9 +535,7 @@ namespace zhuravleva
   template< class T >
   void List< T >::swap(List& other) noexcept
   {
-    detail::Node< T >* tmp = fake_;
-    fake_ = other.fake_;
-    other.fake_ = tmp;
+    std::swap(fake_, other.fake_);
   }
 }
 
