@@ -3,7 +3,7 @@
 #include <utility>
 #include <stdexcept>
 #include <cstddef>
-#include "../common/list.hpp"
+#include "list.hpp"
 
 int main()
 {
