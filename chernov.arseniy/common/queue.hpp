@@ -22,7 +22,7 @@ namespace chernov {
 
     template< class U >
     void push(U && value);
-    void pop();
+    void pop() noexcept;
 
     template< class... Args >
     void emplace(Args &&... args);
@@ -120,7 +120,7 @@ void chernov::Queue< T >::push(U && value)
 }
 
 template< class T >
-void chernov::Queue< T >::pop()
+void chernov::Queue< T >::pop() noexcept
 {
   if (list_.size() == 1) {
     list_.popFront();

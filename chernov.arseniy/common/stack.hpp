@@ -20,8 +20,11 @@ namespace chernov {
 
     template< class U >
     void push(U && value);
-
     void pop() noexcept;
+
+    template< class... Args >
+    void emplace(Args &&... args);
+
     bool empty() const noexcept;
     size_t size() const noexcept;
     void clear() noexcept;
@@ -46,13 +49,20 @@ template< class T >
 template< class U >
 void chernov::Stack< T >::push(U && value)
 {
-  list_.pushFront(std::forward< U >(value));
+  emplace(std::forward< U >(value));
 }
 
 template< class T >
 void chernov::Stack< T >::pop() noexcept
 {
   list_.popFront();
+}
+
+template< class T >
+template< class... Args >
+void chernov::Stack< T >::emplace(Args &&... args)
+{
+  list_.emplaceFront(std::forward< Args >(args)...);
 }
 
 template< class T >
