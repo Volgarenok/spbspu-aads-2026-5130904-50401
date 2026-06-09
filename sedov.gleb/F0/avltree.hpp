@@ -36,8 +36,8 @@ namespace sedov
       bool erase(const Key & k);
       Value drop(const Key & k);
 
-      void push(const Key & k, const Value & v)
-      void push(Key && k, Value && v)
+      void push(const Key & k, const Value & v);
+      void push(Key && k, Value && v);
 
       iter begin() noexcept;
       iter end() noexcept;
@@ -48,7 +48,7 @@ namespace sedov
 
       size_t height() const noexcept;
       void collectInRange(const Key & from, const Key & to, List< valueType > & result) const;
-      void getAll(List< value_type > & result) const;
+      void getAll(List< valueType > & result) const;
 
   private:
       AVLTreeNode< Key, Value > * root_;
@@ -75,8 +75,8 @@ namespace sedov
       const AVLTreeNode< Key, Value > * findNode(const Key & k) const noexcept;
 
       void collectInRangeImpl(AVLTreeNode< Key, Value > * node, const Key & from, const Key & to,
-        List< valueType> & result) const;
-      void getAllImpl(AVLTreeNode< Key, Value > * node, List< valueType> & result) const;
+        List< valueType > & result) const;
+      void getAllImpl(AVLTreeNode< Key, Value > * node, List< valueType > & result) const;
   };
 
   template < class Key, class Value, class Compare >
@@ -253,6 +253,80 @@ namespace sedov
       }
     }
     return nullptr;
+  }
+
+  template < class Key, class Value, class Compare >
+  bool AVLTree< Key, Value, Compare >::insert(const Key & k, const Value & v)
+  {
+    auto res = insertNode(root_, k, v);
+    root_ = res.first;
+    if (root_)
+    {
+      root_->parent_ = nullptr;
+    }
+    return res.second;
+  }
+
+  template < class Key, class Value, class Compare >
+  bool AVLTree< Key, Value, Compare >::insert(Key && k, Value && v)
+  {
+    auto res = insertNode(root_, std::move(k), std::move(v));
+    root_ = res.first;
+    if (root_)
+    {
+      root_->parent_ = nullptr;
+    }
+    return res.second;
+  }
+
+  template < class Key, class Value, class Compare >
+  bool AVLTree< Key, Value, Compare >::erase(const Key & k)
+  {
+    if (!findNode(k))
+    {
+      return false;
+    }
+    bool found = false;
+    root_ = removeNode(root_, k, found);
+    if (root_)
+    {
+      root_->parent_ = nullptr;
+    }
+    if (found)
+    {
+      --size_;
+    }
+    return found;
+  }
+
+  template < class Key, class Value, class Compare >
+  Value AVLTree< Key, Value, Compare >::drop(const Key & k)
+  {
+    if (!findNode(k))
+    {
+      throw std::out_of_range("Key not found");
+    }
+    Value result;
+    find(k, result);
+    bool found = false;
+    root_ = removeNode(root_, k, found);
+    if (root_)
+    {
+      root_->parent_ = nullptr;
+    }
+    return result;
+  }
+
+  template< class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::push(const Key & k, const Value & v)
+  {
+    insert(k, v);
+  }
+
+  template< class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::push(Key && k, Value && v)
+  {
+    insert(std::move(k), std::move(v));
   }
 }
 
