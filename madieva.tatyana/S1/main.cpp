@@ -36,9 +36,9 @@ namespace madieva
       size_t i)
     {
       auto it = list.begin();
-      size_t size = list.getSize();
+      size_t size = list.size();
       for (size_t j = 0; j < size; ++j) {
-        if (it->second.getSize() > i) {
+        if (it->second.size() > i) {
           LCIter< size_t > it_num = it->second.begin();
           for (size_t k =  0; k < i; ++k) {
             ++it_num;
@@ -54,9 +54,9 @@ namespace madieva
     {
       size_t max_size = 0;
       auto it = list.begin();
-      for (size_t i = 0; i < list.getSize(); ++i) {
-        if (max_size < it->second.getSize()) {
-          max_size = it->second.getSize();
+      for (size_t i = 0; i < list.size(); ++i) {
+        if (max_size < it->second.size()) {
+          max_size = it->second.size();
         }
         ++it;
       }
@@ -101,7 +101,7 @@ namespace madieva
 
     void printMatrix(const List< List< size_t > > & t_list)
     {
-      if (t_list.isEmpty()) {
+      if (t_list.empty()) {
         std::cout << "0\n";
         return;
       }
@@ -144,13 +144,13 @@ int main()
     std::cerr << e.what() << "\n";
     return 1;
   }
-  if (list.isEmpty()) {
+  if (list.empty()) {
     std::cout << "0\n";
     return 0;
   }
   mad::List< mad::List< size_t > > t_list;
   mad::transpose(t_list, list);
-  if (t_list.isEmpty()) {
+  if (t_list.empty()) {
     mad::printStrings(list);
     std::cout << "\n";
     std::cout << "0\n";
