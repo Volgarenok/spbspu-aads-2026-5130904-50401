@@ -377,12 +377,12 @@ namespace madieva {
   void List< T >::pushFront(T && a)
   {
     if (!head_) {
-      head_ = new detail::node_t< T >{std::move(a), nullptr, nullptr};
+      head_ = new detail::node_t< T >{std::forward<T>(a), nullptr, nullptr};
       head_->next_ = head_;
       head_->prev_ = head_;
       size_ = 1;
     } else {
-      detail::node_t< T > * temp = new detail::node_t< T >{std::move(a), head_, head_->prev_};
+      detail::node_t< T > * temp = new detail::node_t< T >{std::forward<T>(a), head_, head_->prev_};
       head_->prev_->next_ = temp;
       head_->prev_ = temp;
       head_ = temp;
@@ -410,12 +410,12 @@ namespace madieva {
   void List< T >::pushBack(T && a)
   {
     if (!head_) {
-      head_ = new detail::node_t< T >{std::move(a), nullptr, nullptr};
+      head_ = new detail::node_t< T >{std::forward<T>(a), nullptr, nullptr};
       head_->next_ = head_;
       head_->prev_ = head_;
       size_ = 1;
     } else {
-      detail::node_t< T > * temp = new detail::node_t< T >{std::move(a), head_, head_->prev_};
+      detail::node_t< T > * temp = new detail::node_t< T >{std::forward<T>(a), head_, head_->prev_};
       head_->prev_->next_ = temp;
       head_->prev_ = temp;
       size_++;
@@ -449,7 +449,7 @@ namespace madieva {
         delete head_;
         head_ = nullptr;
         size_ = 0;
-      } else{
+      } else {
         detail::node_t< T > * a = head_->prev_;
         a->next_->prev_ = a->prev_;
         a->prev_->next_ = a->next_;
@@ -560,21 +560,7 @@ namespace madieva {
   template< class T >
   void List< T >::sort()
   {
-    if (size_ < 2) {
-      return;
-    }
-
-    for (LIter< T > i = begin(); i != end(); ++i) {
-      LIter< T > min = i;
-
-      for (LIter< T > j = i; j != end(); ++j) {
-        if (*j < *min) {
-          min = j;
-        }
-      }
-
-      std::swap(*i, *min);
-    }
+    sort(std::less< T >());
   }
 
   template< class T >
@@ -601,23 +587,7 @@ namespace madieva {
   template< class T >
   void List< T >::merge(List< T > & other) noexcept
   {
-    if (this == & other) {
-      return;
-    }
-
-    LIter< T > it = begin();
-    LIter< T > it_other = other.begin();
-
-    while (it_other != other.end()) {
-      if (it == end() || !(*it < *it_other)) {
-        LIter< T > next = it_other;
-        ++next;
-        splice(it, other, it_other);
-        it_other = next;
-      } else {
-        ++it;
-      }
-    }
+    merge(other, std::less< T >());
   }
 
   template< class T >
@@ -646,14 +616,10 @@ namespace madieva {
   template< class T >
   LIter< T > List< T >::partition(const T & pivot)
   {
-    LIter< T > it = begin();
-    for (LIter< T > scan = begin(); scan != end(); ++scan) {
-      if (*scan < pivot) {
-        std::swap(*it, *scan);
-        ++it;
-      }
-    }
-    return it;
+    return partition([&pivot](const T & val)
+    {
+      return std::less< T >()(val, pivot);
+    });
   }
 
   template< class T >

@@ -8,31 +8,34 @@ namespace madieva
 {
   namespace
   {
-    void read(List< std::pair< std::string,
-      List< size_t > > > & list)
+    using StringListPair = std::pair< std::string, List< size_t > >;
+    using PairList = List< StringListPair >;
+    using SizeList = List< size_t >;
+    using SizeListList = List< SizeList >;
+
+    void read(PairList & list)
     {
       std::string name;
       while (std::cin >> name) {
-        List< size_t > numbers;
+        SizeList numbers;
         size_t num = 0;
         while (std::cin >> num) {
           numbers.pushBack(num);
         }
-        std::pair<std::string, List<size_t>> p;
+        StringListPair p;
         p = {name, numbers};
         list.pushBack(p);
         if (std::cin.eof()) {
           return;
         } else if (std::cin.bad()) {
-          throw std::ios_base::failure("I/O stream failure");
+          return;
         }
         std::cin.clear();
       }
     }
 
-    void writeRow(const List< std::pair< std::string,
-      List< size_t > > > & list,
-      List< size_t > & l_numbers,
+    void writeRow(const PairList & list,
+      SizeList & l_numbers,
       size_t i)
     {
       auto it = list.begin();
@@ -49,8 +52,8 @@ namespace madieva
       }
     }
 
-    void transpose(List< List< size_t > > & t_list,
-      const List<std::pair< std::string, List< size_t > > > & list)
+    void transpose(SizeListList & t_list,
+      const PairList & list)
     {
       size_t max_size = 0;
       auto it = list.begin();
@@ -67,8 +70,8 @@ namespace madieva
       }
     }
 
-    void calculateSums(const List< List< size_t > > & t_list,
-      List< size_t > & sum)
+    void calculateSums(const SizeListList & t_list,
+      SizeList & sum)
     {
       using lim_size_t = std::numeric_limits< size_t >;
       const size_t max_size_t = lim_size_t::max();
@@ -87,9 +90,9 @@ namespace madieva
       }
     }
 
-    void printStrings(const List< std::pair< std::string, List< size_t > > > & list)
+    void printStrings(const PairList & list)
     {
-      LCIter< std::pair< std::string, List< size_t > > > p_it = list.begin();
+      LCIter< StringListPair > p_it = list.begin();
       if (p_it != list.end()) {
         std::cout << p_it->first;
         ++p_it;
@@ -99,14 +102,14 @@ namespace madieva
       }
     }
 
-    void printMatrix(const List< List< size_t > > & t_list)
+    void printMatrix(const SizeListList & t_list)
     {
       if (t_list.empty()) {
-        std::cout << "0\n";
+        std::cout << "0";
         return;
       }
 
-      LCIter< List< size_t > > l_it = t_list.begin();
+      LCIter< SizeList > l_it = t_list.begin();
       for (; l_it != t_list.end(); ++l_it) {
         LCIter< size_t > it_num = l_it->begin();
         if (it_num != l_it->end()) {
@@ -116,11 +119,10 @@ namespace madieva
             std::cout << " " << *it_num;
           }
         }
-        std::cout << "\n";
       }
     }
 
-    void printSums(const List< size_t > & sum)
+    void printSums(const SizeList & sum)
     {
       LCIter< size_t > s_it = sum.begin();
       if (s_it != sum.end()) {
@@ -137,18 +139,13 @@ namespace madieva
 int main()
 {
   namespace mad =  madieva;
-  mad::List< std::pair< std::string, mad::List< size_t > > > list;
-  try {
-    mad::read(list);
-  } catch (const std::ios_base::failure & e) {
-    std::cerr << e.what() << "\n";
+  mad::PairList list;
+  mad::read(list);
+  if (!std::cin && !std::cin.eof()) {
+    std::cerr << "I/O error\n";
     return 1;
   }
-  if (list.empty()) {
-    std::cout << "0\n";
-    return 0;
-  }
-  mad::List< mad::List< size_t > > t_list;
+  mad::SizeListList t_list;
   mad::transpose(t_list, list);
   if (t_list.empty()) {
     mad::printStrings(list);
@@ -156,19 +153,21 @@ int main()
     std::cout << "0\n";
     return 0;
   }
-  mad::List< size_t > sum;
+  mad::SizeList sum;
   try {
     mad::calculateSums(t_list, sum);
   } catch (const std::overflow_error & e) {
     mad::printStrings(list);
     std::cout << "\n";
     mad::printMatrix(t_list);
+    std::cout << "\n";
     std::cerr << e.what() << "\n";
     return 1;
   }
   mad::printStrings(list);
   std::cout << "\n";
   mad::printMatrix(t_list);
+  std::cout << "\n";
   mad::printSums(sum);
   std::cout << "\n";
   return 0;
