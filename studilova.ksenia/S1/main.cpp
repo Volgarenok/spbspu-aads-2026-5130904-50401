@@ -76,7 +76,7 @@ int main()
 
     for (; pos < list.size(); ++pos, ++it)
     {
-      auto& seq = it->second;
+      studilova::List< size_t >& seq = it->second;
 
       if (row < seq.size())
       {
@@ -108,7 +108,7 @@ int main()
     {
       for (; pos < list.size(); ++pos, ++it)
       {
-        auto& seq = it->second;
+        studilova::List< size_t >& seq = it->second;
 
         if (row < seq.size())
         {
