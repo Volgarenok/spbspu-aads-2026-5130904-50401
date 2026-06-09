@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 
-#include "math-expression.hpp"
+#include "math_expression.hpp"
 #include "stack.hpp"
 
 int main(int argc, char* argv[])

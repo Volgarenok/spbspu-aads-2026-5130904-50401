@@ -1,4 +1,4 @@
-#include "math-expression.hpp"
+#include "math_expression.hpp"
 
 #include <stdexcept>
 
