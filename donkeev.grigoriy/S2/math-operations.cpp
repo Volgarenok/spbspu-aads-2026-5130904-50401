@@ -257,7 +257,8 @@ void donkeev::calculate(Stack< llint_t >& result, Queue< Queue< char > >& expres
       }
       else if (isOperator(test))
       {
-        while (!operatorStack.empty() && operatorStack.top() != '(' && getPriority(test) <= getPriority(operatorStack.top()))
+        while (!operatorStack.empty() && operatorStack.top() != '('
+          && getPriority(test) <= getPriority(operatorStack.top()))
         {
           if (finishStack.size() < 2)
           {
