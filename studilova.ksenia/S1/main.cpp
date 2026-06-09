@@ -1,0 +1,149 @@
+#include <iostream>
+#include <string>
+#include <limits>
+#include <utility>
+#include <algorithm>
+
+#include "list.hpp"
+
+int main()
+{
+  studilova::List< std::pair< std::string, studilova::List< size_t > > > list;
+
+  std::string name;
+  while (std::cin >> name)
+  {
+    studilova::List< size_t > seq;
+    size_t value = 0;
+
+    while (std::cin >> value)
+    {
+      seq.pushBack(value);
+    }
+
+    list.pushBack({ name, seq });
+
+    if (std::cin.bad())
+    {
+      return 1;
+    }
+    std::cin.clear();
+  }
+
+  if (list.empty())
+  {
+    std::cout << "0\n";
+    return 0;
+  }
+
+  auto it = list.begin();
+  std::cout << it->first;
+  ++it;
+
+  for (size_t i = 1; i < list.size(); ++i, ++it)
+  {
+    std::cout << " " << it->first;
+  }
+  std::cout << "\n";
+
+  size_t maxLen = 0;
+  it = list.begin();
+  for (size_t i = 0; i < list.size(); ++i, ++it)
+  {
+    maxLen = std::max(maxLen, it->second.size());
+  }
+
+  if (maxLen == 0)
+  {
+    std::cout << "0\n";
+    return 0;
+  }
+
+  studilova::List< size_t > sums;
+  for (size_t i = 0; i < maxLen; ++i)
+  {
+    sums.pushBack(0);
+  }
+
+  const size_t maxValue = std::numeric_limits< size_t >::max();
+
+  auto sumIt = sums.begin();
+  for (size_t row = 0; row < maxLen; ++row, ++sumIt)
+  {
+    it = list.begin();
+    bool found = false;
+    size_t pos = 0;
+
+    for (; pos < list.size(); ++pos, ++it)
+    {
+      studilova::List< size_t >& seq = it->second;
+
+      if (row < seq.size())
+      {
+        auto sit = seq.begin();
+        for (size_t j = 0; j < row; ++j)
+        {
+          ++sit;
+        }
+
+        std::cout << *sit;
+
+        if (maxValue - *sit < *sumIt)
+        {
+          std::cout << "\n";
+          std::cerr << "Overflow\n";
+          return 1;
+        }
+
+        *sumIt += *sit;
+        found = true;
+
+        ++it;
+        ++pos;
+        break;
+      }
+    }
+
+    if (found)
+    {
+      for (; pos < list.size(); ++pos, ++it)
+      {
+        studilova::List< size_t >& seq = it->second;
+
+        if (row < seq.size())
+        {
+          auto sit = seq.begin();
+
+          for (size_t j = 0; j < row; ++j)
+          {
+            ++sit;
+          }
+
+          std::cout << " " << *sit;
+
+          if (maxValue - *sit < *sumIt)
+          {
+            std::cout << "\n";
+            std::cerr << "Overflow\n";
+            return 1;
+          }
+
+          *sumIt += *sit;
+        }
+      }
+    }
+    std::cout << "\n";
+  }
+
+  sumIt = sums.begin();
+  std::cout << *sumIt;
+  ++sumIt;
+
+  for (size_t i = 1; i < sums.size(); ++i, ++sumIt)
+  {
+    std::cout << " " << *sumIt;
+  }
+  std::cout << "\n";
+
+  return 0;
+}
