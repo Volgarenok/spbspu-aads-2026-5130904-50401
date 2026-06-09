@@ -22,7 +22,6 @@ namespace
   {
     if (results.empty())
     {
-      std::cout << "\n";
       return;
     }
     std::cout << results.top();
@@ -32,7 +31,6 @@ namespace
       std::cout << " " << results.top();
       results.pop();
     }
-    std::cout << "\n";
   }
 }
 
@@ -77,5 +75,6 @@ int main(int argc, char* argv[])
     }
   }
   printResults(results);
+  std::cout << "\n";
   return 0;
 }
