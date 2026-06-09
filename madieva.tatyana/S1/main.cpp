@@ -119,6 +119,11 @@ namespace madieva
             std::cout << " " << *it_num;
           }
         }
+        auto next = l_it;
+        ++next;
+        if (next != t_list.end()) {
+          std::cout << "\n";
+        }
       }
     }
 
@@ -144,6 +149,10 @@ int main()
   if (!std::cin && !std::cin.eof()) {
     std::cerr << "I/O error\n";
     return 1;
+  }
+  if (list.empty()) {
+    std::cout << "0\n";
+    return 0;
   }
   mad::SizeListList t_list;
   mad::transpose(t_list, list);
