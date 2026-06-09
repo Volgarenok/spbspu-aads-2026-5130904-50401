@@ -16,7 +16,7 @@ void donkeev::readFromFile(Queue< Queue< char > >& expressionsQueue, std::ifstre
   char test;
   while (input >> test && !input.eof())
   {
-    if (test == ' ' || test == '\n')
+    if (std::isspace(test))
     {
       continue;
     }
@@ -26,7 +26,7 @@ void donkeev::readFromFile(Queue< Queue< char > >& expressionsQueue, std::ifstre
     input >> test;
     while (test != '\n' && !input.eof())
     {
-      if (test != ' ')
+      if (!std::isspace(test))
       {
         symbolsQueue.push(test);
       }
@@ -52,7 +52,7 @@ void donkeev::readFromTerminal(Queue< Queue< char > >& expressionsQueue, std::is
   char test;
   while (input >> test && !input.eof())
   {
-    if (test == ' ' || test == '\n')
+    if (std::isspace(test))
     {
       continue;
     }
@@ -62,7 +62,7 @@ void donkeev::readFromTerminal(Queue< Queue< char > >& expressionsQueue, std::is
     input >> test;
     while (test != '\n' && !input.eof())
     {
-      if (test != ' ')
+      if (!std::isspace(test))
       {
         symbolsQueue.push(test);
       }
@@ -223,7 +223,7 @@ void donkeev::calculate(Stack< llint_t >& result, Queue< Queue< char > >& expres
     {
       test = innerQueue.front();
       innerQueue.pop();
-      if (test == ' ')
+      if (std::isspace(test))
       {
         continue;
       }
