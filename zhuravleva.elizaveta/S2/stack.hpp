@@ -32,13 +32,13 @@ namespace zhuravleva
 template< class T >
 void zhuravleva::Stack< T >::push(const T& value)
 {
-  data_.pushFront(value);
+  data_.emplaceFront(value);
 }
 
 template< class T >
 void zhuravleva::Stack< T >::push(T&& value)
 {
-  data_.pushFront(std::move(value));
+  data_.emplaceFront(std::forward< T >(value));
 }
 
 template< class T >
