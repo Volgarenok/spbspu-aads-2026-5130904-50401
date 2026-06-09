@@ -397,6 +397,43 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::updateHeight(AVLTreeNode< Key, Value > * node) noexcept
+  {
+    if (node)
+    {
+      node->updateHeight();
+    }
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::balanceNode(AVLTreeNode< Key, Value > * node) noexcept
+  {
+    if (!node)
+    {
+      return nullptr;
+    }
+    updateHeight(node);
+    int bf = node->balanceFactor();
+    if (bf > 1)
+    {
+      if (node->left_ && node->left_->balanceFactor() < 0)
+      {
+        return rotateLargeLeft(node);
+      }
+      return rotateRight(node);
+    }
+    if (bf < -1)
+    {
+      if (node->right_ && node->right_->balanceFactor() > 0)
+      {
+        return rotateLargeRight(node);
+      }
+      return rotateLeft(node);
+    }
+    return node;
+  }
+
+  template < class Key, class Value, class Compare >
   const AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::findNode(const Key & k) const noexcept
   {
     AVLTreeNode< Key, Value > * cur = root_;
