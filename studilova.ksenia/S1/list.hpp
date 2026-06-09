@@ -358,7 +358,7 @@ namespace studilova
   template< class T >
   void List< T >::pushFront(T&& value)
   {
-    detail::Node< T >* node = new detail::Node< T >{ std::move(value), nullptr, nullptr };
+    detail::Node< T >* node = new detail::Node< T >{ std::forward< T >(value), nullptr, nullptr };
 
     pushFrontNode(node);
   }
@@ -396,7 +396,7 @@ namespace studilova
   template< class T >
   void List< T >::pushBack(T&& value)
   {
-    detail::Node< T >* node = new detail::Node< T >{ std::move(value), nullptr, nullptr };
+    detail::Node< T >* node = new detail::Node< T >{ std::forward< T >(value), nullptr, nullptr };
 
     pushBackNode(node);
   }
@@ -432,19 +432,19 @@ namespace studilova
   {
     if (!pos.node_)
     {
-      pushBack(std::move(value));
+      pushBack(std::forward< T >(value));
       return;
     }
 
     if (pos.node_ == head_)
     {
-      pushFront(std::move(value));
+      pushFront(std::forward< T >(value));
       return;
     }
 
     detail::Node< T >* curr = pos.node_;
     detail::Node< T >* prev = curr->prev;
-    detail::Node< T >* node = new detail::Node< T >{ std::move(value), curr, prev };
+    detail::Node< T >* node = new detail::Node< T >{ std::forward< T >(value), curr, prev };
 
     prev->next = node;
     curr->prev = node;
