@@ -89,6 +89,52 @@ namespace studilova
   };
 
   template< class T >
+  class LIter
+  {
+    public:
+      T& operator*() const;
+      T* operator->() const noexcept;
+
+      LIter& operator++() noexcept;
+      LIter operator++(int) noexcept;
+      LIter& operator--() noexcept;
+      LIter operator--(int) noexcept;
+
+      bool operator==(const LIter& other) const noexcept;
+      bool operator!=(const LIter& other) const noexcept;
+
+    private:
+      detail::Node< T >* node_;
+
+      explicit LIter(detail::Node< T >* node = nullptr);
+
+      friend class List< T >;
+  };
+
+  template< class T >
+  class CLIter
+  {
+    public:
+      const T& operator*() const;
+      const T* operator->() const noexcept;
+
+      CLIter& operator++() noexcept;
+      CLIter operator++(int) noexcept;
+      CLIter& operator--() noexcept;
+      CLIter operator--(int) noexcept;
+
+      bool operator==(const CLIter& other) const noexcept;
+      bool operator!=(const CLIter& other) const noexcept;
+
+    private:
+      detail::Node< T >* node_;
+
+      explicit CLIter(detail::Node< T >* node = nullptr);
+
+      friend class List< T >;
+  };
+
+  template< class T >
   List< T >::List() noexcept:
     head_(nullptr),
     size_(0)
@@ -607,29 +653,6 @@ namespace studilova
   }
 
   template< class T >
-  class LIter
-  {
-    public:
-      T& operator*() const;
-      T* operator->() const noexcept;
-
-      LIter& operator++() noexcept;
-      LIter operator++(int) noexcept;
-      LIter& operator--() noexcept;
-      LIter operator--(int) noexcept;
-
-      bool operator==(const LIter& other) const noexcept;
-      bool operator!=(const LIter& other) const noexcept;
-
-    private:
-      detail::Node< T >* node_;
-
-      explicit LIter(detail::Node< T >* node = nullptr);
-
-      friend class List< T >;
-  };
-
-  template< class T >
   LIter< T >::LIter(detail::Node< T >* node):
     node_(node)
   {}
@@ -703,29 +726,6 @@ namespace studilova
   {
     return LIter< T >(nullptr);
   }
-
-  template< class T >
-  class CLIter
-  {
-    public:
-      const T& operator*() const;
-      const T* operator->() const noexcept;
-
-      CLIter& operator++() noexcept;
-      CLIter operator++(int) noexcept;
-      CLIter& operator--() noexcept;
-      CLIter operator--(int) noexcept;
-
-      bool operator==(const CLIter& other) const noexcept;
-      bool operator!=(const CLIter& other) const noexcept;
-
-    private:
-      detail::Node< T >* node_;
-
-      explicit CLIter(detail::Node< T >* node = nullptr);
-
-      friend class List< T >;
-  };
 
   template< class T >
   CLIter< T >::CLIter(detail::Node< T >* node):
