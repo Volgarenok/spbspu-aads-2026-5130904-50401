@@ -17,7 +17,6 @@ namespace zhuravleva
     void pop();
     T& front();
     const T& front() const;
-    T drop();
     bool empty() const noexcept;
     void clear() noexcept;
     size_t size() const noexcept;
@@ -70,14 +69,6 @@ const T& zhuravleva::Queue< T >::front() const
     throw std::runtime_error("empty queue");
   }
   return *data_.cbegin();
-}
-
-template< class T >
-T zhuravleva::Queue< T >::drop()
-{
-  T result = front();
-  pop();
-  return result;
 }
 
 template< class T >

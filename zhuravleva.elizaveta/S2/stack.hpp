@@ -71,6 +71,7 @@ const T& zhuravleva::Stack< T >::top() const
   return *data_.cbegin();
 }
 
+
 template< class T >
 bool zhuravleva::Stack< T >::empty() const noexcept
 {

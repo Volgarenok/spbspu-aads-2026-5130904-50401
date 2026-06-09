@@ -25,10 +25,12 @@ namespace
       std::cout << "\n";
       return;
     }
-    std::cout << results.drop();
+    std::cout << results.top();
+    results.pop();
     while (!results.empty())
     {
-      std::cout << " " << results.drop();
+      std::cout << " " << results.top();
+      results.pop();
     }
     std::cout << "\n";
   }
