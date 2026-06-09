@@ -273,14 +273,7 @@ long long studilova::evaluatePostfix(studilova::Queue< std::string >& postfix)
     }
     else
     {
-      size_t pos = 0;
-      long long value = std::stoll(token, &pos);
-
-      if (pos != token.length())
-      {
-        throw std::runtime_error("Invalid number");
-      }
-      values.push(value);
+      values.push(std::stoll(token));
     }
   }
 
