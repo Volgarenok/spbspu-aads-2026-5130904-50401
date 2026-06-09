@@ -250,7 +250,7 @@ void donkeev::calculate(Stack< llint_t >& result, Queue< Queue< char > >& expres
         }
 
         operatorStack.push(test);
-      }      
+      }
       else if (test == ')')
       {
         while(!operatorStack.empty() && operatorStack.top() != '(')
