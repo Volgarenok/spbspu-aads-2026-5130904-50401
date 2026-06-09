@@ -106,7 +106,7 @@ namespace studilova
     private:
       detail::Node< T >* node_;
 
-      explicit LIter(detail::Node< T >* node = nullptr);
+      explicit LIter(detail::Node< T >* node = nullptr) noexcept;
 
       friend class List< T >;
   };
@@ -129,7 +129,7 @@ namespace studilova
     private:
       detail::Node< T >* node_;
 
-      explicit CLIter(detail::Node< T >* node = nullptr);
+      explicit CLIter(detail::Node< T >* node = nullptr) noexcept;
 
       friend class List< T >;
   };
@@ -653,7 +653,7 @@ namespace studilova
   }
 
   template< class T >
-  LIter< T >::LIter(detail::Node< T >* node):
+  LIter< T >::LIter(detail::Node< T >* node) noexcept:
     node_(node)
   {}
 
@@ -728,7 +728,7 @@ namespace studilova
   }
 
   template< class T >
-  CLIter< T >::CLIter(detail::Node< T >* node):
+  CLIter< T >::CLIter(detail::Node< T >* node) noexcept:
     node_(node)
   {}
 
