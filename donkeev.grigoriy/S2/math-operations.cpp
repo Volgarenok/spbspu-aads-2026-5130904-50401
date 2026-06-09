@@ -1,0 +1,267 @@
+#include <fstream>
+#include <limits>
+#include <iomanip>
+#include "stack.hpp"
+#include "queue.hpp"
+#include "math-operations.hpp"
+
+void donkeev::readExpression(Queue< Queue< char > >& expressionsQueue, std::istream& input)
+{
+  bool isSkipws = input.flags() & std::ios_base::skipws;
+  if (isSkipws)
+  {
+    input >> std::noskipws;
+  }
+
+  char test;
+  while (input >> test && !input.eof())
+  {
+    if (std::isspace(test))
+    {
+      continue;
+    }
+
+    donkeev::Queue< char > symbolsQueue;
+    symbolsQueue.push(test);
+    input >> test;
+    while (test != '\n' && !input.eof())
+    {
+      if (!std::isspace(test))
+      {
+        symbolsQueue.push(test);
+      }
+      input >> test;
+    }
+
+    expressionsQueue.push(symbolsQueue);
+  }
+
+  if (isSkipws)
+  {
+    input >> std::skipws;
+  }
+}
+
+bool donkeev::isOperator(const char& ch)
+{
+  const char operators[] = {'+', '-', '*', '/', '%', '&'};
+  const size_t operatorsSize = 6;
+
+  for (size_t i = 0; i < operatorsSize; ++i)
+  {
+    if (ch == operators[i])
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+size_t donkeev::getPriority(const char& ch)
+{
+  if (ch == '+' || ch == '-')
+  {
+    return 1;
+  }
+  else if (ch == '*' || ch == '/' || ch == '%')
+  {
+    return 2;
+  }
+  else
+  {
+    return 0;
+  }
+}
+donkeev::llint_t donkeev::doOperation(const llint_t& operand1, const llint_t& operand2, const char& operation)
+{
+  llint_t max_llint = std::numeric_limits< llint_t >::max();
+  llint_t min_llint = std::numeric_limits< llint_t >::min();
+
+  if (operation == '+')
+  {
+    if ((operand2 > 0 && operand1 > max_llint - operand2) || (operand2 < 0 && operand1 < min_llint - operand2))
+    {
+      throw std::overflow_error("Summ overflow");
+    }
+
+    return operand1 + operand2;
+  }
+  else if (operation == '-')
+  {
+    if ((operand1 < 0 && operand1 < min_llint + operand2) || (operand2 < 0 && operand1 > max_llint + operand2))
+    {
+      throw std::overflow_error("Subtraction overflow");
+    }
+
+    return operand1 - operand2;
+  }
+  else if (operation == '*')
+  {
+    if (operand1 != 0 && operand2 != 0)
+    {
+      if ((operand1 > max_llint / operand2) || (operand1 < min_llint / operand2))
+      {
+        throw std::overflow_error("Multiplication overflow");
+      }
+    }
+
+    return operand1 * operand2;
+  }
+  else if (operation == '/')
+  {
+    if (operand2 == 0)
+    {
+      throw std::domain_error("Division by zero");
+    }
+    if (operand1 == min_llint && operand2 == -1)
+    {
+      throw std::overflow_error("Division overflow");
+    }
+
+    return operand1 / operand2;
+  }
+  else if (operation == '%')
+  {
+    if (operand2 == 0)
+    {
+      throw std::domain_error("Modulo by zero");
+    }
+    if (operand1 == std::numeric_limits<llint_t>::min() && operand2 == -1)
+    {
+      throw std::overflow_error("Modulo overflow");
+    }
+
+    llint_t result = operand1 % operand2;
+    if (result < 0)
+    {
+      result += operand2;
+    }
+    return result;
+  }
+  else if (operation == '&')
+  {
+    if (operand1 < 0 || operand2 < 0)
+    {
+        throw std::invalid_argument("Bitwise AND requires non-negative operands");
+    }
+    return operand1 & operand2;
+  }
+  else
+  {
+    throw std::invalid_argument("Unknown operator");
+  }
+}
+void donkeev::calculate(Stack< llint_t >& result, Queue< Queue< char > >& expressionsQueue)
+{
+  while (!expressionsQueue.empty())
+  {
+    Queue< char > innerQueue = expressionsQueue.front();
+    Stack< char > operatorStack;
+    Stack< llint_t > finishStack;
+
+    char test;
+    while (!innerQueue.empty())
+    {
+      test = innerQueue.front();
+      innerQueue.pop();
+      if (std::isspace(test))
+      {
+        continue;
+      }
+      if (test == '(')
+      {
+        operatorStack.push(test);
+      }
+      else if (std::isdigit(static_cast<unsigned char>(test)))
+      {
+        Queue< char > charQueue;
+        std::string chars;
+
+        charQueue.push(test);
+        chars.push_back(test);
+        while (!innerQueue.empty() && std::isdigit(static_cast<unsigned char>(innerQueue.front())))
+        {
+          charQueue.push(innerQueue.front());
+          chars.push_back(innerQueue.front());
+          innerQueue.pop();
+        }
+
+        char* endPtr = nullptr;
+        errno = 0;
+
+        llint_t operand = std::strtoll(chars.c_str(), &endPtr, 10);
+        if (errno == ERANGE)
+        {
+          throw std::invalid_argument("Invalid expression");
+        }
+        finishStack.push(operand);
+      }
+      else if (isOperator(test))
+      {
+        while (!operatorStack.empty() && operatorStack.top() != '('
+          && getPriority(test) <= getPriority(operatorStack.top()))
+        {
+          if (finishStack.size() < 2)
+          {
+            throw std::invalid_argument("Invalid expression");
+          }
+
+          llint_t operand2 = finishStack.top();
+          finishStack.pop();
+          llint_t operand1 = finishStack.top();
+          finishStack.pop();
+          finishStack.push(doOperation(operand1, operand2, operatorStack.top()));
+          operatorStack.pop();
+        }
+
+        operatorStack.push(test);
+      }
+      else if (test == ')')
+      {
+        while (!operatorStack.empty() && operatorStack.top() != '(')
+        {
+          if (finishStack.size() < 2)
+          {
+            throw std::invalid_argument("Invalid expression");
+          }
+
+          llint_t operand2 = finishStack.top();
+          finishStack.pop();
+          llint_t operand1 = finishStack.top();
+          finishStack.pop();
+          finishStack.push(doOperation(operand1, operand2, operatorStack.top()));
+          operatorStack.pop();
+        }
+
+        operatorStack.pop();
+      }
+      else
+      {
+        throw std::invalid_argument("Invalid expression");
+      }
+    }
+
+    while (!operatorStack.empty())
+    {
+      if (finishStack.size() < 2)
+      {
+        throw std::invalid_argument("Invalid expression");
+      }
+
+      llint_t operand2 = finishStack.top();
+      finishStack.pop();
+      llint_t operand1 = finishStack.top();
+      finishStack.pop();
+      finishStack.push(doOperation(operand1, operand2, operatorStack.top()));
+      operatorStack.pop();
+    }
+
+    if (finishStack.size() != 1)
+    {
+      throw std::invalid_argument("Invalid expression");
+    }
+
+    result.push(finishStack.top());
+    expressionsQueue.pop();
+  }
+}
