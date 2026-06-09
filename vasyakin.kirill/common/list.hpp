@@ -419,8 +419,7 @@ namespace vasyakin
     it.ptr_->next_ = to_delete->next_;
 
     to_delete->destroyValue();
-    to_delete->~Node();
-    ::operator delete (to_delete);
+    delete to_delete;
     --size_;
     return it;
   }
@@ -601,8 +600,7 @@ namespace vasyakin
   template< class... Args >
   LIter< T > List< T >::emplace_after(LIter< T > pos, Args&&... args)
   {
-    void* mem = ::operator new(sizeof(detail::Node< T >));
-    detail::Node< T >* new_node = new (mem) detail::Node< T >(std::forward< Args >(args)...);
+    detail::Node< T >* new_node = new detail::Node< T >(std::forward< Args >(args)...);
 
     if (fake_node_->next_ == fake_node_)
     {
