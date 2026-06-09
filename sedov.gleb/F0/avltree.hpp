@@ -1,6 +1,7 @@
 #ifndef AVLTREE_HPP
 #define AVLTREE_HPP
 #include <iostream>
+#include "avltreenode.hpp"
 
 namespace sedov
 {
@@ -135,6 +136,123 @@ namespace sedov
       h.size_ = 0;
     }
     return *this;
+  }
+
+  template < class Key, class Value, class Compare >
+  bool AVLTree< Key, Value, Compare >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template < class Key, class Value, class Compare >
+  size_t AVLTree< Key, Value, Compare >::size() const noexcept
+  {
+    return size_;
+  }
+
+  template < class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::swap(AVLTree & h) noexcept
+  {
+    std::swap(root_, h.root_);
+    std::swap(size_, h.size_);
+    std::swap(comp_, h.comp_);
+  }
+
+  template < class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::clear() noexcept
+  {
+    clearImpl(root_);
+    root_ = nullptr;
+    size_ = 0;
+  }
+
+  template < class Key, class Value, class Compare >
+  bool AVLTree< Key, Value, Compare >::find(const Key & k, Value & outValue) const
+  {
+    AVLTreeNode< Key, Value > * node = findNode(k);
+    if (node)
+    {
+      outValue = node->value_;
+      return true;
+    }
+    return false;
+  }
+
+  template < class Key, class Value, class Compare >
+  const Value & AVLTree< Key, Value, Compare >::at(const Key & k) const
+  {
+    AVLTreeNode< Key, Value > * node = findNode(k);
+    if (!node)
+    {
+      throw std::out_of_range("Key not found");
+    }
+    return node->value_;
+  }
+
+  template < class Key, class Value, class Compare >
+  Value & AVLTree< Key, Value, Compare >::at(const Key & k)
+  {
+    AVLTreeNode< Key, Value > * node = findNode(k);
+    if (!node)
+    {
+      throw std::out_of_range("Key not found");
+    }
+    return node->value_;
+  }
+
+  template < class Key, class Value, class Compare >
+  bool AVLTree< Key, Value, Compare >::contains(const Key & k) const
+  {
+    return findNode(k) != nullptr;
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::clone(AVLTreeNode< Key, Value > * src,
+    AVLTreeNode< Key, Value > * parent)
+  {
+    if (!src)
+    {
+      return nullptr;
+    }
+    AVLTreeNode< Key, Value > * newNode = new AVLTreeNode< Key, Value >(src->key_, src->value_, parent);
+    newNode->left_ = clone(src->left_, newNode);
+    newNode->right_ = clone(src->right_, newNode);
+    newNode->height_ = src->height_;
+    return newNode;
+  }
+
+  template < class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::clearImpl(AVLTreeNode< Key, Value > * node) noexcept
+  {
+    if (!node)
+    {
+      return;
+    }
+    clearImpl(node->left_);
+    clearImpl(node->right_);
+    delete node;
+  }
+
+  template < class Key, class Value, class Compare >
+  const AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::findNode(const Key & k) const noexcept
+  {
+    AVLTreeNode< Key, Value > * cur = root_;
+    while (cur)
+    {
+      if (comp_(k, cur->key_))
+      {
+        cur = cur->left_;
+      }
+      else if (comp_(cur->key_, k))
+      {
+        cur = cur->right_;
+      }
+      else
+      {
+        return cur;
+      }
+    }
+    return nullptr;
   }
 }
 
