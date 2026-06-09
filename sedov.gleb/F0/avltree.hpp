@@ -77,6 +77,65 @@ namespace sedov
         List< valueType> & result) const;
       void getAllImpl(AVLTreeNode< Key, Value > * node, List< valueType> & result) const;
   };
+
+  template < class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare >::AVLTree() noexcept:
+    root_(nullptr),
+    size_(0),
+    comp_()
+  {}
+
+  template < class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare >::AVLTree(const AVLTree & h):
+    root_(nullptr),
+    size_(0),
+    comp_(h.comp_)
+  {
+    root_ = clone(h.root_, nullptr);
+    size_ = h.size_;
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare >::AVLTree(AVLTree && h) noexcept:
+    root_(h.root_),
+    size_(h.size_),
+    comp_(std::move(h.comp_))
+  {
+    h.root_ = nullptr;
+    h.size_ = 0;
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare >::~AVLTree()
+  {
+    clear();
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare > & AVLTree< Key, Value, Compare >::operator=(const AVLTree & h)
+  {
+    if (this != std::addressof(h))
+    {
+      AVLTree temp(h);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare > & AVLTree< Key, Value, Compare >::operator=(AVLTree && h) noexcept
+  {
+    if (this != std::addressof(h))
+    {
+      clear();
+      root_ = h.root_;
+      size_ = h.size_;
+      comp_ = std::move(h.comp_);
+      h.root_ = nullptr;
+      h.size_ = 0;
+    }
+    return *this;
+  }
 }
 
 #endif
