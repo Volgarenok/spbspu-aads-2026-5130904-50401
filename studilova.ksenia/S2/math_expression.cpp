@@ -29,18 +29,6 @@ bool studilova::isRightAssociative(const std::string& op)
   return op == "**";
 }
 
-long long studilova::toNumber(const std::string& token)
-{
-  size_t pos = 0;
-  long long value = std::stoll(token, &pos);
-
-  if (pos != token.length())
-  {
-    throw std::runtime_error("Invalid number");
-  }
-  return value;
-}
-
 void studilova::processToken(const std::string& token, studilova::Stack< std::string >& ops,
   studilova::Queue< std::string >& output)
 {
@@ -66,7 +54,6 @@ void studilova::processToken(const std::string& token, studilova::Stack< std::st
   }
   else
   {
-    toNumber(token);
     output.push(token);
   }
 }
@@ -286,7 +273,14 @@ long long studilova::evaluatePostfix(studilova::Queue< std::string >& postfix)
     }
     else
     {
-      values.push(std::stoll(token));
+      size_t pos = 0;
+      long long value = std::stoll(token, &pos);
+
+      if (pos != token.length())
+      {
+        throw std::runtime_error("Invalid number");
+      }
+      values.push(value);
     }
   }
 
