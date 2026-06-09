@@ -2,6 +2,7 @@
 #define AVLTREE_HPP
 #include <iostream>
 #include "avltreenode.hpp"
+#include "list.hpp"
 
 namespace sedov
 {
@@ -207,55 +208,6 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
-  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::clone(AVLTreeNode< Key, Value > * src,
-    AVLTreeNode< Key, Value > * parent)
-  {
-    if (!src)
-    {
-      return nullptr;
-    }
-    AVLTreeNode< Key, Value > * newNode = new AVLTreeNode< Key, Value >(src->key_, src->value_, parent);
-    newNode->left_ = clone(src->left_, newNode);
-    newNode->right_ = clone(src->right_, newNode);
-    newNode->height_ = src->height_;
-    return newNode;
-  }
-
-  template < class Key, class Value, class Compare >
-  void AVLTree< Key, Value, Compare >::clearImpl(AVLTreeNode< Key, Value > * node) noexcept
-  {
-    if (!node)
-    {
-      return;
-    }
-    clearImpl(node->left_);
-    clearImpl(node->right_);
-    delete node;
-  }
-
-  template < class Key, class Value, class Compare >
-  const AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::findNode(const Key & k) const noexcept
-  {
-    AVLTreeNode< Key, Value > * cur = root_;
-    while (cur)
-    {
-      if (comp_(k, cur->key_))
-      {
-        cur = cur->left_;
-      }
-      else if (comp_(cur->key_, k))
-      {
-        cur = cur->right_;
-      }
-      else
-      {
-        return cur;
-      }
-    }
-    return nullptr;
-  }
-
-  template < class Key, class Value, class Compare >
   bool AVLTree< Key, Value, Compare >::insert(const Key & k, const Value & v)
   {
     auto res = insertNode(root_, k, v);
@@ -375,6 +327,74 @@ namespace sedov
   AVLTree< Key, Value, Compare >::constIter AVLTree< Key, Value, Compare >::cend() const noexcept
   {
     return constIter(nullptr);
+  }
+
+  template < class Key, class Value, class Compare >
+  size_t AVLTree< Key, Value, Compare >::height() const noexcept
+  {
+    return root_ ? root_->height_ : 0;
+  }
+
+  template < class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::collectInRange(const Key & from, const Key & to,
+    List< std::pair< const Key, Value > > & result) const
+  {
+    collectInRangeImpl(root_, from, to, result);
+  }
+
+  template < class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::getAll(List< std::pair< const Key, Value > > & result) const
+  {
+    getAllImpl(root_, result);
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::clone(AVLTreeNode< Key, Value > * src,
+    AVLTreeNode< Key, Value > * parent)
+  {
+    if (!src)
+    {
+      return nullptr;
+    }
+    AVLTreeNode< Key, Value > * newNode = new AVLTreeNode< Key, Value >(src->key_, src->value_, parent);
+    newNode->left_ = clone(src->left_, newNode);
+    newNode->right_ = clone(src->right_, newNode);
+    newNode->height_ = src->height_;
+    return newNode;
+  }
+
+  template < class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::clearImpl(AVLTreeNode< Key, Value > * node) noexcept
+  {
+    if (!node)
+    {
+      return;
+    }
+    clearImpl(node->left_);
+    clearImpl(node->right_);
+    delete node;
+  }
+
+  template < class Key, class Value, class Compare >
+  const AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::findNode(const Key & k) const noexcept
+  {
+    AVLTreeNode< Key, Value > * cur = root_;
+    while (cur)
+    {
+      if (comp_(k, cur->key_))
+      {
+        cur = cur->left_;
+      }
+      else if (comp_(cur->key_, k))
+      {
+        cur = cur->right_;
+      }
+      else
+      {
+        return cur;
+      }
+    }
+    return nullptr;
   }
 }
 
