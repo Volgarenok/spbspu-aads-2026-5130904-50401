@@ -2,8 +2,6 @@
 
 #include <stdexcept>
 
-#include "stack.hpp"
-
 bool studilova::isOperator(const std::string& s)
 {
   return s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "**";

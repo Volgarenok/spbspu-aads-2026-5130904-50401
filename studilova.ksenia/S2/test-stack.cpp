@@ -1,9 +1,9 @@
+#include <string>
+
 #include <boost/test/unit_test.hpp>
 
 #include "stack.hpp"
 #include "math-expression.hpp"
-
-#include <string>
 
 BOOST_AUTO_TEST_SUITE(stack_tests)
 
