@@ -4,7 +4,7 @@
 
 namespace sedov
 {
-  template< class Key, class Value >
+  template< class Key, class Value, class Compare >
   class AVLTree;
 
   template< class Key, class Value >
