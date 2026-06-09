@@ -25,6 +25,9 @@ namespace studilova
       size_t size() const noexcept;
       void clear() noexcept;
 
+      template< class... Args >
+      void emplace(Args&&... args);
+
     private:
       List< T > data_;
   };
@@ -88,6 +91,13 @@ template< class T >
 void studilova::Stack< T >::clear() noexcept
 {
   data_.clear();
+}
+
+template< class T >
+template< class... Args >
+void studilova::Stack< T >::emplace(Args&&... args)
+{
+  data_.emplaceBack(std::forward< Args >(args)...);
 }
 
 #endif

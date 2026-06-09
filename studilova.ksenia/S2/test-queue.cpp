@@ -1,4 +1,5 @@
 #include <string>
+#include <utility>
 
 #include <boost/test/unit_test.hpp>
 
@@ -98,6 +99,17 @@ BOOST_AUTO_TEST_CASE(const_front)
   const studilova::Queue< int >& constQ = q;
 
   BOOST_CHECK_EQUAL(constQ.front(), 10);
+}
+
+BOOST_AUTO_TEST_CASE(emplace_queue)
+{
+  studilova::Queue< std::pair< int, std::string > > q;
+
+  q.emplace(20, "world");
+
+  BOOST_CHECK_EQUAL(q.front().first, 20);
+  BOOST_CHECK_EQUAL(q.front().second, "world");
+  BOOST_CHECK_EQUAL(q.size(), 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

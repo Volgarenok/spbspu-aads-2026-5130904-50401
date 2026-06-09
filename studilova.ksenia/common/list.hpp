@@ -74,6 +74,12 @@ namespace studilova
       template< class P >
       LIter< T > partition(P pred);
 
+      template< class... Args >
+      void emplaceFront(Args&&... args);
+
+      template< class... Args >
+      void emplaceBack(Args&&... args);
+
       LIter< T > begin() noexcept;
       LIter< T > end() noexcept;
 
@@ -650,6 +656,22 @@ namespace studilova
     }
 
     return border;
+  }
+
+  template< class T >
+  template< class... Args >
+  void List< T >::emplaceFront(Args&&... args)
+  {
+    detail::Node< T >* node = new detail::Node< T >{ T(std::forward< Args >(args)...), nullptr, nullptr };
+    pushFrontNode(node);
+  }
+
+  template< class T >
+  template< class... Args >
+  void List< T >::emplaceBack(Args&&... args)
+  {
+    detail::Node< T >* node = new detail::Node< T >{ T(std::forward< Args >(args)...), nullptr, nullptr };
+    pushBackNode(node);
   }
 
   template< class T >

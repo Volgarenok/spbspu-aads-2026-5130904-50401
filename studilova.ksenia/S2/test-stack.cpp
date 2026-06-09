@@ -1,4 +1,5 @@
 #include <string>
+#include <utility>
 
 #include <boost/test/unit_test.hpp>
 
@@ -98,6 +99,17 @@ BOOST_AUTO_TEST_CASE(const_top)
   const studilova::Stack< int >& constS = s;
 
   BOOST_CHECK_EQUAL(constS.top(), 10);
+}
+
+BOOST_AUTO_TEST_CASE(emplace_stack)
+{
+  studilova::Stack< std::pair< int, std::string > > s;
+
+  s.emplace(10, "hello");
+
+  BOOST_CHECK_EQUAL(s.top().first, 10);
+  BOOST_CHECK_EQUAL(s.top().second, "hello");
+  BOOST_CHECK_EQUAL(s.size(), 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

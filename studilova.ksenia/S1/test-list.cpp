@@ -1,6 +1,11 @@
 #define BOOST_TEST_MODULE S1
+
+#include <string>
+#include <utility>
+
 #include <boost/test/included/unit_test.hpp>
-#include "list.hpp"
+
+#include <list.hpp>
 
 BOOST_AUTO_TEST_SUITE(ConstructorSuite)
 
@@ -342,6 +347,21 @@ BOOST_AUTO_TEST_CASE(IteratorComparison)
   ++it2;
 
   BOOST_CHECK(it1 != it2);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(AdditionalTaskS2)
+
+BOOST_AUTO_TEST_CASE(EmplaceBack)
+{
+  studilova::List< std::pair< int, std::string > > list;
+
+  list.emplaceBack(1, "test");
+
+  BOOST_CHECK_EQUAL(list.size(), 1);
+  BOOST_CHECK_EQUAL(list.back().first, 1);
+  BOOST_CHECK_EQUAL(list.back().second, "test");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
