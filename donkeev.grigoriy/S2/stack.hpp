@@ -35,9 +35,17 @@ namespace donkeev
   Stack< T >::Stack(std::initializer_list< T > il):
     list_()
   {
-    for (auto it = il.begin(); it != il.end(); ++it)
+    try
     {
-      list_.pushFront(*it);
+      for (auto it = il.begin(); it != il.end(); ++it)
+      {
+        list_.pushFront(*it);
+      }
+    }
+    catch (...)
+    {
+      list_.clear();
+      throw;
     }
   }
 
