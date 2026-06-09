@@ -77,4 +77,27 @@ BOOST_AUTO_TEST_CASE(string_stack)
   BOOST_CHECK_EQUAL(s.top(), "hello");
 }
 
+BOOST_AUTO_TEST_CASE(clear_stack)
+{
+  studilova::Stack< int > s;
+
+  s.push(1);
+  s.push(2);
+  s.clear();
+
+  BOOST_CHECK(s.empty());
+  BOOST_CHECK_EQUAL(s.size(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(const_top)
+{
+  studilova::Stack< int > s;
+
+  s.push(10);
+
+  const studilova::Stack< int >& constS = s;
+
+  BOOST_CHECK_EQUAL(constS.top(), 10);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
