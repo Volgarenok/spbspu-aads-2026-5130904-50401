@@ -9,9 +9,7 @@
 namespace donkeev
 {
   using llint_t = long long int;
-  void readFromFile(donkeev::Queue< donkeev::Queue< char > >&, std::ifstream& input);
-  void readFromTerminal(donkeev::Queue< donkeev::Queue< char > >&, std::istream&);
-  bool isNumber(const donkeev::Queue< char >& , llint_t &);
+  void readExpression(donkeev::Queue< donkeev::Queue< char > >&, std::istream& input);
   bool isOperator(const char&);
   size_t getPriority(const char&);
   llint_t doOperation(const llint_t&, const llint_t&, const char&);

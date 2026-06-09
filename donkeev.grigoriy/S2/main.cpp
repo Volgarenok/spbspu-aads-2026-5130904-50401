@@ -5,8 +5,6 @@
 #include "queue.hpp"
 #include "stack.hpp"
 
-using llint_t = long long int;
-
 int main(int argc, char** argv)
 {
   donkeev::Queue< donkeev::Queue< char > > infixExpression;
@@ -24,7 +22,7 @@ int main(int argc, char** argv)
     }
     try
     {
-      donkeev::readFromFile(infixExpression, input);
+      donkeev::readExpression(infixExpression, input);
     }
     catch (const std::runtime_error& e)
     {
@@ -34,10 +32,10 @@ int main(int argc, char** argv)
   }
   else
   {
-    donkeev::readFromTerminal(infixExpression, std::cin);
+    donkeev::readExpression(infixExpression, std::cin);
   }
 
-  donkeev::Stack< llint_t > result;
+  donkeev::Stack< donkeev::llint_t > result;
 
   try
   {
@@ -49,5 +47,15 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  donkeev::printResult(result, std::cout);
+  if (!result.empty())
+  {
+    std::cout << result.top();
+    result.pop();
+  }
+  while (!result.empty())
+  {
+    std::cout << " " << result.top();
+    result.pop();
+  }
+  std::cout << '\n';
 }

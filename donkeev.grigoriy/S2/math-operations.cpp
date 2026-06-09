@@ -5,43 +5,7 @@
 #include "queue.hpp"
 #include "math-operations.hpp"
 
-void donkeev::readFromFile(Queue< Queue< char > >& expressionsQueue, std::ifstream& input)
-{
-  bool isSkipws = input.flags() & std::ios_base::skipws;
-  if (isSkipws)
-  {
-    input >> std::noskipws;
-  }
-
-  char test;
-  while (input >> test && !input.eof())
-  {
-    if (std::isspace(test))
-    {
-      continue;
-    }
-
-    donkeev::Queue< char > symbolsQueue;
-    symbolsQueue.push(test);
-    input >> test;
-    while (test != '\n' && !input.eof())
-    {
-      if (!std::isspace(test))
-      {
-        symbolsQueue.push(test);
-      }
-      input >> test;
-    }
-
-    expressionsQueue.push(symbolsQueue);
-  }
-
-  if (isSkipws)
-  {
-    input >> std::skipws;
-  }
-}
-void donkeev::readFromTerminal(Queue< Queue< char > >& expressionsQueue, std::istream& input)
+void donkeev::readExpression(Queue< Queue< char > >& expressionsQueue, std::istream& input)
 {
   bool isSkipws = input.flags() & std::ios_base::skipws;
   if (isSkipws)
@@ -78,29 +42,6 @@ void donkeev::readFromTerminal(Queue< Queue< char > >& expressionsQueue, std::is
   }
 }
 
-bool donkeev::isNumber(const Queue< char >& q, llint_t &operand)
-{
-  operand = 0;
-  Queue<char> temp = q;
-
-  while (!temp.empty())
-  {
-    char ch = temp.front();
-    temp.pop();
-
-    if (!std::isdigit(static_cast<unsigned char>(ch)))
-    {
-      return false;
-    }
-    if ((operand * 10 + (ch - '0')) < operand)
-    {
-      throw std::overflow_error("Number overflow");
-    }
-
-    operand = operand * 10 + (ch - '0');
-  }
-  return true;
-}
 bool donkeev::isOperator(const char& ch)
 {
   const char operators[] = {'+', '-', '*', '/', '%', '&'};
@@ -277,7 +218,7 @@ void donkeev::calculate(Stack< llint_t >& result, Queue< Queue< char > >& expres
       }
       else if (test == ')')
       {
-        while(!operatorStack.empty() && operatorStack.top() != '(')
+        while (!operatorStack.empty() && operatorStack.top() != '(')
         {
           if (finishStack.size() < 2)
           {
@@ -323,21 +264,4 @@ void donkeev::calculate(Stack< llint_t >& result, Queue< Queue< char > >& expres
     result.push(finishStack.top());
     expressionsQueue.pop();
   }
-}
-
-std::ostream& donkeev::printResult(Stack< llint_t >& result, std::ostream& out)
-{
-  if (!result.empty())
-  {
-    out << result.top();
-    result.pop();
-  }
-  while (!result.empty())
-  {
-    out << " " << result.top();
-    result.pop();
-  }
-  out << '\n';
-
-  return out;
 }
