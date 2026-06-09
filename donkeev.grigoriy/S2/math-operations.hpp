@@ -2,6 +2,7 @@
 #define MATH_OPERATIONS_HPP
 
 #include <limits>
+#include <cerrno>
 #include "queue.hpp"
 #include "stack.hpp"
 

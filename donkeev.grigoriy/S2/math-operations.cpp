@@ -36,7 +36,7 @@ void donkeev::readFromFile(Queue< Queue< char > >& expressionsQueue, std::ifstre
     expressionsQueue.push(symbolsQueue);
   }
 
-  if(isSkipws)
+  if (isSkipws)
   {
     input >> std::skipws;
   }
@@ -72,7 +72,7 @@ void donkeev::readFromTerminal(Queue< Queue< char > >& expressionsQueue, std::is
     expressionsQueue.push(symbolsQueue);
   }
 
-  if(isSkipws)
+  if (isSkipws)
   {
     input >> std::skipws;
   }
@@ -234,15 +234,22 @@ void donkeev::calculate(Stack< llint_t >& result, Queue< Queue< char > >& expres
       else if (std::isdigit(static_cast<unsigned char>(test)))
       {
         Queue< char > charQueue;
+        std::string chars;
+
         charQueue.push(test);
+        chars.push_back(test);
         while (!innerQueue.empty() && std::isdigit(static_cast<unsigned char>(innerQueue.front())))
         {
           charQueue.push(innerQueue.front());
+          chars.push_back(innerQueue.front());
           innerQueue.pop();
         }
 
-        llint_t operand;
-        if (!isNumber(charQueue, operand))
+        char* endPtr = nullptr;
+        errno = 0;
+
+        llint_t operand = std::strtoll(chars.c_str(), &endPtr, 10);
+        if (errno == ERANGE)
         {
           throw std::invalid_argument("Invalid expression");
         }
