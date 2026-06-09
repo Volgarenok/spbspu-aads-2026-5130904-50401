@@ -77,4 +77,27 @@ BOOST_AUTO_TEST_CASE(string_queue)
   BOOST_CHECK_EQUAL(q.front(), "second");
 }
 
+BOOST_AUTO_TEST_CASE(clear_queue)
+{
+  studilova::Queue< int > q;
+
+  q.push(1);
+  q.push(2);
+  q.clear();
+
+  BOOST_CHECK(q.empty());
+  BOOST_CHECK_EQUAL(q.size(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(const_front)
+{
+  studilova::Queue< int > q;
+
+  q.push(10);
+
+  const studilova::Queue< int >& constQ = q;
+
+  BOOST_CHECK_EQUAL(constQ.front(), 10);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
