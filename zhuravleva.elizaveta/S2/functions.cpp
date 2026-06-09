@@ -6,7 +6,7 @@
 bool zhuravleva::isOperator(const std::string& op)
 {
   return op == "+" || op == "-" || op == "*" ||
-    op == "/" || op == "%" || op == "!";
+      op == "/" || op == "%" || op == "!";
 }
 
 int zhuravleva::priority(const std::string& op)
