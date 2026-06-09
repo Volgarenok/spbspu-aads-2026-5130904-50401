@@ -231,33 +231,10 @@ void donkeev::calculate(Stack< llint_t >& result, Queue< Queue< char > >& expres
       {
         operatorStack.push(test);
       }
-      else if (std::isdigit(static_cast<unsigned char>(test)))
-      {
-        Queue< char > charQueue;
-        std::string chars;
-
-        charQueue.push(test);
-        chars.push_back(test);
-        while (!innerQueue.empty() && std::isdigit(static_cast<unsigned char>(innerQueue.front())))
-        {
-          charQueue.push(innerQueue.front());
-          chars.push_back(innerQueue.front());
-          innerQueue.pop();
-        }
-
-        char* endPtr = nullptr;
-        errno = 0;
-
-        llint_t operand = std::strtoll(chars.c_str(), &endPtr, 10);
-        if (errno == ERANGE)
-        {
-          throw std::invalid_argument("Invalid expression");
-        }
-        finishStack.push(operand);
-      }
       else if (isOperator(test))
       {
-        while (!operatorStack.empty() && operatorStack.top() != '(' && getPriority(test) <= getPriority(operatorStack.top()))
+        while (!operatorStack.empty() && operatorStack.top() != '('
+          && getPriority(test) <= getPriority(operatorStack.top()))
         {
           if (finishStack.size() < 2)
           {
@@ -273,7 +250,7 @@ void donkeev::calculate(Stack< llint_t >& result, Queue< Queue< char > >& expres
         }
 
         operatorStack.push(test);
-      }
+      }      
       else if (test == ')')
       {
         while(!operatorStack.empty() && operatorStack.top() != '(')
@@ -295,7 +272,24 @@ void donkeev::calculate(Stack< llint_t >& result, Queue< Queue< char > >& expres
       }
       else
       {
-        throw std::invalid_argument("Invalid expression");
+        std::string chars;
+
+        chars.push_back(test);
+        while (!innerQueue.empty())
+        {
+          chars.push_back(innerQueue.front());
+          innerQueue.pop();
+        }
+
+        char* endPtr = nullptr;
+        errno = 0;
+
+        llint_t operand = std::strtoll(chars.c_str(), &endPtr, 10);
+        if (errno == ERANGE)
+        {
+          throw std::invalid_argument("Invalid expression");
+        }
+        finishStack.push(operand);
       }
     }
 
