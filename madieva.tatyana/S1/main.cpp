@@ -9,7 +9,7 @@ namespace madieva
   namespace
   {
     void read(List< std::pair< std::string,
-      List< size_t >>> & list)
+      List< size_t > > > & list)
     {
       std::string name;
       while (std::cin >> name) {
@@ -30,8 +30,8 @@ namespace madieva
       }
     }
 
-    void writeRow(const List<std::pair<std::string,
-      List<size_t>>> & list,
+    void writeRow(const List< std::pair< std::string,
+      List< size_t > > > & list,
       List< size_t > & l_numbers,
       size_t i)
     {
@@ -49,8 +49,8 @@ namespace madieva
       }
     }
 
-    void transpose(List<List<size_t>> & t_list,
-      const List<std::pair<std::string, List<size_t>>> & list)
+    void transpose(List< List< size_t > > & t_list,
+      const List<std::pair< std::string, List< size_t > > > & list)
     {
       size_t max_size = 0;
       auto it = list.begin();
@@ -67,7 +67,7 @@ namespace madieva
       }
     }
 
-    void calculateSums(const List< List< size_t >> & t_list,
+    void calculateSums(const List< List< size_t > > & t_list,
       List< size_t > & sum)
     {
       using lim_size_t = std::numeric_limits< size_t >;
@@ -75,9 +75,9 @@ namespace madieva
       LCIter<List < size_t >> l_it = t_list.begin();
       for (; l_it != t_list.end(); ++l_it) {
         size_t s = 0;
-        LCIter<size_t> n_it = l_it->begin();
+        LCIter< size_t > n_it = l_it->begin();
         for (; n_it != l_it->end(); ++n_it) {
-            if((*n_it) < max_size_t - s) {
+            if ((*n_it) < max_size_t - s) {
             s += *n_it;
           } else {
             throw std::overflow_error("overflow");
@@ -87,9 +87,9 @@ namespace madieva
       }
     }
 
-    void printStrings(const List<std::pair<std::string, List<size_t>>> & list)
+    void printStrings(const List< std::pair< std::string, List< size_t > > > & list)
     {
-      LCIter<std::pair<std::string, List<size_t>>> p_it = list.begin();
+      LCIter< std::pair< std::string, List< size_t > > > p_it = list.begin();
       if (p_it != list.end()) {
         std::cout << p_it->first;
         ++p_it;
@@ -99,14 +99,14 @@ namespace madieva
       }
     }
 
-    void printMatrix(const List< List< size_t >> & t_list)
+    void printMatrix(const List< List< size_t > > & t_list)
     {
       if (t_list.isEmpty()) {
         std::cout << "0\n";
         return;
       }
 
-      LCIter< List< size_t >> l_it = t_list.begin();
+      LCIter< List< size_t > > l_it = t_list.begin();
       for (; l_it != t_list.end(); ++l_it) {
         LCIter< size_t > it_num = l_it->begin();
         if (it_num != l_it->end()) {
@@ -137,7 +137,7 @@ namespace madieva
 int main()
 {
   namespace mad =  madieva;
-  mad::List<std::pair<std::string, mad::List<size_t>>> list;
+  mad::List< std::pair< std::string, mad::List< size_t > > > list;
   try {
     mad::read(list);
   } catch (const std::ios_base::failure & e) {
@@ -148,7 +148,7 @@ int main()
     std::cout << "0\n";
     return 0;
   }
-  mad::List<mad::List<size_t>> t_list;
+  mad::List< mad::List< size_t > > t_list;
   mad::transpose(t_list, list);
   if (t_list.isEmpty()) {
     mad::printStrings(list);
