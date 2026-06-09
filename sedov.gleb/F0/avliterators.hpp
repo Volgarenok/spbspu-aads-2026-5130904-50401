@@ -147,6 +147,101 @@ namespace sedov
   {
     return node_ != other.node_;
   }
+
+  template < class Key, class Value >
+  AVLIterator< Key, Value >::AVLIterator(AVLTreeNode< Key, Value > * node):
+    node_(node)
+  {}
+
+  template < class Key, class Value >
+  std::pair< const Key, Value > AVLIterator< Key, Value >::operator*() const
+  {
+    return std::pair< const Key, Value >(node_->key_, node_->value_);
+  }
+
+  template < class Key, class Value >
+  AVLIterator< Key, Value > & AVLIterator< Key, Value >::operator++() noexcept
+  {
+    if (!node_)
+    {
+      return *this;
+    }
+    if (node_->right_)
+    {
+      node_ = node_->right_;
+      while (node_->left_)
+      {
+        node_ = node_->left_;
+      }
+    }
+    else
+    {
+      AVLTreeNode< Key, Value > * parent = node_->parent_;
+      while (parent && node_ == parent->right_)
+      {
+        node_ = parent;
+        parent = node_->parent_;
+      }
+      node_ = parent;
+    }
+    return *this;
+  }
+
+  template < class Key, class Value >
+  AVLIterator< Key, Value > AVLIterator< Key, Value >::operator++(int) noexcept
+  {
+    AVLIterator tmp = *this;
+    ++(*this);
+    return tmp;
+  }
+
+  template < class Key, class Value >
+  AVLIterator< Key, Value > & AVLIterator< Key, Value >::operator--() noexcept
+  {
+    if (!node_)
+    {
+      return *this;
+    }
+    if (node_->left_)
+    {
+      node_ = node_->left_;
+      while (node_->right_)
+      {
+        node_ = node_->right_;
+      }
+    }
+    else
+    {
+      AVLTreeNode< Key, Value > * parent = node_->parent_;
+      while (parent && node_ == parent->left_)
+      {
+        node_ = parent;
+        parent = node_->parent_;
+      }
+      node_ = parent;
+    }
+    return *this;
+  }
+
+  template < class Key, class Value >
+  AVLIterator< Key, Value > AVLIterator< Key, Value >::operator--(int) noexcept
+  {
+    AVLIterator tmp = *this;
+    --(*this);
+    return tmp;
+  }
+
+  template < class Key, class Value >
+  bool AVLIterator< Key, Value >::operator==(const AVLIterator & other) const noexcept
+  {
+    return node_ == other.node_;
+  }
+
+  template < class Key, class Value >
+  bool AVLIterator< Key, Value >::operator!=(const AVLIterator & other) const noexcept
+  {
+    return node_ != other.node_;
+  }
 }
 
 #endif
