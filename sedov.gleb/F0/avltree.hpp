@@ -376,6 +376,27 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::fallLeft(AVLTreeNode< Key, Value > * node) const noexcept
+  {
+    while (node && node->left_)
+    {
+      node = node->left_;
+    }
+    return node;
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > *
+    AVLTree< Key, Value, Compare >::fallRight(AVLTreeNode< Key, Value > * node) const noexcept
+  {
+    while (node && node->right_)
+    {
+      node = node->right_;
+    }
+    return node;
+  }
+
+  template < class Key, class Value, class Compare >
   const AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::findNode(const Key & k) const noexcept
   {
     AVLTreeNode< Key, Value > * cur = root_;
