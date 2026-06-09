@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <utility>
 #include <stdexcept>
-#include "list.hpp"
+#include <list.hpp>
 
 namespace zhuravleva
 {
@@ -17,7 +17,6 @@ namespace zhuravleva
     void pop();
     T& top();
     const T& top() const;
-    T drop();
     bool empty() const noexcept;
     void clear() noexcept;
     size_t size() const noexcept;
@@ -70,14 +69,6 @@ const T& zhuravleva::Stack< T >::top() const
     throw std::runtime_error("empty stack");
   }
   return *data_.cbegin();
-}
-
-template< class T >
-T zhuravleva::Stack< T >::drop()
-{
-  T result = top();
-  pop();
-  return result;
 }
 
 template< class T >
