@@ -93,7 +93,7 @@ namespace studilova
   {
     public:
       T& operator*() const;
-      T* operator->() const noexcept;
+      T* operator->() const;
 
       LIter& operator++() noexcept;
       LIter operator++(int) noexcept;
@@ -116,7 +116,7 @@ namespace studilova
   {
     public:
       const T& operator*() const;
-      const T* operator->() const noexcept;
+      const T* operator->() const;
 
       CLIter& operator++() noexcept;
       CLIter operator++(int) noexcept;
@@ -668,8 +668,12 @@ namespace studilova
   }
 
   template< class T >
-  T* LIter< T >::operator->() const noexcept
+  T* LIter< T >::operator->() const
   {
+    if (node_ == nullptr)
+    {
+      throw std::out_of_range("Iterator access error");
+    }
     return std::addressof(node_->data);
   }
 
@@ -743,8 +747,12 @@ namespace studilova
   }
 
   template< class T >
-  const T* CLIter< T >::operator->() const noexcept
+  const T* CLIter< T >::operator->() const
   {
+    if (node_ == nullptr)
+    {
+      throw std::out_of_range("Iterator access error");
+    }
     return std::addressof(node_->data);
   }
 
