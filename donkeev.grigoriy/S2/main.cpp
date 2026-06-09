@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdexcept>
+#include <fstream>
 #include "math-operations.hpp"
 #include "queue.hpp"
 #include "stack.hpp"
@@ -15,8 +16,15 @@ int main(int argc, char** argv)
   }
   else if (argc == 2)
   {
-    try{
-      donkeev::readFromFile(infixExpression, argv[1]);
+    std::ifstream input(argv[1]);
+    if (!input)
+    {
+      std::cerr << "Can't open the file\n";
+      return 1;
+    }
+    try
+    {
+      donkeev::readFromFile(infixExpression, input);
     }
     catch (const std::runtime_error& e)
     {

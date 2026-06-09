@@ -1,15 +1,14 @@
 #ifndef MATH_OPERATIONS_HPP
 #define MATH_OPERATIONS_HPP
 
+#include <limits>
 #include "queue.hpp"
 #include "stack.hpp"
-#include <limits>
-
-using llint_t = long long int;
 
 namespace donkeev
 {
-  void readFromFile(donkeev::Queue< donkeev::Queue< char > >&, const char*);
+  using llint_t = long long int;
+  void readFromFile(donkeev::Queue< donkeev::Queue< char > >&, std::ifstream& input);
   void readFromTerminal(donkeev::Queue< donkeev::Queue< char > >&, std::istream&);
   bool isNumber(const donkeev::Queue< char >& , llint_t &);
   bool isOperator(const char&);
