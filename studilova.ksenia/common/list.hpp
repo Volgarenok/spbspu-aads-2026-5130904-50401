@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <utility>
 #include <memory>
+#include <functional>
 
 namespace studilova
 {
@@ -29,10 +30,10 @@ namespace studilova
   class List
   {
     public:
-      List();
+      List() noexcept;
       List(const List& other);
       List(List&& other) noexcept;
-      ~List();
+      ~List() noexcept;
 
       List& operator=(const List& other);
       List& operator=(List&& other) noexcept;
@@ -58,6 +59,21 @@ namespace studilova
       void insert(LIter< T > pos, const T& value);
       void insert(LIter< T > pos, T&& value);
 
+      void splice(LIter< T > pos, List& other) noexcept;
+      void splice(LIter< T > pos, List& other, LIter< T > it) noexcept;
+      void splice(LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept;
+
+      void sort();
+      template< class Cmp >
+      void sort(Cmp cmp);
+
+      void merge(List& other);
+      template< class Cmp >
+      void merge(List& other, Cmp cmp);
+
+      template< class P >
+      LIter< T > partition(P pred);
+
       LIter< T > begin() noexcept;
       LIter< T > end() noexcept;
 
@@ -67,16 +83,65 @@ namespace studilova
     private:
       detail::Node< T >* head_;
       size_t size_;
+
+      void pushFrontNode(detail::Node< T >* node) noexcept;
+      void pushBackNode(detail::Node< T >* node) noexcept;
   };
 
   template< class T >
-  List< T >::List() :
+  class LIter
+  {
+    public:
+      T& operator*() const;
+      T* operator->() const;
+
+      LIter& operator++() noexcept;
+      LIter operator++(int) noexcept;
+      LIter& operator--() noexcept;
+      LIter operator--(int) noexcept;
+
+      bool operator==(const LIter& other) const noexcept;
+      bool operator!=(const LIter& other) const noexcept;
+
+    private:
+      detail::Node< T >* node_;
+
+      explicit LIter(detail::Node< T >* node = nullptr) noexcept;
+
+      friend class List< T >;
+  };
+
+  template< class T >
+  class CLIter
+  {
+    public:
+      const T& operator*() const;
+      const T* operator->() const;
+
+      CLIter& operator++() noexcept;
+      CLIter operator++(int) noexcept;
+      CLIter& operator--() noexcept;
+      CLIter operator--(int) noexcept;
+
+      bool operator==(const CLIter& other) const noexcept;
+      bool operator!=(const CLIter& other) const noexcept;
+
+    private:
+      detail::Node< T >* node_;
+
+      explicit CLIter(detail::Node< T >* node = nullptr) noexcept;
+
+      friend class List< T >;
+  };
+
+  template< class T >
+  List< T >::List() noexcept:
     head_(nullptr),
     size_(0)
   {}
 
   template< class T >
-  List< T >::List(const List& other) :
+  List< T >::List(const List& other):
     head_(nullptr),
     size_(0)
   {
@@ -98,16 +163,13 @@ namespace studilova
   }
 
   template< class T >
-  List< T >::List(List&& other) noexcept :
-    head_(other.head_),
-    size_(other.size_)
-  {
-    other.head_ = nullptr;
-    other.size_ = 0;
-  }
+  List< T >::List(List&& other) noexcept:
+    head_(std::exchange(other.head_, nullptr)),
+    size_(std::exchange(other.size_, 0))
+  {}
 
   template< class T >
-  List< T >::~List()
+  List< T >::~List() noexcept
   {
     clear();
   }
@@ -115,27 +177,24 @@ namespace studilova
   template< class T >
   List< T >& List< T >::operator=(const List& other)
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
       List< T > temp(other);
       swap(temp);
     }
+
     return *this;
   }
 
   template< class T >
   List< T >& List< T >::operator=(List&& other) noexcept
   {
-    if (this != &other)
+    if (this != std::addressof(other))
     {
-      clear();
-
-      head_ = other.head_;
-      size_ = other.size_;
-
-      other.head_ = nullptr;
-      other.size_ = 0;
+      List< T > temp(std::move(other));
+      swap(temp);
     }
+
     return *this;
   }
 
@@ -222,7 +281,9 @@ namespace studilova
       delete temp;
       head_ = nullptr;
       size_ = 0;
-    } else {
+    }
+    else
+    {
       detail::Node< T >* tail = head_->prev;
 
       head_ = head_->next;
@@ -248,7 +309,9 @@ namespace studilova
       delete head_;
       head_ = nullptr;
       size_ = 0;
-    } else {
+    }
+    else
+    {
       detail::Node< T >* tail = head_->prev;
       detail::Node< T >* new_tail = tail->prev;
 
@@ -261,16 +324,16 @@ namespace studilova
   }
 
   template< class T >
-  void List< T >::pushFront(const T& value)
+  void List< T >::pushFrontNode(detail::Node< T >* node) noexcept
   {
-    detail::Node< T >* node = new detail::Node< T >{ value, nullptr, nullptr };
-
     if (empty())
     {
       node->next = node;
       node->prev = node;
       head_ = node;
-    } else {
+    }
+    else
+    {
       detail::Node< T >* tail = head_->prev;
 
       node->next = head_;
@@ -285,16 +348,32 @@ namespace studilova
   }
 
   template< class T >
+  void List< T >::pushFront(const T& value)
+  {
+    detail::Node< T >* node = new detail::Node< T >{ value, nullptr, nullptr };
+
+    pushFrontNode(node);
+  }
+
+  template< class T >
   void List< T >::pushFront(T&& value)
   {
-    detail::Node< T >* node = new detail::Node< T >{ std::move(value), nullptr, nullptr };
+    detail::Node< T >* node = new detail::Node< T >{ std::forward< T >(value), nullptr, nullptr };
 
+    pushFrontNode(node);
+  }
+
+  template< class T >
+  void List< T >::pushBackNode(detail::Node< T >* node) noexcept
+  {
     if (empty())
     {
       node->next = node;
       node->prev = node;
       head_ = node;
-    } else {
+    }
+    else
+    {
       detail::Node< T >* tail = head_->prev;
 
       node->next = head_;
@@ -302,8 +381,6 @@ namespace studilova
 
       tail->next = node;
       head_->prev = node;
-
-      head_ = node;
     }
     ++size_;
   }
@@ -313,43 +390,15 @@ namespace studilova
   {
     detail::Node< T >* node = new detail::Node< T >{ value, nullptr, nullptr };
 
-    if (empty())
-    {
-      node->next = node;
-      node->prev = node;
-      head_ = node;
-    } else {
-      detail::Node< T >* tail = head_->prev;
-
-      node->next = head_;
-      node->prev = tail;
-
-      tail->next = node;
-      head_->prev = node;
-    }
-    size_++;
+    pushBackNode(node);
   }
 
   template< class T >
   void List< T >::pushBack(T&& value)
   {
-    detail::Node< T >* node = new detail::Node< T >{ std::move(value), nullptr, nullptr };
+    detail::Node< T >* node = new detail::Node< T >{ std::forward< T >(value), nullptr, nullptr };
 
-    if (empty())
-    {
-      node->next = node;
-      node->prev = node;
-      head_ = node;
-    } else {
-      detail::Node< T >* tail = head_->prev;
-
-      node->next = head_;
-      node->prev = tail;
-
-      tail->next = node;
-      head_->prev = node;
-    }
-    ++size_;
+    pushBackNode(node);
   }
 
   template< class T >
@@ -360,6 +409,7 @@ namespace studilova
       pushBack(value);
       return;
     }
+
     if (pos.node_ == head_)
     {
       pushFront(value);
@@ -382,18 +432,19 @@ namespace studilova
   {
     if (!pos.node_)
     {
-      pushBack(std::move(value));
+      pushBack(std::forward< T >(value));
       return;
     }
+
     if (pos.node_ == head_)
     {
-      pushFront(std::move(value));
+      pushFront(std::forward< T >(value));
       return;
     }
 
     detail::Node< T >* curr = pos.node_;
     detail::Node< T >* prev = curr->prev;
-    detail::Node< T >* node = new detail::Node< T >{ std::move(value), curr, prev };
+    detail::Node< T >* node = new detail::Node< T >{ std::forward< T >(value), curr, prev };
 
     prev->next = node;
     curr->prev = node;
@@ -401,30 +452,208 @@ namespace studilova
   }
 
   template< class T >
-  class LIter
+  void List< T >::splice(LIter< T > pos, List& other) noexcept
   {
-    public:
-      T& operator*() const;
-      T* operator->() const;
-
-      LIter& operator++();
-      LIter operator++(int);
-      LIter& operator--();
-      LIter operator--(int);
-
-      bool operator==(const LIter& other) const;
-      bool operator!=(const LIter& other) const;
-
-    private:
-      detail::Node< T >* node_;
-
-      explicit LIter(detail::Node< T >* node = nullptr);
-
-      friend class List< T >;
-  };
+    splice(pos, other, other.begin(), other.end());
+  }
 
   template< class T >
-  LIter< T >::LIter(detail::Node< T >* node) :
+  void List< T >::splice(LIter< T > pos, List& other, LIter< T > it) noexcept
+  {
+    if (it.node_ == nullptr)
+    {
+      return;
+    }
+
+    LIter< T > next = it;
+    ++next;
+
+    if (next.node_ == other.head_)
+    {
+      next = other.end();
+    }
+
+    splice(pos, other, it, next);
+  }
+
+  template< class T >
+  void List< T >::splice(LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept
+  {
+    if (other.empty() || first.node_ == last.node_ || first.node_ == nullptr || this == &other)
+    {
+      return;
+    }
+
+    detail::Node< T >* rangeFirst = first.node_;
+    detail::Node< T >* rangeLast = first.node_;
+    size_t count = 1;
+
+    while (rangeLast->next != other.head_ && rangeLast->next != last.node_)
+    {
+      rangeLast = rangeLast->next;
+      ++count;
+    }
+
+    detail::Node< T >* beforeRange = rangeFirst->prev;
+    detail::Node< T >* afterRange = rangeLast->next;
+
+    beforeRange->next = afterRange;
+    afterRange->prev = beforeRange;
+
+    if (other.head_ == rangeFirst)
+    {
+      other.head_ = afterRange;
+    }
+
+    other.size_ -= count;
+
+    if (other.size_ == 0)
+    {
+      other.head_ = nullptr;
+    }
+
+    if (empty())
+    {
+      rangeFirst->prev = rangeLast;
+      rangeLast->next = rangeFirst;
+      head_ = rangeFirst;
+    }
+    else if (pos.node_ == nullptr)
+    {
+      detail::Node< T >* tail = head_->prev;
+
+      tail->next = rangeFirst;
+      rangeFirst->prev = tail;
+
+      rangeLast->next = head_;
+      head_->prev = rangeLast;
+    }
+    else
+    {
+      detail::Node< T >* curr = pos.node_;
+      detail::Node< T >* prev = curr->prev;
+
+      prev->next = rangeFirst;
+      rangeFirst->prev = prev;
+
+      rangeLast->next = curr;
+      curr->prev = rangeLast;
+
+      if (curr == head_)
+      {
+        head_ = rangeFirst;
+      }
+    }
+    size_ += count;
+  }
+
+  template< class T >
+  void List< T >::sort()
+  {
+    sort(std::less< T >{});
+  }
+
+  template< class T >
+  template< class Cmp >
+  void List< T >::sort(Cmp cmp)
+  {
+    if (size_ <= 1)
+    {
+      return;
+    }
+
+    List< T > second;
+
+    size_t half = size_ / 2;
+    LIter< T > mid = begin();
+
+    for (size_t i = 0; i < half; ++i)
+    {
+      ++mid;
+    }
+
+    second.splice(second.end(), *this, mid, end());
+
+    sort(cmp);
+    second.sort(cmp);
+
+    merge(second, cmp);
+  }
+
+  template< class T >
+  void List< T >::merge(List& other)
+  {
+    merge(other, std::less< T >{});
+  }
+
+  template< class T >
+  template< class Cmp >
+  void List< T >::merge(List& other, Cmp cmp)
+  {
+    if (this == &other || other.empty())
+    {
+      return;
+    }
+
+    LIter< T > pos = begin();
+    size_t posIndex = 0;
+
+    while (!other.empty())
+    {
+      LIter< T > otherIt = other.begin();
+
+      while (posIndex < size_ && !cmp(*otherIt, *pos))
+      {
+        ++pos;
+        ++posIndex;
+      }
+
+      if (posIndex == size_)
+      {
+        splice(end(), other, otherIt);
+      }
+      else
+      {
+        splice(pos, other, otherIt);
+        ++posIndex;
+      }
+    }
+  }
+
+  template< class T >
+  template< class P >
+  LIter< T > List< T >::partition(P pred)
+  {
+    List< T > secondList;
+
+    size_t count = size_;
+    LIter< T > it = begin();
+
+    for (size_t i = 0; i < count;)
+    {
+      LIter< T > current = it;
+      ++it;
+      ++i;
+
+      if (!pred(*current))
+      {
+        secondList.splice(secondList.end(), *this, current);
+      }
+    }
+
+    LIter< T > border = end();
+
+    if (!secondList.empty())
+    {
+      border = secondList.begin();
+      splice(end(), secondList);
+    }
+
+    return border;
+  }
+
+  template< class T >
+  LIter< T >::LIter(detail::Node< T >* node) noexcept:
     node_(node)
   {}
 
@@ -441,18 +670,22 @@ namespace studilova
   template< class T >
   T* LIter< T >::operator->() const
   {
+    if (node_ == nullptr)
+    {
+      throw std::out_of_range("Iterator access error");
+    }
     return std::addressof(node_->data);
   }
 
   template< class T >
-  LIter< T >& LIter< T >::operator++()
+  LIter< T >& LIter< T >::operator++() noexcept
   {
     node_ = node_->next;
     return *this;
   }
 
   template< class T >
-  LIter< T > LIter< T >::operator++(int)
+  LIter< T > LIter< T >::operator++(int) noexcept
   {
     LIter< T > temp(*this);
     ++(*this);
@@ -460,14 +693,14 @@ namespace studilova
   }
 
   template< class T >
-  LIter< T >& LIter< T >::operator--()
+  LIter< T >& LIter< T >::operator--() noexcept
   {
     node_ = node_->prev;
     return *this;
   }
 
   template< class T >
-  LIter< T > LIter< T >::operator--(int)
+  LIter< T > LIter< T >::operator--(int) noexcept
   {
     LIter< T > temp(*this);
     --(*this);
@@ -475,13 +708,13 @@ namespace studilova
   }
 
   template< class T >
-  bool LIter< T >::operator==(const LIter& other) const
+  bool LIter< T >::operator==(const LIter& other) const noexcept
   {
     return node_ == other.node_;
   }
 
   template< class T >
-  bool LIter< T >::operator!=(const LIter& other) const
+  bool LIter< T >::operator!=(const LIter& other) const noexcept
   {
     return !(*this == other);
   }
@@ -499,30 +732,7 @@ namespace studilova
   }
 
   template< class T >
-  class CLIter
-  {
-    public:
-      const T& operator*() const;
-      const T* operator->() const;
-
-      CLIter& operator++();
-      CLIter operator++(int);
-      CLIter& operator--();
-      CLIter operator--(int);
-
-      bool operator==(const CLIter& other) const;
-      bool operator!=(const CLIter& other) const;
-
-    private:
-      detail::Node< T >* node_;
-
-      explicit CLIter(detail::Node< T >* node = nullptr);
-
-      friend class List< T >;
-  };
-
-  template< class T >
-  CLIter< T >::CLIter(detail::Node< T >* node) :
+  CLIter< T >::CLIter(detail::Node< T >* node) noexcept:
     node_(node)
   {}
 
@@ -539,18 +749,22 @@ namespace studilova
   template< class T >
   const T* CLIter< T >::operator->() const
   {
+    if (node_ == nullptr)
+    {
+      throw std::out_of_range("Iterator access error");
+    }
     return std::addressof(node_->data);
   }
 
   template< class T >
-  CLIter< T >& CLIter< T >::operator++()
+  CLIter< T >& CLIter< T >::operator++() noexcept
   {
     node_ = node_->next;
     return *this;
   }
 
   template< class T >
-  CLIter< T > CLIter< T >::operator++(int)
+  CLIter< T > CLIter< T >::operator++(int) noexcept
   {
     CLIter< T > temp(*this);
     ++(*this);
@@ -558,14 +772,14 @@ namespace studilova
   }
 
   template< class T >
-  CLIter< T >& CLIter< T >::operator--()
+  CLIter< T >& CLIter< T >::operator--() noexcept
   {
     node_ = node_->prev;
     return *this;
   }
 
   template< class T >
-  CLIter< T > CLIter< T >::operator--(int)
+  CLIter< T > CLIter< T >::operator--(int) noexcept
   {
     CLIter< T > temp(*this);
     --(*this);
@@ -573,13 +787,13 @@ namespace studilova
   }
 
   template< class T >
-  bool CLIter< T >::operator==(const CLIter& other) const
+  bool CLIter< T >::operator==(const CLIter& other) const noexcept
   {
     return node_ == other.node_;
   }
 
   template< class T >
-  bool CLIter< T >::operator!=(const CLIter& other) const
+  bool CLIter< T >::operator!=(const CLIter& other) const noexcept
   {
     return !(*this == other);
   }
