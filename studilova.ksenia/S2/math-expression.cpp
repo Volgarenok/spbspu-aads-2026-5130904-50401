@@ -58,12 +58,16 @@ void studilova::processToken(const std::string& token, studilova::Stack< std::st
       {
         output.push(topOp);
         ops.pop();
-      } else {
+      }
+      else
+      {
         break;
       }
     }
     ops.push(token);
-  } else {
+  }
+  else
+  {
     toNumber(token);
     output.push(token);
   }
@@ -111,7 +115,9 @@ long long studilova::multiply(long long a, long long b)
     {
       throw std::overflow_error("Multiplication underflow");
     }
-  } else {
+  }
+  else
+  {
     if (b > 0 && a < studilova::MIN / b)
     {
       throw std::overflow_error("Multiplication underflow");
@@ -257,7 +263,7 @@ studilova::Queue< std::string > studilova::infixToPostfix(const std::string& lin
 
 long long studilova::evaluatePostfix(studilova::Queue< std::string >& postfix)
 {
-  Stack< long long > values;
+  studilova::Stack< long long > values;
 
   while (!postfix.empty())
   {
@@ -279,7 +285,9 @@ long long studilova::evaluatePostfix(studilova::Queue< std::string >& postfix)
 
       long long res = applyOperator(a, b, token);
       values.push(res);
-    } else {
+    }
+    else
+    {
       values.push(std::stoll(token));
     }
   }
