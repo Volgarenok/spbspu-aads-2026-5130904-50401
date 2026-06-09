@@ -1,9 +1,13 @@
 #ifndef LCITER_HPP
 #define LCITER_HPP
 
+#include <memory>
+
 namespace chernov {
-  template< class T >
-  class Node;
+  namespace detail {
+    template< class T >
+    class Node;
+  }
 
   template< class T >
   class List;
@@ -11,56 +15,56 @@ namespace chernov {
   template< class T >
   class LCIter {
   public:
-    LCIter();
-    const T & operator*() const;
-    const T * operator->() const;
-    LCIter< T > & operator++();
-    LCIter< T > operator++(int);
+    LCIter() noexcept;
+    const T & operator*() const noexcept;
+    const T * operator->() const noexcept;
+    LCIter< T > & operator++() noexcept;
+    LCIter< T > operator++(int) noexcept;
     bool operator==(const LCIter< T > & other) const noexcept;
     bool operator!=(const LCIter< T > & other) const noexcept;
   private:
     friend class List< T >;
-    const Node< T > * ptr;
-    const Node< T > * fake_;
-    LCIter(const Node< T > * node, const Node< T > * fake);
+    const detail::Node< T > * ptr_;
+    const detail::Node< T > * fake_;
+    LCIter(const detail::Node< T > * node, const detail::Node< T > * fake);
   };
 
   template< class T >
-  chernov::LCIter< T >::LCIter(const Node< T > * node, const Node< T > * fake):
-    ptr(node),
+  chernov::LCIter< T >::LCIter(const detail::Node< T > * node, const detail::Node< T > * fake):
+    ptr_(node),
     fake_(fake)
   {}
 
   template< class T >
-  chernov::LCIter< T >::LCIter():
-    ptr(nullptr),
+  chernov::LCIter< T >::LCIter() noexcept:
+    ptr_(nullptr),
     fake_(nullptr)
   {}
 
   template< class T >
-  const T & chernov::LCIter< T >::operator*() const
+  const T & chernov::LCIter< T >::operator*() const noexcept
   {
-    return ptr->data;
+    return ptr_->data;
   }
 
   template< class T >
-  const T * chernov::LCIter< T >::operator->() const
+  const T * chernov::LCIter< T >::operator->() const noexcept
   {
-    return &(ptr->data);
+    return std::addressof(ptr_->data);
   }
 
   template< class T >
-  chernov::LCIter< T > & chernov::LCIter< T >::operator++()
+  chernov::LCIter< T > & chernov::LCIter< T >::operator++() noexcept
   {
-    ptr = ptr->next;
-    if (ptr == fake_) {
-      ptr = fake_->next;
+    ptr_ = ptr_->next;
+    if (ptr_ == fake_) {
+      ptr_ = fake_->next;
     }
     return *this;
   }
 
   template< class T >
-  chernov::LCIter< T > chernov::LCIter< T >::operator++(int)
+  chernov::LCIter< T > chernov::LCIter< T >::operator++(int) noexcept
   {
     LCIter old = *this;
     ++(*this);
@@ -70,7 +74,7 @@ namespace chernov {
   template< class T >
   bool chernov::LCIter< T >::operator==(const LCIter< T > & other) const noexcept
   {
-    return ptr == other.ptr;
+    return ptr_ == other.ptr_;
   }
 
   template< class T >
