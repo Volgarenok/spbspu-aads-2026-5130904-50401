@@ -18,8 +18,8 @@ namespace chernov {
     T & top() noexcept;
     const T & top() const noexcept;
 
-    template< class U >
-    void push(U && value);
+    void push(const T & value);
+    void push(T && value);
     void pop() noexcept;
 
     template< class... Args >
@@ -46,10 +46,15 @@ const T & chernov::Stack< T >::top() const noexcept
 }
 
 template< class T >
-template< class U >
-void chernov::Stack< T >::push(U && value)
+void chernov::Stack< T >::push(const T & value)
 {
-  emplace(std::forward< U >(value));
+  emplace(value);
+}
+
+template< class T >
+void chernov::Stack< T >::push(T && value)
+{
+  emplace(std::forward< T >(value));
 }
 
 template< class T >
