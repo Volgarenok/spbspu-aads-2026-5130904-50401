@@ -41,8 +41,8 @@ namespace chernov {
     size_t size() const noexcept;
     void clear() noexcept;
 
-    template< class U >
-    LIter< T > insertAfter(LIter< T > pos, U && value);
+    LIter< T > insertAfter(LIter< T > pos, const T & value);
+    LIter< T > insertAfter(LIter< T > pos, T && value);
 
     template< class... Args >
     LIter< T > emplaceAfter(LIter< T > pos, Args &&... args);
@@ -52,8 +52,8 @@ namespace chernov {
     LIter< T > eraseAfter(LIter< T > pos);
     LIter< T > eraseAfter(LIter< T > first, LIter< T > last);
 
-    template< class U >
-    void pushFront(U && value);
+    void pushFront(const T & value);
+    void pushFront(T && value);
     void popFront();
 
     void swap(List< T > & other) noexcept;
@@ -238,10 +238,15 @@ namespace chernov {
   }
 
   template< class T >
-  template< class U >
-  LIter< T > List< T >::insertAfter(LIter< T > pos, U && value)
+  LIter< T > List< T >::insertAfter(LIter< T > pos, const T & value)
   {
-    return emplaceAfter(pos, std::forward< U >(value));
+    return emplaceAfter(pos, value);
+  }
+
+  template< class T >
+  LIter< T > List< T >::insertAfter(LIter< T > pos, T && value)
+  {
+    return emplaceAfter(pos, std::move(value));
   }
 
   template< class T >
@@ -313,10 +318,15 @@ namespace chernov {
   }
 
   template< class T >
-  template< class U >
-  void List< T >::pushFront(U && value)
+  void List< T >::pushFront(const T & value)
   {
-    insertAfter(beforeBegin(), std::forward< U >(value));
+    insertAfter(beforeBegin(), value);
+  }
+
+  template< class T >
+  void List< T >::pushFront(T && value)
+  {
+    insertAfter(beforeBegin(), std::move(value));
   }
 
   template< class T >
