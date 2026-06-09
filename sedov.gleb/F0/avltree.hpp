@@ -434,6 +434,96 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::rotateLeft(AVLTreeNode< Key, Value > * x) noexcept
+  {
+    AVLTreeNode< Key, Value > * y = x->right_;
+    if (!y)
+    {
+      return x;
+    }
+    x->right_ = y->left_;
+    if (y->left_)
+    {
+      y->left_->parent_ = x;
+    }
+    y->parent_ = x->parent_;
+    if (!x->parent_)
+    {
+      root_ = y;
+    }
+    else if (x == x->parent_->left_)
+    {
+      x->parent_->left_ = y;
+    }
+    else
+    {
+      x->parent_->right_ = y;
+    }
+    y->left_ = x;
+    x->parent_ = y;
+    updateHeight(x);
+    updateHeight(y);
+    return y;
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::rotateRight(AVLTreeNode< Key, Value > * y) noexcept
+  {
+    AVLTreeNode< Key, Value > * x = y->left_;
+    if (!x)
+    {
+      return y;
+    }
+    y->left_ = x->right_;
+    if (x->right_)
+    {
+      x->right_->parent_ = y;
+    }
+    x->parent_ = y->parent_;
+    if (!y->parent_)
+    {
+      root_ = x;
+    }
+    else if (y == y->parent_->left_)
+    {
+      y->parent_->left_ = x;
+    }
+    else
+    {
+      y->parent_->right_ = x;
+    }
+    x->right_ = y;
+    y->parent_ = x;
+    updateHeight(y);
+    updateHeight(x);
+    return x;
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > *
+    AVLTree< Key, Value, Compare >::rotateLargeLeft(AVLTreeNode< Key, Value > * node) noexcept
+  {
+    node->left_ = rotateLeft(node->left_);
+    if (node->left_)
+    {
+      node->left_->parent_ = node;
+    }
+    return rotateRight(node);
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > *
+    AVLTree< Key, Value, Compare >::rotateLargeRight(AVLTreeNode< Key, Value > * node) noexcept
+  {
+    node->right_ = rotateRight(node->right_);
+    if (node->right_)
+    {
+      node->right_->parent_ = node;
+    }
+    return rotateLeft(node);
+  }
+
+  template < class Key, class Value, class Compare >
   const AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::findNode(const Key & k) const noexcept
   {
     AVLTreeNode< Key, Value > * cur = root_;
