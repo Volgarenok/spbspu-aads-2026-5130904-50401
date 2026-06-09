@@ -368,7 +368,7 @@ namespace zhuravleva
   template< class T >
   LIter< T > List< T >::pushFront(const T& value)
   {
-    return insertAfter(beforeBegin(), value);
+    return emplaceFront(value);
   }
 
   template< class T >
@@ -470,27 +470,13 @@ namespace zhuravleva
   template< class T >
   LIter< T > List< T >::insertAfter(LIter< T > pos, const T& value)
   {
-    if (!pos.current_)
-    {
-      throw std::runtime_error("invalid iterator");
-    }
-
-    detail::Node< T >* node = new detail::Node< T >(value, pos.current_->next);
-    pos.current_->next = node;
-    return LIter< T >(node);
+    return emplaceAfter(pos, value);
   }
 
   template< class T >
   LIter< T > List< T >::pushBack(const T& value)
   {
-    detail::Node< T >* cur = fake_;
-    while (cur->next != fake_)
-    {
-      cur = cur->next;
-    }
-    detail::Node< T >* node = new detail::Node< T >(value, fake_);
-    cur->next = node;
-    return LIter< T >(node);
+    return emplaceBack(value);
   }
 
   template< class T >
@@ -502,19 +488,13 @@ namespace zhuravleva
   template< class T >
   LIter< T > List< T >::insertAfter(LIter< T > pos, T&& value)
   {
-    if (!pos.current_)
-    {
-      throw std::runtime_error("invalid iterator");
-    }
-    detail::Node< T > * node = new detail::Node< T >(std::move(value), pos.current_->next);
-    pos.current_->next = node;
-    return LIter< T >(node);
+    return emplaceAfter(pos, std::forward< T >(value));
   }
 
   template< class T >
   LIter< T > List< T >::pushFront(T&& value)
   {
-    return insertAfter(beforeBegin(), std::move(value));
+    return emplaceFront(std::forward< T >(value));
   }
 
   template< class T >
@@ -553,12 +533,7 @@ namespace zhuravleva
   template< class T >
   LIter< T > List< T >::pushBack(T&& value)
   {
-    detail::Node< T > * cur = fake_;
-    while (cur->next != fake_)
-    {
-      cur = cur->next;
-    }
-    return insertAfter(LIter< T >(cur), std::move(value));
+    return emplaceBack(std::forward< T >(value));
   }
 
   template< class T >
