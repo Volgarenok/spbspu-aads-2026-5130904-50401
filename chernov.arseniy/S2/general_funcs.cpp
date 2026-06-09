@@ -78,8 +78,9 @@ long long chernov::MathExpression::calculateMathExpression()
         throw std::runtime_error("invalid math expression: opening bracket is missing");
       }
       stack.pop();
-    } else if (isOperator(element)) {
-      while (!stack.empty() && stack.top() != "(" && (getPriority(element) <= getPriority(stack.top()))) {
+    } else if (detail::isOperator(element)) {
+      while (!stack.empty() && stack.top() != "("
+        && (detail::getPriority(element) <= detail::getPriority(stack.top()))) {
         executeOperation(result, stack.top());
         stack.pop();
       }

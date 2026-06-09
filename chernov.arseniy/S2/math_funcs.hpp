@@ -20,8 +20,10 @@ namespace chernov {
   long long gcd(long long a, long long b);
   long long lcm(long long a, long long b);
 
-  bool isOperator(const std::string & str);
-  size_t getPriority(const std::string & oper);
+  namespace detail {
+    bool isOperator(const std::string & str);
+    size_t getPriority(const std::string & oper);
+  }
 }
 
 #endif

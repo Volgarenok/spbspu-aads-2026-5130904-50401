@@ -96,7 +96,7 @@ long long chernov::lcm(long long a, long long b)
   return abs(mul(a_div, b));
 }
 
-bool chernov::isOperator(const std::string & str)
+bool chernov::detail::isOperator(const std::string & str)
 {
   for (size_t i = 0; i < count_operators; ++i) {
     if (str == operators[i]) {
@@ -106,7 +106,7 @@ bool chernov::isOperator(const std::string & str)
   return false;
 }
 
-size_t chernov::getPriority(const std::string & oper)
+size_t chernov::detail::getPriority(const std::string & oper)
 {
   if (oper == "lcm") {
     return 3;
