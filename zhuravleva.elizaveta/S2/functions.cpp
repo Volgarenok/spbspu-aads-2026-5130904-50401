@@ -156,14 +156,7 @@ zhuravleva::value_t zhuravleva::calcPostfix(Queue< std::string > line)
     }
     else
     {
-      try
-      {
-        operands.push(std::stoll(part));
-      }
-      catch (const std::exception&)
-      {
-        throw std::runtime_error("invalid operand");
-      }
+      operands.push(std::stoll(part));
     }
   }
 
