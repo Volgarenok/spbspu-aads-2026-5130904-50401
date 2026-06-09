@@ -39,7 +39,7 @@ void studilova::Queue< T >::push(const T& value)
 template< class T >
 void studilova::Queue< T >::push(T&& value)
 {
-  data_.pushBack(std::move(value));
+  data_.pushBack(std::forward< T >(value));
 }
 
 template< class T >

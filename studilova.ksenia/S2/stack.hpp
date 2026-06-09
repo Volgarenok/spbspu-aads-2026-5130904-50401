@@ -39,7 +39,7 @@ void studilova::Stack< T >::push(const T& value)
 template< class T >
 void studilova::Stack< T >::push(T&& value)
 {
-  data_.pushBack(std::move(value));
+  data_.pushBack(std::forward< T >(value));
 }
 
 template< class T >
