@@ -23,10 +23,10 @@ namespace sedov
     bool removeTask(int id) noexcept;
     bool findTask(int id, Task & outTask) const noexcept;
     bool updateTask(const Task & task);
-    List< Task > getTasksOnDate(const std::string& date) const;
+    List< Task > getTasksOnDate(const std::string & date) const;
     List< Task > getTasksInRange(const std::string & fromDate, const std::string & toDate) const;
 
-    bool hasConflict(const Task& task, int excludeId = -1) const;
+    bool hasConflict(const Task & task, int excludeId = -1) const;
     void clear() noexcept;
   private:
       std::string name_;
