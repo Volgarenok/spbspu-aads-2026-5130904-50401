@@ -1,0 +1,52 @@
+#ifndef PROFILE_HPP
+#define PROFILE_HPP
+#include "avltree.hpp"
+#include "list.hpp"
+#include "task.hpp"
+#include "schedule.hpp"
+#include <string>
+
+namespace sedov
+{
+  class Profile
+  {
+  public:
+    Profile() noexcept;
+    explicit Profile(const std::string & name);
+
+    const std::string & getName() const noexcept;
+    size_t unplacedCount() const noexcept;
+
+    bool addSchedule(const std::string & schedName);
+    bool removeSchedule(const std::string & schedName);
+    bool findSchedule(const std::string & schedName, Schedule & outSched) const;
+    void getAllSchedules(List< Schedule > & outScheds) const;
+    bool scheduleExists(const std::string & schedName) const;
+
+    bool addTaskToSchedule(const std::string & schedName, const Task & task);
+    bool removeTaskFromSchedule(const std::string & schedName, int id);
+    bool findTaskInSchedule(const std::string & schedName, int id, Task & outTask) const;
+
+    void addToUnplaced(const Task & task);
+    bool removeFromUnplaced(int id);
+    void getAllUnplaced(List< Task > & outTasks) const;
+    Task* findUnplacedTask(int id);
+
+    void addToHistory(const HistoryEntry & entry);
+    void getRecentHistory(int limit, List< HistoryEntry > & outHistory) const;
+    bool updateSchedule(const std::string & schedName, const Schedule & sch);
+
+    int generateTaskId();
+    void setNextTaskId(int id) noexcept;
+    void clear() noexcept;
+
+  private:
+    std::string name_;
+    AVLTree< ScheduleKey, Schedule > schedules_;
+    List< Task > unplacedTasks_;
+    List< HistoryEntry > history_;
+    int nextTaskId_;
+  };
+}
+
+#endif
