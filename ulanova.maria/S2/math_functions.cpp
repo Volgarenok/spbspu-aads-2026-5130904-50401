@@ -1,4 +1,5 @@
 #include "math_functions.hpp"
+
 #include <climits>
 #include <stdexcept>
 

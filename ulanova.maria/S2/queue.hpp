@@ -2,6 +2,7 @@
 #define QUEUE_HPP
 
 #include <list.hpp>
+
 #include <stdexcept>
 #include <utility>
 

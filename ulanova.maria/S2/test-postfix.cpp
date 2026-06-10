@@ -1,4 +1,5 @@
 #include "postfix.hpp"
+
 #include "boost/test/unit_test.hpp"
 
 BOOST_AUTO_TEST_CASE(test_simple_postfix)

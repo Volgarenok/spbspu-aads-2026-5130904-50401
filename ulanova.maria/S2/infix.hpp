@@ -1,11 +1,12 @@
 #ifndef INFIX_HPP
 #define INFIX_HPP
 
-#include <string>
-#include <sstream>
 #include "stack.hpp"
 #include "math_functions.hpp"
 #include "queue.hpp"
+
+#include <string>
+#include <sstream>
 
 namespace ulanova
 {
