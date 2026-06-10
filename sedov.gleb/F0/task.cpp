@@ -221,4 +221,27 @@ namespace sedov
   {
     return name_ == h.name_;
   }
+
+  TaskIDKey::TaskIDKey() noexcept:
+    id_(0)
+  {}
+
+  TaskIDKey::TaskIDKey(int i) noexcept:
+    id_(i)
+  {}
+
+  int TaskIDKey::getId() const noexcept
+  {
+    return id_;
+  }
+
+  bool TaskIDKey::operator<(const TaskIDKey & h) const noexcept
+  {
+    return id_ < h.id_;
+  }
+
+  bool TaskIDKey::operator==(const TaskIDKey & h) const noexcept
+  {
+    return id_ == h.id_;
+  }
 }

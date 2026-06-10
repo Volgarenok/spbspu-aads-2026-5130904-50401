@@ -150,6 +150,17 @@ namespace sedov
   private:
     std::string name_;
   };
+
+  struct TaskIDKey {
+  public:
+    TaskIDKey() noexcept;
+    explicit TaskIDKey(int i) noexcept;
+    int getId() const noexcept;
+    bool operator<(const TaskIDKey & h) const noexcept;
+    bool operator==(const TaskIDKey & h) const noexcept;
+  private:
+    int id_;
+  };
 }
 
 #endif
