@@ -1,10 +1,10 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "stack.hpp"
-#include "queue.hpp"
 #include "math.hpp"
 #include "postfix.hpp"
+#include "queue.hpp"
+#include "stack.hpp"
 
 int main(int argc, char * argv[])
 {
@@ -28,7 +28,7 @@ int main(int argc, char * argv[])
     if (!line.empty()) {
       try {
         madieva::Queue< std::string > post = madieva::postfix(line);
-        evaluateExpression(post, res);
+        madieva::evaluateExpression(post, res);
       } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << "\n";
         return 1;

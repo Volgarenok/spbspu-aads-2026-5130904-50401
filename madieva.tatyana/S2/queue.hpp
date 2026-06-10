@@ -1,8 +1,8 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 #include <stdexcept>
-#include <list.hpp>
 #include <utility>
+#include <list.hpp>
 
 namespace madieva
 {
@@ -76,7 +76,7 @@ namespace madieva
   template< class T >
   bool Queue< T >::empty() const noexcept
   {
-    return data_.empty() == 0;
+    return data_.empty();
   }
 }
 

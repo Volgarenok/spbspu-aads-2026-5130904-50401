@@ -1,6 +1,6 @@
 #include "postfix.hpp"
-#include <string>
 #include <stdexcept>
+#include <string>
 
 #include "math.hpp"
 
@@ -31,7 +31,7 @@ namespace
 
 }
 
-madieva::Queue< std::string > madieva::postfix(std::string line)
+madieva::Queue< std::string > madieva::postfix(const std::string line)
 {
   madieva::Stack< std::string > op;
   madieva::Queue< std::string > post;

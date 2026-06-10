@@ -6,7 +6,7 @@
 
 namespace madieva
 {
-  Queue< std::string > postfix(std::string line);
+  Queue< std::string > postfix(const std::string line);
 }
 
 #endif
