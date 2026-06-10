@@ -35,7 +35,7 @@ namespace sedov
   class AVLIterator
   {
   public:
-    using valueType = std::pair<const Key, Value>;
+    using valueType = std::pair< const Key, Value >;
 
     explicit AVLIterator(AVLTreeNode< Key, Value > * node = nullptr);
     valueType operator*() const;

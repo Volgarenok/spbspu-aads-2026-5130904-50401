@@ -1,6 +1,11 @@
 #ifndef AVLTREE_HPP
 #define AVLTREE_HPP
 #include <iostream>
+#include <cstddef>
+#include <functional>
+#include <stdexcept>
+#include <utility>
+#include "avliterators.hpp"
 #include "avltreenode.hpp"
 #include "list.hpp"
 
@@ -54,7 +59,7 @@ namespace sedov
   private:
       AVLTreeNode< Key, Value > * root_;
       size_t size_;
-      Key comp_;
+      Compare comp_;
 
       AVLTreeNode< Key, Value > * clone(AVLTreeNode< Key, Value > * src, AVLTreeNode< Key, Value > * parent);
       void clearImpl(AVLTreeNode< Key, Value > * node) noexcept;
