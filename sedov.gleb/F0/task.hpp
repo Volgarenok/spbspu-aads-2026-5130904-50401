@@ -190,6 +190,22 @@ namespace sedov
     std::string completedAt_;
     std::string originalDate_;
   };
+
+  class TimeWindow
+  {
+  public:
+    TimeWindow() noexcept;
+    TimeWindow(const std::string & date, int startMin, int endMin) noexcept;
+    const std::string & getDate() const noexcept;
+    int getStartMinutes() const noexcept;
+    int getEndMinutes() const noexcept;
+    int getDurationMinutes() const noexcept;
+    std::string format() const;
+  private:
+    std::string date_;
+    int startMinutes_;
+    int endMinutes_;
+  };
 }
 
 #endif

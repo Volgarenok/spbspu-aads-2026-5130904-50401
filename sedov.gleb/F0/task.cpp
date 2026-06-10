@@ -294,4 +294,41 @@ namespace sedov
   {
     return originalDate_;
   }
+
+  TimeWindow::TimeWindow() noexcept:
+    startMinutes_(0),
+    endMinutes_(0)
+  {}
+
+  TimeWindow::TimeWindow(const std::string & date, int startMin, int endMin) noexcept:
+    date_(date),
+    startMinutes_(startMin),
+    endMinutes_(endMin)
+  {}
+
+  const std::string & TimeWindow::getDate() const noexcept
+  {
+    return date_;
+  }
+
+  int TimeWindow::getStartMinutes() const noexcept
+  {
+    return startMinutes_;
+  }
+
+  int TimeWindow::getEndMinutes() const noexcept
+  {
+    return endMinutes_;
+  }
+
+  int TimeWindow::getDurationMinutes() const noexcept
+  {
+    return endMinutes_ - startMinutes_;
+  }
+
+  std::string TimeWindow::format() const
+  {
+    return date_ + " " + formatTime(startMinutes_) + "-" + formatTime(endMinutes_) + " ("
+      + std::to_string(getDurationMinutes()) + " min)";
+  }
 }
