@@ -725,7 +725,7 @@ BOOST_AUTO_TEST_CASE(emplace_at_position_test)
 BOOST_AUTO_TEST_CASE(emplace_into_empty_list)
 {
   madieva::List< std::string > list;
-  
+
   list.emplace_back("first");
   list.emplace_front("second");
 
