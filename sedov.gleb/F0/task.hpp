@@ -81,6 +81,51 @@ namespace sedov
       return pad(totalMinutes / 60) + ":" + pad(totalMinutes % 60);
     }
   }
+
+  class Task
+  {
+  public:
+    Task() noexcept;
+    explicit Task(int id, const std::string & title, const std::string & date, const std::string & time_start,
+      const std::string & time_end, const std::string & importance, const std::string & schedule_name,
+      bool active = true);
+
+    int getId() const noexcept;
+    const std::string & getTitle() const noexcept;
+    const std::string & getDescription() const noexcept;
+    const std::string & getDate() const noexcept;
+    const std::string & getTimeStart() const noexcept;
+    const std::string & getTimeEnd() const noexcept;
+    const std::string & getImportance() const noexcept;
+    const std::string & getScheduleName() const noexcept;
+    bool isActive() const noexcept;
+
+    void setTitle(const std::string & title);
+    void setDescription(const std::string & description);
+    void setDate(const std::string & date);
+    void setTimeStart(const std::string & time);
+    void setTimeEnd(const std::string & time);
+    void setImportance(const std::string & importance);
+    void setScheduleName(const std::string & name);
+    void setActive(bool active) noexcept;
+
+    int getDurationMinutes() const noexcept;
+    bool overlapsWith(const Task& other) const noexcept;
+    int getImportanceValue() const noexcept;
+    std::string makeDatetimeKey() const;
+    void validate() const;
+
+  private:
+    int id_;
+    std::string title_;
+    std::string description_;
+    std::string date_;
+    std::string time_start_;
+    std::string time_end_;
+    std::string importance_;
+    std::string schedule_name_;
+    bool active_;
+  };
 }
 
 #endif
