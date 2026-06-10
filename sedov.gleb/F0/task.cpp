@@ -244,4 +244,18 @@ namespace sedov
   {
     return id_ == h.id_;
   }
+
+  DateTimeKey::DateTimeKey(const std::string & dt):
+    datetime_(dt)
+  {}
+
+  const std::string & DateTimeKey::getDatetime() const noexcept
+  {
+    return datetime_;
+  }
+
+  bool operator<(const DateTimeKey & a, const DateTimeKey & b) noexcept
+  { 
+    return a.getDatetime() < b.getDatetime(); 
+  }
 }

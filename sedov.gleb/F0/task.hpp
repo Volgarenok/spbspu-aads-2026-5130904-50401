@@ -139,7 +139,8 @@ namespace sedov
     std::string name_;
   };
 
-  struct ScheduleKey {
+  struct ScheduleKey
+  {
   public:
     ScheduleKey() = default;
     explicit ScheduleKey(const std::string & n);
@@ -151,7 +152,8 @@ namespace sedov
     std::string name_;
   };
 
-  struct TaskIDKey {
+  struct TaskIDKey
+  {
   public:
     TaskIDKey() noexcept;
     explicit TaskIDKey(int i) noexcept;
@@ -161,6 +163,17 @@ namespace sedov
   private:
     int id_;
   };
+
+  struct DateTimeKey
+  {
+  public:
+    DateTimeKey() = default;
+    explicit DateTimeKey(const std::string & dt);
+    const std::string & getDatetime() const noexcept;
+  private:
+    std::string datetime_;
+  };
+  bool operator<(const DateTimeKey & a, const DateTimeKey & b) noexcept;
 }
 
 #endif
