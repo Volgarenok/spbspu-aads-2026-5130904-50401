@@ -335,21 +335,12 @@ namespace ulanova
     {
       return;
     }
-    if (head_->next == head_)
-    {
-      delete head_;
-      head_ = nullptr;
-      return;
-    }
     detail::Node< T >* last = head_;
     while (last->next != head_)
     {
       last = last->next;
     }
-    detail::Node< T >* temp = head_;
-    head_ = head_->next;
-    last->next = head_;
-    delete temp;
+    erase_after(LIter< T >(last, head_));
   }
 
   template < class T >
@@ -396,9 +387,7 @@ namespace ulanova
   template< class T >
   void ulanova::List< T >::swap(List< T >& other) noexcept
   {
-    detail::Node< T >* temp = head_;
-    head_ = other.head_;
-    other.head_ = temp;
+    std::swap(head_, other.head_);
   }
 
   template < class T >
