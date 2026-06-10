@@ -57,7 +57,7 @@ namespace ulanova
     List() noexcept;
     List(const List& other);
     List(List&& other) noexcept;
-    ~List();
+    ~List() noexcept;
 
     List& operator=(const List& other);
     List& operator=(List&& other) noexcept;
@@ -81,7 +81,7 @@ namespace ulanova
     LCIter< T > cbegin() const noexcept;
     LCIter< T > cend() const noexcept;
 
-    void clear();
+    void clear() noexcept;
     void swap(List< T >& other) noexcept;
 
     T& front();
@@ -218,13 +218,11 @@ namespace ulanova
 
   template< class T >
   List< T >::List(List< T >&& other) noexcept:
-    head_(other.head_)
-  {
-    other.head_ = nullptr;
-  }
+    head_(std::exchange(other.head_, nullptr))
+  {}
 
   template< class T >
-  List< T >::~List()
+  List< T >::~List() noexcept
   {
     clear();
   }
@@ -255,7 +253,7 @@ namespace ulanova
   template < class T >
   void List< T >::push_front(const T& value)
   {
-    detail::Node< T >* new_node = new detail::Node< T >{value,nullptr};
+    detail::Node< T >* new_node = new detail::Node< T >{value, nullptr};
     if (!head_)
     {
       head_ = new_node;
@@ -275,7 +273,7 @@ namespace ulanova
   template< class T >
   void List< T >::push_front(T&& value)
   {
-    detail::Node< T >* new_node = new detail::Node< T >{std::move(value), nullptr};
+    detail::Node< T >* new_node = new detail::Node< T >{std::forward< T >(value), nullptr};
     if (!head_)
     {
       head_ = new_node;
@@ -387,7 +385,7 @@ namespace ulanova
   }
 
   template < class T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (head_)
     {
