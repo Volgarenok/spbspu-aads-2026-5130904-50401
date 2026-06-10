@@ -1,9 +1,9 @@
 #ifndef POSTFIX_HPP
 #define POSTFIX_HPP
 
-#include "queue.hpp"
-
 #include <string>
+
+#include "queue.hpp"
 
 namespace ulanova
 {

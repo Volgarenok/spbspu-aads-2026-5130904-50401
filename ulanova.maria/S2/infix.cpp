@@ -1,8 +1,9 @@
 #include "infix.hpp"
-#include "stack.hpp"
 
-#include <sstream>
+#include <stdexcept>
 #include <string>
+
+#include "stack.hpp"
 
 namespace
 {
@@ -25,55 +26,74 @@ namespace
 }
 ulanova::Queue< std::string > ulanova::infix_to_postfix(const std::string& expr)
 {
-  Stack< char > ops;
+  Stack< std::string > ops;
   Queue<std::string> output;
 
-  std::stringstream s(expr);
-  std::string token;
+  size_t pos = 0;
+  while (pos < expr.size())
+  {
+    while (pos < expr.size() && expr[pos] == ' ')
+    {
+      ++pos;
+    }
 
-  while (s >> token)
-  {
-  if (!isOperator(token[0]) && token != "(" && token != ")")
-  {
+    if (pos == expr.size())
+    {
+      break;
+    }
+
+    size_t end = pos;
+    while (end < expr.size() && expr[end] != ' ')
+    {
+      ++end;
+    }
+
+    std::string token = expr.substr(pos, end - pos);
+
+    if (!isOperator(token[0]) && token != "(" && token != ")")
+    {
       output.push(token);
-  }
-  else if (token == "(")
-  {
-      ops.push('(');
-  }
-  else if (token == ")")
-  {
-      while (!ops.empty() && ops.front() != '(')
+    }
+    else if (token == "(")
+    {
+      ops.push(token);
+    }
+    else if (token == ")")
+    {
+      while (!ops.empty() && ops.front() != "(")
       {
-      output.push(std::string(1, ops.front()));
-      ops.pop();
+        output.push(ops.front());
+        ops.pop();
       }
       if (ops.empty())
       {
         throw std::runtime_error("incorrect expression");
       }
       ops.pop();
-  }
-  else
-  {
-      char op = token[0];
-      while (!ops.empty() && priority(ops.front()) >= priority(op))
+    }
+    else
+    {
+      std::string op = token;
+      while (!ops.empty() && ops.front() != "(" && priority(ops.front()[0]) >= priority(op[0]))
       {
-        output.push(std::string(1, ops.front()));
+        output.push(ops.front());
         ops.pop();
       }
       ops.push(op);
+    }
+
+    pos = end;
   }
-  }
+
   while (!ops.empty())
   {
-    if (ops.front() == '(')
+    if (ops.front() == "(")
     {
       throw std::runtime_error("incorrect expression");
     }
-
-    output.push(std::string(1, ops.front()));
+    output.push(ops.front());
     ops.pop();
   }
+
   return output;
 }

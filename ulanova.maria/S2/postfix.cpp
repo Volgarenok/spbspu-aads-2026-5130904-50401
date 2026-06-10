@@ -1,10 +1,11 @@
 #include "postfix.hpp"
-#include "math_functions.hpp"
-#include "stack.hpp"
 
 #include <sstream>
 #include <string>
 #include <stdexcept>
+
+#include "math_functions.hpp"
+#include "stack.hpp"
 
 namespace
 {

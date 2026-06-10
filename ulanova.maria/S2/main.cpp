@@ -1,9 +1,9 @@
-#include "infix.hpp"
-#include "postfix.hpp"
-
 #include <iostream>
 #include <string>
 #include <fstream>
+
+#include "infix.hpp"
+#include "postfix.hpp"
 
 int main(int argc, char* argv[])
 {

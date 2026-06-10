@@ -1,10 +1,10 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 
-#include <list.hpp>
-
 #include <stdexcept>
 #include <utility>
+
+#include <list.hpp>
 
 namespace ulanova
 {

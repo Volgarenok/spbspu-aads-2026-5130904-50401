@@ -6,7 +6,6 @@
 #include "queue.hpp"
 
 #include <string>
-#include <sstream>
 
 namespace ulanova
 {
