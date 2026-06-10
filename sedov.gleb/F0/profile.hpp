@@ -32,8 +32,6 @@ namespace sedov
     void getAllUnplaced(List< Task > & outTasks) const;
     Task* findUnplacedTask(int id);
 
-    void addToHistory(const HistoryEntry & entry);
-    void getRecentHistory(int limit, List< HistoryEntry > & outHistory) const;
     bool updateSchedule(const std::string & schedName, const Schedule & sch);
 
     int generateTaskId();
@@ -44,7 +42,6 @@ namespace sedov
     std::string name_;
     AVLTree< ScheduleKey, Schedule > schedules_;
     List< Task > unplacedTasks_;
-    List< HistoryEntry > history_;
     int nextTaskId_;
   };
 }

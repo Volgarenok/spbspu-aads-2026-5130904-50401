@@ -175,22 +175,6 @@ namespace sedov
   };
   bool operator<(const DateTimeKey & a, const DateTimeKey & b) noexcept;
 
-  class HistoryEntry
-  {
-  public:
-    HistoryEntry();
-    HistoryEntry(int id, const std::string & title, const std::string & date, const std::string & time);
-    int getTaskId() const noexcept;
-    const std::string & getTitle() const noexcept;
-    const std::string & getCompletedAt() const noexcept;
-    const std::string & getOriginalDate() const noexcept;
-  private:
-    int taskId_;
-    std::string title_;
-    std::string completedAt_;
-    std::string originalDate_;
-  };
-
   class TimeWindow
   {
   public:
