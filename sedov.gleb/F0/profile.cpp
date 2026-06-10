@@ -147,4 +147,31 @@ namespace sedov
     }
     return nullptr;
   }
+
+  bool Profile::updateSchedule(const std::string & scheduleName, const Schedule & sch)
+  {
+    if (!scheduleExists(scheduleName))
+    {
+      return false;
+    }
+    schedules_.insert(ScheduleKey{scheduleName}, sch);
+    return true;
+  }
+
+  int Profile::generateTaskId()
+  {
+    return nextTaskId_++;
+  }
+
+  void Profile::setNextTaskId(int id) noexcept
+  {
+    nextTaskId_ = id;
+  }
+
+  void Profile::clear() noexcept
+  {
+    schedules_.clear();
+    unplacedTasks_.clear();
+    nextTaskId_ = 1;
+  }
 }
