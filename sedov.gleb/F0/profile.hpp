@@ -30,7 +30,7 @@ namespace sedov
     void addToUnplaced(const Task & task);
     bool removeFromUnplaced(int id);
     void getAllUnplaced(List< Task > & outTasks) const;
-    Task* findUnplacedTask(int id);
+    Task * findUnplacedTask(int id);
 
     bool updateSchedule(const std::string & schedName, const Schedule & sch);
 

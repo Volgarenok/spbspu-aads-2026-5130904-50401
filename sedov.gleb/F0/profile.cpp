@@ -112,4 +112,39 @@ namespace sedov
     }
     return sch.findTask(id, outTask);
   }
+
+  void Profile::addToUnplaced(const Task & task)
+  {
+    unplacedTasks_.pushBack(task);
+  }
+
+  bool Profile::removeFromUnplaced(int id)
+  {
+    for (auto it = unplacedTasks_.begin(); it != unplacedTasks_.end(); ++it)
+    {
+      if ((*it).getId() == id)
+      {
+        unplacedTasks_.erase(it);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void Profile::getAllUnplaced(List< Task > & outTasks) const
+  {
+    outTasks = unplacedTasks_;
+  }
+
+  Task * Profile::findUnplacedTask(int id)
+  {
+    for (auto it = unplacedTasks_.begin(); it != unplacedTasks_.end(); ++it)
+    {
+      if ((*it).getId() == id)
+      {
+        return &(*it);
+      }
+    }
+    return nullptr;
+  }
 }
