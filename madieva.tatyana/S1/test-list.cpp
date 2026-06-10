@@ -664,11 +664,11 @@ BOOST_AUTO_TEST_CASE(partition_by_predicate)
 BOOST_AUTO_TEST_CASE(emplace_back_test)
 {
   madieva::List< std::pair< int, std::string > > list;
-  
+
   list.emplace_back(1, "one");
   list.emplace_back(2, "two");
   list.emplace_back(3, "three");
-  
+
   madieva::LIter< std::pair< int, std::string > > it = list.begin();
   BOOST_CHECK(it->first == 1);
   BOOST_CHECK(it->second == "one");
@@ -685,11 +685,11 @@ BOOST_AUTO_TEST_CASE(emplace_back_test)
 BOOST_AUTO_TEST_CASE(emplace_front_test)
 {
   madieva::List< std::pair< int, std::string > > list;
-  
+
   list.emplace_front(1, "one");
   list.emplace_front(2, "two");
   list.emplace_front(3, "three");
-  
+
   madieva::LIter< std::pair< int, std::string > > it = list.begin();
   BOOST_CHECK(it->first == 3);
   BOOST_CHECK(it->second == "three");
@@ -707,11 +707,11 @@ BOOST_AUTO_TEST_CASE(emplace_at_position_test)
   list.pushBack(1);
   list.pushBack(3);
   list.pushBack(4);
-  
+
   madieva::LIter< int > it = list.begin();
   ++it;
   list.emplace(it, 2);
-  
+
   madieva::LIter< int > check = list.begin();
   BOOST_CHECK(*check == 1);
   ++check;
@@ -728,7 +728,7 @@ BOOST_AUTO_TEST_CASE(emplace_into_empty_list)
   
   list.emplace_back("first");
   list.emplace_front("second");
-  
+
   madieva::LIter< std::string > it = list.begin();
   BOOST_CHECK(*it == "second");
   ++it;

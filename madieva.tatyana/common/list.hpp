@@ -501,7 +501,7 @@ namespace madieva {
     if (pos == end()) {
       return emplace_back(std::forward< Args >(args)...);
     }
-    
+
     if (pos == begin()) {
       return emplace_front(std::forward< Args >(args)...);
     }

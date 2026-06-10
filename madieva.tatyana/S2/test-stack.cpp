@@ -163,11 +163,11 @@ BOOST_AUTO_TEST_CASE(assignment_operator)
 BOOST_AUTO_TEST_CASE(stack_emplace_test)
 {
   madieva::Stack< std::pair<int, double> > stack;
-  
+
   stack.emplace(1, 1.5);
   stack.emplace(2, 2.5);
   stack.emplace(3, 3.5);
-  
+
   BOOST_CHECK(stack.top().first == 3);
   BOOST_CHECK(stack.top().second == 3.5);
   stack.pop();

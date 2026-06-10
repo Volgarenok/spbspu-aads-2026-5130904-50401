@@ -163,11 +163,11 @@ BOOST_AUTO_TEST_CASE(assignment_operator)
 BOOST_AUTO_TEST_CASE(queue_emplace_test)
 {
   madieva::Queue< std::pair<int, char> > queue;
-  
+
   queue.emplace(1, 'a');
   queue.emplace(2, 'b');
   queue.emplace(3, 'c');
-  
+
   BOOST_CHECK(queue.front().first == 1);
   BOOST_CHECK(queue.front().second == 'a');
   queue.pop();
