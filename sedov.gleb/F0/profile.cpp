@@ -73,4 +73,43 @@ namespace sedov
   {
     return schedules_.contains(ScheduleKey{schedName});
   }
+
+  bool Profile::addTaskToSchedule(const std::string & scheduleName, const Task & task)
+  {
+    ScheduleKey key{scheduleName};
+    Schedule sch;
+    if (!schedules_.find(key, sch))
+    {
+      return false;
+    }
+    sch.addTask(task);
+    schedules_.insert(key, sch);
+    return true;
+  }
+
+  bool Profile::removeTaskFromSchedule(const std::string & scheduleName, int id)
+  {
+    ScheduleKey key{scheduleName};
+    Schedule sch;
+    if (!schedules_.find(key, sch))
+    {
+      return false;
+    }
+    if (!sch.removeTask(id))
+    {
+      return false;
+    }
+    schedules_.insert(key, sch);
+    return true;
+  }
+
+  bool Profile::findTaskInSchedule(const std::string & scheduleName, int id, Task & outTask) const
+  {
+    Schedule sch;
+    if (!schedules_.find(ScheduleKey{scheduleName}, sch))
+    {
+      return false;
+    }
+    return sch.findTask(id, outTask);
+  }
 }
