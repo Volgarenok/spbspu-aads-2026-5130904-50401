@@ -58,7 +58,7 @@ namespace madieva
   template< class T >
   size_t Queue< T >::size() const noexcept
   {
-    return data_.getSize();
+    return data_.size();
   }
 
   template< class T >
@@ -76,7 +76,7 @@ namespace madieva
   template< class T >
   bool Queue< T >::empty() const noexcept
   {
-    return data_.getSize() == 0;
+    return data_.empty() == 0;
   }
 }
 

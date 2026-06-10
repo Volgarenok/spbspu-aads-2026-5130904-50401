@@ -59,7 +59,7 @@ namespace madieva {
   template< class T >
   size_t Stack< T >::size() const noexcept
   {
-    return data_.getSize();
+    return data_.size();
   }
 
   template< class T >
@@ -77,7 +77,7 @@ namespace madieva {
   template< class T >
   bool Stack< T >::empty() const noexcept
   {
-    return data_.getSize() == 0;
+    return data_.size() == 0;
   }
 }
 
