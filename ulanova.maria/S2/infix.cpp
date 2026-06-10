@@ -1,10 +1,28 @@
 #include "infix.hpp"
-#include "math_functions.hpp"
 #include "stack.hpp"
 
 #include <sstream>
 #include <string>
 
+namespace
+{
+  bool isOperator(char c)
+  {
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '^';
+  }
+  int priority(char op)
+  {
+    if (op == '+' || op == '-' || op == '^')
+    {
+      return 1;
+    }
+    if (op == '*' || op == '/' || op == '%')
+    {
+      return 2;
+    }
+    return 0;
+  }
+}
 ulanova::Queue< std::string > ulanova::infix_to_postfix(const std::string& expr)
 {
   Stack< char > ops;
@@ -15,7 +33,7 @@ ulanova::Queue< std::string > ulanova::infix_to_postfix(const std::string& expr)
 
   while (s >> token)
   {
-  if (!is_operator(token[0]) && token != "(" && token != ")")
+  if (!isOperator(token[0]) && token != "(" && token != ")")
   {
       output.push(token);
   }

@@ -6,6 +6,14 @@
 #include <string>
 #include <stdexcept>
 
+namespace
+{
+  bool isOperator(char c)
+  {
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '^';
+  }
+}
+
 long long ulanova::postfix(Queue< std::string >& expr)
 {
   Stack< long long > stack;
@@ -15,7 +23,7 @@ long long ulanova::postfix(Queue< std::string >& expr)
     std::string token = expr.front();
     expr.pop();
 
-    if (token.size() == 1 && is_operator(token[0]))
+    if (token.size() == 1 && isOperator(token[0]))
     {
       long long b = stack.front();
       stack.pop();
