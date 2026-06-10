@@ -21,4 +21,24 @@ namespace sedov
   {
     return tasksById_.size();
   }
+
+  int Schedule::getNextId() const noexcept
+  {
+    return nextId_;
+  }
+
+  void Schedule::setNextId(int id) noexcept
+  {
+    nextId_ = id;
+  }
+
+  void Schedule::addToIndex(const Task & task)
+  {
+    tasksByDatetime_.insert(DateTimeKey(task.makeDatetimeKey()), task);
+  }
+
+  void Schedule::removeFromIndex(const Task & task)
+  {
+    tasksByDatetime_.erase(DateTimeKey(task.makeDatetimeKey()));
+  }
 }
