@@ -4,7 +4,7 @@
 
 namespace sedov
 {
-  namespace detail
+  namespace
   {
     std::string pad(int val)
     {
@@ -86,9 +86,8 @@ namespace sedov
   {
   public:
     Task() noexcept;
-    explicit Task(int id, const std::string & title, const std::string & date, const std::string & time_start,
-      const std::string & time_end, const std::string & importance, const std::string & schedule_name,
-      bool active = true);
+    explicit Task(int id, const std::string & title, const std::string & date, const std::string & timeStart,
+      const std::string & timeEnd, const std::string & imp, const std::string & scheduleName, bool active = true);
 
     int getId() const noexcept;
     const std::string & getTitle() const noexcept;
@@ -101,16 +100,16 @@ namespace sedov
     bool isActive() const noexcept;
 
     void setTitle(const std::string & title);
-    void setDescription(const std::string & description);
+    void setDescription(const std::string & desc);
     void setDate(const std::string & date);
     void setTimeStart(const std::string & time);
     void setTimeEnd(const std::string & time);
-    void setImportance(const std::string & importance);
+    void setImportance(const std::string & imp);
     void setScheduleName(const std::string & name);
     void setActive(bool active) noexcept;
 
     int getDurationMinutes() const noexcept;
-    bool overlapsWith(const Task& other) const noexcept;
+    bool overlapsWith(const Task & h) const noexcept;
     int getImportanceValue() const noexcept;
     std::string makeDatetimeKey() const;
     void validate() const;
@@ -120,10 +119,10 @@ namespace sedov
     std::string title_;
     std::string description_;
     std::string date_;
-    std::string time_start_;
-    std::string time_end_;
+    std::string timeStart_;
+    std::string timeEnd_;
     std::string importance_;
-    std::string schedule_name_;
+    std::string scheduleName_;
     bool active_;
   };
 }
