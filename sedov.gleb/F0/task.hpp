@@ -125,6 +125,19 @@ namespace sedov
     std::string scheduleName_;
     bool active_;
   };
+
+  struct ProfileKey
+  {
+  public:
+    ProfileKey() = default;
+    explicit ProfileKey(const std::string & n);
+    explicit ProfileKey(const char * n);
+    const std::string & getName() const noexcept;
+    bool operator<(const ProfileKey & h) const noexcept;
+    bool operator==(const ProfileKey & h) const noexcept;
+  private:
+    std::string name_;
+  };
 }
 
 #endif

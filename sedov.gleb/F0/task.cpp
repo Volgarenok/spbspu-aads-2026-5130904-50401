@@ -175,4 +175,27 @@ namespace sedov
       throw std::invalid_argument("Invalid importance: " + importance_);
     }
   }
+
+  ProfileKey::ProfileKey(const std::string & n):
+    name_(n)
+  {}
+
+  ProfileKey::ProfileKey(const char * n):
+    name_(n ? n : "")
+  {}
+
+  const std::string & ProfileKey::getName() const noexcept
+  {
+    return name_;
+  }
+
+  bool ProfileKey::operator<(const ProfileKey & h) const noexcept
+  {
+    return name_ < h.name_;
+  }
+
+  bool ProfileKey::operator==(const ProfileKey & h) const noexcept
+  {
+    return name_ == h.name_;
+  }
 }
