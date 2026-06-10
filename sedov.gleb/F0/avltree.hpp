@@ -524,6 +524,129 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
+  std::pair< AVLTreeNode< Key, Value > *, bool > 
+    AVLTree< Key, Value, Compare >::insertNode(AVLTreeNode< Key, Value > * node, const Key & k, const Value & v)
+  {
+    if (!node)
+    {
+      ++size_;
+      return std::make_pair(new AVLTreeNode< Key, Value >(k, v, nullptr), true);
+    }
+    if (comp_(k, node->key_))
+    {
+      auto res = insertNode(node->left_, k, v);
+      node->left_ = res.first;
+      if (node->left_)
+      {
+        node->left_->parent_ = node;
+      }
+    }
+    else if (comp_(node->key_, k))
+    {
+      auto res = insertNode(node->right_, k, v);
+      node->right_ = res.first;
+      if (node->right_)
+      {
+        node->right_->parent_ = node;
+      }
+    }
+    else
+    {
+      node->value_ = v;
+      return std::make_pair(node, false);
+    }
+    return std::make_pair(balanceNode(node), true);
+  }
+
+  template < class Key, class Value, class Compare >
+  std::pair< AVLTreeNode< Key, Value > *, bool>
+    AVLTree< Key, Value, Compare >::insertNode(AVLTreeNode< Key, Value > * node, Key && k, Value && v)
+  {
+    if (!node)
+    {
+      ++size_;
+      return std::make_pair(new AVLTreeNode< Key, Value >(std::move(k), std::move(v), nullptr), true);
+    }
+    if (comp_(k, node->key_))
+    {
+      auto res = insertNode(node->left_, std::move(k), std::move(v));
+      node->left_ = res.first;
+      if (node->left_)
+      {
+        node->left_->parent_ = node;
+      }
+    }
+    else if (comp_(node->key_, k))
+    {
+      auto res = insertNode(node->right_, std::move(k), std::move(v));
+      node->right_ = res.first;
+      if (node->right_)
+      {
+        node->right_->parent_ = node;
+      }
+    }
+    else
+    {
+      node->value_ = std::move(v);
+      return std::make_pair(node, false);
+    }
+    return std::make_pair(balanceNode(node), true);
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::removeNode( AVLTreeNode< Key, Value > * node,
+    const Key & k, bool & found) noexcept
+  {
+    if (!node)
+    {
+      return nullptr;
+    }
+
+    if (comp_(k, node->key_))
+    {
+      node->left_ = removeNode(node->left_, k, found);
+      if (node->left_)
+      {
+        node->left_->parent_ = node;
+      }
+    }
+    else if (comp_(node->key_, k))
+    {
+      node->right_ = removeNode(node->right_, k, found);
+      if (node->right_)
+      {
+        node->right_->parent_ = node;
+      }
+    }
+    else
+    {
+      found = true;
+      if (!node->left_ || !node->right_)
+      {
+        AVLTreeNode< Key, Value > * child = node->left_ ? node->left_ : node->right_;
+        if (child)
+        {
+          child->parent_ = node->parent_;
+        }
+        delete node;
+        return child;
+      }
+      else
+      {
+        AVLTreeNode< Key, Value > * succ = fallLeft(node->right_);
+        node->key_ = succ->key_;      // Прямое присваивание (Key не const в узле)
+        node->value_ = std::move(succ->value_);
+        node->right_ = removeNode(node->right_, succ->key_, found);
+        if (node->right_)
+        {
+          node->right_->parent_ = node;
+        }
+      }
+    }
+    return balanceNode(node);
+  }
+
+  template < class Key, class Value, class Compare >
   const AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::findNode(const Key & k) const noexcept
   {
     AVLTreeNode< Key, Value > * cur = root_;
