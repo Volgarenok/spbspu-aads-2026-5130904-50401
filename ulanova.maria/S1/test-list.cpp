@@ -355,3 +355,42 @@ BOOST_AUTO_TEST_CASE(splice_after_one_test)
   ++second_it;
   BOOST_CHECK(second_it == second.end());
 }
+
+BOOST_AUTO_TEST_CASE(splice_after_range_test)
+{
+  ulanova::List< int > first;
+  first.push_back(1);
+  first.push_back(5);
+
+  ulanova::List< int > second;
+  second.push_back(2);
+  second.push_back(3);
+  second.push_back(4);
+  second.push_back(6);
+
+  ulanova::LIter< int > before_first = second.begin();
+  ulanova::LIter< int > before_last = second.begin();
+  ++before_last;
+  ++before_last;
+  ++before_last;
+
+  first.splice_after(first.begin(), second, before_first, before_last);
+
+  ulanova::LIter< int > first_it = first.begin();
+  BOOST_CHECK(*first_it == 1);
+  ++first_it;
+  BOOST_CHECK(*first_it == 3);
+  ++first_it;
+  BOOST_CHECK(*first_it == 4);
+  ++first_it;
+  BOOST_CHECK(*first_it == 5);
+  ++first_it;
+  BOOST_CHECK(first_it == first.end());
+
+  ulanova::LIter< int > second_it = second.begin();
+  BOOST_CHECK(*second_it == 2);
+  ++second_it;
+  BOOST_CHECK(*second_it == 6);
+  ++second_it;
+  BOOST_CHECK(second_it == second.end());
+}

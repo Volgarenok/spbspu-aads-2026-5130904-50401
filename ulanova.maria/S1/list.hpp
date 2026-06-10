@@ -88,6 +88,7 @@ namespace ulanova
 
     void splice_after(LIter< T > pos, List< T >& other) noexcept;
     void splice_after(LIter< T > pos, List< T >& other, LIter< T > before) noexcept;
+    void splice_after(LIter< T > pos, List< T >& other, LIter< T > before_first, LIter< T > before_last) noexcept;
   private:
     detail::Node< T >* head_;
   };
@@ -499,5 +500,15 @@ namespace ulanova
 
     moved->next = pos.node_->next;
     pos.node_->next = moved;
+  }
+
+  template< class T >
+  void List< T >::splice_after(LIter< T > pos, List< T >& other, LIter< T > before_first, LIter< T > before_last) noexcept
+  {
+    while (before_first.node_ && before_first.node_->next != before_last.node_)
+    {
+      splice_after(pos, other, before_first);
+      ++pos;
+    }
   }
 }
