@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include <string>
+#include <stdexcept>
 
 long long ulanova::postfix(Queue< std::string >& expr)
 {
@@ -29,7 +30,16 @@ long long ulanova::postfix(Queue< std::string >& expr)
       stack.push(std::stoll(token));
     }
   }
+  if (stack.empty())
+  {
+    throw std::runtime_error("incorrect expression");
+  }
   long long result = stack.front();
   stack.pop();
+  if (!stack.empty())
+  {
+    throw std::runtime_error("incorrect expression");
+  }
+
   return result;
 }

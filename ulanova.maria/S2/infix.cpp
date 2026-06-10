@@ -7,7 +7,7 @@
 
 ulanova::Queue< std::string > ulanova::infix_to_postfix(const std::string& expr)
 {
-  Stack<char> ops;
+  Stack< char > ops;
   Queue<std::string> output;
 
   std::stringstream s(expr);
