@@ -22,7 +22,6 @@ ulanova::List< ulanova::Sequence > ulanova::read_sequences(std::istream& in)
       {
         continue;
       }
-    }
 
       size_t value = 0;
       in >> value;
