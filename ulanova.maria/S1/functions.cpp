@@ -15,32 +15,21 @@ ulanova::List< ulanova::Sequence > ulanova::read_sequences(std::istream& in)
     ulanova::Sequence seq;
     seq.name = name;
 
-    while (in && in.peek() != '\n' && in.peek() != EOF)
+    char separator = '\0';
+    while (in.get(separator) && separator != '\n')
     {
-      size_t value = 0;
-      if (in >> value)
+      if (separator == '\r')
       {
-        seq.values.push_back(value);
+        continue;
       }
-      else
-      {
-        in.clear();
-        in.ignore();
-      }
-    }
 
-    if (in.peek() == '\r')
-    {
-      in.ignore();
-    }
-    if (in.peek() == '\n')
-    {
-      in.ignore();
+      size_t value = 0;
+      in >> value;
+      seq.values.push_back(value);
     }
 
     sequences.push_back(seq);
   }
-
   return sequences;
 }
 
