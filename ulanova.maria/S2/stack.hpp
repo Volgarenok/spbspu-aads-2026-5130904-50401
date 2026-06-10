@@ -29,15 +29,12 @@ namespace ulanova
   template< class T >
   void Stack< T >::push(T&& value)
   {
-    list_.push_front(std::move(value));
+    list_.push_front(std::forward< T >(value));
   }
   template < class T >
   void Stack< T >::clear()
   {
-    while (!empty())
-    {
-      pop();
-    }
+    list_.clear();
   }
   template < class T >
   void Stack< T >::pop()

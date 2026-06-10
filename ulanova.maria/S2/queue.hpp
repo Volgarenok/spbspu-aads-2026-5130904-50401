@@ -30,15 +30,12 @@ namespace ulanova
   template < class T >
   void Queue< T >::push(T&& value)
   {
-    list_.push_back(std::move(value));
+    list_.push_back(std::forward< T >(value));
   }
   template < class T >
   void Queue< T >:: clear()
   {
-    while (!empty())
-    {
-      pop();
-    }
+    list_.clear();
   }
   template< class T >
   T& Queue< T >::front()
