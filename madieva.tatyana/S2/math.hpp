@@ -12,7 +12,13 @@ namespace madieva {
 
   bool isOperator(const std::string& token);
   long long computeGcd(long long a, long long b);
-  long long calculateOperation(const std::string & op, madieva::Stack< long long > & temp);
+  long long add(long long left, long long right);
+  long long subtract(long long left, long long right);
+  long long multiply(long long left, long long right);
+  long long divide(long long left, long long right);
+  long long modulo(long long left, long long right);
+
+  long long calculateOperation(const std::string & op,  long long left, long long right);
   void evaluateExpression(madieva::Queue< std::string > & post, madieva::Stack< long long > & res);
 
 }

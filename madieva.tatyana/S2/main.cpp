@@ -11,8 +11,12 @@ namespace madieva
   {
     int getPriority(const std::string & op)
     {
-      if (op == "+" || op == "-") return 1;
-      if (op == "*" || op == "/" || op == "%" || op == "gcd") return 2;
+      if (op == "+" || op == "-") {
+        return 1;
+      }
+      if (op == "*" || op == "/" || op == "%" || op == "gcd") {
+        return 2;
+      }
       return 0;
     }
 
@@ -22,8 +26,8 @@ namespace madieva
       int prior = getPriority(s);
 
       while (!op.empty() && op.top() != "(" && getPriority(op.top()) >= prior) {
-          post.push(op.top());
-          op.pop();
+        post.push(op.top());
+        op.pop();
       }
       op.push(s);
     }

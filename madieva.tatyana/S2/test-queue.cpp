@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(clear_empty_queue)
 
 BOOST_AUTO_TEST_CASE(size_after_operations)
 {
-  madieva::Queue<int> q;
+  madieva::Queue< int > q;
   BOOST_CHECK(q.size() == 0);
   q.push(10);
   BOOST_CHECK(q.size() == 1);
@@ -126,9 +126,9 @@ BOOST_AUTO_TEST_CASE(size_after_operations)
 
 BOOST_AUTO_TEST_CASE(empty_on_const_queue)
 {
-  madieva::Queue<int> q;
+  madieva::Queue< int > q;
   q.push(1);
-  const madieva::Queue<int>& cq = q;
+  const madieva::Queue< int >& cq = q;
   BOOST_CHECK(!cq.empty());
   BOOST_CHECK(q.front() == 1);
   BOOST_CHECK(cq.front() == 1);
@@ -136,10 +136,10 @@ BOOST_AUTO_TEST_CASE(empty_on_const_queue)
 
 BOOST_AUTO_TEST_CASE(copy_constructor)
 {
-  madieva::Queue<int> q1;
+  madieva::Queue< int > q1;
   q1.push(1);
   q1.push(2);
-  madieva::Queue<int> q2(q1);
+  madieva::Queue< int > q2(q1);
   BOOST_CHECK(q2.size() == 2);
   BOOST_CHECK(q2.front() == 1);
   q2.pop();
@@ -149,10 +149,10 @@ BOOST_AUTO_TEST_CASE(copy_constructor)
 
 BOOST_AUTO_TEST_CASE(assignment_operator)
 {
-  madieva::Queue<int> q1;
+  madieva::Queue< int > q1;
   q1.push(1);
   q1.push(2);
-  madieva::Queue<int> q2;
+  madieva::Queue< int > q2;
   q2 = q1;
   BOOST_CHECK(q2.size() == 2);
   BOOST_CHECK(q2.front() == 1);

@@ -1,7 +1,8 @@
-#ifndef STAC_HPP
-#define STAC_HPP
+#ifndef STACK_HPP
+#define STACK_HPP
 #include <stdexcept>
-#include "list.hpp"
+#include <utility>
+#include <list.hpp>
 namespace madieva {
   template< class T >
   class Stack {
@@ -28,7 +29,7 @@ namespace madieva {
   template< class T >
   void Stack< T >::push(T && val)
   {
-    data_.pushBack(std::move(val));
+    data_.pushBack(std::forward< T >(val));
   }
 
   template< class T >

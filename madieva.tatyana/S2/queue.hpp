@@ -1,8 +1,11 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 #include <stdexcept>
-#include "list.hpp"
-namespace madieva {
+#include <list.hpp>
+#include <utility>
+
+namespace madieva
+{
   template< class T >
   class Queue {
   public:
@@ -27,7 +30,7 @@ namespace madieva {
   template< class T >
   void Queue< T >::push(T && val)
   {
-    data_.pushBack(std::move(val));
+    data_.pushBack(std::forward< T >(val));
   }
 
   template< class T >
