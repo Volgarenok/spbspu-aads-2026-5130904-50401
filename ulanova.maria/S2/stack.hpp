@@ -12,11 +12,11 @@ namespace ulanova
   public:
     void push(const T& value);
     void push(T&& value);
-    void clear();
+    void clear() noexcept;
     void pop();
     T& front();
     const T& front() const;
-    bool empty() const;
+    bool empty() const noexcept;
   private:
     List< T > list_;
   };
@@ -32,7 +32,7 @@ namespace ulanova
     list_.push_front(std::forward< T >(value));
   }
   template < class T >
-  void Stack< T >::clear()
+  void Stack< T >::clear() noexcept
   {
     list_.clear();
   }
@@ -64,7 +64,7 @@ namespace ulanova
     return list_.front();
   }
   template < class T >
-  bool Stack< T >::empty() const
+  bool Stack< T >::empty() const noexcept
   {
     return list_.empty();
   }
