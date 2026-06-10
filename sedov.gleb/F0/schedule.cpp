@@ -32,16 +32,6 @@ namespace sedov
     nextId_ = id;
   }
 
-  void Schedule::addToIndex(const Task & task)
-  {
-    tasksByDatetime_.insert(DateTimeKey(task.makeDatetimeKey()), task);
-  }
-
-  void Schedule::removeFromIndex(const Task & task)
-  {
-    tasksByDatetime_.erase(DateTimeKey(task.makeDatetimeKey()));
-  }
-
   int Schedule::addTask(const Task & task)
   {
     Task newTask = task;
@@ -122,5 +112,35 @@ namespace sedov
       }
     }
     return result;
+  }
+
+  bool Schedule::hasConflict(const Task & task, int excludeId) const
+  {
+    List< Task > tasksOnDate = getTasksOnDate(task.getDate());
+    for (auto it = tasksOnDate.begin(); it != tasksOnDate.end(); ++it)
+    {
+      if ((*it).getId() != excludeId && (*it).overlapsWith(task))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void Schedule::clear() noexcept
+  {
+    tasksById_.clear();
+    tasksByDatetime_.clear();
+    nextId_ = 1;
+  }
+
+  void Schedule::addToIndex(const Task & task)
+  {
+    tasksByDatetime_.insert(DateTimeKey(task.makeDatetimeKey()), task);
+  }
+
+  void Schedule::removeFromIndex(const Task & task)
+  {
+    tasksByDatetime_.erase(DateTimeKey(task.makeDatetimeKey()));
   }
 }
