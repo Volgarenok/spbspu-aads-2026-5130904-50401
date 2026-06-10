@@ -44,9 +44,9 @@ namespace ulanova
     bool operator==(const LCIter& other) const noexcept;
     const T* operator->() const noexcept;
   private:
-    detail::Node< T >* node_;
-    detail::Node< T >* head_;
-    LCIter(detail::Node< T >* n = nullptr, detail::Node< T >* h = nullptr) noexcept;
+    const detail::Node< T >* node_;
+    const detail::Node< T >* head_;
+    LCIter(const detail::Node< T >* n = nullptr, const detail::Node< T >* h = nullptr) noexcept;
     friend class List< T >;
   };
 
@@ -190,7 +190,7 @@ namespace ulanova
   }
 
   template< class T >
-  LCIter< T >::LCIter(detail::Node< T >* n, detail::Node< T >* h) noexcept:
+  LCIter< T >::LCIter(const detail::Node< T >* n, const detail::Node< T >* h) noexcept:
     node_(n),
     head_(h)
   {}
