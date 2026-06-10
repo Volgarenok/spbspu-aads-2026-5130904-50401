@@ -138,6 +138,18 @@ namespace sedov
   private:
     std::string name_;
   };
+
+  struct ScheduleKey {
+  public:
+    ScheduleKey() = default;
+    explicit ScheduleKey(const std::string & n);
+    explicit ScheduleKey(const char * n);
+    const std::string & getName() const noexcept;
+    bool operator<(const ScheduleKey & h) const noexcept;
+    bool operator==(const ScheduleKey & h) const noexcept;
+  private:
+    std::string name_;
+  };
 }
 
 #endif

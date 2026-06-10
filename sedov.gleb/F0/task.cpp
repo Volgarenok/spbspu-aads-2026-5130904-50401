@@ -198,4 +198,27 @@ namespace sedov
   {
     return name_ == h.name_;
   }
+
+  ScheduleKey::ScheduleKey(const std::string & n):
+    name_(n)
+  {}
+
+  ScheduleKey::ScheduleKey(const char * n):
+    name_(n ? n : "")
+  {}
+
+  const std::string & ScheduleKey::getName() const noexcept
+  {
+    return name_;
+  }
+
+  bool ScheduleKey::operator<(const ScheduleKey & h) const noexcept
+  {
+    return name_ < h.name_;
+  }
+
+  bool ScheduleKey::operator==(const ScheduleKey & h) const noexcept
+  {
+    return name_ == h.name_;
+  }
 }
