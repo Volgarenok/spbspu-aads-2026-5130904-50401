@@ -89,6 +89,8 @@ namespace ulanova
     void splice_after(LIter< T > pos, List< T >& other) noexcept;
     void splice_after(LIter< T > pos, List< T >& other, LIter< T > before) noexcept;
     void splice_after(LIter< T > pos, List< T >& other, LIter< T > before_first, LIter< T > before_last) noexcept;
+
+    void sort();
   private:
     detail::Node< T >* head_;
   };
@@ -509,6 +511,59 @@ namespace ulanova
     {
       splice_after(pos, other, before_first);
       ++pos;
+    }
+  }
+
+  template< class T >
+  void List< T >::sort()
+  {
+    if (!head_ || head_->next == head_)
+    {
+      return;
+    }
+
+    detail::Node< T >* source = head_;
+    detail::Node< T >* last = head_;
+    while (last->next != head_)
+    {
+      last = last->next;
+    }
+    last->next = nullptr;
+    head_ = nullptr;
+
+    while (source)
+    {
+      detail::Node< T >* current = source;
+      source = source->next;
+
+      if (!head_)
+      {
+        head_ = current;
+        current->next = current;
+      }
+      else if (current->data < head_->data)
+      {
+        detail::Node< T >* sorted_last = head_;
+        while (sorted_last->next != head_)
+        {
+          sorted_last = sorted_last->next;
+        }
+
+        current->next = head_;
+        sorted_last->next = current;
+        head_ = current;
+      }
+      else
+      {
+        detail::Node< T >* position = head_;
+        while (position->next != head_ && !(current->data < position->next->data))
+        {
+          position = position->next;
+        }
+
+        current->next = position->next;
+        position->next = current;
+      }
     }
   }
 }

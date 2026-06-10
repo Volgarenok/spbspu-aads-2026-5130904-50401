@@ -394,3 +394,41 @@ BOOST_AUTO_TEST_CASE(splice_after_range_test)
   ++second_it;
   BOOST_CHECK(second_it == second.end());
 }
+
+BOOST_AUTO_TEST_CASE(sort_test)
+{
+  ulanova::List< int > list;
+  list.push_back(3);
+  list.push_back(1);
+  list.push_back(2);
+
+  list.sort();
+
+  ulanova::LIter< int > it = list.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(it == list.end());
+}
+
+BOOST_AUTO_TEST_CASE(sort_empty_test)
+{
+  ulanova::List< int > list;
+
+  list.sort();
+
+  BOOST_CHECK(list.begin() == list.end());
+}
+
+BOOST_AUTO_TEST_CASE(sort_single_element_test)
+{
+  ulanova::List< int > list;
+  list.push_back(1);
+
+  list.sort();
+
+  BOOST_CHECK(list.front() == 1);
+}
