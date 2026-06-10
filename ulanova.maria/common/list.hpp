@@ -39,11 +39,11 @@ namespace ulanova
     }
     bool operator!=(const LIter& other) const noexcept
     {
-      return node_ != other.node;
+      return node_ != other.node_;
     }
     bool operator==(const LIter& other) const noexcept
     {
-      return node_ == other.node;
+      return node_ == other.node_;
     }
     T* operator->() noexcept
     {
@@ -79,11 +79,11 @@ namespace ulanova
     }
     bool operator!=(const LCIter& other) const noexcept
     {
-      return node_ != other.node;
+      return node_ != other.node_;
     }
     bool operator==(const LCIter& other) const noexcept
     {
-      return node_ == other.node;
+      return node_ == other.node_;
     }
     const T* operator->() const noexcept
     {
@@ -344,31 +344,14 @@ namespace ulanova
   template< class... Args >
   void List< T >::emplace_front(Args&&... args)
   {
-    Node< T >* node = new Node< T >{ T(std::forward< Args >(args)...), head_ };
-    head_ = node;
-    if (tail_ == nullptr)
-    {
-      tail_ = head_;
-    }
-    ++size_;
+    push_front(T(std::forward< Args >(args)...));
   }
 
   template< class T >
   template< class... Args >
   void List< T >::emplace_back(Args&&... args)
   {
-    Node< T >* node = new Node< T >{ T(std::forward< Args >(args)...), nullptr };
-    if (tail_ == nullptr)
-    {
-      head_ = node;
-      tail_ = node;
-    }
-    else
-    {
-      tail_->next = node;
-      tail_ = node;
-    }
-    ++size_;
+    push_back(T(std::forward< Args >(args)...));
   }
 }
 #endif
