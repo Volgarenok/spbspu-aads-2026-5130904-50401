@@ -1,5 +1,6 @@
-#include "functions.hpp"
 #include <iostream>
+#include <stdexcept>
+#include "functions.hpp"
 
 int main()
 {
@@ -25,7 +26,7 @@ int main()
   }
   std::cout << "\n";
 
-  ulanova::List<ulanova::List<size_t>> transposed = transpose_sequences(seqs);
+  ulanova::List< ulanova::List< size_t > > transposed = transpose_sequences(seqs);
   if (transposed.cbegin() == transposed.cend())
   {
     std::cout << "0\n";

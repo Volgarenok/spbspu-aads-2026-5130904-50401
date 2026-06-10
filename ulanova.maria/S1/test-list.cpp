@@ -1,7 +1,7 @@
+#include <stdexcept>
+#include <utility>
 #include <boost/test/unit_test.hpp>
 #include "list.hpp"
-
-#include <utility>
 
 
 BOOST_AUTO_TEST_CASE(push_front_test)
