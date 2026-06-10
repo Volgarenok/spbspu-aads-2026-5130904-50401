@@ -594,14 +594,13 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
-  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::removeNode( AVLTreeNode< Key, Value > * node,
+  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::removeNode(AVLTreeNode< Key, Value > * node,
     const Key & k, bool & found) noexcept
   {
     if (!node)
     {
       return nullptr;
     }
-
     if (comp_(k, node->key_))
     {
       node->left_ = removeNode(node->left_, k, found);
@@ -634,7 +633,7 @@ namespace sedov
       else
       {
         AVLTreeNode< Key, Value > * succ = fallLeft(node->right_);
-        node->key_ = succ->key_;      // Прямое присваивание (Key не const в узле)
+        node->key_ = succ->key_;
         node->value_ = std::move(succ->value_);
         node->right_ = removeNode(node->right_, succ->key_, found);
         if (node->right_)
@@ -666,6 +665,41 @@ namespace sedov
       }
     }
     return nullptr;
+  }
+
+  template < class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::collectInRangeImpl(AVLTreeNode< Key, Value > * node, const Key & from,
+    const Key & to, List< std::pair< const Key, Value > > & result) const
+  {
+    if (!node)
+    {
+      return;
+    }
+    if (!comp_(node->key_, from))
+    {
+      collectInRangeImpl(node->left_, from, to, result);
+    }
+    if (!comp_(node->key_, from) && !comp_(to, node->key_))
+    {
+      result.pushBack(std::pair< const Key, Value >(node->key_, node->value_));
+    }
+    if (!comp_(to, node->key_))
+    {
+      collectInRangeImpl(node->right_, from, to, result);
+    }
+  }
+
+  template < class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::getAllImpl(AVLTreeNode< Key, Value > * node,
+    List< std::pair< const Key, Value > > & result) const
+  {
+    if (!node)
+    {
+      return;
+    }
+    getAllImpl(node->left_, result);
+    result.pushBack(std::pair< const Key, Value >(node->key_, node->value_));
+    getAllImpl(node->right_, result);
   }
 }
 
