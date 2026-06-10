@@ -74,9 +74,9 @@ namespace sedov
     return schedules_.contains(ScheduleKey{schedName});
   }
 
-  bool Profile::addTaskToSchedule(const std::string & scheduleName, const Task & task)
+  bool Profile::addTaskToSchedule(const std::string & schedName, const Task & task)
   {
-    ScheduleKey key{scheduleName};
+    ScheduleKey key{schedName};
     Schedule sch;
     if (!schedules_.find(key, sch))
     {
@@ -87,9 +87,9 @@ namespace sedov
     return true;
   }
 
-  bool Profile::removeTaskFromSchedule(const std::string & scheduleName, int id)
+  bool Profile::removeTaskFromSchedule(const std::string & schedName, int id)
   {
-    ScheduleKey key{scheduleName};
+    ScheduleKey key{schedName};
     Schedule sch;
     if (!schedules_.find(key, sch))
     {
@@ -103,10 +103,10 @@ namespace sedov
     return true;
   }
 
-  bool Profile::findTaskInSchedule(const std::string & scheduleName, int id, Task & outTask) const
+  bool Profile::findTaskInSchedule(const std::string & schedName, int id, Task & outTask) const
   {
     Schedule sch;
-    if (!schedules_.find(ScheduleKey{scheduleName}, sch))
+    if (!schedules_.find(ScheduleKey{schedName}, sch))
     {
       return false;
     }
@@ -148,13 +148,13 @@ namespace sedov
     return nullptr;
   }
 
-  bool Profile::updateSchedule(const std::string & scheduleName, const Schedule & sch)
+  bool Profile::updateSchedule(const std::string & schedName, const Schedule & sch)
   {
-    if (!scheduleExists(scheduleName))
+    if (!scheduleExists(schedName))
     {
       return false;
     }
-    schedules_.insert(ScheduleKey{scheduleName}, sch);
+    schedules_.insert(ScheduleKey{schedName}, sch);
     return true;
   }
 
