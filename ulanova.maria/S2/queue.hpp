@@ -19,6 +19,9 @@ namespace ulanova
     const T& front() const;
     void pop();
     bool empty() const noexcept;
+
+    template< class... Args >
+    void emplace(Args&&... args);
   private:
     List< T > list_;
   };
@@ -70,6 +73,13 @@ namespace ulanova
   bool Queue< T >::empty() const noexcept
   {
     return list_.empty();
+  }
+
+  template< class T >
+  template< class... Args >
+  void Queue< T >::emplace(Args&&... args)
+  {
+    list_.emplace_back(std::forward< Args >(args)...);
   }
 }
 #endif
