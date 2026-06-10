@@ -101,7 +101,7 @@ namespace ulanova
     Node< T >* head;
   public:
     List();
-    ~List();
+    ~List() noexcept;
     List(const List& other);
 
     void push_front(const T& value);
@@ -119,11 +119,17 @@ namespace ulanova
     LCIter< T > cbegin() const noexcept;
     LCIter< T > cend() const noexcept;
 
-    void clear();
+    void clear() noexcept;
 
     T& front();
     const T& front() const;
-    bool empty() const;
+    bool empty() const noexcept;
+
+    template< class... Args >
+    void emplace_front(Args&&... args);
+
+    template< class... Args >
+    void emplace_back(Args&&... args);
   };
 
   template< class T >
@@ -279,7 +285,7 @@ namespace ulanova
   }
 
   template < class T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (head)
     {
@@ -287,7 +293,7 @@ namespace ulanova
     }
   }
   template < class T >
-  List< T >::~List()
+  List< T >::~List() noexcept
   {
     clear();
   }
@@ -329,9 +335,40 @@ namespace ulanova
     delete temp;
   }
   template < class T >
-  bool List< T >::empty() const
+  bool List< T >::empty() const noexcept
   {
     return head == nullptr;
+  }
+
+  template< class T >
+  template< class... Args >
+  void List< T >::emplace_front(Args&&... args)
+  {
+    Node< T >* node = new Node< T >{ T(std::forward< Args >(args)...), head_ };
+    head_ = node;
+    if (tail_ == nullptr)
+    {
+      tail_ = head_;
+    }
+    ++size_;
+  }
+
+  template< class T >
+  template< class... Args >
+  void List< T >::emplace_back(Args&&... args)
+  {
+    Node< T >* node = new Node< T >{ T(std::forward< Args >(args)...), nullptr };
+    if (tail_ == nullptr)
+    {
+      head_ = node;
+      tail_ = node;
+    }
+    else
+    {
+      tail_->next = node;
+      tail_ = node;
+    }
+    ++size_;
   }
 }
 #endif
