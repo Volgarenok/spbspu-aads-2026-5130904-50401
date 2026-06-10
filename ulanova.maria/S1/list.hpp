@@ -93,6 +93,9 @@ namespace ulanova
     void sort();
 
     void merge(List< T >& other);
+
+    template< class Predicate >
+    void partition(Predicate predicate);
   private:
     detail::Node< T >* head_;
   };
@@ -634,4 +637,76 @@ namespace ulanova
     head_ = result;
   }
 
+  template< class T >
+  template< class Predicate >
+  void List< T >::partition(Predicate predicate)
+  {
+    if (!head_ || head_->next == head_)
+    {
+      return;
+    }
+
+    detail::Node< T >* source = head_;
+    detail::Node< T >* last = head_;
+    while (last->next != head_)
+    {
+      last = last->next;
+    }
+    last->next = nullptr;
+    head_ = nullptr;
+
+    detail::Node< T >* true_head = nullptr;
+    detail::Node< T >* true_tail = nullptr;
+    detail::Node< T >* false_head = nullptr;
+    detail::Node< T >* false_tail = nullptr;
+
+    while (source)
+    {
+      detail::Node< T >* current = source;
+      source = source->next;
+      current->next = nullptr;
+
+      if (predicate(current->data))
+      {
+        if (!true_head)
+        {
+          true_head = current;
+          true_tail = current;
+        }
+        else
+        {
+          true_tail->next = current;
+          true_tail = current;
+        }
+      }
+      else
+      {
+        if (!false_head)
+        {
+          false_head = current;
+          false_tail = current;
+        }
+        else
+        {
+          false_tail->next = current;
+          false_tail = current;
+        }
+      }
+    }
+
+    if (true_head)
+    {
+      head_ = true_head;
+      true_tail->next = false_head ? false_head : true_head;
+    }
+    else
+    {
+      head_ = false_head;
+    }
+
+    if (false_head)
+    {
+      false_tail->next = head_;
+    }
+  }
 }

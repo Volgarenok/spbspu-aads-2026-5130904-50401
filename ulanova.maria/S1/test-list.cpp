@@ -502,3 +502,81 @@ BOOST_AUTO_TEST_CASE(merge_empty_test)
   ++it;
   BOOST_CHECK(it == first.end());
 }
+
+BOOST_AUTO_TEST_CASE(partition_test)
+{
+  ulanova::List< int > list;
+  list.push_back(1);
+  list.push_back(2);
+  list.push_back(3);
+  list.push_back(4);
+  list.push_back(5);
+
+  list.partition([](int value)
+  {
+    return value % 2 == 0;
+  });
+
+  ulanova::LIter< int > it = list.begin();
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 4);
+  ++it;
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 5);
+  ++it;
+  BOOST_CHECK(it == list.end());
+}
+
+BOOST_AUTO_TEST_CASE(partition_empty_test)
+{
+  ulanova::List< int > list;
+
+  list.partition([](int value)
+  {
+    return value % 2 == 0;
+  });
+
+  BOOST_CHECK(list.begin() == list.end());
+}
+
+BOOST_AUTO_TEST_CASE(partition_all_true_test)
+{
+  ulanova::List< int > list;
+  list.push_back(2);
+  list.push_back(4);
+
+  list.partition([](int value)
+  {
+    return value % 2 == 0;
+  });
+
+  ulanova::LIter< int > it = list.begin();
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 4);
+  ++it;
+  BOOST_CHECK(it == list.end());
+}
+
+BOOST_AUTO_TEST_CASE(partition_all_false_test)
+{
+  ulanova::List< int > list;
+  list.push_back(1);
+  list.push_back(3);
+
+  list.partition([](int value)
+  {
+    return value % 2 == 0;
+  });
+
+  ulanova::LIter< int > it = list.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(it == list.end());
+}
