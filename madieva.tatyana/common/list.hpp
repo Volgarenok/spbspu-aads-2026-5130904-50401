@@ -71,6 +71,12 @@ namespace madieva {
     void pushBack(T && a);
     void popFront() noexcept;
     void popBack() noexcept;
+    template< class... Args >
+    T & emplace_back(Args &&... args);
+    template< class... Args >
+    T & emplace_front(Args &&... args);
+    template< class... Args >
+    T & emplace(LIter< T > pos, Args &&... args);
     size_t size() const noexcept;
     bool empty() const noexcept;
     LIter< T > begin() noexcept;
@@ -457,6 +463,58 @@ namespace madieva {
         size_--;
       }
     }
+  }
+
+  template< class T >
+  template< class... Args >
+  T & List< T >::emplace_back(Args &&... args)
+  {
+    detail::node_t< T > * node = new detail::node_t< T >();
+    new (&node->val_) T(std::forward< Args >(args)...);
+    if (!head_) {
+      head_ = node;
+      head_->next_ = head_;
+      head_->prev_ = head_;
+    } else {
+      node->next_ = head_;
+      node->prev_ = head_->prev_;
+      head_->prev_->next_ = node;
+      head_->prev_ = node;
+    }
+    size_++;
+    return node->val_;
+  }
+
+  template< class T >
+  template< class... Args >
+  T & List< T >::emplace_front(Args &&... args)
+  {
+    T & result = emplace_back(std::forward< Args >(args)...);
+    head_ = head_->prev_;
+    return result;
+  }
+
+  template< class T >
+  template< class... Args >
+  T & List< T >::emplace(LIter< T > pos, Args &&... args)
+  {
+    if (pos == end()) {
+      return emplace_back(std::forward< Args >(args)...);
+    }
+    
+    if (pos == begin()) {
+      return emplace_front(std::forward< Args >(args)...);
+    }
+    detail::node_t< T > * node = new detail::node_t< T >();
+    new (&node->val_) T(std::forward< Args >(args)...);
+
+    node->prev_ = pos.it_->prev_;
+    node->next_ = pos.it_;
+    pos.it_->prev_->next_ = node;
+    pos.it_->prev_ = node;
+
+    size_++;
+    return node->val_;
   }
 
   template< class T >

@@ -160,4 +160,22 @@ BOOST_AUTO_TEST_CASE(assignment_operator)
   BOOST_CHECK(q1.front() == 1);
 }
 
+BOOST_AUTO_TEST_CASE(queue_emplace_test)
+{
+  madieva::Queue< std::pair<int, char> > queue;
+  
+  queue.emplace(1, 'a');
+  queue.emplace(2, 'b');
+  queue.emplace(3, 'c');
+  
+  BOOST_CHECK(queue.front().first == 1);
+  BOOST_CHECK(queue.front().second == 'a');
+  queue.pop();
+  BOOST_CHECK(queue.front().first == 2);
+  BOOST_CHECK(queue.front().second == 'b');
+  queue.pop();
+  BOOST_CHECK(queue.front().first == 3);
+  BOOST_CHECK(queue.front().second == 'c');
+}
+
 BOOST_AUTO_TEST_SUITE_END()

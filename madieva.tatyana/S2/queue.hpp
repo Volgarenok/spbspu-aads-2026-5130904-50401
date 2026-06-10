@@ -11,6 +11,8 @@ namespace madieva
   public:
     void push(const T & val);
     void push(T && val);
+    template< class... Args >
+    T & emplace(Args &&... args);
     T & front();
     const T & front() const;
     size_t size() const noexcept;
@@ -31,6 +33,13 @@ namespace madieva
   void Queue< T >::push(T && val)
   {
     data_.pushBack(std::forward< T >(val));
+  }
+
+  template< class T >
+  template< class... Args >
+  T & Queue< T >::emplace(Args &&... args)
+  {
+    return data_.emplace_back(std::forward< Args >(args)...);
   }
 
   template< class T >
