@@ -303,4 +303,55 @@ BOOST_AUTO_TEST_CASE(front_empty_throws_test)
   BOOST_CHECK_THROW(list.front(), std::logic_error);
 }
 
+BOOST_AUTO_TEST_CASE(splice_after_all_test)
+{
+  ulanova::List< int > first;
+  first.push_back(1);
+  first.push_back(4);
 
+  ulanova::List< int > second;
+  second.push_back(2);
+  second.push_back(3);
+
+  first.splice_after(first.begin(), second);
+
+  ulanova::LIter< int > it = first.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 4);
+  ++it;
+  BOOST_CHECK(it == first.end());
+
+  BOOST_CHECK(second.begin() == second.end());
+}
+
+BOOST_AUTO_TEST_CASE(splice_after_one_test)
+{
+  ulanova::List< int > first;
+  first.push_back(1);
+  first.push_back(4);
+
+  ulanova::List< int > second;
+  second.push_back(2);
+  second.push_back(3);
+
+  ulanova::LIter< int > before = second.begin();
+
+  first.splice_after(first.begin(), second, before);
+
+  ulanova::LIter< int > first_it = first.begin();
+  BOOST_CHECK(*first_it == 1);
+  ++first_it;
+  BOOST_CHECK(*first_it == 3);
+  ++first_it;
+  BOOST_CHECK(*first_it == 4);
+
+  ulanova::LIter< int > second_it = second.begin();
+  BOOST_CHECK(*second_it == 2);
+  ++second_it;
+  BOOST_CHECK(second_it == second.end());
+}

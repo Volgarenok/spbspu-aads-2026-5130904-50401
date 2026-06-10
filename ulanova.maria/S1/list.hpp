@@ -85,6 +85,9 @@ namespace ulanova
     void swap(List< T >& other) noexcept;
 
     T& front();
+
+    void splice_after(LIter< T > pos, List< T >& other) noexcept;
+    void splice_after(LIter< T > pos, List< T >& other, LIter< T > before) noexcept;
   private:
     detail::Node< T >* head_;
   };
@@ -438,5 +441,63 @@ namespace ulanova
     }
     pos.node_->next = temp->next;
     delete temp;
+  }
+
+  template< class T >
+  void List< T >::splice_after(LIter< T > pos, List< T >& other) noexcept
+  {
+    if (this == std::addressof(other) || !other.head_)
+    {
+      return;
+    }
+
+    if (!head_)
+    {
+      head_ = std::exchange(other.head_, nullptr);
+      return;
+    }
+
+    if (!pos.node_)
+    {
+      return;
+    }
+
+    detail::Node< T >* other_last = other.head_;
+    while (other_last->next != other.head_)
+    {
+      other_last = other_last->next;
+    }
+
+    other_last->next = pos.node_->next;
+    pos.node_->next = other.head_;
+    other.head_ = nullptr;
+  }
+
+  template< class T >
+  void List< T >::splice_after(LIter< T > pos, List< T >& other, LIter< T > before) noexcept
+  {
+    if (!pos.node_ || !before.node_ || !other.head_)
+    {
+      return;
+    }
+
+    detail::Node< T >* moved = before.node_->next;
+
+    if (moved == other.head_)
+    {
+      other.head_ = other.head_->next;
+    }
+
+    if (moved == before.node_)
+    {
+      other.head_ = nullptr;
+    }
+    else
+    {
+      before.node_->next = moved->next;
+    }
+
+    moved->next = pos.node_->next;
+    pos.node_->next = moved;
   }
 }
