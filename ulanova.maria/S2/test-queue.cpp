@@ -2,6 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <stdexcept>
+#include <string>
 
 BOOST_AUTO_TEST_CASE(test_push_pop_queue)
 {
@@ -38,4 +39,12 @@ BOOST_AUTO_TEST_CASE(test_exception_queue)
 {
   ulanova::Queue<size_t> q;
   BOOST_CHECK_THROW(q.pop(), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(test_queue_emplace)
+{
+  ulanova::Queue< std::string > queue;
+  queue.emplace(4, 'b');
+
+  BOOST_CHECK(queue.front() == "bbbb");
 }

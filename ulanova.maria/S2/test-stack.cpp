@@ -2,6 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <stdexcept>
+#include <string>
 
 BOOST_AUTO_TEST_CASE(test_push_pop_stack)
 {
@@ -49,4 +50,12 @@ BOOST_AUTO_TEST_CASE(test_top)
   BOOST_CHECK(s.front() == 10);
   s.pop();
   BOOST_CHECK(s.front() == 5);
+}
+
+BOOST_AUTO_TEST_CASE(test_stack_emplace)
+{
+  ulanova::Stack< std::string > stack;
+  stack.emplace(3, 'a');
+
+  BOOST_CHECK(stack.front() == "aaa");
 }
