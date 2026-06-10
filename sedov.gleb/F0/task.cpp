@@ -258,4 +258,40 @@ namespace sedov
   { 
     return a.getDatetime() < b.getDatetime(); 
   }
+
+  HistoryEntry::HistoryEntry():
+    taskId_(0)
+  {}
+
+  HistoryEntry::HistoryEntry(int id, const std::string & title, const std::string & date, const std::string & time):
+    taskId_(id),
+    title_(title),
+    originalDate_(date)
+  {
+    std::time_t now = std::time(nullptr);
+    std::tm * timeinfo = std::localtime(&now);
+    completedAt_ = pad(timeinfo->tm_year + 1900) + "-" + pad(timeinfo->tm_mon + 1) + "-" +
+      pad(timeinfo->tm_mday) + " " + pad(timeinfo->tm_hour) + ":" + pad(timeinfo->tm_min);
+    (void)time;
+  }
+
+  int HistoryEntry::getTaskId() const noexcept
+  {
+    return taskId_;
+  }
+
+  const std::string & HistoryEntry::getTitle() const noexcept
+  {
+    return title_;
+  }
+
+  const std::string & HistoryEntry::getCompletedAt() const noexcept
+  {
+    return completedAt_;
+  }
+
+  const std::string & HistoryEntry::getOriginalDate() const noexcept
+  {
+    return originalDate_;
+  }
 }
