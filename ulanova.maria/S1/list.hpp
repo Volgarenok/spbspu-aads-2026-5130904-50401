@@ -91,6 +91,8 @@ namespace ulanova
     void splice_after(LIter< T > pos, List< T >& other, LIter< T > before_first, LIter< T > before_last) noexcept;
 
     void sort();
+
+    void merge(List< T >& other);
   private:
     detail::Node< T >* head_;
   };
@@ -566,4 +568,70 @@ namespace ulanova
       }
     }
   }
+
+  template< class T >
+  void List< T >::merge(List< T >& other)
+  {
+    if (this == std::addressof(other) || !other.head_)
+    {
+      return;
+    }
+
+    if (!head_)
+    {
+      head_ = std::exchange(other.head_, nullptr);
+      return;
+    }
+
+    detail::Node< T >* first = head_;
+    detail::Node< T >* first_last = head_;
+    while (first_last->next != head_)
+    {
+      first_last = first_last->next;
+    }
+    first_last->next = nullptr;
+
+    detail::Node< T >* second = other.head_;
+    detail::Node< T >* second_last = other.head_;
+    while (second_last->next != other.head_)
+    {
+      second_last = second_last->next;
+    }
+    second_last->next = nullptr;
+    other.head_ = nullptr;
+
+    detail::Node< T >* result = nullptr;
+    detail::Node< T >* result_last = nullptr;
+
+    while (first || second)
+    {
+      detail::Node< T >* selected = nullptr;
+
+      if (!second || (first && !(second->data < first->data)))
+      {
+        selected = first;
+        first = first->next;
+      }
+      else
+      {
+        selected = second;
+        second = second->next;
+      }
+
+      if (!result)
+      {
+        result = selected;
+        result_last = selected;
+      }
+      else
+      {
+        result_last->next = selected;
+        result_last = selected;
+      }
+    }
+
+    result_last->next = result;
+    head_ = result;
+  }
+
 }

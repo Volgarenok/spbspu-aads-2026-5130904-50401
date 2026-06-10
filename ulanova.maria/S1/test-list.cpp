@@ -432,3 +432,73 @@ BOOST_AUTO_TEST_CASE(sort_single_element_test)
 
   BOOST_CHECK(list.front() == 1);
 }
+
+BOOST_AUTO_TEST_CASE(merge_test)
+{
+  ulanova::List< int > first;
+  first.push_back(1);
+  first.push_back(3);
+  first.push_back(5);
+
+  ulanova::List< int > second;
+  second.push_back(2);
+  second.push_back(4);
+  second.push_back(6);
+
+  first.merge(second);
+
+  ulanova::LIter< int > it = first.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(*it == 3);
+  ++it;
+  BOOST_CHECK(*it == 4);
+  ++it;
+  BOOST_CHECK(*it == 5);
+  ++it;
+  BOOST_CHECK(*it == 6);
+  ++it;
+  BOOST_CHECK(it == first.end());
+
+  BOOST_CHECK(second.begin() == second.end());
+}
+
+BOOST_AUTO_TEST_CASE(merge_into_empty_test)
+{
+  ulanova::List< int > first;
+
+  ulanova::List< int > second;
+  second.push_back(1);
+  second.push_back(2);
+
+  first.merge(second);
+
+  ulanova::LIter< int > it = first.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(it == first.end());
+
+  BOOST_CHECK(second.begin() == second.end());
+}
+
+BOOST_AUTO_TEST_CASE(merge_empty_test)
+{
+  ulanova::List< int > first;
+  first.push_back(1);
+  first.push_back(2);
+
+  ulanova::List< int > second;
+
+  first.merge(second);
+
+  ulanova::LIter< int > it = first.begin();
+  BOOST_CHECK(*it == 1);
+  ++it;
+  BOOST_CHECK(*it == 2);
+  ++it;
+  BOOST_CHECK(it == first.end());
+}
