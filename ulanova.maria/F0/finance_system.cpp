@@ -38,3 +38,17 @@ long long ulanova::FinanceSystem::get_balance(const std::string& name) const
   }
   throw std::logic_error("profile not found");
 }
+
+void ulanova::FinanceSystem::drop_profile(const std::string& name)
+{
+  for (size_t i = 0; i < profiles_.size(); ++i)
+  {
+    if (profiles_[i].name == name)
+    {
+      profiles_.erase(profiles_.begin() + i);
+      return;
+    }
+  }
+
+  throw std::logic_error("profile not found");
+}

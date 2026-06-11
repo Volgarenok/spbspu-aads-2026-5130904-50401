@@ -41,6 +41,21 @@ namespace
     }
   }
 
+  void drop_profile(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  {
+    std::string name;
+    in >> name;
+
+    try
+    {
+      system.drop_profile(name);
+    }
+    catch (const std::logic_error&)
+    {
+      out << "Профиль не найден\n";
+    }
+  }
+
   void invalid_command(std::istream& in, std::ostream& out)
   {
     out << "<INVALID COMMAND>\n";
@@ -58,6 +73,7 @@ int main()
   commands_t commands;
   commands["create-profile"] = create_profile;
   commands["show-balance"] = show_balance;
+  commands["drop-profile"] = drop_profile;
 
   std::string command;
   while (std::cin >> command)
