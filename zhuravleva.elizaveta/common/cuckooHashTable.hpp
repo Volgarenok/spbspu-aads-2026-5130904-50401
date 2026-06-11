@@ -41,6 +41,8 @@ namespace zhuravleva
     void insert(const Key& key, const Value& value);
 
   private:
+    static const size_t maxShiftCount_ = 32;
+
     struct Cell
     {
       bool occupied;
@@ -62,6 +64,8 @@ namespace zhuravleva
     size_t getIndex2(const Key& key) const;
     bool updateIfExists(const Key& key, const Value& value);
     bool insertToEmpty(const Key& key, const Value& value);
+    bool insertWithDisplacement(const Key& key, const Value& value);
+    void rehash(size_t newCapacity);
   };
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
@@ -237,6 +241,48 @@ namespace zhuravleva
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insertWithDisplacement(
+      const Key& key, const Value& value)
+  {
+    std::pair< Key, Value > current(key, value);
+    bool inFirstTable = true;
+    for (size_t i = 0; i < maxShiftCount_; ++i)
+    {
+      if (inFirstTable)
+      {
+        size_t index = getIndex1(current.first);
+        std::swap(current, table1_[index].data);
+        table1_[index].occupied = true;
+        inFirstTable = false;
+        if (!table2_[getIndex2(current.first)].occupied)
+        {
+          size_t index2 = getIndex2(current.first);
+          table2_[index2].data = current;
+          table2_[index2].occupied = true;
+          ++size_;
+          return true;
+        }
+      }
+      else
+      {
+        size_t index = getIndex2(current.first);
+        std::swap(current, table2_[index].data);
+        table2_[index].occupied = true;
+        inFirstTable = true;
+        if (!table1_[getIndex1(current.first)].occupied)
+        {
+          size_t index1 = getIndex1(current.first);
+          table1_[index1].data = current;
+          table1_[index1].occupied = true;
+          ++size_;
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
   void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insert(
       const Key& key, const Value& value)
   {
@@ -248,7 +294,39 @@ namespace zhuravleva
     {
       return;
     }
-    throw std::runtime_error("cuckoo insertion failed");
+    CuckooHashTable temp(*this);
+    if (temp.insertWithDisplacement(key, value))
+    {
+      swap(temp);
+      return;
+    }
+    temp.rehash(table1_.size() * 2);
+    temp.insert(key, value);
+    swap(temp);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::rehash(size_t newCapacity)
+  {
+    myVector< Cell > oldTable1(table1_);
+    myVector< Cell > oldTable2(table2_);
+    table1_ = myVector< Cell >(newCapacity);
+    table2_ = myVector< Cell >(newCapacity);
+    size_ = 0;
+    for (size_t i = 0; i < oldTable1.size(); ++i)
+    {
+      if (oldTable1[i].occupied)
+      {
+        insert(oldTable1[i].data.first, oldTable1[i].data.second);
+      }
+    }
+    for (size_t i = 0; i < oldTable2.size(); ++i)
+    {
+      if (oldTable2[i].occupied)
+      {
+        insert(oldTable2[i].data.first, oldTable2[i].data.second);
+      }
+    }
   }
 
 }
