@@ -5,7 +5,7 @@
 #include <functional>
 #include <stdexcept>
 #include <utility>
-#include <vector>
+#include "myVector.hpp"
 
 namespace zhuravleva
 {
@@ -33,8 +33,11 @@ namespace zhuravleva
     size_t size() const noexcept;
     size_t capacity() const noexcept;
     void clear() noexcept;
+    void erase(const Key& key);
     void swap(CuckooHashTable& other) noexcept;
     bool contains(const Key& key) const;
+    Value& get(const Key& key);
+    const Value& get(const Key& key) const;
 
   private:
     struct Cell
@@ -48,8 +51,8 @@ namespace zhuravleva
       {}
     };
 
-    std::vector< Cell > table1_;
-    std::vector< Cell > table2_;
+    myVector< Cell > table1_;
+    myVector< Cell > table2_;
     size_t size_;
     Hash1 hash1_;
     Hash2 hash2_;
@@ -97,6 +100,26 @@ namespace zhuravleva
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::erase(const Key& key)
+  {
+    size_t index1 = getIndex1(key);
+    if (table1_[index1].occupied && equal_(table1_[index1].data.first, key))
+    {
+      table1_[index1].occupied = false;
+      --size_;
+      return;
+    }
+    size_t index2 = getIndex2(key);
+    if (table2_[index2].occupied && equal_(table2_[index2].data.first, key))
+    {
+      table2_[index2].occupied = false;
+      --size_;
+      return;
+    }
+    throw std::out_of_range("key not found");
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
   void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::swap(CuckooHashTable& other) noexcept
   {
     table1_.swap(other.table1_);
@@ -134,6 +157,38 @@ namespace zhuravleva
     }
 
     return false;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  Value& CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::get(const Key& key)
+  {
+    size_t index1 = getIndex1(key);
+    if (table1_[index1].occupied && equal_(table1_[index1].data.first, key))
+    {
+      return table1_[index1].data.second;
+    }
+    size_t index2 = getIndex2(key);
+    if (table2_[index2].occupied && equal_(table2_[index2].data.first, key))
+    {
+      return table2_[index2].data.second;
+    }
+    throw std::out_of_range("key not found");
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  const Value& CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::get(const Key& key) const
+  {
+    size_t index1 = getIndex1(key);
+    if (table1_[index1].occupied && equal_(table1_[index1].data.first, key))
+    {
+      return table1_[index1].data.second;
+    }
+    size_t index2 = getIndex2(key);
+    if (table2_[index2].occupied && equal_(table2_[index2].data.first, key))
+    {
+      return table2_[index2].data.second;
+    }
+    throw std::out_of_range("key not found");
   }
 }
 
