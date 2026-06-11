@@ -356,4 +356,156 @@ namespace sedov
     }
     return true;
   }
+
+  bool Scheduler::showUnplaced(const std::string & profName)
+  {
+    if (profName.empty())
+    {
+      std::cout << "[ERROR] Profile name cannot be empty\n";
+      return false;
+    }
+    Profile profile;
+    if (!findProfile(profName, profile))
+    {
+      std::cout << "[ERROR] Profile \"" << profName << "\" not found\n";
+      return false;
+    }
+    List< Task > raw;
+    profile.getAllUnplaced(raw);
+    Vector< Task > tasks;
+    for (auto it = raw.begin(); it != raw.end(); ++it)
+    {
+      tasks.pushBack(*it);
+    }
+    for (size_t i = 0; i < tasks.getSize(); ++i)
+    {
+      for (size_t j = i + 1; j < tasks.getSize(); ++j)
+      {
+        bool swap = tasks[i].getDate() > tasks[j].getDate();
+        if (tasks[i].getDate() == tasks[j].getDate())
+        {
+          swap = tasks[i].getTimeStart() > tasks[j].getTimeStart();
+        }
+        if (swap)
+        {
+          std::swap(tasks[i], tasks[j]);
+        }
+      }
+    }
+    std::cout << "Unplaced tasks in profile \"" << profName << "\":\n";
+    if (tasks.getSize() == 0)
+    {
+      std::cout << "  No tasks\n";
+    }
+    else
+    {
+      for (size_t i = 0; i < tasks.getSize(); ++i)
+      {
+        std::cout << "  ID " << tasks[i].getId() << ": " << tasks[i].getTitle() << " | " << tasks[i].getDate() << " "
+          << tasks[i].getTimeStart() << "-" << tasks[i].getTimeEnd() << " | " << tasks[i].getImportance() << "\n";
+      }
+      std::cout << "Total: " << tasks.getSize() << " tasks\n";
+    }
+    return true;
+  }
+
+  bool Scheduler::autoPlace(const std::string & profName, const std::string & dateFrom, const std::string & dateTo)
+  {
+    if (profName.empty())
+    {
+      std::cout << "[ERROR] Profile name cannot be empty\n";
+      return false;
+    }
+    Profile profile;
+    if (!findProfile(profName, profile))
+    {
+      std::cout << "[ERROR] Profile \"" << profName << "\" not found\n";
+      return false;
+    }
+    int y1, m1, d1;
+    if (!parseDate(dateFrom, y1, m1, d1))
+    {
+      std::cout << "[ERROR] Invalid date_from format: " << dateFrom << "\n";
+      return false;
+    }
+    int y2, m2, d2;
+    if (!parseDate(dateTo, y2, m2, d2))
+    {
+      std::cout << "[ERROR] Invalid date_to format: " << dateTo << "\n";
+      return false;
+    }
+    if (dateFrom > dateTo)
+    {
+      std::cout << "[ERROR] date_from (" << dateFrom << ") must be <= date_to (" << dateTo << ")\n";
+      return false;
+    }
+    List< Task > unplaced;
+    profile.getAllUnplaced(unplaced);
+    int placed = 0, failed = 0;
+    std::cout << "Searching free windows for " << unplaced.size() << " unplaced tasks:\n\n";
+    for (auto task_it = unplaced.begin(); task_it != unplaced.end(); ++task_it)
+    {
+      Task orig = *task_it;
+      bool found = false;
+      Schedule targetSched;
+      if (profile.findSchedule(orig.getScheduleName(), targetSched))
+      {
+        Schedule sched = targetSched;
+        if (orig.getDate() >= dateFrom && orig.getDate() <= dateTo && !sched.hasConflict(orig))
+        {
+          Task placedTask = orig;
+          placedTask.setActive(true);
+          sched.addTask(placedTask);
+          profile.updateSchedule(sched.getName(), sched);
+          profile.removeFromUnplaced(orig.getId());
+          std::cout << "[PLACED] Task \"" << orig.getTitle() << "\" (" << orig.getDurationMinutes() << "min, "
+            << orig.getImportance() << ") -> " << sched.getName() << " " << orig.getDate() << " "
+            << orig.getTimeStart() << "-" << orig.getTimeEnd() << "\n";
+          placed++;
+          found = true;
+        }
+        else
+        {
+          Vector< TimeWindow > windows = findFreeWindowsInSchedule(sched, dateFrom, dateTo, orig.getDurationMinutes());
+          for (size_t i = 0; i < windows.getSize() && !found; ++i)
+          {
+            std::string newEnd;
+            std::string newStart = formatTime(windows[i].getStartMinutes());
+            if (canPlaceTask(sched, orig, windows[i].getDate(), newStart, newEnd))
+            {
+              Task placedTask = orig;
+              placedTask.setDate(windows[i].getDate());
+              placedTask.setTimeStart(newStart);
+              placedTask.setTimeEnd(newEnd);
+              placedTask.setActive(true);
+              sched.addTask(placedTask);
+              profile.updateSchedule(sched.getName(), sched);
+              profile.removeFromUnplaced(orig.getId());
+              std::cout << "[PLACED] Task \"" << orig.getTitle() << "\" (" << orig.getDurationMinutes() << "min, "
+                << orig.getImportance() << ") -> " << sched.getName() << " " << placedTask.getDate() << " "
+                << placedTask.getTimeStart() << "-" << placedTask.getTimeEnd() << "\n";
+              placed++;
+              found = true;
+            }
+          }
+        }
+      }
+      else
+      {
+        std::cout << "[WARN] Schedule \"" << orig.getScheduleName() << "\" for task \"" << orig.getTitle() 
+          << "\" no longer exists. Skipping.\n";
+        found = true;
+        failed++;
+      }
+      if (!found)
+      {
+        std::cout << "[FAILED] Task \"" << orig.getTitle() << "\" (" << orig.getDurationMinutes() << "min, " 
+          << orig.getImportance() << ") - no suitable window in schedule \"" << orig.getScheduleName() << "\"\n";
+        failed++;
+      }
+    }
+    profiles_.insert(ProfileKey{profName}, profile);
+    std::cout << "\nResult: " << placed << " placed, " << failed << " failed\n";
+    return true;
+  }
 }
