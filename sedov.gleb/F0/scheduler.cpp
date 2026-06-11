@@ -597,4 +597,145 @@ namespace sedov
     std::cout << "\n[OK] Best: " << common[best].format() << "\n";
     return true;
   }
+
+  bool Scheduler::mergeSchedules(const std::string & profName, const std::string & newName,
+    const std::string & sched1Name, const std::string & sched2Name)
+  {
+    if (profName.empty())
+    {
+      std::cout << "[ERROR] Profile name cannot be empty\n";
+      return false;
+    }
+    Profile profile;
+    if (!findProfile(profName, profile))
+    {
+      std::cout << "[ERROR] Profile \"" << profName << "\" not found\n";
+      return false;
+    }
+    if (newName.empty())
+    {
+      std::cout << "[ERROR] New schedule name cannot be empty\n";
+      return false;
+    }
+    if (sched1Name.empty() || sched2Name.empty())
+    {
+      std::cout << "[ERROR] Schedule names cannot be empty\n";
+      return false;
+    }
+    Schedule sch1, sch2;
+    if (!profile.findSchedule(sched1Name, sch1) || !profile.findSchedule(sched2Name, sch2))
+    {
+      std::cout << "[ERROR] Source schedule not found\n";
+      return false;
+    }
+    if (sched1Name == sched2Name)
+    {
+      std::cout << "[ERROR] Cannot merge a schedule with itself\n";
+      return false;
+    }
+    if (profile.scheduleExists(newName))
+    {
+      std::cout << "[ERROR] Schedule \"" << newName << "\" already exists\n";
+      return false;
+    }
+    Schedule merged(newName);
+    int conflicts = 0;
+    List< Task > t1 = sch1.getTasksInRange("0000-01-01", "9999-12-31");
+    for (auto it = t1.begin(); it != t1.end(); ++it)
+    {
+      merged.addTask(*it);
+    }
+    List< Task > t2 = sch2.getTasksInRange("0000-01-01", "9999-12-31");
+    for (auto it = t2.begin(); it != t2.end(); ++it)
+    {
+      Task task = *it;
+      if (merged.hasConflict(task))
+      {
+        List< Task > conflictTasks = merged.getTasksOnDate(task.getDate());
+        bool resolved = false;
+        for (auto cit = conflictTasks.begin(); cit != conflictTasks.end(); ++cit)
+        {
+          if (task.overlapsWith(*cit))
+          {
+            if (task.getImportanceValue() > (*cit).getImportanceValue())
+            {
+              Task old = *cit;
+              merged.removeTask(old.getId());
+              merged.addTask(task);
+              profile.addToUnplaced(old);
+              std::cout << "  Conflict: keeping \"" << task.getTitle() << "\", moving \"" << old.getTitle() << "\"\n";
+            }
+            else
+            {
+              profile.addToUnplaced(task);
+              std::cout << "  Conflict: keeping \"" << (*cit).getTitle() << "\", moving \"" << task.getTitle()
+                << "\"\n";
+            }
+            resolved = true;
+            conflicts++;
+            break;
+          }
+        }
+        if (!resolved)
+        {
+          merged.addTask(task);
+        }
+      }
+      else
+      {
+        merged.addTask(task);
+      }
+    }
+    profile.addSchedule(newName);
+    profile.updateSchedule(newName, merged);
+    profiles_.insert(ProfileKey{profName}, profile);
+    std::cout << "[OK] Schedule \"" << newName << "\" created\nTotal conflicts: " << conflicts << "\n";
+    return true;
+  }
+
+  bool Scheduler::compareMerge(const std::string & profName, const std::string & sched1Name, const std::string & sched2Name)
+  {
+    if (profName.empty())
+    {
+      std::cout << "[ERROR] Profile name cannot be empty\n";
+      return false;
+    }
+    Profile profile;
+    if (!findProfile(profName, profile))
+    {
+      std::cout << "[ERROR] Profile \"" << profName << "\" not found\n";
+      return false;
+    }
+    if (sched1Name.empty() || sched2Name.empty())
+    {
+      std::cout << "[ERROR] Schedule names cannot be empty\n";
+      return false;
+    }
+    Schedule sch1, sch2;
+    if (!profile.findSchedule(sched1Name, sch1) || !profile.findSchedule(sched2Name, sch2))
+    {
+      std::cout << "[ERROR] Schedule not found\n";
+      return false;
+    }
+    if (sched1Name == sched2Name)
+    {
+      std::cout << "[ERROR] Cannot merge a schedule with itself\n";
+      return false;
+    }
+    std::cout << "Tasks that will NOT be included in merged schedule:\n";
+    List< Task > t2 = sch2.getTasksInRange("0000-01-01", "9999-12-31");
+    int count = 0;
+    for (auto it = t2.begin(); it != t2.end(); ++it)
+    {
+      if (sch1.hasConflict(*it))
+      {
+        std::cout << "  From " << sched2Name << ": ID " << (*it).getId() << ": " << (*it).getTitle() << " | "
+          << (*it).getDate() << " " << (*it).getTimeStart() << "-" << (*it).getTimeEnd() << " | "
+          << (*it).getImportance() << "\n";
+          count++;
+      }
+    }
+    std::cout << "Total: " << count << " task(s) will be moved to unplaced\n";
+    return true;
+  }
 }
