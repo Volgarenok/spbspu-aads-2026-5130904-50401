@@ -1,4 +1,6 @@
 #include "scheduler.hpp"
+#include <iostream>
+#include <fstream>
 
 namespace sedov
 {
@@ -991,6 +993,265 @@ namespace sedov
     std::cout << "\n[OK] Best day: " << bestDates[bestIndex] << "\n     Longest free window: "
       << formatTime(bestStarts[bestIndex]) << "-" << formatTime(bestEnds[bestIndex])
       << " (" << bestDurations[bestIndex] / 60 << "h " << bestDurations[bestIndex] % 60 << "m)\n";
+    return true;
+  }
+
+  bool Scheduler::exportProfile(const std::string & name, const std::string & filename)
+  {
+    if (name.empty())
+    {
+      std::cout << "[ERROR] Profile name cannot be empty\n";
+      return false;
+    }
+    Profile profile;
+    if (!findProfile(name, profile))
+    {
+      std::cout << "[ERROR] Profile \"" << name << "\" not found\n";
+      return false;
+    }
+    if (filename.empty())
+    {
+      std::cout << "[ERROR] Filename cannot be empty\n";
+      return false;
+    }
+    std::ofstream file(filename);
+    if (!file.is_open())
+    {
+      std::cout << "[ERROR] Cannot create file: " << filename << "\n";
+      return false;
+    }
+    file << "Profile: " << name << "\n";
+    file << "Next task ID: " << profile.generateTaskId() << "\n\n";
+    file << "Schedules:\n";
+    List< Schedule > scheds;
+    profile.getAllSchedules(scheds);
+    for (auto it = scheds.begin(); it != scheds.end(); ++it)
+    {
+      file << "  " << (*it).getName() << ":\n";
+      List< Task > raw = (*it).getTasksInRange("0000-01-01", "9999-12-31");
+      Vector< Task > tasks;
+      for (auto tit = raw.begin(); tit != raw.end(); ++tit)
+      {
+        tasks.pushBack(*tit);
+      }
+      for (size_t i = 0; i < tasks.getSize(); ++i)
+      {
+        for (size_t j = i + 1; j < tasks.getSize(); ++j)
+        {
+          if (tasks[i].getDate() > tasks[j].getDate() || (tasks[i].getDate() == tasks[j].getDate() &&
+            tasks[i].getTimeStart() > tasks[j].getTimeStart()))
+          {
+            std::swap(tasks[i], tasks[j]);
+          }
+        }
+      }
+      for (size_t i = 0; i < tasks.getSize(); ++i)
+      {
+        file << "    ID " << tasks[i].getId() << ": " << tasks[i].getTitle() << " | " << tasks[i].getDate() << " "
+          << tasks[i].getTimeStart() << "-" << tasks[i].getTimeEnd() << " | " << tasks[i].getImportance() << "\n";
+      }
+    }
+    file << "\nUnplaced tasks:\n";
+    List< Task > rawUnp;
+    profile.getAllUnplaced(rawUnp);
+    Vector< Task > unplaced;
+    for (auto it = rawUnp.begin(); it != rawUnp.end(); ++it)
+    {
+      unplaced.pushBack(*it);
+    }
+    for (size_t i = 0; i < unplaced.getSize(); ++i)
+    {
+      for (size_t j = i + 1; j < unplaced.getSize(); ++j)
+      {
+        if (unplaced[i].getDate() > unplaced[j].getDate() || (unplaced[i].getDate() == unplaced[j].getDate() &&
+          unplaced[i].getTimeStart() > unplaced[j].getTimeStart()))
+        {
+          std::swap(unplaced[i], unplaced[j]);
+        }
+      }
+    }
+    for (size_t i = 0; i < unplaced.getSize(); ++i)
+    {
+      file << "  ID " << unplaced[i].getId() << ": " << unplaced[i].getTitle() << " | " << unplaced[i].getDate() << " "
+        << unplaced[i].getTimeStart() << "-" << unplaced[i].getTimeEnd() << " | " << unplaced[i].getImportance()
+        << "\n";
+    }
+    file.close();
+    std::cout << "[OK] Profile exported to " << filename << "\n";
+    return true;
+  }
+
+  bool Scheduler::importProfile(const std::string & filename)
+  {
+    if (filename.empty())
+    {
+      std::cout << "[ERROR] Filename cannot be empty\n";
+      return false;
+    }
+    std::ifstream file(filename);
+    if (!file.is_open())
+    {
+      std::cout << "[ERROR] File not found: " << filename << "\n";
+      return false;
+    }
+    std::string line;
+    if (!std::getline(file, line) || line.find("Profile: ") != 0)
+    {
+      std::cout << "[ERROR] Invalid format: missing 'Profile:' header\n";
+      return false;
+    }
+    std::string profileName = line.substr(9);
+    if (profileName.empty())
+    {
+      std::cout << "[ERROR] Invalid format: empty profile name\n";
+      return false;
+    }
+    std::string importName = profileName;
+    int counter = 1;
+    while (profiles_.contains(ProfileKey{importName}))
+    {
+      importName = profileName + "_imported";
+      if (counter > 1)
+      {
+        importName += "_" + std::to_string(counter);
+      }
+      counter++;
+    }
+    Profile newProfile(importName);
+    if (std::getline(file, line) && line.find("Next task ID: ") == 0)
+    {
+      try
+      {
+        int id = std::stoi(line.substr(14));
+        if (id >= 1)
+        {
+          newProfile.setNextTaskId(id);
+        }
+      }
+      catch (...)
+      {}
+    }
+    std::getline(file, line);
+    std::string curSched;
+    while (std::getline(file, line))
+    {
+      if (line.size() >= 2 && line[0] == ' ' && line[1] == ' ' && line[2] != ' ')
+      {
+        size_t colon = line.find(':');
+        if (colon != std::string::npos)
+        {
+          curSched = line.substr(2, colon - 2);
+          if (!curSched.empty())
+          {
+            newProfile.addSchedule(curSched);
+          }
+        }
+      }
+      else if (line.size() >= 6 && line.substr(0, 6) == "    ID " && !curSched.empty())
+      {
+        size_t pos = 6;
+        size_t idEnd = line.find(':', pos);
+        if (idEnd == std::string::npos)
+        {
+          continue;
+        }
+        int id = std::stoi(line.substr(pos, idEnd - pos));
+        pos = idEnd + 2;
+        size_t titleEnd = line.find(" | ", pos);
+        if (titleEnd == std::string::npos)
+        {
+          continue;
+        }
+        std::string title = line.substr(pos, titleEnd - pos);
+        pos = titleEnd + 3;
+        size_t dateEnd = line.find(' ', pos);
+        if (dateEnd == std::string::npos)
+        {
+          continue;
+        }
+        std::string date = line.substr(pos, dateEnd - pos);
+        pos = dateEnd + 1;
+        size_t timesEnd = line.find(" | ", pos);
+        if (timesEnd == std::string::npos)
+        {
+          continue;
+        }
+        std::string times = line.substr(pos, timesEnd - pos);
+        size_t dash = times.find('-');
+        if (dash == std::string::npos)
+        {
+          continue;
+        }
+        std::string timeStart = times.substr(0, dash);
+        std::string timeEnd = times.substr(dash + 1);
+        pos = timesEnd + 3;
+        std::string importance = line.substr(pos);
+        if (importance != "low" && importance != "mid" && importance != "high")
+        {
+          importance = "mid";
+        }
+        newProfile.addTaskToSchedule(curSched, Task(id, title, date, timeStart, timeEnd, importance, curSched, true));
+      }
+      else if (line.size() >= 8 && line.substr(0, 8) == "Unplaced")
+      {
+        break;
+      }
+    }
+    if (line.size() >= 8 && line.substr(0, 8) == "Unplaced")
+    {
+      while (std::getline(file, line))
+      {
+        if (line.size() >= 4 && line.substr(0, 4) == "  ID")
+        {
+          size_t pos = 4;
+          size_t idEnd = line.find(':', pos);
+          if (idEnd == std::string::npos)
+          {
+            continue;
+          }
+          int id = std::stoi(line.substr(pos, idEnd - pos));
+          pos = idEnd + 2;
+          size_t titleEnd = line.find(" | ", pos);
+          if (titleEnd == std::string::npos)
+          {
+            continue;
+          }
+          std::string title = line.substr(pos, titleEnd - pos);
+          pos = titleEnd + 3;
+          size_t dateEnd = line.find(' ', pos);
+          if (dateEnd == std::string::npos)
+          {
+            continue;
+          }
+          std::string date = line.substr(pos, dateEnd - pos);
+          pos = dateEnd + 1;
+          size_t timesEnd = line.find(" | ", pos);
+          if (timesEnd == std::string::npos)
+          {
+            continue;
+          }
+          std::string times = line.substr(pos, timesEnd - pos);
+          size_t dash = times.find('-');
+          if (dash == std::string::npos)
+          {
+            continue;
+          }
+          std::string timeStart = times.substr(0, dash);
+          std::string timeEnd = times.substr(dash + 1);
+          pos = timesEnd + 3;
+          std::string importance = line.substr(pos);
+          if (importance != "low" && importance != "mid" && importance != "high")
+          {
+            importance = "mid";
+          }
+          newProfile.addToUnplaced(Task(id, title, date, timeStart, timeEnd, importance, "", false));
+        }
+      }
+    }
+    file.close();
+    profiles_.insert(ProfileKey{importName}, newProfile);
+    std::cout << "[OK] Profile loaded from " << filename << "\n";
+    std::cout << "[OK] Imported as \"" << importName << "\"\n";
     return true;
   }
 }
