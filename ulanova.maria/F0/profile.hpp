@@ -1,6 +1,7 @@
 #ifndef PROFILE_HPP
 #define PROFILE_HPP
 
+#include "operation.hpp"
 #include "saving.hpp"
 
 #include <vector>
@@ -13,6 +14,7 @@ namespace ulanova
     std::string name;
     long long balance;
     std::vector< Saving > savings;
+    std::vector< Operation > operations;
   };
 }
 

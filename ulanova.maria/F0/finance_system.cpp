@@ -10,7 +10,7 @@ void ulanova::FinanceSystem::create_profile(const std::string& name)
   }
 
   const Saving default_saving{"default", 0, 0, 999};
-  Profile profile{name, 0, {default_saving}};
+  Profile profile{name, 0, {default_saving}, {}};
   profiles_.push_back(profile);
 }
 
