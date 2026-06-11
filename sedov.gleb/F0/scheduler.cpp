@@ -1254,4 +1254,105 @@ namespace sedov
     std::cout << "[OK] Imported as \"" << importName << "\"\n";
     return true;
   }
+
+  bool Scheduler::findProfile(const std::string & name, Profile & outProf) const
+  {
+    if (name.empty())
+    {
+      return false;
+    }
+    return profiles_.find(ProfileKey{name}, outProf);
+  }
+
+  bool Scheduler::findSchedule(const std::string & profName, const std::string & schedName, Schedule & outSched) const
+  {
+    if (profName.empty() || schedName.empty()) 
+    {
+      return false;
+    }
+    Profile profile;
+    if (!findProfile(profName, profile))
+    {
+      return false;
+    }
+    return profile.findSchedule(schedName, outSched);
+  }
+
+  bool Scheduler::findTask(const std::string & profName, const std::string & schedName, int id, Task & outTask) const
+  {
+    if (profName.empty() || schedName.empty() || id <= 0)
+    {
+      return false;
+    }
+    Profile profile;
+    if (!findProfile(profName, profile))
+    {
+      return false;
+    }
+    return profile.findTaskInSchedule(schedName, id, outTask);
+  }
+
+  Vector< TimeWindow > Scheduler::findFreeWindowsInSchedule(const Schedule & sched, const std::string & dateFrom,
+    const std::string & dateTo, int min_duration_minutes) const
+  {
+    Vector< TimeWindow > result;
+    int y1, m1, d1, y2, m2, d2;
+    if (!parseDate(dateFrom, y1, m1, d1) || !parseDate(dateTo, y2, m2, d2))
+    {
+      return result;
+    }
+    if (dateFrom > dateTo)
+    {
+      return result;
+    }
+    std::string curDate = dateFrom;
+    while (compareDates(curDate, dateTo) <= 0)
+    {
+      List< Task > tasks = sched.getTasksOnDate(curDate);
+      Vector< std::pair< int,int > > busy;
+      for (auto it = tasks.begin(); it != tasks.end(); ++it)
+      {
+        int sh, sm, eh, em;
+        parseTime((*it).getTimeStart(), sh, sm);
+        parseTime((*it).getTimeEnd(), eh, em);
+        busy.pushBack({sh*60+sm, eh*60+em});
+      }
+      for (size_t i = 0; i < busy.getSize(); ++i)
+      {
+        for (size_t j = i+1; j < busy.getSize(); ++j)
+        {
+          if (busy[i].first > busy[j].first)
+          {
+            std::swap(busy[i], busy[j]);
+          }
+        }
+      }
+      int curStart = 0;
+      for (size_t i = 0; i < busy.getSize(); ++i)
+      {
+        if (curStart + min_duration_minutes <= busy[i].first)
+        {
+          TimeWindow w(curDate, curStart, busy[i].first);
+          if (w.getDurationMinutes() >= min_duration_minutes)
+          {
+            result.pushBack(w);
+          }
+        }
+        if (curStart < busy[i].second)
+        {
+          curStart = busy[i].second;
+        }
+      }
+      if (curStart + min_duration_minutes <= 1440)
+      {
+        TimeWindow w(curDate, curStart, 1440);
+        if (w.getDurationMinutes() >= min_duration_minutes)
+        {
+          result.pushBack(w);
+        }
+      }
+      curDate = nextDay(curDate);
+    }
+    return result;
+  }
 }
