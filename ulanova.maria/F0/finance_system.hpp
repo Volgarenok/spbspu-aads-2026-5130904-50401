@@ -13,7 +13,7 @@ namespace ulanova
   public:
     void create_profile(const std::string& name);
     bool has_profile(const std::string& name) const;
-
+    long long get_balance(const std::string& name) const;
   private:
     std::vector< Profile > profiles_;
   };

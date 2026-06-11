@@ -25,6 +25,22 @@ namespace
     }
   }
 
+  void show_balance(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  {
+    std::string name;
+    std::string date;
+    in >> name >> date;
+
+    try
+    {
+      out << "Баланс: " << system.get_balance(name) << "\n";
+    }
+    catch (const std::logic_error&)
+    {
+      out << "Профиль не существует\n";
+    }
+  }
+
   void invalid_command(std::istream& in, std::ostream& out)
   {
     out << "<INVALID COMMAND>\n";
@@ -41,6 +57,7 @@ int main()
   ulanova::FinanceSystem system;
   commands_t commands;
   commands["create-profile"] = create_profile;
+  commands["show-balance"] = show_balance;
 
   std::string command;
   while (std::cin >> command)

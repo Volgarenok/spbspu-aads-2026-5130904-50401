@@ -27,3 +27,14 @@ bool ulanova::FinanceSystem::has_profile(const std::string& name) const
   return false;
 }
 
+long long ulanova::FinanceSystem::get_balance(const std::string& name) const
+{
+  for (size_t i = 0; i < profiles_.size(); ++i)
+  {
+    if (profiles_[i].name == name)
+    {
+      return profiles_[i].balance;
+    }
+  }
+  throw std::logic_error("profile not found");
+}
