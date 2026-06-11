@@ -9,6 +9,41 @@ namespace sedov
     currentProfile_.clear();
   }
 
+  std::string nextDay(const std::string & date)
+  {
+    int y, m, d;
+    if (!parseDate(date, y, m, d))
+    {
+      return date;
+    }
+    const int dim[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+    bool leap = (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
+    int maxd = (m == 2 && leap) ? 29 : dim[m-1];
+    d++;
+    if (d > maxd)
+    {
+      d = 1; m++;
+    }
+    if (m > 12)
+    {
+      m = 1; y++;
+    }
+    return pad(y) + "-" + pad(m) + "-" + pad(d);
+  }
+
+  int compareDates(const std::string & a, const std::string & b)
+  {
+    if (a < b)
+    {
+      return -1;
+    }
+    if (a > b)
+    {
+      return 1;
+    }
+    return 0;
+  }
+
   bool Scheduler::createProfile(const std::string & name)
   {
     if (name.empty())
@@ -905,24 +940,7 @@ namespace sedov
     std::string weekEnd = today;
     for (int i = 0; i < 7; ++i)
     {
-      int y = std::stoi(weekEnd.substr(0, 4));
-      int m = std::stoi(weekEnd.substr(5, 2));
-      int d = std::stoi(weekEnd.substr(8, 2));
-      const int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-      bool isLeap = (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
-      int maxDay = (m == 2 && isLeap) ? 29 : daysInMonth[m - 1];
-      d++;
-      if (d > maxDay)
-      {
-        d = 1;
-        m++;
-        if (m > 12)
-        {
-          m = 1;
-          y++;
-        }
-      }
-      weekEnd = pad(y) + "-" + pad(m) + "-" + pad(d);
+      weekEnd = nextDay(weekEnd);
     }
     Vector< TimeWindow > w1 = findFreeWindowsInSchedule(sch1, today, weekEnd, min_minutes);
     Vector< TimeWindow > w2 = findFreeWindowsInSchedule(sch2, today, weekEnd, min_minutes);
@@ -1354,5 +1372,80 @@ namespace sedov
       curDate = nextDay(curDate);
     }
     return result;
+  }
+
+  bool Scheduler::canPlaceTask(const Schedule & sched, const Task & task, const std::string & newDate,
+    const std::string & newTimeStart, std::string & outTimeEnd) const
+  {
+    int y, m, d;
+    if (!parseDate(newDate, y, m, d))
+    {
+      return false;
+    }
+    int dur = task.getDurationMinutes();
+    int sh, sm;
+    if (!parseTime(newTimeStart, sh, sm))
+    {
+      return false;
+    }
+    int start_min = sh*60 + sm, end_min = start_min + dur;
+    if (end_min > 1440)
+    {
+      return false;
+    }
+    outTimeEnd = formatTime(end_min);
+    Task tmp = task;
+    tmp.setDate(newDate);
+    tmp.setTimeStart(newTimeStart);
+    tmp.setTimeEnd(outTimeEnd);
+    return !sched.hasConflict(tmp);
+  }
+
+  void Scheduler::resolveConflict(Task & task1, Task & task2, const std::string & criterion, Task & keep, Task & move)
+  {
+    if (criterion == "importance")
+    {
+      if (task1.getImportanceValue() >= task2.getImportanceValue())
+      {
+        keep = task1;
+        move = task2;
+      }
+      else
+      {
+        keep = task2;
+        move = task1;
+      }
+    }
+    else if (criterion == "short")
+    {
+      if (task1.getDurationMinutes() <= task2.getDurationMinutes())
+      {
+        keep = task1;
+        move = task2;
+      }
+      else
+      {
+        keep = task2;
+        move = task1;
+      }
+    }
+    else if (criterion == "long")
+    {
+      if (task1.getDurationMinutes() >= task2.getDurationMinutes())
+      {
+        keep = task1;
+        move = task2;
+      }
+      else
+      {
+        keep = task2;
+        move = task1;
+      }
+    }
+    else
+    {
+      keep = task1;
+      move = task2;
+    }
   }
 }
