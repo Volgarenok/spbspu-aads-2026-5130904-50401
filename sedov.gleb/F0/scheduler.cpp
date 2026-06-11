@@ -738,4 +738,259 @@ namespace sedov
     std::cout << "Total: " << count << " task(s) will be moved to unplaced\n";
     return true;
   }
+
+  bool Scheduler::optimizeRange(const std::string & profName, const std::string & dateFrom, const std::string & dateTo,
+    const std::string & criterion, const std::vector< std::string > & targetScheds)
+  {
+    if (profName.empty())
+    {
+      std::cout << "[ERROR] Profile name cannot be empty\n";
+      return false;
+    }
+    Profile profile;
+    if (!findProfile(profName, profile))
+    {
+      std::cout << "[ERROR] Profile \"" << profName << "\" not found\n";
+      return false;
+    }
+    if (criterion != "importance" && criterion != "short" && criterion != "long")
+    {
+      std::cout << "[ERROR] Invalid criterion. Use: importance, short, long\n";
+      return false;
+    }
+    int y1, m1, d1, y2, m2, d2;
+    if (!parseDate(dateFrom, y1, m1, d1))
+    {
+      std::cout << "[ERROR] Invalid date_from format: " << dateFrom << "\n";
+      return false;
+    }
+    if (!parseDate(dateTo, y2, m2, d2))
+    {
+      std::cout << "[ERROR] Invalid date_to format: " << dateTo << "\n";
+      return false;
+    }
+    if (dateFrom > dateTo)
+    {
+      std::cout << "[ERROR] date_from must be <= date_to\n";
+      return false;
+    }
+    List< Schedule > targetScheds1;
+    if (targetScheds.empty())
+    {
+      profile.getAllSchedules(targetScheds1);
+    }
+    else
+    {
+      for (size_t idx = 0; idx < targetScheds.size(); ++idx)
+      {
+        const std::string & name = targetScheds[idx];
+        if (name.empty())
+        {
+          std::cout << "[ERROR] Schedule name cannot be empty\n";
+          return false;
+        }
+        Schedule s;
+        if (!profile.findSchedule(name, s))
+        {
+          std::cout << "[ERROR] Schedule \"" << name << "\" not found\n"; 
+          return false;
+        }
+        targetScheds1.pushBack(s);
+      }
+    }
+    int moved = 0;
+    for (auto sch_it = targetScheds1.begin(); sch_it != targetScheds1.end(); ++sch_it)
+    {
+      Schedule schedule = *sch_it;
+      List< Task > schedTasks = schedule.getTasksInRange(dateFrom, dateTo);
+      Vector< Task > pool;
+      for (auto it = schedTasks.begin(); it != schedTasks.end(); ++it) 
+      {
+        pool.pushBack(*it);
+      }
+      List< Task > unplaced;
+      profile.getAllUnplaced(unplaced);
+      for (auto it = unplaced.begin(); it != unplaced.end(); ++it)
+      {
+        if ((*it).getDate() >= dateFrom && (*it).getDate() <= dateTo
+          && (*it).getScheduleName() == schedule.getName())
+        {
+          pool.pushBack(*it);
+        }
+      }
+      for (size_t i = 0; i < pool.getSize(); ++i)
+      {
+        for (size_t j = i + 1; j < pool.getSize(); ++j)
+        {
+          bool need_swap = false;
+          if (criterion == "importance")
+          {
+            need_swap = pool[i].getImportanceValue() < pool[j].getImportanceValue();
+          }
+          else if (criterion == "short")
+          {
+            need_swap = pool[i].getDurationMinutes() > pool[j].getDurationMinutes();
+          }
+          else if (criterion == "long")
+          {
+            need_swap = pool[i].getDurationMinutes() < pool[j].getDurationMinutes();
+          }
+          if (need_swap)
+          {
+            std::swap(pool[i], pool[j]);
+          }
+        }
+      }
+      List< Task > toRemove = schedule.getTasksInRange(dateFrom, dateTo);
+      for (auto it = toRemove.begin(); it != toRemove.end(); ++it)
+      {
+        schedule.removeTask((*it).getId());
+      }
+      for (size_t i = 0; i < pool.getSize(); ++i)
+      {
+        Task t = pool[i];
+        if (!schedule.hasConflict(t))
+        {
+          schedule.addTask(t);
+        }
+        else
+        {
+          if (t.isActive())
+          {
+            t.setActive(false);
+            profile.addToUnplaced(t);
+            moved++;
+          }
+        }
+      }
+      profile.updateSchedule(schedule.getName(), schedule);
+    }
+    profiles_.insert(ProfileKey{profName}, profile);
+    std::cout << "[OK] Optimization complete. " << moved << " tasks moved to unplaced\n";
+    return true;
+  }
+
+  bool Scheduler::findBestDay(const std::string & prof1, const std::string & sched1, const std::string & prof2,
+    const std::string & sched2, int minHours)
+  {
+    if (prof1.empty() || prof2.empty())
+    {
+      std::cout << "[ERROR] Profile names cannot be empty\n";
+      return false;
+    }
+    if (sched1.empty() || sched2.empty())
+    {
+      std::cout << "[ERROR] Schedule names cannot be empty\n";
+      return false;
+    }
+    if (minHours < 1 || minHours > 23)
+    {
+      std::cout << "[ERROR] min_hours must be in range [1; 23]\n";
+      return false;
+    }
+    Schedule sch1, sch2;
+    if (!findSchedule(prof1, sched1, sch1) || !findSchedule(prof2, sched2, sch2))
+    {
+      std::cout << "[ERROR] Schedule not found\n";
+      return false;
+    }
+    int min_minutes = minHours * 60;
+    std::cout << "Searching best day for profiles and schedules: " << prof1 << "." << sched1 << ", " << prof2 << "."
+      << sched2 << "\nMinimum hours required: " << minHours << "\n\n";
+    std::time_t now = std::time(nullptr);
+    std::tm * tmNow = std::localtime(&now);
+    std::string today = pad(tmNow->tm_year + 1900) + "-" + pad(tmNow->tm_mon + 1) + "-" + pad(tmNow->tm_mday);
+    std::string weekEnd = today;
+    for (int i = 0; i < 7; ++i)
+    {
+      int y = std::stoi(weekEnd.substr(0, 4));
+      int m = std::stoi(weekEnd.substr(5, 2));
+      int d = std::stoi(weekEnd.substr(8, 2));
+      const int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+      bool isLeap = (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
+      int maxDay = (m == 2 && isLeap) ? 29 : daysInMonth[m - 1];
+      d++;
+      if (d > maxDay)
+      {
+        d = 1;
+        m++;
+        if (m > 12)
+        {
+          m = 1;
+          y++;
+        }
+      }
+      weekEnd = pad(y) + "-" + pad(m) + "-" + pad(d);
+    }
+    Vector< TimeWindow > w1 = findFreeWindowsInSchedule(sch1, today, weekEnd, min_minutes);
+    Vector< TimeWindow > w2 = findFreeWindowsInSchedule(sch2, today, weekEnd, min_minutes);
+    Vector< std::string > bestDates;
+    Vector< int > bestStarts;
+    Vector< int > bestEnds;
+    Vector< int > bestDurations;
+    for (size_t i = 0; i < w1.getSize(); ++i)
+    {
+      for (size_t j = 0; j < w2.getSize(); ++j)
+      {
+        if (w1[i].getDate() == w2[j].getDate())
+        {
+          int s = std::max(w1[i].getStartMinutes(), w2[j].getStartMinutes());
+          int e = std::min(w1[i].getEndMinutes(), w2[j].getEndMinutes());
+          int dur = e - s;
+          if (dur >= min_minutes)
+          {
+            bool found = false;
+            for (size_t k = 0; k < bestDates.getSize(); ++k)
+            {
+              if (bestDates[k] == w1[i].getDate())
+              {
+                if (dur > bestDurations[k])
+                {
+                  bestDurations[k] = dur;
+                  bestStarts[k] = s;
+                  bestEnds[k] = e;
+                }
+                found = true;
+                break;
+              }
+            }
+            if (!found)
+            {
+              bestDates.pushBack(w1[i].getDate());
+              bestStarts.pushBack(s);
+              bestEnds.pushBack(e);
+              bestDurations.pushBack(dur);
+            }
+          }
+        }
+      }
+    }
+    if (bestDates.getSize() == 0)
+    {
+      std::cout << "No suitable day found\n";
+      return true;
+    }
+    int bestIndex = 0;
+    for (size_t i = 1; i < bestDurations.getSize(); ++i)
+    {
+      if (bestDurations[i] > bestDurations[bestIndex])
+      {
+        bestIndex = i;
+      }
+    }
+    for (size_t i = 0; i < bestDates.getSize(); ++i)
+    {
+      std::cout << "  " << bestDates[i] << " " << formatTime(bestStarts[i]) << "-" << formatTime(bestEnds[i])
+        << " (" << bestDurations[i] / 60 << "h " << bestDurations[i] % 60 << "m)";
+      if (i == static_cast< size_t >(bestIndex))
+      {
+        std::cout << " [BEST]";
+      }
+      std::cout << "\n";
+    }
+    std::cout << "\n[OK] Best day: " << bestDates[bestIndex] << "\n     Longest free window: "
+      << formatTime(bestStarts[bestIndex]) << "-" << formatTime(bestEnds[bestIndex])
+      << " (" << bestDurations[bestIndex] / 60 << "h " << bestDurations[bestIndex] % 60 << "m)\n";
+    return true;
+  }
 }
