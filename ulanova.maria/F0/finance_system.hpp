@@ -13,6 +13,7 @@ namespace ulanova
   public:
     void create_profile(const std::string& name);
     void drop_profile(const std::string& name);
+    void add_income(const std::string& name, long long amount, const std::string& date);
     bool has_profile(const std::string& name) const;
     long long get_balance(const std::string& name) const;
   private:

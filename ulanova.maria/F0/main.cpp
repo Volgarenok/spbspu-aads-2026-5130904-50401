@@ -56,6 +56,23 @@ namespace
     }
   }
 
+  void add_income(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  {
+    std::string name;
+    long long amount = 0;
+    std::string date;
+    in >> name >> amount >> date;
+
+    try
+    {
+      system.add_income(name, amount, date);
+    }
+    catch (const std::logic_error&)
+    {
+      out << "Профиль не существует\n";
+    }
+  }
+
   void invalid_command(std::istream& in, std::ostream& out)
   {
     out << "<INVALID COMMAND>\n";
@@ -74,6 +91,7 @@ int main()
   commands["create-profile"] = create_profile;
   commands["show-balance"] = show_balance;
   commands["drop-profile"] = drop_profile;
+  commands["add-income"] = add_income;
 
   std::string command;
   while (std::cin >> command)

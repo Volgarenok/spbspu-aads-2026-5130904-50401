@@ -52,3 +52,19 @@ void ulanova::FinanceSystem::drop_profile(const std::string& name)
 
   throw std::logic_error("profile not found");
 }
+
+void ulanova::FinanceSystem::add_income(const std::string& name, long long amount, const std::string& date)
+{
+  for (size_t i = 0; i < profiles_.size(); ++i)
+  {
+    if (profiles_[i].name == name)
+    {
+      Operation operation{amount, date, true};
+      profiles_[i].operations.push_back(operation);
+      profiles_[i].balance += amount;
+      return;
+    }
+  }
+
+  throw std::logic_error("profile not found");
+}
