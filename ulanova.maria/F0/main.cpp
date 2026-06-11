@@ -1,3 +1,5 @@
+#include "finance_system.hpp"
+
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -6,7 +8,22 @@
 
 namespace
 {
-  using command_t = void (*)(std::istream&, std::ostream&);
+  using command_t = void (*)(std::istream&, std::ostream&, ulanova::FinanceSystem&);
+
+  void create_profile(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  {
+    std::string name;
+    in >> name;
+
+    try
+    {
+      system.create_profile(name);
+    }
+    catch (const std::logic_error&)
+    {
+      out << "Профиль уже существует\n";
+    }
+  }
 
   void invalid_command(std::istream& in, std::ostream& out)
   {
@@ -21,14 +38,16 @@ int main()
 {
   using commands_t = std::unordered_map< std::string, command_t >;
 
+  ulanova::FinanceSystem system;
   commands_t commands;
+  commands["create-profile"] = create_profile;
 
   std::string command;
   while (std::cin >> command)
   {
     try
     {
-      commands.at(command)(std::cin, std::cout);
+      commands.at(command)(std::cin, std::cout, system);
     }
     catch (const std::out_of_range&)
     {
