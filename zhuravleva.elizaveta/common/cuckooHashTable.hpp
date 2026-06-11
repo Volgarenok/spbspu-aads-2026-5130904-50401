@@ -66,6 +66,8 @@ namespace zhuravleva
     bool insertToEmpty(const Key& key, const Value& value);
     bool insertWithDisplacement(const Key& key, const Value& value);
     void rehash(size_t newCapacity);
+    bool insertInternal(const Key& key, const Value& value);
+    void moveElementsTo(CuckooHashTable& dest) const;
   };
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
@@ -254,9 +256,9 @@ namespace zhuravleva
         std::swap(current, table1_[index].data);
         table1_[index].occupied = true;
         inFirstTable = false;
-        if (!table2_[getIndex2(current.first)].occupied)
+        size_t index2 = getIndex2(current.first);
+        if (!table2_[index2].occupied)
         {
-          size_t index2 = getIndex2(current.first);
           table2_[index2].data = current;
           table2_[index2].occupied = true;
           ++size_;
@@ -269,9 +271,9 @@ namespace zhuravleva
         std::swap(current, table2_[index].data);
         table2_[index].occupied = true;
         inFirstTable = true;
-        if (!table1_[getIndex1(current.first)].occupied)
+        size_t index1 = getIndex1(current.first);
+        if (!table1_[index1].occupied)
         {
-          size_t index1 = getIndex1(current.first);
           table1_[index1].data = current;
           table1_[index1].occupied = true;
           ++size_;
@@ -286,49 +288,66 @@ namespace zhuravleva
   void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insert(
       const Key& key, const Value& value)
   {
-    if (updateIfExists(key, value))
-    {
-      return;
-    }
-    if (insertToEmpty(key, value))
-    {
-      return;
-    }
     CuckooHashTable temp(*this);
-    if (temp.insertWithDisplacement(key, value))
+    while (!temp.insertInternal(key, value))
     {
-      swap(temp);
-      return;
+      temp.rehash(temp.table1_.size() * 2);
     }
-    temp.rehash(table1_.size() * 2);
-    temp.insert(key, value);
     swap(temp);
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
   void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::rehash(size_t newCapacity)
   {
-    myVector< Cell > oldTable1(table1_);
-    myVector< Cell > oldTable2(table2_);
-    table1_ = myVector< Cell >(newCapacity);
-    table2_ = myVector< Cell >(newCapacity);
-    size_ = 0;
-    for (size_t i = 0; i < oldTable1.size(); ++i)
+    CuckooHashTable temp;
+    temp.table1_ = myVector< Cell >(newCapacity);
+    temp.table2_ = myVector< Cell >(newCapacity);
+    temp.size_ = 0;
+    moveElementsTo(temp);
+    swap(temp);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insertInternal(
+      const Key& key, const Value& value)
+  {
+    if (updateIfExists(key, value))
     {
-      if (oldTable1[i].occupied)
+      return true;
+    }
+    if (insertToEmpty(key, value))
+    {
+      return true;
+    }
+    return insertWithDisplacement(key, value);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::moveElementsTo(
+      CuckooHashTable& dest) const
+  {
+    for (size_t i = 0; i < table1_.size(); ++i)
+    {
+      if (table1_[i].occupied)
       {
-        insert(oldTable1[i].data.first, oldTable1[i].data.second);
+        while (!dest.insertInternal(table1_[i].data.first, table1_[i].data.second))
+        {
+          dest.rehash(dest.table1_.size() * 2);
+        }
       }
     }
-    for (size_t i = 0; i < oldTable2.size(); ++i)
+
+    for (size_t i = 0; i < table2_.size(); ++i)
     {
-      if (oldTable2[i].occupied)
+      if (table2_[i].occupied)
       {
-        insert(oldTable2[i].data.first, oldTable2[i].data.second);
+        while (!dest.insertInternal(table2_[i].data.first, table2_[i].data.second))
+        {
+          dest.rehash(dest.table1_.size() * 2);
+        }
       }
     }
   }
-
 }
 
 #endif
