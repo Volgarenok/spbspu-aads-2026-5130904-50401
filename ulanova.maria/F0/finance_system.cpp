@@ -9,7 +9,8 @@ void ulanova::FinanceSystem::create_profile(const std::string& name)
     throw std::logic_error("profile already exists");
   }
 
-  Profile profile{name, 0};
+  const Saving default_saving{"default", 0, 0, 999};
+  Profile profile{name, 0, {default_saving}};
   profiles_.push_back(profile);
 }
 
