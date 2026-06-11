@@ -38,6 +38,7 @@ namespace zhuravleva
     bool contains(const Key& key) const;
     Value& get(const Key& key);
     const Value& get(const Key& key) const;
+    void insert(const Key& key, const Value& value);
 
   private:
     struct Cell
@@ -59,6 +60,8 @@ namespace zhuravleva
     Equal equal_;
     size_t getIndex1(const Key& key) const;
     size_t getIndex2(const Key& key) const;
+    bool updateIfExists(const Key& key, const Value& value);
+    bool insertToEmpty(const Key& key, const Value& value);
   };
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
@@ -190,6 +193,64 @@ namespace zhuravleva
     }
     throw std::out_of_range("key not found");
   }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::updateIfExists(
+      const Key& key, const Value& value)
+  {
+    size_t index1 = getIndex1(key);
+    if (table1_[index1].occupied && equal_(table1_[index1].data.first, key))
+    {
+      table1_[index1].data.second = value;
+      return true;
+    }
+    size_t index2 = getIndex2(key);
+    if (table2_[index2].occupied && equal_(table2_[index2].data.first, key))
+    {
+      table2_[index2].data.second = value;
+      return true;
+    }
+    return false;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insertToEmpty(
+      const Key& key, const Value& value)
+  {
+    size_t index1 = getIndex1(key);
+    if (!table1_[index1].occupied)
+    {
+      table1_[index1].data = std::make_pair(key, value);
+      table1_[index1].occupied = true;
+      ++size_;
+      return true;
+    }
+    size_t index2 = getIndex2(key);
+    if (!table2_[index2].occupied)
+    {
+      table2_[index2].data = std::make_pair(key, value);
+      table2_[index2].occupied = true;
+      ++size_;
+      return true;
+    }
+    return false;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insert(
+      const Key& key, const Value& value)
+  {
+    if (updateIfExists(key, value))
+    {
+      return;
+    }
+    if (insertToEmpty(key, value))
+    {
+      return;
+    }
+    throw std::runtime_error("cuckoo insertion failed");
+  }
+
 }
 
 #endif
