@@ -508,4 +508,93 @@ namespace sedov
     std::cout << "\nResult: " << placed << " placed, " << failed << " failed\n";
     return true;
   }
+
+  bool Scheduler::findFreeWindow(const std::string & prof1, const std::string & sched1, const std::string & prof2,
+    const std::string & sched2, const std::string & dateFrom, const std::string & dateTo, int minHours)
+  {
+    if (prof1.empty() || prof2.empty())
+    {
+      std::cout << "[ERROR] Profile names cannot be empty\n";
+      return false;
+    }
+    if (sched1.empty() || sched2.empty())
+    {
+      std::cout << "[ERROR] Schedule names cannot be empty\n";
+      return false;
+    }
+    int y1, m1, d1, y2, m2, d2;
+    if (!parseDate(dateFrom, y1, m1, d1))
+    {
+      std::cout << "[ERROR] Invalid date_from format: " << dateFrom << "\n";
+      return false;
+    }
+    if (!parseDate(dateTo, y2, m2, d2))
+    {
+      std::cout << "[ERROR] Invalid date_to format: " << dateTo << "\n";
+      return false;
+    }
+    if (minHours < 1 || minHours > 23)
+    {
+      std::cout << "[ERROR] min_hours must be in range [1; 23]\n";
+      return false;
+    }
+    if (dateFrom > dateTo)
+    {
+      std::cout << "[ERROR] date_from must be <= date_to\n";
+      return false;
+    }
+    Schedule sch1, sch2;
+    if (!findSchedule(prof1, sched1, sch1))
+    {
+      std::cout << "[ERROR] Schedule \"" << sched1 << "\" not found in profile \"" << prof1 << "\"\n";
+      return false;
+    }
+    if (!findSchedule(prof2, sched2, sch2))
+    {
+      std::cout << "[ERROR] Schedule \"" << sched2 << "\" not found in profile \"" << prof2 << "\"\n";
+      return false;
+    }
+    int min_minutes = minHours * 60;
+    std::cout << "Searching shared free windows\nProfiles and schedules: " << prof1 << "." << sched1
+      << ", " << prof2 << "." << sched2 << "\nMin duration: " << minHours << " hours\nDate range: " << dateFrom
+      << " - " << dateTo << "\n\n";
+    Vector< TimeWindow > windows1 = findFreeWindowsInSchedule(sch1, dateFrom, dateTo, min_minutes);
+    Vector< TimeWindow > windows2 = findFreeWindowsInSchedule(sch2, dateFrom, dateTo, min_minutes);
+    Vector< TimeWindow > common;
+    for (size_t i = 0; i < windows1.getSize(); ++i)
+    {
+      for (size_t j = 0; j < windows2.getSize(); ++j)
+      {
+        if (windows1[i].getDate() == windows2[j].getDate())
+        {
+          int start = std::max(windows1[i].getStartMinutes(), windows2[j].getStartMinutes());
+          int end = std::min(windows1[i].getEndMinutes(), windows2[j].getEndMinutes());
+          if (end - start >= min_minutes)
+          {
+            TimeWindow w(windows1[i].getDate(), start, end);
+            common.pushBack(w);
+          }
+        }
+      }
+    }
+    if (common.getSize() == 0)
+    {
+      std::cout << "No free windows found\n";
+      return true;
+    }
+    int best = 0;
+    for (size_t i = 1; i < common.getSize(); ++i)
+    {
+      if (common[i].getDurationMinutes() > common[best].getDurationMinutes())
+      {
+        best = i;
+      }
+    }
+    for (size_t i = 0; i < common.getSize(); ++i)
+    {
+      std::cout << "  " << common[i].format() << (i == (size_t)best ? " [BEST]" : "") << "\n";
+    }
+    std::cout << "\n[OK] Best: " << common[best].format() << "\n";
+    return true;
+  }
 }
