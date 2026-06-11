@@ -32,7 +32,7 @@ namespace zhuravleva
     bool empty() const noexcept;
     size_t size() const noexcept;
     size_t capacity() const noexcept;
-    void clear() noexcept;
+    void clear();
     void erase(const Key& key);
     void swap(CuckooHashTable& other) noexcept;
     bool contains(const Key& key) const;
