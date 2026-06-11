@@ -1,5 +1,5 @@
 #ifndef FINANCE_SYSTEM_HPP
-#define INANCE_SYSTEM_HPP
+#define FINANCE_SYSTEM_HPP
 
 #include "profile.hpp"
 
