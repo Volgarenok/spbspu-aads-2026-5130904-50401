@@ -130,6 +130,7 @@ size_t ulanova::HashTable< Value >::get_first_hash(const std::string& key) const
 template< class Value >
 size_t ulanova::HashTable< Value >::get_second_hash( const std::string& key ) const
 {
+  const size_t hash = std::hash< std::string >{}(key);
   return 1 + (hash % (buckets_.getsize() - 1));
 }
 
