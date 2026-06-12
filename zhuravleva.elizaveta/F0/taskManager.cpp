@@ -230,4 +230,44 @@ namespace zhuravleva
     }
     return count;
   }
+
+  void TaskManager::setDeadline(const std::string& listName,
+      const std::string& taskId, const std::string& deadline)
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    TaskList& list = lists_.get(listName);
+    for (LIter< TaskInList > it = list.tasks.begin(); it != list.tasks.end(); ++it)
+    {
+      if (it->taskId == taskId)
+      {
+        it->deadline = deadline;
+        return;
+      }
+    }
+    throw std::logic_error("task not found in list");
+  }
+
+  void TaskManager::showExpired(const std::string& listName,
+      const std::string& date, std::ostream& out) const
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    for (LCIter< TaskInList > it = list.tasks.cbegin(); it != list.tasks.cend(); ++it)
+    {
+      if (!it->done && !it->deadline.empty() && it->deadline < date)
+      {
+        const Task& task = globalTasks_.get(it->taskId);
+        out << it->taskId << " "
+            << task.labor << " "
+            << it->priority << " "
+            << it->deadline << "\n";
+      }
+    }
+  }
 }
