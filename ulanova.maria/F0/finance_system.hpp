@@ -16,7 +16,7 @@ namespace ulanova
     void add_income(const std::string& name, long long amount, const std::string& date);
     void add_expense(const std::string& name, long long amount, const std::string& date);
     bool has_profile(const std::string& name) const;
-    long long get_balance(const std::string& name) const;
+    long long get_balance(const std::string& name, const std::string& date) const;
   private:
     std::vector< Profile > profiles_;
   };

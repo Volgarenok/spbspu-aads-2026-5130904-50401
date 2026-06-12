@@ -27,13 +27,33 @@ bool ulanova::FinanceSystem::has_profile(const std::string& name) const
   return false;
 }
 
-long long ulanova::FinanceSystem::get_balance(const std::string& name) const
+long long ulanova::FinanceSystem::get_balance(const std::string& name, const std::string& date) const
 {
+  const Date target_date = parse_date(date);
+
   for (size_t i = 0; i < profiles_.size(); ++i)
   {
     if (profiles_[i].name == name)
     {
-      return profiles_[i].balance;
+      long long balance = 0;
+
+      for (size_t j = 0; j < profiles_[i].operations.size(); ++j)
+      {
+        const Operation& operation = profiles_[i].operations[j];
+
+        if (is_before_or_equal(operation.date, target_date))
+        {
+          if (operation.is_income)
+          {
+            balance += operation.amount;
+          }
+          else
+          {
+            balance -= operation.amount;
+          }
+        }
+      }
+      return balance;
     }
   }
   throw std::logic_error("profile not found");

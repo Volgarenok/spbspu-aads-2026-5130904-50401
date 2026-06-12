@@ -33,7 +33,7 @@ namespace
 
     try
     {
-      out << "Баланс: " << system.get_balance(name) << "\n";
+      out << "Баланс: " << system.get_balance(name, date) << "\n";
     }
     catch (const std::logic_error&)
     {

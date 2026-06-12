@@ -40,3 +40,8 @@ bool ulanova::is_before_or_equal(const Date& lhs, const Date& rhs)
 {
   return lhs <= rhs;
 }
+
+bool ulanova::is_after_or_equal(const Date& lhs, const Date& rhs)
+{
+  return lhs >= rhs;
+}
