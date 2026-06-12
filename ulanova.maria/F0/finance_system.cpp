@@ -59,7 +59,7 @@ void ulanova::FinanceSystem::add_income(const std::string& name, long long amoun
   {
     if (profiles_[i].name == name)
     {
-      Operation operation{amount, date, true};
+      Operation operation{amount, parse_date(date), true};
       profiles_[i].operations.push_back(operation);
       profiles_[i].balance += amount;
       return;
@@ -75,7 +75,7 @@ void ulanova::FinanceSystem::add_expense(const std::string& name, long long amou
   {
     if (profiles_[i].name == name)
     {
-      Operation operation{amount, date, false};
+      Operation operation{amount, parse_date(date), false};
       profiles_[i].operations.push_back(operation);
       profiles_[i].balance -= amount;
       return;

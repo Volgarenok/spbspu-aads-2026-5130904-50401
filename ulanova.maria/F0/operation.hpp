@@ -1,14 +1,14 @@
 #ifndef OPERATION_HPP
 #define OPERATION_HPP
 
-#include <string>
+#include "date.hpp"
 
 namespace ulanova
 {
   struct Operation
   {
     long long amount;
-    std::string date;
+    Date date;
     bool is_income;
   };
 }
