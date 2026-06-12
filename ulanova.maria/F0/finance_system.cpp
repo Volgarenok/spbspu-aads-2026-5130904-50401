@@ -104,3 +104,42 @@ void ulanova::FinanceSystem::add_expense(const std::string& name, long long amou
 
   throw std::logic_error("profile not found");
 }
+
+ulanova::Cashflow ulanova::FinanceSystem::get_cashflow(
+  const std::string& name,
+  const std::string& from_date,
+  const std::string& to_date) const
+{
+  const Date from = parse_date(from_date);
+  const Date to = parse_date(to_date);
+
+  for (size_t i = 0; i < profiles_.size(); ++i)
+  {
+    if (profiles_[i].name == name)
+    {
+      Cashflow cashflow{0, 0, 0};
+
+      for (size_t j = 0; j < profiles_[i].operations.size(); ++j)
+      {
+        const Operation& operation = profiles_[i].operations[j];
+
+        if (is_after_or_equal(operation.date, from) && is_before_or_equal(operation.date, to))
+        {
+          if (operation.is_income)
+          {
+            cashflow.income += operation.amount;
+          }
+          else
+          {
+            cashflow.expense += operation.amount;
+          }
+        }
+      }
+
+      cashflow.total = cashflow.income - cashflow.expense;
+      return cashflow;
+    }
+  }
+
+  throw std::logic_error("profile not found");
+}

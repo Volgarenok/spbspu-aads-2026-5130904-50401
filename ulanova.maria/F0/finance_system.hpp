@@ -8,6 +8,13 @@
 
 namespace ulanova
 {
+  struct Cashflow
+  {
+    long long income;
+    long long expense;
+    long long total;
+  };
+
   class FinanceSystem
   {
   public:
@@ -17,6 +24,7 @@ namespace ulanova
     void add_expense(const std::string& name, long long amount, const std::string& date);
     bool has_profile(const std::string& name) const;
     long long get_balance(const std::string& name, const std::string& date) const;
+    Cashflow get_cashflow(const std::string& name, const std::string& from_date, const std::string& to_date) const;
   private:
     std::vector< Profile > profiles_;
   };

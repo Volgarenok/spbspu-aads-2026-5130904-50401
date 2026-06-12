@@ -90,6 +90,27 @@ namespace
     }
   }
 
+  void cashflow(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  {
+    std::string name;
+    std::string from_date;
+    std::string to_date;
+    in >> name >> from_date >> to_date;
+
+    try
+    {
+      const ulanova::Cashflow result = system.get_cashflow(name, from_date, to_date);
+
+      out << "Доходы: " << result.income << "\n";
+      out << "Расходы: " << result.expense << "\n";
+      out << "Остаток: " << result.total << "\n";
+    }
+    catch (const std::logic_error&)
+    {
+      out << "Профиль не существует\n";
+    }
+  }
+
   void invalid_command(std::istream& in, std::ostream& out)
   {
     out << "<INVALID COMMAND>\n";
@@ -110,6 +131,7 @@ int main()
   commands["drop-profile"] = drop_profile;
   commands["add-income"] = add_income;
   commands["add-expense"] = add_expense;
+  commands["cashflow"] = cashflow;
 
   std::string command;
   while (std::cin >> command)
