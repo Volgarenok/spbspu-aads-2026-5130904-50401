@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "functions.hpp"
 
 void lukashevich::getData(std::istream& in, List< pair_t >& res)
@@ -43,36 +45,39 @@ size_t lukashevich::printOneRow(std::ostream& out, List< pair_t >& data)
   LIter< pair_t > end = data.end();
 
   bool first = true;
-  bool overflow = false;
+  std::ostringstream row;
   size_t sum = 0;
 
   while (it != end) {
     if (!it->second.empty()) {
       size_t value = it->second.front();
 
+      if (sum > std::numeric_limits< size_t >::max() - value) {
+        throw std::overflow_error("overflow");
+      }
+
+      sum += value;
+
       if (!first) {
-        out << ' ';
+        row << ' ';
       }
 
-      out << value;
-
-      if (!overflow) {
-        if (sum > std::numeric_limits< size_t >::max() - value) {
-          overflow = true;
-        } else {
-          sum += value;
-        }
-      }
-
-      it->second.popFront();
+      row << value;
       first = false;
     }
-
     ++it;
   }
 
-  if (overflow) {
-    throw std::overflow_error("overflow");
+  out << row.str();
+
+  it = data.begin();
+
+  while (it != end) {
+    if (!it->second.empty()) {
+      it->second.popFront();
+    }
+
+    ++it;
   }
 
   return sum;
