@@ -13,7 +13,7 @@ namespace lukashevich
   namespace detail
   {
     template< class T >
-    class Node
+    struct Node
     {
         T val;
         Node< T >* next;
