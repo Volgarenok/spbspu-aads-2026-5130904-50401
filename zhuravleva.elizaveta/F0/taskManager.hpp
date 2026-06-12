@@ -25,6 +25,9 @@ namespace zhuravleva
     void removeTaskFromList(const std::string& listName, const std::string& taskId);
     void showList(const std::string& listName, std::ostream& out) const;
     void highPriority(const std::string& listName, size_t count, std::ostream& out) const;
+    size_t getCurrentLabor(const std::string& listName) const;
+    bool canAddTask(const std::string& listName, const std::string& taskId) const;
+
   private:
     CuckooHashTable< std::string, Task > globalTasks_;
     CuckooHashTable< std::string, TaskList > lists_;

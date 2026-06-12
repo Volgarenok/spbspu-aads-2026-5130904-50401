@@ -145,4 +145,37 @@ namespace zhuravleva
       ++printed;
     }
   }
+
+  size_t TaskManager::getCurrentLabor(const std::string& listName) const
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    size_t labor = 0;
+    for (LCIter< TaskInList > it = list.tasks.cbegin();
+        it != list.tasks.cend(); ++it)
+    {
+      labor += globalTasks_.get(it->taskId).labor;
+    }
+    return labor;
+  }
+
+  bool TaskManager::canAddTask(const std::string& listName,
+      const std::string& taskId) const
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    if (!globalTasks_.contains(taskId))
+    {
+      throw std::logic_error("task not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    size_t currentLabor = getCurrentLabor(listName);
+    size_t taskLabor = globalTasks_.get(taskId).labor;
+    return (currentLabor + taskLabor <= list.maxLabor);
+  }
 }
