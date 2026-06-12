@@ -38,7 +38,7 @@ namespace ulanova
       State state;
       std::string key;
       Value value;
-    }
+    };
 
     ulanova::Vector< Bucket > buckets_;
     size_t size_;
