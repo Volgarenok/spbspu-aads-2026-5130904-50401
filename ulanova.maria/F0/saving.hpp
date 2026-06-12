@@ -11,6 +11,7 @@ namespace ulanova
     long long current_sum;
     long long target_sum;
     int priority;
+    Date start_date;
   };
 }
 #endif

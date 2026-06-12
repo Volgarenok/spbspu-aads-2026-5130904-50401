@@ -9,7 +9,7 @@ void ulanova::FinanceSystem::create_profile(const std::string& name)
     throw std::logic_error("profile already exists");
   }
 
-  const Saving default_saving{"default", 0, 0, 999};
+  const Saving default_saving{"default", 0, 0, 999, parse_date("01.01.1970")};
   Profile profile{name, 0, {default_saving}, {}};
   profiles_.push_back(profile);
 }
@@ -155,6 +155,35 @@ std::vector< ulanova::Saving > ulanova::FinanceSystem::get_savings(
     if (profiles_[i].name == name)
     {
       return profiles_[i].savings;
+    }
+  }
+
+  throw std::logic_error("profile not found");
+}
+
+void ulanova::FinanceSystem::create_saving(const std::string& saving_name,
+  const std::string& profile_name,
+  long long target_sum,
+  int priority,
+  const std::string& start_date)
+{
+  const Date parsed_start_date = parse_date(start_date);
+
+  for (size_t i = 0; i < profiles_.size(); ++i)
+  {
+    if (profiles_[i].name == profile_name)
+    {
+      for (size_t j = 0; j < profiles_[i].savings.size(); ++j)
+      {
+        if (profiles_[i].savings[j].name == saving_name)
+        {
+          throw std::logic_error("saving already exists");
+        }
+      }
+
+      Saving saving{saving_name, 0 , target_sum, priority, parsed_start_date};
+      profiles_[i].savings.push_back(saving);
+      return;
     }
   }
 

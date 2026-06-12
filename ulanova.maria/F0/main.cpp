@@ -142,6 +142,36 @@ namespace
     }
   }
 
+  void create_saving(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  {
+    std::string saving_name;
+    std::string profile_name;
+    long long target_sum = 0;
+    int priority = 0;
+    std::string start_date;
+
+    in >> saving_name >> profile_name >> target_sum >> priority >> start_date;
+
+    try
+    {
+      system.create_saving(saving_name, profile_name, target_sum, priority, start_date);
+    }
+    catch (const std::logic_error& error)
+    {
+      const std::string message = error.what();
+
+      if (message == "saving already exists")
+      {
+        out << "Счет уже существует\n";
+      }
+      else
+      {
+        out << "Профиль не существует\n";
+      }
+    }
+
+  }
+
   void invalid_command(std::istream& in, std::ostream& out)
   {
     out << "<INVALID COMMAND>\n";
@@ -164,6 +194,7 @@ int main()
   commands["add-expense"] = add_expense;
   commands["cashflow"] = cashflow;
   commands["show-savings"] = show_savings;
+  commands["create-saving"] = create_saving;
 
   std::string command;
   while (std::cin >> command)
