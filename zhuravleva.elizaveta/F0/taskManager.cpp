@@ -1,4 +1,5 @@
 #include "taskManager.hpp"
+#include <ostream>
 #include <stdexcept>
 
 namespace zhuravleva
@@ -97,5 +98,23 @@ namespace zhuravleva
       ++current;
     }
     throw std::logic_error("task not found in list");
+  }
+
+  void TaskManager::showList(const std::string& listName, std::ostream& out) const
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    for (LCIter< TaskInList > it = list.tasks.cbegin(); it != list.tasks.cend(); ++it)
+    {
+      const Task& task = globalTasks_.get(it->taskId);
+      out << it->taskId << " "
+          << task.labor << " "
+          << it->priority << " "
+          << it->done << " "
+          << it->deadline << "\n";
+    }
   }
 }

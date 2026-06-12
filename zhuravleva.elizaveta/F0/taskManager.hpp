@@ -2,6 +2,7 @@
 #define TASK_MANAGER_HPP
 
 #include <string>
+#include <iosfwd>
 #include "../common/cuckooHashTable.hpp"
 #include "task.hpp"
 #include "taskList.hpp"
@@ -22,6 +23,7 @@ namespace zhuravleva
     void addTaskToList(const std::string& listName,
         const std::string& taskId, size_t priority);
     void removeTaskFromList(const std::string& listName, const std::string& taskId);
+    void showList(const std::string& listName, std::ostream& out) const;
   private:
     CuckooHashTable< std::string, Task > globalTasks_;
     CuckooHashTable< std::string, TaskList > lists_;
