@@ -45,39 +45,34 @@ size_t lukashevich::printOneRow(std::ostream& out, List< pair_t >& data)
   LIter< pair_t > end = data.end();
 
   bool first = true;
-  std::ostringstream row;
+  bool overflow = false;
   size_t sum = 0;
 
   while (it != end) {
     if (!it->second.empty()) {
       size_t value = it->second.front();
 
-      if (sum > std::numeric_limits< size_t >::max() - value) {
-        throw std::overflow_error("overflow");
-      }
-
-      sum += value;
-
       if (!first) {
-        row << ' ';
+        out << ' ';
       }
 
-      row << value;
+      out << value;
+      if (!overflow) {
+        if (sum > std::numeric_limits< size_t >::max() - value) {
+          overflow = true;
+        } else {
+          sum += value;
+        }
+      }
+
+      it->second.popFront();
       first = false;
     }
     ++it;
   }
 
-  out << row.str();
-
-  it = data.begin();
-
-  while (it != end) {
-    if (!it->second.empty()) {
-      it->second.popFront();
-    }
-
-    ++it;
+  if (overflow) {
+    throw std::overflow_error("overflow");
   }
 
   return sum;

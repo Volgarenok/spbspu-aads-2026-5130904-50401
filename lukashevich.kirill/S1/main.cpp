@@ -30,6 +30,7 @@ int main()
     }
   } catch (const std::overflow_error&)
   {
+    std::cout << '\n';
     std::cerr << "error\n";
     return 1;
   }
