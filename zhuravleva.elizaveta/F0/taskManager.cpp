@@ -53,4 +53,49 @@ namespace zhuravleva
     }
     globalTasks_.erase(taskId);
   }
+
+  void TaskManager::addTaskToList(const std::string& listName,
+      const std::string& taskId, size_t priority)
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    if (!globalTasks_.contains(taskId))
+    {
+      throw std::logic_error("task not found");
+    }
+    TaskList& list = lists_.get(listName);
+    for (LIter< TaskInList > it = list.tasks.begin(); it != list.tasks.end(); ++it)
+    {
+      if (it->taskId == taskId)
+      {
+        throw std::logic_error("task already in list");
+      }
+    }
+    list.tasks.pushBack(TaskInList(taskId, priority));
+  }
+
+  void TaskManager::removeTaskFromList(const std::string& listName,
+      const std::string& taskId)
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    TaskList& list = lists_.get(listName);
+    LIter< TaskInList > prev = list.tasks.beforeBegin();
+    LIter< TaskInList > current = list.tasks.begin();
+    while (current != list.tasks.end())
+    {
+      if (current->taskId == taskId)
+      {
+        list.tasks.eraseAfter(prev);
+        return;
+      }
+      ++prev;
+      ++current;
+    }
+    throw std::logic_error("task not found in list");
+  }
 }

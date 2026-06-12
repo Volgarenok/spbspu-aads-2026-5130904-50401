@@ -19,7 +19,9 @@ namespace zhuravleva
     void deleteList(const std::string& listName);
     void addTaskGlobal(const std::string& taskId, size_t labor);
     void removeTaskGlobal(const std::string& taskId);
-
+    void addTaskToList(const std::string& listName,
+        const std::string& taskId, size_t priority);
+    void removeTaskFromList(const std::string& listName, const std::string& taskId);
   private:
     CuckooHashTable< std::string, Task > globalTasks_;
     CuckooHashTable< std::string, TaskList > lists_;
