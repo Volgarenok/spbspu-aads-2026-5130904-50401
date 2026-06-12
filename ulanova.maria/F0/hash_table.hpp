@@ -40,7 +40,7 @@ namespace ulanova
       Value value;
     }
 
-    Vector< Bucket > buckets_;
+    ulanova::Vector< Bucket > buckets_;
     size_t size_;
 
     size_t get_first_hash(const std::string& key) const;
@@ -141,7 +141,7 @@ size_t ulanova::HashTable< Value >::find_index( const std::string& key) const
 
   for (size_t i = 0; i < buckets_.size(); ++i)
   {
-    const size_t index = (first_hash i * second_hash) % buckets_.getsize();
+    const size_t index = (first_hash + i * second_hash) % buckets_.getsize();
 
     if (buckets_[index].state == State::empty)
     {
@@ -201,7 +201,7 @@ void ulanova::HashTable< Value >::add_without_rehash(
     }
     else if (buckets_[index].state == State::empty)
     {
-      const size_t target = (deleted_index == buckets_.getsize()) & index : deleted_index;
+      const size_t target = (deleted_index == buckets_.getsize()) ? index : deleted_index;
 
       buckets_[target].state = State::filled;
       buckets_[target].key = key;
