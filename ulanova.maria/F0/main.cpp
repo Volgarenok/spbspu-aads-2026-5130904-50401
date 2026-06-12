@@ -172,6 +172,24 @@ namespace
 
   }
 
+  void finish_saving(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  {
+    std::string saving_name;
+    std::string date;
+    in >> saving_name >> date;
+
+    try
+    {
+      system.finish_saving(saving_name, date);
+      out << "Цель достигнута. Счет " << saving_name << " закрыт ";
+      out << date << "\n";
+    }
+    catch (const std::logic_error&)
+    {
+      out << "Счет не существует\n";
+    }
+  }
+
   void invalid_command(std::istream& in, std::ostream& out)
   {
     out << "<INVALID COMMAND>\n";
@@ -195,6 +213,7 @@ int main()
   commands["cashflow"] = cashflow;
   commands["show-savings"] = show_savings;
   commands["create-saving"] = create_saving;
+  commands["finish-saving"] = finish_saving;
 
   std::string command;
   while (std::cin >> command)

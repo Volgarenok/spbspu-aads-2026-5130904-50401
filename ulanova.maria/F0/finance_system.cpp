@@ -189,3 +189,26 @@ void ulanova::FinanceSystem::create_saving(const std::string& saving_name,
 
   throw std::logic_error("profile not found");
 }
+
+void ulanova::FinanceSystem::finish_saving(const std::string& saving_name, const std::string& date)
+{
+  parse_date(date);
+
+  for (size_t i = 0; i < profiles_.size(); ++i)
+  {
+    for (size_t j = 0; j < profiles_[i].savings.size(); ++j)
+    {
+      if (profiles_[i].savings[j].name == saving_name)
+      {
+        if (saving_name == "default")
+        {
+          throw std::logic_error("system saving");
+        }
+        profiles_[i].savings.erase(profiles_[i].savings.begin() + j);
+        return;
+      }
+    }
+  }
+
+  throw std::logic_error("saving not found");
+}
