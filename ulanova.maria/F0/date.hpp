@@ -10,6 +10,7 @@ namespace ulanova
 
   Date parse_date(const std::string& text);
   bool is_before_or_equal(const Date& lhs, const Date& rhs);
+  bool is_after_or_equal(const Date& lhs, const Date& rhs);
 }
 
 
