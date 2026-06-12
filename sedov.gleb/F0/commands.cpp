@@ -1,5 +1,5 @@
 #include "commands.hpp"
-#include "vector.hpp"
+#include "../common/vector.hpp"
 
 namespace sedov
 {

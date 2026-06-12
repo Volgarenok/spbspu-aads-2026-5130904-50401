@@ -2,8 +2,8 @@
 #define SCHEDULER_HPP
 #include "avltree.hpp"
 #include "profile.hpp"
-#include "list.hpp"
-#include "vector.hpp"
+#include "../common/list.hpp"
+#include "../common/vector.hpp"
 #include <string>
 
 namespace sedov

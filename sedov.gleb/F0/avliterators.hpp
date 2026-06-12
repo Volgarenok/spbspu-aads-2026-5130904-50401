@@ -27,7 +27,7 @@ namespace sedov
   private:
     AVLTreeNode< Key, Value > * node_;
 
-    template< class Key, class Value, class Compare >
+    template< class K, class V, class C >
     friend class AVLTree;
   };
 
@@ -49,7 +49,7 @@ namespace sedov
 
   private:
     AVLTreeNode< Key, Value > * node_;
-    template< class Key, class Value, class Compare >
+    template< class K, class V, class C >
     friend class AVLTree;
   };
 

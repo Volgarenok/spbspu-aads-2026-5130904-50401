@@ -7,7 +7,7 @@
 #include <utility>
 #include "avliterators.hpp"
 #include "avltreenode.hpp"
-#include "list.hpp"
+#include "../common/list.hpp"
 
 namespace sedov
 {
@@ -16,8 +16,8 @@ namespace sedov
   {
   public:
       using valueType = std::pair< const Key, Value >;
-      using iter = AVLiter< Key, Value >;
-      using constIter = AVLConstiter< Key, Value >;
+      using iter = AVLIterator< Key, Value >;
+      using constIter = AVLConstIterator< Key, Value >;
 
       AVLTree() noexcept;
       AVLTree(const AVLTree & h);
@@ -78,6 +78,7 @@ namespace sedov
       std::pair< AVLTreeNode< Key, Value > *, bool > insertNode(AVLTreeNode< Key, Value > * node, Key && k,
         Value && v);
       AVLTreeNode< Key, Value > * removeNode(AVLTreeNode< Key, Value > * node, const Key & k, bool & found) noexcept;
+      AVLTreeNode< Key, Value > * findNode(const Key & k) noexcept;
       const AVLTreeNode< Key, Value > * findNode(const Key & k) const noexcept;
 
       void collectInRangeImpl(AVLTreeNode< Key, Value > * node, const Key & from, const Key & to,
@@ -175,7 +176,7 @@ namespace sedov
   template < class Key, class Value, class Compare >
   bool AVLTree< Key, Value, Compare >::find(const Key & k, Value & outValue) const
   {
-    AVLTreeNode< Key, Value > * node = findNode(k);
+    const AVLTreeNode< Key, Value > * node = findNode(k);
     if (node)
     {
       outValue = node->value_;
@@ -187,7 +188,7 @@ namespace sedov
   template < class Key, class Value, class Compare >
   const Value & AVLTree< Key, Value, Compare >::at(const Key & k) const
   {
-    AVLTreeNode< Key, Value > * node = findNode(k);
+    const AVLTreeNode< Key, Value > * node = findNode(k);
     if (!node)
     {
       throw std::out_of_range("Key not found");
@@ -648,6 +649,28 @@ namespace sedov
       }
     }
     return balanceNode(node);
+  }
+
+  template < class Key, class Value, class Compare >
+  AVLTreeNode< Key, Value > * AVLTree< Key, Value, Compare >::findNode(const Key & k) noexcept
+  {
+    AVLTreeNode< Key, Value > * cur = root_;
+    while (cur)
+    {
+      if (comp_(k, cur->key_))
+      {
+        cur = cur->left_;
+      }
+      else if (comp_(cur->key_, k))
+      {
+        cur = cur->right_;
+      }
+      else
+      {
+        return cur;
+      }
+    }
+    return nullptr;
   }
 
   template < class Key, class Value, class Compare >

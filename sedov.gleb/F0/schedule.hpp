@@ -1,7 +1,7 @@
 #ifndef SCHEDULE_HPP
 #define SCHEDULE_HPP
 #include "avltree.hpp"
-#include "list.hpp"
+#include "../common/list.hpp"
 #include "task.hpp"
 #include <algorithm>
 

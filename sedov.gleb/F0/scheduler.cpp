@@ -3,7 +3,6 @@
 #include <fstream>
 #include <algorithm>
 #include <string>
-#include <vector>
 #include <ctime>
 
 namespace sedov

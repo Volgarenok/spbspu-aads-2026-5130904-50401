@@ -8,7 +8,7 @@ namespace sedov
   {}
 
   Task::Task(int id, const std::string & title, const std::string & date, const std::string & timeStart,
-    const std::string & timeEnd, const std::string & imp, const std::string & scheduleName, bool active = true):
+    const std::string & timeEnd, const std::string & imp, const std::string & scheduleName, bool active):
       id_(id),
       title_(title),
       date_(date),
