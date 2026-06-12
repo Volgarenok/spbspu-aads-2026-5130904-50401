@@ -117,4 +117,32 @@ namespace zhuravleva
           << it->deadline << "\n";
     }
   }
+
+  void TaskManager::highPriority(const std::string& listName, size_t count, std::ostream& out) const
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    List< TaskInList > sorted(list.tasks);
+    struct PriorityCompare
+    {
+      bool operator()(const TaskInList& lhs, const TaskInList& rhs) const
+      {
+        return lhs.priority < rhs.priority;
+      }
+    };
+    sorted.sort(PriorityCompare());
+    size_t printed = 0;
+    for (LCIter< TaskInList > it = sorted.cbegin();
+        it != sorted.cend() && printed < count; ++it)
+    {
+      const Task& task = globalTasks_.get(it->taskId);
+      out << it->taskId << " "
+          << task.labor << " "
+          << it->priority << "\n";
+      ++printed;
+    }
+  }
 }
