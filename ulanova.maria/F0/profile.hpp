@@ -3,8 +3,8 @@
 
 #include "operation.hpp"
 #include "saving.hpp"
+#include "../common/vector.hpp"
 
-#include <vector>
 #include <string>
 
 namespace ulanova
@@ -13,8 +13,8 @@ namespace ulanova
   {
     std::string name;
     long long balance;
-    std::vector< Saving > savings;
-    std::vector< Operation > operations;
+    Vector< Saving > savings;
+    Vector< Operation > operations;
   };
 }
 

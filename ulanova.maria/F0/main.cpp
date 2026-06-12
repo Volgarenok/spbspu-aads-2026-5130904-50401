@@ -1,11 +1,11 @@
 #include "finance_system.hpp"
+#include "../common/vector.hpp"
 
 #include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 namespace
 {
@@ -120,15 +120,15 @@ namespace
 
     try
     {
-      const std::vector< ulanova::Saving > savings = system.get_savings(name, date);
+      const ulanova::Vector< ulanova::Saving > savings = system.get_savings(name, date);
 
-      if (savings.empty())
+      if (savings.isEmpty())
       {
         out << "Нет накопительных счетов\n";
         return;
       }
 
-      for (size_t i = 0; i < savings.size(); ++i)
+      for (size_t i = 0; i < savings.getsize(); ++i)
       {
         out << savings[i].name << " ";
         out << savings[i].current_sum << " ";

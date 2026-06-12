@@ -2,9 +2,9 @@
 #define FINANCE_SYSTEM_HPP
 
 #include "profile.hpp"
+#include "../common/vector.hpp"
 
 #include <string>
-#include <vector>
 
 namespace ulanova
 {
@@ -30,9 +30,9 @@ namespace ulanova
     bool has_profile(const std::string& name) const;
     long long get_balance(const std::string& name, const std::string& date) const;
     Cashflow get_cashflow(const std::string& name, const std::string& from_date, const std::string& to_date) const;
-    std::vector< Saving > get_savings(const std::string& name, const std::string& date) const;
+    Vector< Saving > get_savings(const std::string& name, const std::string& date) const;
   private:
-    std::vector< Profile > profiles_;
+    Vector< Profile > profiles_;
   };
 }
 

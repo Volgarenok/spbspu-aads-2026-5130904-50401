@@ -10,13 +10,14 @@ void ulanova::FinanceSystem::create_profile(const std::string& name)
   }
 
   const Saving default_saving{"default", 0, 0, 999, parse_date("01.01.1970")};
-  Profile profile{name, 0, {default_saving}, {}};
+  Profile profile{name, 0, ulanova::Vector< Saving >{}, ulanova::Vector< Operation >{}};
+  profile.savings.push_back(default_saving);
   profiles_.push_back(profile);
 }
 
 bool ulanova::FinanceSystem::has_profile(const std::string& name) const
 {
-  for (size_t i = 0; i < profiles_.size(); ++i)
+  for (size_t i = 0; i < profiles_.getsize(); ++i)
   {
     if (profiles_[i].name == name)
     {
@@ -31,13 +32,13 @@ long long ulanova::FinanceSystem::get_balance(const std::string& name, const std
 {
   const Date target_date = parse_date(date);
 
-  for (size_t i = 0; i < profiles_.size(); ++i)
+  for (size_t i = 0; i < profiles_.getsize(); ++i)
   {
     if (profiles_[i].name == name)
     {
       long long balance = 0;
 
-      for (size_t j = 0; j < profiles_[i].operations.size(); ++j)
+      for (size_t j = 0; j < profiles_[i].operations.getsize(); ++j)
       {
         const Operation& operation = profiles_[i].operations[j];
 
@@ -61,11 +62,11 @@ long long ulanova::FinanceSystem::get_balance(const std::string& name, const std
 
 void ulanova::FinanceSystem::drop_profile(const std::string& name)
 {
-  for (size_t i = 0; i < profiles_.size(); ++i)
+  for (size_t i = 0; i < profiles_.getsize(); ++i)
   {
     if (profiles_[i].name == name)
     {
-      profiles_.erase(profiles_.begin() + i);
+      profiles_.erase(i);
       return;
     }
   }
@@ -75,7 +76,7 @@ void ulanova::FinanceSystem::drop_profile(const std::string& name)
 
 void ulanova::FinanceSystem::add_income(const std::string& name, long long amount, const std::string& date)
 {
-  for (size_t i = 0; i < profiles_.size(); ++i)
+  for (size_t i = 0; i < profiles_.getsize(); ++i)
   {
     if (profiles_[i].name == name)
     {
@@ -91,7 +92,7 @@ void ulanova::FinanceSystem::add_income(const std::string& name, long long amoun
 
 void ulanova::FinanceSystem::add_expense(const std::string& name, long long amount, const std::string& date)
 {
-  for (size_t i = 0; i < profiles_.size(); ++i)
+  for (size_t i = 0; i < profiles_.getsize(); ++i)
   {
     if (profiles_[i].name == name)
     {
@@ -113,13 +114,13 @@ ulanova::Cashflow ulanova::FinanceSystem::get_cashflow(
   const Date from = parse_date(from_date);
   const Date to = parse_date(to_date);
 
-  for (size_t i = 0; i < profiles_.size(); ++i)
+  for (size_t i = 0; i < profiles_.getsize(); ++i)
   {
     if (profiles_[i].name == name)
     {
       Cashflow cashflow{0, 0, 0};
 
-      for (size_t j = 0; j < profiles_[i].operations.size(); ++j)
+      for (size_t j = 0; j < profiles_[i].operations.getsize(); ++j)
       {
         const Operation& operation = profiles_[i].operations[j];
 
@@ -144,13 +145,13 @@ ulanova::Cashflow ulanova::FinanceSystem::get_cashflow(
   throw std::logic_error("profile not found");
 }
 
-std::vector< ulanova::Saving > ulanova::FinanceSystem::get_savings(
+ulanova::Vector< ulanova::Saving > ulanova::FinanceSystem::get_savings(
   const std::string& name,
   const std::string& date) const
 {
   parse_date(date);
 
-  for (size_t i = 0; i < profiles_.size(); ++i)
+  for (size_t i = 0; i < profiles_.getsize(); ++i)
   {
     if (profiles_[i].name == name)
     {
@@ -169,11 +170,11 @@ void ulanova::FinanceSystem::create_saving(const std::string& saving_name,
 {
   const Date parsed_start_date = parse_date(start_date);
 
-  for (size_t i = 0; i < profiles_.size(); ++i)
+  for (size_t i = 0; i < profiles_.getsize(); ++i)
   {
     if (profiles_[i].name == profile_name)
     {
-      for (size_t j = 0; j < profiles_[i].savings.size(); ++j)
+      for (size_t j = 0; j < profiles_[i].savings.getsize(); ++j)
       {
         if (profiles_[i].savings[j].name == saving_name)
         {
@@ -194,9 +195,9 @@ void ulanova::FinanceSystem::finish_saving(const std::string& saving_name, const
 {
   parse_date(date);
 
-  for (size_t i = 0; i < profiles_.size(); ++i)
+  for (size_t i = 0; i < profiles_.getsize(); ++i)
   {
-    for (size_t j = 0; j < profiles_[i].savings.size(); ++j)
+    for (size_t j = 0; j < profiles_[i].savings.getsize(); ++j)
     {
       if (profiles_[i].savings[j].name == saving_name)
       {
@@ -204,7 +205,7 @@ void ulanova::FinanceSystem::finish_saving(const std::string& saving_name, const
         {
           throw std::logic_error("system saving");
         }
-        profiles_[i].savings.erase(profiles_[i].savings.begin() + j);
+        profiles_[i].savings.erase(j);
         return;
       }
     }
@@ -217,9 +218,9 @@ void ulanova::FinanceSystem::close_saving(const std::string& saving_name, const 
 {
   parse_date(date);
 
-  for (size_t i = 0; i < profiles_.size(); ++i)
+  for (size_t i = 0; i < profiles_.getsize(); ++i)
   {
-    for (size_t j = 0; j < profiles_.size(); ++j)
+    for (size_t j = 0; j < profiles_.getsize(); ++j)
     {
       if (profiles_[i].savings[j].name == saving_name)
       {
@@ -229,7 +230,7 @@ void ulanova::FinanceSystem::close_saving(const std::string& saving_name, const 
         }
 
         profiles_[i].balance += profiles_[i].savings[j].current_sum;
-        profiles_[i].savings.erase(profiles_[i].savings.begin() + j);
+        profiles_[i].savings.erase( j);
         return;
       }
     }
