@@ -3,6 +3,7 @@
 
 #include "profile.hpp"
 #include "../common/vector.hpp"
+#include "hash_table.hpp"
 
 #include <string>
 
@@ -32,7 +33,7 @@ namespace ulanova
     Cashflow get_cashflow(const std::string& name, const std::string& from_date, const std::string& to_date) const;
     Vector< Saving > get_savings(const std::string& name, const std::string& date) const;
   private:
-    Vector< Profile > profiles_;
+    HashTable< Profile > profiles_;
   };
 }
 

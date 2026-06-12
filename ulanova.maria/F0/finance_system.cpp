@@ -10,100 +10,82 @@ void ulanova::FinanceSystem::create_profile(const std::string& name)
   }
 
   const Saving default_saving{"default", 0, 0, 999, parse_date("01.01.1970")};
-  Profile profile{name, 0, ulanova::Vector< Saving >{}, ulanova::Vector< Operation >{}};
+
+  ulanova::Vector< Saving > savings;
+  ulanova::Vector< Operation > operations;
+  Profile profile{name, 0, savings, operations};
   profile.savings.push_back(default_saving);
-  profiles_.push_back(profile);
+  profiles_.add(name, profile);
 }
 
 bool ulanova::FinanceSystem::has_profile(const std::string& name) const
 {
-  for (size_t i = 0; i < profiles_.getsize(); ++i)
-  {
-    if (profiles_[i].name == name)
-    {
-      return true;
-    }
-  }
-
-  return false;
+  return profiles_.has(name);
 }
 
 long long ulanova::FinanceSystem::get_balance(const std::string& name, const std::string& date) const
 {
   const Date target_date = parse_date(date);
+  const Profile* profile = profiles_.find(name);
 
-  for (size_t i = 0; i < profiles_.getsize(); ++i)
+  if (profile == nullptr)
   {
-    if (profiles_[i].name == name)
+    throw std::logic_error("profile not found");
+  }
+
+  long long balance = 0;
+
+  for (size_t i = 0; i < profile->operations.getsize(); ++i)
+  {
+    const Operation& operation = profile->operations[i];
+
+    if (is_before_or_equal(operation.date, target_date))
     {
-      long long balance = 0;
-
-      for (size_t j = 0; j < profiles_[i].operations.getsize(); ++j)
+      if (operation.is_income)
       {
-        const Operation& operation = profiles_[i].operations[j];
-
-        if (is_before_or_equal(operation.date, target_date))
-        {
-          if (operation.is_income)
-          {
-            balance += operation.amount;
-          }
-          else
-          {
-            balance -= operation.amount;
-          }
-        }
+        balance += operation.amount;
       }
-      return balance;
+      else
+      {
+        balance -= operation.amount;
+      }
     }
   }
-  throw std::logic_error("profile not found");
+
+  return balance;
 }
 
 void ulanova::FinanceSystem::drop_profile(const std::string& name)
 {
-  for (size_t i = 0; i < profiles_.getsize(); ++i)
-  {
-    if (profiles_[i].name == name)
-    {
-      profiles_.erase(i);
-      return;
-    }
-  }
-
-  throw std::logic_error("profile not found");
+  profiles_.drop(name);
 }
 
 void ulanova::FinanceSystem::add_income(const std::string& name, long long amount, const std::string& date)
 {
-  for (size_t i = 0; i < profiles_.getsize(); ++i)
+  Profile* profile = profiles_.find(name);
+
+  if (profile == nullptr)
   {
-    if (profiles_[i].name == name)
-    {
-      Operation operation{amount, parse_date(date), true};
-      profiles_[i].operations.push_back(operation);
-      profiles_[i].balance += amount;
-      return;
-    }
+    throw std::logic_error("profile not found");
   }
 
-  throw std::logic_error("profile not found");
+  Operation operation{amount, parse_date(date), true};
+  profile->operations.push_back(operation);
+  profile->balance += amount;
 }
 
 void ulanova::FinanceSystem::add_expense(const std::string& name, long long amount, const std::string& date)
 {
-  for (size_t i = 0; i < profiles_.getsize(); ++i)
+  Profile* profile = profiles_.find(name);
+
+  if (profile == nullptr)
   {
-    if (profiles_[i].name == name)
-    {
-      Operation operation{amount, parse_date(date), false};
-      profiles_[i].operations.push_back(operation);
-      profiles_[i].balance -= amount;
-      return;
-    }
+    throw std::logic_error("profile not found");
   }
 
-  throw std::logic_error("profile not found");
+  Operation operation{amount, parse_date(date), false};
+  profile->operations.push_back(operation);
+  profile->balance -= amount;
 }
 
 ulanova::Cashflow ulanova::FinanceSystem::get_cashflow(
@@ -113,36 +95,34 @@ ulanova::Cashflow ulanova::FinanceSystem::get_cashflow(
 {
   const Date from = parse_date(from_date);
   const Date to = parse_date(to_date);
+  const Profile* profile = profiles_.find(name);
 
-  for (size_t i = 0; i < profiles_.getsize(); ++i)
+  if (profile == nullptr)
   {
-    if (profiles_[i].name == name)
-    {
-      Cashflow cashflow{0, 0, 0};
-
-      for (size_t j = 0; j < profiles_[i].operations.getsize(); ++j)
-      {
-        const Operation& operation = profiles_[i].operations[j];
-
-        if (is_after_or_equal(operation.date, from) && is_before_or_equal(operation.date, to))
-        {
-          if (operation.is_income)
-          {
-            cashflow.income += operation.amount;
-          }
-          else
-          {
-            cashflow.expense += operation.amount;
-          }
-        }
-      }
-
-      cashflow.total = cashflow.income - cashflow.expense;
-      return cashflow;
-    }
+    throw std::logic_error("profile not found");
   }
 
-  throw std::logic_error("profile not found");
+  Cashflow cashflow{0, 0, 0};
+
+  for (size_t i = 0; i < profile->operations.getsize(); ++i)
+  {
+    const Operation& operation = profile->operations[i];
+
+    if (is_after_or_equal(operation.date, from) && is_before_or_equal(operation.date, to))
+    {
+      if (operation.is_income)
+      {
+        cashflow.income += operation.amount;
+      }
+      else
+      {
+        cashflow.expense += operation.amount;
+      }
+    }
+  }
+  
+  cashflow.total = cashflow.income - cashflow.expense;
+  return cashflow;
 }
 
 ulanova::Vector< ulanova::Saving > ulanova::FinanceSystem::get_savings(
@@ -151,15 +131,14 @@ ulanova::Vector< ulanova::Saving > ulanova::FinanceSystem::get_savings(
 {
   parse_date(date);
 
-  for (size_t i = 0; i < profiles_.getsize(); ++i)
+  const Profile* profile = profiles_.find(name);
+
+  if (profile == nullptr)
   {
-    if (profiles_[i].name == name)
-    {
-      return profiles_[i].savings;
-    }
+    throw std::logic_error("profile not found");
   }
 
-  throw std::logic_error("profile not found");
+  return profile->savings;
 }
 
 void ulanova::FinanceSystem::create_saving(const std::string& saving_name,
