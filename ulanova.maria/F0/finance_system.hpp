@@ -26,6 +26,7 @@ namespace ulanova
       long long target_sum, int priority,
       const std::string& start_date);
     void finish_saving(const std::string& saving_name, const std::string& date);
+    void close_saving(const std::string& saving_name, const std::string& date);
     bool has_profile(const std::string& name) const;
     long long get_balance(const std::string& name, const std::string& date) const;
     Cashflow get_cashflow(const std::string& name, const std::string& from_date, const std::string& to_date) const;
