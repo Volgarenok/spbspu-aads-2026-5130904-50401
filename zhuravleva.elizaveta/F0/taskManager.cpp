@@ -178,4 +178,56 @@ namespace zhuravleva
     size_t taskLabor = globalTasks_.get(taskId).labor;
     return (currentLabor + taskLabor <= list.maxLabor);
   }
+
+  void TaskManager::checkAdd(const std::string& listName,
+      const std::string& taskId, std::ostream& out) const
+  {
+    if (canAddTask(listName, taskId))
+    {
+      out << "OK\n";
+    }
+    else
+    {
+      out << "NOT OK\n";
+    }
+  }
+
+  void TaskManager::markDone(const std::string& listName,
+      const std::string& taskId, const std::string& date)
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    TaskList& list = lists_.get(listName);
+    for (LIter< TaskInList > it = list.tasks.begin(); it != list.tasks.end(); ++it)
+    {
+      if (it->taskId == taskId)
+      {
+        it->done = true;
+        it->doneDate = date;
+        return;
+      }
+    }
+    throw std::logic_error("task not found in list");
+  }
+
+  size_t TaskManager::countCompleted(const std::string& listName,
+      const std::string& from, const std::string& to) const
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    size_t count = 0;
+    for (LCIter< TaskInList > it = list.tasks.cbegin(); it != list.tasks.cend(); ++it)
+    {
+      if (it->done && it->doneDate >= from && it->doneDate <= to)
+      {
+        ++count;
+      }
+    }
+    return count;
+  }
 }
