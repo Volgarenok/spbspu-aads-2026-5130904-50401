@@ -4,35 +4,79 @@
 #include "scheduler.hpp"
 #include "commands.hpp"
 
+std::vector< std::string > parseCommandLine(const std::string & line)
+{
+  std::vector< std::string > args;
+  std::string current;
+  bool inQuotes = false;
+  for (size_t i = 0; i < line.size(); ++i)
+  {
+    char c = line[i];
+    if (c == '"')
+    {
+      inQuotes = !inQuotes;
+    }
+    else if (c == ' ' && !inQuotes)
+    {
+      if (!current.empty())
+      {
+        args.push_back(current);
+        current.clear();
+      }
+    }
+    else
+    {
+      current += c;
+    }
+  }
+  if (!current.empty())
+  {
+    args.push_back(current);
+  }
+  return args;
+}
+
 int main()
 {
   sedov::Scheduler scheduler;
   sedov::CommandMap commands = sedov::makeCommandMap();
-  std::string cmd;
-  while (std::cin >> cmd)
+  std::string line;
+  while (std::getline(std::cin, line))
   {
+    if (line.empty())
+    {
+      continue;
+    }
+    std::vector< std::string > args = parseCommandLine(line);
+    if (args.empty())
+    {
+      continue;
+    }
+    const std::string & cmd = args[0];
     try
     {
       sedov::CommandHandler handler = nullptr;
       if (commands.find(cmd, handler))
       {
-        handler(std::cin, std::cout, scheduler);
+        std::vector< std::string > cmdArgs;
+        for (size_t i = 1; i < args.size(); ++i)
+        {
+          cmdArgs.push_back(args[i]);
+        }
+        handler(cmdArgs, std::cout, scheduler);
       }
       else
       {
         std::cout << "[ERROR] Unknown command \"" << cmd << "\". Type 'help' for commands.\n";
-        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       }
     }
     catch (const std::exception & e)
     {
       std::cout << "[ERROR] " << e.what() << "\n";
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     catch (...)
     {
       std::cout << "[ERROR] Unexpected error occurred\n";
-      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
   }
   std::cout << "Goodbye!\n";

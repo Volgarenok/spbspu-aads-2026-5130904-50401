@@ -1,5 +1,4 @@
 #include "commands.hpp"
-#include "../common/vector.hpp"
 
 namespace sedov
 {
@@ -30,216 +29,232 @@ namespace sedov
     return cmds;
   }
 
-  void cCreateProfile(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cCreateProfile(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string name;
-    if (!(in >> name))
+    if (args.size() < 1)
     {
       out << "[ERROR] Usage: create_profile <name>\n";
       return;
     }
-    sched.createProfile(name);
+    sched.createProfile(args[0]);
   }
 
-  void cDeleteProfile(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cDeleteProfile(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string name;
-    if (!(in >> name))
+    if (args.size() < 1)
     {
       out << "[ERROR] Usage: delete_profile <name>\n";
       return;
     }
-    sched.deleteProfile(name);
+    sched.deleteProfile(args[0]);
   }
 
-  void cListProfiles(std::istream &, std::ostream &, Scheduler & sched)
+  void cListProfiles(const std::vector<std::string>&, std::ostream&, Scheduler & sched)
   {
     sched.listProfiles();
   }
 
-  void cCreateSchedule(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cCreateSchedule(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName, schedName;
-    if (!(in >> profName >> schedName))
+    if (args.size() < 2)
     {
       out << "[ERROR] Usage: create_schedule <profile> <name>\n";
       return;
     }
-    sched.createSchedule(profName, schedName);
+    sched.createSchedule(args[0], args[1]);
   }
 
-  void cDeleteSchedule(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cDeleteSchedule(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName, schedName;
-    if (!(in >> profName >> schedName))
+    if (args.size() < 2)
     {
       out << "[ERROR] Usage: delete_schedule <profile> <name>\n";
       return;
     }
-    sched.deleteSchedule(profName, schedName);
+    sched.deleteSchedule(args[0], args[1]);
   }
 
-  void cListSchedules(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cListSchedules(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName;
-    if (!(in >> profName))
+    if (args.size() < 1)
     {
       out << "[ERROR] Usage: list_schedules <profile>\n";
       return;
     }
-    sched.listSchedules(profName);
+    sched.listSchedules(args[0]);
   }
 
-  void cAddTask(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cAddTask(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName, schedName, title, date, timeStart, timeEnd, imp;
-    if (!(in >> profName >> schedName >> title >> date >> timeStart >> timeEnd >> imp))
+    if (args.size() < 7)
     {
       out << "[ERROR] Usage: add_task <profile> <schedule> <title> <date> <time_start> <time_end> <importance>\n";
       return;
     }
-    sched.addTask(profName, schedName, title, date, timeStart, timeEnd, imp);
+    sched.addTask(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
   }
 
-  void cRemoveTask(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cRemoveTask(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName, schedName;
-    int id;
-    if (!(in >> profName >> schedName >> id))
+    if (args.size() < 3)
     {
       out << "[ERROR] Usage: remove_task <profile> <schedule> <id>\n";
       return;
     }
-    sched.removeTask(profName, schedName, id);
+    int id = 0;
+    try
+    {
+      id = std::stoi(args[2]);
+    }
+    catch (...)
+    {
+      out << "[ERROR] Invalid task ID\n";
+      return;
+    }
+    sched.removeTask(args[0], args[1], id);
   }
 
-  void cViewTask(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cViewTask(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName, schedName;
-    int id;
-    if (!(in >> profName >> schedName >> id))
+    if (args.size() < 3)
     {
       out << "[ERROR] Usage: view_task <profile> <schedule> <id>\n";
       return;
     }
-    sched.viewTask(profName, schedName, id);
+    int id = 0;
+    try
+    {
+      id = std::stoi(args[2]);
+    }
+    catch (...)
+    {
+      out << "[ERROR] Invalid task ID\n";
+      return;
+    }
+    sched.viewTask(args[0], args[1], id);
   }
 
-  void cListTasks(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cListTasks(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName, schedName, date;
-    if (!(in >> profName >> schedName >> date))
+    if (args.size() < 3)
     {
       out << "[ERROR] Usage: list_tasks <profile> <schedule> <date>\n";
       return;
     }
-    sched.listTasks(profName, schedName, date);
+    sched.listTasks(args[0], args[1], args[2]);
   }
 
-  void cShowUnplaced(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cShowUnplaced(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName;
-    if (!(in >> profName))
+    if (args.size() < 1)
     {
       out << "[ERROR] Usage: show_unplaced <profile>\n";
       return;
     }
-    sched.showUnplaced(profName);
+    sched.showUnplaced(args[0]);
   }
 
-  void cAutoPlace(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cAutoPlace(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName, dateFrom, dateTo;
-    if (!(in >> profName >> dateFrom >> dateTo))
+    if (args.size() < 3)
     {
       out << "[ERROR] Usage: auto_place <profile> <date_from> <date_to>\n";
       return;
     }
-    sched.autoPlace(profName, dateFrom, dateTo);
+    sched.autoPlace(args[0], args[1], args[2]);
   }
 
-  void cFindFreeWindow(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cFindFreeWindow(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string p1, s1, p2, s2, dateFrom, dateTo;
-    int min_hours;
-    if (!(in >> p1 >> s1 >> p2 >> s2 >> dateFrom >> dateTo >> min_hours))
+    if (args.size() < 7)
     {
       out << "[ERROR] Usage: find_free_window <p1> <s1> <p2> <s2> <from> <to> <min_hours>\n";
       return;
     }
-    sched.findFreeWindow(p1, s1, p2, s2, dateFrom, dateTo, min_hours);
+    int minHours = 0;
+    try
+    {
+      minHours = std::stoi(args[6]);
+    }
+    catch (...)
+    { out << "[ERROR] Invalid min_hours value\n";
+      return;
+    }
+    sched.findFreeWindow(args[0], args[1], args[2], args[3], args[4], args[5], minHours);
   }
 
-  void cMergeSchedules(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cMergeSchedules(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName, newName, s1, s2;
-    if (!(in >> profName >> newName >> s1 >> s2))
+    if (args.size() < 4)
     {
       out << "[ERROR] Usage: merge_schedules <profile> <new_name> <s1> <s2>\n";
       return;
     }
-    sched.mergeSchedules(profName, newName, s1, s2);
+    sched.mergeSchedules(args[0], args[1], args[2], args[3]);
   }
 
-  void cCompareMerge(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cCompareMerge(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName, s1, s2;
-    if (!(in >> profName >> s1 >> s2))
+    if (args.size() < 3)
     {
       out << "[ERROR] Usage: compare_merge <profile> <s1> <s2>\n";
       return;
     }
-    sched.compareMerge(profName, s1, s2);
+    sched.compareMerge(args[0], args[1], args[2]);
   }
 
-  void cOptimizeRange(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cOptimizeRange(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string profName, dateFrom, dateTo, criterion;
-    if (!(in >> profName >> dateFrom >> dateTo >> criterion))
+    if (args.size() < 4)
     {
       out << "[ERROR] Usage: optimize_range <profile> <from> <to> <criterion> [schedules...]\n";
       return;
     }
     std::vector< std::string > schedules;
-    std::string schedName;
-    while (in >> schedName)
+    for (size_t i = 4; i < args.size(); ++i)
     {
-      schedules.push_back(schedName);
+      schedules.push_back(args[i]);
     }
-    sched.optimizeRange(profName, dateFrom, dateTo, criterion, schedules);
+    sched.optimizeRange(args[0], args[1], args[2], args[3], schedules);
   }
 
-  void cFindBestDay(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cFindBestDay(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string p1, s1, p2, s2;
-    int min_hours;
-    if (!(in >> p1 >> s1 >> p2 >> s2 >> min_hours))
+    if (args.size() < 5)
     {
       out << "[ERROR] Usage: find_best_day <p1> <s1> <p2> <s2> <min_hours>\n";
       return;
     }
-    sched.findBestDay(p1, s1, p2, s2, min_hours);
+    int minHours = 0;
+    try
+    {
+      minHours = std::stoi(args[4]);
+    }
+    catch (...)
+    {
+      out << "[ERROR] Invalid min_hours value\n";
+      return;
+    }
+    sched.findBestDay(args[0], args[1], args[2], args[3], minHours);
   }
 
-  void cExportProfile(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cExportProfile(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string name, filename;
-    if (!(in >> name >> filename))
+    if (args.size() < 2)
     {
       out << "[ERROR] Usage: export_profile <name> <filename>\n";
       return;
     }
-    sched.exportProfile(name, filename);
+    sched.exportProfile(args[0], args[1]);
   }
 
-  void cImportProfile(std::istream & in, std::ostream & out, Scheduler & sched)
+  void cImportProfile(const std::vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
-    std::string filename;
-    if (!(in >> filename))
+    if (args.size() < 1)
     {
       out << "[ERROR] Usage: import_profile <filename>\n";
       return;
     }
-    sched.importProfile(filename);
+    sched.importProfile(args[0]);
   }
 }
