@@ -23,13 +23,12 @@ void lukashevich::getData(std::istream& in, List< pair_t >& res)
 
 void lukashevich::printSeqName(std::ostream& out, const List< pair_t >& data)
 {
-
   LCIter< pair_t > it = data.begin();
   LCIter< pair_t > end = data.end();
 
   if (it != end) {
-  out << it->first;
-  ++it;
+    out << it->first;
+    ++it;
   }
 
   while (it != end) {
@@ -47,8 +46,7 @@ size_t lukashevich::printOneRow(std::ostream& out, List< pair_t >& data)
   bool overflow = false;
   size_t sum = 0;
 
-  while (it != end)
-  {
+  while (it != end) {
     if (!it->second.empty()) {
       size_t value = it->second.front();
 
@@ -73,8 +71,6 @@ size_t lukashevich::printOneRow(std::ostream& out, List< pair_t >& data)
     ++it;
   }
 
-  std::cout << '\n';
-
   if (overflow) {
     throw std::overflow_error("overflow");
   }
@@ -97,17 +93,8 @@ bool lukashevich::hasNum(const List< pair_t >& data)
   return false;
 }
 
-void lukashevich::printAll(List< pair_t >& data, List< size_t >& sums)
-{
-  while (hasNum(data)) {
-    size_t sum = printOneRow(std::cout, data);
-    sums.pushBack(sum);
-  }
-}
-
 void lukashevich::printSum(std::ostream& out, const List< size_t >& sums)
 {
-
   if (sums.empty()) {
     out << 0;
     return;

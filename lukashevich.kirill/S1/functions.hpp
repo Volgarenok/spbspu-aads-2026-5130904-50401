@@ -15,7 +15,6 @@ namespace lukashevich
   void printSeqName(std::ostream& out, const List< pair_t >& data);
   bool hasNum(const List< pair_t >& data);
   size_t printOneRow(std::ostream& out, List< pair_t >& data);
-  void printAll(List< pair_t >& data, List< size_t >& sums);
   void printSum(std::ostream& out, const List< size_t >& sums);
 }
 

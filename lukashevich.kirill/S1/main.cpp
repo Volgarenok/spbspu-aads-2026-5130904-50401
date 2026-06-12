@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 
 #include "list.hpp"
 #include "functions.hpp"
@@ -22,9 +23,12 @@ int main()
 
   try
   {
-    lukashevich::printAll(copy, sums);
-  }
-  catch (const std::overflow_error&)
+    while (lukashevich::hasNum(copy)) {
+      size_t sum = lukashevich::printOneRow(std::cout, copy);
+      sums.pushBack(sum);
+      std::cout << '\n';
+    }
+  } catch (const std::overflow_error&)
   {
     std::cerr << "error\n";
     return 1;

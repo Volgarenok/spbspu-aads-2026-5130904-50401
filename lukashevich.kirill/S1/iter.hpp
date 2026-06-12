@@ -2,6 +2,7 @@
 #define ITER_HPP
 
 #include <cassert>
+#include <memory>
 
 namespace lukashevich
 {
@@ -17,8 +18,6 @@ namespace lukashevich
   template< class T >
   class LIter
   {
-    friend class List< T >;
-
     public:
       LIter() noexcept;
       LIter< T >& operator++() noexcept;
@@ -33,8 +32,9 @@ namespace lukashevich
       T* operator->() noexcept;
 
     private:
-      explicit LIter(detail::Node< T >* node) noexcept;
       detail::Node< T >* node_;
+      explicit LIter(detail::Node< T >* node) noexcept;
+      friend class List< T >;
   };
 
   template< class T >
@@ -102,7 +102,7 @@ namespace lukashevich
   T* LIter< T >::operator->() noexcept
   {
     assert(node_ != nullptr);
-    return &node_->val;
+    return std::addressof(node_->val);
   }
 }
 

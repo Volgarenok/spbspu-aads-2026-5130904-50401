@@ -15,13 +15,6 @@ namespace lukashevich
     template< class T >
     class Node
     {
-      public:
-        Node(T value, Node<T>* n, Node<T>* p):
-          val(value),
-          next(n),
-          prev(p)
-        {}
-
         T val;
         Node< T >* next;
         Node< T >* prev;
@@ -120,7 +113,7 @@ namespace lukashevich
   template< class T >
   void List< T >::pushFront(const T& value)
   {
-    detail::Node< T >* node = new detail::Node< T >(value, fake_->next, fake_);
+    detail::Node< T >* node = new detail::Node< T >{ value, fake_->next, fake_ };
 
     if (fake_->next != nullptr) {
       fake_->next->prev = node;
@@ -135,7 +128,7 @@ namespace lukashevich
   void List< T >::pushBack(const T& value)
   {
     detail::Node< T >* prev_node = fake_->prev != nullptr ? fake_->prev : fake_;
-    detail::Node< T >* node = new detail::Node< T >(value, nullptr, prev_node);
+    detail::Node< T >* node = new detail::Node< T >{ value, nullptr, prev_node };
 
     if (fake_->prev != nullptr) {
       fake_->prev->next = node;
@@ -150,7 +143,7 @@ namespace lukashevich
   template< class T >
   void List< T >::pushFront(T&& value)
   {
-    detail::Node< T >* node = new detail::Node< T >(std::move(value), fake_->next, fake_);
+    detail::Node< T >* node = new detail::Node< T >{ std::forward< T >(value), fake_->next, fake_ };
 
     if (fake_->next != nullptr) {
       fake_->next->prev = node;
@@ -167,7 +160,7 @@ namespace lukashevich
   void List< T >::pushBack(T&& value)
   {
     detail::Node< T >* prev_node = fake_->prev != nullptr ? fake_->prev : fake_;
-    detail::Node< T >* node = new detail::Node< T >(std::move(value), nullptr, prev_node);
+    detail::Node< T >* node = new detail::Node< T >{ std::forward< T >(value), nullptr, prev_node };
 
     if (fake_->prev != nullptr) {
       fake_->prev->next = node;
@@ -293,11 +286,17 @@ namespace lukashevich
     fake_(makeFake< T >()),
     size_(0)
   {
-    detail::Node< T >* cur = list.fake_->next;
+    try {
+      detail::Node< T >* cur = list.fake_->next;
 
-    while (cur != nullptr) {
-      pushBack(cur->val);
-      cur = cur->next;
+      while (cur != nullptr) {
+        pushBack(cur->val);
+        cur = cur->next;
+      }
+    } catch (...) {
+      clear();
+      removeFake(fake_);
+      throw;
     }
   }
 

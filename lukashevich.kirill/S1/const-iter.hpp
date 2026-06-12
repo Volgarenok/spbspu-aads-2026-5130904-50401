@@ -2,6 +2,7 @@
 #define CONST_ITER_HPP
 
 #include <cassert>
+#include <memory>
 
 namespace lukashevich
 {
@@ -31,14 +32,14 @@ namespace lukashevich
       const T* operator->() const noexcept;
 
     private:
-      explicit LCIter(detail::Node< T >* node) noexcept;
-      detail::Node< T >* node_;
+      const detail::Node< T >* node_;
+      explicit LCIter(const detail::Node< T >* node) noexcept;
       friend class List< T >;
   };
 
   template< class T >
-  LCIter< T >::LCIter(detail::Node< T >* node) noexcept:
-        node_(node)
+  LCIter< T >::LCIter(const detail::Node< T >* node) noexcept:
+    node_(node)
   {}
 
   template< class T >
@@ -63,7 +64,7 @@ namespace lukashevich
   }
 
   template< class T >
-  LCIter< T > & LCIter< T >::operator--() noexcept
+  LCIter< T >& LCIter< T >::operator--() noexcept
   {
     assert(node_ != nullptr);
     node_ = node_->prev;
@@ -101,7 +102,7 @@ namespace lukashevich
   const T* LCIter< T >::operator->() const noexcept
   {
     assert(node_ != nullptr);
-    return &node_->val;
+    return std::addressof(node_->val);
   }
 }
 
