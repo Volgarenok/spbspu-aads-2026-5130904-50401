@@ -143,3 +143,20 @@ ulanova::Cashflow ulanova::FinanceSystem::get_cashflow(
 
   throw std::logic_error("profile not found");
 }
+
+std::vector< ulanova::Saving > ulanova::FinanceSystem::get_savings(
+  const std::string& name,
+  const std::string& date) const
+{
+  parse_date(date);
+
+  for (size_t i = 0; i < profiles_.size(); ++i)
+  {
+    if (profiles_[i].name == name)
+    {
+      return profiles_[i].savings;
+    }
+  }
+
+  throw std::logic_error("profile not found");
+}

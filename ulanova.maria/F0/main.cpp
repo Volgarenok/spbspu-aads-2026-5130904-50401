@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace
 {
@@ -111,6 +112,36 @@ namespace
     }
   }
 
+  void show_savings(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  {
+    std::string name;
+    std::string date;
+    in >> name >> date;
+
+    try
+    {
+      const std::vector< ulanova::Saving > savings = system.get_savings(name, date);
+
+      if (savings.empty())
+      {
+        out << "Нет накопительных счетов\n";
+        return;
+      }
+
+      for (size_t i = 0; i < savings.size(); ++i)
+      {
+        out << savings[i].name << " ";
+        out << savings[i].current_sum << " ";
+        out << savings[i].target_sum << " ";
+        out << savings[i].priority << " приоритет\n";
+      }
+    }
+    catch (const std::logic_error&)
+    {
+      out << "Профиль не существует\n";
+    }
+  }
+
   void invalid_command(std::istream& in, std::ostream& out)
   {
     out << "<INVALID COMMAND>\n";
@@ -132,6 +163,7 @@ int main()
   commands["add-income"] = add_income;
   commands["add-expense"] = add_expense;
   commands["cashflow"] = cashflow;
+  commands["show-savings"] = show_savings;
 
   std::string command;
   while (std::cin >> command)
