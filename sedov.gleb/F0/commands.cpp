@@ -106,6 +106,11 @@ namespace sedov
     {
       id = std::stoi(args[2]);
     }
+    catch (const std::out_of_range &)
+    {
+      out << "[ERROR] Task ID value is too large\n";
+      return;
+    }
     catch (...)
     {
       out << "[ERROR] Invalid task ID\n";
@@ -125,6 +130,11 @@ namespace sedov
     try
     {
       id = std::stoi(args[2]);
+    }
+    catch (const std::out_of_range &)
+    {
+      out << "[ERROR] Task ID value is too large\n";
+      return;
     }
     catch (...)
     {
@@ -175,6 +185,11 @@ namespace sedov
     try
     {
       minHours = std::stoi(args[6]);
+    }
+    catch (const std::out_of_range &)
+    {
+      out << "[ERROR] Task ID value is too large\n";
+      return;
     }
     catch (...)
     { out << "[ERROR] Invalid min_hours value\n";
@@ -229,6 +244,11 @@ namespace sedov
     try
     {
       minHours = std::stoi(args[4]);
+    }
+    catch (const std::out_of_range &)
+    {
+      out << "[ERROR] Task ID value is too large\n";
+      return;
     }
     catch (...)
     {

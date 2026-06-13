@@ -48,7 +48,6 @@ namespace sedov
 
   private:
     AVLTree< ProfileKey, Profile > profiles_;
-    std::string currentProfile_;
 
     bool findProfile(const std::string & name, Profile & outProf) const;
     bool findSchedule(const std::string & profName, const std::string & schedName,

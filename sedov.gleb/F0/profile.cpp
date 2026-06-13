@@ -158,6 +158,11 @@ namespace sedov
     return true;
   }
 
+  int Profile::getNextTaskId() const noexcept
+  {
+    return nextTaskId_;
+  }
+
   int Profile::generateTaskId()
   {
     return nextTaskId_++;

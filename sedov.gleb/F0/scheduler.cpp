@@ -8,9 +8,7 @@
 namespace sedov
 {
   Scheduler::Scheduler() noexcept
-  {
-    currentProfile_.clear();
-  }
+  {}
 
   std::string nextDay(const std::string & date)
   {
@@ -532,8 +530,19 @@ namespace sedov
       }
       else
       {
-        std::cout << "[WARN] Schedule \"" << orig.getScheduleName() << "\" for task \"" << orig.getTitle() 
-          << "\" no longer exists. Skipping.\n";
+        std::cout << "[WARN] Schedule \"" << orig.getScheduleName() << "\" for task \"" << orig.getTitle()
+          << "\" no longer exists. Remove task? (y/n): ";
+        char answer;
+        std::cin >> answer;
+        if (answer == 'y' || answer == 'Y')
+        {
+          profile.removeFromUnplaced(orig.getId());
+          std::cout << "[OK] Task removed\n";
+        }
+        else
+        {
+          std::cout << "[INFO] Task kept in unplaced\n";
+        }
         found = true;
         failed++;
       }
@@ -1061,7 +1070,7 @@ namespace sedov
       return false;
     }
     file << "Profile: " << name << "\n";
-    file << "Next task ID: " << profile.generateTaskId() << "\n\n";
+    file << "Next task ID: " << profile.getNextTaskId() << "\n\n";
     file << "Schedules:\n";
     List< Schedule > scheds;
     profile.getAllSchedules(scheds);
@@ -1346,8 +1355,11 @@ namespace sedov
       return result;
     }
     std::string curDate = dateFrom;
-    while (compareDates(curDate, dateTo) <= 0)
+    int maxIter = 365;
+    int iter = 0;
+    while (compareDates(curDate, dateTo) <= 0 && iter < maxIter)
     {
+      iter++;
       List< Task > tasks = sched.getTasksOnDate(curDate);
       Vector< std::pair< int,int > > busy;
       for (auto it = tasks.begin(); it != tasks.end(); ++it)
@@ -1391,7 +1403,12 @@ namespace sedov
           result.pushBack(w);
         }
       }
-      curDate = nextDay(curDate);
+      std::string nextDate = nextDay(curDate);
+      if (nextDate == curDate)
+      {
+        break;
+      }
+      curDate = nextDate;
     }
     return result;
   }
@@ -1466,8 +1483,7 @@ namespace sedov
     }
     else
     {
-      keep = task1;
-      move = task2;
+      throw std::invalid_argument("Unknown criterion: " + criterion);
     }
   }
 }

@@ -43,6 +43,15 @@ namespace sedov
       addToIndex(updatedTask);
       return updatedTask.getId();
     }
+    Task existing;
+    if (tasksById_.find(TaskIDKey{newTask.getId()}, existing))
+    {
+      Task updatedTask(nextId_++, newTask.getTitle(), newTask.getDate(), newTask.getTimeStart(), newTask.getTimeEnd(),
+        newTask.getImportance(), newTask.getScheduleName(), newTask.isActive());
+      tasksById_.insert(TaskIDKey{updatedTask.getId()}, updatedTask);
+      addToIndex(updatedTask);
+      return updatedTask.getId();
+    }
     tasksById_.insert(TaskIDKey{newTask.getId()}, newTask);
     addToIndex(newTask);
     return newTask.getId();

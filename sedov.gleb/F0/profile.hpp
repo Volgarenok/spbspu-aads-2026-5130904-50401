@@ -34,6 +34,7 @@ namespace sedov
 
     bool updateSchedule(const std::string & schedName, const Schedule & sch);
 
+    int getNextTaskId() const noexcept;
     int generateTaskId();
     void setNextTaskId(int id) noexcept;
     void clear() noexcept;
