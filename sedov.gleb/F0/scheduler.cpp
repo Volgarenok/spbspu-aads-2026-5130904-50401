@@ -562,6 +562,11 @@ namespace sedov
       std::cout << "[ERROR] Schedule names cannot be empty\n";
       return false;
     }
+    if (prof1 == prof2 && sched1 == sched2)
+    {
+      std::cout << "[ERROR] Cannot find free window in the same schedule\n";
+      return false;
+    }
     int y1, m1, d1, y2, m2, d2;
     if (!parseDate(dateFrom, y1, m1, d1))
     {
@@ -921,6 +926,11 @@ namespace sedov
     if (sched1.empty() || sched2.empty())
     {
       std::cout << "[ERROR] Schedule names cannot be empty\n";
+      return false;
+    }
+    if (prof1 == prof2 && sched1 == sched2)
+    {
+      std::cout << "[ERROR] Cannot find best day in the same schedule\n";
       return false;
     }
     if (minHours < 1 || minHours > 23)
