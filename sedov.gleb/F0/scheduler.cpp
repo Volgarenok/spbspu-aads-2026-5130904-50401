@@ -643,7 +643,7 @@ namespace sedov
     }
     for (size_t i = 0; i < common.getSize(); ++i)
     {
-      std::cout << "  " << common[i].format() << (i == (size_t)best ? " [BEST]" : "") << "\n";
+      std::cout << "  " << common[i].format() << (i == static_cast< size_t >(best) ? " [BEST]" : "") << "\n";
     }
     std::cout << "\n[OK] Best: " << common[best].format() << "\n";
     return true;
