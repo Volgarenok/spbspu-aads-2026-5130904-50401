@@ -688,12 +688,15 @@ namespace sedov
     List< Task > t1 = sch1.getTasksInRange("0000-01-01", "9999-12-31");
     for (auto it = t1.begin(); it != t1.end(); ++it)
     {
-      merged.addTask(*it);
+      Task task = *it;
+      task.setScheduleName(newName);
+      merged.addTask(task);
     }
     List< Task > t2 = sch2.getTasksInRange("0000-01-01", "9999-12-31");
     for (auto it = t2.begin(); it != t2.end(); ++it)
     {
       Task task = *it;
+      task.setScheduleName(newName);
       if (merged.hasConflict(task))
       {
         List< Task > conflictTasks = merged.getTasksOnDate(task.getDate());
@@ -857,8 +860,7 @@ namespace sedov
       profile.getAllUnplaced(unplaced);
       for (auto it = unplaced.begin(); it != unplaced.end(); ++it)
       {
-        if ((*it).getDate() >= dateFrom && (*it).getDate() <= dateTo
-          && (*it).getScheduleName() == schedule.getName())
+        if ((*it).getDate() >= dateFrom && (*it).getDate() <= dateTo && (*it).getScheduleName() == schedule.getName())
         {
           pool.pushBack(*it);
         }
@@ -894,8 +896,10 @@ namespace sedov
       for (size_t i = 0; i < pool.getSize(); ++i)
       {
         Task t = pool[i];
+        t.setScheduleName(schedule.getName());
         if (!schedule.hasConflict(t))
         {
+          t.setActive(true);
           schedule.addTask(t);
         }
         else
@@ -905,6 +909,11 @@ namespace sedov
             t.setActive(false);
             profile.addToUnplaced(t);
             moved++;
+            std::cout << "  Moved to unplaced: \"" << t.getTitle() << "\" on " << t.getDate() << "\n";
+          }
+          else
+          {
+            std::cout << "  Staying in unplaced: \"" << t.getTitle() << "\" on " << t.getDate() << "\n";
           }
         }
       }
