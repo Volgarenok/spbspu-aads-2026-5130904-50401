@@ -85,7 +85,12 @@ namespace sedov
   class Task
   {
   public:
-    Task() noexcept;
+    Task() noexcept = default;
+    Task(const Task &) = default;
+    Task(Task &&) = default;
+    Task & operator=(const Task &) = default;
+    Task & operator=(Task &&) = default;
+    ~Task() = default;
     explicit Task(int id, const std::string & title, const std::string & date, const std::string & timeStart,
       const std::string & timeEnd, const std::string & imp, const std::string & scheduleName, bool active = true);
 
@@ -130,6 +135,11 @@ namespace sedov
   {
   public:
     ProfileKey() = default;
+    ProfileKey(const ProfileKey &) = default;
+    ProfileKey(ProfileKey &&) = default;
+    ProfileKey & operator=(const ProfileKey &) = default;
+    ProfileKey & operator=(ProfileKey &&) = default;
+    ~ProfileKey() = default;
     explicit ProfileKey(const std::string & n);
     explicit ProfileKey(const char * n);
     const std::string & getName() const noexcept;
@@ -143,6 +153,11 @@ namespace sedov
   {
   public:
     ScheduleKey() = default;
+    ScheduleKey(const ScheduleKey &) = default;
+    ScheduleKey(ScheduleKey &&) = default;
+    ScheduleKey & operator=(const ScheduleKey &) = default;
+    ScheduleKey & operator=(ScheduleKey &&) = default;
+    ~ScheduleKey() = default;
     explicit ScheduleKey(const std::string & n);
     explicit ScheduleKey(const char * n);
     const std::string & getName() const noexcept;
@@ -155,7 +170,12 @@ namespace sedov
   struct TaskIDKey
   {
   public:
-    TaskIDKey() noexcept;
+    TaskIDKey() noexcept = default;
+    TaskIDKey(const TaskIDKey &) = default;
+    TaskIDKey(TaskIDKey &&) = default;
+    TaskIDKey & operator=(const TaskIDKey &) = default;
+    TaskIDKey & operator=(TaskIDKey &&) = default;
+    ~TaskIDKey() = default;
     explicit TaskIDKey(int i) noexcept;
     int getId() const noexcept;
     bool operator<(const TaskIDKey & h) const noexcept;
@@ -168,6 +188,11 @@ namespace sedov
   {
   public:
     DateTimeKey() = default;
+    DateTimeKey(const DateTimeKey &) = default;
+    DateTimeKey(DateTimeKey &&) = default;
+    DateTimeKey & operator=(const DateTimeKey &) = default;
+    DateTimeKey & operator=(DateTimeKey &&) = default;
+    ~DateTimeKey() = default;
     explicit DateTimeKey(const std::string & dt);
     const std::string & getDatetime() const noexcept;
   private:
@@ -178,7 +203,12 @@ namespace sedov
   class TimeWindow
   {
   public:
-    TimeWindow() noexcept;
+    TimeWindow() noexcept = default;
+    TimeWindow(const TimeWindow &) = default;
+    TimeWindow(TimeWindow &&) = default;
+    TimeWindow & operator=(const TimeWindow &) = default;
+    TimeWindow & operator=(TimeWindow &&) = default;
+    ~TimeWindow() = default;
     TimeWindow(const std::string & date, int startMin, int endMin) noexcept;
     const std::string & getDate() const noexcept;
     int getStartMinutes() const noexcept;

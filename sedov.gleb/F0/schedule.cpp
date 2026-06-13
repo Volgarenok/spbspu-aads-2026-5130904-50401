@@ -3,10 +3,6 @@
 
 namespace sedov
 {
-  Schedule::Schedule() noexcept:
-    nextId_(1)
-  {}
-
   Schedule::Schedule(const std::string & name):
     name_(name),
     nextId_(1)

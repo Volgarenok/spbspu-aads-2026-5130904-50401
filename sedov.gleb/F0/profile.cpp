@@ -3,10 +3,6 @@
 
 namespace sedov
 {
-  Profile::Profile() noexcept:
-    nextTaskId_(1)
-  {}
-
   Profile::Profile(const std::string & name):
     name_(name),
     nextTaskId_(1)

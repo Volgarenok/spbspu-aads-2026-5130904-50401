@@ -11,7 +11,12 @@ namespace sedov
   class Scheduler
   {
   public:
-    Scheduler() noexcept;
+    Scheduler() noexcept = default;
+    Scheduler(const Scheduler &) = default;
+    Scheduler(Scheduler &&) = default;
+    Scheduler & operator=(const Scheduler &) = default;
+    Scheduler & operator=(Scheduler &&) = default;
+    ~Scheduler() = default;
 
     bool createProfile(const std::string & name);
     bool deleteProfile(const std::string & name);

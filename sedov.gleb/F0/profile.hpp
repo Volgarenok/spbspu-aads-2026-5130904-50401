@@ -11,7 +11,12 @@ namespace sedov
   class Profile
   {
   public:
-    Profile() noexcept;
+    Profile() noexcept = default;
+    Profile(const Profile &) = default;
+    Profile(Profile &&) = default;
+    Profile & operator=(const Profile &) = default;
+    Profile & operator=(Profile &&) = default;
+    ~Profile() = default;
     explicit Profile(const std::string & name);
 
     const std::string & getName() const noexcept;

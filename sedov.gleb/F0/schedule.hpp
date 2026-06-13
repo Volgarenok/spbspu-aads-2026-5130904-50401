@@ -10,7 +10,12 @@ namespace sedov
   class Schedule
   {
   public:
-    Schedule() noexcept;
+    Schedule() noexcept = default;
+    Schedule(const Schedule &) = default;
+    Schedule(Schedule &&) = default;
+    Schedule & operator=(const Schedule &) = default;
+    Schedule & operator=(Schedule &&) = default;
+    ~Schedule() = default;
     explicit Schedule(const std::string & name);
 
     const std::string & getName() const noexcept;

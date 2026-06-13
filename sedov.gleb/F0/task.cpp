@@ -2,11 +2,6 @@
 
 namespace sedov
 {
-  Task::Task() noexcept:
-    id_(0),
-    active_(true)
-  {}
-
   Task::Task(int id, const std::string & title, const std::string & date, const std::string & timeStart,
     const std::string & timeEnd, const std::string & imp, const std::string & scheduleName, bool active):
       id_(id),
@@ -222,10 +217,6 @@ namespace sedov
     return name_ == h.name_;
   }
 
-  TaskIDKey::TaskIDKey() noexcept:
-    id_(0)
-  {}
-
   TaskIDKey::TaskIDKey(int i) noexcept:
     id_(i)
   {}
@@ -258,11 +249,6 @@ namespace sedov
   { 
     return a.getDatetime() < b.getDatetime(); 
   }
-
-  TimeWindow::TimeWindow() noexcept:
-    startMinutes_(0),
-    endMinutes_(0)
-  {}
 
   TimeWindow::TimeWindow(const std::string & date, int startMin, int endMin) noexcept:
     date_(date),

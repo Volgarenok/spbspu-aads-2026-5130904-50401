@@ -7,9 +7,6 @@
 
 namespace sedov
 {
-  Scheduler::Scheduler() noexcept
-  {}
-
   std::string nextDay(const std::string & date)
   {
     int y, m, d;
