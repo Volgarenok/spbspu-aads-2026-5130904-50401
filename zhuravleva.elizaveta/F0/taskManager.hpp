@@ -27,20 +27,19 @@ namespace zhuravleva
     void highPriority(const std::string& listName, size_t count, std::ostream& out) const;
     size_t getCurrentLabor(const std::string& listName) const;
     bool canAddTask(const std::string& listName, const std::string& taskId) const;
-    void checkAdd(const std::string& listName,
-        const std::string& taskId, std::ostream& out) const;
-
-    void markDone(const std::string& listName,
-        const std::string& taskId, const std::string& date);
-
+    void checkAdd(const std::string& listName, const std::string& taskId, std::ostream& out) const;
+    void markDone(const std::string& listName, const std::string& taskId, const std::string& date);
     size_t countCompleted(const std::string& listName,
         const std::string& from, const std::string& to) const;
-
     void setDeadline(const std::string& listName,
         const std::string& taskId, const std::string& deadline);
-
     void showExpired(const std::string& listName,
         const std::string& date, std::ostream& out) const;
+    void suggestRemoveOne(const std::string& listName,
+        const std::string& taskId, std::ostream& out) const;
+    size_t getFreeLabor(const std::string& listName) const;
+    void showCapacity(const std::string& listName, std::ostream& out) const;
+    bool hasTaskInList(const std::string& listName, const std::string& taskId) const;
 
   private:
     CuckooHashTable< std::string, Task > globalTasks_;

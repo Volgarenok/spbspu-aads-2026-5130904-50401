@@ -270,4 +270,82 @@ namespace zhuravleva
       }
     }
   }
+
+  void TaskManager::suggestRemoveOne(const std::string& listName,
+      const std::string& taskId, std::ostream& out) const
+ {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    if (!globalTasks_.contains(taskId))
+    {
+      throw std::logic_error("task not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    size_t currentLabor = getCurrentLabor(listName);
+    size_t newTaskLabor = globalTasks_.get(taskId).labor;
+    if (currentLabor + newTaskLabor <= list.maxLabor)
+    {
+      out << "OK\n";
+      return;
+    }
+    size_t required = currentLabor + newTaskLabor - list.maxLabor;
+    bool found = false;
+    for (LCIter< TaskInList > it = list.tasks.cbegin(); it != list.tasks.cend(); ++it)
+    {
+      const Task& task = globalTasks_.get(it->taskId);
+      if (task.labor >= required)
+      {
+        out << it->taskId << "\n";
+        found = true;
+      }
+    }
+    if (!found)
+    {
+      out << "IMPOSSIBLE\n";
+    }
+  }
+
+  size_t TaskManager::getFreeLabor(const std::string& listName) const
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    return list.maxLabor - getCurrentLabor(listName);
+  }
+
+  void TaskManager::showCapacity(const std::string& listName,
+      std::ostream& out) const
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    out << getCurrentLabor(listName)
+        << " / "
+        << list.maxLabor
+        << "\n";
+  }
+
+  bool TaskManager::hasTaskInList(const std::string& listName,
+      const std::string& taskId) const
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    for (LCIter< TaskInList > it = list.tasks.cbegin(); it != list.tasks.cend(); ++it)
+    {
+      if (it->taskId == taskId)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
 }
