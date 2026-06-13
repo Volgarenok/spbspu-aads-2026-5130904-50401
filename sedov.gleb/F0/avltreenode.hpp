@@ -11,20 +11,25 @@ namespace sedov
   class AVLTreeNode
   {
   private:
-      Key key_;
-      Value value_;
-      AVLTreeNode * left_;
-      AVLTreeNode * right_;
-      AVLTreeNode * parent_;
-      int height_;
+    Key key_;
+    Value value_;
+    AVLTreeNode * left_;
+    AVLTreeNode * right_;
+    AVLTreeNode * parent_;
+    int height_;
 
-      void updateHeight() noexcept;
-      int balanceFactor() const noexcept;
-      explicit AVLTreeNode(const Key & k, const Value & v, AVLTreeNode * parent);
-      explicit AVLTreeNode(Key && k, Value && v, AVLTreeNode * parent);
+    void updateHeight() noexcept;
+    int balanceFactor() const noexcept;
+    explicit AVLTreeNode(const Key & k, const Value & v, AVLTreeNode * parent);
+    explicit AVLTreeNode(Key && k, Value && v, AVLTreeNode * parent);
 
-      template< class K, class V, class C >
-      friend class AVLTree;
+    template< class K, class V, class C >
+    friend class AVLTree;
+
+    template< class K, class V >
+    friend class AVLIterator;
+    template< class K, class V >
+    friend class AVLConstIterator;
   };
 
   template < class Key, class Value >

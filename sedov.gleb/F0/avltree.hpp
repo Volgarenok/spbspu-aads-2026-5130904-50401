@@ -288,7 +288,7 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
-  AVLTree< Key, Value, Compare >::iter AVLTree< Key, Value, Compare >::begin() noexcept
+  typename AVLTree< Key, Value, Compare >::iter AVLTree< Key, Value, Compare >::begin() noexcept
   {
     if (!root_)
     {
@@ -298,13 +298,13 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
-  AVLTree< Key, Value, Compare >::iter AVLTree< Key, Value, Compare >::end() noexcept
+  typename AVLTree< Key, Value, Compare >::iter AVLTree< Key, Value, Compare >::end() noexcept
   {
     return iter(nullptr);
   }
 
   template < class Key, class Value, class Compare >
-  AVLTree< Key, Value, Compare >::constIter AVLTree< Key, Value, Compare >::begin() const noexcept
+  typename AVLTree< Key, Value, Compare >::constIter AVLTree< Key, Value, Compare >::begin() const noexcept
   {
     if (!root_)
     {
@@ -314,13 +314,13 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
-  AVLTree< Key, Value, Compare >::constIter AVLTree< Key, Value, Compare >::end() const noexcept
+  typename AVLTree< Key, Value, Compare >::constIter AVLTree< Key, Value, Compare >::end() const noexcept
   {
     return constIter(nullptr);
   }
 
   template < class Key, class Value, class Compare >
-  AVLTree< Key, Value, Compare >::constIter AVLTree< Key, Value, Compare >::cbegin() const noexcept
+  typename AVLTree< Key, Value, Compare >::constIter AVLTree< Key, Value, Compare >::cbegin() const noexcept
   {
     if (!root_)
     {
@@ -330,7 +330,7 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
-  AVLTree< Key, Value, Compare >::constIter AVLTree< Key, Value, Compare >::cend() const noexcept
+  typename AVLTree< Key, Value, Compare >::constIter AVLTree< Key, Value, Compare >::cend() const noexcept
   {
     return constIter(nullptr);
   }
