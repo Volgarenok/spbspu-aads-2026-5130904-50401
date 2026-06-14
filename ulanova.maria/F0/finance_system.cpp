@@ -120,7 +120,7 @@ ulanova::Cashflow ulanova::FinanceSystem::get_cashflow(
       }
     }
   }
-  
+
   cashflow.total = cashflow.income - cashflow.expense;
   return cashflow;
 }
