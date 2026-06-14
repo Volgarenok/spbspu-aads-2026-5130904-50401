@@ -534,7 +534,7 @@ namespace sedov
   }
 
   template < class Key, class Value, class Compare >
-  std::pair< AVLTreeNode< Key, Value > *, bool > 
+  std::pair< AVLTreeNode< Key, Value > *, bool >
     AVLTree< Key, Value, Compare >::insertNode(AVLTreeNode< Key, Value > * node, const Key & k, const Value & v)
   {
     if (!node)

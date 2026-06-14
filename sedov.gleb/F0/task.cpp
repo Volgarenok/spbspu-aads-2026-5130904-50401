@@ -247,7 +247,7 @@ namespace sedov
 
   bool operator<(const DateTimeKey & a, const DateTimeKey & b) noexcept
   { 
-    return a.getDatetime() < b.getDatetime(); 
+    return a.getDatetime() < b.getDatetime();
   }
 
   TimeWindow::TimeWindow(const std::string & date, int startMin, int endMin) noexcept:

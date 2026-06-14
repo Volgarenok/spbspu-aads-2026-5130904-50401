@@ -335,8 +335,7 @@ namespace sedov
     return true;
   }
 
-  bool Scheduler::listTasks(const std::string & profName, const std::string & schedName,
-    const std::string & date)
+  bool Scheduler::listTasks(const std::string & profName, const std::string & schedName, const std::string & date)
   {
     if (profName.empty())
     {
@@ -385,7 +384,7 @@ namespace sedov
     {
       for (size_t i = 0; i < tasks.getSize(); ++i)
       {
-        std::cout << "  ID " << tasks[i].getId() << ": " << tasks[i].getTimeStart() << "-" << tasks[i].getTimeEnd() 
+        std::cout << "  ID " << tasks[i].getId() << ": " << tasks[i].getTimeStart() << "-" << tasks[i].getTimeEnd()
           << " [" << tasks[i].getImportance() << "] " << tasks[i].getTitle() << "\n";
       }
     }
@@ -545,7 +544,7 @@ namespace sedov
       }
       if (!found)
       {
-        std::cout << "[FAILED] Task \"" << orig.getTitle() << "\" (" << orig.getDurationMinutes() << "min, " 
+        std::cout << "[FAILED] Task \"" << orig.getTitle() << "\" (" << orig.getDurationMinutes() << "min, "
           << orig.getImportance() << ") - no suitable window in schedule \"" << orig.getScheduleName() << "\"\n";
         failed++;
       }
@@ -747,7 +746,8 @@ namespace sedov
     return true;
   }
 
-  bool Scheduler::compareMerge(const std::string & profName, const std::string & sched1Name, const std::string & sched2Name)
+  bool Scheduler::compareMerge(const std::string & profName, const std::string & sched1Name,
+    const std::string & sched2Name)
   {
     if (profName.empty())
     {

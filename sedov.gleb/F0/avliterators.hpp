@@ -39,7 +39,7 @@ namespace sedov
 
     explicit AVLIterator(AVLTreeNode< Key, Value > * node = nullptr);
     valueType operator*() const;
-    
+
     AVLIterator & operator++() noexcept;
     AVLIterator operator++(int) noexcept;
     AVLIterator & operator--() noexcept;
