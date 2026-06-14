@@ -405,4 +405,63 @@ namespace zhuravleva
     selected.popBack();
     suggestRemoveRecursive(next, end, maxRemove, required, currentSum, selected, found, out);
   }
+
+  size_t TaskManager::getPriorityScore(const TaskInList& task) const
+  {
+    if (task.priority >= 1000000)
+    {
+      return 0;
+    }
+    return 1000000 - task.priority;
+  }
+
+  void TaskManager::optimize(const std::string& newListName, const std::string& listName, size_t maxLabor)
+  {
+    if (lists_.contains(newListName))
+    {
+      throw std::logic_error("list already exists");
+    }
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    List< TaskInList > currentList;
+    List< TaskInList > bestList;
+    size_t bestScore = 0;
+    optimizeRecursive(list.tasks.cbegin(), list.tasks.cend(), maxLabor,
+        0, 0, currentList, bestScore, bestList);
+    TaskList result(newListName, maxLabor);
+    for (LCIter< TaskInList > it = bestList.cbegin(); it != bestList.cend(); ++it)
+    {
+      result.tasks.pushBack(*it);
+    }
+    lists_.insert(newListName, result);
+  }
+
+  void TaskManager::optimizeRecursive(LCIter< TaskInList > current, LCIter< TaskInList > end, size_t maxLabor,
+      size_t currentLabor, size_t currentScore, List< TaskInList >& currentList,
+      size_t& bestScore, List< TaskInList >& bestList) const
+  {
+    if (current == end)
+    {
+      if (currentScore > bestScore)
+      {
+        bestScore = currentScore;
+        bestList = currentList;
+      }
+      return;
+    }
+    const Task& task = globalTasks_.get(current->taskId);
+    LCIter< TaskInList > next = current;
+    ++next;
+    if (currentLabor + task.labor <= maxLabor)
+    {
+      currentList.pushBack(*current);
+      optimizeRecursive(next, end, maxLabor, currentLabor + task.labor,
+           currentScore + getPriorityScore(*current), currentList, bestScore, bestList);
+      currentList.popBack();
+    }
+    optimizeRecursive(next, end, maxLabor, currentLabor, currentScore, currentList, bestScore, bestList);
+  }
 }
