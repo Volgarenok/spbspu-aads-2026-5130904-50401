@@ -1,11 +1,11 @@
 #include "finance_system.hpp"
 #include "../common/vector.hpp"
+#include "hash_table.hpp"
 
 #include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <string>
-#include <unordered_map>
 
 namespace
 {
@@ -247,32 +247,36 @@ namespace
 
 int main()
 {
-  using commands_t = std::unordered_map< std::string, command_t >;
-
   ulanova::FinanceSystem system;
-  commands_t commands;
-  commands["create-profile"] = create_profile;
-  commands["show-balance"] = show_balance;
-  commands["drop-profile"] = drop_profile;
-  commands["add-income"] = add_income;
-  commands["add-expense"] = add_expense;
-  commands["cashflow"] = cashflow;
-  commands["show-savings"] = show_savings;
-  commands["create-saving"] = create_saving;
-  commands["finish-saving"] = finish_saving;
-  commands["close-saving"] = close_saving;
-  commands["calc-date"] = calce_date;
+  ulanova::HashTable< command_t > commands;
+
+  commands.add("create-profile", create_profile);
+  commands.add("show-balance", show_balance);
+  commands.add("drop-profile", drop_profile);
+  commands.add("add-income", add_income);
+  commands.add("add-expense", add_expense);
+  commands.add("cashflow", cashflow);
+  commands.add("show-savings", show_savings);
+  commands.add("create-saving", create_saving);
+  commands.add("finish-saving", finish_saving);
+  commands.add("close-saving", close_saving);
+  commands.add("calc-date", calce_date);
 
   std::string command;
   while (std::cin >> command)
   {
     try
     {
-      commands.at(command)(std::cin, std::cout, system);
-    }
-    catch (const std::out_of_range&)
-    {
-      invalid_command(std::cin, std::cout);
+      command_t* h = commands.find(command);
+
+      if (h == nullptr)
+      {
+        invalid_command(std::cin, std::cout);
+      }
+      else
+      {
+        (*h)(std::cin, std::cout, system);
+      }
     }
     catch (const std::logic_error&)
     {
