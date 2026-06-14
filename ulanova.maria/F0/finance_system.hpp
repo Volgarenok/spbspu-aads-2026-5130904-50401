@@ -32,6 +32,10 @@ namespace ulanova
     long long get_balance(const std::string& name, const std::string& date) const;
     Cashflow get_cashflow(const std::string& name, const std::string& from_date, const std::string& to_date) const;
     Vector< Saving > get_savings(const std::string& name, const std::string& date) const;
+    std::string calculate_goal_date(const std::string& profile_name,
+      const std::string& saving_name,
+      const std::string& from_date,
+      const std::string& to_date) const;
   private:
     HashTable< Profile > profiles_;
   };

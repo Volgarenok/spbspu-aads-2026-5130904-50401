@@ -2,6 +2,39 @@
 
 #include <stdexcept>
 
+namespace
+{
+  long long get_free_money_for_date(const ulanova::Profile& profile,
+    const ulanova::Date& date)
+  {
+    long long free_money = 0;
+
+    for (size_t i = 0; i < profile.operations.getsize(); ++i)
+    {
+      const ulanova::Operation& operation = profile.operations[i];
+
+      if (operation.date == date)
+      {
+        if (operation.is_income)
+        {
+          free_money += operation.amount;
+        }
+        else
+        {
+          free_money -= operation.amount;
+        }
+      }
+    }
+
+    return free_money;
+  }
+
+  long long get_saving_need(const ulanova::Saving& saving)
+  {
+    return saving.target_sum - saving.current_sum;
+  }
+}
+
 void ulanova::FinanceSystem::create_profile(const std::string& name)
 {
   if (has_profile(name))
@@ -217,3 +250,67 @@ void ulanova::FinanceSystem::close_saving(const std::string& saving_name, const 
 
   throw std::logic_error("saving not found");
 }
+
+std::string ulanova::FinanceSystem::calculate_goal_date(
+  const std::string& profile_name,
+  const std::string& saving_name,
+  const std::string& from_date,
+  const std::string& to_date) const
+{
+  const Profile* profile = profiles_.find(profile_name);
+
+  if (profile == nullptr)
+  {
+    throw std::logic_error("profile not found");
+  }
+
+  const Date from = parse_date(from_date);
+  const Date to = parse_date(to_date);
+
+  Vector< Saving > savings = profile->savings;
+  size_t target_index = savings.getsize();
+
+  for (size_t i = 0; i < savings.getsize(); ++i)
+  {
+    if (savings[i].name == saving_name)
+    {
+      target_index = i;
+    }
+  }
+
+  if (target_index == savings.getsize())
+  {
+    throw std::logic_error("saving not found");
+  }
+
+  Date current_date = from;
+
+  while (is_before_or_equal(current_date, to))
+  {
+    long long free_money = get_free_money_for_date(*profile, current_date);
+
+    for (size_t priority = 0; priority <= 999; ++priority)
+    {
+      for (size_t i = 0; i < savings.getsize(); ++i)
+      {
+        if ((savings[i].priority == static_cast< int >(priority)) && (free_money > 0))
+        {
+          const long long need = get_saving_need(savings[i]);
+          const long long add = (free_money < need ) ? free_money : need;
+
+          savings[i].current_sum += add;
+          free_money -= add;
+
+          if ((i == target_index) && (savings[i].current_sum >= savings[i].target_sum))
+          {
+            return date_to_string(current_date);
+          }
+        }
+      }
+    }
+
+    current_date = add_days(current_date, 1);
+  }
+  return "не достигнута";
+}
+

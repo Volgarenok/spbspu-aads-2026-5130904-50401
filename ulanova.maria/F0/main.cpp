@@ -206,6 +206,36 @@ namespace
     }
   }
 
+  void calce_date(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  {
+    std::string profile_name;
+    std::string saving_name;
+    std::string from_date;
+    std::string to_date;
+
+    in >> profile_name >> saving_name >> from_date >> to_date;
+
+    try
+    {
+      const std::string result = system.calculate_goal_date(profile_name,
+        saving_name, from_date, to_date);
+      out << "Цель будет достигнута: " << result << "\n";
+    }
+    catch (const std::logic_error& error)
+    {
+      const std::string message = error.what();
+
+      if (message == "saving not found")
+      {
+        out << "Счет не существует\n";
+      }
+      else
+      {
+        out << "Профиль не существует\n";
+      }
+    }
+  }
+
   void invalid_command(std::istream& in, std::ostream& out)
   {
     out << "<INVALID COMMAND>\n";
@@ -231,6 +261,7 @@ int main()
   commands["create-saving"] = create_saving;
   commands["finish-saving"] = finish_saving;
   commands["close-saving"] = close_saving;
+  commands["calc-date"] = calce_date;
 
   std::string command;
   while (std::cin >> command)
