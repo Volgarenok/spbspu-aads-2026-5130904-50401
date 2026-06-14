@@ -273,7 +273,7 @@ namespace zhuravleva
 
   void TaskManager::suggestRemoveOne(const std::string& listName,
       const std::string& taskId, std::ostream& out) const
- {
+  {
     if (!lists_.contains(listName))
     {
       throw std::logic_error("list not found");
@@ -347,5 +347,62 @@ namespace zhuravleva
       }
     }
     return false;
+  }
+
+  void TaskManager::suggestRemove(const std::string& listName, const std::string& taskId,
+      size_t maxRemove, std::ostream& out) const
+  {
+    if (!lists_.contains(listName))
+    {
+      throw std::logic_error("list not found");
+    }
+    if (!globalTasks_.contains(taskId))
+    {
+      throw std::logic_error("task not found");
+    }
+    const TaskList& list = lists_.get(listName);
+    size_t currentLabor = getCurrentLabor(listName);
+    size_t newTaskLabor = globalTasks_.get(taskId).labor;
+    if (currentLabor + newTaskLabor <= list.maxLabor)
+    {
+      out << "OK\n";
+      return;
+    }
+    size_t required = currentLabor + newTaskLabor - list.maxLabor;
+    List< std::string > selected;
+    bool found = false;
+    suggestRemoveRecursive(list.tasks.cbegin(), list.tasks.cend(),
+        maxRemove, required, 0, selected, found, out);
+    if (!found)
+    {
+      out << "IMPOSSIBLE\n";
+    }
+  }
+
+  void TaskManager::suggestRemoveRecursive(LCIter< TaskInList > current,
+      LCIter< TaskInList > end, size_t maxRemove, size_t required,
+    size_t currentSum, List< std::string >& selected, bool& found, std::ostream& out) const
+  {
+    if (currentSum >= required && !selected.empty())
+    {
+      for (LCIter< std::string > it = selected.cbegin(); it != selected.cend(); ++it)
+      {
+        out << *it << " ";
+      }
+      out << "\n";
+      found = true;
+      return;
+    }
+    if (current == end || selected.size() == maxRemove)
+    {
+      return;
+    }
+    const Task& task = globalTasks_.get(current->taskId);
+    selected.pushBack(current->taskId);
+    LCIter< TaskInList > next = current;
+    ++next;
+    suggestRemoveRecursive(next, end, maxRemove, required, currentSum + task.labor, selected, found, out);
+    selected.popBack();
+    suggestRemoveRecursive(next, end, maxRemove, required, currentSum, selected, found, out);
   }
 }

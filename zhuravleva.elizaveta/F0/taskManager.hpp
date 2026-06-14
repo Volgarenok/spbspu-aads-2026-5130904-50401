@@ -40,10 +40,16 @@ namespace zhuravleva
     size_t getFreeLabor(const std::string& listName) const;
     void showCapacity(const std::string& listName, std::ostream& out) const;
     bool hasTaskInList(const std::string& listName, const std::string& taskId) const;
+    void suggestRemove(const std::string& listName, const std::string& taskId,
+        size_t maxRemove, std::ostream& out) const;
 
   private:
     CuckooHashTable< std::string, Task > globalTasks_;
     CuckooHashTable< std::string, TaskList > lists_;
+
+    void suggestRemoveRecursive(LCIter< TaskInList > current,
+        LCIter< TaskInList > end, size_t maxRemove, size_t required,
+        size_t currentSum, List< std::string >& selected, bool& found, std::ostream& out) const;
   };
 }
 
