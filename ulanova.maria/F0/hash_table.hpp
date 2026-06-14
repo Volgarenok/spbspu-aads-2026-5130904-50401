@@ -16,6 +16,9 @@ namespace ulanova
   {
   public:
 
+    class iterator;
+    class const_iterator;
+
     HashTable();
 
     void add(const std::string& key, const Value& value);
@@ -23,6 +26,13 @@ namespace ulanova
     bool has(const std::string& key) const;
     Value* find(const std::string& key);
     const Value* find(const std::string& key) const;
+
+    iterator begin() noexcept;
+    iterator end() noexcept;
+    const_iterator begin() const noexcept;
+    const_iterator end() const noexcept;
+    const_iterator cbegin() const noexcept;
+    const_iterator cend() const noexcept;
 
   private:
 
@@ -51,6 +61,109 @@ namespace ulanova
     void add_without_rehash(const std::string& key, const Value& value);
   };
 }
+
+template< class Value >
+class ulanova::HashTable< Value >::iterator
+{
+public:
+  iterator(HashTable< Value >* table, size_t index) noexcept:
+    table_(table),
+    index_(index);
+  {
+    skip_empty();
+  }
+
+  Value& operator*() const
+  {
+    return table_->buckets_[index_].value;
+  }
+
+  Value* operator->() const
+  {
+    return std::adressof(table_->buckets_[index].value);
+  }
+
+  iterator& operator++() noexcept
+  {
+    ++index_;
+    skip_empty();
+    return *this;
+  }
+
+  bool operator!=(const iterator& rhs) const noexcept
+  {
+    return (table_ != rhs.table_) || (index_ != rhs.index_);
+  }
+
+  bool operator==(const iterator& rhs) const noexcept
+  {
+    return !(*this != rhs);
+  }
+
+private:
+  HashTable< Value >* table_;
+  size_t index_;
+
+  void skip_empty() noexcept
+  {
+    while ((index_ < table_->buckets_.getsize()) && (table_->buckets_[index].state != State::filled))
+    {
+      ++index_;
+    }
+  }
+};
+
+template< class Value >
+class ulanova::HashTable< Value >::const_iterator
+{
+public:
+  const_iterator(const HashTable< Value >* table, size_t index) noexcept:
+    table_(table),
+    index_(index)
+  {
+    skip_empty();
+  }
+
+  const Value& operator*() const
+  {
+    return table_->buckets_[index].value;
+  }
+
+  const Value* operator->() const
+  {
+    return std::addressof(table_->buckets_[index].value);
+  }
+
+  const_iterator& operator++() noexcept
+  {
+    ++index_;
+    skip_empty();
+    return *this;
+  }
+
+  bool operator!=(const const_iterator& rhs) const noexcept
+  {
+    return (table_ != rhs.table_) || ( index_ != rhs.index_);
+  }
+
+  bool operator==(const const_iterator& rhs) const noexcept
+  {
+    return !(*this != rhs);
+  }
+
+private:
+  const HashTable< Value >* table_;
+  size_t index_;
+
+  void skip_empty() noexcept
+  {
+    while ((index_ < table_->buckets_.getsize()) && (table_->buckets_[index].state != State::filled))
+    {
+      ++index_;
+    }
+  }
+};
+
 
 template< class Value >
 ulanova::HashTable< Value >::HashTable():
@@ -214,5 +327,48 @@ void ulanova::HashTable< Value >::add_without_rehash(
 
   throw std::logic_error("hash table is full");
 }
+
+template< class Value >
+typename ulanova::HashTable< Value >::iterator
+ulanova::HashTable< Value >::begin() noexcept
+{
+  return iterator(this,0);
+}
+
+template< class Value >
+typename ulanova::HashTable< Value >::iterator
+ulanova::HashTable< Value >::end() noexcept
+{
+  return iterator(this, buckets_.size());
+}
+
+template< class Value >
+typename ulanova::HashTable< Value >::const_iterator
+ulanova::HashTable< Value >::begin() const noexcept
+{
+  return const_iterator(this, 0);
+}
+
+template< class Value >
+typename ulanova::HashTable< Value >::const_iterator
+ulanova::HashTable< Value >::end() const noexcept
+{
+  return const_iterator(this, buckets_.getsize());
+}
+
+template< class Value >
+typename ulanova::HashTable< Value >::const_iterator
+ulanova::HashTable< Value >::cbegin() const noexcept
+{
+  return begin();
+}
+
+template< class Value >
+typename ulanova::HashTable< Value >::const_iterator
+ulanova::HashTable< Value >::cend() const noexcept
+{
+  return end();
+}
+
 
 #endif
