@@ -147,44 +147,43 @@ void ulanova::FinanceSystem::create_saving(const std::string& saving_name,
   int priority,
   const std::string& start_date)
 {
+  Profile* profile = profiles_.find(profile_name);
+
+  if (profile == nullptr)
+  {
+    throw std::logic_error("profile not found");
+  }
+
   const Date parsed_start_date = parse_date(start_date);
 
-  for (size_t i = 0; i < profiles_.getsize(); ++i)
+  for (size_t i = 0; i < profile->savings.getsize(); ++i)
   {
-    if (profiles_[i].name == profile_name)
+    if (profile->savings[i].name == saving_name)
     {
-      for (size_t j = 0; j < profiles_[i].savings.getsize(); ++j)
-      {
-        if (profiles_[i].savings[j].name == saving_name)
-        {
-          throw std::logic_error("saving already exists");
-        }
-      }
-
-      Saving saving{saving_name, 0 , target_sum, priority, parsed_start_date};
-      profiles_[i].savings.push_back(saving);
-      return;
+      throw std::logic_error("saving already exists");
     }
   }
 
-  throw std::logic_error("profile not found");
+  Saving saving{saving_name, 0 , target_sum, priority, parsed_start_date};
+  profile->savings.push_back(saving);
 }
 
 void ulanova::FinanceSystem::finish_saving(const std::string& saving_name, const std::string& date)
 {
   parse_date(date);
 
-  for (size_t i = 0; i < profiles_.getsize(); ++i)
+  for (auto it = profiles_.begin(); it != profiles_.end(); ++it)
   {
-    for (size_t j = 0; j < profiles_[i].savings.getsize(); ++j)
+    Profile& profile = *it;
+    for (size_t j = 0; j < profile.savings.getsize(); ++j)
     {
-      if (profiles_[i].savings[j].name == saving_name)
+      if (profile.savings[j].name == saving_name)
       {
         if (saving_name == "default")
         {
           throw std::logic_error("system saving");
         }
-        profiles_[i].savings.erase(j);
+        profile.savings.erase(j);
         return;
       }
     }
@@ -197,19 +196,20 @@ void ulanova::FinanceSystem::close_saving(const std::string& saving_name, const 
 {
   parse_date(date);
 
-  for (size_t i = 0; i < profiles_.getsize(); ++i)
+  for (auto it = profiles_.begin(); it != profiles_.end(); ++it)
   {
-    for (size_t j = 0; j < profiles_.getsize(); ++j)
+    Profile& profile = *it;
+    for (size_t j = 0; j < profile.savings.getsize(); ++j)
     {
-      if (profiles_[i].savings[j].name == saving_name)
+      if (profile.savings[j].name == saving_name)
       {
         if (saving_name == "default")
         {
           throw std::logic_error("system saving");
         }
 
-        profiles_[i].balance += profiles_[i].savings[j].current_sum;
-        profiles_[i].savings.erase( j);
+        profile.balance += profile.savings[j].current_sum;
+        profile.savings.erase( j);
         return;
       }
     }

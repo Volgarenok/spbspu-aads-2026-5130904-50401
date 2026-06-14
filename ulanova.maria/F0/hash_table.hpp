@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <memory>
 
 namespace ulanova
 {
@@ -68,7 +69,7 @@ class ulanova::HashTable< Value >::iterator
 public:
   iterator(HashTable< Value >* table, size_t index) noexcept:
     table_(table),
-    index_(index);
+    index_(index)
   {
     skip_empty();
   }
@@ -80,7 +81,7 @@ public:
 
   Value* operator->() const
   {
-    return std::adressof(table_->buckets_[index].value);
+    return std::addressof(table_->buckets_[index].value);
   }
 
   iterator& operator++() noexcept
@@ -106,7 +107,7 @@ private:
 
   void skip_empty() noexcept
   {
-    while ((index_ < table_->buckets_.getsize()) && (table_->buckets_[index].state != State::filled))
+    while ((index_ < table_->buckets_.getsize()) && (table_->buckets_[index_].state != State::filled))
     {
       ++index_;
     }
@@ -157,7 +158,7 @@ private:
 
   void skip_empty() noexcept
   {
-    while ((index_ < table_->buckets_.getsize()) && (table_->buckets_[index].state != State::filled))
+    while ((index_ < table_->buckets_.getsize()) && (table_->buckets_[index_].state != State::filled))
     {
       ++index_;
     }
@@ -253,7 +254,7 @@ size_t ulanova::HashTable< Value >::find_index( const std::string& key) const
   const size_t first_hash = get_first_hash(key);
   const size_t second_hash = get_second_hash(key);
 
-  for (size_t i = 0; i < buckets_.size(); ++i)
+  for (size_t i = 0; i < buckets_.getsize(); ++i)
   {
     const size_t index = (first_hash + i * second_hash) % buckets_.getsize();
 
@@ -339,7 +340,7 @@ template< class Value >
 typename ulanova::HashTable< Value >::iterator
 ulanova::HashTable< Value >::end() noexcept
 {
-  return iterator(this, buckets_.size());
+  return iterator(this, buckets_.getsize());
 }
 
 template< class Value >
