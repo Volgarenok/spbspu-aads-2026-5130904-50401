@@ -246,7 +246,7 @@ namespace sedov
   }
 
   bool operator<(const DateTimeKey & a, const DateTimeKey & b) noexcept
-  { 
+  {
     return a.getDatetime() < b.getDatetime();
   }
 

@@ -20,11 +20,13 @@ namespace sedov
     d++;
     if (d > maxd)
     {
-      d = 1; m++;
+      d = 1;
+      m++;
     }
     if (m > 12)
     {
-      m = 1; y++;
+      m = 1;
+      y++;
     }
     return pad(y) + "-" + pad(m) + "-" + pad(d);
   }
@@ -171,7 +173,7 @@ namespace sedov
     std::cout << "Schedules in profile \"" << profName << "\":\n";
     if (scheds.size() == 0)
     {
-        std::cout << "  No schedules\n";
+      std::cout << "  No schedules\n";
     }
     else
     {
@@ -378,7 +380,7 @@ namespace sedov
     std::cout << "Tasks for " << date << " (" << schedName << "):\n";
     if (tasks.getSize() == 0)
     {
-        std::cout << "  No tasks\n";
+      std::cout << "  No tasks\n";
     }
     else
     {
@@ -846,7 +848,7 @@ namespace sedov
         Schedule s;
         if (!profile.findSchedule(name, s))
         {
-          std::cout << "[ERROR] Schedule \"" << name << "\" not found\n"; 
+          std::cout << "[ERROR] Schedule \"" << name << "\" not found\n";
           return false;
         }
         targetScheds1.pushBack(s);
@@ -858,7 +860,7 @@ namespace sedov
       Schedule schedule = *sch_it;
       List< Task > schedTasks = schedule.getTasksInRange(dateFrom, dateTo);
       Vector< Task > pool;
-      for (auto it = schedTasks.begin(); it != schedTasks.end(); ++it) 
+      for (auto it = schedTasks.begin(); it != schedTasks.end(); ++it)
       {
         pool.pushBack(*it);
       }
@@ -1312,7 +1314,7 @@ namespace sedov
 
   bool Scheduler::findSchedule(const std::string & profName, const std::string & schedName, Schedule & outSched) const
   {
-    if (profName.empty() || schedName.empty()) 
+    if (profName.empty() || schedName.empty())
     {
       return false;
     }
