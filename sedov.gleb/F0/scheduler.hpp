@@ -44,7 +44,7 @@ namespace sedov
 
     bool compareMerge(const std::string & profName, const std::string & sched1Name, const std::string & sched2Name);
     bool optimizeRange(const std::string & profName, const std::string & dateFrom, const std::string & dateTo,
-      const std::string & criterion, const sedov::Vector< std::string > & targetScheds = {});
+      const std::string & criterion, const Vector< std::string > & targetScheds = {});
 
     bool findBestDay(const std::string & prof1, const std::string & sched1, const std::string & prof2,
       const std::string & sched2, int minHours);

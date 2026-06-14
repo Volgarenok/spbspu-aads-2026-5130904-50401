@@ -796,7 +796,7 @@ namespace sedov
   }
 
   bool Scheduler::optimizeRange(const std::string & profName, const std::string & dateFrom, const std::string & dateTo,
-    const std::string & criterion, const sedov::Vector< std::string > & targetScheds)
+    const std::string & criterion, const Vector< std::string > & targetScheds)
   {
     if (profName.empty())
     {
