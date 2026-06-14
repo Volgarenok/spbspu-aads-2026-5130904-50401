@@ -29,7 +29,7 @@ namespace sedov
     return cmds;
   }
 
-  void cCreateProfile(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cCreateProfile(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 1)
     {
@@ -39,7 +39,7 @@ namespace sedov
     sched.createProfile(args[0]);
   }
 
-  void cDeleteProfile(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cDeleteProfile(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 1)
     {
@@ -49,12 +49,12 @@ namespace sedov
     sched.deleteProfile(args[0]);
   }
 
-  void cListProfiles(const sedov::Vector<std::string>&, std::ostream&, Scheduler & sched)
+  void cListProfiles(const Vector<std::string>&, std::ostream&, Scheduler & sched)
   {
     sched.listProfiles();
   }
 
-  void cCreateSchedule(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cCreateSchedule(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 2)
     {
@@ -64,7 +64,7 @@ namespace sedov
     sched.createSchedule(args[0], args[1]);
   }
 
-  void cDeleteSchedule(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cDeleteSchedule(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 2)
     {
@@ -74,7 +74,7 @@ namespace sedov
     sched.deleteSchedule(args[0], args[1]);
   }
 
-  void cListSchedules(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cListSchedules(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 1)
     {
@@ -84,7 +84,7 @@ namespace sedov
     sched.listSchedules(args[0]);
   }
 
-  void cAddTask(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cAddTask(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 7)
     {
@@ -94,7 +94,7 @@ namespace sedov
     sched.addTask(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
   }
 
-  void cRemoveTask(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cRemoveTask(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 3)
     {
@@ -119,7 +119,7 @@ namespace sedov
     sched.removeTask(args[0], args[1], id);
   }
 
-  void cViewTask(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cViewTask(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 3)
     {
@@ -144,7 +144,7 @@ namespace sedov
     sched.viewTask(args[0], args[1], id);
   }
 
-  void cListTasks(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cListTasks(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 3)
     {
@@ -154,7 +154,7 @@ namespace sedov
     sched.listTasks(args[0], args[1], args[2]);
   }
 
-  void cShowUnplaced(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cShowUnplaced(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 1)
     {
@@ -164,7 +164,7 @@ namespace sedov
     sched.showUnplaced(args[0]);
   }
 
-  void cAutoPlace(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cAutoPlace(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 3)
     {
@@ -174,7 +174,7 @@ namespace sedov
     sched.autoPlace(args[0], args[1], args[2]);
   }
 
-  void cFindFreeWindow(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cFindFreeWindow(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 7)
     {
@@ -198,7 +198,7 @@ namespace sedov
     sched.findFreeWindow(args[0], args[1], args[2], args[3], args[4], args[5], minHours);
   }
 
-  void cMergeSchedules(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cMergeSchedules(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 4)
     {
@@ -208,7 +208,7 @@ namespace sedov
     sched.mergeSchedules(args[0], args[1], args[2], args[3]);
   }
 
-  void cCompareMerge(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cCompareMerge(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 3)
     {
@@ -218,14 +218,14 @@ namespace sedov
     sched.compareMerge(args[0], args[1], args[2]);
   }
 
-  void cOptimizeRange(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cOptimizeRange(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 4)
     {
       out << "[ERROR] Usage: optimize_range <profile> <from> <to> <criterion> [schedules...]\n";
       return;
     }
-    sedov::Vector< std::string > schedules;
+    Vector< std::string > schedules;
     for (size_t i = 4; i < args.getSize(); ++i)
     {
       schedules.pushBack(args[i]);
@@ -233,7 +233,7 @@ namespace sedov
     sched.optimizeRange(args[0], args[1], args[2], args[3], schedules);
   }
 
-  void cFindBestDay(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cFindBestDay(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 5)
     {
@@ -258,7 +258,7 @@ namespace sedov
     sched.findBestDay(args[0], args[1], args[2], args[3], minHours);
   }
 
-  void cExportProfile(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cExportProfile(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 2)
     {
@@ -268,7 +268,7 @@ namespace sedov
     sched.exportProfile(args[0], args[1]);
   }
 
-  void cImportProfile(const sedov::Vector< std::string > & args, std::ostream & out, Scheduler & sched)
+  void cImportProfile(const Vector< std::string > & args, std::ostream & out, Scheduler & sched)
   {
     if (args.getSize() < 1)
     {
