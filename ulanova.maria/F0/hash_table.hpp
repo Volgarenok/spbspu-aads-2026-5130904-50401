@@ -81,7 +81,7 @@ public:
 
   Value* operator->() const
   {
-    return std::addressof(table_->buckets_[index].value);
+    return std::addressof(table_->buckets_[index_].value);
   }
 
   iterator& operator++() noexcept
@@ -127,12 +127,12 @@ public:
 
   const Value& operator*() const
   {
-    return table_->buckets_[index].value;
+    return table_->buckets_[index_].value;
   }
 
   const Value* operator->() const
   {
-    return std::addressof(table_->buckets_[index].value);
+    return std::addressof(table_->buckets_[index_].value);
   }
 
   const_iterator& operator++() noexcept
