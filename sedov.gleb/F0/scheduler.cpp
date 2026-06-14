@@ -796,7 +796,7 @@ namespace sedov
   }
 
   bool Scheduler::optimizeRange(const std::string & profName, const std::string & dateFrom, const std::string & dateTo,
-    const std::string & criterion, const std::vector< std::string > & targetScheds)
+    const std::string & criterion, const sedov::Vector< std::string > & targetScheds)
   {
     if (profName.empty())
     {
@@ -831,13 +831,13 @@ namespace sedov
       return false;
     }
     List< Schedule > targetScheds1;
-    if (targetScheds.empty())
+    if (targetScheds.isEmpty())
     {
       profile.getAllSchedules(targetScheds1);
     }
     else
     {
-      for (size_t idx = 0; idx < targetScheds.size(); ++idx)
+      for (size_t idx = 0; idx < targetScheds.getSize(); ++idx)
       {
         const std::string & name = targetScheds[idx];
         if (name.empty())

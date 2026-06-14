@@ -1,4 +1,5 @@
 #include "task.hpp"
+#include <stdexcept>
 
 namespace sedov
 {

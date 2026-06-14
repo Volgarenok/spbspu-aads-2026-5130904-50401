@@ -4,9 +4,9 @@
 #include "scheduler.hpp"
 #include "commands.hpp"
 
-std::vector< std::string > parseCommandLine(const std::string & line)
+sedov::Vector< std::string > parseCommandLine(const std::string & line)
 {
-  std::vector< std::string > args;
+  sedov::Vector< std::string > args;
   std::string current;
   bool inQuotes = false;
   for (size_t i = 0; i < line.size(); ++i)
@@ -20,7 +20,7 @@ std::vector< std::string > parseCommandLine(const std::string & line)
     {
       if (!current.empty())
       {
-        args.push_back(current);
+        args.pushBack(current);
         current.clear();
       }
     }
@@ -31,7 +31,7 @@ std::vector< std::string > parseCommandLine(const std::string & line)
   }
   if (!current.empty())
   {
-    args.push_back(current);
+    args.pushBack(current);
   }
   return args;
 }
@@ -47,8 +47,8 @@ int main()
     {
       continue;
     }
-    std::vector< std::string > args = parseCommandLine(line);
-    if (args.empty())
+    sedov::Vector< std::string > args = parseCommandLine(line);
+    if (args.isEmpty())
     {
       continue;
     }
@@ -58,10 +58,10 @@ int main()
       sedov::CommandHandler handler = nullptr;
       if (commands.find(cmd, handler))
       {
-        std::vector< std::string > cmdArgs;
-        for (size_t i = 1; i < args.size(); ++i)
+        sedov::Vector< std::string > cmdArgs;
+        for (size_t i = 1; i < args.getSize(); ++i)
         {
-          cmdArgs.push_back(args[i]);
+          cmdArgs.pushBack(args[i]);
         }
         handler(cmdArgs, std::cout, scheduler);
       }
