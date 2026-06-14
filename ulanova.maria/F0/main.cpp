@@ -236,6 +236,41 @@ namespace
     }
   }
 
+  void recommend_priority(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  {
+    std::string profile_name;
+    std::string saving_name;
+    std::string from_date;
+    std::string to_date;
+
+    in >> profile_name >> saving_name >>  from_date >> to_date;
+
+    try
+    {
+      int priority = 0;
+      const std::string date = system.recommend_priority(profile_name,
+        saving_name, from_date, to_date, priority);
+
+      out << "Для накопительного счета " << saving_name;
+      out << "рекомендуется приоритет " << priority;
+      out << ". При этом цель будет достигнута: " << date << "\n";
+    }
+    catch (const std::logic_error& error)
+    {
+      const std::string message = error.what();
+
+      if (message == "saving not found")
+      {
+        out << "Счет не существует\n";
+      }
+      else
+      {
+        out << "Профиль не существует";
+      }
+    }
+
+  }
+
   void invalid_command(std::istream& in, std::ostream& out)
   {
     out << "<INVALID COMMAND>\n";
@@ -261,6 +296,7 @@ int main()
   commands.add("finish-saving", finish_saving);
   commands.add("close-saving", close_saving);
   commands.add("calc-date", calce_date);
+  commands.add("recommend-priority", recommend_priority);
 
   std::string command;
   while (std::cin >> command)

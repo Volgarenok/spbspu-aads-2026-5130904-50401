@@ -36,6 +36,11 @@ namespace ulanova
       const std::string& saving_name,
       const std::string& from_date,
       const std::string& to_date) const;
+    std::string recommend_priority(const std::string& profile_name,
+      const std::string& saving_name,
+      const std::string& from_date,
+      const std::string& to_date,
+      int& priority) const;
   private:
     HashTable< Profile > profiles_;
   };

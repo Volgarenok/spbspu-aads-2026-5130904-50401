@@ -33,6 +33,61 @@ namespace
   {
     return saving.target_sum - saving.current_sum;
   }
+
+  std::string calculate_goal_date_with_savings(const ulanova::Profile& profile,
+    ulanova::Vector< ulanova::Saving > savings,
+    const std::string& saving_name,
+    const std::string& from_date,
+    const std::string& to_date)
+  {
+    const ulanova::Date from = ulanova::parse_date(from_date);
+    const ulanova::Date to = ulanova::parse_date(to_date);
+    size_t target_index = savings.getsize();
+
+    for (size_t i = 0; i < savings.getsize(); ++i)
+    {
+      if (savings[i].name == saving_name)
+      {
+        target_index = i;
+      }
+    }
+
+    if (target_index == savings.getsize())
+    {
+      throw std::logic_error("saving not found");
+    }
+
+    ulanova::Date current_date = from;
+
+    while (ulanova::is_before_or_equal(current_date, to))
+    {
+      long long free_money = get_free_money_for_date(profile, current_date);
+
+      for (size_t priority = 0; priority <= 999; ++priority)
+      {
+        for (size_t i = 0; i < savings.getsize(); ++i)
+        {
+          if ((savings[i].priority == static_cast< int >(priority)) && (free_money > 0))
+          {
+            const long long need = get_saving_need(savings[i]);
+            const long long add = (free_money < need) ? free_money : need;
+
+            savings[i].current_sum += add;
+            free_money -= add;
+
+            if ((i == target_index) && (savings[i].current_sum >= savings[i].target_sum))
+            {
+              return ulanova::date_to_string(current_date);
+            }
+          }
+        }
+      }
+
+      current_date = ulanova::add_days(current_date, 1);
+    }
+
+    return "не достигнута";
+  }
 }
 
 void ulanova::FinanceSystem::create_profile(const std::string& name)
@@ -264,53 +319,65 @@ std::string ulanova::FinanceSystem::calculate_goal_date(
     throw std::logic_error("profile not found");
   }
 
-  const Date from = parse_date(from_date);
-  const Date to = parse_date(to_date);
+  return calculate_goal_date_with_savings(*profile,
+    profile->savings, saving_name, from_date, to_date);
+}
 
-  Vector< Saving > savings = profile->savings;
-  size_t target_index = savings.getsize();
+std::string ulanova::FinanceSystem::recommend_priority(
+  const std::string& profile_name,
+  const std::string& saving_name,
+  const std::string& from_date,
+  const std::string& to_date,
+  int& priority) const
+{
+  const Profile* profile = profiles_.find(profile_name);
 
-  for (size_t i = 0; i < savings.getsize(); ++i)
+  if (profile == nullptr)
   {
-    if (savings[i].name == saving_name)
+    throw std::logic_error("profile not found");
+  }
+
+  bool has_saving = false;
+
+  for (size_t i = 0; i < profile->savings.getsize(); ++i)
+  {
+    if (profile->savings[i].name == saving_name)
     {
-      target_index = i;
+      has_saving = true;
     }
   }
 
-  if (target_index == savings.getsize())
+  if (!has_saving)
   {
     throw std::logic_error("saving not found");
   }
 
-  Date current_date = from;
+  std::string best_date = "не достигнута";
+  int best_priority = 10;
 
-  while (is_before_or_equal(current_date, to))
+  for (int current_priority = 10; current_priority >= 0; --current_priority)
   {
-    long long free_money = get_free_money_for_date(*profile, current_date);
+    Vector< Saving > savings = profile->savings;
 
-    for (size_t priority = 0; priority <= 999; ++priority)
+    for (size_t i = 0; i < savings.getsize(); ++i)
     {
-      for (size_t i = 0; i < savings.getsize(); ++i)
+      if (savings[i].name == saving_name)
       {
-        if ((savings[i].priority == static_cast< int >(priority)) && (free_money > 0))
-        {
-          const long long need = get_saving_need(savings[i]);
-          const long long add = (free_money < need ) ? free_money : need;
-
-          savings[i].current_sum += add;
-          free_money -= add;
-
-          if ((i == target_index) && (savings[i].current_sum >= savings[i].target_sum))
-          {
-            return date_to_string(current_date);
-          }
-        }
+        savings[i].priority = current_priority;
       }
     }
 
-    current_date = add_days(current_date, 1);
+    const std::string result = calculate_goal_date_with_savings(*profile,
+      savings, saving_name, from_date, to_date);
+
+    if (result != "не достигнута" )
+    {
+      best_date = result;
+      best_priority = current_priority;
+    }
   }
-  return "не достигнута";
+
+  priority = best_priority;
+  return best_date;
 }
 
