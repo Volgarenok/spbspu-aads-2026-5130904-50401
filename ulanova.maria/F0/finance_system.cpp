@@ -59,25 +59,34 @@ namespace
 
     ulanova::Date current_date = from;
 
+    long long free_balance = 0;
+
     while (ulanova::is_before_or_equal(current_date, to))
     {
-      long long free_money = get_free_money_for_date(profile, current_date);
+      free_balance = get_free_money_for_date(profile, current_date);
 
-      for (size_t priority = 0; priority <= 999; ++priority)
+      if (free_balance > 0)
       {
-        for (size_t i = 0; i < savings.getsize(); ++i)
+        for (size_t priority = 0; priority <= 999; ++priority)
         {
-          if ((savings[i].priority == static_cast< int >(priority)) && (free_money > 0))
+          for (size_t i = 0; i < savings.getsize(); ++i)
           {
-            const long long need = get_saving_need(savings[i]);
-            const long long add = (free_money < need) ? free_money : need;
-
-            savings[i].current_sum += add;
-            free_money -= add;
-
-            if ((i == target_index) && (savings[i].current_sum >= savings[i].target_sum))
+            if ((savings[i].priority == static_cast< int >(priority)) && (free_balance> 0))
             {
-              return ulanova::date_to_string(current_date);
+              const long long need = get_saving_need(savings[i]);
+
+              if (need > 0)
+              {
+                const long long add = (free_balance < need) ? free_balance : need;
+
+                savings[i].current_sum += add;
+                free_balance -= add;
+              }
+
+              if ((i == target_index) && (savings[i].current_sum >= savings[i].target_sum))
+              {
+                return ulanova::date_to_string(current_date);
+              }
             }
           }
         }
@@ -355,7 +364,7 @@ std::string ulanova::FinanceSystem::recommend_priority(
   std::string best_date = "не достигнута";
   int best_priority = 10;
 
-  for (int current_priority = 10; current_priority >= 0; --current_priority)
+  for (int current_priority = 0; current_priority >= 10; ++current_priority)
   {
     Vector< Saving > savings = profile->savings;
 
