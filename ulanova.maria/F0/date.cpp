@@ -2,6 +2,8 @@
 
 #include <ctime>
 #include <stdexcept>
+#include <iomanip>
+#include <sstream>
 
 ulanova::Date ulanova::parse_date(const std::string& text)
 {
@@ -44,4 +46,28 @@ bool ulanova::is_before_or_equal(const Date& lhs, const Date& rhs)
 bool ulanova::is_after_or_equal(const Date& lhs, const Date& rhs)
 {
   return lhs >= rhs;
+}
+
+ulanova::Date ulanova::add_days(const Date& date, int days)
+{
+  return date + std::chrono::hours(24 * days);
+}
+
+std::string ulanova::date_to_string(const Date& date)
+{
+  const std::time_t raw_time = std::chrono::system_clock::to_time_t(date);
+  const std::tm* time = std::localtime(&raw_time);
+
+  if (time == nullptr)
+  {
+    throw std::logic_error("wrong date");
+  }
+
+  std::ostringstream out;
+  out << std::setfill('0') << std::setw(2) << time->tm_mday << ".";
+  out << std::setfill('0') << std::setw(2) << (time->tm_mon + 1) << ".";
+  out << (time->tm_year + 1900);
+
+  return out.str();
+
 }
