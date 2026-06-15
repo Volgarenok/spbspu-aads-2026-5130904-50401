@@ -5,7 +5,7 @@
 #include <functional>
 #include <stdexcept>
 #include <utility>
-#include "myVector.hpp"
+#include <myVector.hpp>
 
 namespace zhuravleva
 {
@@ -39,6 +39,57 @@ namespace zhuravleva
     Value& get(const Key& key);
     const Value& get(const Key& key) const;
     void insert(const Key& key, const Value& value);
+
+    class Iterator;
+    class ConstIterator;
+
+    Iterator begin();
+    Iterator end();
+    ConstIterator begin() const;
+    ConstIterator end() const;
+    ConstIterator cbegin() const;
+    ConstIterator cend() const;
+
+    class Iterator
+    {
+    public:
+      Iterator();
+      std::pair< Key, Value >& operator*() const;
+      std::pair< Key, Value >* operator->() const;
+      Iterator& operator++();
+      Iterator operator++(int);
+      bool operator==(const Iterator& other) const noexcept;
+      bool operator!=(const Iterator& other) const noexcept;
+
+    private:
+      friend class CuckooHashTable< Key, Value, Hash1, Hash2, Equal >;
+      CuckooHashTable* table_;
+      bool firstTable_;
+      size_t index_;
+      Iterator(CuckooHashTable* table, bool firstTable, size_t index);
+      void skipEmpty();
+    };
+
+    class ConstIterator
+    {
+    public:
+      ConstIterator();
+      const std::pair< Key, Value >& operator*() const;
+      const std::pair< Key, Value >* operator->() const;
+      ConstIterator& operator++();
+      ConstIterator operator++(int);
+      bool operator==(const ConstIterator& other) const noexcept;
+      bool operator!=(const ConstIterator& other) const noexcept;
+
+    private:
+      friend class CuckooHashTable< Key, Value, Hash1, Hash2, Equal >;
+      const CuckooHashTable* table_;
+      bool firstTable_;
+      size_t index_;
+      ConstIterator(const CuckooHashTable* table,
+          bool firstTable, size_t index);
+      void skipEmpty();
+    };
 
   private:
     static const size_t maxShiftCount_ = 32;
@@ -95,7 +146,7 @@ namespace zhuravleva
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
-  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::clear() noexcept
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::clear()
   {
     for (size_t i = 0; i < table1_.size(); ++i)
     {
@@ -347,6 +398,266 @@ namespace zhuravleva
         }
       }
     }
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator::Iterator():
+    table_(nullptr),
+    firstTable_(true),
+    index_(0)
+  {}
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator::Iterator(
+      CuckooHashTable* table, bool firstTable, size_t index):
+    table_(table),
+    firstTable_(firstTable),
+    index_(index)
+  {
+    skipEmpty();
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator::skipEmpty()
+  {
+    if (!table_)
+    {
+      return;
+    }
+    while (firstTable_ && index_ < table_->table1_.size()
+        && !table_->table1_[index_].occupied)
+    {
+      ++index_;
+    }
+    if (firstTable_ && index_ == table_->table1_.size())
+    {
+      firstTable_ = false;
+      index_ = 0;
+    }
+    while (!firstTable_ && index_ < table_->table2_.size()
+        && !table_->table2_[index_].occupied)
+    {
+      ++index_;
+    }
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  std::pair< Key, Value >&
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator::operator*() const
+  {
+    if (!table_)
+    {
+      throw std::runtime_error("invalid iterator");
+    }
+    if (firstTable_)
+    {
+      if (index_ >= table_->table1_.size())
+      {
+        throw std::runtime_error("invalid iterator");
+      }
+      return table_->table1_[index_].data;
+    }
+    if (index_ >= table_->table2_.size())
+    {
+      throw std::runtime_error("invalid iterator");
+    }
+    return table_->table2_[index_].data;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  std::pair< Key, Value >*
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator::operator->() const
+  {
+    return &(**this);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  typename CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator&
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator::operator++()
+  {
+    if (!table_)
+    {
+      throw std::runtime_error("invalid iterator");
+    }
+    ++index_;
+    skipEmpty();
+    return *this;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  typename CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator::operator++(int)
+  {
+    Iterator result(*this);
+    ++(*this);
+    return result;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator::operator==(
+      const Iterator& other) const noexcept
+  {
+    return table_ == other.table_
+        && firstTable_ == other.firstTable_
+        && index_ == other.index_;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator::operator!=(
+      const Iterator& other) const noexcept
+  {
+    return !(*this == other);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator::ConstIterator():
+    table_(nullptr),
+    firstTable_(true),
+    index_(0)
+  {}
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator::ConstIterator(
+      const CuckooHashTable* table, bool firstTable, size_t index):
+    table_(table),
+    firstTable_(firstTable),
+    index_(index)
+  {
+    skipEmpty();
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator::skipEmpty()
+  {
+    if (!table_)
+    {
+      return;
+    }
+    while (firstTable_ && index_ < table_->table1_.size()
+        && !table_->table1_[index_].occupied)
+    {
+      ++index_;
+    }
+    if (firstTable_ && index_ == table_->table1_.size())
+    {
+      firstTable_ = false;
+      index_ = 0;
+    }
+    while (!firstTable_ && index_ < table_->table2_.size()
+        && !table_->table2_[index_].occupied)
+    {
+      ++index_;
+    }
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  const std::pair< Key, Value >&
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator::operator*() const
+  {
+    if (!table_)
+    {
+      throw std::runtime_error("invalid iterator");
+    }
+    if (firstTable_)
+    {
+      if (index_ >= table_->table1_.size())
+      {
+        throw std::runtime_error("invalid iterator");
+      }
+      return table_->table1_[index_].data;
+    }
+    if (index_ >= table_->table2_.size())
+    {
+      throw std::runtime_error("invalid iterator");
+    }
+    return table_->table2_[index_].data;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  const std::pair< Key, Value >*
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator::operator->() const
+  {
+    return &(**this);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  typename CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator&
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator::operator++()
+  {
+    if (!table_)
+    {
+      throw std::runtime_error("invalid iterator");
+    }
+    ++index_;
+    skipEmpty();
+    return *this;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  typename CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator::operator++(int)
+  {
+    ConstIterator result(*this);
+    ++(*this);
+    return result;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator::operator==(
+      const ConstIterator& other) const noexcept
+  {
+    return table_ == other.table_
+        && firstTable_ == other.firstTable_
+        && index_ == other.index_;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator::operator!=(
+      const ConstIterator& other) const noexcept
+  {
+    return !(*this == other);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  typename CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::begin()
+  {
+    return Iterator(this, true, 0);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  typename CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::Iterator
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::end()
+  {
+    return Iterator(this, false, table2_.size());
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  typename CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::begin() const
+  {
+    return ConstIterator(this, true, 0);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  typename CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::end() const
+  {
+    return ConstIterator(this, false, table2_.size());
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  typename CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::cbegin() const
+  {
+    return ConstIterator(this, true, 0);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  typename CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::ConstIterator
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::cend() const
+  {
+    return ConstIterator(this, false, table2_.size());
   }
 }
 
