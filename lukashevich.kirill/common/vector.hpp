@@ -57,4 +57,98 @@ namespace lukashevich {
   };
 }
 
+template< class T >
+lukashevich::Vector< T >::Vector():
+  data_(nullptr),
+  size_(0),
+  capacity_(0)
+{}
+
+template< class T >
+lukashevich::Vector< T >::Vector(size_t count):
+  data_(nullptr),
+  size_(0),
+  capacity_(0)
+{
+  reserve(count);
+
+  try {
+    for (size_t i = 0; i < count; ++i) {
+      new (data_ + i) T();
+    }
+    size_ = count;
+  } catch (...) {
+    destroyRange(data_, 0, size_);
+    deallocate(data_);
+    data_ = nullptr;
+    capacity_ = 0;
+    throw;
+  }
+}
+
+template< class T >
+lukashevich::Vector< T >::Vector(size_t count, const T & value):
+  data_(nullptr),
+  size_(0),
+  capacity_(0)
+{
+  reserve(count);
+
+  try {
+    for (size_t i = 0; i < count; ++i) {
+      new (data_ + i) T(value);
+      ++size_;
+    }
+  } catch (...) {
+    clear();
+    deallocate(data_);
+    data_ = nullptr;
+    capacity_ = 0;
+    throw;
+  }
+}
+
+template< class T >
+lukashevich::Vector< T >::~Vector()
+{
+  clear();
+  deallocate(data_);
+}
+
+template< class T >
+T * lukashevich::Vector< T >::allocate(size_t capacity)
+{
+  if (capacity == 0) {
+    return nullptr;
+  }
+
+  return static_cast< T * >(operator new(sizeof(T) * capacity));
+}
+
+template< class T >
+void lukashevich::Vector< T >::deallocate(T * data) noexcept
+{
+  operator delete(data);
+}
+
+template< class T >
+void lukashevich::Vector< T >::destroyRange(T * data, size_t begin, size_t end) noexcept
+{
+  for (size_t i = begin; i < end; ++i) {
+    data[i].~T();
+  }
+}
+
+template< class T >
+size_t lukashevich::Vector< T >::nextCapacity(size_t needed)
+{
+  size_t capacity = 1;
+
+  while (capacity < needed) {
+    capacity *= 2;
+  }
+
+  return capacity;
+}
+
 #endif
