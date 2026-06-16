@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include "stack.hpp"
 #include "queue.hpp"
-#include "../common/list.hpp"
+#include "../common/list/list.hpp"
 
 namespace lukashevich
 {
