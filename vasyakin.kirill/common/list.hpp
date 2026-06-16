@@ -138,6 +138,7 @@ namespace vasyakin
     List();
     List(const List& other);
     List(List&& other) noexcept;
+
     explicit List(const T& value);
     List(T&& value);
     ~List() noexcept;
@@ -160,10 +161,12 @@ namespace vasyakin
     void splice_after(LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept;
 
     void merge(List& other) noexcept;
+
     template< class Compare >
     void merge(List& other, Compare comp) noexcept;
 
     void sort();
+
     template< class Compare >
     void sort(Compare comp);
 
