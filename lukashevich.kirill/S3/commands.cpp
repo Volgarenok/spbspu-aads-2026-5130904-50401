@@ -23,6 +23,11 @@ namespace {
       }
     }
 
+    if (names.isEmpty()) {
+    out << '\n';
+    return;
+    }
+
     for (size_t i = 0; i < names.getSize(); ++i) {
       out << names[i] << '\n';
     }
