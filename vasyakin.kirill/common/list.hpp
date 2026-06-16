@@ -760,6 +760,31 @@ namespace vasyakin
   {
     return fake_node_->next_->value();
   }
+
+  template< class T >
+  template< class P >
+  bool List< T >::erase_if(P p)
+  {
+    bool was_erased = false;
+    detail::Node< T >* prev = fake_node_;
+    detail::Node< T >* curr = prev->next_;
+
+    while (curr != fake_node_)
+    {
+      if (p(curr->value()))
+      {
+        erase(LIter< T >(prev));
+        curr = prev->next_;
+        was_erased = true;
+      }
+      else
+      {
+        prev = curr;
+        curr = curr->next_;
+      }
+    }
+    return was_erased;
+  }
 }
 
 #endif
