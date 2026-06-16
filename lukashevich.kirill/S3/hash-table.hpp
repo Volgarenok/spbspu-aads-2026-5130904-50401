@@ -7,7 +7,7 @@
 #include <utility>
 #include "../common/list.hpp"
 #include "../common/vector.hpp"
-dgmrgjr
+
 namespace lukashevich {
   template< class Key, class Value, class Hash, class Equal >
   class HashTable
