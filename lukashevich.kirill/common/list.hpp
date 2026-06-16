@@ -5,6 +5,7 @@
 #include "const-iter.hpp"
 
 #include <cstddef>
+#include <utility>
 
 namespace lukashevich
 {
@@ -60,6 +61,8 @@ namespace lukashevich
 
       size_t size() const;
       bool empty() const;
+
+      void swap(List< T > & rhs) noexcept;
 
     private:
       Node< T >* fake_;
@@ -241,6 +244,13 @@ namespace lukashevich
   bool List< T >::empty() const
   {
     return size_ == 0;
+  }
+
+  template< class T >
+  void lukashevich::List< T >::swap(List< T > & rhs) noexcept
+  {
+    std::swap(fake_, rhs.fake_);
+    std::swap(size_, rhs.size_);
   }
 
   template< class T >

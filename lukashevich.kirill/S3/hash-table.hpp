@@ -32,6 +32,9 @@ namespace lukashevich {
         bool occupied_;
       };
 
+      using OverflowIterator = LIter< Node >;
+      using OverflowConstIterator = LCIter< Node >;
+
       class ConstIterator
       {
         public:
@@ -309,7 +312,7 @@ Value lukashevich::HashTable< Key, Value, Hash, Equal >::drop(const Key & key)
   bool found = false;
   Value value = Value();
 
-  for (typename List< Node >::iterator it = overflow_.begin(); it != overflow_.end(); ++it) {
+  for (OverflowIterator it = overflow_.begin(); it != overflow_.end(); ++it) {
     if (!found && equal_(it->key_, key)) {
       value = it->value_;
       found = true;
@@ -353,7 +356,7 @@ typename lukashevich::HashTable< Key, Value, Hash, Equal >::Node &
   }
 
   size_t overflowIndex = index - buckets_.getSize();
-  typename List< Node >::iterator it = overflow_.begin();
+  OverflowIterator it = overflow_.begin();
 
   while (overflowIndex != 0) {
     --overflowIndex;
@@ -372,7 +375,7 @@ const typename lukashevich::HashTable< Key, Value, Hash, Equal >::Node &
   }
 
   size_t overflowIndex = index - buckets_.getSize();
-  typename List< Node >::const_iterator it = overflow_.cbegin();
+  OverflowConstIterator it = overflow_.begin();
 
   while (overflowIndex != 0) {
     --overflowIndex;
@@ -511,7 +514,7 @@ typename lukashevich::HashTable< Key, Value, Hash, Equal >::Node *
     }
   }
 
-  for (typename List< Node >::iterator it = overflow_.begin(); it != overflow_.end(); ++it) {
+  for (OverflowIterator it = overflow_.begin(); it != overflow_.end(); ++it) {
     if (equal_(it->key_, key)) {
       return std::addressof(*it);
     }
@@ -534,7 +537,7 @@ const typename lukashevich::HashTable< Key, Value, Hash, Equal >::Node *
     }
   }
 
-  for (typename List< Node >::const_iterator it = overflow_.cbegin(); it != overflow_.cend(); ++it) {
+  for (OverflowConstIterator it = overflow_.begin(); it != overflow_.end(); ++it) {
     if (equal_(it->key_, key)) {
       return std::addressof(*it);
     }
