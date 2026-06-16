@@ -1,6 +1,8 @@
-#include "list.hpp"
-#include "functions.hpp"
 #include <iostream>
+#include <stdexcept>
+
+#include "../common/list/list.hpp"
+#include "functions.hpp"
 
 int main()
 {
@@ -13,22 +15,28 @@ int main()
     return 0;
   }
 
-  lukashevich::printSeqName(data);
+  lukashevich::printSeqName(std::cout, data);
+  std::cout << '\n';
 
   lukashevich::List< lukashevich::pair_t > copy(data);
   lukashevich::List< size_t > sums;
 
   try
   {
-    lukashevich::printAll(copy, sums);
-  }
-  catch (const std::overflow_error&)
+    while (lukashevich::hasNum(copy)) {
+      size_t sum = lukashevich::printOneRow(std::cout, copy);
+      sums.pushBack(sum);
+      std::cout << '\n';
+    }
+  } catch (const std::overflow_error&)
   {
-    std::cerr << "erorr\n";
+    std::cout << '\n';
+    std::cerr << "error\n";
     return 1;
   }
 
-  lukashevich::printSum(sums);
+  lukashevich::printSum(std::cout, sums);
+  std::cout << '\n';
 
   return 0;
 }
