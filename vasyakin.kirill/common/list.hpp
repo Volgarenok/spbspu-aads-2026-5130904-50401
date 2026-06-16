@@ -180,7 +180,7 @@ namespace vasyakin
     LCIter< T > cbegin() const noexcept;
     LCIter< T > cend() const noexcept;
 
-    size_t getsize() const noexcept;
+    size_t size() const noexcept;
 
     T& front() noexcept;
     const T& front() const noexcept;
@@ -744,7 +744,7 @@ namespace vasyakin
   }
 
   template< class T >
-  size_t List< T >::getsize() const noexcept
+  size_t List< T >::size() const noexcept
   {
     return size_;
   }
@@ -759,31 +759,6 @@ namespace vasyakin
   const T& List< T >::front() const noexcept
   {
     return fake_node_->next_->value();
-  }
-
-  template< class T >
-  template< class P >
-  bool List< T >::erase_if(P p)
-  {
-    bool was_erased = false;
-    detail::Node< T >* prev = fake_node_;
-    detail::Node< T >* curr = prev->next_;
-
-    while (curr != fake_node_)
-    {
-      if (p(curr->value()))
-      {
-        erase(LIter< T >(prev));
-        curr = prev->next_;
-        was_erased = true;
-      }
-      else
-      {
-        prev = curr;
-        curr = curr->next_;
-      }
-    }
-    return was_erased;
   }
 }
 
