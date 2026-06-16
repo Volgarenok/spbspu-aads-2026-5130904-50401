@@ -17,7 +17,24 @@ namespace vasyakin
     struct FakeTag {};
   }
 
-  template< class T > class List;
+  template< class T >
+  class List;
+
+  template< class T >
+  class LIter;
+
+  template< class T >
+  class LCIter;
+
+  template< class Key, class Value, class Hash, class Equal >
+  class HashTable;
+
+  template< class Key, class Value, class Hash, class Equal >
+  class HashIter;
+
+  template< class Key, class Value, class Hash, class Equal >
+  class HashConstIter;
+
   const size_t max = std::numeric_limits< size_t >::max();
 
   template< class T >
@@ -95,10 +112,6 @@ namespace vasyakin
 
       T& value() noexcept;
       const T& value() const noexcept;
-
-      Node< T >* getNext() noexcept;
-      const Node< T >* getNext() const noexcept;
-
     private:
       alignas(T) unsigned char storage_[sizeof(T)];
       Node< T >* next_;
@@ -108,13 +121,13 @@ namespace vasyakin
       friend class LCIter< T >;
 
       template< class Key, class Value, class Hash, class Equal >
-      friend class HashTable;
+      friend class ::vasyakin::HashTable;
 
       template< class Key, class Value, class Hash, class Equal >
-      friend class HashIter;
+      friend class ::vasyakin::HashIter;
 
       template< class Key, class Value, class Hash, class Equal >
-      friend class HashConstIter;
+      friend class ::vasyakin::HashConstIter;
     };
   }
 
@@ -168,7 +181,9 @@ namespace vasyakin
     LCIter< T > cend() const noexcept;
 
     size_t getsize() const noexcept;
-    detail::Node< T >* getfirst() const noexcept;
+
+    T& front() noexcept;
+    const T& front() const noexcept;
 
     template< class P >
     bool erase_if(P p);
@@ -332,18 +347,6 @@ namespace vasyakin
   const T& detail::Node< T >::value() const noexcept
   {
     return *reinterpret_cast< const T* >(storage_);
-  }
-
-  template< class T >
-  detail::Node< T >* detail::Node< T >::getNext() noexcept
-  {
-    return next_;
-  }
-
-  template< class T >
-  const detail::Node< T >* detail::Node< T >::getNext() const noexcept
-  {
-    return next_;
   }
 
   template< class T >
@@ -747,9 +750,15 @@ namespace vasyakin
   }
 
   template< class T >
-  detail::Node< T >* List< T >::getfirst() const noexcept
+  T& List< T >::front() noexcept
   {
-    return fake_node_->next_;
+    return fake_node_->next_->value();
+  }
+
+  template< class T >
+  const T& List< T >::front() const noexcept
+  {
+    return fake_node_->next_->value();
   }
 
   template< class T >
