@@ -38,6 +38,8 @@ namespace lukashevich {
   };
 
   using GraphTable = HashTable< std::string, Graph, Blake2StringHash, StringEqual >;
+
+  void addGraphCopy(GraphTable & graphs, const std::string & name, const Graph & graph);
 }
 
 #endif
