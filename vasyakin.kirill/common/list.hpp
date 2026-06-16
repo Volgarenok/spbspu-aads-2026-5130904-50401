@@ -154,6 +154,7 @@ namespace vasyakin
     void pushBack(T&& value);
 
     void swap(List& other) noexcept;
+
     void clear() noexcept;
 
     void splice_after(LIter< T > pos, List& other) noexcept;
@@ -531,7 +532,8 @@ namespace vasyakin
   }
 
   template< class T >
-  void List< T >::splice_after(LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept
+  void List< T >::splice_after(
+    LIter< T > pos, List& other, LIter< T > first, LIter< T > last) noexcept
   {
     if (std::addressof(other) == this)
     {
@@ -775,7 +777,7 @@ namespace vasyakin
   }
 
   template< class T >
-  void vasyakin::List< T >::destroyFakeNode(detail::Node< T >* node) noexcept
+  void List< T >::destroyFakeNode(detail::Node< T >* node) noexcept
   {
     if (node)
     {
