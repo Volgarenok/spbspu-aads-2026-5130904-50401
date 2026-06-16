@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "list.hpp"
+#include "../common/list/list.hpp"
 #include "functions.hpp"
 
 int main()
