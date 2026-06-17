@@ -236,4 +236,30 @@ chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::~CuckooHT()
   delete [] occupied2_;
 }
 
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal > &
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::operator=(const CuckooHT & ht)
+{
+  if (this == std::addressof(ht))
+  {
+    return *this;
+  }
+  CuckooHT< Key, Value, Hash1, Hash2, Equal > new_ht(ht);
+  swap(new_ht);
+  return *this;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal > &
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::operator=(CuckooHT && ht) noexcept
+{
+  if (this == std::addressof(ht))
+  {
+    return *this;
+  }
+  CuckooHT< Key, Value, Hash1, Hash2, Equal > new_ht(std::move(ht));
+  swap(new_ht);
+  return *this;
+}
+
 #endif
