@@ -745,7 +745,50 @@ namespace vasyakin
     }
 
     rebalanceUp(rebalance_from);
+
     return true;
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::iterator
+  AVLTree< Key, Value, Compare >::begin() noexcept
+  {
+    return iterator(fallLeft(root_));
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::iterator
+  AVLTree< Key, Value, Compare >::end() noexcept
+  {
+    return iterator();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::const_iterator
+  AVLTree< Key, Value, Compare >::begin() const noexcept
+  {
+    return const_iterator(fallLeft(root_));
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::const_iterator
+  AVLTree< Key, Value, Compare >::end() const noexcept
+  {
+    return const_iterator();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::const_iterator
+  AVLTree< Key, Value, Compare >::cbegin() const noexcept
+  {
+    return begin();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::const_iterator
+  AVLTree< Key, Value, Compare >::cend() const noexcept
+  {
+    return end();
   }
 }
 
