@@ -215,3 +215,84 @@ void vasyakin::cmdRemoveItem(
   state.log_.insert(state.op_counter_,
     LogEntry{state.op_counter_, state.current_date_, details});
 }
+
+void vasyakin::cmdShip(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  state.completeTransfers();
+
+  std::string from, to, model, color, date;
+  size_t count = 0, size = 0;
+
+  from = readQuotedToken(in);
+  to = readQuotedToken(in);
+  model = readQuotedToken(in);
+  color = readQuotedToken(in);
+
+  if (!(in >> size >> count >> date) || size == 0 || count == 0)
+  {
+    throw std::runtime_error("Invalid ship args");
+  }
+
+  vasyakin::Date departure = Date::fromString(date);
+  state.current_date_ = departure;
+
+  if (!state.warehouses_.has(from) || !state.warehouses_.has(to))
+  {
+    out << "<ERROR: WAREHOUSE NOT FOUND>" << '\n';
+    return;
+  }
+
+  std::string key = model + "|" + color + "|" + std::to_string(size);
+
+  auto& wh_from = state.warehouses_.at(from);
+  if (!wh_from.items_.has(key) || wh_from.items_.at(key).getCount() < count)
+  {
+    out << "<ERROR: NOT ENOUGH ITEMS>" << '\n';
+    return;
+  }
+
+  size_t travel_days = wh_from.days_to_center_ +
+    state.warehouses_.at(to).days_to_center_;
+
+  vasyakin::Date arrival = departure + travel_days;
+
+  auto& wh_to = state.warehouses_.at(to);
+  if (wh_to.used_capacity_ + count > wh_to.capacity_)
+  {
+    out << "<ERROR: NOT ENOUGH CAPACITY AT DESTINATION>" << '\n';
+    return;
+  }
+
+  auto& item = wh_from.items_.at(key);
+  size_t price = item.getPrice();
+
+  item.removeCount(count);
+  wh_from.used_capacity_ -= count;
+  wh_from.total_value_ -= count * price;
+
+  if (item.getCount() == 0)
+  {
+    wh_from.items_.remove(key);
+  }
+
+  ++state.transfer_counter_;
+
+  state.transfers_.insert(state.transfer_counter_,
+    Transfer{state.transfer_counter_, from, to, key,
+    count, price, departure, arrival, true});
+  
+  ++state.op_counter_;
+
+  out << "<TRANSFER #" << state.transfer_counter_ << " CREATED: " << from <<
+    " -> " << to << ">" << '\n';
+
+  out << "<Departure: " << departure.toString() <<
+    ", Arrival: " << arrival.toString() << " (via Center)>" << '\n';
+
+  std::string details = "SHIP " + from + "->" + to + " " + model + " " + color +
+    " " + std::to_string(size) + " -" + std::to_string(count);
+
+  state.log_.insert(state.op_counter_,
+    LogEntry{state.op_counter_, state.current_date_, details});
+}
