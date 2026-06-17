@@ -1,7 +1,7 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include <iostream>
-#include "structures.hpp"
+#include "utils.hpp"
 
 namespace vasyakin
 {
