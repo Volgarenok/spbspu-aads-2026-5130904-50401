@@ -54,7 +54,7 @@ void vasyakin::SystemState::completeTransfers()
         std::string color = rest.substr(0, rest.find('|'));
         size_t size = std::stoul(rest.substr(rest.find('|') + 1));
 
-        wh_to.items_.insert(tr.item_key_, 
+        wh_to.items_.insert(tr.item_key_,
           Item(model, color, size, tr.count_, tr.price_));
       }
 

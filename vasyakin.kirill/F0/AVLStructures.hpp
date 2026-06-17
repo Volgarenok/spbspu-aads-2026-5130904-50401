@@ -185,7 +185,7 @@ namespace vasyakin
   {
     return tree_.upper_bound(key);
   }
-  
+
   template< class Key, class Value, class Compare >
   typename AVLMap< Key, Value, Compare >::const_iterator
   AVLMap< Key, Value, Compare >::upper_bound(const Key& key) const noexcept
@@ -422,8 +422,8 @@ namespace vasyakin
   class AVLMultiMap
   {
   public:
-    using iterator = typename AVLTree< Key, topit::Vector< Value >, Compare >::iterator;
-    using const_iterator = typename AVLTree< Key, topit::Vector< Value >, Compare >::const_iterator;
+    using iterator = typename AVLTree< Key, vasyakin::Vector< Value >, Compare >::iterator;
+    using const_iterator = typename AVLTree< Key, vasyakin::Vector< Value >, Compare >::const_iterator;
     using value_type = std::pair< const Key, Value >;
 
     AVLMultiMap(const AVLMultiMap&) = default;
@@ -466,7 +466,7 @@ namespace vasyakin
     const_iterator cbegin() const noexcept;
     const_iterator cend() const noexcept;
   private:
-    AVLTree< Key, topit::Vector< Value >, Compare > tree_;
+    AVLTree< Key, vasyakin::Vector< Value >, Compare > tree_;
   };
 
   template< class Key, class Value, class Compare >
@@ -528,7 +528,7 @@ namespace vasyakin
       return it;
     }
 
-    tree_.insert(value.first, topit::Vector< Value >{value.second});
+    tree_.insert(value.first, vasyakin::Vector< Value >{value.second});
     return tree_.find(value.first);
   }
 
@@ -654,7 +654,7 @@ namespace vasyakin
   class AVLMultiSet
   {
   public:
-    using iterator = typename AVLTree< Key, topit::Vector< Key >, Compare >::const_iterator;
+    using iterator = typename AVLTree< Key, vasyakin::Vector< Key >, Compare >::const_iterator;
     using const_iterator = iterator;
     using value_type = Key;
 
@@ -690,7 +690,7 @@ namespace vasyakin
     const_iterator cbegin() const noexcept;
     const_iterator cend() const noexcept;
   private:
-    AVLTree< Key, topit::Vector< Key >, Compare > tree_;
+    AVLTree< Key, vasyakin::Vector< Key >, Compare > tree_;
   };
 
   template< class Key, class Compare >
@@ -752,7 +752,7 @@ namespace vasyakin
       return it;
     }
 
-    tree_.insert(value, topit::Vector< Key >{value});
+    tree_.insert(value, vasyakin::Vector< Key >{value});
     return tree_.find(value);
   }
 

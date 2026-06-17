@@ -505,7 +505,7 @@ namespace vasyakin
       {
         return rotateLargeRight(node);
       }
-      
+
       return rotateRight(node);
     }
 

@@ -281,7 +281,7 @@ void vasyakin::cmdShip(
   state.transfers_.insert(state.transfer_counter_,
     Transfer{state.transfer_counter_, from, to, key,
     count, price, departure, arrival, true});
-  
+
   ++state.op_counter_;
 
   out << "<TRANSFER #" << state.transfer_counter_ << " CREATED: " << from <<
@@ -694,11 +694,11 @@ void vasyakin::cmdSave(
     {
       const auto& item = (*ccit).second;
 
-      file << "IT " << wh_name << ' ' 
-        << escapeSpaces(item.getModel()) << ' ' 
-        << escapeSpaces(item.getColor()) << ' ' 
-        << item.getSize() << ' ' 
-        << item.getCount() << ' ' 
+      file << "IT " << wh_name << ' '
+        << escapeSpaces(item.getModel()) << ' '
+        << escapeSpaces(item.getColor()) << ' '
+        << item.getSize() << ' '
+        << item.getCount() << ' '
         << item.getPrice() << '\n';
     }
   }
@@ -707,12 +707,12 @@ void vasyakin::cmdSave(
   {
     const auto& tr = (*cit).second;
 
-    file << "TR " << tr.id_ << ' ' 
-      << escapeSpaces(tr.from_) << ' ' 
+    file << "TR " << tr.id_ << ' '
+      << escapeSpaces(tr.from_) << ' '
       << escapeSpaces(tr.to_) << ' '
-      << escapeSpaces(tr.item_key_) << ' ' 
+      << escapeSpaces(tr.item_key_) << ' '
       << tr.count_ << ' ' << tr.price_ << ' '
-      << tr.departure_.toString() << ' ' 
+      << tr.departure_.toString() << ' '
       << tr.arrival_.toString() << ' '
       << (tr.active_ ? 1 : 0) << '\n';
   }

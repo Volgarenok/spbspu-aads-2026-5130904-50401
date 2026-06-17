@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE(stress_removal)
   {
     tree.insert(i, i);
   }
-  
+
   BOOST_CHECK_EQUAL(tree.size(), 100u);
 
   for (int i = 99; i >= 0; --i)
@@ -547,10 +547,10 @@ BOOST_AUTO_TEST_CASE(equal_range)
 BOOST_AUTO_TEST_CASE(bounds_empty_tree)
 {
   vasyakin::AVLTree< int, int > tree;
-  
+
   BOOST_CHECK(tree.lower_bound(42) == tree.end());
   BOOST_CHECK(tree.upper_bound(42) == tree.end());
-  
+
   auto range = tree.equal_range(42);
   BOOST_CHECK(range.first == tree.end());
   BOOST_CHECK(range.second == tree.end());
@@ -560,14 +560,14 @@ BOOST_AUTO_TEST_CASE(bounds_single_element)
 {
   vasyakin::AVLTree< int, int > tree;
   tree.insert(100, 1);
-  
+
   auto lb = tree.lower_bound(100);
   BOOST_REQUIRE(lb != tree.end());
   BOOST_CHECK_EQUAL((*lb).first, 100);
-  
+
   auto ub = tree.upper_bound(100);
   BOOST_CHECK(ub == tree.end());
-  
+
   auto range = tree.equal_range(100);
   BOOST_REQUIRE(range.first != tree.end());
   BOOST_CHECK_EQUAL((*range.first).first, 100);

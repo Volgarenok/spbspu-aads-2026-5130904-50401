@@ -8,7 +8,7 @@ vasyakin::Date::Date() noexcept:
 
 vasyakin::Date::Date(size_t day, size_t month, size_t year):
   day_(day),
-  month_(month), 
+  month_(month),
   year_(year)
 {
   normalize();
