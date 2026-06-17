@@ -12,18 +12,22 @@ namespace madieva
     using Pair = std::pair< Key, Value >;
 
     explicit CuckooHashTable(size_t initialSize = 16, size_t maxRehashSteps = 100);
+    CuckooHashTable(const CuckooHashTable & other);
+    CuckooHashTable & operator=(const CuckooHashTable & other);
     ~CuckooHashTable() = default;
 
     void insert(const Key & key, const Value & value);
     bool contains(const Key & key) const;
     Value & get(const Key & key);
     const Value & get(const Key & key) const;
+    Value & operator[](const Key & key);
     Value erase(const Key & key);
     void clear();
 
     size_t size() const noexcept;
     size_t capacity() const noexcept;
     bool empty() const noexcept;
+    void swap(CuckooHashTable & other) noexcept;
   private:
     Vector< Pair > table1_;
     Vector< Pair > table2_;
@@ -57,6 +61,31 @@ namespace madieva
       table1_.pushBack(Pair());
       table2_.pushBack(Pair());
     }
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::CuckooHashTable(
+    const CuckooHashTable & other):
+    table1_(other.table1_),
+    table2_(other.table2_),
+    hash1_(other.hash1_),
+    hash2_(other.hash2_),
+    equal_(other.equal_),
+    size_(other.size_),
+    maxRehashSteps_(other.maxRehashSteps_)
+  {}
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal > &
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::operator=(
+    const CuckooHashTable & other)
+  {
+    if (this == &other) {
+      return *this;
+    }
+    CuckooHashTable copy(other);
+    swap(copy);
+    return *this;
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
@@ -158,6 +187,15 @@ namespace madieva
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  Value & CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::operator[](const Key & key)
+  {
+    if (!contains(key)) {
+      insert(key, Value());
+    }
+    return get(key);
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
   Value CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::erase(const Key & key)
   {
     size_t idx1 = index1(key);
@@ -220,6 +258,19 @@ namespace madieva
   bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::empty() const noexcept
   {
     return size_ == 0;
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::swap(
+    CuckooHashTable & other) noexcept
+  {
+    table1_.swap(other.table1_);
+    table2_.swap(other.table2_);
+    std::swap(hash1_, other.hash1_);
+    std::swap(hash2_, other.hash2_);
+    std::swap(equal_, other.equal_);
+    std::swap(size_, other.size_);
+    std::swap(maxRehashSteps_, other.maxRehashSteps_);
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
