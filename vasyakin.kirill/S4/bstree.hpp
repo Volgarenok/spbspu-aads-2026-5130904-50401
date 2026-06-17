@@ -15,7 +15,6 @@ namespace vasyakin
   class BSTree
   {
   public:
-
     BSTree(const Compare& cmp = Compare());
     ~BSTree();
     BSTree(const BSTree& other);

@@ -11,15 +11,9 @@ namespace vasyakin
   template< class Key, class Value >
   class BSTIterator
   {
-  private:
-    using Node = vasyakin::Node< Key, Value >;
-    Node* node_;
-    Node* fake_leaf_;
-
-    template< class K, class V, class C >
-    friend class BSTree;
-
   public:
+    using Node = vasyakin::Node< Key, Value >;
+
     BSTIterator();
     explicit BSTIterator(Node* node, Node* fake_leaf);
 
@@ -35,20 +29,20 @@ namespace vasyakin
     bool operator!=(const BSTIterator& other) const;
 
     operator BSTConstIterator< Key, Value >() const;
+  private:
+    Node* node_;
+    Node* fake_leaf_;
+
+    template< class K, class V, class C >
+    friend class BSTree;
   };
 
   template< class Key, class Value >
   class BSTConstIterator
   {
-  private:
-    using Node = vasyakin::Node< Key, Value >;
-    const Node* node_;
-    const Node* fake_leaf_;
-
-    template< class K, class V, class C >
-    friend class BSTree;
-
   public:
+    using Node = vasyakin::Node< Key, Value >;
+
     BSTConstIterator();
     explicit BSTConstIterator(const Node* node, const Node* fake_leaf);
 
@@ -62,6 +56,12 @@ namespace vasyakin
 
     bool operator==(const BSTConstIterator& other) const;
     bool operator!=(const BSTConstIterator& other) const;
+  private:
+    const Node* node_;
+    const Node* fake_leaf_;
+
+    template< class K, class V, class C >
+    friend class BSTree;
   };
 
   template< class Key, class Value >
