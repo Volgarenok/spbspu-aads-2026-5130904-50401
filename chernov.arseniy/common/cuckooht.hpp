@@ -331,6 +331,38 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::add(Key k, Value v)
 }
 
 template< class Key, class Value, class Hash1, class Hash2, class Equal >
+void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::remove(Key k)
+{
+  CuckooHT new_ht(*this);
+  Slot * slot = new_ht.findKey(k);
+  if (slot == nullptr)
+  {
+    throw std::out_of_range("Element not found");
+  }
+  size_t index;
+  if (slot >= new_ht.table1_ && slot < new_ht.table1_ + new_ht.capacity_)
+  {
+    index = slot - new_ht.table1_;
+    slot->~Slot();
+    new_ht.occupied1_[index] = false;
+  }
+  else
+  {
+    index = slot - new_ht.table2_;
+    slot->~Slot();
+    new_ht.occupied2_[index] = false;
+  }
+  --new_ht.count_;
+  swap(new_ht);
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+bool chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::has(Key k) const
+{
+  return findKey(k) != nullptr;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
 void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::rehash(size_t slots)
 {
   rehashInternal(slots);
