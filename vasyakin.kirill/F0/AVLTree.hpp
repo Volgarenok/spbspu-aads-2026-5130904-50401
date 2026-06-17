@@ -282,6 +282,66 @@ namespace vasyakin
   {
     return size_ == 0;
   }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::iterator
+  AVLTree< Key, Value, Compare >::lower_bound(const Key& key) noexcept
+  {
+    Node* curr = root_;
+    Node* candidate = nullptr;
+
+    while (curr)
+    {
+      if (cmp_(curr->key_, key))
+      {
+        curr = curr->right_;
+      }
+      else
+      {
+        candidate = curr;
+        curr = curr->left_;
+      }
+    }
+
+    return iterator(candidate);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::const_iterator
+  AVLTree< Key, Value, Compare >::lower_bound(const Key& key) const noexcept
+  {
+    return const_cast< AVLTree* >(this)->lower_bound(key);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::iterator
+  AVLTree< Key, Value, Compare >::upper_bound(const Key& key) noexcept
+  {
+    Node* curr = root_;
+    Node* candidate = nullptr;
+
+    while (curr)
+    {
+      if (!cmp_(key, curr->key_))
+      {
+        curr = curr->right_;
+      }
+      else
+      {
+        candidate = curr;
+        curr = curr->left_;
+      }
+    }
+
+    return iterator(candidate);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::const_iterator
+  AVLTree< Key, Value, Compare >::upper_bound(const Key& key) const noexcept
+  {
+    return const_cast< AVLTree* >(this)->upper_bound(key);
+  }
 }
 
 #endif
