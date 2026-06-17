@@ -77,6 +77,61 @@ namespace vasyakin
     const Node* findNode(const Key& key) const noexcept;
     static void destroyTree(Node* node) noexcept;
   };
+
+  template< class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare >::AVLTree(const Compare& cmp):
+    root_(nullptr),
+    size_(0),
+    cmp_(cmp)
+  {}
+
+  template< class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare >::AVLTree(const AVLTree& other):
+    size_(other.size_),
+    cmp_(other.cmp_)
+  {
+    root_ = cloneNode(other.root_, nullptr);
+  }
+
+  template< class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare >::AVLTree(AVLTree&& other) noexcept:
+    root_(std::exchange(other.root_, nullptr)),
+    size_(std::exchange(other.size_, 0)),
+    cmp_(std::move(other.cmp_))
+  {}
+
+  template< class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare >::~AVLTree() noexcept
+  {
+    clear();
+  }
+
+  template< class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare >&
+    AVLTree< Key, Value, Compare >::operator=(const AVLTree& other)
+  {
+    if (this == std::addressof(other))
+    {
+      return *this;
+    }
+
+    AVLTree< Key, Value, Compare > cpy = other;
+    swap(cpy);
+    return *this;
+  }
+
+  template< class Key, class Value, class Compare >
+  AVLTree< Key, Value, Compare >&
+    AVLTree< Key, Value, Compare >::operator=(AVLTree&& other) noexcept
+  {
+    if (this == std::addressof(other))
+    {
+      return *this;
+    }
+
+    swap(other);
+    return *this;
+  }
 }
 
 #endif
