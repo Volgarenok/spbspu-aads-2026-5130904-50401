@@ -419,3 +419,168 @@ void vasyakin::cmdShowItem(
 
   out << '\n';
 }
+
+void vasyakin::cmdShowLog(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  int limit = 0;
+
+  int ch = in.peek();
+  while (ch == ' ' || ch == '\t')
+  {
+    in.get();
+    ch = in.peek();
+  }
+
+  if (ch != EOF && std::isdigit(static_cast< unsigned char >(ch)))
+  {
+    in >> limit;
+  }
+
+  if (limit > 0)
+  {
+    out << "<OPERATION LOG (LAST " << limit << ")>" << '\n';
+  }
+  else
+  {
+    out << "<OPERATION LOG>" << '\n';
+  }
+
+  size_t count = 0;
+  size_t total = state.log_.size();
+
+  size_t start = (limit > 0 &&
+    total > static_cast< size_t >(limit)) ? total - limit : 0;
+
+  for (auto cit = state.log_.cbegin(); cit != state.log_.cend(); ++cit)
+  {
+    if (count >= start)
+    {
+      const auto& log = (*cit).second;
+
+      out << "> #" << log.id_ << " [" << log.date_.toString()
+        << "] " << log.details_ << '\n';
+    }
+
+    ++count;
+  }
+}
+
+void vasyakin::cmdShowStateAt(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  state.completeTransfers();
+
+  const vasyakin::Date date = readDate(in);
+  state.current_date_ = date;
+
+  size_t total = 0;
+  size_t in_transit = 0;
+  size_t active = 0;
+
+  for (auto cit = state.warehouses_.cbegin(); cit != state.warehouses_.cend(); ++cit)
+  {
+    const auto& wh = (*cit).second;
+
+    for (auto ccit = wh.items_.cbegin(); ccit != wh.items_.cend(); ++ccit)
+    {
+      total += (*ccit).second.getCount();
+    }
+  }
+
+  for (auto cit = state.transfers_.cbegin(); cit != state.transfers_.cend(); ++cit)
+  {
+    const auto& tr = (*cit).second;
+
+    if (tr.departure_ <= date && tr.arrival_ > date)
+    {
+      in_transit += tr.count_;
+      ++active;
+    }
+  }
+
+  out << "<SYSTEM STATE (Date: " << date.toString() << ")>" << '\n';
+  out << "> Warehouses: " << state.warehouses_.size() << '\n';
+  out << "> Total Items: " << total << '\n';
+  out << "> Items in Transit: " << in_transit << '\n';
+  out << "> Active Transfers: " << active << '\n';
+}
+
+void vasyakin::cmdStats(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  state.completeTransfers();
+
+  std::string warehouse;
+
+  int ch = in.peek();
+  while (ch == ' ' || ch == '\t')
+  {
+    in.get();
+    ch = in.peek();
+  }
+
+  if (ch != EOF && ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r')
+  {
+    in >> warehouse;
+  }
+
+  size_t total_items = 0;
+  if (warehouse.empty())
+  {
+    out << "<SYSTEM STATS>" << '\n';
+    out << "> Warehouses: " << state.warehouses_.size() << '\n';
+
+    size_t completed = 0;
+    size_t active = 0;
+
+    for (auto cit = state.warehouses_.cbegin(); cit != state.warehouses_.cend(); ++cit)
+    {
+      const auto& wh = (*cit).second;
+
+      for (auto ccit = wh.items_.cbegin(); ccit != wh.items_.cend(); ++ccit)
+      {
+        total_items += (*ccit).second.getCount();
+      }
+    }
+
+    for (auto cit = state.transfers_.cbegin(); cit != state.transfers_.cend(); ++cit)
+    {
+      if ((*cit).second.arrival_ <= state.current_date_)
+      {
+        ++completed;
+      }
+      else
+      {
+        ++active;
+      }
+    }
+
+    out << "> Total Items (all warehouses): " << total_items << '\n';
+    out << "> Total Transfers Completed: " << completed << '\n';
+    out << "> Total Transfers Active: " << active << '\n';
+  }
+  else
+  {
+    if (!state.warehouses_.has(warehouse))
+    {
+      out << "<ERROR: WAREHOUSE NOT FOUND>" << '\n';
+      return;
+    }
+
+    const auto& wh = state.warehouses_.at(warehouse);
+    for (auto cit = wh.items_.cbegin(); cit != wh.items_.cend(); ++cit)
+    {
+      total_items += (*cit).second.getCount();
+    }
+
+    out << "<WAREHOUSE STATS: " << warehouse << ">" << '\n';
+    out << "> Total Items: " << total_items << '\n';
+    out << "> Total Value: " << wh.total_value_ << '\n';
+    out << "> Items Sent: " << wh.items_sent_ << '\n';
+    out << "> Items Received: " << wh.items_received_ << '\n';
+    out << "> Capacity Used: " << wh.used_capacity_ << "/"
+      << wh.capacity_ << " (" << (wh.capacity_ > 0 ?
+      (wh.used_capacity_ * 100 / wh.capacity_) : 0) << "%)" << '\n';
+  }
+}
