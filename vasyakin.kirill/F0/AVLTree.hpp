@@ -240,6 +240,48 @@ namespace vasyakin
   {
     return const_iterator(findNode(key));
   }
+
+  template< class Key, class Value, class Compare >
+  Value& AVLTree< Key, Value, Compare >::at(const Key& key)
+  {
+    Node* node = const_cast< Node* >(findNode(key));
+    if (!node)
+    {
+      throw std::out_of_range("AVLTree::at: key not found");
+    }
+
+    return node->value_;
+  }
+
+  template< class Key, class Value, class Compare >
+  const Value& AVLTree< Key, Value, Compare >::at(const Key& key) const
+  {
+    const Node* node = findNode(key);
+    if (!node)
+    {
+      throw std::out_of_range("AVLTree::at: key not found");
+    }
+
+    return node->value_;
+  }
+
+  template< class Key, class Value, class Compare >
+  bool AVLTree< Key, Value, Compare >::has(const Key& key) const noexcept
+  {
+    return findNode(key) != nullptr;
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t AVLTree< Key, Value, Compare >::size() const noexcept
+  {
+    return size_;
+  }
+
+  template< class Key, class Value, class Compare >
+  bool AVLTree< Key, Value, Compare >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
 }
 
 #endif
