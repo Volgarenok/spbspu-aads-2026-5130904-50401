@@ -1,5 +1,5 @@
-#ifndef HASH_TABLE_NODE
-#define HASH_TABLE_NODE
+#ifndef CUCKOO_HASH_TABLE_NODE_HPP
+#define CUCKOO_HASH_TABLE_NODE_HPP
 
 namespace malashenko
 {
