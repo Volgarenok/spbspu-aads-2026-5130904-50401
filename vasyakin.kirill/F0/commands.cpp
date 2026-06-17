@@ -584,3 +584,77 @@ void vasyakin::cmdStats(
       (wh.used_capacity_ * 100 / wh.capacity_) : 0) << "%)" << '\n';
   }
 }
+
+void vasyakin::cmdCalculateCenterCapacity(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  state.completeTransfers();
+
+  const vasyakin::Date from = readDate(in);
+  const vasyakin::Date to = readDate(in);
+  state.current_date_ = to;
+
+  if (from > to)
+  {
+    throw std::runtime_error("Invalid date range: from > to");
+  }
+
+  size_t peak_load = 0;
+  vasyakin::Date peak_date = from;
+
+  for (auto curr = from; curr <= to; curr = curr + 1)
+  {
+    size_t daily_load = 0;
+
+    for (auto cit = state.transfers_.cbegin(); cit != state.transfers_.cend(); ++cit)
+    {
+      const auto& tr = (*cit).second;
+
+      if (!state.warehouses_.has(tr.from_) || !state.warehouses_.has(tr.to_))
+      {
+        continue;
+      }
+
+      size_t days_from = state.warehouses_.at(tr.from_).days_to_center_;
+      vasyakin::Date at_center_date = tr.departure_ + days_from;
+
+      if (curr == at_center_date)
+      {
+        daily_load += tr.count_;
+      }
+    }
+
+    if (daily_load > peak_load)
+    {
+      peak_load = daily_load;
+      peak_date = curr;
+    }
+  }
+
+  out << "<CENTER CAPACITY ANALYSIS (" << from.toString()
+    << " — " << to.toString() << ")>" << '\n';
+  out << "> Peak Date: " << peak_date.toString() << '\n';
+  out << "> Peak Load: " << peak_load << " pcs (at center simultaneously)" << '\n';
+  out << "> Total Shipments: " << state.transfers_.size() << '\n';
+  out << "> MINIMUM REQUIRED CAPACITY: " << peak_load << " pcs" << '\n';
+}
+
+void vasyakin::cmdHelp(
+  std::istream&, std::ostream& out, SystemState&)
+{
+  out << "<AVAILABLE COMMANDS>" << '\n';
+  out << "> create-warehouse <date> <name> <capacity> <days-to-center>" << '\n';
+  out << "> add-item <date> <warehouse> <model> <color> <size> <count> <price>" << '\n';
+  out << "> remove-item <date> <warehouse> <model> <color> <size> <count>" << '\n';
+  out << "> ship <from> <to> <model> <color> <size> <count> <departure-date>" << '\n';
+  out << "> show-warehouse <name> <date>" << '\n';
+  out << "> show-transfers <date>" << '\n';
+  out << "> show-item <model> <color> <size>" << '\n';
+  out << "> show-log [limit]" << '\n';
+  out << "> stats [warehouse]" << '\n';
+  out << "> calculate-center-capacity <date-from> <date-to>" << '\n';
+  out << "> show-state-at <date>" << '\n';
+  out << "> help" << '\n';
+  out << "> save <filename>" << '\n';
+  out << "> load <filename>" << '\n';
+}
