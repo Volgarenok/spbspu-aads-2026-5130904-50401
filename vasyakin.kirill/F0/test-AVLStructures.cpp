@@ -190,6 +190,8 @@ BOOST_AUTO_TEST_CASE(basic_insert_and_find)
   auto ok2 = result2.second;
 
   BOOST_CHECK(!ok2);
+  BOOST_CHECK_EQUAL((*it2).first, 10);
+  BOOST_CHECK(it1 == it2);
 
   BOOST_CHECK_EQUAL(set.size(), 1u);
   BOOST_CHECK_EQUAL(set.count(10), 1u);

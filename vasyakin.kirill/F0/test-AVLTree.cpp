@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE(empty_tree_edge_cases)
 
   BOOST_CHECK(empty.empty());
   BOOST_CHECK_EQUAL(empty.size(), 0u);
-  BOOST_CHECK_EQUAL(empty.begin(), empty.end());
+  BOOST_CHECK(empty.begin() == empty.end());
   BOOST_CHECK(empty.cbegin() == empty.cend());
 
   BOOST_CHECK_THROW(empty.at(100), std::out_of_range);

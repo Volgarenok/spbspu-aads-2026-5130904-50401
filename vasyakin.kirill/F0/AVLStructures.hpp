@@ -512,7 +512,7 @@ namespace vasyakin
       return 0;
     }
 
-    size_t cnt = (*it).second.getSize();
+    size_t cnt = tree_.at(key).getSize();
     tree_.remove(key);
     return cnt;
   }
@@ -524,7 +524,7 @@ namespace vasyakin
     auto it = tree_.find(value.first);
     if (it != tree_.end())
     {
-      (*it).second.push_back(value.second);
+      tree_.at(value.first).push_back(value.second);
       return it;
     }
 
@@ -541,7 +541,7 @@ namespace vasyakin
       return 0;
     }
 
-    return (*it).second.getSize();
+    return tree_.at(key).getSize();
   }
 
   template< class Key, class Value, class Compare >
@@ -736,7 +736,7 @@ namespace vasyakin
       return 0;
     }
 
-    size_t cnt = (*it).second.getSize();
+    size_t cnt = tree_.at(key).getSize();
     tree_.remove(key);
     return cnt;
   }
@@ -748,7 +748,7 @@ namespace vasyakin
     auto it = tree_.find(value);
     if (it != tree_.end())
     {
-      (*it).second.push_back(value);
+      tree_.at(value).push_back(value);
       return it;
     }
 
@@ -765,7 +765,7 @@ namespace vasyakin
       return 0;
     }
 
-    return (*it).second.getSize();
+    return tree_.at(key).getSize();
   }
 
   template< class Key, class Compare >

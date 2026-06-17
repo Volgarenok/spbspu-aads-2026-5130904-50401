@@ -24,7 +24,9 @@ namespace vasyakin
     AVLTree& operator=(const AVLTree& other);
     AVLTree& operator=(AVLTree&& other) noexcept;
 
-    void insert(const Key& key, const Value& value);
+    template< class K, class V >
+    void insert(K&& key, V&& value);
+
     bool remove(const Key& key);
     void clear() noexcept;
 
@@ -566,11 +568,12 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Compare >
-  void AVLTree< Key, Value, Compare >::insert(
-      const Key& key, const Value& value)
+  template< class K, class V >
+  void AVLTree< Key, Value, Compare >::insert(K&& key, V&& value)
   {
     Node* curr = root_;
     Node* parent = nullptr;
+    bool go_left = false;
 
     while (curr)
     {
@@ -579,25 +582,27 @@ namespace vasyakin
       if (cmp_(key, curr->key_))
       {
         curr = curr->left_;
+        go_left = true;
       }
       else if (cmp_(curr->key_, key))
       {
         curr = curr->right_;
+        go_left = false;
       }
       else
       {
-        curr->value_ = value;
+        curr->value_ = std::forward< V >(value);
         return;
       }
     }
 
-    Node* new_node = new Node(key, value);
+    Node* new_node = new Node(std::forward< K >(key), std::forward< V >(value));
     ++size_;
     new_node->parent_ = parent;
 
     if (parent != nullptr)
     {
-      if (cmp_(key, parent->key_))
+      if (go_left)
       {
         parent->left_ = new_node;
       }
