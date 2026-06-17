@@ -1,7 +1,7 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include <iostream>
-#include "../common/vector.hpp"
+#include <vector.hpp>
 #include "scheduler.hpp"
 #include "avltree.hpp"
 

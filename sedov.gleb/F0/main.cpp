@@ -1,9 +1,9 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <vector.hpp>
 #include "scheduler.hpp"
 #include "commands.hpp"
-#include "../common/vector.hpp"
 
 sedov::Vector< std::string > parseCommandLine(const std::string & line)
 {

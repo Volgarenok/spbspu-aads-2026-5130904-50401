@@ -2,8 +2,8 @@
 #include <string>
 #include <stdexcept>
 #include <utility>
+#include <vector.hpp>
 #include "avltree.hpp"
-#include "../common/vector.hpp"
 
 using namespace sedov;
 

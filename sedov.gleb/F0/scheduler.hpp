@@ -1,11 +1,11 @@
 #ifndef SCHEDULER_HPP
 #define SCHEDULER_HPP
+#include <string>
+#include <list.hpp>
+#include <vector.hpp>
 #include "avltree.hpp"
 #include "profile.hpp"
-#include "../common/list.hpp"
-#include "../common/vector.hpp"
 #include "utils.hpp"
-#include <string>
 
 namespace sedov
 {

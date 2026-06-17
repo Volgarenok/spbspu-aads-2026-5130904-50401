@@ -5,9 +5,9 @@
 #include <functional>
 #include <stdexcept>
 #include <utility>
+#include <list.hpp>
 #include "avliterators.hpp"
 #include "avltreenode.hpp"
-#include "../common/list.hpp"
 
 namespace sedov
 {

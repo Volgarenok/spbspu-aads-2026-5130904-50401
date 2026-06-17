@@ -1,9 +1,9 @@
 #ifndef SCHEDULE_HPP
 #define SCHEDULE_HPP
-#include "avltree.hpp"
-#include "../common/list.hpp"
-#include "task.hpp"
 #include <algorithm>
+#include <list.hpp>
+#include "avltree.hpp"
+#include "task.hpp"
 
 namespace sedov
 {

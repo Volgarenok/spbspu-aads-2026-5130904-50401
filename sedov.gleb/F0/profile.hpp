@@ -1,10 +1,10 @@
 #ifndef PROFILE_HPP
 #define PROFILE_HPP
+#include <string>
+#include <list.hpp>
 #include "avltree.hpp"
-#include "../common/list.hpp"
 #include "task.hpp"
 #include "schedule.hpp"
-#include <string>
 
 namespace sedov
 {
