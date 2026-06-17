@@ -262,4 +262,18 @@ chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::operator=(CuckooHT && ht) 
   return *this;
 }
 
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::swap(CuckooHT & ht) noexcept
+{
+  std::swap(table1_, ht.table1_);
+  std::swap(table2_, ht.table2_);
+  std::swap(occupied1_, ht.occupied1_);
+  std::swap(occupied2_, ht.occupied2_);
+  std::swap(capacity_, ht.capacity_);
+  std::swap(count_, ht.count_);
+  std::swap(hasher1_, ht.hasher1_);
+  std::swap(hasher2_, ht.hasher2_);
+  std::swap(equal_, ht.equal_);
+}
+
 #endif
