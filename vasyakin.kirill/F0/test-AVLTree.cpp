@@ -311,3 +311,154 @@ BOOST_AUTO_TEST_CASE(iterator_increment_decrement)
   --it;
   BOOST_CHECK_EQUAL((*it).first, 10);
 }
+
+BOOST_AUTO_TEST_CASE(move_only_types)
+{
+  vasyakin::AVLTree< int, std::unique_ptr< int > > tree;
+
+  tree.insert(1, std::make_unique< int >(100));
+  tree.insert(2, std::make_unique< int >(200));
+
+  BOOST_CHECK_EQUAL(*tree.at(1), 100);
+  BOOST_CHECK_EQUAL(*tree.at(2), 200);
+
+  BOOST_CHECK(tree.remove(1));
+  BOOST_CHECK_EQUAL(tree.size(), 1u);
+  BOOST_CHECK_EQUAL(*tree.at(2), 200);
+}
+
+BOOST_AUTO_TEST_CASE(left_rotate)
+{
+  vasyakin::AVLTree< int, std::string > tree;
+
+  tree.insert(10, "ten");
+  tree.insert(20, "twenty");
+  tree.insert(30, "thirty");
+  tree.insert(40, "forty");
+
+  BOOST_CHECK_EQUAL(tree.size(), 4u);
+  BOOST_CHECK(tree.has(10));
+  BOOST_CHECK(tree.has(20));
+  BOOST_CHECK(tree.has(30));
+  BOOST_CHECK(tree.has(40));
+
+  std::vector< int > keys;
+  for (auto it = tree.begin(); it != tree.end(); ++it)
+  {
+    keys.push_back((*it).first);
+  }
+
+  std::vector< int > expected = {10, 20, 30, 40};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(),
+    expected.begin(), expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(right_rotate)
+{
+  vasyakin::AVLTree< int, std::string > tree;
+
+  tree.insert(10, "ten");
+  tree.insert(9, "nine");
+  tree.insert(8, "eight");
+  tree.insert(7, "seven");
+
+  BOOST_CHECK_EQUAL(tree.size(), 4u);
+  BOOST_CHECK(tree.has(10));
+  BOOST_CHECK(tree.has(9));
+  BOOST_CHECK(tree.has(8));
+  BOOST_CHECK(tree.has(7));
+
+  std::vector< int > keys;
+  for (auto it = tree.begin(); it != tree.end(); ++it)
+  {
+    keys.push_back((*it).first);
+  }
+
+  std::vector< int > expected = {7, 8, 9, 10};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(),
+    expected.begin(), expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(left_large_rotate)
+{
+  vasyakin::AVLTree< int, std::string > tree;
+
+  tree.insert(10, "ten");
+  tree.insert(8, "eight");
+  tree.insert(9, "nine");
+
+  BOOST_CHECK_EQUAL(tree.size(), 3u);
+  BOOST_CHECK(tree.has(10));
+  BOOST_CHECK(tree.has(8));
+  BOOST_CHECK(tree.has(9));
+
+  std::vector< int > keys;
+  for (auto it = tree.begin(); it != tree.end(); ++it)
+  {
+    keys.push_back((*it).first);
+  }
+
+  std::vector< int > expected = {8, 9, 10};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(),
+    expected.begin(), expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(right_large_rotate)
+{
+  vasyakin::AVLTree< int, std::string > tree;
+
+  tree.insert(10, "ten");
+  tree.insert(20, "twenty");
+  tree.insert(15, "fifteen");
+
+  BOOST_CHECK_EQUAL(tree.size(), 3u);
+  BOOST_CHECK(tree.has(10));
+  BOOST_CHECK(tree.has(20));
+  BOOST_CHECK(tree.has(15));
+
+  std::vector< int > keys;
+  for (auto it = tree.begin(); it != tree.end(); ++it)
+  {
+    keys.push_back((*it).first);
+  }
+
+  std::vector< int > expected = {10, 15, 20};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(),
+    expected.begin(), expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(rotations_maintain_balance_under_load)
+{
+  vasyakin::AVLTree< int, int > tree;
+
+  for (int i = 0; i < 100; ++i)
+  {
+    tree.insert(i, i);
+  }
+
+  BOOST_CHECK_EQUAL(tree.size(), 100u);
+
+  std::vector< int > keys;
+  for (auto it = tree.begin(); it != tree.end(); ++it)
+  {
+    keys.push_back((*it).first);
+  }
+
+  std::vector< int > expected(100);
+  for (int i = 0; i < 100; ++i)
+  {
+    expected[i] = i;
+  }
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(),
+    expected.begin(), expected.end());
+
+  for (int i = 0; i < 100; ++i)
+  {
+    BOOST_CHECK(tree.has(i));
+  }
+}
