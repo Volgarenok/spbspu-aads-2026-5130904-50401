@@ -171,3 +171,125 @@ BOOST_AUTO_TEST_CASE(const_correctness)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(AVLSetTests)
+
+BOOST_AUTO_TEST_CASE(basic_insert_and_find)
+{
+  vasyakin::AVLSet< int > set;
+
+  auto result1 = set.insert(10);
+  auto it1 = result1.first;
+  auto ok1 = result1.second;
+
+  BOOST_CHECK(ok1);
+  BOOST_CHECK_EQUAL((*it1).first, 10);
+
+  auto result2 = set.insert(10);
+  auto it2 = result2.first;
+  auto ok2 = result2.second;
+
+  BOOST_CHECK(!ok2);
+
+  BOOST_CHECK_EQUAL(set.size(), 1u);
+  BOOST_CHECK_EQUAL(set.count(10), 1u);
+  BOOST_CHECK_EQUAL(set.count(99), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(erase_and_clear)
+{
+  vasyakin::AVLSet< int > set;
+
+  set.insert(1);
+  set.insert(2);
+  set.insert(3);
+
+  BOOST_CHECK_EQUAL(set.erase(2), 1u);
+  BOOST_CHECK_EQUAL(set.erase(999), 0u);
+  BOOST_CHECK_EQUAL(set.size(), 2u);
+
+  set.clear();
+  BOOST_CHECK(set.empty());
+}
+
+BOOST_AUTO_TEST_CASE(iteration_sorted)
+{
+  vasyakin::AVLSet< int > set;
+
+  set.insert(5);
+  set.insert(1);
+  set.insert(4);
+  set.insert(2);
+  set.insert(3);
+
+  std::vector< int > keys;
+  for (auto it = set.begin(); it != set.end(); ++it)
+  {
+    keys.push_back((*it).first);
+  }
+
+  std::vector< int > expected = {1, 2, 3, 4, 5};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(),
+    expected.begin(), expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(const_correctness)
+{
+  vasyakin::AVLSet< int > set;
+
+  set.insert(10);
+  set.insert(20);
+  set.insert(30);
+
+  const vasyakin::AVLSet< int >& cset = set;
+
+  BOOST_CHECK_EQUAL(cset.size(), 3u);
+  BOOST_CHECK(!cset.empty());
+  BOOST_CHECK_EQUAL(cset.count(10), 1u);
+  BOOST_CHECK(cset.has(20));
+  BOOST_CHECK(!cset.has(99));
+
+  auto it = cset.find(20);
+  BOOST_REQUIRE(it != cset.end());
+  BOOST_CHECK_EQUAL((*it).first, 20);
+
+  auto lb = cset.lower_bound(15);
+  BOOST_REQUIRE(lb != cset.end());
+  BOOST_CHECK_EQUAL((*lb).first, 20);
+
+  auto ub = cset.upper_bound(20);
+  BOOST_REQUIRE(ub != cset.end());
+  BOOST_CHECK_EQUAL((*ub).first, 30);
+
+  auto range = cset.equal_range(20);
+  BOOST_CHECK_EQUAL((*range.first).first, 20);
+  BOOST_CHECK_EQUAL((*range.second).first, 30);
+
+  auto begin_it = cset.begin();
+  BOOST_REQUIRE(begin_it != cset.end());
+  BOOST_CHECK_EQUAL((*begin_it).first, 10);
+}
+
+BOOST_AUTO_TEST_CASE(bounds)
+{
+  vasyakin::AVLSet< int > set;
+
+  set.insert(10);
+  set.insert(20);
+  set.insert(30);
+
+  auto lb = set.lower_bound(15);
+  BOOST_CHECK_EQUAL((*lb).first, 20);
+
+  auto ub = set.upper_bound(20);
+  BOOST_CHECK_EQUAL((*ub).first, 30);
+}
+
+BOOST_AUTO_TEST_CASE(initializer_list)
+{
+  vasyakin::AVLSet< int > set = {5, 1, 3, 1, 5};
+  BOOST_CHECK_EQUAL(set.size(), 3u);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
