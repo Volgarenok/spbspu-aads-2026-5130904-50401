@@ -61,6 +61,196 @@ namespace vasyakin
     AVLTree< Key, Value, Compare > tree_;
   };
 
+  template< class Key, class Value, class Compare >
+  AVLMap< Key, Value, Compare >::AVLMap(const Compare& cmp):
+    tree_(cmp)
+  {}
+
+  template< class Key, class Value, class Compare >
+  AVLMap< Key, Value, Compare >::AVLMap(
+    std::initializer_list< value_type > init, const Compare& cmp):
+    tree_(cmp)
+  {
+    for (auto it = init.begin(); it != init.end(); ++it)
+    {
+      const auto& pair = *it;
+      tree_.insert(pair.first, pair.second);
+    }
+  }
+
+  template< class Key, class Value, class Compare >
+  Value& AVLMap< Key, Value, Compare >::at(const Key& key)
+  {
+    return tree_.at(key);
+  }
+
+  template< class Key, class Value, class Compare >
+  const Value& AVLMap< Key, Value, Compare >::at(const Key& key) const
+  {
+    return tree_.at(key);
+  }
+
+  template< class Key, class Value, class Compare >
+  Value& AVLMap< Key, Value, Compare >::operator[](const Key& key)
+  {
+    if (!tree_.has(key))
+    {
+      tree_.insert(key, Value{});
+    }
+
+    return tree_.at(key);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::iterator
+  AVLMap< Key, Value, Compare >::find(const Key& key) noexcept
+  {
+    return tree_.find(key);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::const_iterator
+  AVLMap< Key, Value, Compare >::find(const Key& key) const noexcept
+  {
+    return tree_.find(key);
+  }
+
+  template< class Key, class Value, class Compare >
+  bool AVLMap< Key, Value, Compare >::empty() const noexcept
+  {
+    return tree_.empty();
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t AVLMap< Key, Value, Compare >::size() const noexcept
+  {
+    return tree_.size();
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t AVLMap< Key, Value, Compare >::count(const Key& key) const noexcept
+  {
+    return tree_.has(key) ? 1 : 0;
+  }
+
+  template< class Key, class Value, class Compare >
+  bool AVLMap< Key, Value, Compare >::has(const Key& key) const noexcept
+  {
+    return tree_.has(key);
+  }
+
+  template< class Key, class Value, class Compare >
+  std::pair< typename AVLMap< Key, Value, Compare >::iterator, bool >
+    AVLMap< Key, Value, Compare >::insert(const value_type& value)
+  {
+    auto it = tree_.find(value.first);
+    if (it != tree_.end())
+    {
+      return {it, false};
+    }
+
+    tree_.insert(value.first, value.second);
+    return {tree_.find(value.first), true};
+  }
+
+  template< class Key, class Value, class Compare >
+  void AVLMap< Key, Value, Compare >::clear() noexcept
+  {
+    tree_.clear();
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t AVLMap< Key, Value, Compare >::erase(const Key& key)
+  {
+    return tree_.remove(key) ? 1 : 0;
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::iterator
+  AVLMap< Key, Value, Compare >::lower_bound(const Key& key) noexcept
+  {
+    return tree_.lower_bound(key);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::const_iterator
+  AVLMap< Key, Value, Compare >::lower_bound(const Key& key) const noexcept
+  {
+    return tree_.lower_bound(key);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::iterator
+  AVLMap< Key, Value, Compare >::upper_bound(const Key& key) noexcept
+  {
+    return tree_.upper_bound(key);
+  }
+  
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::const_iterator
+  AVLMap< Key, Value, Compare >::upper_bound(const Key& key) const noexcept
+  {
+    return tree_.upper_bound(key);
+  }
+
+  template< class Key, class Value, class Compare >
+  std::pair< typename AVLMap< Key, Value, Compare >::iterator,
+    typename AVLMap< Key, Value, Compare >::iterator >
+    AVLMap< Key, Value, Compare >::equal_range(const Key& key) noexcept
+  {
+    return {lower_bound(key), upper_bound(key)};
+  }
+
+  template< class Key, class Value, class Compare >
+  std::pair< typename AVLMap< Key, Value, Compare >::const_iterator,
+    typename AVLMap< Key, Value, Compare >::const_iterator >
+    AVLMap< Key, Value, Compare >::equal_range(const Key& key) const noexcept
+  {
+    return {lower_bound(key), upper_bound(key)};
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::iterator
+  AVLMap< Key, Value, Compare >::begin() noexcept
+  {
+    return tree_.begin();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::iterator
+  AVLMap< Key, Value, Compare >::end() noexcept
+  {
+    return tree_.end();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::const_iterator
+  AVLMap< Key, Value, Compare >::begin() const noexcept
+  {
+    return tree_.cbegin();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::const_iterator
+  AVLMap< Key, Value, Compare >::end() const noexcept
+  {
+    return tree_.cend();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::const_iterator
+  AVLMap< Key, Value, Compare >::cbegin() const noexcept
+  {
+    return tree_.cbegin();
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLMap< Key, Value, Compare >::const_iterator
+  AVLMap< Key, Value, Compare >::cend() const noexcept
+  {
+    return tree_.cend();
+  }
+
   template< class Key, class Compare = std::less< Key > >
   class AVLSet
   {
