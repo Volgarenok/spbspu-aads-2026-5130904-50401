@@ -293,3 +293,123 @@ BOOST_AUTO_TEST_CASE(initializer_list)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(AVLMultiMapTests)
+
+BOOST_AUTO_TEST_CASE(duplicates_allowed)
+{
+  vasyakin::AVLMultiMap< int, std::string > multimap;
+
+  multimap.insert({1, "one"});
+  multimap.insert({1, "uno"});
+  multimap.insert({1, "eins"});
+  multimap.insert({2, "two"});
+
+  BOOST_CHECK_EQUAL(multimap.size(), 2u);
+  BOOST_CHECK_EQUAL(multimap.count(1), 3u);
+  BOOST_CHECK_EQUAL(multimap.count(2), 1u);
+  BOOST_CHECK_EQUAL(multimap.count(99), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(insert_returns_iterator)
+{
+  vasyakin::AVLMultiMap< int, int > multimap;
+
+  auto it = multimap.insert({10, 100});
+  BOOST_CHECK(it != multimap.end());
+  BOOST_CHECK_EQUAL((*it).first, 10);
+}
+
+BOOST_AUTO_TEST_CASE(erase_removes_all)
+{
+  vasyakin::AVLMultiMap< int, int > multimap;
+
+  multimap.insert({1, 10});
+  multimap.insert({1, 20});
+  multimap.insert({1, 30});
+
+  BOOST_CHECK_EQUAL(multimap.erase(1), 3u);
+  BOOST_CHECK_EQUAL(multimap.size(), 0u);
+  BOOST_CHECK_EQUAL(multimap.count(1), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(values_stored_in_vector)
+{
+  vasyakin::AVLMultiMap< int, std::string > multimap;
+
+  multimap.insert({1, "a"});
+  multimap.insert({1, "b"});
+  multimap.insert({1, "c"});
+
+  auto it = multimap.find(1);
+  BOOST_REQUIRE(it != multimap.end());
+
+  const auto& vec = (*it).second;
+  BOOST_CHECK_EQUAL(vec.getSize(), 3u);
+  BOOST_CHECK_EQUAL(vec[0], "a");
+  BOOST_CHECK_EQUAL(vec[1], "b");
+  BOOST_CHECK_EQUAL(vec[2], "c");
+}
+
+BOOST_AUTO_TEST_CASE(multimap_empty)
+{
+  vasyakin::AVLMultiMap< int, int > multimap;
+
+  BOOST_CHECK(multimap.empty());
+  BOOST_CHECK_EQUAL(multimap.size(), 0u);
+
+  BOOST_CHECK_EQUAL(multimap.count(42), 0u);
+  BOOST_CHECK(!multimap.has(42));
+
+  BOOST_CHECK_EQUAL(multimap.erase(42), 0u);
+  BOOST_CHECK(multimap.begin() == multimap.end());
+}
+
+
+BOOST_AUTO_TEST_CASE(multimap_const_correctness)
+{
+  vasyakin::AVLMultiMap< int, int > multimap;
+
+  multimap.insert({1, 10});
+  multimap.insert({1, 20});
+
+  const auto& cmultimap = multimap;
+  BOOST_CHECK_EQUAL(cmultimap.count(1), 2u);
+  BOOST_CHECK(cmultimap.has(1));
+  BOOST_CHECK(!cmultimap.has(99));
+
+  auto it = cmultimap.find(1);
+  BOOST_REQUIRE(it != cmultimap.end());
+  BOOST_CHECK_EQUAL((*it).first, 1);
+  BOOST_CHECK_EQUAL((*it).second.getSize(), 2u);
+}
+
+BOOST_AUTO_TEST_CASE(bounds_and_equal_range)
+{
+  vasyakin::AVLMultiMap< int, int > multimap;
+
+  multimap.insert({10, 1});
+  multimap.insert({20, 2});
+  multimap.insert({30, 3});
+
+  auto lb = multimap.lower_bound(15);
+  BOOST_CHECK_EQUAL((*lb).first, 20);
+
+  auto ub = multimap.upper_bound(20);
+  BOOST_CHECK_EQUAL((*ub).first, 30);
+
+  auto range = multimap.equal_range(20);
+  BOOST_CHECK_EQUAL((*range.first).first, 20);
+  BOOST_CHECK_EQUAL((*range.second).first, 30);
+}
+
+BOOST_AUTO_TEST_CASE(initializer_list)
+{
+  vasyakin::AVLMultiMap< int, std::string > multimap =
+    {{1, "a"}, {1, "b"}, {2, "c"}};
+
+  BOOST_CHECK_EQUAL(multimap.size(), 2u);
+  BOOST_CHECK_EQUAL(multimap.count(1), 2u);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
