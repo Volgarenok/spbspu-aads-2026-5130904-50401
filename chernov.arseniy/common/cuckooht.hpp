@@ -480,11 +480,9 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::insertWithEviction(Ke
   const size_t maxIterations = capacity_ * 4 + 1;
   std::pair< Key, Value > current(std::move(k), std::move(v));
 
-  for (size_t iter = 0; iter < maxIterations; ++iter)
-  {
+  for (size_t iter = 0; iter < maxIterations; ++iter) {
     size_t h1 = hash1(current.first);
-    if (!occupied1_[h1])
-    {
+    if (!occupied1_[h1]) {
       new (table1_ + h1) Slot(std::move(current.first), std::move(current.second));
       occupied1_[h1] = true;
       ++count_;
@@ -497,8 +495,7 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::insertWithEviction(Ke
     current = std::move(evicted);
 
     size_t h2 = hash2(current.first);
-    if (!occupied2_[h2])
-    {
+    if (!occupied2_[h2]) {
       new (table2_ + h2) Slot(std::move(current.first), std::move(current.second));
       occupied2_[h2] = true;
       ++count_;
