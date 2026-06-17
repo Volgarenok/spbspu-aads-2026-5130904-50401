@@ -155,3 +155,63 @@ void vasyakin::cmdAddItem(
   state.log_.insert(state.op_counter_,
     LogEntry{state.op_counter_, state.current_date_, details});
 }
+
+void vasyakin::cmdRemoveItem(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  state.completeTransfers();
+
+  const vasyakin::Date date = readDate(in);
+  state.current_date_ = date;
+
+  std::string warehouse, model, color;
+  size_t size = 0, count = 0;
+
+  warehouse = readQuotedToken(in);
+  model = readQuotedToken(in);
+  color = readQuotedToken(in);
+
+  if (!(in >> size >> count) || size == 0 || count == 0)
+  {
+    throw std::runtime_error("Invalid remove-item args");
+  }
+
+  if (!state.warehouses_.has(warehouse))
+  {
+    out << "<ERROR: WAREHOUSE NOT FOUND>" << '\n';
+    return;
+  }
+
+  std::string key = model + "|" + color + "|" + std::to_string(size);
+  auto& wh = state.warehouses_.at(warehouse);
+  if (!wh.items_.has(key))
+  {
+    out << "<ERROR: NOT ENOUGH ITEMS>" << '\n';
+    return;
+  }
+
+  auto& item = wh.items_.at(key);
+  if (!item.removeCount(count))
+  {
+    out << "<ERROR: NOT ENOUGH ITEMS>" << '\n';
+    return;
+  }
+
+  wh.used_capacity_ -= count;
+  wh.total_value_ -= count * item.getPrice();
+
+  if (item.getCount() == 0)
+  {
+    wh.items_.remove(key);
+  }
+
+  ++state.op_counter_;
+
+  out << "<ITEM REMOVED: " << count << " pcs>" << '\n';
+
+  std::string details = "REMOVE_ITEM " + warehouse + " " + model + " " +
+    color + " " + std::to_string(size) + " -" + std::to_string(count);
+
+  state.log_.insert(state.op_counter_,
+    LogEntry{state.op_counter_, state.current_date_, details});
+}
