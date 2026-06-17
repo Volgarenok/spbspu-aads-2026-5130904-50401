@@ -413,3 +413,133 @@ BOOST_AUTO_TEST_CASE(initializer_list)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(AVLMultiSetTests)
+
+BOOST_AUTO_TEST_CASE(duplicates_allowed)
+{
+  vasyakin::AVLMultiSet< int > multiset;
+
+  multiset.insert(10);
+  multiset.insert(10);
+  multiset.insert(10);
+  multiset.insert(20);
+
+  BOOST_CHECK_EQUAL(multiset.size(), 2u);
+  BOOST_CHECK_EQUAL(multiset.count(10), 3u);
+  BOOST_CHECK_EQUAL(multiset.count(20), 1u);
+  BOOST_CHECK_EQUAL(multiset.count(99), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(values_in_vector)
+{
+  vasyakin::AVLMultiSet< int > multiset;
+
+  multiset.insert(5);
+  multiset.insert(5);
+  multiset.insert(5);
+
+  auto it = multiset.find(5);
+  BOOST_REQUIRE(it != multiset.end());
+
+  const auto& vec = (*it).second;
+  BOOST_CHECK_EQUAL(vec.getSize(), 3u);
+  BOOST_CHECK_EQUAL(vec[0], 5);
+  BOOST_CHECK_EQUAL(vec[1], 5);
+  BOOST_CHECK_EQUAL(vec[2], 5);
+}
+
+BOOST_AUTO_TEST_CASE(erase_removes_all)
+{
+  vasyakin::AVLMultiSet< int > multiset;
+
+  multiset.insert(1);
+  multiset.insert(1);
+  multiset.insert(2);
+
+  BOOST_CHECK_EQUAL(multiset.erase(1), 2u);
+  BOOST_CHECK_EQUAL(multiset.size(), 1u);
+  BOOST_CHECK_EQUAL(multiset.count(1), 0u);
+}
+
+BOOST_AUTO_TEST_CASE(multiset_const_correctness)
+{
+  vasyakin::AVLMultiSet< int > multiset;
+
+  multiset.insert(10);
+  multiset.insert(10);
+
+  const auto& cmultiset = multiset;
+  BOOST_CHECK_EQUAL(cmultiset.count(10), 2u);
+  BOOST_CHECK(cmultiset.has(10));
+
+  auto it = cmultiset.find(10);
+  BOOST_REQUIRE(it != cmultiset.end());
+  BOOST_CHECK_EQUAL((*it).first, 10);
+}
+
+BOOST_AUTO_TEST_CASE(sorted_iteration)
+{
+  vasyakin::AVLMultiSet< int > multiset;
+
+  multiset.insert(30);
+  multiset.insert(10);
+  multiset.insert(20);
+  multiset.insert(10);
+
+  std::vector< int > keys;
+  for (auto it = multiset.begin(); it != multiset.end(); ++it)
+  {
+    keys.push_back((*it).first);
+  }
+
+  std::vector< int > expected = {10, 20, 30};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(),
+    expected.begin(), expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(multiset_empty)
+{
+  vasyakin::AVLMultiSet< int > multiset;
+
+  BOOST_CHECK(multiset.empty());
+  BOOST_CHECK_EQUAL(multiset.size(), 0u);
+
+  BOOST_CHECK_EQUAL(multiset.count(42), 0u);
+  BOOST_CHECK(!multiset.has(42));
+
+  BOOST_CHECK_EQUAL(multiset.erase(42), 0u);
+  BOOST_CHECK(multiset.begin() == multiset.end());
+}
+
+BOOST_AUTO_TEST_CASE(multiset_bounds)
+{
+  vasyakin::AVLMultiSet< int > multiset;
+
+  multiset.insert(10);
+  multiset.insert(20);
+  multiset.insert(30);
+
+  auto lb = multiset.lower_bound(15);
+  BOOST_REQUIRE(lb != multiset.end());
+  BOOST_CHECK_EQUAL((*lb).first, 20);
+
+  auto ub = multiset.upper_bound(20);
+  BOOST_REQUIRE(ub != multiset.end());
+  BOOST_CHECK_EQUAL((*ub).first, 30);
+
+  auto range = multiset.equal_range(20);
+  BOOST_CHECK_EQUAL((*range.first).first, 20);
+  BOOST_CHECK_EQUAL((*range.second).first, 30);
+}
+
+BOOST_AUTO_TEST_CASE(initializer_list)
+{
+  vasyakin::AVLMultiSet< int > multiset = {1, 2, 2, 3, 3, 3};
+
+  BOOST_CHECK_EQUAL(multiset.size(), 3u);
+  BOOST_CHECK_EQUAL(multiset.count(3), 3u);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
