@@ -5,8 +5,8 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include "../common/list.hpp"
-#include "../common/vector.hpp"
+#include "../common/list/list.hpp"
+#include "../common/vector/vector.hpp"
 
 namespace lukashevich {
   template< class Key, class Value, class Hash, class Equal >

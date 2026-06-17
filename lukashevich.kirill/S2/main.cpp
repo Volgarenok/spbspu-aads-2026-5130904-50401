@@ -1,5 +1,5 @@
 #include "math_funcs.hpp"
-#include "../common/list.hpp"
+#include "../common//list/list.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>

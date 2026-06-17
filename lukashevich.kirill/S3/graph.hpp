@@ -4,7 +4,7 @@
 #include <iosfwd>
 #include <string>
 #include <utility>
-#include "../common/vector.hpp"
+#include "../common/vector/vector.hpp"
 #include "hash-table.hpp"
 #include "hasher.hpp"
 

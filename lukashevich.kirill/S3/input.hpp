@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <istream>
 #include <string>
-#include "../common/vector.hpp"
+#include "../common/vector/vector.hpp"
 #include "graph.hpp"
 
 namespace lukashevich {
