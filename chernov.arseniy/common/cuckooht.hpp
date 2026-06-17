@@ -74,6 +74,7 @@ namespace chernov {
     size_t hash2(const Key & k) const noexcept;
 
     const Slot * findKey(const Key & k) const;
+    Slot * findKey(const Key & k);
     void insertWithEviction(Key k, Value v);
     void rehashInternal(size_t newSlots);
 
@@ -314,6 +315,28 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::clear() noexcept
 }
 
 template< class Key, class Value, class Hash1, class Hash2, class Equal >
+void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::add(Key k, Value v)
+{
+  CuckooHT new_ht(*this);
+  Slot * existing = new_ht.findKey(k);
+  if (existing != nullptr)
+  {
+    existing->second = v;
+  }
+  else
+  {
+    new_ht.insertWithEviction(std::move(k), std::move(v));
+  }
+  swap(new_ht);
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::rehash(size_t slots)
+{
+  rehashInternal(slots);
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
 Value & chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::at(const Key & k)
 {
   const CuckooHT * cthis = this;
@@ -373,6 +396,74 @@ chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::findKey(const Key & k) con
   }
 
   return nullptr;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+typename chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::Slot *
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::findKey(const Key & k)
+{
+  const CuckooHT * cthis = this;
+  return const_cast< Slot * >(cthis->findKey(k));
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::insertWithEviction(Key k, Value v)
+{
+  const size_t maxIterations = capacity_ * 4 + 1;
+  for (size_t iter = 0; iter < maxIterations; ++iter)
+  {
+    size_t h1 = hash1(k);
+    if (!occupied1_[h1])
+    {
+      new (table1_ + h1) Slot(std::move(k), std::move(v));
+      occupied1_[h1] = true;
+      ++count_;
+      return;
+    }
+    Slot old = std::move(table1_[h1]);
+    table1_[h1].~Slot();
+    new (table1_ + h1) Slot(std::move(k), std::move(v));
+    k = std::move(old.first);
+    v = std::move(old.second);
+
+    size_t h2 = hash2(k);
+    if (!occupied2_[h2])
+    {
+      new (table2_ + h2) Slot(std::move(k), std::move(v));
+      occupied2_[h2] = true;
+      ++count_;
+      return;
+    }
+    old = std::move(table2_[h2]);
+    table2_[h2].~Slot();
+    new (table2_ + h2) Slot(std::move(k), std::move(v));
+    k = std::move(old.first);
+    v = std::move(old.second);
+  }
+  rehashInternal(2 * capacity_ + 1);
+  insertWithEviction(std::move(k), std::move(v));
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::rehashInternal(size_t newSlots)
+{
+  size_t newCapacity = (newSlots + 1) / 2;
+  CuckooHT new_ht(newCapacity, 0);
+  new_ht.hasher1_ = hasher1_;
+  new_ht.hasher2_ = hasher2_;
+  new_ht.equal_ = equal_;
+  for (size_t i = 0; i < capacity_; ++i)
+  {
+    if (occupied1_[i])
+    {
+      new_ht.insertWithEviction(table1_[i].first, table1_[i].second);
+    }
+    if (occupied2_[i])
+    {
+      new_ht.insertWithEviction(table2_[i].first, table2_[i].second);
+    }
+  }
+  swap(new_ht);
 }
 
 #endif
