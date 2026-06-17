@@ -246,3 +246,68 @@ BOOST_AUTO_TEST_CASE(stress_removal)
 
   BOOST_CHECK(tree.empty());
 }
+
+BOOST_AUTO_TEST_CASE(find_method_and_const_correctness)
+{
+  vasyakin::AVLTree< int, std::string > tree;
+
+  tree.insert(10, "ten");
+  tree.insert(20, "twenty");
+  tree.insert(30, "thirty");
+
+  auto it_found = tree.find(10);
+  BOOST_REQUIRE(it_found != tree.end());
+  BOOST_CHECK_EQUAL((*it_found).first, 10);
+  BOOST_CHECK_EQUAL((*it_found).second, "ten");
+
+  auto it_not_found = tree.find(67);
+  BOOST_CHECK(it_not_found == tree.end());
+
+  const vasyakin::AVLTree< int, std::string >& const_ref = tree;
+
+  auto const_it_found = const_ref.find(10);
+  BOOST_REQUIRE(const_it_found != const_ref.cend());
+  BOOST_CHECK_EQUAL((*const_it_found).first, 10);
+  BOOST_CHECK_EQUAL((*const_it_found).second, "ten");
+
+  auto const_it_not_found = const_ref.find(50);
+  BOOST_CHECK(const_it_not_found == const_ref.cend());
+}
+
+BOOST_AUTO_TEST_CASE(at_method_throws_on_invalid_key)
+{
+  vasyakin::AVLTree< int, std::string > tree;
+  tree.insert(10, "ten");
+
+  BOOST_CHECK_NO_THROW(tree.at(10));
+  BOOST_CHECK_THROW(tree.at(999), std::out_of_range);
+
+  const vasyakin::AVLTree< int, std::string > const_tree = tree;
+
+  BOOST_CHECK_NO_THROW(const_tree.at(10));
+  BOOST_CHECK_THROW(const_tree.at(0), std::out_of_range);
+}
+
+BOOST_AUTO_TEST_CASE(iterator_increment_decrement)
+{
+  vasyakin::AVLTree< int, int > tree;
+
+  tree.insert(10, 10);
+  tree.insert(20, 20);
+  tree.insert(30, 30);
+
+  auto it = tree.begin();
+  BOOST_CHECK_EQUAL((*it).first, 10);
+
+  ++it;
+  BOOST_CHECK_EQUAL((*it).first, 20);
+
+  ++it;
+  BOOST_CHECK_EQUAL((*it).first, 30);
+
+  --it;
+  BOOST_CHECK_EQUAL((*it).first, 20);
+
+  --it;
+  BOOST_CHECK_EQUAL((*it).first, 10);
+}
