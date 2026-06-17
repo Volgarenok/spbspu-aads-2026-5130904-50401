@@ -138,18 +138,14 @@ chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::CuckooHT(size_t slots):
   hasher2_(Hash2{}),
   equal_(Equal{})
 {
-  if (slots > 0)
-  {
+  if (slots > 0) {
     capacity_ = (slots + 1) / 2;
     table1_ = static_cast< Slot * >(::operator new (sizeof(Slot) * capacity_));
     table2_ = static_cast< Slot * >(::operator new (sizeof(Slot) * capacity_));
     occupied1_ = new bool[capacity_]{false};
-    try
-    {
+    try {
       occupied2_ = new bool[capacity_]{false};
-    }
-    catch (...)
-    {
+    } catch (...) {
       ::operator delete (table1_);
       ::operator delete (table2_);
       delete [] occupied1_;
@@ -170,17 +166,13 @@ chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::CuckooHT(size_t capacity, 
   hasher2_(Hash2{}),
   equal_(Equal{})
 {
-  if (capacity_ > 0)
-  {
+  if (capacity_ > 0) {
     table1_ = static_cast< Slot * >(::operator new (sizeof(Slot) * capacity_));
     table2_ = static_cast< Slot * >(::operator new (sizeof(Slot) * capacity_));
     occupied1_ = new bool[capacity_]{false};
-    try
-    {
+    try {
       occupied2_ = new bool[capacity_]{false};
-    }
-    catch (...)
-    {
+    } catch (...) {
       ::operator delete (table1_);
       ::operator delete (table2_);
       delete [] occupied1_;
@@ -197,34 +189,25 @@ chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::CuckooHT(const CuckooHT & 
   hasher2_ = ht.hasher2_;
   equal_ = ht.equal_;
 
-  try
-  {
-    for (size_t i = 0; i < capacity_; ++i)
-    {
-      if (ht.occupied1_[i])
-      {
+  try {
+    for (size_t i = 0; i < capacity_; ++i) {
+      if (ht.occupied1_[i]) {
         new (table1_ + i) Slot(ht.table1_[i]);
         occupied1_[i] = true;
         ++count_;
       }
-      if (ht.occupied2_[i])
-      {
+      if (ht.occupied2_[i]) {
         new (table2_ + i) Slot(ht.table2_[i]);
         occupied2_[i] = true;
         ++count_;
       }
     }
-  }
-  catch (...)
-  {
-    for (size_t i = 0; i < capacity_; ++i)
-    {
-      if (occupied1_[i])
-      {
+  } catch (...) {
+    for (size_t i = 0; i < capacity_; ++i) {
+      if (occupied1_[i]) {
         table1_[i].~Slot();
       }
-      if (occupied2_[i])
-      {
+      if (occupied2_[i]) {
         table2_[i].~Slot();
       }
     }
@@ -270,8 +253,7 @@ template< class Key, class Value, class Hash1, class Hash2, class Equal >
 chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal > &
 chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::operator=(const CuckooHT & ht)
 {
-  if (this == std::addressof(ht))
-  {
+  if (this == std::addressof(ht)) {
     return *this;
   }
   CuckooHT< Key, Value, Hash1, Hash2, Equal > new_ht(ht);
@@ -283,8 +265,7 @@ template< class Key, class Value, class Hash1, class Hash2, class Equal >
 chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal > &
 chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::operator=(CuckooHT && ht) noexcept
 {
-  if (this == std::addressof(ht))
-  {
+  if (this == std::addressof(ht)) {
     return *this;
   }
   CuckooHT< Key, Value, Hash1, Hash2, Equal > new_ht(std::move(ht));
@@ -327,15 +308,12 @@ size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::maxCapacity() const
 template< class Key, class Value, class Hash1, class Hash2, class Equal >
 void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::clear() noexcept
 {
-  for (size_t i = 0; i < capacity_; ++i)
-  {
-    if (occupied1_[i])
-    {
+  for (size_t i = 0; i < capacity_; ++i) {
+    if (occupied1_[i]) {
       table1_[i].~Slot();
       occupied1_[i] = false;
     }
-    if (occupied2_[i])
-    {
+    if (occupied2_[i]) {
       table2_[i].~Slot();
       occupied2_[i] = false;
     }
@@ -348,12 +326,9 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::add(Key k, Value v)
 {
   CuckooHT new_ht(*this);
   Slot * existing = new_ht.findKey(k);
-  if (existing != nullptr)
-  {
+  if (existing != nullptr) {
     existing->second = v;
-  }
-  else
-  {
+  } else {
     new_ht.insertWithEviction(std::move(k), std::move(v));
   }
   swap(new_ht);
@@ -364,19 +339,15 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::remove(Key k)
 {
   CuckooHT new_ht(*this);
   Slot * slot = new_ht.findKey(k);
-  if (slot == nullptr)
-  {
+  if (slot == nullptr) {
     throw std::out_of_range("Element not found");
   }
   size_t index;
-  if (slot >= new_ht.table1_ && slot < new_ht.table1_ + new_ht.capacity_)
-  {
+  if (slot >= new_ht.table1_ && slot < new_ht.table1_ + new_ht.capacity_) {
     index = slot - new_ht.table1_;
     slot->~Slot();
     new_ht.occupied1_[index] = false;
-  }
-  else
-  {
+  } else {
     index = slot - new_ht.table2_;
     slot->~Slot();
     new_ht.occupied2_[index] = false;
@@ -408,8 +379,7 @@ template< class Key, class Value, class Hash1, class Hash2, class Equal >
 const Value & chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::at(const Key & k) const
 {
   const Slot * slot = findKey(k);
-  if (slot == nullptr)
-  {
+  if (slot == nullptr) {
     throw std::out_of_range("Element not found");
   }
   return slot->second;
@@ -418,8 +388,7 @@ const Value & chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::at(const Key
 template< class Key, class Value, class Hash1, class Hash2, class Equal >
 size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::hash1(const Key & k) const noexcept
 {
-  if (capacity_ == 0)
-  {
+  if (capacity_ == 0) {
     return 0;
   }
   return hasher1_(k) % capacity_;
@@ -428,8 +397,7 @@ size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::hash1(const Key & k
 template< class Key, class Value, class Hash1, class Hash2, class Equal >
 size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::hash2(const Key & k) const noexcept
 {
-  if (capacity_ == 0)
-  {
+  if (capacity_ == 0) {
     return 0;
   }
   return hasher2_(k) % capacity_;
@@ -439,20 +407,17 @@ template< class Key, class Value, class Hash1, class Hash2, class Equal >
 const typename chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::Slot *
 chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::findKey(const Key & k) const
 {
-  if (capacity_ == 0)
-  {
+  if (capacity_ == 0) {
     return nullptr;
   }
 
   size_t h1 = hash1(k);
-  if (occupied1_[h1] && equal_(k, table1_[h1].first))
-  {
+  if (occupied1_[h1] && equal_(k, table1_[h1].first)) {
     return &table1_[h1];
   }
 
   size_t h2 = hash2(k);
-  if (occupied2_[h2] && equal_(k, table2_[h2].first))
-  {
+  if (occupied2_[h2] && equal_(k, table2_[h2].first)) {
     return &table2_[h2];
   }
 
@@ -471,11 +436,9 @@ template< class Key, class Value, class Hash1, class Hash2, class Equal >
 void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::insertWithEviction(Key k, Value v)
 {
   const size_t maxIterations = capacity_ * 4 + 1;
-  for (size_t iter = 0; iter < maxIterations; ++iter)
-  {
+  for (size_t iter = 0; iter < maxIterations; ++iter) {
     size_t h1 = hash1(k);
-    if (!occupied1_[h1])
-    {
+    if (!occupied1_[h1]) {
       new (table1_ + h1) Slot(std::move(k), std::move(v));
       occupied1_[h1] = true;
       ++count_;
@@ -488,8 +451,7 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::insertWithEviction(Ke
     v = std::move(old.second);
 
     size_t h2 = hash2(k);
-    if (!occupied2_[h2])
-    {
+    if (!occupied2_[h2]) {
       new (table2_ + h2) Slot(std::move(k), std::move(v));
       occupied2_[h2] = true;
       ++count_;
@@ -513,14 +475,11 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::rehashInternal(size_t
   new_ht.hasher1_ = hasher1_;
   new_ht.hasher2_ = hasher2_;
   new_ht.equal_ = equal_;
-  for (size_t i = 0; i < capacity_; ++i)
-  {
-    if (occupied1_[i])
-    {
+  for (size_t i = 0; i < capacity_; ++i) {
+    if (occupied1_[i]) {
       new_ht.insertWithEviction(table1_[i].first, table1_[i].second);
     }
-    if (occupied2_[i])
-    {
+    if (occupied2_[i]) {
       new_ht.insertWithEviction(table2_[i].first, table2_[i].second);
     }
   }
@@ -544,12 +503,9 @@ template< class Key, class Value, class Hash1, class Hash2, class Equal, bool Is
 typename chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::reference
 chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::operator*() const
 {
-  if (index_ < ht_->capacity_)
-  {
+  if (index_ < ht_->capacity_) {
     return ht_->table1_[index_];
-  }
-  else
-  {
+  } else {
     return ht_->table2_[index_ - ht_->capacity_];
   }
 }
@@ -558,12 +514,9 @@ template< class Key, class Value, class Hash1, class Hash2, class Equal, bool Is
 typename chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::pointer
 chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::operator->() const
 {
-  if (index_ < ht_->capacity_)
-  {
+  if (index_ < ht_->capacity_) {
     return &ht_->table1_[index_];
-  }
-  else
-  {
+  } else {
     return &ht_->table2_[index_ - ht_->capacity_];
   }
 }
@@ -574,19 +527,13 @@ chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::operator++()
 {
   size_t endIdx = 2 * ht_->capacity_;
   ++index_;
-  while (index_ < endIdx)
-  {
-    if (index_ < ht_->capacity_)
-    {
-      if (ht_->occupied1_[index_])
-      {
+  while (index_ < endIdx) {
+    if (index_ < ht_->capacity_) {
+      if (ht_->occupied1_[index_]) {
         break;
       }
-    }
-    else
-    {
-      if (ht_->occupied2_[index_ - ht_->capacity_])
-      {
+    } else {
+      if (ht_->occupied2_[index_ - ht_->capacity_]) {
         break;
       }
     }
