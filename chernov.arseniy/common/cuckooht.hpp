@@ -527,4 +527,97 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::rehashInternal(size_t
   swap(new_ht);
 }
 
+template< class Key, class Value, class Hash1, class Hash2, class Equal, bool IsConst >
+chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::CuckooHTIter() :
+  ht_(nullptr),
+  index_(0)
+{}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal, bool IsConst >
+chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::
+CuckooHTIter(const CuckooHT< Key, Value, Hash1, Hash2, Equal > * ht, size_t index) :
+  ht_(ht),
+  index_(index)
+{}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal, bool IsConst >
+typename chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::reference
+chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::operator*() const
+{
+  if (index_ < ht_->capacity_)
+  {
+    return ht_->table1_[index_];
+  }
+  else
+  {
+    return ht_->table2_[index_ - ht_->capacity_];
+  }
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal, bool IsConst >
+typename chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::pointer
+chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::operator->() const
+{
+  if (index_ < ht_->capacity_)
+  {
+    return &ht_->table1_[index_];
+  }
+  else
+  {
+    return &ht_->table2_[index_ - ht_->capacity_];
+  }
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal, bool IsConst >
+chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst > &
+chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::operator++()
+{
+  size_t endIdx = 2 * ht_->capacity_;
+  ++index_;
+  while (index_ < endIdx)
+  {
+    if (index_ < ht_->capacity_)
+    {
+      if (ht_->occupied1_[index_])
+      {
+        break;
+      }
+    }
+    else
+    {
+      if (ht_->occupied2_[index_ - ht_->capacity_])
+      {
+        break;
+      }
+    }
+    ++index_;
+  }
+  return *this;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal, bool IsConst >
+chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >
+chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::operator++(int)
+{
+  CuckooHTIter old = *this;
+  ++(*this);
+  return old;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal, bool IsConst >
+template< bool OtherConst >
+bool chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::
+operator==(const CuckooHTIter< Key, Value, Hash1, Hash2, Equal, OtherConst > & other) const noexcept
+{
+  return ht_ == other.ht_ && index_ == other.index_;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal, bool IsConst >
+template< bool OtherConst >
+bool chernov::CuckooHTIter< Key, Value, Hash1, Hash2, Equal, IsConst >::
+operator!=(const CuckooHTIter< Key, Value, Hash1, Hash2, Equal, OtherConst > & other) const noexcept
+{
+  return !(*this == other);
+}
+
 #endif
