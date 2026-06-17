@@ -658,3 +658,188 @@ void vasyakin::cmdHelp(
   out << "> save <filename>" << '\n';
   out << "> load <filename>" << '\n';
 }
+
+void vasyakin::cmdSave(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  std::string filename;
+  if (!(in >> filename))
+  {
+    throw std::runtime_error("Invalid save args");
+  }
+
+  std::ofstream file(filename);
+  if (!file.is_open())
+  {
+    out << "<ERROR: Cannot save file>" << '\n';
+    return;
+  }
+
+  file << "# Привет, держи отчёт о проделанной работе!" << '\n';
+
+  file << "META " << state.op_counter_ << ' ' << state.transfer_counter_ << ' '
+    << state.current_date_.toString() << '\n';
+
+  for (auto cit = state.warehouses_.cbegin(); cit != state.warehouses_.cend(); ++cit)
+  {
+    const std::string& wh_name = (*cit).first;
+    const auto& wh = (*cit).second;
+
+    file << "WH " << wh_name << ' ' << wh.capacity_ << ' '
+      << wh.days_to_center_ << ' ' << wh.used_capacity_ << ' '
+      << wh.items_sent_ << ' ' << wh.items_received_ << ' '
+      << wh.total_value_ << '\n';
+
+    for (auto ccit = wh.items_.cbegin(); ccit != wh.items_.cend(); ++ccit)
+    {
+      const auto& item = (*ccit).second;
+
+      file << "IT " << wh_name << ' ' 
+        << escapeSpaces(item.getModel()) << ' ' 
+        << escapeSpaces(item.getColor()) << ' ' 
+        << item.getSize() << ' ' 
+        << item.getCount() << ' ' 
+        << item.getPrice() << '\n';
+    }
+  }
+
+  for (auto cit = state.transfers_.cbegin(); cit != state.transfers_.cend(); ++cit)
+  {
+    const auto& tr = (*cit).second;
+
+    file << "TR " << tr.id_ << ' ' 
+      << escapeSpaces(tr.from_) << ' ' 
+      << escapeSpaces(tr.to_) << ' '
+      << escapeSpaces(tr.item_key_) << ' ' 
+      << tr.count_ << ' ' << tr.price_ << ' '
+      << tr.departure_.toString() << ' ' 
+      << tr.arrival_.toString() << ' '
+      << (tr.active_ ? 1 : 0) << '\n';
+  }
+
+  for (auto cit = state.log_.cbegin(); cit != state.log_.cend(); ++cit)
+  {
+    const auto& log = (*cit).second;
+
+    file << "LOG " << log.id_ << ' '
+      << log.date_.toString() << ' ' << log.details_ << '\n';
+  }
+
+  file << "END" << '\n';
+  out << "<DATA SAVED TO: " << filename << ">" << '\n';
+}
+
+void vasyakin::cmdLoad(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  std::string filename;
+  if (!(in >> filename))
+  {
+    throw std::runtime_error("Invalid load args");
+  }
+
+  std::ifstream file(filename);
+  if (!file.is_open())
+  {
+    out << "<ERROR: FILE NOT FOUND>" << '\n';
+    return;
+  }
+
+  state = SystemState();
+
+  std::string token;
+  while (file >> token)
+  {
+    if (token == "#")
+    {
+      std::string dummy;
+      std::getline(file, dummy);
+      continue;
+    }
+
+    if (token == "META")
+    {
+      size_t op_cnt = 0;
+      size_t tr_cnt = 0;
+      std::string date_str;
+
+      file >> op_cnt >> tr_cnt >> date_str;
+
+      state.op_counter_ = op_cnt;
+      state.transfer_counter_ = tr_cnt;
+      state.current_date_ = Date::fromString(date_str);
+    }
+    else if (token == "WH")
+    {
+      std::string name;
+      size_t cap = 0, days = 0, used = 0, sent = 0, recv = 0, val = 0;
+
+      file >> name >> cap >> days >> used >> sent >> recv >> val;
+
+      state.warehouses_.insert(name, WarehouseState(name, cap, days));
+      auto& wh = state.warehouses_.at(name);
+
+      wh.used_capacity_ = used;
+      wh.items_sent_ = sent;
+      wh.items_received_ = recv;
+      wh.total_value_ = val;
+    }
+    else if (token == "IT")
+    {
+      std::string wh_name, model_raw, color_raw;
+      size_t size = 0, count = 0, price = 0;
+
+      file >> wh_name >> model_raw >> color_raw >> size >> count >> price;
+
+      if (state.warehouses_.has(wh_name))
+      {
+        std::string model = unescapeSpaces(model_raw);
+        std::string color = unescapeSpaces(color_raw);
+
+        state.warehouses_.at(wh_name).items_.insert(
+          model + "|" + color + "|" + std::to_string(size),
+          Item(model, color, size, count, price));
+      }
+    }
+    else if (token == "TR")
+    {
+      size_t id = 0, count = 0, price = 0, active_flag = 0;
+      std::string from_raw, to_raw, key_raw, dep_str, arr_str;
+
+      file >> id >> from_raw >> to_raw >> key_raw >> count >> price >> dep_str >> arr_str >> active_flag;
+
+      std::string from = unescapeSpaces(from_raw);
+      std::string to = unescapeSpaces(to_raw);
+      std::string key = unescapeSpaces(key_raw);
+
+      state.transfers_.insert(id, Transfer{
+        id, from, to, key, count, price,
+        Date::fromString(dep_str),
+        Date::fromString(arr_str),
+        (active_flag == 1)});
+    }
+    else if (token == "LOG")
+    {
+      size_t id = 0;
+      std::string date_str, details;
+
+      file >> id >> date_str;
+      file.ignore(std::numeric_limits< std::streamsize >::max(), ' ');
+      std::getline(file, details);
+
+      if (!details.empty() && details.back() == '\r')
+      {
+        details.pop_back();
+      }
+
+      state.log_.insert(id, LogEntry{id, Date::fromString(date_str), details});
+    }
+    else if (token == "END")
+    {
+      break;
+    }
+  }
+
+  state.completeTransfers();
+  out << "<DATA LOADED FROM: " << filename << ">" << '\n';
+}
