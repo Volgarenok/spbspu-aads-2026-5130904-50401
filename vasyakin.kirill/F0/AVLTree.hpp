@@ -342,6 +342,44 @@ namespace vasyakin
   {
     return const_cast< AVLTree* >(this)->upper_bound(key);
   }
+
+  template< class Key, class Value, class Compare >
+  std::pair< typename AVLTree< Key, Value, Compare >::iterator,
+    typename AVLTree< Key, Value, Compare >::iterator >
+    AVLTree< Key, Value, Compare >::equal_range(const Key& key) noexcept
+  {
+    return {lower_bound(key), upper_bound(key)};
+  }
+
+  template< class Key, class Value, class Compare >
+  std::pair< typename AVLTree< Key, Value, Compare >::const_iterator,
+    typename AVLTree< Key, Value, Compare >::const_iterator >
+    AVLTree< Key, Value, Compare >::equal_range(const Key& key) const noexcept
+  {
+    return {lower_bound(key), upper_bound(key)};
+  }
+
+  template< class Key, class Value, class Compare >
+  int AVLTree< Key, Value, Compare >::getHeight(const Node* node) const noexcept
+  {
+    return node ? node->height_ : 0;
+  }
+
+  template< class Key, class Value, class Compare >
+  int AVLTree< Key, Value, Compare >::getBalance(const Node* node) const noexcept
+  {
+    return node ? getHeight(node->left_) - getHeight(node->right_) : 0;
+  }
+
+  template< class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::updateHeight(Node* node) noexcept
+  {
+    if (node)
+    {
+      node->height_ = 1 +
+        std::max(getHeight(node->left_), getHeight(node->right_));
+    }
+  }
 }
 
 #endif
