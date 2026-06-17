@@ -132,6 +132,64 @@ namespace vasyakin
     swap(other);
     return *this;
   }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::Node*
+  AVLTree< Key, Value, Compare >::cloneNode(const Node* src, Node* parent) const
+  {
+    if (src == nullptr)
+    {
+      return nullptr;
+    }
+
+    Node* new_node = new Node(src->key_, src->value_);
+
+    try
+    {
+      new_node->parent_ = parent;
+      new_node->height_ = src->height_;
+      new_node->left_ = cloneNode(src->left_, new_node);
+      new_node->right_ = cloneNode(src->right_, new_node);
+    }
+    catch (...)
+    {
+      destroyTree(new_node->left_);
+      destroyTree(new_node->right_);
+      delete new_node;
+      throw;
+    }
+
+    return new_node;
+  }
+
+  template< class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::swap(AVLTree& other) noexcept
+  {
+    std::swap(other.root_, root_);
+    std::swap(other.size_, size_);
+    std::swap(other.cmp_, cmp_);
+  }
+
+  template< class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::clear() noexcept
+  {
+    destroyTree(root_);
+    root_ = nullptr;
+    size_ = 0;
+  }
+
+  template< class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::destroyTree(Node* node) noexcept
+  {
+    if (!node)
+    {
+      return;
+    }
+
+    destroyTree(node->left_);
+    destroyTree(node->right_);
+    delete node;
+  }
 }
 
 #endif
