@@ -27,7 +27,7 @@ namespace sedov
     HashIter & operator++();
     bool operator==(const HashIter & other) const;
     bool operator!=(const HashIter & other) const;
-    valType & operator*() const;
+    valType & operator*();
 
   private:
     sedov::Vector< sedov::List< valType > > * data_;
@@ -144,7 +144,7 @@ bool sedov::HashIter< Key, Value, Hash, Equal >::operator!=(const HashIter & oth
 
 template < class Key, class Value, class Hash, class Equal >
 typename sedov::HashIter< Key, Value, Hash, Equal >::valType &
-sedov::HashIter< Key, Value, Hash, Equal >::operator*() const
+sedov::HashIter< Key, Value, Hash, Equal >::operator*()
 {
   return *listIt_;
 }

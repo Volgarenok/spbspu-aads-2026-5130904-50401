@@ -34,7 +34,9 @@ namespace sedov
   class LIter
   {
   public:
-    T & operator*() noexcept;
+    explicit LIter(detail::Node< T > * p = nullptr) noexcept;
+
+    T & operator*() const noexcept;
     T * operator->() noexcept;
 
     LIter & operator++() noexcept;
@@ -47,13 +49,14 @@ namespace sedov
   private:
     friend class List< T >;
     detail::Node< T > * ptr_;
-    explicit LIter(detail::Node< T > * p = nullptr) noexcept;
   };
 
   template< class T >
   class LCIter
   {
   public:
+    LCIter(const detail::Node< T > * p = nullptr) noexcept;
+
     const T & operator*() const noexcept;
     const T * operator->() const noexcept;
 
@@ -67,7 +70,6 @@ namespace sedov
   private:
     friend class List< T >;
     const detail::Node< T > * ptr_;
-    LCIter(const detail::Node< T > * p = nullptr) noexcept;
   };
 
   template< class T >
@@ -172,7 +174,7 @@ namespace sedov
   {}
 
   template< class T >
-  T & LIter< T >::operator*() noexcept
+  T & LIter< T >::operator*() const noexcept
   {
     return ptr_->val;
   }
