@@ -82,6 +82,35 @@ namespace chernov {
     size_t endIndex() const noexcept;
   };
 
+  template< class Key, class Value, class Hash1, class Hash2, class Equal, bool IsConst >
+  class CuckooHTIter {
+  public:
+    using pair_type = std::pair< const Key, Value >;
+    using reference = typename std::conditional< IsConst, const pair_type &, pair_type & >::type;
+    using pointer = typename std::conditional< IsConst, const pair_type *, pair_type * >::type;
+
+    CuckooHTIter();
+    CuckooHTIter(const CuckooHT< Key, Value, Hash1, Hash2, Equal > * ht, size_t index);
+
+    reference operator*() const;
+    pointer operator->() const;
+
+    CuckooHTIter & operator++();
+    CuckooHTIter operator++(int);
+
+    template< bool OtherConst >
+    bool operator==(const CuckooHTIter< Key, Value, Hash1, Hash2, Equal, OtherConst > & other) const noexcept;
+
+    template< bool OtherConst >
+    bool operator!=(const CuckooHTIter< Key, Value, Hash1, Hash2, Equal, OtherConst > & other) const noexcept;
+
+  private:
+    const CuckooHT< Key, Value, Hash1, Hash2, Equal > * ht_;
+    size_t index_;
+
+    template< class K, class V, class H1, class H2, class E, bool C >
+    friend class CuckooHTIter;
+  };
 }
 
 template< class Key, class Value, class Hash1, class Hash2, class Equal >
