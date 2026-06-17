@@ -462,3 +462,116 @@ BOOST_AUTO_TEST_CASE(rotations_maintain_balance_under_load)
     BOOST_CHECK(tree.has(i));
   }
 }
+
+BOOST_AUTO_TEST_CASE(lower_bound)
+{
+  vasyakin::AVLTree< int, std::string > tree;
+
+  tree.insert(10, "ten");
+  tree.insert(20, "twenty");
+  tree.insert(30, "thirty");
+  tree.insert(40, "forty");
+  tree.insert(50, "fifty");
+
+  auto lb1 = tree.lower_bound(20);
+  BOOST_REQUIRE(lb1 != tree.end());
+  BOOST_CHECK_EQUAL((*lb1).first, 20);
+  BOOST_CHECK_EQUAL((*lb1).second, "twenty");
+
+  auto lb2 = tree.lower_bound(25);
+  BOOST_REQUIRE(lb2 != tree.end());
+  BOOST_CHECK_EQUAL((*lb2).first, 30);
+  BOOST_CHECK_EQUAL((*lb2).second, "thirty");
+
+  auto lb3 = tree.lower_bound(5);
+  BOOST_REQUIRE(lb3 != tree.end());
+  BOOST_CHECK_EQUAL((*lb3).first, 10);
+  BOOST_CHECK_EQUAL((*lb3).second, "ten");
+
+  auto lb4 = tree.lower_bound(50);
+  BOOST_REQUIRE(lb4 != tree.end());
+  BOOST_CHECK_EQUAL((*lb4).first, 50);
+  BOOST_CHECK_EQUAL((*lb4).second, "fifty");
+
+  BOOST_CHECK(tree.lower_bound(52) == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(upper_bound)
+{
+  vasyakin::AVLTree< int, std::string > tree;
+
+  tree.insert(10, "ten");
+  tree.insert(20, "twenty");
+  tree.insert(30, "thirty");
+  tree.insert(40, "forty");
+  tree.insert(50, "fifty");
+
+  auto ub1 = tree.upper_bound(10);
+  BOOST_REQUIRE(ub1 != tree.end());
+  BOOST_CHECK_EQUAL((*ub1).first, 20);
+  BOOST_CHECK_EQUAL((*ub1).second, "twenty");
+
+  auto ub2 = tree.upper_bound(15);
+  BOOST_REQUIRE(ub2 != tree.end());
+  BOOST_CHECK_EQUAL((*ub2).first, 20);
+  BOOST_CHECK_EQUAL((*ub2).second, "twenty");
+
+  auto ub3 = tree.upper_bound(5);
+  BOOST_REQUIRE(ub3 != tree.end());
+  BOOST_CHECK_EQUAL((*ub3).first, 10);
+  BOOST_CHECK_EQUAL((*ub3).second, "ten");
+
+  BOOST_CHECK(tree.upper_bound(50) == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(equal_range)
+{
+  vasyakin::AVLTree< int, int > tree;
+
+  for (size_t i = 1; i <= 10; ++i)
+  {
+    tree.insert(i * 10, i);
+  }
+
+  for (size_t key = 0; key <= 110; key += 5)
+  {
+    auto range = tree.equal_range(key);
+    auto lb = tree.lower_bound(key);
+    auto ub = tree.upper_bound(key);
+
+    BOOST_CHECK(range.first == lb);
+    BOOST_CHECK(range.second == ub);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(bounds_empty_tree)
+{
+  vasyakin::AVLTree< int, int > tree;
+  
+  BOOST_CHECK(tree.lower_bound(42) == tree.end());
+  BOOST_CHECK(tree.upper_bound(42) == tree.end());
+  
+  auto range = tree.equal_range(42);
+  BOOST_CHECK(range.first == tree.end());
+  BOOST_CHECK(range.second == tree.end());
+}
+
+BOOST_AUTO_TEST_CASE(bounds_single_element)
+{
+  vasyakin::AVLTree< int, int > tree;
+  tree.insert(100, 1);
+  
+  auto lb = tree.lower_bound(100);
+  BOOST_REQUIRE(lb != tree.end());
+  BOOST_CHECK_EQUAL((*lb).first, 100);
+  
+  auto ub = tree.upper_bound(100);
+  BOOST_CHECK(ub == tree.end());
+  
+  auto range = tree.equal_range(100);
+  BOOST_REQUIRE(range.first != tree.end());
+  BOOST_CHECK_EQUAL((*range.first).first, 100);
+  BOOST_CHECK(range.second == tree.end());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
