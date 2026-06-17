@@ -478,35 +478,41 @@ template< class Key, class Value, class Hash1, class Hash2, class Equal >
 void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::insertWithEviction(Key k, Value v)
 {
   const size_t maxIterations = capacity_ * 4 + 1;
-  for (size_t iter = 0; iter < maxIterations; ++iter) {
-    size_t h1 = hash1(k);
-    if (!occupied1_[h1]) {
-      new (table1_ + h1) Slot(std::move(k), std::move(v));
+  std::pair< Key, Value > current(std::move(k), std::move(v));
+
+  for (size_t iter = 0; iter < maxIterations; ++iter)
+  {
+    size_t h1 = hash1(current.first);
+    if (!occupied1_[h1])
+    {
+      new (table1_ + h1) Slot(std::move(current.first), std::move(current.second));
       occupied1_[h1] = true;
       ++count_;
       return;
     }
-    Slot old = std::move(table1_[h1]);
-    table1_[h1].~Slot();
-    new (table1_ + h1) Slot(std::move(k), std::move(v));
-    k = std::move(old.first);
-    v = std::move(old.second);
+    Slot & oldSlot = table1_[h1];
+    std::pair< Key, Value > evicted(std::move(oldSlot.first), std::move(oldSlot.second));
+    oldSlot.~Slot();
+    new (table1_ + h1) Slot(std::move(current.first), std::move(current.second));
+    current = std::move(evicted);
 
-    size_t h2 = hash2(k);
-    if (!occupied2_[h2]) {
-      new (table2_ + h2) Slot(std::move(k), std::move(v));
+    size_t h2 = hash2(current.first);
+    if (!occupied2_[h2])
+    {
+      new (table2_ + h2) Slot(std::move(current.first), std::move(current.second));
       occupied2_[h2] = true;
       ++count_;
       return;
     }
-    old = std::move(table2_[h2]);
-    table2_[h2].~Slot();
-    new (table2_ + h2) Slot(std::move(k), std::move(v));
-    k = std::move(old.first);
-    v = std::move(old.second);
+    Slot & oldSlot2 = table2_[h2];
+    std::pair< Key, Value > evicted2(std::move(oldSlot2.first), std::move(oldSlot2.second));
+    oldSlot2.~Slot();
+    new (table2_ + h2) Slot(std::move(current.first), std::move(current.second));
+    current = std::move(evicted2);
   }
+
   rehashInternal(2 * capacity_ + 1);
-  insertWithEviction(std::move(k), std::move(v));
+  insertWithEviction(std::move(current.first), std::move(current.second));
 }
 
 template< class Key, class Value, class Hash1, class Hash2, class Equal >
