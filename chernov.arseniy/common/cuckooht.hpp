@@ -59,12 +59,16 @@ namespace chernov {
   private:
     Slot * table1_;
     Slot * table2_;
+    bool * occupied1_;
+    bool * occupied2_;
     size_t capacity_;
     size_t count_;
 
     Hash1 hasher1_;
     Hash2 hasher2_;
     Equal equal_;
+
+    CuckooHT(size_t capacity, int);
 
     size_t hash1(const Key & k) const noexcept;
     size_t hash2(const Key & k) const noexcept;
