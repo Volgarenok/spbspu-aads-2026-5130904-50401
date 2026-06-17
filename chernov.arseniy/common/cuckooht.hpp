@@ -73,7 +73,7 @@ namespace chernov {
     size_t hash1(const Key & k) const noexcept;
     size_t hash2(const Key & k) const noexcept;
 
-    std::pair< Slot *, int > findKey(const Key & k) const;
+    const Slot * findKey(const Key & k) const;
     void insertWithEviction(Key k, Value v);
     void rehashInternal(size_t newSlots);
 
@@ -314,6 +314,24 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::clear() noexcept
 }
 
 template< class Key, class Value, class Hash1, class Hash2, class Equal >
+Value & chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::at(const Key & k)
+{
+  const CuckooHT * cthis = this;
+  return const_cast< Value & >(cthis->at(k));
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+const Value & chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::at(const Key & k) const
+{
+  const Slot * slot = findKey(k);
+  if (slot == nullptr)
+  {
+    throw std::out_of_range("Element not found");
+  }
+  return slot->second;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
 size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::hash1(const Key & k) const noexcept
 {
   if (capacity_ == 0)
@@ -331,6 +349,30 @@ size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::hash2(const Key & k
     return 0;
   }
   return hasher2_(k) % capacity_;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+const typename chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::Slot *
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::findKey(const Key & k) const
+{
+  if (capacity_ == 0)
+  {
+    return nullptr;
+  }
+
+  size_t h1 = hash1(k);
+  if (occupied1_[h1] && equal_(k, table1_[h1].first))
+  {
+    return &table1_[h1];
+  }
+
+  size_t h2 = hash2(k);
+  if (occupied2_[h2] && equal_(k, table2_[h2].first))
+  {
+    return &table2_[h2];
+  }
+
+  return nullptr;
 }
 
 #endif
