@@ -276,4 +276,43 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::swap(CuckooHT & ht) n
   std::swap(equal_, ht.equal_);
 }
 
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::clear() noexcept
+{
+  for (size_t i = 0; i < capacity_; ++i)
+  {
+    if (occupied1_[i])
+    {
+      table1_[i].~Slot();
+      occupied1_[i] = false;
+    }
+    if (occupied2_[i])
+    {
+      table2_[i].~Slot();
+      occupied2_[i] = false;
+    }
+  }
+  count_ = 0;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::hash1(const Key & k) const noexcept
+{
+  if (capacity_ == 0)
+  {
+    return 0;
+  }
+  return hasher1_(k) % capacity_;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::hash2(const Key & k) const noexcept
+{
+  if (capacity_ == 0)
+  {
+    return 0;
+  }
+  return hasher2_(k) % capacity_;
+}
+
 #endif
