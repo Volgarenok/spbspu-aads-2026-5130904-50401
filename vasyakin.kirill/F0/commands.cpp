@@ -296,3 +296,126 @@ void vasyakin::cmdShip(
   state.log_.insert(state.op_counter_,
     LogEntry{state.op_counter_, state.current_date_, details});
 }
+
+void vasyakin::cmdShowWarehouse(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  state.completeTransfers();
+
+  std::string name;
+  if (!(in >> name))
+  {
+    throw std::runtime_error("Invalid show-warehouse args");
+  }
+
+  const vasyakin::Date date = readDate(in);
+  state.current_date_ = date;
+
+  if (!state.warehouses_.has(name))
+  {
+    out << "<ERROR: WAREHOUSE NOT FOUND>" << '\n';
+    return;
+  }
+
+  out << "<WAREHOUSE: " << name << " (Date: " << date.toString() << ")>" << '\n';
+
+  const auto& wh = state.warehouses_.at(name);
+  size_t total_items = 0;
+
+  for (auto cit = wh.items_.cbegin(); cit != wh.items_.cend(); ++cit)
+  {
+    out << "> " << (*cit).second.toString() << '\n';
+    total_items += (*cit).second.getCount();
+  }
+
+  out << "TOTAL: " << total_items << " pcs | USED CAPACITY: "
+    << wh.used_capacity_ << "/" << wh.capacity_ << '\n';
+}
+
+void vasyakin::cmdShowTransfers(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  state.completeTransfers();
+
+  const vasyakin::Date date = readDate(in);
+  state.current_date_ = date;
+
+  out << "<ACTIVE TRANSFERS (Date: " <<
+    state.current_date_.toString() << ")>" <<'\n';
+
+  size_t active_trans = 0;
+
+  for (auto cit = state.transfers_.cbegin(); cit != state.transfers_.cend(); ++cit)
+  {
+    const auto& tr = (*cit).second;
+
+    if (tr.active_ && tr.departure_ <= date && tr.arrival_ > date)
+    {
+      out << "> #" << tr.id_ << ": " << tr.from_ << " -> " << tr.to_
+        << " | " << tr.item_key_.substr(0, tr.item_key_.find('|'))
+        << " | " << tr.count_ << " pcs | Status: In Transit" << '\n';
+
+      ++active_trans;
+    }
+  }
+
+  out << "TOTAL ACTIVE: " << active_trans << '\n';
+}
+
+void vasyakin::cmdShowItem(
+  std::istream& in, std::ostream& out, SystemState& state)
+{
+  std::string model, color;
+  size_t size = 0;
+
+  model = readQuotedToken(in);
+  color = readQuotedToken(in);
+
+  if (!(in >> size) || size == 0)
+  {
+    throw std::runtime_error("Invalid show-item args");
+  }
+
+  std::string search_log = model + " " + color + " " + std::to_string(size);
+  std::string key_items = model + "|" + color + "|" + std::to_string(size);
+
+  out << "<ITEM HISTORY: " << model << " " << color << " " << size << ">" << '\n';
+
+  for (auto cit = state.log_.cbegin(); cit != state.log_.cend(); ++cit)
+  {
+    const auto& log = (*cit).second;
+
+    if (log.details_.find(search_log) != std::string::npos)
+    {
+      out << "> [" << log.date_.toString() << "] " << log.details_
+        << " [Op #" << log.id_ << "]" << '\n';
+    }
+  }
+
+  out << "CURRENT LOCATIONS (" << state.current_date_.toString() << "): ";
+
+  bool found = false;
+  for (auto cit = state.warehouses_.cbegin(); cit != state.warehouses_.cend(); ++cit)
+  {
+    const auto& wh1 = (*cit).first;
+    const auto& wh2 = (*cit).second;
+
+    if (wh2.items_.has(key_items))
+    {
+      if (found)
+      {
+        out << ", ";
+      }
+
+      out << wh1 << " (" << wh2.items_.at(key_items).getCount() << " pcs)";
+      found = true;
+    }
+  }
+
+  if (!found)
+  {
+    out << "None";
+  }
+
+  out << '\n';
+}
