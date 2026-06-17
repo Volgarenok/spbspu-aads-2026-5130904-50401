@@ -277,6 +277,24 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::swap(CuckooHT & ht) n
 }
 
 template< class Key, class Value, class Hash1, class Hash2, class Equal >
+bool chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::empty() const noexcept
+{
+  return count_ == 0;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::size() const noexcept
+{
+  return count_;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::maxCapacity() const noexcept
+{
+  return 2 * capacity_;
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
 void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::clear() noexcept
 {
   for (size_t i = 0; i < capacity_; ++i)
