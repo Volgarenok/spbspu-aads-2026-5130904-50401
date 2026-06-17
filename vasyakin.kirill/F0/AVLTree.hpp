@@ -380,6 +380,147 @@ namespace vasyakin
         std::max(getHeight(node->left_), getHeight(node->right_));
     }
   }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::Node*
+  AVLTree< Key, Value, Compare >::rotateLeft(Node* node) noexcept
+  {
+    if (!node)
+    {
+      return node;
+    }
+
+    Node* new_root = node->right_;
+    node->right_ = new_root->left_;
+
+    if (new_root->left_)
+    {
+      new_root->left_->parent_ = node;
+    }
+
+    new_root->parent_ = node->parent_;
+    if (!node->parent_)
+    {
+      root_ = new_root;
+    }
+    else if (node == node->parent_->left_)
+    {
+      node->parent_->left_ = new_root;
+    }
+    else
+    {
+      node->parent_->right_ = new_root;
+    }
+
+    new_root->left_ = node;
+    node->parent_ = new_root;
+
+    updateHeight(node);
+    updateHeight(new_root);
+
+    return new_root;
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::Node*
+  AVLTree< Key, Value, Compare >::rotateLargeLeft(Node* node) noexcept
+  {
+    if (!node)
+    {
+      return node;
+    }
+
+    node->right_ = rotateRight(node->right_);
+    return rotateLeft(node);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::Node*
+  AVLTree< Key, Value, Compare >::rotateRight(Node* node) noexcept
+  {
+    if (!node)
+    {
+      return node;
+    }
+
+    Node* new_root = node->left_;
+    node->left_ = new_root->right_;
+
+    if (new_root->right_)
+    {
+      new_root->right_->parent_ = node;
+    }
+
+    new_root->parent_ = node->parent_;
+    if (!node->parent_)
+    {
+      root_ = new_root;
+    }
+    else if (node == node->parent_->right_)
+    {
+      node->parent_->right_ = new_root;
+    }
+    else
+    {
+      node->parent_->left_ = new_root;
+    }
+
+    new_root->right_ = node;
+    node->parent_ = new_root;
+
+    updateHeight(node);
+    updateHeight(new_root);
+
+    return new_root;
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::Node*
+  AVLTree< Key, Value, Compare >::rotateLargeRight(Node* node) noexcept
+  {
+    if (!node)
+    {
+      return node;
+    }
+
+    node->left_ = rotateLeft(node->left_);
+    return rotateRight(node);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::Node*
+  AVLTree< Key, Value, Compare >::balance(Node* node) noexcept
+  {
+    if (!node)
+    {
+      return node;
+    }
+
+    updateHeight(node);
+    int bal = getBalance(node);
+
+    if (bal > 1)
+    {
+      if (getBalance(node->left_) < 0)
+      {
+        return rotateLargeRight(node);
+      }
+      
+      return rotateRight(node);
+    }
+
+    if (bal < -1)
+    {
+      if (getBalance(node->right_) > 0)
+      {
+        return rotateLargeLeft(node);
+      }
+
+      return rotateLeft(node);
+    }
+
+    return node;
+  }
 }
 
 #endif
