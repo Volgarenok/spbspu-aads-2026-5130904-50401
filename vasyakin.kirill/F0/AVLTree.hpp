@@ -190,6 +190,56 @@ namespace vasyakin
     destroyTree(node->right_);
     delete node;
   }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::Node*
+  AVLTree< Key, Value, Compare >::fallLeft(Node* node) const noexcept
+  {
+    while (node && node->left_)
+    {
+      node = node->left_;
+    }
+
+    return node;
+  }
+
+  template< class Key, class Value, class Compare >
+  const typename AVLTree< Key, Value, Compare >::Node*
+  AVLTree< Key, Value, Compare >::findNode(const Key& key) const noexcept
+  {
+    const Node* curr = root_;
+    while (curr)
+    {
+      if (cmp_(key, curr->key_))
+      {
+        curr = curr->left_;
+      }
+      else if (cmp_(curr->key_, key))
+      {
+        curr = curr->right_;
+      }
+      else
+      {
+        return curr;
+      }
+    }
+
+    return nullptr;
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::iterator
+  AVLTree< Key, Value, Compare >::find(const Key& key) noexcept
+  {
+    return iterator(const_cast< Node* >(findNode(key)));
+  }
+
+  template< class Key, class Value, class Compare >
+  typename AVLTree< Key, Value, Compare >::const_iterator
+  AVLTree< Key, Value, Compare >::find(const Key& key) const noexcept
+  {
+    return const_iterator(findNode(key));
+  }
 }
 
 #endif
