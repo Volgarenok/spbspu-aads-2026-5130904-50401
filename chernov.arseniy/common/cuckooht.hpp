@@ -386,6 +386,48 @@ const Value & chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::at(const Key
 }
 
 template< class Key, class Value, class Hash1, class Hash2, class Equal >
+typename chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::iterator
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::begin()
+{
+  return iterator(this, firstValidIndex());
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+typename chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::const_iterator
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::begin() const
+{
+  return const_iterator(this, firstValidIndex());
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+typename chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::const_iterator
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::cbegin() const
+{
+  return begin();
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+typename chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::iterator
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::end()
+{
+  return iterator(this, endIndex());
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+typename chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::const_iterator
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::end() const
+{
+  return const_iterator(this, endIndex());
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+typename chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::const_iterator
+chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::cend() const
+{
+  return end();
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
 size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::hash1(const Key & k) const noexcept
 {
   if (capacity_ == 0) {
@@ -484,6 +526,28 @@ void chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::rehashInternal(size_t
     }
   }
   swap(new_ht);
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::firstValidIndex() const noexcept
+{
+  for (size_t i = 0; i < capacity_; ++i) {
+    if (occupied1_[i]) {
+      return i;
+    }
+  }
+  for (size_t i = 0; i < capacity_; ++i) {
+    if (occupied2_[i]) {
+      return capacity_ + i;
+    }
+  }
+  return endIndex();
+}
+
+template< class Key, class Value, class Hash1, class Hash2, class Equal >
+size_t chernov::CuckooHT< Key, Value, Hash1, Hash2, Equal >::endIndex() const noexcept
+{
+  return 2 * capacity_;
 }
 
 template< class Key, class Value, class Hash1, class Hash2, class Equal, bool IsConst >
