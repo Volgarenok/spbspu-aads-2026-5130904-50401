@@ -650,7 +650,6 @@ namespace vasyakin
     return tree_.cend();
   }
 
-
   template< class Key, class Compare = std::less< Key > >
   class AVLMultiSet
   {
@@ -693,6 +692,144 @@ namespace vasyakin
   private:
     AVLTree< Key, topit::Vector< Key >, Compare > tree_;
   };
+
+  template< class Key, class Compare >
+  AVLMultiSet< Key, Compare >::AVLMultiSet(const Compare& cmp):
+    tree_(cmp)
+  {}
+
+  template< class Key, class Compare >
+  AVLMultiSet< Key, Compare >::AVLMultiSet(
+    std::initializer_list< value_type > init, const Compare& cmp):
+    tree_(cmp)
+  {
+    for (auto it = init.begin(); it != init.end(); ++it)
+    {
+      insert(*it);
+    }
+  }
+
+  template< class Key, class Compare >
+  bool AVLMultiSet< Key, Compare >::empty() const noexcept
+  {
+    return tree_.empty();
+  }
+
+  template< class Key, class Compare >
+  size_t AVLMultiSet< Key, Compare >::size() const noexcept
+  {
+    return tree_.size();
+  }
+
+  template< class Key, class Compare >
+  void AVLMultiSet< Key, Compare >::clear() noexcept
+  {
+    tree_.clear();
+  }
+
+  template< class Key, class Compare >
+  size_t AVLMultiSet< Key, Compare >::erase(const Key& key)
+  {
+    auto it = tree_.find(key);
+    if (it == tree_.end())
+    {
+      return 0;
+    }
+
+    size_t cnt = (*it).second.getSize();
+    tree_.remove(key);
+    return cnt;
+  }
+
+  template< class Key, class Compare >
+  typename AVLMultiSet< Key, Compare >::iterator
+  AVLMultiSet< Key, Compare >::insert(const value_type& value)
+  {
+    auto it = tree_.find(value);
+    if (it != tree_.end())
+    {
+      (*it).second.push_back(value);
+      return it;
+    }
+
+    tree_.insert(value, topit::Vector< Key >{value});
+    return tree_.find(value);
+  }
+
+  template< class Key, class Compare >
+  size_t AVLMultiSet< Key, Compare >::count(const Key& key) const noexcept
+  {
+    auto it = tree_.find(key);
+    if (it == tree_.end())
+    {
+      return 0;
+    }
+
+    return (*it).second.getSize();
+  }
+
+  template< class Key, class Compare >
+  bool AVLMultiSet< Key, Compare >::has(const Key& key) const noexcept
+  {
+    return tree_.has(key);
+  }
+
+  template< class Key, class Compare >
+  typename AVLMultiSet< Key, Compare >::iterator
+  AVLMultiSet< Key, Compare >::find(const Key& key) const noexcept
+  {
+    return tree_.find(key);
+  }
+
+  template< class Key, class Compare >
+  typename AVLMultiSet< Key, Compare >::iterator
+  AVLMultiSet< Key, Compare >::lower_bound(const Key& key) const noexcept
+  {
+    return tree_.lower_bound(key);
+  }
+
+  template< class Key, class Compare >
+  typename AVLMultiSet< Key, Compare >::iterator
+  AVLMultiSet< Key, Compare >::upper_bound(const Key& key) const noexcept
+  {
+    return tree_.upper_bound(key);
+  }
+
+  template< class Key, class Compare >
+  std::pair< typename AVLMultiSet< Key, Compare >::iterator,
+    typename AVLMultiSet< Key, Compare >::iterator >
+    AVLMultiSet< Key, Compare >::equal_range(const Key& key) const noexcept
+  {
+    return {lower_bound(key), upper_bound(key)};
+  }
+
+  template< class Key, class Compare >
+  typename AVLMultiSet< Key, Compare >::iterator
+  AVLMultiSet< Key, Compare >::begin() const noexcept
+  {
+    return tree_.cbegin();
+  }
+
+  template< class Key, class Compare >
+  typename AVLMultiSet< Key, Compare >::iterator
+  AVLMultiSet< Key, Compare >::end() const noexcept
+  {
+    return tree_.cend();
+  }
+
+  template< class Key, class Compare >
+  typename AVLMultiSet< Key, Compare >::const_iterator
+  AVLMultiSet< Key, Compare >::cbegin() const noexcept
+  {
+    return tree_.cbegin();
+  }
+
+  template< class Key, class Compare >
+  typename AVLMultiSet< Key, Compare >::const_iterator
+  AVLMultiSet< Key, Compare >::cend() const noexcept
+  {
+    return tree_.cend();
+  }
 }
 
 #endif
