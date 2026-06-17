@@ -13,7 +13,7 @@ namespace malashenko
   public:
     using cht_t = CuckooHashTable< Key, Value, Hash1, Hash2, Equal >;
 
-    CuckooHashTable();
+    CuckooHashTable() = default;
     CuckooHashTable(const size_t& size);
 
     CuckooHashTable(const cht_t& rhs);
@@ -51,12 +51,12 @@ namespace malashenko
 
     size_t size_;
     size_t capacity_;
-    size_t max_steps_ = 16;
+    size_t max_steps_;
 
     Hash1 hasher1_;
     Hash2 hasher2_;
 
-    bool insertInTable(const Key& key, const Value& value, size_t tableInd, size_t cnt);
+    std::pair< bool, malashenko::detail::HashTableNode< Key, Value > > insertInTable(const Key& key, const Value& value);
     std::pair< size_t, size_t> hasInTable(const Key& key) const noexcept;
   };
 }
@@ -100,6 +100,7 @@ malashenko::CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::CuckooHashTable(
   hasher2_(std::move(rhs.hasher2_))
 {}
 
+
 template<class Key, class Value, class Hash1, class Hash2, class Equal >
 malashenko::CuckooHashTable< Key, Value, Hash1, Hash2, Equal >& malashenko::CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::operator=(const cht_t& rhs)
 {
@@ -139,63 +140,58 @@ std::pair< size_t, size_t> malashenko::CuckooHashTable< Key, Value, Hash1, Hash2
 
 
 template<class Key, class Value, class Hash1, class Hash2, class Equal >
-bool malashenko::CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insertInTable(const Key& key, const Value& value, size_t tableInd, size_t cnt)
+std::pair< bool, malashenko::detail::HashTableNode< Key, Value > > malashenko::CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insertInTable(const Key& key, const Value& value)
 {
-  if (cnt >= max_steps_)
-  {
-    return false;
-  }
-
   std::pair< size_t, size_t > keyInTableIndex = hasInTable(key);
 
   if (keyInTableIndex.first != 2)
   {
     table_[keyInTableIndex.first][keyInTableIndex.second].value = value;
-    return true;
+    return {true, {}};
   }
 
-  detail::HashTableNode< Key, Value > insertNode = {true, key, value};
-  size_t hashedKey = (tableInd == 0) ? hasher1_(key) : hasher2_(key);
-  size_t pos = hashedKey % capacity_;
-  if (!table_[tableInd][pos].isOccupied)
+  detail::HashTableNode< Key, Value > cur{true, key, value};
+  size_t tableInd = 0;
+
+  for (size_t step = 0; step < max_steps_; ++step)
   {
-    table_[tableInd][pos] = insertNode;
-    return true;
+    size_t pos = (tableInd == 0 ? hasher1_(cur.key) : hasher2_(cur.key)) % capacity_;
+    if (!table_[tableInd][pos].isOccupied)
+    {
+      table_[tableInd][pos] = cur;
+      ++size_;
+      return {true, {}};
+    }
+
+    std::swap(cur, table_[tableInd][pos]);
+    tableInd = 1 - tableInd;
   }
-  else
-  {
-    Key tmpKey = table_[tableInd][pos].key;
-    Value tmpValue = table_[tableInd][pos].value;
-    table_[tableInd][pos] = insertNode;
-    return insertInTable(tmpKey, tmpValue, 1 - tableInd, cnt + 1);
-  }
+
+  return {false, cur};
 }
 
 template<class Key, class Value, class Hash1, class Hash2, class Equal >
 void malashenko::CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::add(const Key& key, const Value& value)
 {
-  // Hash1 hasher1;
-  // detail::HashTableNode< Key, Value > insertNode = {true, key, value};
-  // size_t ind1 = hasher1(key) % capacity_;
-  // if (!table1_[ind1].isOccupied)
-  // {
-  //   table1_[ind1] = insertNode;
-  //   return;
-  // }
-  // else
-  // {
-  //   detail::HashTableNode< Key, Value > tmpNode = table1_[ind1];
-  //   table1_[ind1] = insertNode;
-  //   Hash2 hasher2;
-  //   size_t counter = 0;
-  //   size_t ind2 = hasher2(key) % capacity_;
-
-
-  // }
-
-
+  std::pair< bool, detail::HashTableNode< Key, Value > > tmp = insertInTable(key, value);
+  if (!tmp.first)
+  {
+    rehash(capacity_ * 2);
+    add(tmp.second.key, tmp.second.value);
+  }
 }
 
+template<class Key, class Value, class Hash1, class Hash2, class Equal >
+bool malashenko::CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::has(const Key& key) const
+{
+  return hasInTable(key) != 2;
+}
+
+template<class Key, class Value, class Hash1, class Hash2, class Equal >
+size_t malashenko::CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::size() const noexcept
+{
+  return size_;
+}
 
 
 template<class Key, class Value, class Hash1, class Hash2, class Equal >

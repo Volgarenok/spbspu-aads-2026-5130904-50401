@@ -9,7 +9,7 @@ namespace malashenko
     struct HashTableNode {
       bool isOccupied = false;
       Key key;
-      Value Value;
+      Value value;
     };
   }
 }
