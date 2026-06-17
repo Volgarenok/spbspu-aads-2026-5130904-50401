@@ -521,6 +521,232 @@ namespace vasyakin
 
     return node;
   }
+
+  template< class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::rebalanceUp(Node* from) noexcept
+  {
+    Node* node = from;
+    while (node)
+    {
+      Node* parent = node->parent_;
+      bool was_left = parent && parent->left_ == node;
+
+      int old_height = node->height_;
+
+      node = balance(node);
+      if (old_height == node->height_)
+      {
+        break;
+      }
+
+      if (parent)
+      {
+        if (was_left)
+        {
+          parent->left_ = node;
+        }
+        else
+        {
+          parent->right_ = node;
+        }
+      }
+      else
+      {
+        root_ = node;
+        break;
+      }
+
+      node = parent;
+    }
+
+    if (root_)
+    {
+      root_->parent_ = nullptr;
+    }
+  }
+
+  template< class Key, class Value, class Compare >
+  void AVLTree< Key, Value, Compare >::insert(
+      const Key& key, const Value& value)
+  {
+    Node* curr = root_;
+    Node* parent = nullptr;
+
+    while (curr)
+    {
+      parent = curr;
+
+      if (cmp_(key, curr->key_))
+      {
+        curr = curr->left_;
+      }
+      else if (cmp_(curr->key_, key))
+      {
+        curr = curr->right_;
+      }
+      else
+      {
+        curr->value_ = value;
+        return;
+      }
+    }
+
+    Node* new_node = new Node(key, value);
+    ++size_;
+    new_node->parent_ = parent;
+
+    if (parent != nullptr)
+    {
+      if (cmp_(key, parent->key_))
+      {
+        parent->left_ = new_node;
+      }
+      else
+      {
+        parent->right_ = new_node;
+      }
+    }
+    else
+    {
+      root_ = new_node;
+    }
+
+    rebalanceUp(new_node);
+  }
+
+  template< class Key, class Value, class Compare >
+  bool AVLTree< Key, Value, Compare >::remove(const Key& key)
+  {
+    Node* curr = root_;
+    Node* rebalance_from = nullptr;
+    bool found = false;
+
+    while (curr != nullptr)
+    {
+      if (!cmp_(key, curr->key_) && !cmp_(curr->key_, key))
+      {
+        found = true;
+
+        if (curr->left_ == nullptr && curr->right_ == nullptr)
+        {
+          rebalance_from = curr->parent_;
+
+          if (curr->parent_)
+          {
+            if (curr->parent_->left_ == curr)
+            {
+              curr->parent_->left_ = nullptr;
+            }
+            else
+            {
+              curr->parent_->right_ = nullptr;
+            }
+          }
+          else
+          {
+            root_ = nullptr;
+          }
+        }
+        else if (curr->left_ == nullptr)
+        {
+          rebalance_from = curr->parent_;
+
+          curr->right_->parent_ = curr->parent_;
+
+          if (curr->parent_)
+          {
+            if (curr->parent_->left_ == curr)
+            {
+              curr->parent_->left_ = curr->right_;
+            }
+            else
+            {
+              curr->parent_->right_ = curr->right_;
+            }
+          }
+          else
+          {
+            root_ = curr->right_;
+          }
+        }
+        else if (curr->right_ == nullptr)
+        {
+          rebalance_from = curr->parent_;
+
+          curr->left_->parent_ = curr->parent_;
+
+          if (curr->parent_)
+          {
+            if (curr->parent_->left_ == curr)
+            {
+              curr->parent_->left_ = curr->left_;
+            }
+            else
+            {
+              curr->parent_->right_ = curr->left_;
+            }
+          }
+          else
+          {
+            root_ = curr->left_;
+          }
+        }
+        else
+        {
+          Node* min_in_right = curr->right_;
+
+          while (min_in_right->left_ != nullptr)
+          {
+            min_in_right = min_in_right->left_;
+          }
+
+          curr->key_ = std::move(min_in_right->key_);
+          curr->value_ = std::move(min_in_right->value_);
+
+          if (min_in_right->right_ != nullptr)
+          {
+            min_in_right->right_->parent_ = min_in_right->parent_;
+          }
+
+          if (min_in_right->parent_->left_ == min_in_right)
+          {
+            min_in_right->parent_->left_ = min_in_right->right_;
+          }
+          else
+          {
+            min_in_right->parent_->right_ = min_in_right->right_;
+          }
+
+          rebalance_from = min_in_right->parent_;
+
+          delete min_in_right;
+          --size_;
+          break;
+        }
+
+        delete curr;
+        --size_;
+        break;
+      }
+
+      if (cmp_(key, curr->key_))
+      {
+        curr = curr->left_;
+      }
+      else
+      {
+        curr = curr->right_;
+      }
+    }
+
+    if (!found)
+    {
+      return false;
+    }
+
+    rebalanceUp(rebalance_from);
+    return true;
+  }
 }
 
 #endif
