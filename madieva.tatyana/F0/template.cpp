@@ -168,4 +168,3 @@ bool madieva::Template::solve()
   }
   return isSolvable_;
 }
-
