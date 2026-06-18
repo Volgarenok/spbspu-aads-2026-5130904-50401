@@ -159,50 +159,95 @@ namespace chernov {
     tree.listPersons(out, filter);
   }
 
-  // Заглушки (исправлены размеры)
-  void cmdAddParent(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdAddParent(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<OK>\n";
-  }
-
-  void cmdRemoveParent(CommandArgs & args, TreeManager &, std::ostream & out)
-  {
-    if (args.getSize() != 4) {
-      out << "<ERROR: Invalid arguments>\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    std::string error;
+    if (!tree.addParent(args[2], args[3], error)) {
+      out << "<ERROR: " << error << ">\n";
       return;
     }
     out << "<OK>\n";
   }
 
-  void cmdAddSpouse(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdRemoveParent(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<OK>\n";
-  }
-
-  void cmdRemoveSpouse(CommandArgs & args, TreeManager &, std::ostream & out)
-  {
-    if (args.getSize() != 4) {
-      out << "<ERROR: Invalid arguments>\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    if (!tree.removeParent(args[2], args[3])) {
+      out << "<ERROR: Parent link not found>\n";
       return;
     }
     out << "<OK>\n";
   }
 
-  void cmdShowConnections(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdAddSpouse(CommandArgs & args, TreeManager & manager, std::ostream & out)
+  {
+    if (args.getSize() != 4) {
+      out << "<ERROR: Invalid arguments>\n";
+      return;
+    }
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    std::string error;
+    if (!tree.addSpouse(args[2], args[3], error)) {
+      out << "<ERROR: " << error << ">\n";
+      return;
+    }
+    out << "<OK>\n";
+  }
+
+  void cmdRemoveSpouse(CommandArgs & args, TreeManager & manager, std::ostream & out)
+  {
+    if (args.getSize() != 4) {
+      out << "<ERROR: Invalid arguments>\n";
+      return;
+    }
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    if (!tree.removeSpouse(args[2], args[3])) {
+      out << "<ERROR: Spouse link not found>\n";
+      return;
+    }
+    out << "<OK>\n";
+  }
+
+  void cmdShowConnections(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() < 3 || args.getSize() > 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<CHILDREN: >\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    std::string type = "all";
+    if (args.getSize() == 4)
+      type = args[3];
+    tree.showConnections(args[2], type, out);
   }
 
   void cmdShowAncestors(CommandArgs & args, TreeManager &, std::ostream & out)
