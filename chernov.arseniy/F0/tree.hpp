@@ -40,6 +40,9 @@ namespace chernov {
     void showDescendants(const std::string & id, int maxDepth, std::ostream & out) const;
     void showRelatives(const std::string & id, int maxDepth, std::ostream & out) const;
 
+    Vector< std::string > findCommonAncestors(const std::string & id1, const std::string & id2) const;
+    void showRelationship(const std::string & id1, const std::string & id2, std::ostream & out) const;
+
   private:
     std::string name_;
     std::string description_;

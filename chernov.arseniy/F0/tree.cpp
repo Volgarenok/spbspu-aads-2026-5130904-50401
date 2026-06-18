@@ -418,3 +418,15 @@ void chernov::Tree::showRelatives(const std::string & id, int maxDepth, std::ost
     }
   }
 }
+
+chernov::Vector< std::string > chernov::Tree::findCommonAncestors(
+  const std::string & id1, const std::string & id2) const
+{
+  return detail::findCommonAncestors(*this, id1, id2);
+}
+
+void chernov::Tree::showRelationship(const std::string & id1, const std::string & id2, std::ostream & out) const
+{
+  std::string rel = detail::getRelationship(*this, id1, id2);
+  out << "<RELATION: " << rel << ">\n";
+}
