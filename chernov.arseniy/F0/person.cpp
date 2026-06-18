@@ -122,26 +122,30 @@ const chernov::Vector< std::string > & chernov::Person::getParents() const
 {
   return parents_;
 }
+
 const chernov::Vector< std::string > & chernov::Person::getChildren() const
 {
   return children_;
 }
-const chernov::Vector< std::string > & chernov::Person::getSpouses() const
+
+const std::string & chernov::Person::getSpouse() const
 {
-  return spouses_;
+  return spouseId_;
 }
 
 size_t chernov::Person::getParentsCount() const
 {
   return parents_.getSize();
 }
+
 size_t chernov::Person::getChildrenCount() const
 {
   return children_.getSize();
 }
-size_t chernov::Person::getSpousesCount() const
+
+bool chernov::Person::hasSpouse() const
 {
-  return spouses_.getSize();
+  return !spouseId_.empty();
 }
 
 bool chernov::Person::hasParent(const std::string & id) const
@@ -157,19 +161,8 @@ bool chernov::Person::hasParent(const std::string & id) const
 bool chernov::Person::hasChild(const std::string & id) const
 {
   for (size_t i = 0; i < children_.getSize(); ++i) {
-    if (children_[i] == id) {
+    if (children_[i] == id)
       return true;
-    }
-  }
-  return false;
-}
-
-bool chernov::Person::hasSpouse(const std::string & id) const
-{
-  for (size_t i = 0; i < spouses_.getSize(); ++i) {
-    if (spouses_[i] == id) {
-      return true;
-    }
   }
   return false;
 }
@@ -208,19 +201,12 @@ void chernov::Person::removeChild(const std::string & id)
   }
 }
 
-void chernov::Person::addSpouse(const std::string & id)
+void chernov::Person::setSpouse(const std::string & id)
 {
-  if (!hasSpouse(id)) {
-    spouses_.pushBack(id);
-  }
+  spouseId_ = id;
 }
 
-void chernov::Person::removeSpouse(const std::string & id)
+void chernov::Person::clearSpouse()
 {
-  for (size_t i = 0; i < spouses_.getSize(); ++i) {
-    if (spouses_[i] == id) {
-      spouses_.erase(i);
-      break;
-    }
-  }
+  spouseId_.clear();
 }

@@ -33,19 +33,19 @@ namespace chernov {
 
     const Vector< std::string > & getParents() const;
     const Vector< std::string > & getChildren() const;
-    const Vector< std::string > & getSpouses() const;
+    const std::string & getSpouse() const;
     size_t getParentsCount() const;
     size_t getChildrenCount() const;
-    size_t getSpousesCount() const;
+    bool hasSpouse() const;
     bool hasParent(const std::string & id) const;
     bool hasChild(const std::string & id) const;
-    bool hasSpouse(const std::string & id) const;
+
     void addParent(const std::string & id);
     void removeParent(const std::string & id);
     void addChild(const std::string & id);
     void removeChild(const std::string & id);
-    void addSpouse(const std::string & id);
-    void removeSpouse(const std::string & id);
+    void setSpouse(const std::string & id);
+    void clearSpouse();
 
   private:
     std::string id_;
@@ -59,7 +59,7 @@ namespace chernov {
 
     Vector< std::string > parents_;
     Vector< std::string > children_;
-    Vector< std::string > spouses_;
+    std::string spouseId_;
   };
 }
 

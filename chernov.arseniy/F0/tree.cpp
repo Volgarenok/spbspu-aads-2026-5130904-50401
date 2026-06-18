@@ -146,21 +146,21 @@ bool chernov::Tree::showPerson(const std::string & id, std::ostream & out) const
   out << "<BIRTHDATE: " << toDisplayFormat(p->getBirthDate()) << ">\n";
   out << "<DEATHDATE: " << toDisplayFormat(p->getDeathDate()) << ">\n";
   out << "<INFO: " << p->getInfo() << ">\n";
-  out << "<PARENTS: " << p->getParentsCount() << ">";
-  for (size_t i = 0; i < p->getParents().getSize(); ++i) {
+  out << "<PARENTS: " << p->getParentsCount();
+  for (size_t i = 0; i < p->getParentsCount(); ++i) {
     out << " " << p->getParents()[i];
   }
-  out << "\n";
-  out << "<SPOUSES: " << p->getSpousesCount() << ">";
-  for (size_t i = 0; i < p->getSpouses().getSize(); ++i) {
-    out << " " << p->getSpouses()[i];
+  out << ">\n";
+  out << "<SPOUSES: " << (p->hasSpouse() ? 1 : 0);
+  if (p->hasSpouse()) {
+    out << " " << p->getSpouse();
   }
-  out << "\n";
-  out << "<CHILDREN: " << p->getChildrenCount() << ">";
-  for (size_t i = 0; i < p->getChildren().getSize(); ++i) {
+  out << ">\n";
+  out << "<CHILDREN: " << p->getChildrenCount();
+  for (size_t i = 0; i < p->getChildrenCount(); ++i) {
     out << " " << p->getChildren()[i];
   }
-  out << "\n";
+  out << ">\n";
   return true;
 }
 
@@ -214,12 +214,10 @@ bool chernov::Tree::addParent(const std::string & childId, const std::string & p
     errorMsg = "already a parent";
     return false;
   }
-
   if (isDescendant(childId, parentId)) {
     errorMsg = "cycle detected";
     return false;
   }
-
   if (child->getParentsCount() >= 2) {
     errorMsg = "already has two parents";
     return false;
@@ -227,8 +225,7 @@ bool chernov::Tree::addParent(const std::string & childId, const std::string & p
   const std::string & newGender = parent->getGender();
   if (newGender != "Unknown") {
     for (size_t i = 0; i < child->getParentsCount(); ++i) {
-      const std::string & pid = child->getParents()[i];
-      const Person * existingParent = findPerson(pid);
+      const Person * existingParent = findPerson(child->getParents()[i]);
       if (existingParent && existingParent->getGender() == newGender) {
         errorMsg = "already has a parent of the same gender";
         return false;
@@ -267,12 +264,12 @@ bool chernov::Tree::addSpouse(const std::string & id1, const std::string & id2, 
     errorMsg = "cannot marry oneself";
     return false;
   }
-  if (p1->hasSpouse(id2)) {
-    errorMsg = "already spouses";
+  if (p1->hasSpouse() || p2->hasSpouse()) {
+    errorMsg = "already has a spouse";
     return false;
   }
-  p1->addSpouse(id2);
-  p2->addSpouse(id1);
+  p1->setSpouse(id2);
+  p2->setSpouse(id1);
   return true;
 }
 
@@ -283,11 +280,11 @@ bool chernov::Tree::removeSpouse(const std::string & id1, const std::string & id
   if (!p1 || !p2) {
     return false;
   }
-  if (!p1->hasSpouse(id2)) {
+  if (p1->getSpouse() != id2 || p2->getSpouse() != id1) {
     return false;
   }
-  p1->removeSpouse(id2);
-  p2->removeSpouse(id1);
+  p1->clearSpouse();
+  p2->clearSpouse();
   return true;
 }
 
@@ -307,8 +304,8 @@ void chernov::Tree::showConnections(const std::string & id, const std::string & 
   }
   if (type == "spouses" || type == "all") {
     out << "<SPOUSES:";
-    for (size_t i = 0; i < p->getSpousesCount(); ++i) {
-      out << " " << p->getSpouses()[i];
+    if (p->hasSpouse()) {
+      out << " " << p->getSpouse();
     }
     out << ">\n";
   }
@@ -337,9 +334,8 @@ void chernov::Tree::removeAllConnections(const std::string & id)
     std::string childId = p->getChildren()[0];
     removeParent(childId, id);
   }
-
-  while (p->getSpousesCount() > 0) {
-    std::string spouseId = p->getSpouses()[0];
+  if (p->hasSpouse()) {
+    std::string spouseId = p->getSpouse();
     removeSpouse(id, spouseId);
   }
 }
