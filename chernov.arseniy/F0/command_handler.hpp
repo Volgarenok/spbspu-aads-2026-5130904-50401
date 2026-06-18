@@ -10,7 +10,7 @@
 namespace chernov {
   class CommandHandler {
   public:
-    using CommandFunc = void (*)(Vector<std::string> &, TreeManager &, std::ostream &);
+    using CommandFunc = void (*)(Vector< std::string > &, TreeManager &, std::ostream &);
     using CmdTable = CuckooHT< std::string, CommandFunc, Hasher1, Hasher2, std::equal_to< std::string > >;
 
     explicit CommandHandler(TreeManager & manager);
