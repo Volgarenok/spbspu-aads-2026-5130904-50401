@@ -43,6 +43,9 @@ namespace zhuravleva
     void suggestRemove(const std::string& listName, const std::string& taskId,
         size_t maxRemove, std::ostream& out) const;
     void optimize(const std::string& newListName, const std::string& listName, size_t maxLabor);
+    void save(std::ostream& out) const;
+    void load(std::istream& in);
+    void swap(TaskManager& other) noexcept;
 
   private:
     CuckooHashTable< std::string, Task > globalTasks_;
@@ -57,7 +60,7 @@ namespace zhuravleva
     void optimizeRecursive(LCIter< TaskInList > current,
         LCIter< TaskInList > end, size_t maxLabor, size_t currentLabor, size_t currentScore,
         List< TaskInList >& currentList, size_t& bestScore, List< TaskInList >& bestList) const;
-    };
+  };
 }
 
 #endif

@@ -1,6 +1,8 @@
 #include "taskManager.hpp"
 #include <ostream>
 #include <stdexcept>
+#include <string>
+#include <istream>
 
 namespace zhuravleva
 {
@@ -463,5 +465,129 @@ namespace zhuravleva
       currentList.popBack();
     }
     optimizeRecursive(next, end, maxLabor, currentLabor, currentScore, currentList, bestScore, bestList);
+  }
+
+  void TaskManager::save(std::ostream& out) const
+  {
+    out << "TASKS " << globalTasks_.size() << "\n";
+    for (CuckooHashTable< std::string, Task >::ConstIterator it = globalTasks_.cbegin();
+        it != globalTasks_.cend(); ++it)
+    {
+      out << it->first << " " << it->second.labor << "\n";
+    }
+    out << "LISTS " << lists_.size() << "\n";
+    for (CuckooHashTable< std::string, TaskList >::ConstIterator it = lists_.cbegin();
+        it != lists_.cend(); ++it)
+    {
+      out << it->first << " "  << it->second.maxLabor << "\n";
+    }
+    size_t itemsCount = 0;
+    for (CuckooHashTable< std::string, TaskList >::ConstIterator it = lists_.cbegin();
+        it != lists_.cend(); ++it)
+    {
+      itemsCount += it->second.tasks.size();
+    }
+    out << "ITEMS " << itemsCount << "\n";
+    for (CuckooHashTable< std::string, TaskList >::ConstIterator it = lists_.cbegin();
+        it != lists_.cend(); ++it)
+    {
+      const TaskList& list = it->second;
+      for (LCIter< TaskInList > taskIt = list.tasks.cbegin();
+          taskIt != list.tasks.cend(); ++taskIt)
+      {
+        std::string deadline = taskIt->deadline;
+        std::string doneDate = taskIt->doneDate;
+        if (deadline.empty())
+        {
+          deadline = "-";
+        }
+        if (doneDate.empty())
+        {
+          doneDate = "-";
+        }
+        out << it->first << " " << taskIt->taskId << " "
+            << taskIt->priority << " " << taskIt->done << " "
+            << deadline << " " << doneDate << "\n";
+      }
+    }
+  }
+
+  void TaskManager::load(std::istream& in)
+  {
+    TaskManager temp;
+    std::string marker;
+    size_t count = 0;
+    in >> marker >> count;
+    if (!in || marker != "TASKS")
+    {
+      throw std::logic_error("invalid file");
+    }
+    for (size_t i = 0; i < count; ++i)
+    {
+      std::string taskId;
+      size_t labor = 0;
+      in >> taskId >> labor;
+      if (!in)
+      {
+        throw std::logic_error("invalid file");
+      }
+      temp.addTaskGlobal(taskId, labor);
+    }
+    in >> marker >> count;
+    if (!in || marker != "LISTS")
+    {
+      throw std::logic_error("invalid file");
+    }
+    for (size_t i = 0; i < count; ++i)
+    {
+      std::string listName;
+      size_t maxLabor = 0;
+      in >> listName >> maxLabor;
+      if (!in)
+      {
+        throw std::logic_error("invalid file");
+      }
+      temp.createList(listName, maxLabor);
+    }
+    in >> marker >> count;
+    if (!in || marker != "ITEMS")
+    {
+      throw std::logic_error("invalid file");
+    }
+    for (size_t i = 0; i < count; ++i)
+    {
+      std::string listName;
+      std::string taskId;
+      size_t priority = 0;
+      bool done = false;
+      std::string deadline;
+      std::string doneDate;
+      in >> listName >> taskId >> priority >> done >> deadline >> doneDate;
+      if (!in)
+      {
+        throw std::logic_error("invalid file");
+      }
+      if (deadline == "-")
+      {
+        deadline.clear();
+      }
+      if (doneDate == "-")
+      {
+        doneDate.clear();
+      }
+      temp.addTaskToList(listName, taskId, priority);
+      temp.setDeadline(listName, taskId, deadline);
+      if (done)
+      {
+        temp.markDone(listName, taskId, doneDate);
+      }
+    }
+    swap(temp);
+  }
+
+  void TaskManager::swap(TaskManager& other) noexcept
+  {
+    globalTasks_.swap(other.globalTasks_);
+    lists_.swap(other.lists_);
   }
 }
