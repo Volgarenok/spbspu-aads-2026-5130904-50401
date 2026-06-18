@@ -20,7 +20,7 @@ void chernov::Tree::setDescription(const std::string & desc)
   description_ = desc;
 }
 
-std::size_t chernov::Tree::personCount() const
+size_t chernov::Tree::personCount() const
 {
   return persons_.getSize();
 }

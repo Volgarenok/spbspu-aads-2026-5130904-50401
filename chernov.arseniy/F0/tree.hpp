@@ -12,7 +12,7 @@ namespace chernov {
     const std::string & getName() const;
     const std::string & getDescription() const;
     void setDescription(const std::string & desc);
-    std::size_t personCount() const;
+    size_t personCount() const;
 
   private:
     std::string name_;
