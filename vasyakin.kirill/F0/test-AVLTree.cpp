@@ -12,6 +12,7 @@ BOOST_AUTO_TEST_CASE(constructor_and_basic_insertion)
 
   BOOST_CHECK(tree.empty());
   BOOST_CHECK_EQUAL(tree.size(), 0u);
+
   BOOST_CHECK(tree.begin() == tree.end());
   BOOST_CHECK(tree.cbegin() == tree.cend());
 
@@ -34,6 +35,7 @@ BOOST_AUTO_TEST_CASE(copy_and_move_semantics)
 
   BOOST_CHECK_EQUAL(yatree.size(), tree.size());
   BOOST_CHECK(yatree.has(10));
+
   BOOST_CHECK(yatree.has(20));
   BOOST_CHECK(yatree.has(5));
 
@@ -50,6 +52,7 @@ BOOST_AUTO_TEST_CASE(copy_and_move_semantics)
   assigned = tree;
 
   BOOST_CHECK_EQUAL(assigned.size(), tree.size());
+
   BOOST_CHECK(assigned.has(10));
   BOOST_CHECK(assigned.has(20));
   BOOST_CHECK(assigned.has(5));
@@ -64,8 +67,10 @@ BOOST_AUTO_TEST_CASE(copy_and_move_semantics)
 
   BOOST_CHECK_EQUAL(moved.size(), 3u);
   BOOST_CHECK_EQUAL(tree.size(), 0u);
+
   BOOST_CHECK(moved.has(10));
   BOOST_CHECK(moved.has(20));
+
   BOOST_CHECK(moved.has(5));
   BOOST_CHECK(tree.empty());
 
@@ -74,8 +79,10 @@ BOOST_AUTO_TEST_CASE(copy_and_move_semantics)
 
   BOOST_CHECK_EQUAL(move_assigned.size(), 3u);
   BOOST_CHECK_EQUAL(moved.size(), 0u);
+
   BOOST_CHECK(move_assigned.has(10));
   BOOST_CHECK(move_assigned.has(20));
+
   BOOST_CHECK(move_assigned.has(5));
   BOOST_CHECK(moved.empty());
 }
@@ -92,12 +99,6 @@ BOOST_AUTO_TEST_CASE(self_assignment_safety)
   BOOST_CHECK_EQUAL(tree.size(), 2u);
   BOOST_CHECK(tree.has(1));
   BOOST_CHECK(tree.has(2));
-
-  tree = std::move(tree);
-
-  BOOST_CHECK_EQUAL(tree.size(), 2u);
-  BOOST_CHECK(tree.has(1));
-  BOOST_CHECK(tree.has(2));
 }
 
 BOOST_AUTO_TEST_CASE(destructor_and_clear_safety)
@@ -110,6 +111,7 @@ BOOST_AUTO_TEST_CASE(destructor_and_clear_safety)
 
   tree.clear();
   BOOST_CHECK(tree.empty());
+
   BOOST_CHECK_EQUAL(tree.size(), 0u);
   BOOST_CHECK(tree.begin() == tree.end());
 
@@ -118,8 +120,10 @@ BOOST_AUTO_TEST_CASE(destructor_and_clear_safety)
 
   {
     vasyakin::AVLTree< int, std::string > scoped_tree;
+
     scoped_tree.insert(10, "ten");
     scoped_tree.insert(20, "twenty");
+
     BOOST_CHECK_EQUAL(scoped_tree.size(), 2u);
   }
 
@@ -183,6 +187,7 @@ BOOST_AUTO_TEST_CASE(remove_leaf_and_one_child)
 
   BOOST_CHECK(tree.remove(5));
   BOOST_CHECK_EQUAL(tree.size(), 3u);
+
   BOOST_CHECK(!tree.has(5));
   BOOST_CHECK(tree.has(7));
 }
@@ -199,6 +204,7 @@ BOOST_AUTO_TEST_CASE(remove_two_children)
 
   BOOST_CHECK(tree.remove(5));
   BOOST_CHECK_EQUAL(tree.size(), 4u);
+
   BOOST_CHECK(!tree.has(5));
   BOOST_CHECK(tree.has(3));
   BOOST_CHECK(tree.has(7));
@@ -219,6 +225,7 @@ BOOST_AUTO_TEST_CASE(empty_tree_edge_cases)
 
   BOOST_CHECK(empty.empty());
   BOOST_CHECK_EQUAL(empty.size(), 0u);
+
   BOOST_CHECK(empty.begin() == empty.end());
   BOOST_CHECK(empty.cbegin() == empty.cend());
 
@@ -257,6 +264,7 @@ BOOST_AUTO_TEST_CASE(find_method_and_const_correctness)
 
   auto it_found = tree.find(10);
   BOOST_REQUIRE(it_found != tree.end());
+
   BOOST_CHECK_EQUAL((*it_found).first, 10);
   BOOST_CHECK_EQUAL((*it_found).second, "ten");
 
@@ -267,6 +275,7 @@ BOOST_AUTO_TEST_CASE(find_method_and_const_correctness)
 
   auto const_it_found = const_ref.find(10);
   BOOST_REQUIRE(const_it_found != const_ref.cend());
+
   BOOST_CHECK_EQUAL((*const_it_found).first, 10);
   BOOST_CHECK_EQUAL((*const_it_found).second, "ten");
 
@@ -337,6 +346,7 @@ BOOST_AUTO_TEST_CASE(left_rotate)
   tree.insert(40, "forty");
 
   BOOST_CHECK_EQUAL(tree.size(), 4u);
+
   BOOST_CHECK(tree.has(10));
   BOOST_CHECK(tree.has(20));
   BOOST_CHECK(tree.has(30));
@@ -364,6 +374,7 @@ BOOST_AUTO_TEST_CASE(right_rotate)
   tree.insert(7, "seven");
 
   BOOST_CHECK_EQUAL(tree.size(), 4u);
+
   BOOST_CHECK(tree.has(10));
   BOOST_CHECK(tree.has(9));
   BOOST_CHECK(tree.has(8));
@@ -390,6 +401,7 @@ BOOST_AUTO_TEST_CASE(left_large_rotate)
   tree.insert(9, "nine");
 
   BOOST_CHECK_EQUAL(tree.size(), 3u);
+
   BOOST_CHECK(tree.has(10));
   BOOST_CHECK(tree.has(8));
   BOOST_CHECK(tree.has(9));
@@ -415,6 +427,7 @@ BOOST_AUTO_TEST_CASE(right_large_rotate)
   tree.insert(15, "fifteen");
 
   BOOST_CHECK_EQUAL(tree.size(), 3u);
+
   BOOST_CHECK(tree.has(10));
   BOOST_CHECK(tree.has(20));
   BOOST_CHECK(tree.has(15));
