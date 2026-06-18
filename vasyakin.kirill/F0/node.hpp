@@ -19,9 +19,6 @@ namespace vasyakin
     class Node
     {
     public:
-      Node(const Key& key, const Value& value);
-      Node(Key&& key, Value&& value);
-
       template< class K, class V >
       Node(K&& key, V&& value);
     private:
@@ -41,26 +38,6 @@ namespace vasyakin
       template< class K, class V, class C >
       friend class vasyakin::AVLTree;
     };
-
-    template< class Key, class Value >
-    Node< Key, Value >::Node(const Key& key, const Value& value):
-      key_(key),
-      value_(value),
-      left_(nullptr),
-      right_(nullptr),
-      parent_(nullptr),
-      height_(1)
-    {}
-
-    template< class Key, class Value >
-    Node< Key, Value >::Node(Key&& key, Value&& value):
-      key_(std::move(key)),
-      value_(std::move(value)),
-      left_(nullptr),
-      right_(nullptr),
-      parent_(nullptr),
-      height_(1)
-    {}
 
     template< class Key, class Value >
     template< class K, class V >
