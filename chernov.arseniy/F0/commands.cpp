@@ -3,49 +3,50 @@
 #include "tree_manager.hpp"
 
 namespace chernov {
-  void cmdCreateTree(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdCreateTree(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() < 2 || args.getSize() > 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<CREATED: " << args[1] << ">\n";
+    std::string desc = (args.getSize() == 3) ? args[2] : "";
+    manager.createTree(args[1], desc, out);
   }
 
-  void cmdDropTree(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdDropTree(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 2) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<OK: Tree " << args[1] << " removed>\n";
+    manager.dropTree(args[1], out);
   }
 
-  void cmdRenameTree(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdRenameTree(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<OK: Renamed to " << args[2] << ">\n";
+    manager.renameTree(args[1], args[2], out);
   }
 
-  void cmdEditTreeDesc(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdEditTreeDesc(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<OK>\n";
+    manager.editTreeDescription(args[1], args[2], out);
   }
 
-  void cmdListTrees(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdListTrees(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 1) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<TREES:>\n";
+    manager.listTrees(out);
   }
 
   void cmdAddPerson(CommandArgs & args, TreeManager &, std::ostream & out)
