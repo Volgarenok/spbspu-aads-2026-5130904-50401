@@ -1,3 +1,4 @@
+#include <limits>
 #include "commands.hpp"
 
 int main()
@@ -35,14 +36,16 @@ int main()
     }
     catch (const std::out_of_range&)
     {
-      std::cout << "Ты старался, но увы :(" << '\n';
+      std::cout << "Команду нормальную введи, да)" << '\n';
       std::cout << "<INVALID COMMAND>" << '\n';
+
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
     catch (const std::exception& e)
     {
       std::cerr << "Error: " << e.what() << '\n';
+
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }
