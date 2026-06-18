@@ -24,7 +24,10 @@ namespace ulanova
 
     void add(const std::string& key, const Value& value);
     void drop(const std::string& key);
+    void clear() noexcept;
     bool has(const std::string& key) const;
+    size_t size() const noexcept;
+    bool empty() const noexcept;
     Value* find(const std::string& key);
     const Value* find(const std::string& key) const;
 
@@ -60,6 +63,24 @@ namespace ulanova
     bool need_rehash() const;
     void rehash(size_t new_capacity);
     void add_without_rehash(const std::string& key, const Value& value);
+    static bool is_prime(size_t n)
+    {
+      if (n < 2) return false;
+      for (size_t i = 2; i * i <= n; ++i)
+      {
+        if (n % i == 0) return false;
+      }
+      return true;
+    }
+
+    static size_t next_prime(size_t n)
+    {
+      while (!is_prime(n))
+      {
+        ++n;
+      }
+      return n;
+    }
   };
 }
 
@@ -183,7 +204,7 @@ void ulanova::HashTable< Value >::add(const std::string& key,
 
   if (need_rehash())
   {
-    rehash(buckets_.getsize() * 2);
+    rehash(next_prime(buckets_.getsize() * 2 + 1));
   }
 
   add_without_rehash(key, value);
@@ -203,10 +224,32 @@ void ulanova::HashTable< Value >::drop(const std::string& key)
   --size_;
 }
 
+template< class Value >
+void ulanova::HashTable< Value >::clear() noexcept
+{
+  for (size_t i = 0; i < buckets_.getsize(); ++i)
+  {
+    buckets_[i].state = State::empty;
+  }
+  size_ = 0;
+}
+
 template<class Value >
 bool ulanova::HashTable< Value >::has(const std::string& key) const
 {
   return find_index(key) != buckets_.getsize();
+}
+
+template< class Value >
+size_t ulanova::HashTable< Value >::size() const noexcept
+{
+  return size_;
+}
+
+template< class Value >
+bool ulanova::HashTable< Value >::empty() const noexcept
+{
+  return size() == 0;
 }
 
 template< class Value >
@@ -274,7 +317,7 @@ size_t ulanova::HashTable< Value >::find_index( const std::string& key) const
 template< class Value >
 bool ulanova::HashTable< Value >::need_rehash() const
 {
-  return (size_ + 1) * 2 >= buckets_.getsize();
+  return size_ * 10 >= buckets_.getsize() * 7;
 }
 
 template< class Value >

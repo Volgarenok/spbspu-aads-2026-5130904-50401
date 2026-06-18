@@ -131,3 +131,53 @@ BOOST_AUTO_TEST_CASE(rehash_keeps_values_test)
   }
 }
 
+BOOST_AUTO_TEST_CASE(find_returns_nullptr_for_test)
+{
+  ulanova::HashTable< int > table;
+  BOOST_CHECK(table.find("missing") == nullptr);
+}
+
+BOOST_AUTO_TEST_CASE(drop_and_readd_test)
+{
+  ulanova::HashTable< int > table;
+  table.add("key", 10);
+  table.drop("key");
+  table.add("key", 20);  // должно работать после удаления
+
+  int* val = table.find("key");
+  BOOST_REQUIRE(val != nullptr);
+  BOOST_CHECK(*val == 20);
+}
+
+BOOST_AUTO_TEST_CASE(size_test)
+{
+  ulanova::HashTable< int > table;
+  BOOST_CHECK(table.size() == 0);
+  table.add("a", 1);
+  BOOST_CHECK(table.size() == 1);
+  table.add("b", 2);
+  BOOST_CHECK(table.size() == 2);
+  table.drop("a");
+  BOOST_CHECK(table.size() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(empty_test)
+{
+  ulanova::HashTable< int > table;
+  BOOST_CHECK(table.empty());
+  table.add("a", 1);
+  BOOST_CHECK(!table.empty());
+  table.drop("a");
+  BOOST_CHECK(table.empty());
+}
+
+BOOST_AUTO_TEST_CASE(value_through_find_test)
+{
+  ulanova::HashTable< int > table;
+  table.add("key", 10);
+  int* val = table.find("key");
+  BOOST_REQUIRE(val != nullptr);
+  *val = 99;
+  BOOST_CHECK(*table.find("key") == 99);
+}
+

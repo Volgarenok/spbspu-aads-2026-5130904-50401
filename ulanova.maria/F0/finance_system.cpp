@@ -61,9 +61,18 @@ namespace
 
     long long free_balance = 0;
 
+    for (size_t i = 0; i < profile.operations.getsize(); ++i)
+    {
+      const ulanova::Operation& op = profile.operations[i];
+
+      if (op.date < from)
+      {
+        free_balance += op.is_income ? op.amount : -op.amount;
+      }
+    }
     while (ulanova::is_before_or_equal(current_date, to))
     {
-      free_balance = get_free_money_for_date(profile, current_date);
+      free_balance += get_free_money_for_date(profile, current_date);
 
       if (free_balance > 0)
       {
@@ -226,7 +235,7 @@ ulanova::Vector< ulanova::Saving > ulanova::FinanceSystem::get_savings(
   const std::string& name,
   const std::string& date) const
 {
-  parse_date(date);
+  const Date target = parse_date(date);
 
   const Profile* profile = profiles_.find(name);
 
@@ -235,7 +244,15 @@ ulanova::Vector< ulanova::Saving > ulanova::FinanceSystem::get_savings(
     throw std::logic_error("profile not found");
   }
 
-  return profile->savings;
+  ulanova::Vector< Saving > result;
+  for (size_t i = 0; i < profile->savings.getsize(); ++i)
+  {
+    if (is_before_or_equal(profile->savings[i].start_date, target))
+    {
+      result.push_back(profile->savings[i]);
+    }
+  }
+  return result;
 }
 
 void ulanova::FinanceSystem::create_saving(const std::string& saving_name,
@@ -265,50 +282,54 @@ void ulanova::FinanceSystem::create_saving(const std::string& saving_name,
   profile->savings.push_back(saving);
 }
 
-void ulanova::FinanceSystem::finish_saving(const std::string& saving_name, const std::string& date)
+void ulanova::FinanceSystem::finish_saving(const std::string& profile_name, const std::string& saving_name, const std::string& date)
 {
   parse_date(date);
+  Profile* profile = profiles_.find(profile_name);
 
-  for (auto it = profiles_.begin(); it != profiles_.end(); ++it)
+  if (profile == nullptr)
   {
-    Profile& profile = *it;
-    for (size_t j = 0; j < profile.savings.getsize(); ++j)
+    throw std::logic_error("profile not found");
+  }
+
+  for (size_t j = 0; j < profile->savings.getsize(); ++j)
+  {
+    if (profile->savings[j].name == saving_name)
     {
-      if (profile.savings[j].name == saving_name)
+      if (saving_name == "default")
       {
-        if (saving_name == "default")
-        {
-          throw std::logic_error("system saving");
-        }
-        profile.savings.erase(j);
-        return;
+        throw std::logic_error("system saving");
       }
+      profile->savings.erase(j);
+      return;
     }
   }
 
   throw std::logic_error("saving not found");
 }
 
-void ulanova::FinanceSystem::close_saving(const std::string& saving_name, const std::string& date)
+void ulanova::FinanceSystem::close_saving(const std::string& profile_name, const std::string& saving_name, const std::string& date)
 {
   parse_date(date);
+  Profile* profile = profiles_.find(profile_name);
 
-  for (auto it = profiles_.begin(); it != profiles_.end(); ++it)
+  if (profile == nullptr)
   {
-    Profile& profile = *it;
-    for (size_t j = 0; j < profile.savings.getsize(); ++j)
-    {
-      if (profile.savings[j].name == saving_name)
-      {
-        if (saving_name == "default")
-        {
-          throw std::logic_error("system saving");
-        }
+    throw std::logic_error("profile not found");
+  }
 
-        profile.balance += profile.savings[j].current_sum;
-        profile.savings.erase( j);
-        return;
+  for (size_t j = 0; j < profile->savings.getsize(); ++j)
+  {
+    if (profile->savings[j].name == saving_name)
+    {
+      if (saving_name == "default")
+      {
+        throw std::logic_error("system saving");
       }
+
+      profile->balance += profile->savings[j].current_sum;
+      profile->savings.erase( j);
+      return;
     }
   }
 
@@ -362,9 +383,16 @@ std::string ulanova::FinanceSystem::recommend_priority(
   }
 
   std::string best_date = "не достигнута";
-  int best_priority = 10;
+  int best_priority = 0;
+  for (size_t i = 0; i < profile->savings.getsize(); ++i)
+  {
+    if (profile->savings[i].name == saving_name)
+    {
+      best_priority = profile->savings[i].priority;
+    }
+  }
 
-  for (int current_priority = 0; current_priority >= 10; ++current_priority)
+  for (int current_priority = 0; current_priority <= 10; ++current_priority)
   {
     Vector< Saving > savings = profile->savings;
 
@@ -381,8 +409,11 @@ std::string ulanova::FinanceSystem::recommend_priority(
 
     if (result != "не достигнута" )
     {
-      best_date = result;
-      best_priority = current_priority;
+      if (best_date == "не достигнута" || ulanova::parse_date(result) < ulanova::parse_date(best_date))
+      {
+        best_date = result;
+        best_priority = current_priority;
+      }
     }
   }
 

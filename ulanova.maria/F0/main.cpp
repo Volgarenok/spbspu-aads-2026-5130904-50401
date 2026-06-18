@@ -34,7 +34,8 @@ namespace
 
     try
     {
-      out << "Баланс: " << system.get_balance(name, date) << "\n";
+      const long long balance = system.get_balance(name, date);
+      out << "Баланс: " << balance << "\n";
     }
     catch (const std::logic_error&)
     {
@@ -174,39 +175,65 @@ namespace
 
   void finish_saving(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
   {
+    std::string profile_name;
     std::string saving_name;
     std::string date;
-    in >> saving_name >> date;
+    in >> profile_name >> saving_name >> date;
 
     try
     {
-      system.finish_saving(saving_name, date);
+      system.finish_saving(profile_name, saving_name, date);
       out << "Цель достигнута. Счет " << saving_name << " закрыт ";
       out << date << "\n";
     }
-    catch (const std::logic_error&)
+    catch (const std::logic_error& error)
     {
-      out << "Счет не существует\n";
+      const std::string message = error.what();
+      if (message == "system saving")
+      {
+        out << "Нельзя закрыть системный счет\n";
+      }
+      else if (message == "profile not found")
+      {
+        out << "Профиль не существует\n";
+      }
+      else
+      {
+        out << "Счет не существует\n";
+      }
     }
   }
 
   void close_saving(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
   {
+    std::string profile_name;
     std::string saving_name;
     std::string date;
-    in >> saving_name >> date;
+    in >> profile_name >> saving_name >> date;
 
     try
     {
-      system.close_saving(saving_name, date);
+      system.close_saving(profile_name, saving_name, date);
     }
-    catch (const std::logic_error&)
+    catch (const std::logic_error& error)
     {
-      out << "Счет не существует\n";
+      const std::string message = error.what();
+      if (message == "system saving")
+      {
+        out << "Нельзя закрыть системный счет\n";
+      }
+      else if (message == "profile not found")
+      {
+        out << "Профиль не существует\n";
+      }
+      else
+      {
+        out << "Счет не существует\n";
+      }
     }
   }
 
-  void calce_date(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
+  void calc_date(std::istream& in, std::ostream& out, ulanova::FinanceSystem& system)
   {
     std::string profile_name;
     std::string saving_name;
@@ -252,7 +279,7 @@ namespace
         saving_name, from_date, to_date, priority);
 
       out << "Для накопительного счета " << saving_name;
-      out << "рекомендуется приоритет " << priority;
+      out << " рекомендуется приоритет " << priority;
       out << ". При этом цель будет достигнута: " << date << "\n";
     }
     catch (const std::logic_error& error)
@@ -265,7 +292,7 @@ namespace
       }
       else
       {
-        out << "Профиль не существует";
+        out << "Профиль не существует\n";
       }
     }
 
@@ -295,7 +322,7 @@ int main()
   commands.add("create-saving", create_saving);
   commands.add("finish-saving", finish_saving);
   commands.add("close-saving", close_saving);
-  commands.add("calc-date", calce_date);
+  commands.add("calc-date", calc_date);
   commands.add("recommend-priority", recommend_priority);
 
   std::string command;
