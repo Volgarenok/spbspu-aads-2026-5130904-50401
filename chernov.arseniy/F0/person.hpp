@@ -2,6 +2,7 @@
 #define PERSON_HPP
 
 #include <string>
+#include <vector.hpp>
 
 namespace chernov {
   class Person {
@@ -30,6 +31,22 @@ namespace chernov {
     bool setDeathDate(const std::string & dateStr, std::string & errorMsg);
     void setInfo(const std::string & info);
 
+    const Vector< std::string > & getParents() const;
+    const Vector< std::string > & getChildren() const;
+    const Vector< std::string > & getSpouses() const;
+    size_t getParentsCount() const;
+    size_t getChildrenCount() const;
+    size_t getSpousesCount() const;
+    bool hasParent(const std::string & id) const;
+    bool hasChild(const std::string & id) const;
+    bool hasSpouse(const std::string & id) const;
+    void addParent(const std::string & id);
+    void removeParent(const std::string & id);
+    void addChild(const std::string & id);
+    void removeChild(const std::string & id);
+    void addSpouse(const std::string & id);
+    void removeSpouse(const std::string & id);
+
   private:
     std::string id_;
     std::string surname_;
@@ -39,6 +56,10 @@ namespace chernov {
     std::string birthDate_;
     std::string deathDate_;
     std::string info_;
+
+    Vector< std::string > parents_;
+    Vector< std::string > children_;
+    Vector< std::string > spouses_;
   };
 }
 

@@ -30,6 +30,12 @@ namespace chernov {
     bool editPerson(
       const std::string & id, const std::string & field, const std::string & value, std::string & errorMsg);
 
+    bool addParent(const std::string & childId, const std::string & parentId, std::string & errorMsg);
+    bool removeParent(const std::string & childId, const std::string & parentId);
+    bool addSpouse(const std::string & id1, const std::string & id2, std::string & errorMsg);
+    bool removeSpouse(const std::string & id1, const std::string & id2);
+    void showConnections(const std::string & id, const std::string & type, std::ostream & out) const;
+
   private:
     std::string name_;
     std::string description_;
@@ -39,6 +45,7 @@ namespace chernov {
 
     std::string generateId();
     void removeAllConnections(const std::string & id);
+    bool isDescendant(const std::string & ancestorId, const std::string & personId) const;
   };
 }
 
