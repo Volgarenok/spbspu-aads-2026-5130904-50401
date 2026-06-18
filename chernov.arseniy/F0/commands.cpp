@@ -319,22 +319,39 @@ namespace chernov {
     tree.showRelatives(args[2], depth, out);
   }
 
-  void cmdFindCommonAncestor(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdFindCommonAncestor(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    Vector< std::string > common = tree.findCommonAncestors(args[2], args[3]);
     out << "<COMMON ANCESTORS:>\n";
+    for (size_t i = 0; i < common.getSize(); ++i) {
+      const Person * anc = tree.findPerson(common[i]);
+      if (anc) {
+        out << "<  " << anc->getId() << ": " << anc->getSurname() << " " << anc->getName() << ">\n";
+      }
+    }
   }
 
-  void cmdShowRelationship(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdShowRelationship(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<RELATION: ...>\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    tree.showRelationship(args[2], args[3], out);
   }
 
   void cmdCompareTrees(CommandArgs & args, TreeManager &, std::ostream & out)
