@@ -2,22 +2,43 @@
 #define TREE_HPP
 
 #include <string>
+#include "hashers.hpp"
 #include "person.hpp"
+#include <cuckooht.hpp>
 #include <vector.hpp>
 
 namespace chernov {
   class Tree {
   public:
     Tree(const std::string & name, const std::string & description = "");
+
     const std::string & getName() const;
     const std::string & getDescription() const;
     void setDescription(const std::string & desc);
     size_t personCount() const;
 
+    std::string addPerson(const std::string & surname,
+      const std::string & name,
+      const std::string & patronymic,
+      const std::string & gender);
+    bool deletePerson(const std::string & id);
+    Person * findPerson(const std::string & id);
+    const Person * findPerson(const std::string & id) const;
+    Vector< std::string > searchPerson(const std::string & field, const std::string & value) const;
+    void listPersons(std::ostream & out, const std::string & filter) const;
+    bool showPerson(const std::string & id, std::ostream & out) const;
+    bool editPerson(
+      const std::string & id, const std::string & field, const std::string & value, std::string & errorMsg);
+
   private:
     std::string name_;
     std::string description_;
     Vector< Person > persons_;
+    CuckooHT< std::string, size_t, Hasher1, Hasher2, std::equal_to< std::string > > idToIndex_;
+    size_t nextId_;
+
+    std::string generateId();
+    void removeAllConnections(const std::string & id);
   };
 }
 
