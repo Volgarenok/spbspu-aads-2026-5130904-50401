@@ -49,68 +49,110 @@ namespace chernov {
     manager.listTrees(out);
   }
 
-  void cmdAddPerson(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdAddPerson(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 6) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<CREATED: P0001 in " << args[1] << ">\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    std::string id = tree.addPerson(args[2], args[3], args[4], args[5]);
+    out << "<CREATED: " << id << " in " << args[1] << ">\n";
   }
 
-  void cmdEditPerson(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdEditPerson(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 6) {
       out << "<ERROR: Invalid arguments>\n";
+      return;
+    }
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    std::string error;
+    if (!tree.editPerson(args[2], args[3], args[4], error)) {
+      out << "<ERROR: " << error << ">\n";
       return;
     }
     out << "<OK>\n";
   }
 
-  void cmdDeletePerson(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdDeletePerson(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
+      return;
+    }
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    if (!tree.deletePerson(args[2])) {
+      out << "<ERROR: Person '" << args[2] << "' not found>\n";
       return;
     }
     out << "<OK: Person " << args[2] << " deleted>\n";
   }
 
-  void cmdShowPerson(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdShowPerson(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<ID: " << args[2] << ">\n";
-    out << "<SURNAME: >\n";
-    out << "<NAME: >\n";
-    out << "<PATRONYMIC: >\n";
-    out << "<GENDER: >\n";
-    out << "<BIRTHDATE: >\n";
-    out << "<DEATHDATE: >\n";
-    out << "<INFO: >\n";
-    out << "<PARENTS: 0>\n";
-    out << "<SPOUSES: 0>\n";
-    out << "<CHILDREN: 0>\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    if (!tree.showPerson(args[2], out)) {
+      out << "<ERROR: Person '" << args[2] << "' not found>\n";
+    }
   }
 
-  void cmdSearchPerson(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdSearchPerson(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 5) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<SEARCH RESULTS (name=\"...\")>\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    Vector< std::string > ids = tree.searchPerson(args[2], args[3]);
+    out << "<SEARCH RESULTS (" << args[2] << "=\"" << args[3] << "\")>\n";
+    for (size_t i = 0; i < ids.getSize(); ++i) {
+      const Person * p = tree.findPerson(ids[i]);
+      out << "<  " << ids[i] << ": " << p->getSurname() << " " << p->getName() << ">\n";
+    }
   }
 
-  void cmdListPersons(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdListPersons(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() < 3 || args.getSize() > 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<LIST (...):>\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    std::string filter = args[2];
+    if (filter != "alive" && filter != "deceased" && filter != "male" && filter != "female") {
+      out << "<ERROR: Invalid filter>\n";
+      return;
+    }
+    tree.listPersons(out, filter);
   }
 
   void cmdAddParent(CommandArgs & args, TreeManager &, std::ostream & out)

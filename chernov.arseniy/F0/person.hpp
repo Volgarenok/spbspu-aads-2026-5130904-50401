@@ -23,11 +23,11 @@ namespace chernov {
     const std::string & getInfo() const;
 
     void setSurname(const std::string & s);
-    void setName(const std::string & s);
-    void setPatronymic(const std::string & s);
+    void setName(const std::string & n);
+    void setPatronymic(const std::string & p);
     void setGender(const std::string & g);
-    bool setBirthDate(const std::string & dateStr);
-    bool setDeathDate(const std::string & dateStr);
+    bool setBirthDate(const std::string & dateStr, std::string & errorMsg);
+    bool setDeathDate(const std::string & dateStr, std::string & errorMsg);
     void setInfo(const std::string & info);
 
   private:

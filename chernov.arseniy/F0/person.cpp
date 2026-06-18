@@ -7,10 +7,10 @@ chernov::Person::Person(const std::string & id,
   const std::string & patronymic,
   const std::string & gender):
   id_(id),
-  surname_(surname),
-  name_(name),
-  patronymic_(patronymic),
-  gender_(gender)
+  surname_(surname == "-" ? "" : surname),
+  name_(name == "-" ? "" : name),
+  patronymic_(patronymic == "-" ? "" : patronymic),
+  gender_(gender == "Male" || gender == "Female" ? gender : "Unknown")
 {}
 
 const std::string & chernov::Person::getId() const
@@ -55,17 +55,17 @@ const std::string & chernov::Person::getInfo() const
 
 void chernov::Person::setSurname(const std::string & s)
 {
-  surname_ = (s == "-") ? "" : s;
+  surname_ = (s == "-" ? "" : s);
 }
 
-void chernov::Person::setName(const std::string & s)
+void chernov::Person::setName(const std::string & n)
 {
-  name_ = (s == "-") ? "" : s;
+  name_ = (n == "-" ? "" : n);
 }
 
-void chernov::Person::setPatronymic(const std::string & s)
+void chernov::Person::setPatronymic(const std::string & p)
 {
-  patronymic_ = (s == "-") ? "" : s;
+  patronymic_ = (p == "-" ? "" : p);
 }
 
 void chernov::Person::setGender(const std::string & g)
@@ -75,29 +75,41 @@ void chernov::Person::setGender(const std::string & g)
   }
 }
 
-bool chernov::Person::setBirthDate(const std::string & dateStr)
+bool chernov::Person::setBirthDate(const std::string & dateStr, std::string & errorMsg)
 {
   if (dateStr.empty() || dateStr == "-") {
     birthDate_.clear();
     return true;
   }
   if (!isValidDate(dateStr)) {
+    errorMsg = "invalid date";
     return false;
   }
-  birthDate_ = toStorageFormat(dateStr);
+  std::string storage = toStorageFormat(dateStr);
+  if (!deathDate_.empty() && deathDate_ < storage) {
+    errorMsg = "birth date after death";
+    return false;
+  }
+  birthDate_ = storage;
   return true;
 }
 
-bool chernov::Person::setDeathDate(const std::string & dateStr)
+bool chernov::Person::setDeathDate(const std::string & dateStr, std::string & errorMsg)
 {
   if (dateStr.empty() || dateStr == "-") {
     deathDate_.clear();
     return true;
   }
   if (!isValidDate(dateStr)) {
+    errorMsg = "invalid date";
     return false;
   }
-  deathDate_ = toStorageFormat(dateStr);
+  std::string storage = toStorageFormat(dateStr);
+  if (!birthDate_.empty() && storage < birthDate_) {
+    errorMsg = "death date before birth";
+    return false;
+  }
+  deathDate_ = storage;
   return true;
 }
 

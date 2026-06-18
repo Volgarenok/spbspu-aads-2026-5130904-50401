@@ -17,6 +17,8 @@ namespace chernov {
     void editTreeDescription(const std::string & name, const std::string & description, std::ostream & out);
     void listTrees(std::ostream & out) const;
     bool hasTree(const std::string & name) const;
+    Tree & getTree(const std::string & name);
+    const Tree & getTree(const std::string & name) const;
 
   private:
     CuckooHT< std::string, Tree, Hasher1, Hasher2, std::equal_to< std::string > > trees_;
