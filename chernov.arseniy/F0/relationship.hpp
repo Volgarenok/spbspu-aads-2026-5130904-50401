@@ -28,6 +28,8 @@ namespace chernov {
 
     Vector< std::string > findCommonAncestors(const Tree & tree, const std::string & id1, const std::string & id2);
     std::string getRelationship(const Tree & tree, const std::string & id1, const std::string & id2);
+
+    std::string getRelationLabel(const Tree & tree, const std::string & from, const std::string & to);
   }
 }
 

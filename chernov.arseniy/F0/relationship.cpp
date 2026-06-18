@@ -96,35 +96,34 @@ chernov::Vector< chernov::detail::Relative > chernov::detail::findRelatives(
   struct BfsItem {
     std::string personId;
     int depth;
-    std::string relation;
+    bool spouseLink;
   };
 
   Queue< BfsItem > queue;
+  Vector< std::string > visited;
+  visited.pushBack(id);
 
   for (size_t i = 0; i < start->getParentsCount(); ++i) {
     BfsItem item;
     item.personId = start->getParents()[i];
     item.depth = 1;
-    item.relation = "parent";
+    item.spouseLink = false;
     queue.push(item);
   }
   for (size_t i = 0; i < start->getChildrenCount(); ++i) {
     BfsItem item;
     item.personId = start->getChildren()[i];
     item.depth = 1;
-    item.relation = "child";
+    item.spouseLink = false;
     queue.push(item);
   }
   if (start->hasSpouse()) {
     BfsItem item;
     item.personId = start->getSpouse();
     item.depth = 1;
-    item.relation = "spouse";
+    item.spouseLink = true;
     queue.push(item);
   }
-
-  Vector< std::string > visited;
-  visited.pushBack(id);
 
   while (!queue.empty()) {
     BfsItem current = queue.front();
@@ -144,10 +143,10 @@ chernov::Vector< chernov::detail::Relative > chernov::detail::findRelatives(
 
     Relative rel;
     rel.id = current.personId;
-    if (current.depth == 1) {
-      rel.relation = current.relation;
+    if (current.spouseLink) {
+      rel.relation = "Spouse";
     } else {
-      rel.relation = "";
+      rel.relation = getRelationLabel(tree, current.personId, id);
     }
     result.pushBack(rel);
 
@@ -158,21 +157,21 @@ chernov::Vector< chernov::detail::Relative > chernov::detail::findRelatives(
           BfsItem next;
           next.personId = p->getParents()[i];
           next.depth = current.depth + 1;
-          next.relation = "";
+          next.spouseLink = false;
           queue.push(next);
         }
         for (size_t i = 0; i < p->getChildrenCount(); ++i) {
           BfsItem next;
           next.personId = p->getChildren()[i];
           next.depth = current.depth + 1;
-          next.relation = "";
+          next.spouseLink = false;
           queue.push(next);
         }
         if (p->hasSpouse()) {
           BfsItem next;
           next.personId = p->getSpouse();
           next.depth = current.depth + 1;
-          next.relation = "";
+          next.spouseLink = true;
           queue.push(next);
         }
       }
@@ -299,12 +298,21 @@ std::string chernov::detail::getRelationship(const Tree & tree, const std::strin
     return "Person not found";
   }
 
+  if (p1->hasSpouse() && p1->getSpouse() == id2) {
+    if (p1->getGender() == "Male") {
+      return id1 + " is the Husband of " + id2;
+    } else if (p1->getGender() == "Female") {
+      return id1 + " is the Wife of " + id2;
+    } else {
+      return id1 + " is the Spouse of " + id2;
+    }
+  }
+
   AncestorDistances dist1(16), dist2(16);
   collectAncestorDistances(tree, id1, dist1);
   collectAncestorDistances(tree, id2, dist2);
 
   int minSum = -1;
-  std::string lca;
   int up1 = -1, up2 = -1;
   for (auto it = dist1.begin(); it != dist1.end(); ++it) {
     const std::string & anc = (*it).first;
@@ -314,7 +322,6 @@ std::string chernov::detail::getRelationship(const Tree & tree, const std::strin
       int sum = d1 + d2;
       if (minSum == -1 || sum < minSum) {
         minSum = sum;
-        lca = anc;
         up1 = d1;
         up2 = d2;
       }
@@ -328,43 +335,88 @@ std::string chernov::detail::getRelationship(const Tree & tree, const std::strin
     return id1 + " is the " + getAncestorTitle(p1->getGender(), up2) + " of " + id2;
   }
   if (up2 == 0) {
-    return id1 + " is the " + getDescendantTitle(p2->getGender(), up1) + " of " + id2;
+    return id1 + " is the " + getDescendantTitle(p1->getGender(), up1) + " of " + id2;
   }
+
   if (up1 == 1 && up2 == 1) {
-    if (p2->getGender() == "Male") {
+    if (p1->getGender() == "Male") {
       return id1 + " is the Brother of " + id2;
-    } else if (p2->getGender() == "Female") {
+    } else if (p1->getGender() == "Female") {
       return id1 + " is the Sister of " + id2;
     } else {
       return id1 + " is the Sibling of " + id2;
     }
   }
   if (up1 == 1 && up2 == 2) {
-    if (p2->getGender() == "Male") {
+    if (p1->getGender() == "Male") {
       return id1 + " is the Uncle of " + id2;
-    } else if (p2->getGender() == "Female") {
+    } else if (p1->getGender() == "Female") {
       return id1 + " is the Aunt of " + id2;
     } else {
       return id1 + " is the Uncle/Aunt of " + id2;
     }
   }
   if (up1 == 2 && up2 == 1) {
-    if (p2->getGender() == "Male") {
+    if (p1->getGender() == "Male") {
       return id1 + " is the Nephew of " + id2;
-    } else if (p2->getGender() == "Female") {
+    } else if (p1->getGender() == "Female") {
       return id1 + " is the Niece of " + id2;
     } else {
       return id1 + " is the Nephew/Niece of " + id2;
     }
   }
   if (up1 == 2 && up2 == 2) {
-    if (p2->getGender() == "Male") {
+    if (p1->getGender() == "Male") {
       return id1 + " is the Cousin (male) of " + id2;
-    } else if (p2->getGender() == "Female") {
+    } else if (p1->getGender() == "Female") {
       return id1 + " is the Cousin (female) of " + id2;
     } else {
       return id1 + " is the Cousin of " + id2;
     }
   }
   return id1 + " is a distant relative of " + id2;
+}
+
+std::string chernov::detail::getRelationLabel(const Tree & tree, const std::string & from, const std::string & to)
+{
+  const Person * pFrom = tree.findPerson(from);
+  const Person * pTo = tree.findPerson(to);
+  if (!pFrom || !pTo) {
+    return "";
+  }
+  if (from == to) {
+    return "self";
+  }
+
+  if (pFrom->hasSpouse() && pFrom->getSpouse() == to) {
+    if (pFrom->getGender() == "Male") {
+      return "Husband";
+    } else if (pFrom->getGender() == "Female") {
+      return "Wife";
+    } else {
+      return "Spouse";
+    }
+  }
+  if (pTo->hasSpouse() && pTo->getSpouse() == from) {
+    if (pFrom->getGender() == "Male") {
+      return "Husband";
+    } else if (pFrom->getGender() == "Female") {
+      return "Wife";
+    } else {
+      return "Spouse";
+    }
+  }
+
+  std::string full = getRelationship(tree, from, to);
+  std::string pattern = " is the ";
+  size_t pos1 = full.find(pattern);
+  if (pos1 == std::string::npos) {
+    return "";
+  }
+  pos1 += pattern.size();
+  size_t pos2 = full.find(" of ", pos1);
+  if (pos2 == std::string::npos) {
+    return "";
+  }
+  return full.substr(pos1, pos2 - pos1);
 }
