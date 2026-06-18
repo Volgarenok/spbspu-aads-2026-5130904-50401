@@ -1,6 +1,7 @@
 #include "tree.hpp"
 #include <iostream>
 #include "date_utils.hpp"
+#include "relationship.hpp"
 
 chernov::Tree::Tree(const std::string & name, const std::string & description):
   name_(name),
@@ -361,4 +362,59 @@ bool chernov::Tree::isDescendant(const std::string & ancestorId, const std::stri
     }
   }
   return false;
+}
+
+void chernov::Tree::showAncestors(const std::string & id, int maxDepth, std::ostream & out) const
+{
+  const Person * p = findPerson(id);
+  if (!p) {
+    out << "<ERROR: Person not found>\n";
+    return;
+  }
+  Vector< std::string > ancestors = detail::findAncestors(*this, id, maxDepth);
+  out << "<ANCESTORS:>\n";
+  for (size_t i = 0; i < ancestors.getSize(); ++i) {
+    const Person * anc = findPerson(ancestors[i]);
+    if (anc) {
+      out << "<  " << anc->getId() << ": " << anc->getSurname() << " " << anc->getName() << ">\n";
+    }
+  }
+}
+
+void chernov::Tree::showDescendants(const std::string & id, int maxDepth, std::ostream & out) const
+{
+  const Person * p = findPerson(id);
+  if (!p) {
+    out << "<ERROR: Person not found>\n";
+    return;
+  }
+  Vector< std::string > descendants = detail::findDescendants(*this, id, maxDepth);
+  out << "<DESCENDANTS:>\n";
+  for (size_t i = 0; i < descendants.getSize(); ++i) {
+    const Person * desc = findPerson(descendants[i]);
+    if (desc) {
+      out << "<  " << desc->getId() << ": " << desc->getSurname() << " " << desc->getName() << ">\n";
+    }
+  }
+}
+
+void chernov::Tree::showRelatives(const std::string & id, int maxDepth, std::ostream & out) const
+{
+  const Person * p = findPerson(id);
+  if (!p) {
+    out << "<ERROR: Person not found>\n";
+    return;
+  }
+  Vector< detail::Relative > relatives = detail::findRelatives(*this, id, maxDepth);
+  out << "<RELATIVES (depth=" << (maxDepth == -1 ? "all" : std::to_string(maxDepth)) << "):>\n";
+  for (size_t i = 0; i < relatives.getSize(); ++i) {
+    const Person * rel = findPerson(relatives[i].id);
+    if (rel) {
+      out << "<  " << rel->getId() << ": " << rel->getSurname() << " " << rel->getName();
+      if (!relatives[i].relation.empty()) {
+        out << " [" << relatives[i].relation << "]";
+      }
+      out << ">\n";
+    }
+  }
 }

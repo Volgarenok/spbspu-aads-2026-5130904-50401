@@ -36,6 +36,10 @@ namespace chernov {
     bool removeSpouse(const std::string & id1, const std::string & id2);
     void showConnections(const std::string & id, const std::string & type, std::ostream & out) const;
 
+    void showAncestors(const std::string & id, int maxDepth, std::ostream & out) const;
+    void showDescendants(const std::string & id, int maxDepth, std::ostream & out) const;
+    void showRelatives(const std::string & id, int maxDepth, std::ostream & out) const;
+
   private:
     std::string name_;
     std::string description_;
