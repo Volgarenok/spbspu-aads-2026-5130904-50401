@@ -54,7 +54,7 @@ namespace chernov {
       } else {
         current += c;
       }
-
+      ++i;
     }
     if (!current.empty()) {
       args.pushBack(current);
