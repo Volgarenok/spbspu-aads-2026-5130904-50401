@@ -13,6 +13,7 @@ namespace madieva
     Vector< int > & current,
     Vector< int > & counter,
     int & totalVariants);
+
   bool analyzeLine(
     const Vector< int > & line,
     const Vector< int > & hints,
