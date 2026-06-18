@@ -225,9 +225,14 @@ bool chernov::Tree::addParent(const std::string & childId, const std::string & p
   const std::string & newGender = parent->getGender();
   if (newGender != "Unknown") {
     for (size_t i = 0; i < child->getParentsCount(); ++i) {
-      const Person * existingParent = findPerson(child->getParents()[i]);
+      const std::string & pid = child->getParents()[i];
+      const Person * existingParent = findPerson(pid);
       if (existingParent && existingParent->getGender() == newGender) {
-        errorMsg = "already has a parent of the same gender";
+        if (newGender == "Male") {
+          errorMsg = "Person already has a father";
+        } else {
+          errorMsg = "Person already has a mother";
+        }
         return false;
       }
     }
