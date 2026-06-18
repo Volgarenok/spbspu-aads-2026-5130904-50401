@@ -5,18 +5,12 @@
 #include <utility>
 
 #include "iter_tree.hpp"
-#include "node_tree.hpp"
 
 namespace lukashevich
 {
   template< class Key, class Value >
   class BSTConstIterator
   {
-    template< class TreeKey, class TreeValue, class TreeCompare >
-    friend class BSTree;
-
-    friend class BSTIterator< Key, Value >;
-
   public:
     BSTConstIterator();
     BSTConstIterator(const BSTIterator< Key, Value > & other);
@@ -47,6 +41,11 @@ namespace lukashevich
     void checkDereference() const;
     void increment();
     void decrement();
+
+    template< class TreeKey, class TreeValue, class TreeCompare >
+    friend class BSTree;
+
+    friend class BSTIterator< Key, Value >;
   };
 
   template< class Key, class Value >
@@ -83,9 +82,7 @@ namespace lukashevich
   const std::pair< const Key, Value > *
   BSTConstIterator< Key, Value >::operator->() const
   {
-    checkDereference();
-    return &(static_cast< const TreeNode< Key, Value > * >(
-        node_)->value_);
+    return &operator*();
   }
 
   template< class Key, class Value >
@@ -155,26 +152,21 @@ namespace lukashevich
   {
     if (node_ == nullptr || fakeRoot_ == nullptr)
     {
-      throw std::logic_error("Invalid tree iterator");
+      throw std::logic_error("invalid iterator");
     }
 
     if (node_ == fakeRoot_)
     {
-      throw std::out_of_range("Cannot dereference end iterator");
+      throw std::out_of_range("cant end iterator");
     }
   }
 
   template< class Key, class Value >
   void BSTConstIterator< Key, Value >::increment()
   {
-    if (node_ == nullptr || fakeRoot_ == nullptr)
+    if (node_ == nullptr || node_ == fakeRoot_)
     {
-      throw std::logic_error("Invalid tree iterator");
-    }
-
-    if (node_ == fakeRoot_)
-    {
-      throw std::out_of_range("Cannot increment end iterator");
+      return;
     }
 
     if (node_->right_ != nullptr)
@@ -205,18 +197,23 @@ namespace lukashevich
   {
     if (node_ == nullptr || fakeRoot_ == nullptr)
     {
-      throw std::logic_error("Invalid tree iterator");
+      return;
     }
 
     if (node_ == fakeRoot_)
     {
-      if (fakeRoot_->right_ == fakeRoot_)
+      node_ = fakeRoot_->parent_;
+
+      if (node_ == fakeRoot_)
       {
-        throw std::out_of_range(
-            "Cannot decrement iterator of empty tree");
+        return;
       }
 
-      node_ = fakeRoot_->right_;
+      while (node_->right_ != nullptr)
+      {
+        node_ = node_->right_;
+      }
+
       return;
     }
 
@@ -238,11 +235,6 @@ namespace lukashevich
     {
       node_ = parent;
       parent = parent->parent_;
-    }
-
-    if (parent == fakeRoot_)
-    {
-      throw std::out_of_range("Cannot decrement begin iterator");
     }
 
     node_ = parent;

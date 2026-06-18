@@ -21,18 +21,11 @@ namespace lukashevich
   template< class Key, class Value >
   struct TreeNode: TreeNodeBase
   {
-    using value_type = std::pair< const Key, Value >;
-
-    value_type value_;
+    std::pair< const Key, Value > value_;
 
     TreeNode(const Key & key, const Value & value):
       TreeNodeBase(),
       value_(key, value)
-    {}
-
-    explicit TreeNode(const value_type & value):
-      TreeNodeBase(),
-      value_(value)
     {}
   };
 }
