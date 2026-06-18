@@ -250,31 +250,73 @@ namespace chernov {
     tree.showConnections(args[2], type, out);
   }
 
-  void cmdShowAncestors(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdShowAncestors(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() < 3 || args.getSize() > 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<ANCESTORS:>\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    int depth = -1;
+    if (args.getSize() == 4) {
+      try {
+        depth = std::stoi(args[3]);
+      } catch (...) {
+        out << "<ERROR: Invalid depth>\n";
+        return;
+      }
+    }
+    tree.showAncestors(args[2], depth, out);
   }
 
-  void cmdShowDescendants(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdShowDescendants(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() < 3 || args.getSize() > 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<DESCENDANTS:>\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    int depth = -1;
+    if (args.getSize() == 4) {
+      try {
+        depth = std::stoi(args[3]);
+      } catch (...) {
+        out << "<ERROR: Invalid depth>\n";
+        return;
+      }
+    }
+    tree.showDescendants(args[2], depth, out);
   }
 
-  void cmdShowRelatives(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdShowRelatives(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() < 3 || args.getSize() > 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<RELATIVES (depth=...):>\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    int depth = -1;
+    if (args.getSize() == 4) {
+      try {
+        depth = std::stoi(args[3]);
+      } catch (...) {
+        out << "<ERROR: Invalid depth>\n";
+        return;
+      }
+    }
+    tree.showRelatives(args[2], depth, out);
   }
 
   void cmdFindCommonAncestor(CommandArgs & args, TreeManager &, std::ostream & out)
