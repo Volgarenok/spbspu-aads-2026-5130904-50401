@@ -46,7 +46,7 @@ namespace chernov {
       char c = line[i];
       if (c == '\"') {
         inQuotes = !inQuotes;
-      } else if (c == ' '  && !inQuotes) {
+      } else if (c == ' ' && !inQuotes) {
         if (!current.empty()) {
           args.pushBack(current);
           current.clear();

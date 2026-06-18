@@ -1,10 +1,9 @@
-#include <boost/test/unit_test.hpp>
 #include <functional>
+#include <boost/test/unit_test.hpp>
 #include <cuckooht.hpp>
 
 namespace {
-  struct AnotherHash
-  {
+  struct AnotherHash {
     size_t operator()(int x) const
     {
       return std::hash< int >()(x) ^ 0xDEADBEEF;
