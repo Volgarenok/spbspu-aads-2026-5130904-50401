@@ -1,12 +1,13 @@
 #include "commands.hpp"
 #include <iostream>
+#include "tree.hpp"
 #include "tree_manager.hpp"
 
 namespace chernov {
   void cmdCreateTree(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() < 2 || args.getSize() > 3) {
-      out << "<ERROR: Invalid arguments>\n";
+      out << "<ERROR: Invalid arguments for create-tree>\n";
       return;
     }
     std::string desc = (args.getSize() == 3) ? args[2] : "";
@@ -66,7 +67,7 @@ namespace chernov {
 
   void cmdEditPerson(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
-    if (args.getSize() != 6) {
+    if (args.getSize() != 5) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -85,7 +86,7 @@ namespace chernov {
 
   void cmdDeletePerson(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
-    if (args.getSize() != 4) {
+    if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -103,7 +104,7 @@ namespace chernov {
 
   void cmdShowPerson(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
-    if (args.getSize() != 4) {
+    if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -119,7 +120,7 @@ namespace chernov {
 
   void cmdSearchPerson(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
-    if (args.getSize() != 5) {
+    if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -138,7 +139,7 @@ namespace chernov {
 
   void cmdListPersons(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
-    if (args.getSize() < 3 || args.getSize() > 4) {
+    if (args.getSize() < 2 || args.getSize() > 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -147,17 +148,21 @@ namespace chernov {
       return;
     }
     Tree & tree = manager.getTree(args[1]);
-    std::string filter = args[2];
-    if (filter != "alive" && filter != "deceased" && filter != "male" && filter != "female") {
-      out << "<ERROR: Invalid filter>\n";
-      return;
+    std::string filter;
+    if (args.getSize() == 3) {
+      filter = args[2];
+      if (filter != "alive" && filter != "deceased" && filter != "male" && filter != "female") {
+        out << "<ERROR: Invalid filter>\n";
+        return;
+      }
     }
     tree.listPersons(out, filter);
   }
 
+  // Заглушки (исправлены размеры)
   void cmdAddParent(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 5) {
+    if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -166,7 +171,7 @@ namespace chernov {
 
   void cmdRemoveParent(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 5) {
+    if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -175,7 +180,7 @@ namespace chernov {
 
   void cmdAddSpouse(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 5) {
+    if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -184,7 +189,7 @@ namespace chernov {
 
   void cmdRemoveSpouse(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 5) {
+    if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -193,7 +198,7 @@ namespace chernov {
 
   void cmdShowConnections(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() < 4 || args.getSize() > 5) {
+    if (args.getSize() < 3 || args.getSize() > 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -202,7 +207,7 @@ namespace chernov {
 
   void cmdShowAncestors(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() < 4 || args.getSize() > 5) {
+    if (args.getSize() < 3 || args.getSize() > 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -211,7 +216,7 @@ namespace chernov {
 
   void cmdShowDescendants(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() < 4 || args.getSize() > 5) {
+    if (args.getSize() < 3 || args.getSize() > 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -220,7 +225,7 @@ namespace chernov {
 
   void cmdShowRelatives(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() < 4 || args.getSize() > 5) {
+    if (args.getSize() < 3 || args.getSize() > 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -229,7 +234,7 @@ namespace chernov {
 
   void cmdFindCommonAncestor(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 5) {
+    if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -238,7 +243,7 @@ namespace chernov {
 
   void cmdShowRelationship(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 5) {
+    if (args.getSize() != 4) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -247,7 +252,7 @@ namespace chernov {
 
   void cmdCompareTrees(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 4) {
+    if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -256,7 +261,7 @@ namespace chernov {
 
   void cmdMergePersons(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 7) {
+    if (args.getSize() != 6) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -265,7 +270,7 @@ namespace chernov {
 
   void cmdSave(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 4) {
+    if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -274,7 +279,7 @@ namespace chernov {
 
   void cmdLoad(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 4) {
+    if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
@@ -283,7 +288,7 @@ namespace chernov {
 
   void cmdShowTree(CommandArgs & args, TreeManager &, std::ostream & out)
   {
-    if (args.getSize() != 4) {
+    if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
