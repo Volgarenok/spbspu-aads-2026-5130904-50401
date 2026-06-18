@@ -1,6 +1,7 @@
 #include "template.hpp"
 #include <fstream>
 #include <sstream>
+#include "solver.hpp"
 
 madieva::Template::Template(int rows, int cols):
   rows_(rows),
@@ -77,3 +78,94 @@ bool madieva::Template::loadFromFile(const std::string & filename)
 
   return true;
 }
+
+int madieva::Template::getRows() const noexcept
+{
+  return rows_;
+}
+
+int madieva::Template::getCols() const noexcept
+{
+  return cols_;
+}
+
+
+const madieva::Vector< madieva::Vector< int > > & madieva::Template::getRowHints() const
+{
+  return rowHints_;
+}
+const madieva::Vector< madieva::Vector< int > > & madieva::Template::getColHints() const
+{
+  return colHints_;
+
+}
+const madieva::Vector< madieva::Vector< int > > & madieva::Template::getSolution() const
+{
+  return solution_;
+
+}
+
+bool madieva::Template::solve()
+{
+  Vector< Vector< int > > picture;
+  picture.reserve(getRows());
+  for (int i = 0; i < getRows(); ++i) {
+    picture.pushBack(Vector< int >());
+    for (int j = 0; j < getCols(); ++j) {
+      picture[i].pushBack(0);
+    }
+  }
+  bool changed = true;
+  int iterations = 0;
+  const int MAX_ITERATIONS = 1000;
+
+  while (changed && iterations < MAX_ITERATIONS) {
+    changed = false;
+    ++iterations;
+    for (int i = 0; i < rows_; ++i) {
+      Vector< int > newLine;
+      bool lineChanged = analyzeLine(picture[i], rowHints_[i], newLine);
+      
+      if (lineChanged) {
+        picture[i] = newLine;
+        changed = true;
+      }
+    }
+    for (int j = 0; j < cols_; ++j) {
+      Vector< int > column;
+      column.reserve(rows_);
+      for (int i = 0; i < rows_; ++i) {
+        column.pushBack(picture[i][j]);
+      }
+
+      Vector< int > newColumn;
+      bool colChanged = analyzeLine(column, colHints_[j], newColumn);
+
+      if (colChanged) {
+        for (int i = 0; i < rows_; ++i) {
+          picture[i][j] = newColumn[i];
+        }
+        changed = true;
+      }
+    }
+  }
+
+  bool isFullySolved = true;
+  for (int i = 0; i < rows_ && isFullySolved; ++i) {
+    for (int j = 0; j < cols_ && isFullySolved; ++j) {
+      if (picture[i][j] == 0) {
+        isFullySolved = false;
+      }
+    }
+  }
+
+  if (isFullySolved) {
+    solution_ = picture;
+    isSolvable_ = true;
+  } else {
+    solution_ = Vector< Vector< int > >();
+    isSolvable_ = false;
+  }
+  return isSolvable_;
+}
+
