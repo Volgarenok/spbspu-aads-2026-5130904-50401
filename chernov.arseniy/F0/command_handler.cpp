@@ -41,8 +41,7 @@ namespace chernov {
     std::string current;
     bool inQuotes = false;
 
-    size_t i = 0;
-    while (i < line.size()) {
+    for (size_t i = 0; i < line.size(); ++i) {
       char c = line[i];
       if (c == '\"') {
         inQuotes = !inQuotes;
@@ -54,7 +53,6 @@ namespace chernov {
       } else {
         current += c;
       }
-      ++i;
     }
     if (!current.empty()) {
       args.pushBack(current);
