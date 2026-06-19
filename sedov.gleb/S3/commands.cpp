@@ -240,6 +240,7 @@ void sedov::outbound(std::istream & in, std::ostream & out, bool & printed, grap
   }
   else
   {
+    out << "\n";
     printed = false;
   }
 }
