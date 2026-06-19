@@ -1,7 +1,7 @@
 #ifndef HASH_TABLE_HPP
 #define HASH_TABLE_HPP
-#include "../common/vector.hpp"
-#include "../common/list.hpp"
+#include <vector.hpp>
+#include <list.hpp>
 #include "hash_iter.hpp"
 #include <cstddef>
 #include <functional>
@@ -13,27 +13,25 @@ namespace sedov
   template < class Key, class Value, class Hash = std::hash< Key >, class Equal = std::equal_to< Key > >
   class HashTable
   {
-    friend class HashIter< Key, Value, Hash, Equal >;
-    friend class HashConstIter< Key, Value, Hash, Equal >;
-    using valPair = std::pair< Key, Value >;
-
   public:
     using HIter = HashIter< Key, Value, Hash, Equal >;
     using HCIter = HashConstIter< Key, Value, Hash, Equal >;
 
     explicit HashTable(size_t slots);
-    ~HashTable();
-
     HashTable(const HashTable & other);
     HashTable(HashTable && other) noexcept;
+    ~HashTable();
+
     HashTable & operator=(const HashTable & other);
     HashTable & operator=(HashTable && other) noexcept;
 
-    void add(Key k, Value v);
-    void erase(Key k);
-    Value & at(Key k);
-    const Value & at(Key k) const;
-    bool contains(Key k) const noexcept;
+    void add(const Key & k, const Value & v);
+    void erase(const Key & k);
+    Value & at(const Key & k);
+    const Value & at(const Key & k) const;
+    Value & operator[](const Key & k);
+    Value & operator[](Key && k);
+    bool contains(const Key & k) const noexcept;
     void rehash(size_t slots);
 
     void clear() noexcept;
@@ -49,15 +47,20 @@ namespace sedov
     HCIter cend() const;
 
   private:
-    sedov::Vector< sedov::List< valPair > > data_;
+    using valPair = std::pair< Key, Value >;
+
+    Vector< List< valPair > > data_;
     size_t cap_;
     size_t size_;
     Hash hasher_;
     Equal comp_;
+
+    friend class HashIter< Key, Value, Hash, Equal >;
+    friend class HashConstIter< Key, Value, Hash, Equal >;
   };
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 sedov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
   data_(),
   cap_(slots),
@@ -71,13 +74,13 @@ sedov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
   }
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 sedov::HashTable< Key, Value, Hash, Equal >::~HashTable()
 {
   clear();
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 sedov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable & other):
   data_(),
   cap_(other.cap_),
@@ -100,19 +103,16 @@ sedov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable & other):
   }
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 sedov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable && other) noexcept:
   data_(std::move(other.data_)),
-  cap_(other.cap_),
-  size_(other.size_),
+  cap_(std::exchange(other.cap_, 0)),
+  size_(std::exchange(other.size_, 0)),
   hasher_(std::move(other.hasher_)),
   comp_(std::move(other.comp_))
-{
-  other.cap_ = 0;
-  other.size_ = 0;
-}
+{}
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 sedov::HashTable< Key, Value, Hash, Equal > &
 sedov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable & other)
 {
@@ -125,7 +125,7 @@ sedov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable & other)
   return *this;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 sedov::HashTable< Key, Value, Hash, Equal > &
 sedov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable && other) noexcept
 {
@@ -137,8 +137,8 @@ sedov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable && other) noexc
   return *this;
 }
 
-template < class Key, class Value, class Hash, class Equal >
-void sedov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
+template< class Key, class Value, class Hash, class Equal >
+void sedov::HashTable< Key, Value, Hash, Equal >::add(const Key & k, const Value & v)
 {
   size_t idx = hasher_(k) % cap_;
   for (LIter< valPair > it = data_[idx].begin(); it != data_[idx].end(); ++it)
@@ -153,8 +153,8 @@ void sedov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
   ++size_;
 }
 
-template < class Key, class Value, class Hash, class Equal >
-void sedov::HashTable< Key, Value, Hash, Equal >::erase(Key k)
+template< class Key, class Value, class Hash, class Equal >
+void sedov::HashTable< Key, Value, Hash, Equal >::erase(const Key & k)
 {
   size_t idx = hasher_(k) % cap_;
   for (LIter< valPair > it = data_[idx].begin(); it != data_[idx].end(); ++it)
@@ -168,22 +168,14 @@ void sedov::HashTable< Key, Value, Hash, Equal >::erase(Key k)
   }
 }
 
-template < class Key, class Value, class Hash, class Equal >
-Value & sedov::HashTable< Key, Value, Hash, Equal >::at(Key k)
+template< class Key, class Value, class Hash, class Equal >
+Value & sedov::HashTable< Key, Value, Hash, Equal >::at(const Key & k)
 {
-  size_t idx = hasher_(k) % cap_;
-  for (LIter< valPair > it = data_[idx].begin(); it != data_[idx].end(); ++it)
-  {
-    if (comp_(it->first, k))
-    {
-      return it->second;
-    }
-  }
-  throw std::out_of_range("Key not found");
+  return const_cast< Value & >(static_cast< const HashTable & >(*this).at(k));
 }
 
-template < class Key, class Value, class Hash, class Equal >
-const Value & sedov::HashTable< Key, Value, Hash, Equal >::at(Key k) const
+template< class Key, class Value, class Hash, class Equal >
+const Value & sedov::HashTable< Key, Value, Hash, Equal >::at(const Key & k) const
 {
   size_t idx = hasher_(k) % cap_;
   const sedov::List< valPair > &bucket = data_[idx];
@@ -197,8 +189,30 @@ const Value & sedov::HashTable< Key, Value, Hash, Equal >::at(Key k) const
   throw std::out_of_range("Key not found");
 }
 
-template < class Key, class Value, class Hash, class Equal >
-bool sedov::HashTable< Key, Value, Hash, Equal >::contains(Key k) const noexcept
+template< class Key, class Value, class Hash, class Equal >
+Value & sedov::HashTable< Key, Value, Hash, Equal >::operator[](const Key & k)
+{
+  if (contains(k))
+  {
+    return at(k);
+  }
+  add(k, Value{});
+  return at(k);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+Value & sedov::HashTable< Key, Value, Hash, Equal >::operator[](Key && k)
+{
+  if (contains(k))
+  {
+    return at(k);
+  }
+  add(std::move(k), Value{});
+  return at(k);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool sedov::HashTable< Key, Value, Hash, Equal >::contains(const Key & k) const noexcept
 {
   size_t idx = hasher_(k) % cap_;
   const sedov::List<valPair> &bucket = data_[idx];
@@ -212,7 +226,7 @@ bool sedov::HashTable< Key, Value, Hash, Equal >::contains(Key k) const noexcept
   return false;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void sedov::HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
 {
   if (slots <= cap_)
@@ -236,7 +250,7 @@ void sedov::HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   cap_ = slots;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void sedov::HashTable< Key, Value, Hash, Equal >::clear() noexcept
 {
   for (size_t i = 0; i < cap_; ++i)
@@ -246,19 +260,19 @@ void sedov::HashTable< Key, Value, Hash, Equal >::clear() noexcept
   size_ = 0;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 size_t sedov::HashTable< Key, Value, Hash, Equal >::size() const noexcept
 {
   return size_;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 bool sedov::HashTable< Key, Value, Hash, Equal >::empty() const noexcept
 {
   return size_ == 0;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void sedov::HashTable< Key, Value, Hash, Equal >::swap(HashTable & other) noexcept
 {
   data_.swap(other.data_);
@@ -268,38 +282,38 @@ void sedov::HashTable< Key, Value, Hash, Equal >::swap(HashTable & other) noexce
   std::swap(size_, other.size_);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename sedov::HashTable< Key, Value, Hash, Equal >::HIter sedov::HashTable< Key, Value, Hash, Equal >::begin()
 {
   return HIter(&data_, cap_, 0);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename sedov::HashTable< Key, Value, Hash, Equal >::HIter sedov::HashTable< Key, Value, Hash, Equal >::end()
 {
   return HIter();
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename sedov::HashTable< Key, Value, Hash, Equal >::HCIter sedov::HashTable< Key, Value, Hash, Equal >::begin() const
 {
   return HCIter(&data_, cap_, 0);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename sedov::HashTable< Key, Value, Hash, Equal >::HCIter sedov::HashTable< Key, Value, Hash, Equal >::end() const
 {
   return HCIter();
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename sedov::HashTable< Key, Value, Hash, Equal >::HCIter
 sedov::HashTable< Key, Value, Hash, Equal >::cbegin() const
 {
   return HCIter(&data_, cap_, 0);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename sedov::HashTable< Key, Value, Hash, Equal >::HCIter sedov::HashTable< Key, Value, Hash, Equal >::cend() const
 {
   return HCIter();

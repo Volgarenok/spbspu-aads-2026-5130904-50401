@@ -1,21 +1,19 @@
 #include "hash_table.hpp"
-#include <boost/test/unit_test.hpp>
 #include <stdexcept>
-
-using namespace sedov;
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(HashTableTests)
 
 BOOST_AUTO_TEST_CASE(test_default_constructor)
 {
-  HashTable< std::string, int > ht(16);
+  sedov::HashTable< std::string, int > ht(16);
   BOOST_CHECK(ht.empty());
   BOOST_CHECK_EQUAL(ht.size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_add_and_size)
 {
-  HashTable< std::string, int > ht(16);
+  sedov::HashTable< std::string, int > ht(16);
   ht.add("one", 1);
   BOOST_CHECK_EQUAL(ht.size(), 1);
   BOOST_CHECK(!ht.empty());
@@ -25,7 +23,7 @@ BOOST_AUTO_TEST_CASE(test_add_and_size)
 
 BOOST_AUTO_TEST_CASE(test_contains)
 {
-  HashTable< std::string, int > ht(16);
+  sedov::HashTable< std::string, int > ht(16);
   ht.add("one", 1);
   ht.add("two", 2);
   BOOST_CHECK(ht.contains("one"));
@@ -35,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_contains)
 
 BOOST_AUTO_TEST_CASE(test_at)
 {
-  HashTable< std::string, int > ht(16);
+  sedov::HashTable< std::string, int > ht(16);
   ht.add("one", 1);
   ht.add("two", 2);
   BOOST_CHECK_EQUAL(ht.at("one"), 1);
@@ -46,14 +44,14 @@ BOOST_AUTO_TEST_CASE(test_at)
 
 BOOST_AUTO_TEST_CASE(test_at_throws_for_missing_key)
 {
-  HashTable< std::string, int > ht(16);
+  sedov::HashTable< std::string, int > ht(16);
   ht.add("one", 1);
   BOOST_CHECK_THROW(ht.at("two"), std::out_of_range);
 }
 
 BOOST_AUTO_TEST_CASE(test_erase)
 {
-  HashTable< std::string, int > ht(16);
+  sedov::HashTable< std::string, int > ht(16);
   ht.add("one", 1);
   ht.add("two", 2);
   ht.erase("one");
@@ -64,7 +62,7 @@ BOOST_AUTO_TEST_CASE(test_erase)
 
 BOOST_AUTO_TEST_CASE(test_add_update_existing)
 {
-  HashTable< std::string, int > ht(16);
+  sedov::HashTable< std::string, int > ht(16);
   ht.add("key", 1);
   ht.add("key", 2);
   BOOST_CHECK_EQUAL(ht.size(), 1);
@@ -73,7 +71,7 @@ BOOST_AUTO_TEST_CASE(test_add_update_existing)
 
 BOOST_AUTO_TEST_CASE(test_clear)
 {
-  HashTable< std::string, int > ht(16);
+  sedov::HashTable< std::string, int > ht(16);
   ht.add("one", 1);
   ht.add("two", 2);
   ht.add("three", 3);
@@ -85,10 +83,10 @@ BOOST_AUTO_TEST_CASE(test_clear)
 
 BOOST_AUTO_TEST_CASE(test_copy_constructor)
 {
-  HashTable< std::string, int > ht1(16);
+  sedov::HashTable< std::string, int > ht1(16);
   ht1.add("one", 1);
   ht1.add("two", 2);
-  HashTable< std::string, int > ht2 = ht1;
+  sedov::HashTable< std::string, int > ht2 = ht1;
   BOOST_CHECK_EQUAL(ht2.size(), 2);
   BOOST_CHECK(ht2.contains("one"));
   BOOST_CHECK(ht2.contains("two"));
@@ -97,10 +95,10 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor)
 
 BOOST_AUTO_TEST_CASE(test_move_constructor)
 {
-  HashTable< std::string, int > ht1(16);
+  sedov::HashTable< std::string, int > ht1(16);
   ht1.add("one", 1);
   ht1.add("two", 2);
-  HashTable< std::string, int > ht2 = std::move(ht1);
+  sedov::HashTable< std::string, int > ht2 = std::move(ht1);
   BOOST_CHECK_EQUAL(ht2.size(), 2);
   BOOST_CHECK(ht2.contains("one"));
   BOOST_CHECK(ht2.contains("two"));
@@ -109,7 +107,7 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
 
 BOOST_AUTO_TEST_CASE(test_rehash)
 {
-  HashTable< std::string, int > ht(4);
+  sedov::HashTable< std::string, int > ht(4);
   ht.add("one", 1);
   ht.add("two", 2);
   ht.add("three", 3);
@@ -126,12 +124,12 @@ BOOST_AUTO_TEST_CASE(test_rehash)
 
 BOOST_AUTO_TEST_CASE(test_iterator)
 {
-  HashTable< std::string, int > ht(16);
+  sedov::HashTable< std::string, int > ht(16);
   ht.add("one", 1);
   ht.add("two", 2);
   ht.add("three", 3);
   int sum = 0;
-  for (auto it = ht.begin(); it != ht.end(); ++it)
+  for (sedov::HashTable< std::string, int >::HIter it = ht.begin(); it != ht.end(); ++it)
   {
     sum += (*it).second;
   }

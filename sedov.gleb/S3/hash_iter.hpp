@@ -1,7 +1,7 @@
 #ifndef HASH_ITERS_HPP
 #define HASH_ITERS_HPP
-#include "../common/vector.hpp"
-#include "../common/list.hpp"
+#include <vector.hpp>
+#include <list.hpp>
 #include <cstddef>
 #include <utility>
 
@@ -16,25 +16,29 @@ namespace sedov
   template < class Key, class Value, class Hash, class Equal >
   class HashIter
   {
-    friend class HashTable< Key, Value, Hash, Equal >;
-    friend class HashConstIter< Key, Value, Hash, Equal >;
+  public:
     using valType = std::pair< Key, Value >;
 
-  public:
     HashIter();
-    HashIter(sedov::Vector< sedov::List< valType > > * data, size_t capacity, size_t start_idx);
 
     HashIter & operator++();
+    HashIter operator++(int);
     bool operator==(const HashIter & other) const;
     bool operator!=(const HashIter & other) const;
     valType & operator*();
+    valType *operator->();
 
   private:
-    sedov::Vector< sedov::List< valType > > * data_;
+    Vector< List< valType > > * data_;
     size_t capacity_;
     size_t idx_;
     LIter< valType > listIt_;
     LIter< valType > listEnd_;
+
+    HashIter(Vector< List< valType > > * data, size_t capacity, size_t startIdx);
+
+    friend class HashTable< Key, Value, Hash, Equal >;
+    friend class HashConstIter< Key, Value, Hash, Equal >;
 
     void findValid();
   };
@@ -42,25 +46,29 @@ namespace sedov
   template < class Key, class Value, class Hash, class Equal >
   class HashConstIter
   {
-    friend class HashTable< Key, Value, Hash, Equal >;
-    friend class HashIter< Key, Value, Hash, Equal >;
+  public:
     using valType = std::pair< Key, Value >;
 
-  public:
     HashConstIter();
-    HashConstIter(const sedov::Vector< sedov::List< valType > > * data, size_t capacity, size_t start_idx);
 
     HashConstIter & operator++();
+    HashConstIter operator++(int);
     bool operator==(const HashConstIter & other) const;
     bool operator!=(const HashConstIter & other) const;
     const valType & operator*() const;
+    const valType *operator->() const;
 
   private:
-    const sedov::Vector< sedov::List< valType > > * data_;
+    const Vector< List< valType > > * data_;
     size_t capacity_;
     size_t idx_;
     LCIter< valType > listIt_;
     LCIter< valType > listEnd_;
+
+    HashConstIter(const Vector< List< valType > > * data, size_t capacity, size_t startIdx);
+
+    friend class HashTable< Key, Value, Hash, Equal >;
+    friend class HashIter< Key, Value, Hash, Equal >;
 
     void findValid();
   };
@@ -76,13 +84,11 @@ sedov::HashIter< Key, Value, Hash, Equal >::HashIter():
 {}
 
 template < class Key, class Value, class Hash, class Equal >
-sedov::HashIter< Key, Value, Hash, Equal >::HashIter(
-    sedov::Vector< sedov::List< valType > > * data,
-    size_t capacity,
-    size_t start_idx):
+sedov::HashIter< Key, Value, Hash, Equal >::HashIter(Vector< List< valType > > * data,
+    size_t capacity, size_t startIdx):
   data_(data),
   capacity_(capacity),
-  idx_(start_idx),
+  idx_(startIdx),
   listIt_(nullptr),
   listEnd_(nullptr)
 {
@@ -119,6 +125,14 @@ sedov::HashIter< Key, Value, Hash, Equal > & sedov::HashIter< Key, Value, Hash, 
 }
 
 template < class Key, class Value, class Hash, class Equal >
+sedov::HashIter< Key, Value, Hash, Equal > sedov::HashIter< Key, Value, Hash, Equal >::operator++(int)
+{
+  HashIter temp = *this;
+  ++(*this);
+  return temp;
+}
+
+template < class Key, class Value, class Hash, class Equal >
 bool sedov::HashIter< Key, Value, Hash, Equal >::operator==(const HashIter & other) const
 {
   if (data_ == nullptr && other.data_ == nullptr)
@@ -143,10 +157,15 @@ bool sedov::HashIter< Key, Value, Hash, Equal >::operator!=(const HashIter & oth
 }
 
 template < class Key, class Value, class Hash, class Equal >
-typename sedov::HashIter< Key, Value, Hash, Equal >::valType &
-sedov::HashIter< Key, Value, Hash, Equal >::operator*()
+typename sedov::HashIter< Key, Value, Hash, Equal >::valType & sedov::HashIter< Key, Value, Hash, Equal >::operator*()
 {
   return *listIt_;
+}
+
+template < class Key, class Value, class Hash, class Equal >
+typename sedov::HashIter< Key, Value, Hash, Equal >::valType * sedov::HashIter< Key, Value, Hash, Equal >::operator->()
+{
+  return &(*listIt_);
 }
 
 template < class Key, class Value, class Hash, class Equal >
@@ -159,13 +178,11 @@ sedov::HashConstIter< Key, Value, Hash, Equal >::HashConstIter():
 {}
 
 template < class Key, class Value, class Hash, class Equal >
-sedov::HashConstIter< Key, Value, Hash, Equal >::HashConstIter(
-    const sedov::Vector< sedov::List< valType > > * data,
-    size_t capacity,
-    size_t start_idx):
+sedov::HashConstIter< Key, Value, Hash, Equal >::HashConstIter(const Vector< List< valType > > * data,
+    size_t capacity, size_t startIdx):
   data_(data),
   capacity_(capacity),
-  idx_(start_idx),
+  idx_(startIdx),
   listIt_(nullptr),
   listEnd_(nullptr)
 {
@@ -188,7 +205,7 @@ void sedov::HashConstIter< Key, Value, Hash, Equal >::findValid()
 }
 
 template < class Key, class Value, class Hash, class Equal >
-sedov::HashConstIter<Key, Value, Hash, Equal> & sedov::HashConstIter< Key, Value, Hash, Equal >::operator++()
+sedov::HashConstIter< Key, Value, Hash, Equal > & sedov::HashConstIter< Key, Value, Hash, Equal >::operator++()
 {
   ++listIt_;
   if (listIt_ != listEnd_)
@@ -198,6 +215,14 @@ sedov::HashConstIter<Key, Value, Hash, Equal> & sedov::HashConstIter< Key, Value
   ++idx_;
   findValid();
   return *this;
+}
+
+template < class Key, class Value, class Hash, class Equal >
+sedov::HashConstIter< Key, Value, Hash, Equal > sedov::HashConstIter< Key, Value, Hash, Equal >::operator++(int)
+{
+  HashConstIter temp = *this;
+  ++(*this);
+  return temp;
 }
 
 template < class Key, class Value, class Hash, class Equal >
@@ -226,9 +251,16 @@ bool sedov::HashConstIter< Key, Value, Hash, Equal >::operator!=(const HashConst
 
 template < class Key, class Value, class Hash, class Equal >
 const typename sedov::HashConstIter< Key, Value, Hash, Equal >::valType &
-sedov::HashConstIter<Key, Value, Hash, Equal>::operator*() const
+  sedov::HashConstIter< Key, Value, Hash, Equal >::operator*() const
 {
   return *listIt_;
+}
+
+template < class Key, class Value, class Hash, class Equal >
+const typename sedov::HashConstIter< Key, Value, Hash, Equal >::valType *
+  sedov::HashConstIter< Key, Value, Hash, Equal >::operator->() const
+{
+  return &(*listIt_);
 }
 
 #endif

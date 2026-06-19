@@ -1,39 +1,36 @@
 #include "commands.hpp"
-#include "../common/vector.hpp"
+#include <vector.hpp>
 #include <limits>
 
-namespace sedov
+namespace
 {
-  namespace det
+  void sortStrings(sedov::Vector< std::string > & vec)
   {
-    void sort_strings(sedov::Vector< std::string > & vec)
+    for (size_t i = 1; i < vec.getSize(); ++i)
     {
-      for (size_t i = 1; i < vec.getSize(); ++i)
+      std::string key = vec[i];
+      size_t j = i;
+      while ((j > 0) && (vec[j - 1] > key))
       {
-        std::string key = vec[i];
-        size_t j = i;
-        while ((j > 0) && (vec[j - 1] > key))
-        {
-          vec[j] = vec[j - 1];
-          --j;
-        }
-        vec[j] = key;
+        vec[j] = vec[j - 1];
+        --j;
       }
+      vec[j] = key;
     }
+  }
 
-    void sort_weights(sedov::Vector< size_t > & vec)
+  void sortWeights(sedov::Vector< size_t > & vec)
+  {
+    for (size_t i = 1; i < vec.getSize(); ++i)
     {
-      for (size_t i = 1; i < vec.getSize(); ++i)
+      size_t key = vec[i];
+      size_t j = i;
+      while ((j > 0) && (vec[j - 1] > key))
       {
-        size_t key = vec[i];
-        size_t j = i;
-        while ((j > 0) && (vec[j - 1] > key))
-        {
-          vec[j] = vec[j - 1];
-          --j;
-        }
-        vec[j] = key;
+        vec[j] = vec[j - 1];
+        --j;
       }
+      vec[j] = key;
     }
   }
 }
@@ -43,65 +40,55 @@ void sedov::graphs(std::istream &, std::ostream & out, graphSet & graphs)
   sedov::Vector< std::string > names;
   for (auto it = graphs.begin(); it != graphs.end(); ++it)
   {
-    names.pushBack((*it).first);
+    names.pushBack(it->first);
   }
-  det::sort_strings(names);
-  if (names.getSize() == 0)
+  sortStrings(names);
+  if (names.getSize())
   {
-    out << "\n";
-  }
-  else
-  {
-    for (size_t i = 0; i < names.getSize(); ++i)
+    out << names[0];
+    for (size_t i = 1; i < names.getSize(); ++i)
     {
-      out << names[i] << "\n";
+      out << "\n" << names[i];
     }
   }
 }
 
 void sedov::vertexes(std::istream & in, std::ostream & out, graphSet & graphs)
 {
-  std::string g_name;
-  in >> g_name;
-  if (!graphs.contains(g_name))
-  {
-    throw std::runtime_error("No graph");
-  }
-  Graph & g = graphs.at(g_name);
+  std::string gName;
+  in >> gName;
+  Graph & g = graphs.at(gName);
   sedov::Vector< std::string > verts;
   for (LIter< std::string > it = g.vertices.begin(); it != g.vertices.end(); ++it)
   {
     verts.pushBack(*it);
   }
-  det::sort_strings(verts);
-  if (verts.getSize() == 0)
+  sortStrings(verts);
+  if (verts.getSize())
   {
-    out << "\n";
-  }
-  else
-  {
-    for (size_t i = 0; i < verts.getSize(); ++i)
+    out << verts[0];
+    for (size_t i = 1; i < verts.getSize(); ++i)
     {
-      out << verts[i] << "\n";
+      out << "\n" << verts[i];
     }
   }
 }
 
 void sedov::bind(std::istream & in, std::ostream &, graphSet & graphs)
 {
-  std::string g_name, v1, v2;
+  std::string gName, v1, v2;
   size_t w = 0;
-  in >> g_name >> v1 >> v2 >> w;
-  Graph & g = graphs.at(g_name);
+  in >> gName >> v1 >> v2 >> w;
+  Graph & g = graphs.at(gName);
   g.addEdge(v1, v2, w);
 }
 
 void sedov::cut(std::istream & in, std::ostream &, graphSet & graphs)
 {
-  std::string g_name, v1, v2;
+  std::string gName, v1, v2;
   size_t w = 0;
-  in >> g_name >> v1 >> v2 >> w;
-  Graph & g = graphs.at(g_name);
+  in >> gName >> v1 >> v2 >> w;
+  Graph & g = graphs.at(gName);
   bool v1_exists = false;
   bool v2_exists = false;
   for (LIter< std::string > it = g.vertices.begin(); it != g.vertices.end(); ++it)
@@ -124,13 +111,13 @@ void sedov::cut(std::istream & in, std::ostream &, graphSet & graphs)
 
 void sedov::create(std::istream & in, std::ostream &, graphSet & graphs)
 {
-  std::string g_name;
-  in >> g_name;
+  std::string gName;
+  in >> gName;
   if (!in)
   {
     throw std::runtime_error("Invalid input");
   }
-  if (graphs.contains(g_name))
+  if (graphs.contains(gName))
   {
     throw std::runtime_error("Graph already exists");
   }
@@ -151,18 +138,18 @@ void sedov::create(std::istream & in, std::ostream &, graphSet & graphs)
     }
     g.addVertex(v);
   }
-  graphs.add(g_name, std::move(g));
+  graphs.add(gName, std::move(g));
 }
 
 void sedov::outbound(std::istream & in, std::ostream & out, graphSet & graphs)
 {
-  std::string g_name, v_name;
-  in >> g_name >> v_name;
-  Graph & g = graphs.at(g_name);
+  std::string gName, vName;
+  in >> gName >> vName;
+  Graph & g = graphs.at(gName);
   bool found = false;
   for (LIter< std::string > it = g.vertices.begin(); it != g.vertices.end(); ++it)
   {
-    if (*it == v_name)
+    if (*it == vName)
     {
       found = true;
       break;
@@ -174,20 +161,20 @@ void sedov::outbound(std::istream & in, std::ostream & out, graphSet & graphs)
   }
 
   using EdgeOut = std::pair< std::string, sedov::Vector< size_t > >;
-  sedov::Vector< EdgeOut > edges_out;
+  sedov::Vector< EdgeOut > edgesOut;
 
   for (auto eit = g.edges.begin(); eit != g.edges.end(); ++eit)
   {
-    if ((*eit).first.first == v_name)
+    if (eit->first.first == vName)
     {
       bool exists = false;
-      for (size_t i = 0; i < edges_out.getSize(); ++i)
+      for (size_t i = 0; i < edgesOut.getSize(); ++i)
       {
-        if (edges_out[i].first == (*eit).first.second)
+        if (edgesOut[i].first == eit->first.second)
         {
-          for (LIter< size_t > wit = (*eit).second.begin(); wit != (*eit).second.end(); ++wit)
+          for (LIter< size_t > wit = eit->second.begin(); wit != eit->second.end(); ++wit)
           {
-            edges_out[i].second.pushBack(*wit);
+            edgesOut[i].second.pushBack(*wit);
           }
           exists = true;
           break;
@@ -196,35 +183,35 @@ void sedov::outbound(std::istream & in, std::ostream & out, graphSet & graphs)
       if (!exists)
       {
         sedov::Vector< size_t > ws;
-        for (LIter< size_t > wit = (*eit).second.begin(); wit != (*eit).second.end(); ++wit)
+        for (LIter< size_t > wit = eit->second.begin(); wit != eit->second.end(); ++wit)
         {
           ws.pushBack(*wit);
         }
-        edges_out.pushBack({(*eit).first.second, std::move(ws)});
+        edgesOut.pushBack({eit->first.second, std::move(ws)});
       }
     }
   }
 
   sedov::Vector< std::string > dests;
-  for (size_t i = 0; i < edges_out.getSize(); ++i)
+  for (size_t i = 0; i < edgesOut.getSize(); ++i)
   {
-    dests.pushBack(edges_out[i].first);
+    dests.pushBack(edgesOut[i].first);
   }
-  det::sort_strings(dests);
+  sortStrings(dests);
 
   if (dests.getSize() > 0)
   {
     for (size_t i = 0; i < dests.getSize(); ++i)
     {
       out << dests[i];
-      for (size_t j = 0; j < edges_out.getSize(); ++j)
+      for (size_t j = 0; j < edgesOut.getSize(); ++j)
       {
-        if (edges_out[j].first == dests[i])
+        if (edgesOut[j].first == dests[i])
         {
-          det::sort_weights(edges_out[j].second);
-          for (size_t k = 0; k < edges_out[j].second.getSize(); ++k)
+          sortWeights(edgesOut[j].second);
+          for (size_t k = 0; k < edgesOut[j].second.getSize(); ++k)
           {
-            out << " " << edges_out[j].second[k];
+            out << " " << edgesOut[j].second[k];
           }
           break;
         }
@@ -234,23 +221,18 @@ void sedov::outbound(std::istream & in, std::ostream & out, graphSet & graphs)
         out << "\n";
       }
     }
-    out << "\n";
-  }
-  else
-  {
-    out << "\n";
   }
 }
 
 void sedov::inbound(std::istream & in, std::ostream & out, graphSet & graphs)
 {
-  std::string g_name, v_name;
-  in >> g_name >> v_name;
-  Graph & g = graphs.at(g_name);
+  std::string gName, vName;
+  in >> gName >> vName;
+  Graph & g = graphs.at(gName);
   bool found = false;
   for (LIter< std::string > it = g.vertices.begin(); it != g.vertices.end(); ++it)
   {
-    if (*it == v_name)
+    if (*it == vName)
     {
       found = true;
       break;
@@ -262,20 +244,20 @@ void sedov::inbound(std::istream & in, std::ostream & out, graphSet & graphs)
   }
 
   using EdgeIn = std::pair< std::string, sedov::Vector< size_t > >;
-  sedov::Vector< EdgeIn > edges_in;
+  sedov::Vector< EdgeIn > edgesIn;
 
   for (auto eit = g.edges.begin(); eit != g.edges.end(); ++eit)
   {
-    if ((*eit).first.second == v_name)
+    if (eit->first.second == vName)
     {
       bool exists = false;
-      for (size_t i = 0; i < edges_in.getSize(); ++i)
+      for (size_t i = 0; i < edgesIn.getSize(); ++i)
       {
-        if (edges_in[i].first == (*eit).first.first)
+        if (edgesIn[i].first == eit->first.first)
         {
-          for (LIter< size_t > wit = (*eit).second.begin(); wit != (*eit).second.end(); ++wit)
+          for (LIter< size_t > wit = eit->second.begin(); wit != eit->second.end(); ++wit)
           {
-            edges_in[i].second.pushBack(*wit);
+            edgesIn[i].second.pushBack(*wit);
           }
           exists = true;
           break;
@@ -284,46 +266,49 @@ void sedov::inbound(std::istream & in, std::ostream & out, graphSet & graphs)
       if (!exists)
       {
         sedov::Vector< size_t > ws;
-        for (LIter< size_t > wit = (*eit).second.begin(); wit != (*eit).second.end(); ++wit)
+        for (LIter< size_t > wit = eit->second.begin(); wit != eit->second.end(); ++wit)
         {
           ws.pushBack(*wit);
         }
-        edges_in.pushBack({(*eit).first.first, std::move(ws)});
+        edgesIn.pushBack({eit->first.first, std::move(ws)});
       }
     }
   }
 
   sedov::Vector< std::string > srcs;
-  for (size_t i = 0; i < edges_in.getSize(); ++i)
+  for (size_t i = 0; i < edgesIn.getSize(); ++i)
   {
-    srcs.pushBack(edges_in[i].first);
+    srcs.pushBack(edgesIn[i].first);
   }
-  det::sort_strings(srcs);
+  sortStrings(srcs);
 
   for (size_t i = 0; i < srcs.getSize(); ++i)
   {
     out << srcs[i];
-    for (size_t j = 0; j < edges_in.getSize(); ++j)
+    for (size_t j = 0; j < edgesIn.getSize(); ++j)
     {
-      if (edges_in[j].first == srcs[i])
+      if (edgesIn[j].first == srcs[i])
       {
-        det::sort_weights(edges_in[j].second);
-        for (size_t k = 0; k < edges_in[j].second.getSize(); ++k)
+        sortWeights(edgesIn[j].second);
+        for (size_t k = 0; k < edgesIn[j].second.getSize(); ++k)
         {
-          out << " " << edges_in[j].second[k];
+          out << " " << edgesIn[j].second[k];
         }
         break;
       }
     }
-    out << "\n";
+    if (i < srcs.getSize() - 1)
+    {
+      out << "\n";
+    }
   }
 }
 
 void sedov::merge(std::istream & in, std::ostream &, graphSet & graphs)
 {
-  std::string new_g, g1, g2;
-  in >> new_g >> g1 >> g2;
-  if (graphs.contains(new_g) || !graphs.contains(g1) || !graphs.contains(g2))
+  std::string newG, g1, g2;
+  in >> newG >> g1 >> g2;
+  if (graphs.contains(newG))
   {
     throw std::runtime_error("Invalid");
   }
@@ -342,32 +327,32 @@ void sedov::merge(std::istream & in, std::ostream &, graphSet & graphs)
 
   for (auto eit = src1.edges.begin(); eit != src1.edges.end(); ++eit)
   {
-    for (LIter< size_t > wit = (*eit).second.begin(); wit != (*eit).second.end(); ++wit)
+    for (LIter< size_t > wit = eit->second.begin(); wit != eit->second.end(); ++wit)
     {
-      merged.addEdge((*eit).first.first, (*eit).first.second, *wit);
+      merged.addEdge(eit->first.first, eit->first.second, *wit);
     }
   }
   for (auto eit = src2.edges.begin(); eit != src2.edges.end(); ++eit)
   {
-    for (LIter< size_t > wit = (*eit).second.begin(); wit != (*eit).second.end(); ++wit)
+    for (LIter< size_t > wit = eit->second.begin(); wit != eit->second.end(); ++wit)
     {
-      merged.addEdge((*eit).first.first, (*eit).first.second, *wit);
+      merged.addEdge(eit->first.first, eit->first.second, *wit);
     }
   }
 
-  graphs.add(new_g, std::move(merged));
+  graphs.add(newG, std::move(merged));
 }
 
 void sedov::extract(std::istream & in, std::ostream &, graphSet & graphs)
 {
-  std::string new_g, old_g;
+  std::string newG, oldG;
   size_t k = 0;
-  in >> new_g >> old_g >> k;
-  if (graphs.contains(new_g) || !graphs.contains(old_g))
+  in >> newG >> oldG >> k;
+  if (graphs.contains(newG))
   {
     throw std::runtime_error("Invalid");
   }
-  Graph & src = graphs.at(old_g);
+  Graph & src = graphs.at(oldG);
   sedov::List< std::string > required;
   for (size_t i = 0; i < k; ++i)
   {
@@ -401,27 +386,27 @@ void sedov::extract(std::istream & in, std::ostream &, graphSet & graphs)
 
   for (auto eit = src.edges.begin(); eit != src.edges.end(); ++eit)
   {
-    bool v1_ok = false;
-    bool v2_ok = false;
+    bool v1Ok = false;
+    bool v2Ok = false;
     for (LIter< std::string > rit = required.begin(); rit != required.end(); ++rit)
     {
-      if (*rit == (*eit).first.first)
+      if (*rit == eit->first.first)
       {
-        v1_ok = true;
+        v1Ok = true;
       }
-      if (*rit == (*eit).first.second)
+      if (*rit == eit->first.second)
       {
-        v2_ok = true;
+        v2Ok = true;
       }
     }
-    if (v1_ok && v2_ok)
+    if (v1Ok && v2Ok)
     {
-      for (LIter< size_t > wit = (*eit).second.begin(); wit != (*eit).second.end(); ++wit)
+      for (LIter< size_t > wit = eit->second.begin(); wit != eit->second.end(); ++wit)
       {
-        ext.addEdge((*eit).first.first, (*eit).first.second, *wit);
+        ext.addEdge(eit->first.first, eit->first.second, *wit);
       }
     }
   }
 
-  graphs.add(new_g, std::move(ext));
+  graphs.add(newG, std::move(ext));
 }
