@@ -53,24 +53,20 @@ int main(int argc, char ** argv)
   commands.add("extract", sedov::extract);
 
   std::string cmd;
-  bool firstCmd = true;
   while (std::cin >> cmd)
   {
     try
     {
-      if (!firstCmd)
+      bool outputPrinted = false;
+      commands.at(cmd)(std::cin, std::cout, outputPrinted, graphs);
+      if (outputPrinted)
       {
         std::cout << "\n";
       }
-      commands.at(cmd)(std::cin, std::cout, graphs);
     }
     catch (const std::exception &)
     {
-      if (!firstCmd)
-      {
-        std::cout << "\n";
-      }
-      std::cout << "<INVALID COMMAND>" << '\n';
+      std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }

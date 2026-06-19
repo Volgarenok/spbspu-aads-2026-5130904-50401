@@ -35,7 +35,7 @@ namespace
   }
 }
 
-void sedov::graphs(std::istream &, std::ostream & out, graphSet & graphs)
+void sedov::graphs(std::istream &, std::ostream & out, bool & printed, graphSet & graphs)
 {
   sedov::Vector< std::string > names;
   for (auto it = graphs.begin(); it != graphs.end(); ++it)
@@ -51,9 +51,10 @@ void sedov::graphs(std::istream &, std::ostream & out, graphSet & graphs)
       out << "\n" << names[i];
     }
   }
+  printed = (names.getSize() > 0);
 }
 
-void sedov::vertexes(std::istream & in, std::ostream & out, graphSet & graphs)
+void sedov::vertexes(std::istream & in, std::ostream & out, bool & printed, graphSet & graphs)
 {
   std::string gName;
   in >> gName;
@@ -72,18 +73,20 @@ void sedov::vertexes(std::istream & in, std::ostream & out, graphSet & graphs)
       out << "\n" << verts[i];
     }
   }
+  printed = (verts.getSize() > 0);
 }
 
-void sedov::bind(std::istream & in, std::ostream &, graphSet & graphs)
+void sedov::bind(std::istream & in, std::ostream &, bool & printed, graphSet & graphs)
 {
   std::string gName, v1, v2;
   size_t w = 0;
   in >> gName >> v1 >> v2 >> w;
   Graph & g = graphs.at(gName);
   g.addEdge(v1, v2, w);
+  printed = false;
 }
 
-void sedov::cut(std::istream & in, std::ostream &, graphSet & graphs)
+void sedov::cut(std::istream & in, std::ostream &, bool & printed, graphSet & graphs)
 {
   std::string gName, v1, v2;
   size_t w = 0;
@@ -107,9 +110,10 @@ void sedov::cut(std::istream & in, std::ostream &, graphSet & graphs)
     throw std::runtime_error("Vertex missing");
   }
   g.removeEdge(v1, v2, w);
+  printed = false;
 }
 
-void sedov::create(std::istream & in, std::ostream &, graphSet & graphs)
+void sedov::create(std::istream & in, std::ostream &, bool & printed, graphSet & graphs)
 {
   std::string gName;
   in >> gName;
@@ -139,9 +143,10 @@ void sedov::create(std::istream & in, std::ostream &, graphSet & graphs)
     g.addVertex(v);
   }
   graphs.add(gName, std::move(g));
+  printed = false;
 }
 
-void sedov::outbound(std::istream & in, std::ostream & out, graphSet & graphs)
+void sedov::outbound(std::istream & in, std::ostream & out, bool & printed, graphSet & graphs)
 {
   std::string gName, vName;
   in >> gName >> vName;
@@ -222,9 +227,10 @@ void sedov::outbound(std::istream & in, std::ostream & out, graphSet & graphs)
       }
     }
   }
+  printed = (dests.getSize() > 0);
 }
 
-void sedov::inbound(std::istream & in, std::ostream & out, graphSet & graphs)
+void sedov::inbound(std::istream & in, std::ostream & out, bool & printed, graphSet & graphs)
 {
   std::string gName, vName;
   in >> gName >> vName;
@@ -302,9 +308,10 @@ void sedov::inbound(std::istream & in, std::ostream & out, graphSet & graphs)
       out << "\n";
     }
   }
+  printed = (srcs.getSize() > 0);
 }
 
-void sedov::merge(std::istream & in, std::ostream &, graphSet & graphs)
+void sedov::merge(std::istream & in, std::ostream &, bool & printed, graphSet & graphs)
 {
   std::string newG, g1, g2;
   in >> newG >> g1 >> g2;
@@ -341,9 +348,10 @@ void sedov::merge(std::istream & in, std::ostream &, graphSet & graphs)
   }
 
   graphs.add(newG, std::move(merged));
+  printed = false;
 }
 
-void sedov::extract(std::istream & in, std::ostream &, graphSet & graphs)
+void sedov::extract(std::istream & in, std::ostream &, bool & printed, graphSet & graphs)
 {
   std::string newG, oldG;
   size_t k = 0;
@@ -409,4 +417,5 @@ void sedov::extract(std::istream & in, std::ostream &, graphSet & graphs)
   }
 
   graphs.add(newG, std::move(ext));
+  printed = false;
 }
