@@ -50,8 +50,13 @@ void sedov::graphs(std::istream &, std::ostream & out, bool & printed, graphSet 
     {
       out << "\n" << names[i];
     }
+    printed = true;
   }
-  printed = true;
+  else
+  {
+    out << "\n";
+    printed = false;
+  }
 }
 
 void sedov::vertexes(std::istream & in, std::ostream & out, bool & printed, graphSet & graphs)
@@ -72,8 +77,13 @@ void sedov::vertexes(std::istream & in, std::ostream & out, bool & printed, grap
     {
       out << "\n" << verts[i];
     }
+    printed = true;
   }
-  printed = true;
+  else
+  {
+    out << "\n";
+    printed = false;
+  }
 }
 
 void sedov::bind(std::istream & in, std::ostream &, bool & printed, graphSet & graphs)
@@ -221,10 +231,17 @@ void sedov::outbound(std::istream & in, std::ostream & out, bool & printed, grap
           break;
         }
       }
-      out << "\n";
+      if (i < dests.getSize() - 1)
+      {
+        out << "\n";
+      }
     }
+    printed = true;
   }
-  printed = (dests.getSize() > 0);
+  else
+  {
+    printed = false;
+  }
 }
 
 void sedov::inbound(std::istream & in, std::ostream & out, bool & printed, graphSet & graphs)
@@ -285,24 +302,34 @@ void sedov::inbound(std::istream & in, std::ostream & out, bool & printed, graph
   }
   sortStrings(srcs);
 
-  for (size_t i = 0; i < srcs.getSize(); ++i)
+  if (srcs.getSize())
   {
-    out << srcs[i];
-    for (size_t j = 0; j < edgesIn.getSize(); ++j)
+    for (size_t i = 0; i < srcs.getSize(); ++i)
     {
-      if (edgesIn[j].first == srcs[i])
+      out << srcs[i];
+      for (size_t j = 0; j < edgesIn.getSize(); ++j)
       {
-        sortWeights(edgesIn[j].second);
-        for (size_t k = 0; k < edgesIn[j].second.getSize(); ++k)
+        if (edgesIn[j].first == srcs[i])
         {
-          out << " " << edgesIn[j].second[k];
+          sortWeights(edgesIn[j].second);
+          for (size_t k = 0; k < edgesIn[j].second.getSize(); ++k)
+          {
+            out << " " << edgesIn[j].second[k];
+          }
+          break;
         }
-        break;
+      }
+      if (i < srcs.getSize() - 1)
+      {
+        out << "\n";
       }
     }
-    out << "\n";
+    printed = true;
   }
-  printed = (srcs.getSize() > 0);
+  else
+  {
+    printed = false;
+  }
 }
 
 void sedov::merge(std::istream & in, std::ostream &, bool & printed, graphSet & graphs)
