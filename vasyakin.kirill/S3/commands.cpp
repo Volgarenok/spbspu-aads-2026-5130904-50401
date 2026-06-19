@@ -343,7 +343,7 @@ namespace vasyakin
     Graph graph;
     size_t k = 0;
 
-    if (in >> k) 
+    if (in >> k)
     {
       for (size_t i = 0; i < k; ++i)
       {

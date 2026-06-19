@@ -36,7 +36,7 @@ namespace vasyakin
       size_t capacity,
       size_t start_idx,
       vasyakin::LIter< PairType > list_it = vasyakin::LIter< PairType >{});
-    
+
     HashIter(const HashConstIter< Key, Value, Hash, Equal >& other);
 
     vasyakin::Vector< vasyakin::List< PairType > >* buckets_;
