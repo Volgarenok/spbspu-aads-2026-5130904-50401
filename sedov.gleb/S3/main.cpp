@@ -39,7 +39,7 @@ int main(int argc, char ** argv)
   }
   file.close();
 
-  using cmd_t = void (*)(std::istream &, std::ostream &, sedov::graphSet &);
+  using cmd_t = void (*)(std::istream &, std::ostream &, bool &, sedov::graphSet &);
   sedov::HashTable< std::string, cmd_t, sedov::Hasher< std::string >, std::equal_to< std::string > > commands(16);
 
   commands.add("graphs", sedov::graphs);
