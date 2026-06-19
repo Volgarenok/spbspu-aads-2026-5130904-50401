@@ -106,6 +106,34 @@ namespace
 
     return "не достигнута";
   }
+
+  void distribute_income(ulanova::Profile& profile, long long amount, const ulanova::Date& date)
+  {
+      long long remaining = amount;
+
+      for (int priority = 0; priority <= 999 && remaining > 0; ++priority)
+      {
+          for (size_t i = 0; i < profile.savings.getsize() && remaining > 0; ++i)
+          {
+              ulanova::Saving& saving = profile.savings[i];
+
+              if (saving.priority != priority) continue;
+              if (saving.name == "default") continue;
+              if (!ulanova::is_before_or_equal(saving.start_date, date)) continue;
+
+              const long long need = saving.target_sum - saving.current_sum;
+              if (need <= 0) continue;
+
+              const long long deposit = (remaining < need) ? remaining : need;
+              saving.current_sum += deposit;
+              remaining -= deposit;
+
+              ulanova::Operation op{deposit, date, false};
+              profile.operations.push_back(op);
+              profile.balance -= deposit;
+          }
+      }
+  }
 }
 
 void ulanova::FinanceSystem::create_profile(const std::string& name)
@@ -175,9 +203,12 @@ void ulanova::FinanceSystem::add_income(const std::string& name, long long amoun
     throw std::logic_error("profile not found");
   }
 
-  Operation operation{amount, parse_date(date), true};
+  const Date parsed_date = parse_date(date);
+  Operation operation{amount, parsed_date, true};
   profile->operations.push_back(operation);
   profile->balance += amount;
+
+  distribute_income(*profile, amount, parsed_date);
 }
 
 void ulanova::FinanceSystem::add_expense(const std::string& name, long long amount, const std::string& date)
@@ -280,6 +311,11 @@ void ulanova::FinanceSystem::create_saving(const std::string& saving_name,
 
   Saving saving{saving_name, 0 , target_sum, priority, parsed_start_date};
   profile->savings.push_back(saving);
+  const long long free_balance = profile->balance;
+  if (free_balance > 0)
+  {
+    distribute_income(*profile, free_balance, parsed_start_date);
+  }
 }
 
 void ulanova::FinanceSystem::finish_saving(const std::string& profile_name, const std::string& saving_name, const std::string& date)
@@ -310,7 +346,7 @@ void ulanova::FinanceSystem::finish_saving(const std::string& profile_name, cons
 
 void ulanova::FinanceSystem::close_saving(const std::string& profile_name, const std::string& saving_name, const std::string& date)
 {
-  parse_date(date);
+   const Date parsed_date = parse_date(date);
   Profile* profile = profiles_.find(profile_name);
 
   if (profile == nullptr)
@@ -326,9 +362,14 @@ void ulanova::FinanceSystem::close_saving(const std::string& profile_name, const
       {
         throw std::logic_error("system saving");
       }
-
-      profile->balance += profile->savings[j].current_sum;
-      profile->savings.erase( j);
+      const long long returned = profile->savings[j].current_sum;
+      if (returned > 0)
+      {
+        Operation op{returned, parsed_date, true};
+        profile->operations.push_back(op);
+        profile->balance += returned;
+      }
+      profile->savings.erase(j);
       return;
     }
   }
