@@ -184,3 +184,58 @@ BOOST_AUTO_TEST_CASE(manager_optimize_test)
   BOOST_CHECK(!manager.hasTaskInList("result", "C"));
   BOOST_TEST(manager.getCurrentLabor("result") == 30);
 }
+
+BOOST_AUTO_TEST_CASE(manager_delete_list_test)
+{
+  zhuravleva::TaskManager manager;
+  manager.createList("work", 50);
+  manager.deleteList("work");
+
+  BOOST_CHECK(!manager.hasList("work"));
+}
+
+BOOST_AUTO_TEST_CASE(manager_remove_global_task_test)
+{
+  zhuravleva::TaskManager manager;
+  manager.addTaskGlobal("A", 10);
+  manager.removeTaskGlobal("A");
+
+  BOOST_CHECK(!manager.hasTask("A"));
+}
+
+BOOST_AUTO_TEST_CASE(manager_duplicate_list_test)
+{
+  zhuravleva::TaskManager manager;
+  manager.createList("work", 50);
+
+  BOOST_CHECK_THROW(manager.createList("work", 50), std::logic_error);
+}
+
+BOOST_AUTO_TEST_CASE(manager_duplicate_task_test)
+{
+  zhuravleva::TaskManager manager;
+  manager.addTaskGlobal("A", 10);
+
+  BOOST_CHECK_THROW(manager.addTaskGlobal("A", 20), std::logic_error);
+}
+
+BOOST_AUTO_TEST_CASE(manager_missing_task_add_test)
+{
+  zhuravleva::TaskManager manager;
+  manager.createList("work", 50);
+
+  BOOST_CHECK_THROW(manager.addTaskToList("work", "A", 1), std::logic_error);
+}
+
+BOOST_AUTO_TEST_CASE(manager_load_preserves_data_on_error_test)
+{
+  zhuravleva::TaskManager manager;
+  manager.addTaskGlobal("A", 10);
+  std::istringstream badFile(
+      "TASKS 1\n"
+      "B\n"
+  );
+
+  BOOST_CHECK_THROW(manager.load(badFile), std::logic_error);
+  BOOST_CHECK(manager.hasTask("A"));
+}

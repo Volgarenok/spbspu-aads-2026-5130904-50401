@@ -339,12 +339,22 @@ namespace zhuravleva
   void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insert(
       const Key& key, const Value& value)
   {
-    CuckooHashTable temp(*this);
-    while (!temp.insertInternal(key, value))
+    size_t newCapacity = table1_.size();
+    while (true)
     {
-      temp.rehash(temp.table1_.size() * 2);
+      CuckooHashTable temp(*this);
+      if (temp.table1_.size() != newCapacity)
+      {
+        temp.rehash(newCapacity);
+      }
+      if (temp.insertInternal(key, value))
+      {
+        swap(temp);
+        return;
+      }
+      newCapacity *= 2;
+
     }
-    swap(temp);
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
