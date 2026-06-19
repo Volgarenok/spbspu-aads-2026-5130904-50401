@@ -13,41 +13,45 @@ BOOST_AUTO_TEST_SUITE(HashTableTests)
 BOOST_AUTO_TEST_CASE(test_empty_table)
 {
   TestMap table(16);
-  BOOST_CHECK_EQUAL(table.has("key"), false);
-  BOOST_CHECK_THROW(table.get("key"), std::out_of_range);
-  BOOST_CHECK_THROW(table.drop("key"), std::out_of_range);
+  BOOST_CHECK_EQUAL(table.contains("key"), false);
+  BOOST_CHECK_THROW(table.at("key"), std::out_of_range);
+  BOOST_CHECK_EQUAL(table.erase("key"), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_add_and_has)
 {
   TestMap table(16);
-  table.add("one", 1);
-  table.add("two", 2);
-  table.add("three", 3);
+  table.insert(std::make_pair("one", 1));
+  table.insert(std::make_pair("two", 2));
+  table.insert(std::make_pair("three", 3));
 
-  BOOST_CHECK(table.has("one"));
-  BOOST_CHECK(table.has("two"));
-  BOOST_CHECK(table.has("three"));
-  BOOST_CHECK_EQUAL(table.has("four"), false);
+  BOOST_CHECK(table.contains("one"));
+  BOOST_CHECK(table.contains("two"));
+  BOOST_CHECK(table.contains("three"));
+  BOOST_CHECK_EQUAL(table.contains("four"), false);
 }
 
 BOOST_AUTO_TEST_CASE(test_get_value)
 {
   TestMap table(16);
-  table.add("key", 42);
-  BOOST_CHECK_EQUAL(table.get("key"), 42);
-  table.add("key", 99);
-  BOOST_CHECK(table.has("key"));
+
+  table.insert(std::make_pair("key", 42));
+  BOOST_CHECK_EQUAL(table.at("key"), 42);
+
+  table.insert(std::make_pair("key", 99));
+  BOOST_CHECK(table.contains("key"));
 }
 
 BOOST_AUTO_TEST_CASE(test_drop)
 {
   TestMap table(16);
-  table.add("del", 100);
-  size_t val = table.drop("del");
-  BOOST_CHECK_EQUAL(val, 100);
-  BOOST_CHECK_EQUAL(table.has("del"), false);
-  BOOST_CHECK_THROW(table.drop("del"), std::out_of_range);
+
+  table.insert(std::make_pair("del", 100));
+  size_t erased = table.erase("del");
+
+  BOOST_CHECK_EQUAL(erased, 1);
+  BOOST_CHECK_EQUAL(table.contains("del"), false);
+  BOOST_CHECK_EQUAL(table.erase("del"), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_rehash_preserves_data)
@@ -55,15 +59,15 @@ BOOST_AUTO_TEST_CASE(test_rehash_preserves_data)
   TestMap table(8);
   for (int i = 0; i < 10; ++i)
   {
-    table.add("k" + std::to_string(i), i);
+    table.insert(std::make_pair("k" + std::to_string(i), i));
   }
 
   table.rehash(32);
 
   for (int i = 0; i < 10; ++i)
   {
-    BOOST_CHECK(table.has("k" + std::to_string(i)));
-    BOOST_CHECK_EQUAL(table.get("k" + std::to_string(i)), i);
+    BOOST_CHECK(table.contains("k" + std::to_string(i)));
+    BOOST_CHECK_EQUAL(table.at("k" + std::to_string(i)), i);
   }
 }
 
@@ -72,22 +76,22 @@ BOOST_AUTO_TEST_CASE(test_heavy_collisions)
   TestMap table(2);
   for (int i = 0; i < 20; ++i)
   {
-    table.add("item" + std::to_string(i), i);
+    table.insert(std::make_pair("item" + std::to_string(i), i));
   }
 
   for (int i = 0; i < 20; ++i)
   {
-    BOOST_CHECK(table.has("item" + std::to_string(i)));
+    BOOST_CHECK(table.contains("item" + std::to_string(i)));
   }
 }
 
 BOOST_AUTO_TEST_CASE(test_iteration_collects_all)
 {
   TestMap table(16);
-  table.add("a", 1);
-  table.add("b", 2);
-  table.add("c", 3);
-  table.add("d", 4);
+  table.insert(std::make_pair("a", 1));
+  table.insert(std::make_pair("b", 2));
+  table.insert(std::make_pair("c", 3));
+  table.insert(std::make_pair("d", 4));
 
   std::vector< int > collected;
   for (auto it = table.begin(); it != table.end(); ++it)
@@ -103,8 +107,8 @@ BOOST_AUTO_TEST_CASE(test_iteration_collects_all)
 BOOST_AUTO_TEST_CASE(test_const_iteration)
 {
   TestMap table(16);
-  table.add("x", 10);
-  table.add("y", 20);
+  table.insert(std::make_pair("x", 10));
+  table.insert(std::make_pair("y", 20));
 
   const auto& ctable = table;
   int sum = 0;

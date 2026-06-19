@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <utility>
 #include <cstddef>
+#include <memory>
 #include "vector.hpp"
 #include "list.hpp"
 
@@ -18,14 +19,10 @@ namespace vasyakin
   template< class Key, class Value, class Hash, class Equal >
   class HashIter
   {
-    friend class HashTable< Key, Value, Hash, Equal >;
-    friend class HashConstIter< Key, Value, Hash, Equal >;
-    using PairType = std::pair< Key, Value >;
-    using ChainType = vasyakin::List< PairType >;
-
   public:
+    using PairType = std::pair< Key, Value >;
+
     HashIter();
-    HashIter(vasyakin::Vector< ChainType >* buckets, size_t capacity, size_t start_idx);
 
     HashIter& operator++() noexcept;
     HashIter operator++(int) noexcept;
@@ -35,26 +32,32 @@ namespace vasyakin
     bool operator!=(const HashIter& other) const noexcept;
 
   private:
-    vasyakin::Vector< ChainType >* buckets_;
+    HashIter(vasyakin::Vector< vasyakin::List< PairType > >* buckets,
+      size_t capacity,
+      size_t start_idx,
+      vasyakin::LIter< PairType > list_it = vasyakin::LIter< PairType >{});
+    
+    HashIter(const HashConstIter< Key, Value, Hash, Equal >& other);
+
+    vasyakin::Vector< vasyakin::List< PairType > >* buckets_;
     size_t capacity_;
     size_t bucket_idx_;
     vasyakin::LIter< PairType > list_it_;
     vasyakin::LIter< PairType > list_end_;
 
     void find_valid();
+
+    friend class HashTable< Key, Value, Hash, Equal >;
+    friend class HashConstIter< Key, Value, Hash, Equal >;
   };
 
   template< class Key, class Value, class Hash, class Equal >
   class HashConstIter
   {
-    friend class HashTable< Key, Value, Hash, Equal >;
-    friend class HashIter< Key, Value, Hash, Equal >;
-    using PairType = std::pair< Key, Value >;
-    using ChainType = vasyakin::List< PairType >;
-
   public:
+    using PairType = std::pair< Key, Value >;
+
     HashConstIter();
-    HashConstIter(const vasyakin::Vector< ChainType >* buckets, size_t capacity, size_t start_idx);
 
     HashConstIter& operator++() noexcept;
     HashConstIter operator++(int) noexcept;
@@ -64,51 +67,66 @@ namespace vasyakin
     bool operator!=(const HashConstIter& other) const noexcept;
 
   private:
-    const vasyakin::Vector< ChainType >* buckets_;
+    HashConstIter(
+    const vasyakin::Vector< vasyakin::List< PairType > >* buckets,
+    size_t capacity,
+    size_t bucket_idx,
+    vasyakin::LCIter< PairType > list_it = vasyakin::LCIter< PairType >{});
+
+    const vasyakin::Vector< vasyakin::List< PairType > >* buckets_;
     size_t capacity_;
     size_t bucket_idx_;
     vasyakin::LCIter< PairType > list_it_;
     vasyakin::LCIter< PairType > list_end_;
 
     void find_valid();
+
+    friend class HashTable< Key, Value, Hash, Equal >;
+    friend class HashIter< Key, Value, Hash, Equal >;
+
   };
 
   template< class Key, class Value, class Hash, class Equal >
   class HashTable
   {
-    friend class HashIter< Key, Value, Hash, Equal >;
-    friend class HashConstIter< Key, Value, Hash, Equal >;
-
-    using PairType = std::pair< Key, Value >;
-    using ChainType = vasyakin::List< PairType >;
-    using BucketsType = vasyakin::Vector< ChainType >;
-
   public:
+    using PairType = std::pair< Key, Value >;
     using Iterator = HashIter< Key, Value, Hash, Equal >;
-    using const_iterator = HashConstIter< Key, Value, Hash, Equal >;
+    using ConstIterator = HashConstIter< Key, Value, Hash, Equal >;
 
-    explicit HashTable(size_t slots, Hash hasher = Hash{}, Equal equal = Equal{});
-    void add(const Key& key, const Value& v);
-    Value drop(const Key& key);
-    bool has(const Key& key) const noexcept;
+    explicit HashTable(size_t slots);
+
+    template< class T >
+    std::pair< Iterator, bool > insert(T&& value);
+
+    size_t erase(const Key& key) noexcept;
+
+    bool contains(const Key& key) const noexcept;
     void rehash(size_t slots);
-    Value& get(const Key& k);
-    const Value& get(const Key& k) const;
+
+    Value& at(const Key& key);
+    const Value& at(const Key& key) const;
+
+    Iterator find(const Key& key);
+    ConstIterator find(const Key& key) const;
 
     Iterator begin() noexcept;
     Iterator end() noexcept;
-    const_iterator begin() const noexcept;
-    const_iterator end() const noexcept;
-    const_iterator cbegin() const noexcept;
-    const_iterator cend() const noexcept;
+    ConstIterator begin() const noexcept;
+    ConstIterator end() const noexcept;
+    ConstIterator cbegin() const noexcept;
+    ConstIterator cend() const noexcept;
 
   private:
-    BucketsType buckets_;
+    vasyakin::Vector< vasyakin::List< PairType > > buckets_;
     size_t size_;
     Hash hasher_;
     Equal equal_;
 
     std::pair< bool, vasyakin::detail::Node< PairType >* > find_node(size_t ind, const Key& key) const;
+
+    friend class HashIter< Key, Value, Hash, Equal >;
+    friend class HashConstIter< Key, Value, Hash, Equal >;
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -121,15 +139,32 @@ namespace vasyakin
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  HashIter< Key, Value, Hash, Equal >::HashIter(vasyakin::Vector< ChainType >* buckets, size_t capacity, size_t start_idx):
+  HashIter< Key, Value, Hash, Equal >::HashIter(
+    vasyakin::Vector< vasyakin::List< PairType > >* buckets,
+    size_t capacity,
+    size_t bucket_idx,
+    vasyakin::LIter< PairType > list_it):
     buckets_(buckets),
     capacity_(capacity),
-    bucket_idx_(start_idx),
-    list_it_(nullptr),
-    list_end_(nullptr)
+    bucket_idx_(bucket_idx),
+    list_it_(list_it),
+    list_end_(buckets_ ? (*buckets_)[bucket_idx_].end() : vasyakin::LIter< PairType >{})
   {
-    find_valid();
+    if (list_it_.ptr_ == nullptr && buckets_ != nullptr)
+    {
+      find_valid();
+    }
   }
+
+  template< class Key, class Value, class Hash, class Equal >
+  HashIter< Key, Value, Hash, Equal >::HashIter(
+    const HashConstIter< Key, Value, Hash, Equal >& other):
+    buckets_(const_cast< vasyakin::Vector< vasyakin::List< PairType > >* >(other.buckets_)),
+    capacity_(other.capacity_),
+    bucket_idx_(other.bucket_idx_),
+    list_it_(other.list_it_),
+    list_end_(other.list_end_)
+  {}
 
   template< class Key, class Value, class Hash, class Equal >
   void HashIter< Key, Value, Hash, Equal >::find_valid()
@@ -190,7 +225,7 @@ namespace vasyakin
   typename HashIter< Key, Value, Hash, Equal >::PairType*
   HashIter< Key, Value, Hash, Equal >::operator->() noexcept
   {
-    return &(*list_it_);
+    return std::addressof(*list_it_);
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -228,15 +263,21 @@ namespace vasyakin
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  HashConstIter< Key, Value, Hash, Equal >::HashConstIter
-    (const vasyakin::Vector< ChainType >* buckets, size_t capacity, size_t start_idx):
+  HashConstIter< Key, Value, Hash, Equal >::HashConstIter(
+    const vasyakin::Vector< vasyakin::List< PairType > >* buckets,
+    size_t capacity,
+    size_t bucket_idx,
+    vasyakin::LCIter< PairType > list_it):
     buckets_(buckets),
     capacity_(capacity),
-    bucket_idx_(start_idx),
-    list_it_(nullptr),
-    list_end_(nullptr)
+    bucket_idx_(bucket_idx),
+    list_it_(list_it),
+    list_end_(buckets_ ? (*buckets_)[bucket_idx_].cend() : vasyakin::LCIter< PairType >{})
   {
-    find_valid();
+    if (list_it_.ptr_ == nullptr && buckets_ != nullptr)
+    {
+      find_valid();
+    }
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -259,7 +300,8 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  HashConstIter< Key, Value, Hash, Equal >& HashConstIter< Key, Value, Hash, Equal >::operator++() noexcept
+  HashConstIter< Key, Value, Hash, Equal >&
+    HashConstIter< Key, Value, Hash, Equal >::operator++() noexcept
   {
     if (!buckets_)
     {
@@ -298,7 +340,7 @@ namespace vasyakin
   const typename HashConstIter< Key, Value, Hash, Equal >::PairType*
     HashConstIter< Key, Value, Hash, Equal >::operator->() const noexcept
   {
-    return &(*list_it_);
+    return std::addressof(*list_it_);
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -327,11 +369,11 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots, Hash hasher, Equal equal):
-    buckets_(slots, ChainType{}),
+  HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
+    buckets_(slots, vasyakin::List< PairType >{}),
     size_(0),
-    hasher_(std::move(hasher)),
-    equal_(std::move(equal))
+    hasher_(),
+    equal_()
   {
     if (slots == 0)
     {
@@ -340,46 +382,46 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  void HashTable< Key, Value, Hash, Equal >::add(const Key& key, const Value& value)
+  template< class T >
+  std::pair< typename HashTable< Key, Value, Hash, Equal >::Iterator, bool >
+  HashTable< Key, Value, Hash, Equal >::insert(T&& value)
   {
-    size_t idx = hasher_(key) % buckets_.getSize();
-    auto& bucket = buckets_[idx];
+    size_t idx = hasher_(value.first) % buckets_.getSize();
+    auto res = find_node(idx, value.first);
 
-    for (auto it = bucket.begin(); it != bucket.end(); ++it)
+    if (res.first)
     {
-      if (equal_(it->first, key))
-      {
-        it->second = value;
-        return;
-      }
+      Iterator existing_it(
+        &buckets_, buckets_.getSize(), idx, LIter< PairType >(res.second->next_));
+
+      return {existing_it, false};
     }
 
-    buckets_[idx].pushBack(std::make_pair(key, value));
+    buckets_[idx].pushBack(std::forward< T >(value));
     ++size_;
+
+    return {find(value.first), true};
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
+  size_t HashTable< Key, Value, Hash, Equal >::erase(const Key& key) noexcept
   {
-    size_t ind = hasher_(key) % buckets_.getSize();
-    auto res = find_node(ind, key);
+    size_t idx = hasher_(key) % buckets_.getSize();
+    auto res = find_node(idx, key);
 
     if (!res.first)
     {
-      throw std::out_of_range("Key not found");
+      return 0;
     }
 
-    Value extracted_value;
-    std::swap(res.second->next_->value().second, extracted_value);
-
-    buckets_[ind].erase(LIter< PairType >(res.second));
+    buckets_[idx].erase(LIter< PairType >(res.second));
     --size_;
 
-    return extracted_value;
+    return 1;
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  bool HashTable< Key, Value, Hash, Equal >::has(const Key& key) const noexcept
+  bool HashTable< Key, Value, Hash, Equal >::contains(const Key& key) const noexcept
   {
     size_t ind = hasher_(key) % buckets_.getSize();
     return find_node(ind, key).first;
@@ -393,7 +435,7 @@ namespace vasyakin
       return;
     }
 
-    BucketsType tmp(slots, ChainType{});
+    vasyakin::Vector< vasyakin::List< PairType > > tmp(slots, vasyakin::List< PairType >{});
     for (size_t i = 0; i < buckets_.getSize(); ++i)
     {
       for (auto it = buckets_[i].begin(); it != buckets_[i].end(); ++it)
@@ -406,31 +448,43 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value& HashTable< Key, Value, Hash, Equal >::get(const Key& k)
+  Value& HashTable< Key, Value, Hash, Equal >::at(const Key& key)
   {
-    size_t ind = hasher_(k) % buckets_.getSize();
-    auto res = find_node(ind, k);
-
-    if (!res.first)
-    {
-      throw std::out_of_range("Key not found");
-    }
-
-    return res.second->next_->value().second;
+    return const_cast< Value& >(static_cast< const HashTable* >(this)->at(key));
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  const Value& HashTable< Key, Value, Hash, Equal >::get(const Key& k) const
+  const Value& HashTable< Key, Value, Hash, Equal >::at(const Key& key) const
   {
-    size_t ind = hasher_(k) % buckets_.getSize();
-    auto res = find_node(ind, k);
-
-    if (!res.first)
+    auto it = find(key);
+    if (it == cend())
     {
       throw std::out_of_range("Key not found");
     }
 
-    return res.second->next_->value().second;
+    return it->second;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  typename HashTable< Key, Value, Hash, Equal >::Iterator
+  HashTable< Key, Value, Hash, Equal >::find(const Key& key)
+  {
+    return Iterator(static_cast< const HashTable* >(this)->find(key));
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  typename HashTable< Key, Value, Hash, Equal >::ConstIterator
+  HashTable< Key, Value, Hash, Equal >::find(const Key& key) const
+  {
+    size_t idx = hasher_(key) % buckets_.getSize();
+    auto res = find_node(idx, key);
+
+    if (!res.first)
+    {
+      return cend();
+    }
+
+    return ConstIterator(&buckets_, buckets_.getSize(), idx, vasyakin::LCIter< PairType >(res.second->next_));
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -447,7 +501,9 @@ namespace vasyakin
       {
         return {true, prev};
       }
-      prev = curr; curr = curr->next_;
+
+      prev = curr;
+      curr = curr->next_;
     }
 
     return {false, nullptr};
@@ -468,31 +524,31 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  typename HashTable< Key, Value, Hash, Equal >::const_iterator
+  typename HashTable< Key, Value, Hash, Equal >::ConstIterator
     HashTable< Key, Value, Hash, Equal >::begin() const noexcept
   {
-    return const_iterator(&buckets_, buckets_.getSize(), 0);
+    return ConstIterator(&buckets_, buckets_.getSize(), 0);
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  typename HashTable< Key, Value, Hash, Equal >::const_iterator
+  typename HashTable< Key, Value, Hash, Equal >::ConstIterator
     HashTable< Key, Value, Hash, Equal >::end() const noexcept
   {
-    return const_iterator();
+    return ConstIterator();
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  typename HashTable< Key, Value, Hash, Equal >::const_iterator
+  typename HashTable< Key, Value, Hash, Equal >::ConstIterator
     HashTable< Key, Value, Hash, Equal >::cbegin() const noexcept
   {
-    return const_iterator(&buckets_, buckets_.getSize(), 0);
+    return ConstIterator(&buckets_, buckets_.getSize(), 0);
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  typename HashTable< Key, Value, Hash, Equal >::const_iterator
+  typename HashTable< Key, Value, Hash, Equal >::ConstIterator
     HashTable< Key, Value, Hash, Equal >::cend() const noexcept
   {
-    return const_iterator();
+    return ConstIterator();
   }
 }
 

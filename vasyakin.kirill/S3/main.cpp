@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
   }
 
   std::ifstream file(argv[1]);
-  if (!file.is_open())
+  if (!file)
   {
     std::cerr << "Error: cannot open file '" << argv[1] << "'\n";
     return 1;
@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
   while (file >> graph_name >> edge_count)
   {
-    graphs.add(graph_name, vasyakin::Graph{});
+    graphs.insert(std::make_pair(graph_name, vasyakin::Graph{}));
 
     for (size_t i = 0; i < edge_count; ++i)
     {
@@ -33,44 +33,34 @@ int main(int argc, char* argv[])
       size_t w = 0;
       file >> u >> v >> w;
 
-      auto& g = graphs.get(graph_name);
-      if (g.adj.has(u))
-      {
-        g.adj.get(u).pushBack({v, w});
-      }
-      else
-      {
-        vasyakin::List< vasyakin::Edge > edges;
-        edges.pushBack({v, w});
-        g.adj.add(u, std::move(edges));
-      }
+      auto& g = graphs.at(graph_name);
+      g.addEdge(u, v, w);
     }
   }
-  file.close();
 
   using cmd_t = void(*)(std::istream&, std::ostream&, vasyakin::GraphsMap&);
   vasyakin::HashTable< std::string, cmd_t, vasyakin::HMACHash, std::equal_to< std::string > > cmds(9);
 
-  cmds.add("graphs", vasyakin::graphs);
-  cmds.add("vertexes", vasyakin::vertexes);
-  cmds.add("outbound", vasyakin::outbound);
-  cmds.add("inbound", vasyakin::inbound);
-  cmds.add("bind", vasyakin::bind);
-  cmds.add("cut", vasyakin::cut);
-  cmds.add("create", vasyakin::create);
-  cmds.add("merge", vasyakin::merge);
-  cmds.add("extract", vasyakin::extract);
+  cmds.insert(std::make_pair("graphs", vasyakin::graphs));
+  cmds.insert(std::make_pair("vertexes", vasyakin::vertexes));
+  cmds.insert(std::make_pair("outbound", vasyakin::outbound));
+  cmds.insert(std::make_pair("inbound", vasyakin::inbound));
+  cmds.insert(std::make_pair("bind", vasyakin::bind));
+  cmds.insert(std::make_pair("cut", vasyakin::cut));
+  cmds.insert(std::make_pair("create", vasyakin::create));
+  cmds.insert(std::make_pair("merge", vasyakin::merge));
+  cmds.insert(std::make_pair("extract", vasyakin::extract));
 
   std::string cmd;
   while (std::cin >> cmd)
   {
-    if (cmds.has(cmd))
+    if (cmds.contains(cmd))
     {
       try
       {
-        cmds.get(cmd)(std::cin, std::cout, graphs);
+        cmds.at(cmd)(std::cin, std::cout, graphs);
       }
-      catch (...)
+      catch (const std::exception&)
       {
         std::cout << "<INVALID COMMAND>" << '\n';
       }
@@ -80,18 +70,11 @@ int main(int argc, char* argv[])
       std::cout << "<INVALID COMMAND>\n";
     }
 
-    if (!std::cin)
+    if (std::cin.fail())
     {
       std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-    else
-    {
-      if (std::cin.peek() != '\n' && std::cin.peek() != EOF)
-      {
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      }
-    }
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   }
 
   return 0;

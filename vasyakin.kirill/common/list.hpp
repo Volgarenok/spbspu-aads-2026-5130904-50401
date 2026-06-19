@@ -57,6 +57,8 @@ namespace vasyakin
     detail::Node< T >* ptr_;
     explicit LIter(detail::Node< T >* p) noexcept;
 
+    LIter(const LCIter< T >& other) noexcept;
+
     template< class Key, class Value, class Hash, class Equal >
     friend class HashIter;
 
@@ -85,6 +87,8 @@ namespace vasyakin
     const detail::Node< T >* ptr_;
     explicit LCIter(const detail::Node< T >* p) noexcept;
     explicit LCIter(const LIter< T >& it) noexcept;
+
+    friend class LIter< T >;
 
     template< class Key, class Value, class Hash, class Equal >
     friend class HashIter;
@@ -223,6 +227,11 @@ namespace vasyakin
   template< class T >
   LIter< T >::LIter(detail::Node< T >* p) noexcept:
     ptr_(p)
+  {}
+
+  template< class T >
+  LIter< T >::LIter(const LCIter< T >& other) noexcept:
+    ptr_(const_cast< detail::Node< T >* >(other.ptr_))
   {}
 
   template< class T >

@@ -1,7 +1,7 @@
 #include "commands.hpp"
 #include <utility>
 
-namespace vasyakin
+namespace
 {
   template< class T, class Cmp >
   void sort_list(vasyakin::List< T >& list, Cmp cmp)
@@ -24,19 +24,28 @@ namespace vasyakin
     vasyakin::List< size_t > weights;
   };
 
-  static auto p = [](const std::string& a, const std::string& b)
+  struct LessString
   {
-    return a < b;
+    bool operator()(const std::string& a, const std::string& b) const
+    {
+      return a < b;
+    }
   };
 
-  static auto f = [](const OutputLine& a, const OutputLine& b)
+  struct LessOutputLine
   {
-    return a.name < b.name;
+    bool operator()(const OutputLine& a, const OutputLine& b) const
+    {
+      return a.name < b.name;
+    }
   };
 
-  static auto g = [](size_t a, size_t b)
+  struct LessSizeT
   {
-    return a < b;
+    bool operator()(size_t a, size_t b) const
+    {
+      return a < b;
+    }
   };
 
   void output_int(std::ostream& out, const vasyakin::List< size_t >& list)
@@ -45,9 +54,25 @@ namespace vasyakin
     {
       out << " " << *it;
     }
-    out << '\n';
   }
 
+  void copy_adjacency(vasyakin::Graph& dest, const vasyakin::Graph& src)
+  {
+    auto vertices = src.getAllVertices();
+    for (const auto& v : vertices)
+    {
+      auto edges = src.getOutgoingEdges(v);
+
+      for (const auto& e : edges)
+      {
+        dest.addEdge(v, e.first, e.second);
+      }
+    }
+  }
+}
+
+namespace vasyakin
+{
   void graphs(std::istream&, std::ostream& out, GraphsMap& graphs)
   {
     vasyakin::List< std::string > names;
@@ -62,7 +87,7 @@ namespace vasyakin
       return;
     }
 
-    sort_list(names, p);
+    sort_list(names, LessString{});
 
     for (auto it = names.begin(); it != names.end(); ++it)
     {
@@ -75,22 +100,23 @@ namespace vasyakin
     std::string graph_name;
     in >> graph_name;
 
-    if (!graphs.has(graph_name))
+    if (!in || !graphs.contains(graph_name))
     {
-      out << "<INVALID COMMAND>" << '\n';
-      return;
+      throw std::runtime_error("<INVALID COMMAND>");
     }
 
-    const Graph& graph = graphs.get(graph_name);
+    const Graph& graph = graphs.at(graph_name);
     vasyakin::List< std::string > vertices;
 
-    for (auto it = graph.adj.begin(); it != graph.adj.end(); ++it)
+    auto allVertices = graph.getAllVertices();
+    for (const auto& vertex : allVertices)
     {
-      vertices.pushBack(it->first);
-      const auto& edges = it->second;
-      for (auto eit = edges.begin(); eit != edges.end(); ++eit)
+      vertices.pushBack(vertex);
+      auto edges = graph.getOutgoingEdges(vertex);
+
+      for (const auto& edge : edges)
       {
-        vertices.pushBack(eit->to);
+        vertices.pushBack(edge.first);
       }
     }
 
@@ -100,7 +126,7 @@ namespace vasyakin
       return;
     }
 
-    sort_list(vertices, p);
+    sort_list(vertices, LessString{});
 
     std::string last;
     bool first = true;
@@ -119,55 +145,38 @@ namespace vasyakin
   {
     std::string graph_name;
     std::string vertex_name;
+
     in >> graph_name >> vertex_name;
 
-    if (!graphs.has(graph_name))
+    if (!in || !graphs.contains(graph_name))
     {
-      out << "<INVALID COMMAND>" << '\n';
-      return;
+      throw std::runtime_error("<INVALID COMMAND>");
     }
 
-    const Graph& graph = graphs.get(graph_name);
+    const Graph& graph = graphs.at(graph_name);
 
-    bool vertex_exists = graph.adj.has(vertex_name);
-    if (!vertex_exists)
+    if (!graph.hasVertex(vertex_name) && graph.getIncomingEdges(vertex_name).isEmpty())
     {
-      for (auto it = graph.adj.begin(); it != graph.adj.end() && !vertex_exists; ++it)
-      {
-        for (auto eit = it->second.begin(); eit != it->second.end(); ++eit)
-        {
-          if (eit->to == vertex_name) { vertex_exists = true; break; }
-        }
-      }
-    }
-    if (!vertex_exists)
-    {
-     out << "<INVALID COMMAND>" << '\n';
-      return;
+      throw std::invalid_argument("<INVALID COMMAND>");
     }
 
-    if (!graph.adj.has(vertex_name))
-    {
-      out << '\n';
-      return;
-    }
-
-    const auto& edges = graph.adj.get(vertex_name);
-    if (edges.begin() == edges.end())
+    auto edges = graph.getOutgoingEdges(vertex_name);
+    if (edges.isEmpty())
     {
       out << '\n';
       return;
     }
 
     vasyakin::List< OutputLine > lines;
-    for (auto it = edges.begin(); it != edges.end(); ++it)
+    for (const auto& edge : edges)
     {
       bool found = false;
+
       for (auto lit = lines.begin(); lit != lines.end(); ++lit)
       {
-        if (lit->name == it->to)
+        if (lit->name == edge.first)
         {
-          lit->weights.pushBack(it->weight);
+          lit->weights.pushBack(edge.second);
           found = true;
           break;
         }
@@ -175,18 +184,21 @@ namespace vasyakin
       if (!found)
       {
         OutputLine nl;
-        nl.name = it->to;
-        nl.weights.pushBack(it->weight);
+        nl.name = edge.first;
+
+        nl.weights.pushBack(edge.second);
         lines.pushBack(nl);
       }
     }
 
-    sort_list(lines, f);
+    sort_list(lines, LessOutputLine{});
     for (auto lit = lines.begin(); lit != lines.end(); ++lit)
     {
-      sort_list(lit->weights, g);
+      sort_list(lit->weights, LessSizeT{});
       out << lit->name;
+
       output_int(out, lit->weights);
+      out << '\n';
     }
   }
 
@@ -194,316 +206,257 @@ namespace vasyakin
   {
     std::string graph_name;
     std::string vertex_name;
+
     in >> graph_name >> vertex_name;
 
-    if (!graphs.has(graph_name))
+    if (!in || !graphs.contains(graph_name))
     {
-      out << "<INVALID COMMAND>" << '\n';
-      return;
+      throw std::runtime_error("<INVALID COMMAND>");
     }
 
-    const Graph& graph = graphs.get(graph_name);
-    bool vertex_exists = graph.adj.has(vertex_name);
+    const Graph& graph = graphs.at(graph_name);
+
+    bool vertex_exists = graph.hasVertex(vertex_name);
     if (!vertex_exists)
     {
-      for (auto it = graph.adj.begin(); it != graph.adj.end() && !vertex_exists; ++it)
+      if (!graph.getIncomingEdges(vertex_name).isEmpty())
       {
-        for (auto eit = it->second.begin(); eit != it->second.end(); ++eit)
-        {
-          if (eit->to == vertex_name)
-          {
-            vertex_exists = true;
-            break;
-          }
-        }
+        vertex_exists = true;
       }
     }
+
     if (!vertex_exists)
     {
-      out << "<INVALID COMMAND>\n";
-      return;
+      throw std::invalid_argument("<INVALID COMMAND>");
     }
 
     vasyakin::List< OutputLine > lines;
+    auto incoming = graph.getIncomingEdges(vertex_name);
 
-    for (auto it = graph.adj.begin(); it != graph.adj.end(); ++it)
+    for (const auto& edge : incoming)
     {
-      const std::string& source = it->first;
-      const auto& edges = it->second;
-
-      for (auto eit = edges.begin(); eit != edges.end(); ++eit)
+      bool found = false;
+      for (auto lit = lines.begin(); lit != lines.end(); ++lit)
       {
-        if (eit->to == vertex_name)
+        if (lit->name == edge.first)
         {
-          bool found = false;
-          for (auto lit = lines.begin(); lit != lines.end(); ++lit)
-          {
-            if (source == lit->name)
-            {
-              lit->weights.pushBack(eit->weight);
-              found = true;
-              break;
-            }
-          }
-          if (!found)
-          {
-            OutputLine nl;
-            nl.name = source;
-            nl.weights.pushBack(eit->weight);
-            lines.pushBack(nl);
-          }
-        }
-      }
-    }
-
-    sort_list(lines, f);
-
-    for (auto it = lines.begin(); it != lines.end(); ++it)
-    {
-      sort_list(it->weights, g);
-      out << it->name;
-      output_int(out, it->weights);
-    }
-  }
-
-  void bind(std::istream& in, std::ostream& out, GraphsMap& graphs)
-  {
-    std::string graph_name;
-    std::string vertex_name;
-    std::string vertex_name_to;
-    size_t w = 0;
-    in >> graph_name >> vertex_name >> vertex_name_to >> w;
-
-    if (!graphs.has(graph_name))
-    {
-      out << "<INVALID COMMAND>" << '\n';
-      return;
-    }
-
-    Graph& graph = graphs.get(graph_name);
-
-    if (!graph.adj.has(vertex_name_to))
-    {
-      graph.adj.add(vertex_name_to, vasyakin::List< Edge >{});
-    }
-
-    if (graph.adj.has(vertex_name))
-    {
-      graph.adj.get(vertex_name).pushBack({vertex_name_to, w});
-    }
-    else
-    {
-      vasyakin::List< Edge > edges;
-      edges.pushBack({vertex_name_to, w});
-      graph.adj.add(vertex_name, edges);
-    }
-  }
-
-  void cut(std::istream& in, std::ostream& out, GraphsMap& graphs)
-  {
-    std::string graph_name;
-    std::string vertex_name;
-    std::string vertex_name_to;
-    size_t w = 0;
-    in >> graph_name >> vertex_name >> vertex_name_to >> w;
-
-    if (!graphs.has(graph_name))
-    {
-      out << "<INVALID COMMAND>" << '\n';
-      return;
-    }
-
-    Graph& graph = graphs.get(graph_name);
-
-    bool vertex_from_exists = graph.adj.has(vertex_name);
-    if (!vertex_from_exists)
-    {
-      for (auto it = graph.adj.begin(); it != graph.adj.end(); ++it)
-      {
-        for (auto eit = it->second.begin(); eit != it->second.end(); ++eit)
-        {
-          if (eit->to == vertex_name)
-          {
-            vertex_from_exists = true;
-            break;
-          }
-        }
-        if (vertex_from_exists) break;
-      }
-    }
-
-    bool vertex_to_exists = graph.adj.has(vertex_name_to);
-    if (!vertex_to_exists)
-    {
-      for (auto it = graph.adj.begin(); it != graph.adj.end(); ++it)
-      {
-        for (auto eit = it->second.begin(); eit != it->second.end(); ++eit)
-        {
-          if (eit->to == vertex_name_to)
-          {
-            vertex_to_exists = true;
-            break;
-          }
-        }
-        if (vertex_to_exists)
-        {
+          lit->weights.pushBack(edge.second);
+          found = true;
           break;
         }
       }
+      if (!found)
+      {
+        OutputLine nl;
+        nl.name = edge.first;
+
+        nl.weights.pushBack(edge.second);
+        lines.pushBack(nl);
+      }
     }
 
-    if (!vertex_from_exists || !vertex_to_exists)
+    sort_list(lines, LessOutputLine{});
+    for (auto it = lines.begin(); it != lines.end(); ++it)
     {
-      out << "<INVALID COMMAND>" << '\n';
-      return;
-    }
+      sort_list(it->weights, LessSizeT{});
+      out << it->name;
 
-    if (!graph.adj.has(vertex_name))
-    {
-      out << "<INVALID COMMAND>" << '\n';
-      return;
+      output_int(out, it->weights);
+      out << '\n';
     }
-
-    auto& edges = graph.adj.get(vertex_name);
-    auto p = [&vertex_name_to, &w](const Edge& e)
-    {
-      return e.to == vertex_name_to && e.weight == w;
-    };
-
-    if (edges.erase_if(p))
-    {
-      return;
-    }
-    out << "<INVALID COMMAND>" << '\n';
   }
 
-  void create(std::istream& in, std::ostream& out, GraphsMap& graphs)
+  void bind(std::istream& in, std::ostream&, GraphsMap& graphs)
+  {
+    std::string graph_name;
+    std::string vertex_name;
+    std::string vertex_name_to;
+
+    size_t w = 0;
+
+    in >> graph_name >> vertex_name >> vertex_name_to >> w;
+
+    if (!in || !graphs.contains(graph_name))
+    {
+      throw std::runtime_error("<INVALID COMMAND>");
+    }
+
+    Graph& graph = graphs.at(graph_name);
+
+    Graph temp_graph = graph;
+
+    temp_graph.addEdge(vertex_name, vertex_name_to, w);
+
+    graph = std::move(temp_graph);
+  }
+
+  void cut(std::istream& in, std::ostream&, GraphsMap& graphs)
+  {
+    std::string graph_name;
+    std::string vertex_name;
+    std::string vertex_name_to;
+
+    size_t w = 0;
+
+    in >> graph_name >> vertex_name >> vertex_name_to >> w;
+
+    if (!in || !graphs.contains(graph_name))
+    {
+      throw std::runtime_error("<INVALID COMMAND>");
+    }
+
+    Graph& graph = graphs.at(graph_name);
+
+    bool vertex_from_exists = graph.hasVertex(vertex_name);
+    if (!vertex_from_exists && graph.getIncomingEdges(vertex_name).isEmpty())
+    {
+      throw std::invalid_argument("<INVALID COMMAND>");
+    }
+
+    bool vertex_to_exists = graph.hasVertex(vertex_name_to);
+    if (!vertex_to_exists && graph.getIncomingEdges(vertex_name_to).isEmpty())
+    {
+      throw std::invalid_argument("<INVALID COMMAND>");
+    }
+
+    if (!graph.hasEdge(vertex_name, vertex_name_to, w))
+    {
+      throw std::invalid_argument("<INVALID COMMAND>");
+    }
+
+    graph.removeEdge(vertex_name, vertex_name_to, w);
+  }
+
+  void create(std::istream& in, std::ostream&, GraphsMap& graphs)
   {
     std::string graph_name;
     if (!(in >> graph_name))
     {
-      out << "<INVALID COMMAND>\n";
-      return;
+      throw std::runtime_error("<INVALID COMMAND>");
     }
 
-    if (graphs.has(graph_name))
+    if (graphs.contains(graph_name))
     {
-      out << "<INVALID COMMAND>\n";
-      return;
+      throw std::invalid_argument("<INVALID COMMAND>");
     }
 
+    Graph graph;
     size_t k = 0;
-    char next_char = in.peek();
-    if (next_char != '\n' && next_char != EOF)
-    {
-      if (!(in >> k))
-      {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
 
-      Graph graph;
+    if (in >> k) 
+    {
       for (size_t i = 0; i < k; ++i)
       {
         std::string vertex;
+
         if (!(in >> vertex))
         {
-          out << "<INVALID COMMAND>\n";
-          return;
+          throw std::runtime_error("<INVALID COMMAND>");
         }
         graph.addVertex(vertex);
       }
-      graphs.add(graph_name, std::move(graph));
     }
-    else
-    {
-      graphs.add(graph_name, Graph{});
-    }
+
+    graphs.insert(std::make_pair(graph_name, std::move(graph)));
   }
 
-  void merge(std::istream& in, std::ostream& out, GraphsMap& graphs)
+  void merge(std::istream& in, std::ostream&, GraphsMap& graphs)
   {
     std::string new_graph_name;
     std::string graph_name1, graph_name2;
+
     in >> new_graph_name >> graph_name1 >> graph_name2;
 
-    if (graphs.has(new_graph_name) || !graphs.has(graph_name1) || !graphs.has(graph_name2))
+    if (!in || graphs.contains(new_graph_name) ||
+      !graphs.contains(graph_name1) || !graphs.contains(graph_name2))
     {
-      out << "<INVALID COMMAND>" << '\n';
-      return;
+      throw std::runtime_error("<INVALID COMMAND>");
     }
 
-    const Graph& graph1 = graphs.get(graph_name1);
-    const Graph& graph2 = graphs.get(graph_name2);
+    const Graph& graph1 = graphs.at(graph_name1);
+    const Graph& graph2 = graphs.at(graph_name2);
     Graph graph;
 
-    auto copy_data = [&](const Graph& src)
-    {
-      for (auto it = src.adj.begin(); it != src.adj.end(); ++it)
-      {
-        const std::string& vertex = it->first;
-        const auto& src_edges = it->second;
+    copy_adjacency(graph, graph1);
+    copy_adjacency(graph, graph2);
 
-        if (!graph.adj.has(vertex))
-        {
-          graph.adj.add(vertex, vasyakin::List< Edge >{});
-        }
-
-        auto& edges = graph.adj.get(vertex);
-        for (auto it = src_edges.begin(); it != src_edges.end(); ++it)
-        {
-          edges.pushBack(*it);
-        }
-      }
-    };
-
-    copy_data(graph1);
-    copy_data(graph2);
-
-    graphs.add(new_graph_name, graph);
+    graphs.insert(std::make_pair(new_graph_name, graph));
   }
 
-  void extract(std::istream& in, std::ostream& out, GraphsMap& graphs)
+  void extract(std::istream& in, std::ostream&, GraphsMap& graphs)
   {
     std::string new_graph_name;
     std::string old_graph_name;
+
     size_t k = 0;
+
     in >> new_graph_name >> old_graph_name >> k;
 
-    if (graphs.has(new_graph_name) || !graphs.has(old_graph_name))
+    if (!in || graphs.contains(new_graph_name) || !graphs.contains(old_graph_name))
     {
-      out << "<INVALID COMMAND>" << '\n';
-      return;
+      throw std::runtime_error("<INVALID COMMAND>");
     }
 
-    const Graph& old_graph = graphs.get(old_graph_name);
+    const Graph& old_graph = graphs.at(old_graph_name);
     Graph new_graph;
 
     vasyakin::List< std::string > all_vertices;
-    for (auto it = old_graph.adj.begin(); it != old_graph.adj.end(); ++it)
+    auto old_vertices = old_graph.getAllVertices();
+
+    for (const auto& v : old_vertices)
     {
-      all_vertices.pushBack(it->first);
-      for (auto eit = it->second.begin(); eit != it->second.end(); ++eit)
+      bool exists = false;
+
+      for (auto it = all_vertices.begin(); it != all_vertices.end(); ++it)
       {
-        all_vertices.pushBack(eit->to);
+        if (*it == v)
+        {
+          exists = true;
+          break;
+        }
+      }
+      if (!exists)
+      {
+        all_vertices.pushBack(v);
+      }
+
+      auto edges = old_graph.getOutgoingEdges(v);
+
+      for (const auto& e : edges)
+      {
+        bool exists = false;
+
+        for (auto it = all_vertices.begin(); it != all_vertices.end(); ++it)
+        {
+          if (*it == e.first)
+          {
+            exists = true;
+            break;
+          }
+        }
+        if (!exists)
+        {
+          all_vertices.pushBack(e.first);
+        }
       }
     }
 
+    vasyakin::List< std::string > selected_vertices;
     for (size_t i = 0; i < k; ++i)
     {
       std::string vertex_name;
+
       in >> vertex_name;
 
       if (!in)
       {
-        out << "<INVALID COMMAND>" << '\n';
-        return;
+        throw std::runtime_error("<INVALID COMMAND>");
       }
 
       bool found = false;
-      for (auto vit = all_vertices.begin(); vit != all_vertices.end(); ++vit)
+      for (auto it = all_vertices.begin(); it != all_vertices.end(); ++it)
       {
-        if (*vit == vertex_name)
+        if (*it == vertex_name)
         {
           found = true;
           break;
@@ -511,32 +464,31 @@ namespace vasyakin
       }
       if (!found)
       {
-        out << "<INVALID COMMAND>" << '\n';
-        return;
+        throw std::invalid_argument("<INVALID COMMAND>");
       }
 
       new_graph.addVertex(vertex_name);
+      selected_vertices.pushBack(vertex_name);
     }
 
-    for (auto it = old_graph.adj.begin(); it != old_graph.adj.end(); ++it)
+    for (const auto& src : selected_vertices)
     {
-      const std::string& vertex_name = it->first;
-
-      if (!new_graph.adj.has(vertex_name))
+      auto edges = old_graph.getOutgoingEdges(src);
+      for (const auto& e : edges)
       {
-        continue;
-      }
+        bool target_selected = false;
 
-      const vasyakin::List< Edge >& edges = it->second;
-
-      for (auto it = edges.begin(); it != edges.end(); ++it)
-      {
-        if (new_graph.adj.has(it->to))
+        for (auto it = selected_vertices.begin(); it != selected_vertices.end(); ++it)
         {
-          new_graph.adj.get(vertex_name).pushBack(*it);
+          if (*it == e.first) { target_selected = true; break; }
+        }
+        if (target_selected)
+        {
+          new_graph.addEdge(src, e.first, e.second);
         }
       }
     }
-    graphs.add(new_graph_name, std::move(new_graph));
+
+    graphs.insert(std::make_pair(new_graph_name, std::move(new_graph)));
   }
 }
