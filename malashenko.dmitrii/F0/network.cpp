@@ -1,4 +1,6 @@
 #include "network.hpp"
+#include <queue/queue.hpp>
+#include "cuckoo_hash_table.hpp"
 
 
 bool malashenko::detail::operator==(const Message& rhs, const Message& lhs)
@@ -301,6 +303,108 @@ void malashenko::Network::mutualUsers(std::ostream& out, const std::string& user
   if (counter == 0)
   {
     out << "THERE'S NO MUTUAL FRIENDS\n";
+  }
+}
+
+
+malashenko::Vector< std::string > malashenko::Network::bfsPath( const std::string& from, const std::string& to) const
+{
+  Queue<std::string> q;
+
+  CuckooHashTable<std::string, bool, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > > visited;
+  CuckooHashTable<std::string, std::string , HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > > parent;
+
+  visited[from] = true;
+  q.push(from);
+
+  while (!q.empty())
+  {
+    std::string cur = q.front();
+    q.pop();
+
+    if (cur == to)
+    {
+      break;
+    }
+
+    for (const auto& next : graph_.get(cur))
+    {
+      if (!visited.has(next))
+      {
+        visited[next] = true;
+        parent[next] = cur;
+        q.push(next);
+      }
+    }
+  }
+
+  Vector<std::string> path;
+
+  if (!visited.has(to))
+  {
+    return path;
+  }
+
+  std::string cur = to;
+
+  while (cur != from)
+  {
+    path.pushBack(cur);
+    cur = parent[cur];
+  }
+
+  path.pushBack(from);
+  return path;
+}
+
+void malashenko::Network::pathBetweanUsers(std::ostream& out, const std::string& from, const std::string& to) const
+{
+  Vector< std::string > revPath = bfsPath(from, to);
+  if (revPath.isEmpty())
+  {
+    out << "THIS USERS ARE NOT CONNECTED\n";
+    return;
+  }
+  for (size_t i = 0; i < revPath.getSize(); ++i)
+  {
+    out << revPath[i] << ' ';
+  }
+  out << '\n';
+}
+
+void malashenko::Network::distanceBetweanUsers(std::ostream& out, const std::string& from, const std::string& to) const
+{
+  Vector< std::string > revPath = bfsPath(from, to);
+  if (revPath.isEmpty())
+  {
+    out << "THIS USERS ARE NOT CONNECTED\n";
+    return;
+  }
+  out << revPath.getSize() - 2 << '\n';
+}
+
+void malashenko::Network::removeInactive()
+{
+  using userIter_t = Iterator< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > >;
+  for (userIter_t b = users_.begin(); b != users_.end(); ++b)
+  {
+    if (b->value.outbox.getSize() < 2)
+    {
+      removeUser(b->key);
+    }
+  }
+}
+
+void malashenko::Network::recomendUsers(std::ostream& out, const std::string& user1) const
+{
+  using userIter_t = ConstIterator< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > >;
+  size_t counter = 0;
+  for (userIter_t b = users_.begin(); b != users_.end(); ++b)
+  {
+    if (user1 != b->key &&  (!chats_.has({user1, b->key}) || !chats_.has({user1, b->key})) && bfsPath(user1, b->key).getSize() - 2 <= 2)
+    {
+      out << counter++ << b->key << '\n';
+    }
   }
 }
 

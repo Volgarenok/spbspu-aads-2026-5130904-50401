@@ -46,6 +46,9 @@ namespace malashenko
 
     void mutualUsers(std::ostream& out, const std::string& user1, const std::string& user2) const;
     void recomendUsers(std::ostream& out, const std::string& user1) const;
+    void pathBetweanUsers(std::ostream& out, const std::string& from, const std::string& to) const;
+    void distanceBetweanUsers(std::ostream& out, const std::string& from, const std::string& to) const;
+    void removeInactive();
 
   private:
     using name_t = std::string;
@@ -61,6 +64,7 @@ namespace malashenko
 
     void showMsg(std::ostream& out, const msg_t&) const;
     void showInOutBox(std::ostream& out, const std::string& username, bool isInbox) const;
+    Vector< name_t > bfsPath(const name_t& from, const name_t& to) const;
   };
 
 }
