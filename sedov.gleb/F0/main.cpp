@@ -42,6 +42,7 @@ int main()
   sedov::Scheduler scheduler;
   sedov::CommandMap commands = sedov::makeCommandMap();
   std::string line;
+  std::cout << "> ";
   while (std::getline(std::cin, line))
   {
     if (line.empty())
@@ -68,7 +69,7 @@ int main()
       }
       else
       {
-        std::cout << "[ERROR] Unknown command \"" << cmd << "\". Type 'help' for commands.\n";
+        std::cout << "[ERROR] Unknown command \"" << cmd << "\"\n";
       }
     }
     catch (const std::exception & e)
@@ -79,6 +80,7 @@ int main()
     {
       std::cout << "[ERROR] Unexpected error occurred\n";
     }
+    std::cout << "> ";
   }
   std::cout << "Goodbye!\n";
   return 0;
