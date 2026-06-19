@@ -27,16 +27,16 @@ namespace malashenko
   private:
     friend struct CuckooHashTable< Key, Value, Hash1, Hash2, Equal >;
 
-    cht_t* hashTable_;
+    const cht_t* hashTable_;
     size_t tableNum_;
     size_t pos_;
 
-    ConstIterator(cht_t* hashTable, size_t tableNum, size_t pos);
+    ConstIterator(const cht_t* hashTable, size_t tableNum, size_t pos);
     void skipEmpty();
   };
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
-  ConstIterator< Key, Value, Hash1, Hash2, Equal >::ConstIterator(cht_t* hashTable, size_t tableNum, size_t pos):
+  ConstIterator< Key, Value, Hash1, Hash2, Equal >::ConstIterator(const cht_t* hashTable, size_t tableNum, size_t pos):
     hashTable_(hashTable),
     tableNum_(tableNum),
     pos_(pos)

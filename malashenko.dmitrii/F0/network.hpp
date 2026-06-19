@@ -52,10 +52,10 @@ namespace malashenko
     using user_t = detail::User;
     using msg_t = detail::Message;
 
-    CuckooHashTable< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, Equal< user_t > > users_;
-    CuckooHashTable< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, Equal< msg_t > > messages_;
-    CuckooHashTable< pair_t, Vector< size_t >, HmacHash< pair_t >, SipHasher< pair_t >, Equal< Vector< size_t > > > chats_;
-    CuckooHashTable< name_t, Vector< name_t >, HmacHash< name_t >, SipHasher< name_t >, Equal< Vector< name_t > > > graph_;
+    CuckooHashTable< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > > users_;
+    CuckooHashTable< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, Equal< size_t > > messages_;
+    CuckooHashTable< pair_t, Vector< size_t >, HmacHash< pair_t >, SipHasher< pair_t >, Equal< pair_t > > chats_;
+    CuckooHashTable< name_t, Vector< name_t >, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > > graph_;
     size_t nextMessageId_ = 0;
 
     void showMsg(std::ostream& out, const msg_t&) const;
