@@ -51,7 +51,7 @@ void sedov::graphs(std::istream &, std::ostream & out, bool & printed, graphSet 
       out << "\n" << names[i];
     }
   }
-  printed = (names.getSize() > 0);
+  printed = true;
 }
 
 void sedov::vertexes(std::istream & in, std::ostream & out, bool & printed, graphSet & graphs)
@@ -73,7 +73,7 @@ void sedov::vertexes(std::istream & in, std::ostream & out, bool & printed, grap
       out << "\n" << verts[i];
     }
   }
-  printed = (verts.getSize() > 0);
+  printed = true;
 }
 
 void sedov::bind(std::istream & in, std::ostream &, bool & printed, graphSet & graphs)
@@ -221,10 +221,7 @@ void sedov::outbound(std::istream & in, std::ostream & out, bool & printed, grap
           break;
         }
       }
-      if (i < dests.getSize() - 1)
-      {
-        out << "\n";
-      }
+      out << "\n";
     }
   }
   printed = (dests.getSize() > 0);
@@ -303,10 +300,7 @@ void sedov::inbound(std::istream & in, std::ostream & out, bool & printed, graph
         break;
       }
     }
-    if (i < srcs.getSize() - 1)
-    {
-      out << "\n";
-    }
+    out << "\n";
   }
   printed = (srcs.getSize() > 0);
 }
