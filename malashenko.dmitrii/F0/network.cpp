@@ -115,6 +115,14 @@ void malashenko::Network::sendMsg(const std::string& from, const std::string& to
   messages_.add(nextMessageId_, newMsg);
   users_.get(to).inbox.pushBack(nextMessageId_);
   users_.get(from).outbox.pushBack(nextMessageId_);
+  if (!graph_.get(from).contains(to))
+  {
+    graph_.get(from).pushBack(to);
+  }
+  if (!graph_.get(to).contains(from))
+  {
+    graph_.get(to).pushBack(from);
+  }
   ++nextMessageId_;
 }
 
@@ -273,5 +281,28 @@ void malashenko::Network::clearChat(const std::string& user1, const std::string&
     messages_.drop(msgIdVec[i]);
   }
 }
+
+void malashenko::Network::mutualUsers(std::ostream& out, const std::string& user1, const std::string& user2) const
+{
+  Vector< name_t > friendsOfUser1 = graph_.get(user1);
+  Vector< name_t > friendsOfUser2 = graph_.get(user2);
+  size_t counter = 0;
+  for (size_t i = 0; i < friendsOfUser1.getSize(); ++i)
+  {
+    for (size_t j = 0; j < friendsOfUser2.getSize(); ++j)
+    {
+      if (friendsOfUser1[i] == friendsOfUser2[j])
+      {
+        out << counter << ". " << friendsOfUser1[i] << '\n';
+        counter++;
+      }
+    }
+  }
+  if (counter == 0)
+  {
+    out << "THERE'S NO MUTUAL FRIENDS\n";
+  }
+}
+
 
 

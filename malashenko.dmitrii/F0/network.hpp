@@ -44,11 +44,12 @@ namespace malashenko
     void findMsg(std::ostream& out, const std::string& str) const;
     void clearChat(const std::string& user1, const std::string& user2);
 
+    void mutualUsers(std::ostream& out, const std::string& user1, const std::string& user2) const;
+    void recomendUsers(std::ostream& out, const std::string& user1) const;
 
   private:
     using name_t = std::string;
     using pair_t = std::pair< name_t, name_t >;
-    using vec_t = std::pair< name_t, name_t >;
     using user_t = detail::User;
     using msg_t = detail::Message;
 
