@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include <sstream>
+#include <string>
 #include "taskManager.hpp"
 
 BOOST_AUTO_TEST_CASE(manager_basic_operations_test)
@@ -77,4 +78,109 @@ BOOST_AUTO_TEST_CASE(manager_save_load_test)
   BOOST_TEST(loaded.hasTaskInList("study", "task2"));
   BOOST_TEST(loaded.getCurrentLabor("study") == 15);
   BOOST_TEST(loaded.countCompleted("study", "2026-06-01", "2026-06-30") == 1);
+}
+
+BOOST_AUTO_TEST_CASE(manager_save_empty_test)
+{
+  zhuravleva::TaskManager manager;
+  std::ostringstream out;
+  manager.save(out);
+
+  BOOST_CHECK(out.str().find("TASKS 0") != std::string::npos);
+  BOOST_CHECK(out.str().find("LISTS 0") != std::string::npos);
+  BOOST_CHECK(out.str().find("ITEMS 0") != std::string::npos);
+}
+
+
+BOOST_AUTO_TEST_CASE(manager_load_empty_test)
+{
+  zhuravleva::TaskManager manager;
+  std::istringstream in("TASKS 0\nLISTS 0\nITEMS 0\n");
+
+  BOOST_CHECK_NO_THROW(manager.load(in));
+  BOOST_CHECK(!manager.hasTask("A"));
+  BOOST_CHECK(!manager.hasList("work"));
+}
+
+BOOST_AUTO_TEST_CASE(manager_load_with_data_test)
+{
+  zhuravleva::TaskManager manager;
+  std::istringstream in(
+      "TASKS 2\n"
+      "A 10\n"
+      "B 20\n"
+      "LISTS 1\n"
+      "work 50\n"
+      "ITEMS 2\n"
+      "work A 1 0 - -\n"
+      "work B 3 1 2026-06-20 2026-06-18\n");
+  manager.load(in);
+
+  BOOST_CHECK(manager.hasTask("A"));
+  BOOST_CHECK(manager.hasList("work"));
+  BOOST_CHECK(manager.hasTaskInList("work", "A"));
+  BOOST_CHECK(manager.hasTaskInList("work", "B"));
+  BOOST_TEST(manager.getCurrentLabor("work") == 30);
+  BOOST_TEST(manager.countCompleted("work", "2026-06-01", "2026-06-30") == 1);
+}
+
+BOOST_AUTO_TEST_CASE(manager_load_invalid_test)
+{
+  zhuravleva::TaskManager manager;
+  std::istringstream in("wrong file");
+
+  BOOST_CHECK_THROW(manager.load(in), std::logic_error);
+}
+
+BOOST_AUTO_TEST_CASE(manager_suggest_remove_one_test)
+{
+  zhuravleva::TaskManager manager;
+  std::ostringstream out;
+  manager.addTaskGlobal("A", 40);
+  manager.addTaskGlobal("B", 20);
+  manager.addTaskGlobal("C", 15);
+  manager.createList("work", 50);
+  manager.addTaskToList("work", "A", 1);
+  manager.addTaskToList("work", "C", 2);
+  manager.suggestRemoveOne("work", "B", out);
+
+  BOOST_CHECK(out.str().find("A") != std::string::npos);
+}
+
+BOOST_AUTO_TEST_CASE(manager_suggest_remove_test)
+{
+  zhuravleva::TaskManager manager;
+  std::ostringstream out;
+  manager.addTaskGlobal("A", 30);
+  manager.addTaskGlobal("B", 25);
+  manager.addTaskGlobal("C", 10);
+  manager.addTaskGlobal("D", 20);
+  manager.createList("work", 50);
+  manager.addTaskToList("work", "A", 1);
+  manager.addTaskToList("work", "B", 2);
+  manager.addTaskToList("work", "C", 3);
+  manager.suggestRemove("work", "D", 2, out);
+
+  BOOST_CHECK(out.str().find("A") != std::string::npos
+      || out.str().find("B") != std::string::npos);
+}
+
+BOOST_AUTO_TEST_CASE(manager_optimize_test)
+{
+  zhuravleva::TaskManager manager;
+  std::ostringstream out;
+  manager.addTaskGlobal("A", 10);
+  manager.addTaskGlobal("B", 20);
+  manager.addTaskGlobal("C", 40);
+  manager.createList("work", 100);
+  manager.addTaskToList("work", "A", 1);
+  manager.addTaskToList("work", "B", 2);
+  manager.addTaskToList("work", "C", 10);
+  manager.optimize("result", "work", 30);
+
+  BOOST_CHECK(manager.hasList("result"));
+  BOOST_CHECK(manager.hasTaskInList("result", "A"));
+  BOOST_CHECK(manager.hasTaskInList("result", "B"));
+  BOOST_CHECK(!manager.hasTaskInList("result", "C"));
+  BOOST_TEST(manager.getCurrentLabor("result") == 30);
 }
