@@ -1,4 +1,4 @@
-#include "functions.hpp"
+#include "sequence_functions.hpp"
 #include <iostream>
 #include <string>
 #include <utility>

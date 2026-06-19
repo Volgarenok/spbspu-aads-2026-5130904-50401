@@ -1,5 +1,5 @@
-#ifndef SEQUENCE_FUNCTIONS
-#define SEQUENCE_FUNCTIONS
+#ifndef SEQUENCE_FUNCTIONS_HPP
+#define SEQUENCE_FUNCTIONS_HPP
 #include <iostream>
 #include <string>
 #include <utility>
@@ -7,10 +7,6 @@
 #include "iterator.hpp"
 namespace malashenko
 {
-  template< class T > class LIter;
-  template< class T > class LCIter;
-  template< class T > class List;
-
   using pair_t = std::pair< std::string, List< size_t > >;
 
   void getData(std::istream& in, List< pair_t >& res);

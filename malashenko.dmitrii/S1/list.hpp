@@ -1,11 +1,11 @@
-#ifndef LIST
-#define LIST
+#ifndef LIST_HPP
+#define LIST_HPP
 #include <iostream>
 #include <cstddef>
 #include <string>
 #include <utility>
 #include "iterator.hpp"
-#include "const-iterator.hpp"
+#include "const_iterator.hpp"
 #include "node.hpp"
 
 namespace malashenko {
@@ -17,6 +17,8 @@ namespace malashenko {
     List();
     List(const List< T >& other);
     List(List< T >&& other) noexcept;
+
+    ~List() noexcept;
 
     List& operator=(const List< T >& other);
     List& operator=(List< T >&& other) noexcept;
@@ -46,11 +48,10 @@ namespace malashenko {
     void pop_front();
 
 
-    void clear();
-    size_t size() const;
-    void swap(List< T >& other);
-    ~List();
-    bool empty() const;
+    void clear() noexcept;
+    size_t size() const noexcept;
+    void swap(List< T >& other) noexcept;
+    bool empty() const noexcept;
   private:
     detail::Node< T >* fake_;
     size_t s_;
@@ -87,6 +88,7 @@ namespace malashenko {
       catch (...)
       {
         clear();
+        rmFake();
         throw;
       }
     }
@@ -103,7 +105,7 @@ namespace malashenko {
   {
     assert(this != &other);
 
-    List< T > temp(std::forward< List< T > >(other));
+    List< T > temp(std::move(other));
     swap(temp);
     return *this;
   }
@@ -117,7 +119,7 @@ namespace malashenko {
   }
 
   template< class T >
-  void List< T >::swap(List< T >& other)
+  void List< T >::swap(List< T >& other) noexcept
   {
     using std::swap;
     swap(fake_, other.fake_);
@@ -185,7 +187,7 @@ namespace malashenko {
   template< class T >
   LIter< T > List< T >::insert(LIter< T > h, T&& value)
   {
-    detail::Node< T >* newNode = new detail::Node< T >{std::move(value), h.node_->next, h.node_};
+    detail::Node< T >* newNode = new detail::Node< T >{std::forward< T >(value), h.node_->next, h.node_};
     h.node_->next = newNode;
     newNode->next->prev = newNode;
     ++s_;
@@ -203,7 +205,7 @@ namespace malashenko {
   void List< T >::push_back(T&& value)
   {
     LIter< T > itBack = end().node_->prev;
-    insert(itBack, std::move(value));
+    insert(itBack, std::forward< T >(value));
   }
 
   template< class T >
@@ -215,7 +217,7 @@ namespace malashenko {
   template< class T >
   void List< T >::push_front(T&& value)
   {
-    insert(fake_, std::move(value));
+    insert(fake_, std::forward< T >(value));
   }
 
   template< class T >
@@ -261,7 +263,7 @@ namespace malashenko {
   }
 
   template< class T >
-  void List< T >::clear()
+  void List< T >::clear() noexcept
   {
     while (!empty())
     {
@@ -271,19 +273,19 @@ namespace malashenko {
   }
 
   template< class T >
-  size_t List< T >::size() const
+  size_t List< T >::size() const noexcept
   {
     return s_;
   }
 
   template< class T >
-  bool List< T >::empty() const
+  bool List< T >::empty() const noexcept
   {
     return s_ == 0;
   }
 
   template< class T >
-  List< T >::~List()
+  List< T >::~List() noexcept
   {
     clear();
     rmFake();

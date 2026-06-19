@@ -2,12 +2,11 @@
 #include <string>
 #include <utility>
 #include "list.hpp"
-#include "functions.hpp"
+#include "sequence_functions.hpp"
 #include "iterator.hpp"
 int main()
 {
   using namespace malashenko;
-  using pair_t = std::pair< std::string, List< size_t > >;
   List< pair_t > data;
   try
   {
