@@ -14,7 +14,7 @@ namespace malashenko {
   template< class T >
   class List {
   public:
-    List();
+    List() noexcept;
     List(const List< T >& other);
     List(List< T >&& other) noexcept;
 
@@ -31,8 +31,8 @@ namespace malashenko {
     LCIter< T > end() const noexcept;
     LCIter< T > cend() const noexcept;
 
-    T& front();
-    T& back();
+    T& front() noexcept;
+    T& back() noexcept;
 
     LIter< T > insert(LIter< T > h, const T& value);
     LIter< T > insert(LIter< T > h, T&& value);
@@ -42,10 +42,10 @@ namespace malashenko {
     void push_front(const T& value);
     void push_front(T&& value);
 
-    LIter< T > cut(LIter< T > h);
-    LIter< T > erase(LIter< T > h);
-    void pop_back();
-    void pop_front();
+    LIter< T > cut(LIter< T > h) noexcept;
+    LIter< T > erase(LIter< T > h) noexcept;
+    void pop_back() noexcept;
+    void pop_front() noexcept;
 
 
     void clear() noexcept;
@@ -64,10 +64,10 @@ namespace malashenko {
     ::operator delete(fake_);
   }
   template< class T >
-  List< T >::List():
+  List< T >::List() noexcept:
     s_(0)
   {
-    fake_ = static_cast< detail::Node< T >* >(::operator new (sizeof(detail::Node< T >)));
+    fake_ = reinterpret_cast< detail::Node< T >* >(::operator new (sizeof(detail::Node< T >)));
     fake_->next = fake_;
     fake_->prev = fake_;
   }
@@ -163,13 +163,13 @@ namespace malashenko {
   }
 
   template< class T >
-  T& List< T >::front()
+  T& List< T >::front() noexcept
   {
     return fake_->next->value_;
   }
 
   template< class T >
-  T& List< T >::back()
+  T& List< T >::back() noexcept
   {
     return fake_->prev->value_;
   }
@@ -221,7 +221,7 @@ namespace malashenko {
   }
 
   template< class T >
-  LIter< T > List< T >::cut(LIter< T > h)
+  LIter< T > List< T >::cut(LIter< T > h) noexcept
   {
     if (empty())
     {
@@ -237,7 +237,7 @@ namespace malashenko {
   }
 
   template< class T >
-  LIter< T > List< T >::erase(LIter< T > h)
+  LIter< T > List< T >::erase(LIter< T > h) noexcept
   {
     if (s_ == 1)
     {
@@ -247,13 +247,13 @@ namespace malashenko {
   }
 
   template< class T >
-  void List< T >::pop_back()
+  void List< T >::pop_back() noexcept
   {
     cut(fake_->prev);
   }
 
   template< class T >
-  void List< T >::pop_front()
+  void List< T >::pop_front() noexcept
   {
     if (s_ == 1)
     {
