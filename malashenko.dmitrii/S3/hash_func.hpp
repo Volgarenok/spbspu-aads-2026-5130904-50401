@@ -7,7 +7,7 @@
 #include <string>
 namespace malashenko
 {
-    template< class T >
+  template< class T >
   class HmacHash {
   public:
     HmacHash();
@@ -31,7 +31,7 @@ namespace malashenko
   template< class T >
   size_t HmacHash< T >::operator()(const T& value) const
   {
-    boost::hash2::hmac<boost::hash2::sha2_256> hash(key_.data(), key_.size());
+    boost::hash2::hmac< boost::hash2::sha2_256 > hash(key_.data(), key_.size());
     boost::hash2::hash_append(hash, boost::hash2::default_flavor{}, value);
     size_t out = 0;
     boost::hash2::sha2_256::result_type result = hash.result();

@@ -36,11 +36,11 @@ namespace malashenko
 
   bool Graph::cutVertex(const std::string& from, const std::string& to, size_t size)
   {
-    if (!vertexes_.has({from, to}))
+    if (!vertexes_.contains({from, to}))
     {
       return false;
     }
-    Vector< size_t >& vec = vertexes_.get({from, to});
+    Vector< size_t >& vec = vertexes_.at({from, to});
     for (size_t i = 0; i < vec.getSize(); ++i)
     {
       if (vec[i] == size)
@@ -48,8 +48,8 @@ namespace malashenko
         vec.erase(i);
         if (vec.isEmpty())
         {
-          vertexes_.drop({from, to});
-          vertexes_.add({from, from}, Vector< size_t >());
+          vertexes_.erase({from, to});
+          vertexes_.insert({from, from}, Vector< size_t >());
         }
         return true;
       }
@@ -59,7 +59,7 @@ namespace malashenko
 
   void Graph::addVertex(const std::string& from, const std::string& to, Vector< size_t > vec)
   {
-    vertexes_.add({from, to}, vec);
+    vertexes_.insert({from, to}, vec);
   }
 
   void Graph::sort(Vector< size_t >& vec)
@@ -80,6 +80,6 @@ namespace malashenko
         }
       }
     }
-  }
 
+  }
 }
