@@ -301,7 +301,7 @@ malashenko::lli_t malashenko::detail::calculate(Queue< std::string >& PostfixDat
       if (nums.size() < 2)
       {
         std::cout << nums.top();
-        throw std::invalid_argument("Invalid expression a");
+        throw std::invalid_argument("Invalid expression");
       }
 
       size_t ind = getIndex(symbol, funcNames);

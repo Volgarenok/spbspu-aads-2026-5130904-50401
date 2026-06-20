@@ -12,6 +12,7 @@ namespace malashenko
     void calculateFromPostfix();
     void pushToOut();
     void printOutList(std::ostream&);
+    std::string getOutList();
 
   private:
     Stack< Queue< std::string > > infixAllData_;

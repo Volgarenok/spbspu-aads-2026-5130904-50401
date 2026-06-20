@@ -14,6 +14,7 @@ bool malashenko::Calculator::isInfixAllDataEmpty()
 
 void malashenko::Calculator::convertInfixToPostfix()
 {
+  postfixData_ = Queue<std::string>();
   infixData_ = infixAllData_.top();
   infixAllData_.pop();
   malashenko::detail::converInfixToPostfix(infixData_, postfixData_);
@@ -40,5 +41,27 @@ void malashenko::Calculator::printOutList(std::ostream& out)
     out << ' ' << *it;
   }
 }
+
+std::string malashenko::Calculator::getOutList()
+{
+  std::string res;
+
+  if (out_.empty())
+    return res;
+
+  LIter< lli_t > it = out_.begin();
+
+  res += std::to_string(*it);
+  ++it;
+
+  for (; it != out_.end(); ++it)
+  {
+    res += ' ';
+    res += std::to_string(*it);
+  }
+
+  return res;
+}
+
 
 
