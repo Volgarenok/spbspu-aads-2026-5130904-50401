@@ -32,7 +32,7 @@ void malashenko::Calculator::pushToOut()
 
 void malashenko::Calculator::printOutList(std::ostream& out)
 {
-  LIter< std::string > it = out_.begin();
+  LIter< lli_t > it = out_.begin();
   out << *it;
   ++it;
   for (; it != out_.end(); ++it)

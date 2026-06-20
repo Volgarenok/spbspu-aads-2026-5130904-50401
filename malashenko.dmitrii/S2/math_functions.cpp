@@ -1,18 +1,16 @@
 #include "math_functions.hpp"
 
-using lli_t = long long int;
-
 bool malashenko::detail::isOperation(const std::string& symbol)
 {
-  std::string notOperands[6] = {"+", "-", "/", "*", "%", "##"};
+  std::string operations[6] = {"+", "-", "/", "*", "%", "##"};
   for (size_t i = 0; i < 6; ++i)
   {
-    if (symbol == notOperands[i])
+    if (symbol == operations[i])
     {
-      return false;
+      return true;
     }
   }
-  return true;
+  return false;
 }
 size_t malashenko::detail::getPriority(const std::string& symbol)
 {
@@ -33,7 +31,7 @@ void malashenko::detail::getInfixData(std::istream& in, Stack< Queue< std::strin
 {
   char ch;
   std::string currentToken;
-  malashenko::Queue<std::string> equation;
+  malashenko::Queue< std::string > equation;
   while (in.get(ch))
   {
     if (ch == '\n')
@@ -71,9 +69,8 @@ void malashenko::detail::getInfixData(std::istream& in, Stack< Queue< std::strin
       infixData.push(equation);
   }
 }
-void malashenko::detail::converInfixToPostfix(const Queue< std::string >& infixDataOriginal, Queue< std::string >& PostfixData)
+void malashenko::detail::converInfixToPostfix(Queue< std::string >& infixData, Queue< std::string >& PostfixData)
 {
-  Queue< std::string > infixData = infixDataOriginal;
   Stack< std::string > stack;
   while (!infixData.empty())
   {
@@ -94,24 +91,18 @@ void malashenko::detail::converInfixToPostfix(const Queue< std::string >& infixD
       stack.pop();
       continue;
     }
-    if (isOperation(symbol))
+    if (!isOperation(symbol))
     {
       PostfixData.push(symbol);
     }
     else
     {
-      if (stack.empty() || stack.top() == "(" || stack.top() == ")")
-      {
-        stack.push(symbol);
-        continue;
-      }
-      if (getPriority(stack.top()) >= getPriority(symbol))
+      while (!stack.empty() && stack.top() != "(" && getPriority(stack.top()) >= getPriority(symbol))
       {
         PostfixData.push(stack.top());
         stack.pop();
-        stack.push(symbol);
-        continue;
       }
+      stack.push(symbol);
     }
   }
   while (!stack.empty())
@@ -120,7 +111,8 @@ void malashenko::detail::converInfixToPostfix(const Queue< std::string >& infixD
     stack.pop();
   }
 }
-lli_t malashenko::detail::addition(const lli_t& a, const lli_t& b)
+
+malashenko::lli_t malashenko::detail::addition(const lli_t& a, const lli_t& b)
 {
   lli_t maxllt = std::numeric_limits< lli_t >::max();
   lli_t minllt = std::numeric_limits< lli_t >::min();
@@ -130,7 +122,7 @@ lli_t malashenko::detail::addition(const lli_t& a, const lli_t& b)
   }
   return a + b;
 }
-lli_t malashenko::detail::subtraction(const lli_t& a, const lli_t& b)
+malashenko::lli_t malashenko::detail::subtraction(const lli_t& a, const lli_t& b)
 {
   lli_t maxllt = std::numeric_limits< lli_t >::max();
   lli_t minllt = std::numeric_limits< lli_t >::min();
@@ -140,7 +132,7 @@ lli_t malashenko::detail::subtraction(const lli_t& a, const lli_t& b)
   }
   return a - b;
 }
-lli_t malashenko::detail::multiplication(const lli_t& a, const lli_t& b)
+malashenko::lli_t malashenko::detail::multiplication(const lli_t& a, const lli_t& b)
 {
   lli_t maxllt = std::numeric_limits< lli_t >::max();
   lli_t minllt = std::numeric_limits< lli_t >::min();
@@ -200,7 +192,7 @@ lli_t malashenko::detail::multiplication(const lli_t& a, const lli_t& b)
   }
   return a * b;
 }
-lli_t malashenko::detail::division(const lli_t& a, const lli_t& b)
+malashenko::lli_t malashenko::detail::division(const lli_t& a, const lli_t& b)
 {
   lli_t minllt = std::numeric_limits< lli_t >::min();
   if (b == 0)
@@ -213,7 +205,7 @@ lli_t malashenko::detail::division(const lli_t& a, const lli_t& b)
   }
   return a / b;
 }
-lli_t malashenko::detail::concatenation(const lli_t& a, const lli_t& b)
+malashenko::lli_t malashenko::detail::concatenation(const lli_t& a, const lli_t& b)
 {
   lli_t b_copy = b;
   lli_t a_copy = a;
@@ -253,7 +245,7 @@ lli_t malashenko::detail::concatenation(const lli_t& a, const lli_t& b)
   }
   return res;
 }
-lli_t malashenko::detail::modulo(const lli_t & a, const lli_t &b)
+malashenko::lli_t malashenko::detail::modulo(const lli_t & a, const lli_t &b)
 {
   lli_t minllt = std::numeric_limits< lli_t >::min();
   if (b == 0)
@@ -280,7 +272,7 @@ size_t malashenko::detail::getIndex(const std::string& sign, const List< std::st
   }
   return funcs.size();
 }
-std::string malashenko::detail::calculate(Queue< std::string >& PostfixDataOriginal)
+malashenko::lli_t malashenko::detail::calculate(Queue< std::string >& PostfixDataOriginal)
 {
   List< std::string > funcNames;
   funcNames.push_back("+");
@@ -299,26 +291,31 @@ std::string malashenko::detail::calculate(Queue< std::string >& PostfixDataOrigi
   funcs.push_back(modulo);
   funcs.push_back(concatenation);
 
-  Stack< std::string > nums;
+  Stack< lli_t > nums;
   while (!PostfixDataOriginal.empty())
   {
     std::string symbol = PostfixDataOriginal.front();
     PostfixDataOriginal.pop();
     if (isOperation(symbol))
     {
-      nums.push(symbol);
+      if (nums.size() < 2)
+      {
+        std::cout << nums.top();
+        throw std::invalid_argument("Invalid expression a");
+      }
+
+      size_t ind = getIndex(symbol, funcNames);
+      lli_t num1 = nums.top();
+      nums.pop();
+      lli_t num2 = nums.top();
+      nums.pop();
+      lli_t newNum = (*(funcs.begin() + ind))(num2, num1);
+      nums.push(newNum);
+
     }
     else
     {
-      size_t ind = getIndex(symbol, funcNames);
-      lli_t num1_lli;
-      num1_lli = std::stoll(nums.top());
-      nums.pop();
-      lli_t num2_lli;
-      num2_lli = std::stoll(nums.top());
-      nums.pop();
-      lli_t newNum = (*(funcs.begin() + ind))(num2_lli, num1_lli);
-      nums.push(std::to_string(newNum));
+      nums.push(std::stoll(symbol));
     }
   }
   if (nums.size() != 1)

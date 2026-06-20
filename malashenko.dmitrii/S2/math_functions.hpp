@@ -1,5 +1,5 @@
-#ifndef MATH_FUNCTIONS
-#define MATH_FUNCTIONS
+#ifndef MATH_FUNCTIONS_HPP
+#define MATH_FUNCTIONS_HPP
 #include <iostream>
 #include <string>
 #include <limits>
@@ -7,13 +7,14 @@
 #include "stack.hpp"
 namespace malashenko
 {
+  using lli_t = long long int;
   namespace detail
   {
-    using lli_t = long long int;
+
     using func_t = lli_t(*)(const lli_t&, const lli_t&);
     void getInfixData(std::istream& in, Stack< Queue< std::string > >& infixData);
-    void converInfixToPostfix(const Queue< std::string >& infixDataOriginal, Queue< std::string >& PostfixData);
-    std::string calculate(Queue< std::string >& PostfixDataOriginal);
+    void converInfixToPostfix(Queue< std::string >& infixData, Queue< std::string >& PostfixData);
+    lli_t calculate(Queue< std::string >& PostfixDataOriginal);
     bool isOperation(const std::string& symbol);
 
     size_t getPriority(const std::string& symbol);

@@ -17,8 +17,8 @@ namespace malashenko
     Stack< Queue< std::string > > infixAllData_;
     Queue< std::string > infixData_;
     Queue< std::string > postfixData_;
-    List< std::string > out_;
-    std::string res_;
+    List< lli_t > out_;
+    lli_t res_;
   };
 }
 

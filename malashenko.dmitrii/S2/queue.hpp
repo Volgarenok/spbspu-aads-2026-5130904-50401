@@ -1,5 +1,5 @@
-#ifndef QUEUE
-#define QUEUE
+#ifndef QUEUE_HPP
+#define QUEUE_HPP
 #include <list/list.hpp>
 
 namespace malashenko
@@ -7,28 +7,20 @@ namespace malashenko
   template< class T >
   class Queue {
   public:
-    Queue() = default;
-    Queue(const Queue< T >& other) = default;
-    Queue(Queue< T >&& other) = default;
-
-    Queue& operator=(const Queue< T >& other) = default;
-    Queue& operator=(Queue< T >&& other) = default;
-
-    ~Queue() = default;
-
-    T& front();
-    const T& front() const;
+    T& front() noexcept;
+    const T& front() const noexcept;
 
 
-    bool empty() const;
-    size_t size() const;
+    bool empty() const noexcept;
+    size_t size() const noexcept;
 
 
     void push(const T& value);
     void push(T&& value);
-    void pop();
-    void swap(Queue< T >& other);
-    void clear();
+
+    void pop() noexcept;
+    void swap(Queue< T >& other) noexcept;
+    void clear() noexcept;
 
   private:
     List< T > list_;
@@ -36,25 +28,25 @@ namespace malashenko
 
 
   template< class T >
-  T& Queue< T >::front()
+  T& Queue< T >::front() noexcept
   {
     return list_.front();
   }
 
   template< class T >
-  const T& Queue< T >::front() const
+  const T& Queue< T >::front() const noexcept
   {
     return list_.front();
   }
 
   template< class T >
-  bool Queue< T >::empty() const
+  bool Queue< T >::empty() const noexcept
   {
     return list_.empty();
   }
 
   template< class T >
-  size_t Queue< T >::size() const
+  size_t Queue< T >::size() const noexcept
   {
     return list_.size();
   }
@@ -68,23 +60,23 @@ namespace malashenko
   template< class T >
   void Queue< T >::push(T&& value)
   {
-    list_.push_back(value);
+    list_.push_back(std::forward< T >(value));
   }
 
   template< class T >
-  void Queue< T >::pop()
+  void Queue< T >::pop() noexcept
   {
     list_.pop_front();
   }
 
   template< class T >
-  void Queue< T >::swap(Queue< T >& other)
+  void Queue< T >::swap(Queue< T >& other) noexcept
   {
     list_.swap(other.list_);
   }
 
   template< class T >
-  void Queue< T >::clear()
+  void Queue< T >::clear() noexcept
   {
     list_.clear();
   }
