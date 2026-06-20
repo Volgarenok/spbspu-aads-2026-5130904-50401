@@ -18,6 +18,12 @@ namespace madieva
     const Vector< int > & line,
     const Vector< size_t > & hints,
     Vector< int > & result);
+
+  Vector< Vector< int > > solvePuzzle(
+    const Vector< Vector< size_t > > & rowHints,
+    const Vector< Vector< size_t > > & colHints,
+    size_t rows,
+    size_t cols);
 }
 
 #endif

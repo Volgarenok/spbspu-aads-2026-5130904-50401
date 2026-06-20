@@ -30,11 +30,8 @@ bool madieva::Template::loadFromFile(const std::string & filename)
   if (!file.is_open()) {
     return false;
   }
-  int rows, cols;
+  size_t rows, cols;
   file >> rows >> cols;
-  if (rows <= 0 || cols <= 0) {
-    return false;
-  }
   rows_ = rows;
   cols_ = cols;
   rowHints_ = Vector< Vector< size_t > >();
@@ -57,9 +54,7 @@ bool madieva::Template::loadFromFile(const std::string & filename)
     std::istringstream iss(line);
     size_t num;
     while (iss >> num) {
-      if (num > 0) {
-        rowHints_[i].pushBack(num);
-      }
+      rowHints_[i].pushBack(num);
     }
   }
 
@@ -68,9 +63,7 @@ bool madieva::Template::loadFromFile(const std::string & filename)
     std::istringstream iss(line);
     size_t num;
     while (iss >> num) {
-      if (num > 0) {
-        colHints_[i].pushBack(num);
-      }
+      colHints_[i].pushBack(num);
     }
   }
 
@@ -89,16 +82,21 @@ size_t madieva::Template::getCols() const noexcept
   return cols_;
 }
 
+size_t madieva::Template::getFill() const noexcept
+{
+  return fill_;
+}
 
 const madieva::Vector< madieva::Vector< size_t > > & madieva::Template::getRowHints() const
 {
   return rowHints_;
 }
+
 const madieva::Vector< madieva::Vector< size_t > > & madieva::Template::getColHints() const
 {
   return colHints_;
-
 }
+
 const madieva::Vector< madieva::Vector< int > > & madieva::Template::getSolution() const
 {
   return solution_;
@@ -107,64 +105,31 @@ const madieva::Vector< madieva::Vector< int > > & madieva::Template::getSolution
 
 bool madieva::Template::solve()
 {
-  Vector< Vector< int > > picture;
-  picture.reserve(getRows());
-  for (size_t i = 0; i < getRows(); ++i) {
-    picture.pushBack(Vector< int >());
-    for (size_t j = 0; j < getCols(); ++j) {
-      picture[i].pushBack(0);
+  size_t sumrow = 0;
+  for (size_t i = 0; i < rowHints_.getSize(); ++i) {
+    for (size_t j = 0; j < rowHints_[i].getSize(); ++j) {
+      sumrow++;
     }
   }
-  bool changed = true;
-  size_t iterations = 0;
-  const size_t MAX_ITERATIONS = 1000;
-
-  while (changed && iterations < MAX_ITERATIONS) {
-    changed = false;
-    ++iterations;
-    for (size_t i = 0; i < rows_; ++i) {
-      Vector< int > newLine;
-      bool lineChanged = analyzeLine(picture[i], rowHints_[i], newLine);
-      
-      if (lineChanged) {
-        picture[i] = newLine;
-        changed = true;
-      }
-    }
-    for (size_t j = 0; j < cols_; ++j) {
-      Vector< int > column;
-      column.reserve(rows_);
-      for (size_t i = 0; i < rows_; ++i) {
-        column.pushBack(picture[i][j]);
-      }
-
-      Vector< int > newColumn;
-      bool colChanged = analyzeLine(column, colHints_[j], newColumn);
-
-      if (colChanged) {
-        for (size_t i = 0; i < rows_; ++i) {
-          picture[i][j] = newColumn[i];
-        }
-        changed = true;
-      }
+  size_t sumcol = 0;
+  for (size_t i = 0; i < colHints_.getSize(); ++i) {
+    for (size_t j = 0; j < colHints_[i].getSize(); ++j) {
+      sumcol++;
     }
   }
-
-  bool isFullySolved = true;
-  for (size_t i = 0; i < rows_ && isFullySolved; ++i) {
-    for (size_t j = 0; j < cols_ && isFullySolved; ++j) {
-      if (picture[i][j] == 0) {
-        isFullySolved = false;
-      }
-    }
-  }
-
-  if (isFullySolved) {
-    solution_ = picture;
-    isSolvable_ = true;
-  } else {
+  if (sumcol != sumrow){
     solution_ = Vector< Vector< int > >();
-    isSolvable_ = false;
   }
-  return isSolvable_;
+  fill_ = sumcol;
+  Vector< Vector< int > > result = solvePuzzle(rowHints_, colHints_, rows_, cols_);
+  if (result.getSize() != 0) {
+    solution_ = result;
+    isSolvable_ = true;
+    isSolvable_ = false;
+    return true;
+  }
+
+  solution_ = Vector< Vector< int > >();
+  isSolvable_ = false;
+  return false;
 }

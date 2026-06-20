@@ -161,4 +161,69 @@ void madieva::generateVariants(
   }
 }
 
+madieva::Vector< madieva::Vector< int > > madieva::solvePuzzle(
+    const Vector< Vector< size_t > > & rowHints,
+    const Vector< Vector< size_t > > & colHints,
+    size_t rows,
+    size_t cols)
+{
+  Vector< Vector< int > > picture;
+  picture.reserve(rows);
+  for (size_t i = 0; i < rows; ++i) {
+    picture.pushBack(Vector< int >());
+    for (size_t j = 0; j < cols; ++j) {
+      picture[i].pushBack(0);
+    }
+  }
 
+  bool changed = true;
+  size_t iterations = 0;
+  const size_t MAX_ITERATIONS = 1000;
+
+  while (changed && iterations < MAX_ITERATIONS) {
+    changed = false;
+    ++iterations;
+    for (size_t i = 0; i < rows; ++i) {
+      Vector< int > newLine;
+      bool lineChanged = analyzeLine(picture[i], rowHints[i], newLine);
+
+      if (lineChanged) {
+        picture[i] = newLine;
+        changed = true;
+      }
+    }
+
+    for (size_t j = 0; j < cols; ++j) {
+      Vector< int > column;
+      column.reserve(rows);
+      for (size_t i = 0; i < rows; ++i) {
+        column.pushBack(picture[i][j]);
+      }
+
+      Vector< int > newColumn;
+      bool colChanged = analyzeLine(column, colHints[j], newColumn);
+
+      if (colChanged) {
+        for (size_t i = 0; i < rows; ++i) {
+          picture[i][j] = newColumn[i];
+        }
+        changed = true;
+      }
+    }
+  }
+
+  bool isFullySolved = true;
+  for (size_t i = 0; i < rows && isFullySolved; ++i) {
+    for (size_t j = 0; j < cols && isFullySolved; ++j) {
+      if (picture[i][j] == 0) {
+        isFullySolved = false;
+      }
+    }
+  }
+
+  if (isFullySolved) {
+    return picture;
+  }
+
+  return Vector< Vector< int > >();
+}

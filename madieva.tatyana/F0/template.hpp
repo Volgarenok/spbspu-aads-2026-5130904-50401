@@ -16,6 +16,7 @@ namespace madieva {
 
     size_t getRows() const noexcept;
     size_t getCols() const noexcept;
+    size_t getFill() const noexcept;
     const Vector< Vector< size_t > > & getRowHints() const;
     const Vector< Vector< size_t > > & getColHints() const;
     const Vector< Vector< int > > & getSolution() const;
@@ -23,6 +24,7 @@ namespace madieva {
   private:
     size_t rows_;
     size_t cols_;
+    size_t fill_;
     Vector< Vector< size_t > > rowHints_;
     Vector< Vector< size_t > > colHints_;
     Vector< Vector< int > > solution_;
