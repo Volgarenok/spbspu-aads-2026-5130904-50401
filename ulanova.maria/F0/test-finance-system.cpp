@@ -150,6 +150,7 @@ BOOST_AUTO_TEST_CASE(get_savings_date_filter_test)
 {
   ulanova::FinanceSystem system;
   system.create_profile("Мария");
+  system.create_saving("Машина", "Мария", 100000, 2, "01.03.2026");
   system.create_saving("Отпуск", "Мария", 45000, 1, "01.05.2026");
 
   const auto before = system.get_savings("Мария", "01.04.2026");
