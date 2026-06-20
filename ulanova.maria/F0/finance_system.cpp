@@ -4,36 +4,6 @@
 
 namespace
 {
-  long long get_free_money_for_date(const ulanova::Profile& profile,
-    const ulanova::Date& date)
-  {
-    long long free_money = 0;
-
-    for (size_t i = 0; i < profile.operations.getsize(); ++i)
-    {
-      const ulanova::Operation& operation = profile.operations[i];
-
-      if (operation.date == date)
-      {
-        if (operation.is_income)
-        {
-          free_money += operation.amount;
-        }
-        else
-        {
-          free_money -= operation.amount;
-        }
-      }
-    }
-
-    return free_money;
-  }
-
-  long long get_saving_need(const ulanova::Saving& saving)
-  {
-    return saving.target_sum - saving.current_sum;
-  }
-
   std::string calculate_goal_date_with_savings(const ulanova::Profile& profile,
     ulanova::Vector< ulanova::Saving > savings,
     const std::string& saving_name,
@@ -57,82 +27,90 @@ namespace
       throw std::logic_error("saving not found");
     }
 
-    ulanova::Date current_date = from;
+    if (savings[target_index].current_sum >= savings[target_index].target_sum)
+    {
+      return ulanova::date_to_string(from);
+    }
 
-    long long free_balance = 0;
-
+    long long total_income = 0;
+    long long income_count = 0;
     for (size_t i = 0; i < profile.operations.getsize(); ++i)
     {
       const ulanova::Operation& op = profile.operations[i];
-
-      if (op.date < from)
+      if (op.is_income)
       {
-        free_balance += op.is_income ? op.amount : -op.amount;
+        total_income += op.amount;
+        ++income_count;
       }
     }
-    while (ulanova::is_before_or_equal(current_date, to))
+
+    if (income_count == 0 || total_income == 0)
     {
-      free_balance += get_free_money_for_date(profile, current_date);
+      return "не достигнута";
+    }
 
-      if (free_balance > 0)
+    const long long avg_income = total_income / income_count;
+
+    const int target_priority = savings[target_index].priority;
+    long long higher_priority_need = 0;
+    for (size_t i = 0; i < savings.getsize(); ++i)
+    {
+      if (i == target_index) continue;
+      if (savings[i].name == "default") continue;
+      if (savings[i].priority < target_priority)
       {
-        for (size_t priority = 0; priority <= 999; ++priority)
+        const long long need = savings[i].target_sum - savings[i].current_sum;
+        if (need > 0)
         {
-          for (size_t i = 0; i < savings.getsize(); ++i)
-          {
-            if ((savings[i].priority == static_cast< int >(priority)) && (free_balance> 0))
-            {
-              const long long need = get_saving_need(savings[i]);
-
-              if (need > 0)
-              {
-                const long long add = (free_balance < need) ? free_balance : need;
-
-                savings[i].current_sum += add;
-                free_balance -= add;
-              }
-
-              if ((i == target_index) && (savings[i].current_sum >= savings[i].target_sum))
-              {
-                return ulanova::date_to_string(current_date);
-              }
-            }
-          }
+          higher_priority_need += need;
         }
       }
-
-      current_date = ulanova::add_days(current_date, 1);
     }
 
-    return "не достигнута";
+    const long long our_need = savings[target_index].target_sum - savings[target_index].current_sum;
+    const long long total_need = higher_priority_need + our_need;
+    const long long periods = (total_need + avg_income - 1) / avg_income;
+
+    ulanova::Date result_date = from;
+    for (long long p = 0; p < periods; ++p)
+    {
+      result_date = ulanova::add_days(result_date, 30);
+    }
+
+    if (!ulanova::is_before_or_equal(result_date, to))
+    {
+      return "не достигнута";
+    }
+
+    return ulanova::date_to_string(result_date);
   }
 
   void distribute_income(ulanova::Profile& profile, long long amount, const ulanova::Date& date)
   {
-      long long remaining = amount;
+    long long remaining = amount;
 
-      for (int priority = 0; priority <= 999 && remaining > 0; ++priority)
+    for (int priority = 0; priority <= 999 && remaining > 0; ++priority)
+    {
+      for (size_t i = 0; i < profile.savings.getsize() && remaining > 0; ++i)
       {
-          for (size_t i = 0; i < profile.savings.getsize() && remaining > 0; ++i)
-          {
-              ulanova::Saving& saving = profile.savings[i];
+        ulanova::Saving& saving = profile.savings[i];
 
-              if (saving.priority != priority) continue;
-              if (saving.name == "default") continue;
-              if (!ulanova::is_before_or_equal(saving.start_date, date)) continue;
+        if (saving.priority != priority) continue;
+        if (saving.name == "default") continue;
+        if (!ulanova::is_before_or_equal(saving.start_date, date)) continue;
 
-              const long long need = saving.target_sum - saving.current_sum;
-              if (need <= 0) continue;
+        const long long need = saving.target_sum - saving.current_sum;
+        if (need <= 0) continue;
 
-              const long long deposit = (remaining < need) ? remaining : need;
-              saving.current_sum += deposit;
-              remaining -= deposit;
+        const long long deposit = (remaining < need) ? remaining : need;
+        saving.current_sum += deposit;
+        remaining -= deposit;
 
-              ulanova::Operation op{deposit, date, false};
-              profile.operations.push_back(op);
-              profile.balance -= deposit;
-          }
+        ulanova::Operation op{deposit, date, false};
+        profile.operations.push_back(op);
+        profile.balance -= deposit;
       }
+    }
   }
 }
 
@@ -278,6 +256,7 @@ ulanova::Vector< ulanova::Saving > ulanova::FinanceSystem::get_savings(
   ulanova::Vector< Saving > result;
   for (size_t i = 0; i < profile->savings.getsize(); ++i)
   {
+    if (profile->savings[i].name == "default") continue;
     if (is_before_or_equal(profile->savings[i].start_date, target))
     {
       result.push_back(profile->savings[i]);

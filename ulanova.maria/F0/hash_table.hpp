@@ -21,6 +21,16 @@ namespace ulanova
     class const_iterator;
 
     HashTable();
+    HashTable(size_t capacity);
+    HashTable(const HashTable& other);
+    HashTable(HashTable&& other) noexcept;
+    ~HashTable() = default;
+    HashTable& operator=(const HashTable& other);
+    HashTable& operator=(HashTable&& other) noexcept;
+    void swap(HashTable& other) noexcept;
+    Value& at(const std::string& key);
+    const Value& at(const std::string& key) const;
+    size_t capacity() const noexcept;
 
     void add(const std::string& key, const Value& value);
     void drop(const std::string& key);
@@ -192,6 +202,82 @@ ulanova::HashTable< Value >::HashTable():
   buckets_(17, Bucket{State::empty, "", Value{}}),
   size_(0)
 {}
+
+template< class Value >
+ulanova::HashTable< Value >::HashTable(size_t capacity):
+  buckets_(next_prime(capacity), Bucket{State::empty, "", Value{}}),
+  size_(0)
+{}
+
+template< class Value >
+ulanova::HashTable< Value >::HashTable(const HashTable& other):
+  buckets_(other.buckets_),
+  size_(other.size_)
+{}
+
+template< class Value >
+ulanova::HashTable< Value >::HashTable(HashTable&& other) noexcept:
+  buckets_(std::move(other.buckets_)),
+  size_(other.size_)
+{
+  other.size_ = 0;
+}
+
+template< class Value >
+ulanova::HashTable< Value >& ulanova::HashTable< Value >::operator=(const HashTable& other)
+{
+  if (this != std::addressof(other))
+  {
+    HashTable tmp(other);
+    swap(tmp);
+  }
+  return *this;
+}
+
+template< class Value >
+ulanova::HashTable< Value >& ulanova::HashTable< Value >::operator=(HashTable&& other) noexcept
+{
+  if (this != std::addressof(other))
+  {
+    swap(other);
+  }
+  return *this;
+}
+
+template< class Value >
+void ulanova::HashTable< Value >::swap(HashTable& other) noexcept
+{
+  std::swap(buckets_, other.buckets_);
+  std::swap(size_, other.size_);
+}
+
+template< class Value >
+Value& ulanova::HashTable< Value >::at(const std::string& key)
+{
+  const size_t index = find_index(key);
+  if (index == buckets_.getsize())
+  {
+    throw std::logic_error("key not found");
+  }
+  return buckets_[index].value;
+}
+
+template< class Value >
+const Value& ulanova::HashTable< Value >::at(const std::string& key) const
+{
+  const size_t index = find_index(key);
+  if (index == buckets_.getsize())
+  {
+    throw std::logic_error("key not found");
+  }
+  return buckets_[index].value;
+}
+
+template< class Value >
+size_t ulanova::HashTable< Value >::capacity() const noexcept
+{
+  return buckets_.getsize();
+}
 
 template< class Value >
 void ulanova::HashTable< Value >::add(const std::string& key,
@@ -367,6 +453,15 @@ void ulanova::HashTable< Value >::add_without_rehash(
       ++size_;
       return;
     }
+  }
+
+  if (deleted_index != buckets_.getsize())
+  {
+    buckets_[deleted_index].state = State::filled;
+    buckets_[deleted_index].key = key;
+    buckets_[deleted_index].value = value;
+    ++size_;
+    return;
   }
 
   throw std::logic_error("hash table is full");

@@ -181,3 +181,100 @@ BOOST_AUTO_TEST_CASE(value_through_find_test)
   BOOST_CHECK(*table.find("key") == 99);
 }
 
+BOOST_AUTO_TEST_CASE(at_found_test)
+{
+  ulanova::HashTable< int > table;
+  table.add("key", 42);
+  BOOST_CHECK(table.at("key") == 42);
+}
+
+BOOST_AUTO_TEST_CASE(at_modify_test)
+{
+  ulanova::HashTable< int > table;
+  table.add("key", 42);
+  table.at("key") = 99;
+  BOOST_CHECK(table.at("key") == 99);
+}
+
+BOOST_AUTO_TEST_CASE(at_not_found_throws_test)
+{
+  ulanova::HashTable< int > table;
+  BOOST_CHECK_THROW(table.at("missing"), std::logic_error);
+}
+
+BOOST_AUTO_TEST_CASE(at_const_test)
+{
+  ulanova::HashTable< int > table;
+  table.add("key", 42);
+  const ulanova::HashTable< int >& ctable = table;
+  BOOST_CHECK(ctable.at("key") == 42);
+}
+
+
+BOOST_AUTO_TEST_CASE(capacity_test)
+{
+  ulanova::HashTable< int > table;
+  BOOST_CHECK(table.capacity() >= table.size());
+  table.add("a", 1);
+  BOOST_CHECK(table.capacity() >= table.size());
+}
+
+BOOST_AUTO_TEST_CASE(capacity_constructor_test)
+{
+  ulanova::HashTable< int > table(100);
+  BOOST_CHECK(table.capacity() >= 100);
+  BOOST_CHECK(table.empty());
+}
+
+BOOST_AUTO_TEST_CASE(swap_test)
+{
+  ulanova::HashTable< int > a;
+  ulanova::HashTable< int > b;
+  a.add("x", 1);
+  b.add("y", 2);
+  a.swap(b);
+  BOOST_CHECK(a.has("y") && !a.has("x"));
+  BOOST_CHECK(b.has("x") && !b.has("y"));
+}
+
+BOOST_AUTO_TEST_CASE(copy_constructor_test)
+{
+  ulanova::HashTable< int > original;
+  original.add("a", 1);
+  original.add("b", 2);
+
+  ulanova::HashTable< int > copy(original);
+  BOOST_CHECK(copy.has("a"));
+  BOOST_CHECK(*copy.find("a") == 1);
+
+  original.drop("a");
+  BOOST_CHECK(copy.has("a"));
+}
+
+BOOST_AUTO_TEST_CASE(move_constructor_test)
+{
+  ulanova::HashTable< int > original;
+  original.add("a", 1);
+
+  ulanova::HashTable< int > moved(std::move(original));
+  BOOST_CHECK(moved.has("a"));
+  BOOST_CHECK(original.empty());
+}
+
+BOOST_AUTO_TEST_CASE(copy_assign_test)
+{
+  ulanova::HashTable< int > a;
+  ulanova::HashTable< int > b;
+  a.add("x", 10);
+  b = a;
+  BOOST_CHECK(b.has("x") && *b.find("x") == 10);
+}
+
+BOOST_AUTO_TEST_CASE(move_assign_test)
+{
+  ulanova::HashTable< int > a;
+  ulanova::HashTable< int > b;
+  a.add("x", 10);
+  b = std::move(a);
+  BOOST_CHECK(b.has("x") && a.empty());
+}

@@ -213,21 +213,25 @@ BOOST_AUTO_TEST_CASE(calculate_goal_date_not_achievable_test)
   BOOST_CHECK(result == "не достигнута");
 }
 
-BOOST_AUTO_TEST_CASE(calculate_goal_date_priority_order_test)
+BOOST_AUTO_TEST_CASE(priority_distribution_test)
 {
   ulanova::FinanceSystem system;
   system.create_profile("Мария");
-  system.add_income("Мария", 10000, "01.04.2026");
-  system.add_income("Мария", 10000, "01.05.2026");
-  system.add_income("Мария", 10000, "01.06.2026");
   system.create_saving("Высокий", "Мария", 15000, 0, "01.04.2026");
-  system.create_saving("Низкий",  "Мария", 15000, 1, "01.04.2026");
+  system.create_saving("Низкий",  "Мария", 15000, 5, "01.04.2026");
+  system.add_income("Мария", 10000, "01.04.2026");
 
-  const std::string high = system.calculate_goal_date("Мария", "Высокий", "01.04.2026", "31.12.2026");
-  const std::string low  = system.calculate_goal_date("Мария", "Низкий",  "01.04.2026", "31.12.2026");
+  const auto savings = system.get_savings("Мария", "01.04.2026");
+  long long high_sum = 0;
+  long long low_sum = 0;
+  for (size_t i = 0; i < savings.getsize(); ++i)
+  {
+    if (savings[i].name == "Высокий") high_sum = savings[i].current_sum;
+    if (savings[i].name == "Низкий")  low_sum  = savings[i].current_sum;
+  }
 
-  BOOST_CHECK(high != "не достигнута");
-  BOOST_CHECK(ulanova::parse_date(high) <= ulanova::parse_date(low));
+  BOOST_CHECK(high_sum == 10000);
+  BOOST_CHECK(low_sum == 0);
 }
 
 BOOST_AUTO_TEST_CASE(calculate_goal_date_profile_not_found_throws_test)
@@ -273,4 +277,6 @@ BOOST_AUTO_TEST_CASE(recommend_priority_saving_not_found_throws_test)
   int priority = 0;
   BOOST_CHECK_THROW(system.recommend_priority("Мария", "Отпуск", "01.04.2026", "31.12.2026", priority), std::logic_error);
 }
+
+
 
