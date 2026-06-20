@@ -6,6 +6,45 @@
 
 #include "ioguard.hpp"
 
+namespace
+{
+  bool isLeapYear(int year)
+  {
+    if (year % 400 == 0)
+    {
+      return true;
+    }
+    if (year % 100 == 0)
+    {
+      return false;
+    }
+    return year % 4 == 0;
+  }
+
+  int getDayInMonth(int year, int month)
+  {
+    if (month == 2)
+    {
+      if (isLeapYear(year))
+      {
+        return 29;
+      }
+      return 28;
+    }
+
+    if ((month == 4) || (month == 6) || (month == 9) ||(month == 11))
+    {
+      return 30;
+    }
+
+    if ((month >= 1) && (month <= 12))
+    {
+      return 31;
+    }
+    return 0;
+  }
+}
+
 studilova::Date::Date() noexcept:
   year_(0),
   month_(0),
@@ -22,7 +61,8 @@ studilova::Date::Date(int year, int month, int day):
     throw std::invalid_argument("Incorrect month");
   }
 
-  if ((day < 1) || (day > 31))
+  const int maxDay = getDayInMonth(year, month);
+  if ((day < 1) || (day > maxDay))
   {
     throw std::invalid_argument("Incorrect day");
   }
@@ -70,15 +110,19 @@ bool studilova::Date::operator<(const Date& other) const
 
 std::istream& studilova::operator>>(std::istream& in, Date& date)
 {
+  std::istream::sentry sentry(in);
+  if (!sentry)
+  {
+    return in;
+  }
+
   int year = 0;
   int month = 0;
   int day = 0;
-
   char dash1 = '\0';
   char dash2 = '\0';
 
   in >> year >> dash1 >> month >> dash2 >> day;
-
   if (!in)
   {
     return in;
@@ -92,7 +136,7 @@ std::istream& studilova::operator>>(std::istream& in, Date& date)
 
   try
   {
-    date = studilova::Date(year, month, day);
+    date = Date(year, month, day);
   }
   catch(const std::invalid_argument&)
   {
