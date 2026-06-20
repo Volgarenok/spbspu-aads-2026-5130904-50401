@@ -215,7 +215,7 @@ template< class Key, class Value, class Hash, class Equal >
 bool sedov::HashTable< Key, Value, Hash, Equal >::contains(const Key & k) const noexcept
 {
   size_t idx = hasher_(k) % cap_;
-  const sedov::List<valPair> &bucket = data_[idx];
+  const sedov::List< valPair > &bucket = data_[idx];
   for (LCIter< valPair > it = bucket.cbegin(); it != bucket.cend(); ++it)
   {
     if (comp_(it->first, k))

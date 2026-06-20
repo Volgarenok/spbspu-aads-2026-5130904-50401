@@ -165,7 +165,7 @@ typename sedov::HashIter< Key, Value, Hash, Equal >::valType & sedov::HashIter< 
 template < class Key, class Value, class Hash, class Equal >
 typename sedov::HashIter< Key, Value, Hash, Equal >::valType * sedov::HashIter< Key, Value, Hash, Equal >::operator->()
 {
-  return &(*listIt_);
+  return std::addressof(*listIt_);
 }
 
 template < class Key, class Value, class Hash, class Equal >
@@ -260,7 +260,7 @@ template < class Key, class Value, class Hash, class Equal >
 const typename sedov::HashConstIter< Key, Value, Hash, Equal >::valType *
   sedov::HashConstIter< Key, Value, Hash, Equal >::operator->() const
 {
-  return &(*listIt_);
+  return std::addressof(*listIt_);
 }
 
 #endif
