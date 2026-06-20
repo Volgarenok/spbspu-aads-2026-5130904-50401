@@ -6,17 +6,17 @@
 namespace madieva
 {
   void generateVariants(
-    int pos,
-    int groupIndex,
-    const Vector< int > & hints,
+    size_t pos,
+    size_t groupIndex,
+    const Vector< size_t > & hints,
     const Vector< int > & known,
     Vector< int > & current,
-    Vector< int > & counter,
-    int & totalVariants);
+    Vector< size_t > & counter,
+    size_t & totalVariants);
 
   bool analyzeLine(
     const Vector< int > & line,
-    const Vector< int > & hints,
+    const Vector< size_t > & hints,
     Vector< int > & result);
 }
 

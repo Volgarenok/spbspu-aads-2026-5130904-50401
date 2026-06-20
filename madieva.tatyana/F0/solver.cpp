@@ -2,15 +2,15 @@
 
 bool madieva::analyzeLine(
   const Vector< int > & line,
-  const Vector< int > & hints,
+  const Vector< size_t > & hints,
   Vector< int > & result)
 {
-  int lineSize = line.getSize();
+  size_t lineSize = line.getSize();
 
   if (hints.getSize() == 0) {
     result.reserve(lineSize);
     bool changed = false;
-    for (int i = 0; i < lineSize; ++i) {
+    for (size_t i = 0; i < lineSize; ++i) {
       if (line[i] == 1) {
         return false;
       }
@@ -22,19 +22,19 @@ bool madieva::analyzeLine(
     return changed;
   }
 
-  Vector< int > counter;
+  Vector< size_t > counter;
   counter.reserve(lineSize);
-  for (int i = 0; i < lineSize; ++i) {
+  for (size_t i = 0; i < lineSize; ++i) {
     counter.pushBack(0);
   }
 
   Vector< int > current;
   current.reserve(lineSize);
-  for (int i = 0; i < lineSize; ++i) {
+  for (size_t i = 0; i < lineSize; ++i) {
     current.pushBack(0);
   }
 
-  int totalVariants = 0;
+  size_t totalVariants = 0;
 
   generateVariants(0, 0, hints, line, current, counter, totalVariants);
 
@@ -43,12 +43,12 @@ bool madieva::analyzeLine(
   }
 
   result.reserve(lineSize);
-  for (int i = 0; i < lineSize; ++i) {
+  for (size_t i = 0; i < lineSize; ++i) {
     result.pushBack(0);
   }
 
   bool changed = false;
-  for (int i = 0; i < lineSize; ++i) {
+  for (size_t i = 0; i < lineSize; ++i) {
     if (counter[i] == totalVariants) {
       result[i] = 1;
       if (line[i] != 1) {
@@ -66,30 +66,35 @@ bool madieva::analyzeLine(
 }
 
 void madieva::generateVariants(
-  int pos,
-  int groupIndex,
-  const Vector< int > & hints,
+  size_t pos,
+  size_t groupIndex,
+  const Vector< size_t > & hints,
   const Vector< int > & known,
   Vector< int > & current,
-  Vector< int > & counter,
-  int & totalVariants)
+  Vector< size_t > & counter,
+  size_t & totalVariants)
 {
-  int lineSize = current.getSize();
-  int hintsSize = hints.getSize();
+  size_t lineSize = current.getSize();
+  size_t hintsSize = hints.getSize();
   if (groupIndex == hintsSize) {
-    for (int i = pos; i < lineSize; ++i) {
+    for (size_t i = pos; i < lineSize; ++i) {
       if (current[i] == 1) {
         return;
       }
     }
 
-    for (int i = 0; i < lineSize; ++i) {
-      if (known[i] != 0 && known[i] != current[i]) {
+    for (size_t i = 0; i < lineSize; ++i) {
+      int value = current[i];
+      if (value == 0) {
+        value = -1;
+      }
+      if (known[i] != 0 && known[i] != value) {
         return;
       }
     }
+
     ++totalVariants;
-    for (int i = 0; i < lineSize; ++i) {
+    for (size_t i = 0; i < lineSize; ++i) {
       if (current[i] == 1) {
         ++counter[i];
       }
@@ -97,28 +102,28 @@ void madieva::generateVariants(
     return;
   }
 
-  int remainingSpace = 0;
-    for (int i = groupIndex; i < hintsSize; ++i) {
-      remainingSpace += hints[i];
-    }
-    if (groupIndex < hintsSize - 1) {
-      remainingSpace += hintsSize - 1 - groupIndex;
-    }
-    if (pos + remainingSpace > lineSize) {
-      return;
-    }
-    int groupLength = hints[groupIndex];
-    for (int start = pos; start <= lineSize - groupLength; ++start) {
+  size_t remainingSpace = 0;
+  for (size_t i = groupIndex; i < hintsSize; ++i) {
+    remainingSpace += hints[i];
+  }
+  if (groupIndex < hintsSize - 1) {
+    remainingSpace += hintsSize - 1 - groupIndex;
+  }
+  if (pos + remainingSpace > lineSize) {
+    return;
+  }
+  size_t groupLength = hints[groupIndex];
+  for (size_t start = pos; start <= lineSize - groupLength; ++start) {
     bool canPlace = true;
-    int count = 0;
-    for (int i = start; i < start + groupLength && canPlace; ++i) {
+    size_t count = 0;
+    for (size_t i = start; i < start + groupLength && canPlace; ++i) {
       ++count;
       if (known[i] == -1) {
         canPlace = false;
       }
     }
     if (!canPlace) {
-      start += count;
+      start += count - 1;
       continue;
     }
     if (start > pos) {
@@ -126,13 +131,13 @@ void madieva::generateVariants(
         continue;
       }
     }
-    for (int i = start; i < start + groupLength; ++i) {
+    for (size_t i = start; i < start + groupLength; ++i) {
       current[i] = 1;
     }
 
-    int nextPos = start + groupLength;
+    size_t nextPos = start + groupLength;
     if (groupIndex < hintsSize - 1) {
-      for (int emptyPos = nextPos; emptyPos <= lineSize; ++emptyPos) {
+      for (size_t emptyPos = nextPos; emptyPos <= lineSize; ++emptyPos) {
         if (emptyPos < lineSize) {
           if (known[emptyPos] == 1) {
             break;
@@ -150,7 +155,7 @@ void madieva::generateVariants(
       generateVariants(nextPos, groupIndex + 1, hints, known, current, counter, totalVariants);
     }
 
-    for (int i = start; i < start + groupLength; ++i) {
+    for (size_t i = start; i < start + groupLength; ++i) {
       current[i] = 0;
     }
   }

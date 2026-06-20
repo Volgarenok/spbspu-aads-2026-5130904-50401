@@ -3,7 +3,7 @@
 #include <sstream>
 #include "solver.hpp"
 
-madieva::Template::Template(int rows, int cols):
+madieva::Template::Template(size_t rows, size_t cols):
   rows_(rows),
   cols_(cols),
   rowHints_(),
@@ -14,12 +14,12 @@ madieva::Template::Template(int rows, int cols):
   rowHints_.reserve(rows_);
   colHints_.reserve(cols_);
   
-  for (int i = 0; i < rows_; ++i) {
-    rowHints_.pushBack(Vector< int >());
+  for (size_t i = 0; i < rows_; ++i) {
+    rowHints_.pushBack(Vector< size_t >());
   }
   
-  for (int i = 0; i < cols_; ++i) {
-    colHints_.pushBack(Vector< int >());
+  for (size_t i = 0; i < cols_; ++i) {
+    colHints_.pushBack(Vector< size_t >());
   }
 }
 
@@ -37,25 +37,25 @@ bool madieva::Template::loadFromFile(const std::string & filename)
   }
   rows_ = rows;
   cols_ = cols;
-  rowHints_ = Vector< Vector< int > >();
-  colHints_ = Vector< Vector< int > >();
+  rowHints_ = Vector< Vector< size_t > >();
+  colHints_ = Vector< Vector< size_t > >();
   rowHints_.reserve(rows_);
   colHints_.reserve(cols_);
   
-  for (int i = 0; i < rows_; ++i) {
-    rowHints_.pushBack(Vector< int >());
+  for (size_t i = 0; i < rows_; ++i) {
+    rowHints_.pushBack(Vector< size_t >());
   }
   
-  for (int i = 0; i < cols_; ++i) {
-    colHints_.pushBack(Vector< int >());
+  for (size_t i = 0; i < cols_; ++i) {
+    colHints_.pushBack(Vector< size_t >());
   }
 
   std::string line;
   std::getline(file, line);
-  for (int i = 0; i < rows_; ++i) {
+  for (size_t i = 0; i < rows_; ++i) {
     std::getline(file, line);
     std::istringstream iss(line);
-    int num;
+    size_t num;
     while (iss >> num) {
       if (num > 0) {
         rowHints_[i].pushBack(num);
@@ -63,10 +63,10 @@ bool madieva::Template::loadFromFile(const std::string & filename)
     }
   }
 
-  for (int i = 0; i < cols_; ++i) {
+  for (size_t i = 0; i < cols_; ++i) {
     std::getline(file, line);
     std::istringstream iss(line);
-    int num;
+    size_t num;
     while (iss >> num) {
       if (num > 0) {
         colHints_[i].pushBack(num);
@@ -79,22 +79,22 @@ bool madieva::Template::loadFromFile(const std::string & filename)
   return true;
 }
 
-int madieva::Template::getRows() const noexcept
+size_t madieva::Template::getRows() const noexcept
 {
   return rows_;
 }
 
-int madieva::Template::getCols() const noexcept
+size_t madieva::Template::getCols() const noexcept
 {
   return cols_;
 }
 
 
-const madieva::Vector< madieva::Vector< int > > & madieva::Template::getRowHints() const
+const madieva::Vector< madieva::Vector< size_t > > & madieva::Template::getRowHints() const
 {
   return rowHints_;
 }
-const madieva::Vector< madieva::Vector< int > > & madieva::Template::getColHints() const
+const madieva::Vector< madieva::Vector< size_t > > & madieva::Template::getColHints() const
 {
   return colHints_;
 
@@ -109,20 +109,20 @@ bool madieva::Template::solve()
 {
   Vector< Vector< int > > picture;
   picture.reserve(getRows());
-  for (int i = 0; i < getRows(); ++i) {
+  for (size_t i = 0; i < getRows(); ++i) {
     picture.pushBack(Vector< int >());
-    for (int j = 0; j < getCols(); ++j) {
+    for (size_t j = 0; j < getCols(); ++j) {
       picture[i].pushBack(0);
     }
   }
   bool changed = true;
-  int iterations = 0;
-  const int MAX_ITERATIONS = 1000;
+  size_t iterations = 0;
+  const size_t MAX_ITERATIONS = 1000;
 
   while (changed && iterations < MAX_ITERATIONS) {
     changed = false;
     ++iterations;
-    for (int i = 0; i < rows_; ++i) {
+    for (size_t i = 0; i < rows_; ++i) {
       Vector< int > newLine;
       bool lineChanged = analyzeLine(picture[i], rowHints_[i], newLine);
       
@@ -131,10 +131,10 @@ bool madieva::Template::solve()
         changed = true;
       }
     }
-    for (int j = 0; j < cols_; ++j) {
+    for (size_t j = 0; j < cols_; ++j) {
       Vector< int > column;
       column.reserve(rows_);
-      for (int i = 0; i < rows_; ++i) {
+      for (size_t i = 0; i < rows_; ++i) {
         column.pushBack(picture[i][j]);
       }
 
@@ -142,7 +142,7 @@ bool madieva::Template::solve()
       bool colChanged = analyzeLine(column, colHints_[j], newColumn);
 
       if (colChanged) {
-        for (int i = 0; i < rows_; ++i) {
+        for (size_t i = 0; i < rows_; ++i) {
           picture[i][j] = newColumn[i];
         }
         changed = true;
@@ -151,8 +151,8 @@ bool madieva::Template::solve()
   }
 
   bool isFullySolved = true;
-  for (int i = 0; i < rows_ && isFullySolved; ++i) {
-    for (int j = 0; j < cols_ && isFullySolved; ++j) {
+  for (size_t i = 0; i < rows_ && isFullySolved; ++i) {
+    for (size_t j = 0; j < cols_ && isFullySolved; ++j) {
       if (picture[i][j] == 0) {
         isFullySolved = false;
       }

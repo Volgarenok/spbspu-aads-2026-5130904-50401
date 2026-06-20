@@ -10,21 +10,21 @@ namespace madieva {
   {
   public:
     Template() = default;
-    Template(int rows, int cols);
+    Template(size_t rows, size_t cols);
 
     bool loadFromFile(const std::string & filename);
 
-    int getRows() const noexcept;
-    int getCols() const noexcept;
-    const Vector< Vector< int > > & getRowHints() const;
-    const Vector< Vector< int > > & getColHints() const;
+    size_t getRows() const noexcept;
+    size_t getCols() const noexcept;
+    const Vector< Vector< size_t > > & getRowHints() const;
+    const Vector< Vector< size_t > > & getColHints() const;
     const Vector< Vector< int > > & getSolution() const;
 
   private:
-    int rows_;
-    int cols_;
-    Vector< Vector< int > > rowHints_;
-    Vector< Vector< int > > colHints_;
+    size_t rows_;
+    size_t cols_;
+    Vector< Vector< size_t > > rowHints_;
+    Vector< Vector< size_t > > colHints_;
     Vector< Vector< int > > solution_;
     bool isSolvable_;
 
