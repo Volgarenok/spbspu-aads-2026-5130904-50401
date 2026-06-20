@@ -38,16 +38,18 @@ namespace malashenko
 
     ~CuckooHashTable() = default;
 
-    void add(const Key& key, const Value& value);
+    void insert(const Key& key, const Value& value);
+    void insert(const Key& key, Value&& value);
 
-    Value drop(const Key& key);
+    std::pair< Value, bool > erase(const Key& key);
 
-    bool has(const Key& key) const;
+    bool contains(const Key& key) const noexcept;
 
-    Value& get(const Key& key);
-    const Value& get(const Key& key) const;
+    Value& at(const Key& key);
+    const Value& at(const Key& key) const ;
 
     Value& operator[](const Key& key);
+    Value& operator[](Key&& key);
 
     iter_t begin() noexcept;
     cIter_t begin() const noexcept;
@@ -57,14 +59,16 @@ namespace malashenko
     cIter_t end() const noexcept;
     cIter_t cend() const noexcept;
 
-    void rehash(const size_t& newSize);
+    void rehash(const size_t& newSize) noexcept;
 
     size_t size() const noexcept;
+    size_t max_size() const noexcept;
     size_t capacity() const noexcept;
+    bool empty() const noexcept;
 
-    void clear();
+    void clear() noexcept;
 
-    void swap(chTable_t& rhs);
+    void swap(chTable_t& rhs) noexcept;
 
   private:
     friend class Iterator< Key, Value, Hash1, Hash2, Equal >;
@@ -84,7 +88,8 @@ namespace malashenko
     Hash1 hasher1_;
     Hash2 hasher2_;
 
-    pair_t insertInTable(const Key& key, const Value& value);
+    template< class V >
+    pair_t insertInTable(const Key& key, V&& value);
     std::pair< size_t, size_t> hasInTable(const Key& key) const noexcept;
   };
 
@@ -169,19 +174,20 @@ namespace malashenko
   }
 
 
-  template<class Key, class Value, class Hash1, class Hash2, class Equal >
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  template< class V >
   std::pair< bool, detail::HashTableNode< Key, Value > >
-  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insertInTable(const Key& key, const Value& value)
+  CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insertInTable(const Key& key, V&& value)
   {
     std::pair< size_t, size_t > keyInTableIndex = hasInTable(key);
 
     if (keyInTableIndex.first != 2)
     {
-      table_[keyInTableIndex.first][keyInTableIndex.second].value = value;
+      table_[keyInTableIndex.first][keyInTableIndex.second].value = std::forward< V >(value);
       return {true, node_t{}};
     }
 
-    node_t cur{true, key, value};
+    node_t cur{true, key, std::forward< V >(value)};
     size_t tableInd = 0;
 
     for (size_t step = 0; step < max_steps_; ++step)
@@ -202,24 +208,36 @@ namespace malashenko
   }
 
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
-  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::add(const Key& key, const Value& value)
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insert(const Key& key, const Value& value)
   {
     pair_t tmp = insertInTable(key, value);
+
     if (!tmp.first)
     {
       rehash(capacity_ * 2);
-      add(tmp.second.key, tmp.second.value);
+      insert(tmp.second.key, tmp.second.value);
     }
   }
 
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
-  Value& CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::get(const Key& key)
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insert(const Key& key, Value&& value)
   {
-    return const_cast< Value& >(static_cast< const CuckooHashTable& >(*this).get(key));
+    pair_t tmp = insertInTable(key, std::move(value));
+    if (!tmp.first)
+    {
+      rehash(capacity_ * 2);
+      insert(tmp.second.key, tmp.second.value);
+    }
   }
 
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
-  const Value& CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::get(const Key& key) const
+  Value& CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::at(const Key& key)
+  {
+    return const_cast< Value& >(static_cast< const CuckooHashTable& >(*this).at(key));
+  }
+
+  template<class Key, class Value, class Hash1, class Hash2, class Equal >
+  const Value& CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::at(const Key& key) const
   {
 
     std::pair< size_t, size_t > pos = hasInTable(key);
@@ -232,7 +250,7 @@ namespace malashenko
 
 
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
-  Value CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::drop(const Key& key)
+  std::pair< Value, bool > CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::erase(const Key& key)
   {
     Equal eq;
     size_t pos1 = hasher1_(key) % capacity_;
@@ -241,7 +259,7 @@ namespace malashenko
       Value result = table_[0][pos1].value;
       table_[0][pos1].isOccupied = false;
       --size_;
-      return result;
+      return {result, true};
     }
 
     size_t pos2 = hasher2_(key) % capacity_;
@@ -250,15 +268,15 @@ namespace malashenko
       Value result = table_[1][pos2].value;
       table_[1][pos2].isOccupied = false;
       --size_;
-      return result;
+      return {result, true};
     }
 
-    throw std::invalid_argument("Unknown key");
+    return {Value(), false};
   }
 
 
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
-  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::has(const Key& key) const
+  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::contains(const Key& key) const noexcept
   {
     return hasInTable(key).first != 2;
   }
@@ -276,7 +294,7 @@ namespace malashenko
   }
 
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
-  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::swap(chTable_t& rhs)
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::swap(chTable_t& rhs) noexcept
   {
     using std::swap;
     swap(table_[0], rhs.table_[0]);
@@ -339,37 +357,61 @@ namespace malashenko
 
   Value& CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::operator[](const Key& key)
   {
-    if (!has(key))
+    if (!contains(key))
     {
-      add(key, Value());
+      insert(key, Value());
     }
-    return get(key);
+    return at(key);
+  }
+
+  template<class Key, class Value, class Hash1, class Hash2, class Equal >
+  Value& CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::operator[](Key&& key)
+  {
+    if (!contains(std::move(key)))
+    {
+      insert(std::move(key), Value());
+    }
+    return at(std::move(key));
   }
 
 
+
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
-  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::rehash(const size_t& newSize)
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::rehash(const size_t& newSize) noexcept
   {
     chTable_t newTable(newSize);
     newTable.max_steps_ = 2 * std::log2(newSize);
     for (iter_t beg = begin(); beg != end(); ++beg)
     {
-      newTable.add(beg->key, beg->value);
+      newTable.insert(beg->key, beg->value);
     }
 
     swap(newTable);
   }
 
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
-  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::clear()
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::clear() noexcept
   {
     chTable_t newTable(*this);
     for (iter_t beg = begin(); beg != end(); ++beg)
     {
-      newTable.drop(beg->key);
+      newTable.erase(beg->key);
     }
     swap(newTable);
   }
+
+  template<class Key, class Value, class Hash1, class Hash2, class Equal >
+  bool CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::empty() const noexcept
+  {
+    return size_ == 0;
+  }
+
+  template<class Key, class Value, class Hash1, class Hash2, class Equal >
+  size_t CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::max_size() const noexcept
+  {
+    return capacity_ * 2;
+  }
+
 }
 
 

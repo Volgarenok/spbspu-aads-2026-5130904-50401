@@ -48,7 +48,7 @@ int main()
 
 
 
-  net.recomendUsers(std::cout, "user1");
+  net.pathBetweanUsers(std::cout, "user1", "user12");
 
 
 

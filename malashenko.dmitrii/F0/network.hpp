@@ -19,14 +19,11 @@ namespace malashenko
       std::string to;
       std::string text;
     };
-    bool operator==(const Message& rhs, const Message& lhs);
-
     struct User {
       std::string username;
       Vector< size_t > inbox;
       Vector< size_t > outbox;
     };
-    bool operator==(const User& rhs, const User& lhs);
   }
 
   class Network {
@@ -55,6 +52,16 @@ namespace malashenko
     using pair_t = std::pair< name_t, name_t >;
     using user_t = detail::User;
     using msg_t = detail::Message;
+
+    using userIter_t = Iterator< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > >;
+    using userCIter_t = ConstIterator< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > >;
+
+    using msgIter_t = Iterator< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, Equal< size_t > >;
+    using msgCIter_t = ConstIterator< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, Equal< size_t > >;
+
+    using chatIter_t = Iterator< pair_t, Vector< size_t >, HmacHash< pair_t >, SipHasher< pair_t >, Equal< pair_t > >;
+    using graphIter_t = Iterator< name_t, Vector< name_t >, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > >;
+
 
     CuckooHashTable< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > > users_;
     CuckooHashTable< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, Equal< size_t > > messages_;
