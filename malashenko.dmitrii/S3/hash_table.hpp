@@ -149,7 +149,8 @@ namespace malashenko
 
   template< class Key, class Value, class Hash, class Equal >
   template<class V>
-  std::pair< HashTableIter< Key, Value, Hash, Equal >, bool > HashTable< Key, Value, Hash, Equal >::insert_impl(const Key& key, V&& value)
+  std::pair< HashTableIter< Key, Value, Hash, Equal >, bool >
+  HashTable< Key, Value, Hash, Equal >::insert_impl(const Key& key, V&& value)
   {
 
     Hash hasher;
@@ -178,14 +179,16 @@ namespace malashenko
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  std::pair< HashTableIter< Key, Value, Hash, Equal >, bool > HashTable< Key, Value, Hash, Equal >::insert(const Key& key, const Value& value)
+  std::pair< HashTableIter< Key, Value, Hash, Equal >, bool >
+  HashTable< Key, Value, Hash, Equal >::insert(const Key& key, const Value& value)
   {
     return insert_impl(key, value);
   }
 
 
   template< class Key, class Value, class Hash, class Equal >
-  std::pair< HashTableIter< Key, Value, Hash, Equal >, bool > HashTable< Key, Value, Hash, Equal >::insert(const Key& key, Value&& value)
+  std::pair< HashTableIter< Key, Value, Hash, Equal >, bool >
+  HashTable< Key, Value, Hash, Equal >::insert(const Key& key, Value&& value)
   {
     return insert_impl(key, std::move(value));
   }
