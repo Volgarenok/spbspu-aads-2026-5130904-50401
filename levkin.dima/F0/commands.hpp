@@ -33,7 +33,7 @@ namespace rl {
     RLRoot* selected = nullptr;
 
     void select(RLRoot& item);
-    void select_by_index(size_t index);
+    void selectByIndex(size_t index);
   };
 
   void healthcheck(std::istream&, std::ostream&, RootDB&, RLRoot*);

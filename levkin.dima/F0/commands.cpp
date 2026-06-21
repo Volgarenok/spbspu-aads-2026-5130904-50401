@@ -43,6 +43,37 @@ namespace rl {
 
     out << "Layout initialized: " << w << "x" << h << ". Root node created.\n";
   }
+  void createChild(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout)
+  {
+    if (!layout) {
+      out << "Error: No layout initialized.\n";
+      return;
+    }
+    std::string parentId, childId;
+    if (!(in >> parentId)) {
+      out << "Error: Parent ID required.\n";
+      return;
+    }
+    if (!(in >> childId)) {
+      childId = generateUniqueId(layout->mapOfNodes);
+    }
+    if (!layout->mapOfNodes.has(parentId)) {
+      out << "Error: Parent node '" << parentId << "' not found.\n";
+      return;
+    }
+    if (layout->mapOfNodes.has(childId)) {
+      out << "Error: Node '" << childId << "' already exists.\n";
+      return;
+    }
+
+    auto newNode = std::make_unique< RLNode >();
+    newNode->id = childId;
+
+    layout->mapOfNodes.add(childId, newNode.get());
+    layout->mapOfNodes.get(parentId)->addChild(std::move(newNode));
+
+    out << "Node '" << childId << "' added to '" << parentId << "'.\n";
+  }
   Cmds getCmds()
   {
     Cmds cmds;
@@ -51,7 +82,7 @@ namespace rl {
   }
 
   void RootDB::select(RLRoot& item) { selected = &item; }
-  void RootDB::select_by_index(size_t index) { selected = &data[index]; }
+  void RootDB::selectByIndex(size_t index) { selected = &data[index]; }
   RLRoot::RLRoot(float width, float height)
       : baseWidth(width), baseHeight(height)
   {
