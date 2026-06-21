@@ -10,6 +10,15 @@ chernov::Tree::Tree(const std::string & name, const std::string & description):
   nextId_(1)
 {}
 
+void chernov::Tree::swap(Tree & other) noexcept
+{
+  std::swap(name_, other.name_);
+  std::swap(description_, other.description_);
+  std::swap(persons_, other.persons_);
+  std::swap(idToIndex_, other.idToIndex_);
+  std::swap(nextId_, other.nextId_);
+}
+
 const std::string & chernov::Tree::getName() const
 {
   return name_;

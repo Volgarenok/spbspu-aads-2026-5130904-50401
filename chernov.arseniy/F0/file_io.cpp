@@ -55,8 +55,7 @@ bool chernov::detail::saveTree(const Tree & tree, const std::string & filename)
   return true;
 }
 
-bool chernov::detail::loadTree(
-  Tree & tree, const std::string & filename, std::string & treeNameFromFile, std::string & errorMsg)
+bool chernov::detail::loadTree(Tree & tree, const std::string & filename, std::string & errorMsg)
 {
   std::ifstream file(filename);
   if (!file.is_open()) {
@@ -122,9 +121,7 @@ bool chernov::detail::loadTree(
       }
       std::string key = line.substr(0, eqPos);
       std::string value = line.substr(eqPos + 1);
-      if (key == "name") {
-        treeNameFromFile = value;
-      } else if (key == "next_id") {
+      if (key == "next_id") {
         try {
           nextId = std::stoul(value);
         } catch (...) {
@@ -245,5 +242,51 @@ bool chernov::detail::loadTree(
   }
 
   tree.setNextId(nextId);
+  return true;
+}
+
+bool chernov::detail::peekTreeMetadata(
+  const std::string & filename, std::string & treeName, size_t & nextId, std::string & errorMsg)
+{
+  std::ifstream file(filename);
+  if (!file.is_open()) {
+    errorMsg = "cannot open file";
+    return false;
+  }
+  std::string line;
+  bool inMetadata = false;
+  while (std::getline(file, line)) {
+    if (line.empty() || line[0] == '#')
+      continue;
+    if (line == "[TREE_METADATA]") {
+      inMetadata = true;
+      continue;
+    }
+    if (inMetadata) {
+      if (line[0] == '[')
+        break; // следующая секция
+      size_t eqPos = line.find('=');
+      if (eqPos == std::string::npos) {
+        errorMsg = "invalid metadata line";
+        return false;
+      }
+      std::string key = line.substr(0, eqPos);
+      std::string value = line.substr(eqPos + 1);
+      if (key == "name") {
+        treeName = value;
+      } else if (key == "next_id") {
+        try {
+          nextId = std::stoul(value);
+        } catch (...) {
+          errorMsg = "invalid next_id";
+          return false;
+        }
+      }
+    }
+  }
+  if (treeName.empty()) {
+    errorMsg = "tree name not found in file";
+    return false;
+  }
   return true;
 }

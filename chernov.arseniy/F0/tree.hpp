@@ -12,6 +12,8 @@ namespace chernov {
   public:
     Tree(const std::string & name, const std::string & description = "");
 
+    void swap(Tree & other) noexcept;
+
     const std::string & getName() const;
     const std::string & getDescription() const;
     void setDescription(const std::string & desc);
