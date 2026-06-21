@@ -34,13 +34,15 @@ namespace donkeev
     Value drop(const Key);
     void clear();
     void swap(BSTree< Key, Value, Compare >&);
+
   private:
     BSTNode< Key, Value >* root_;
     size_t size_;
     Compare compareFunc_;
 
-    BSTNode< Key, Value >* cloneRecursive(const BSTNode< Key, Value >* node, BSTNode< Key, Value >* parent);
+    BSTNode< Key, Value >* cloneRecursive(const BSTNode< Key, Value >*, BSTNode< Key, Value >*);
     void removeNode(BSTNode< Key, Value >*);
+    void clearRecursive(BSTNode< Key, Value >*);
   };
 
   template< class Key, class Value, class Compare >
@@ -294,6 +296,13 @@ namespace donkeev
     std::swap(size_, other.size_);
   }
 
+  template<class Key, class Value, class Compare>
+  void BSTree< Key, Value, Compare >::clear()
+  {
+    clearRecursive(root_);
+    size_ = 0;
+  }
+
   template< class Key, class Value, class Compare >
   BSTNode< Key, Value >* BSTree< Key, Value, Compare >::cloneRecursive(const BSTNode< Key, Value >* node, BSTNode< Key, Value >* parent)
   {
@@ -439,6 +448,20 @@ namespace donkeev
 
       delete node;
     }
+  }
+
+  template<class Key, class Value, class Compare>
+  void BSTree<Key, Value, Compare>::clearRecursive(BSTNode< Key, Value >* node)
+  {
+    if (!node)
+    {
+      return;
+    }
+
+    clearRecursive(node->left_);
+    clearRecursive(node->right_);
+
+    delete node;
   }
 }
 
