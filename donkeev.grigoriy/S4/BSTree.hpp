@@ -44,6 +44,10 @@ namespace donkeev
     constIterator begin() const;
     constIterator end() const;
 
+    constIterator rotateRight(iterator);
+    constIterator rotateLeft(iterator);
+    constIterator largeRotateRight(iterator);
+    constIterator largeRotateLeft(iterator);
     void push(Key, const Value&);
     void push(Key, Value&&);
     Value& get(const Key);
@@ -178,6 +182,120 @@ namespace donkeev
   typename BSTree< Key, Value, Compare >::constIterator BSTree< Key, Value, Compare >::end() const
   {
     return constIterator(nullptr);
+  }
+
+  template<class Key, class Value, class Compare>
+  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::rotateRight(iterator it)
+  {
+    BSTNode<Key, Value>* parent = it.getNode(); 
+    if (!parent || !parent->left_)
+    {
+      return it;
+    }
+
+    BSTNode<Key, Value>* leftChild = parent->left_;
+    BSTNode<Key, Value>* rightGrandSon = leftChild->right_;
+    BSTNode<Key, Value>* grandFather = parent->parent_;
+
+    leftChild->parent_ = grandFather;
+    if (grandFather)
+    {
+      if (grandFather->left_ == parent)
+      {
+        grandFather->left_ = leftChild;
+      }
+      else
+      {
+        grandFather->right_ = leftChild;
+      }
+    }
+    else
+    {
+      root_ = leftChild;
+    }
+
+    leftChild->right_ = parent;
+    parent->parent_ = leftChild;
+
+    parent->left_ = rightGrandSon;
+    if (rightGrandSon)
+    {
+      rightGrandSon->parent_ = parent;
+    }
+
+    return const_iterator(leftChild);
+  }
+
+  template<class Key, class Value, class Compare>
+  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::rotateLeft(iterator it)
+  {
+    BSTNode<Key, Value>* parent = it.getNode();
+    if (!parent || !parent->right_)
+    {
+      return it;
+    }
+
+    BSTNode<Key, Value>* rightChild = parent->right_;
+    BSTNode<Key, Value>* leftGrandSon = rightChild->left_;
+    BSTNode<Key, Value>* grandFather = parent->parent_;
+
+    rightChild->parent_ = grandFather;
+    if (grandFather)
+    {
+      if (grandFather->left_ == parent)
+      {
+        grandFather->left_ = rightChild;
+      }
+      else
+      {
+        grandFather->right_ = rightChild;
+      }
+    }
+    else
+    {
+      root_ = rightChild;
+    }
+
+    rightChild->left_ = parent;
+    parent->parent_ = rightChild;
+
+    parent->right_ = leftGrandSon;
+    if (leftGrandSon)
+    {
+      leftGrandSon->parent_ = parent;
+    }
+
+    return const_iterator(rightChild);
+  }
+
+  template<class Key, class Value, class Compare>
+  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::largeRotateRight(iterator it)
+  {
+    BSTNode<Key, Value>* parent = it.getNode();
+    if (!parent || !parent->left_)
+    {
+      return it;
+    }
+
+    iterator leftIt(parent->left_);
+    rotateLeft(leftIt);
+
+    return rotateRight(it);
+  }
+
+  template<class Key, class Value, class Compare>
+  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::largeRotateLeft(iterator it)
+  {
+    BSTNode<Key, Value>* parent = it.getNode();
+    if (!parent || !parent->right_)
+    {
+      return it;
+    }
+
+    iterator rightIt(parent->right_);
+    rotateRight(rightIt);
+
+    return rotateLeft(it);
   }
 
   template< class Key, class Value, class Compare >
