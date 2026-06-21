@@ -372,22 +372,22 @@ namespace chernov {
     out << "<CREATED: " << args[5] << ">\n<MERGE SUCCESS>\n";
   }
 
-  void cmdSave(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdSave(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<OK: Saved to " << args[2] << ">\n";
+    manager.saveTree(args[1], args[2], out);
   }
 
-  void cmdLoad(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdLoad(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<OK: Loaded " << args[1] << " from " << args[2] << ">\n";
+    manager.loadTree(args[1], args[2], out);
   }
 
   void cmdShowTree(CommandArgs & args, TreeManager &, std::ostream & out)
