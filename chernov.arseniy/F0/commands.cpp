@@ -263,11 +263,15 @@ namespace chernov {
     Tree & tree = manager.getTree(args[1]);
     int depth = -1;
     if (args.getSize() == 4) {
-      try {
-        depth = std::stoi(args[3]);
-      } catch (...) {
-        out << "<ERROR: Invalid depth>\n";
-        return;
+      if (args[3] == "all") {
+        depth = -1;
+      } else {
+        try {
+          depth = std::stoi(args[3]);
+        } catch (...) {
+          out << "<ERROR: Invalid depth>\n";
+          return;
+        }
       }
     }
     tree.showAncestors(args[2], depth, out);
@@ -286,11 +290,15 @@ namespace chernov {
     Tree & tree = manager.getTree(args[1]);
     int depth = -1;
     if (args.getSize() == 4) {
-      try {
-        depth = std::stoi(args[3]);
-      } catch (...) {
-        out << "<ERROR: Invalid depth>\n";
-        return;
+      if (args[3] == "all") {
+        depth = -1;
+      } else {
+        try {
+          depth = std::stoi(args[3]);
+        } catch (...) {
+          out << "<ERROR: Invalid depth>\n";
+          return;
+        }
       }
     }
     tree.showDescendants(args[2], depth, out);
@@ -309,11 +317,15 @@ namespace chernov {
     Tree & tree = manager.getTree(args[1]);
     int depth = -1;
     if (args.getSize() == 4) {
-      try {
-        depth = std::stoi(args[3]);
-      } catch (...) {
-        out << "<ERROR: Invalid depth>\n";
-        return;
+      if (args[3] == "all") {
+        depth = -1;
+      } else {
+        try {
+          depth = std::stoi(args[3]);
+        } catch (...) {
+          out << "<ERROR: Invalid depth>\n";
+          return;
+        }
       }
     }
     tree.showRelatives(args[2], depth, out);
