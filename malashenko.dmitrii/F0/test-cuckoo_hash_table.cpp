@@ -188,28 +188,15 @@ BOOST_AUTO_TEST_CASE(erase_func)
   ht.insert("b", 2);
   ht.insert("c", 3);
 
-  try
-  {
-    ht.erase("d");
-    BOOST_FAIL("Should be an error");
-  }
-  catch(const std::exception& e)
-  {
-    BOOST_CHECK(!std::strcmp(e.what(), "Unknown key"));
-  }
+  std::pair< int, bool > resFail = ht.erase("d");
   BOOST_CHECK(ht.size() == 3);
+  BOOST_CHECK(resFail.first == int());
+  BOOST_CHECK(!resFail.second);
 
-  ht.erase("a");
-  try
-  {
-    int _ = ht.at("a");
-    BOOST_FAIL("Should be an error");
-  }
-  catch(const std::exception& e)
-  {
-    BOOST_CHECK(!std::strcmp(e.what(), "Unknown key"));
-  }
+  std::pair< int, bool > resSuccess = ht.erase("a");
   BOOST_CHECK(ht.size() == 2);
+  BOOST_CHECK(resSuccess.first == 1);
+  BOOST_CHECK(resSuccess.second);
 
 }
 
