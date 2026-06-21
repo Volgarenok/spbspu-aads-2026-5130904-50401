@@ -15,7 +15,7 @@ namespace donkeev
     BSTIterator(const BSTIterator< Key, Value >&);
     BSTIterator(BSTIterator< Key, Value >&&);
 
-    BSTIterator(const BSTNode< Key, Value >*);
+    BSTIterator(BSTNode< Key, Value >*);
 
     ~BSTIterator() = default;
     
@@ -78,7 +78,7 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  BSTIterator< Key, Value >::BSTIterator(const BSTNode< Key, Value >* nodePtr):
+  BSTIterator< Key, Value >::BSTIterator(BSTNode< Key, Value >* nodePtr):
     node_(nodePtr)
   {}
 
@@ -273,6 +273,8 @@ namespace donkeev
     {
       nodePtr = nodePtr->left_;
     }
+
+    return nodePtr;
   }
 
   template< class Key, class Value >
@@ -282,6 +284,8 @@ namespace donkeev
     {
       nodePtr = nodePtr->right_;
     }
+
+    return nodePtr;
   }
 
   template< class Key, class Value >
@@ -293,6 +297,7 @@ namespace donkeev
     }
 
     nodePtr = nodePtr->parent_;
+    return nodePtr;
   }
 
   template< class Key, class Value >
@@ -304,8 +309,9 @@ namespace donkeev
     }
 
     nodePtr = nodePtr->parent_;
+    return nodePtr;
   }
-  
+
 }
 
 #endif
