@@ -58,6 +58,8 @@ namespace chernov {
 
     std::string addPersonCopy(const Person & source);
 
+    void showTree(const std::string & id, std::ostream & out) const;
+
   private:
     std::string name_;
     std::string description_;
@@ -68,6 +70,9 @@ namespace chernov {
     std::string generateId();
     void removeAllConnections(const std::string & id);
     bool isDescendant(const std::string & ancestorId, const std::string & personId) const;
+
+    void printAncestors(const std::string & id, std::ostream & out, const std::string & prefix) const;
+    void printDescendants(const std::string & id, std::ostream & out, const std::string & prefix) const;
   };
 }
 

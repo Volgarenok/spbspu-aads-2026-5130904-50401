@@ -515,3 +515,94 @@ std::string chernov::Tree::addPersonCopy(const Person & source)
   p->setInfo(source.getInfo());
   return newId;
 }
+
+void chernov::Tree::showTree(const std::string & id, std::ostream & out) const
+{
+  const Person * p = findPerson(id);
+  if (!p) {
+    out << "<ERROR: Person not found>\n";
+    return;
+  }
+
+  out << "<TREE VIEW:>\n";
+  out << id << " (" << p->getSurname() << " " << p->getName() << ")\n";
+
+  struct Branch {
+    std::string type;
+    std::string id;
+  };
+  Vector< Branch > branches;
+
+  if (p->hasSpouse()) {
+    branches.pushBack({"spouse", p->getSpouse()});
+  }
+  for (size_t i = 0; i < p->getParentsCount(); ++i) {
+    branches.pushBack({"parent", p->getParents()[i]});
+  }
+  for (size_t i = 0; i < p->getChildrenCount(); ++i) {
+    branches.pushBack({"child", p->getChildren()[i]});
+  }
+
+  for (size_t i = 0; i < branches.getSize(); ++i) {
+    bool isLast = (i == branches.getSize() - 1);
+    const std::string & btype = branches[i].type;
+    const std::string & bid = branches[i].id;
+    const Person * bp = findPerson(bid);
+    if (!bp) {
+      continue;
+    }
+
+    out << (isLast ? "└── " : "├── ");
+    if (btype == "spouse") {
+      out << "spouse: ";
+    }
+    out << bid << " (" << bp->getSurname() << " " << bp->getName() << ")\n";
+
+    std::string childPrefix = (isLast ? "    " : "│   ");
+    if (btype == "parent") {
+      printAncestors(bid, out, childPrefix);
+    } else if (btype == "child") {
+      printDescendants(bid, out, childPrefix);
+    }
+  }
+}
+
+void chernov::Tree::printAncestors(const std::string & id, std::ostream & out, const std::string & prefix) const
+{
+  const Person * p = findPerson(id);
+  if (!p) {
+    return;
+  }
+  size_t count = p->getParentsCount();
+  for (size_t i = 0; i < count; ++i) {
+    bool last = (i == count - 1);
+    const std::string & parentId = p->getParents()[i];
+    const Person * parent = findPerson(parentId);
+    if (!parent) {
+      continue;
+    }
+    out << prefix << (last ? "└── " : "├── ") << parentId;
+    out << " (" << parent->getSurname() << " " << parent->getName() << ")\n";
+    printAncestors(parentId, out, prefix + (last ? "    " : "│   "));
+  }
+}
+
+void chernov::Tree::printDescendants(const std::string & id, std::ostream & out, const std::string & prefix) const
+{
+  const Person * p = findPerson(id);
+  if (!p) {
+    return;
+  }
+  size_t count = p->getChildrenCount();
+  for (size_t i = 0; i < count; ++i) {
+    bool last = (i == count - 1);
+    const std::string & childId = p->getChildren()[i];
+    const Person * child = findPerson(childId);
+    if (!child) {
+      continue;
+    }
+    out << prefix << (last ? "└── " : "├── ") << childId;
+    out << " (" << child->getSurname() << " " << child->getName() << ")\n";
+    printDescendants(childId, out, prefix + (last ? "    " : "│   "));
+  }
+}
