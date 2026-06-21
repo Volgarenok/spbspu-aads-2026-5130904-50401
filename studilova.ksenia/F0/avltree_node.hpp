@@ -20,7 +20,7 @@ namespace studilova
     class AVLNode
     {
       public:
-      AVLNode(const Key& key, const Value& value);
+        AVLNode(const Key& key, const Value& value);
 
       private:
         Key key_;
@@ -29,6 +29,15 @@ namespace studilova
         AVLNode* right_;
         AVLNode* parent_;
         size_t height_;
+
+        template< class K, class V, class C >
+        friend class studilova::AVLTree;
+
+        template< class K, class V >
+        friend class studilova::AVLTreeIt;
+
+        template< class K, class V >
+        friend class studilova::AVLTreeCIt;
     };
   }
 }
