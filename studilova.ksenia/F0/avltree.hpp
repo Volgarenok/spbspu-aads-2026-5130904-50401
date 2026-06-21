@@ -75,6 +75,9 @@ namespace studilova
       int getBalance(const Node* node) const;
       void updateNodeHeight(Node* node);
 
+      Node* balance(Node* node);
+      void rebalanceFrom(Node* node);
+
       void swap(AVLTree& other) noexcept;
   };
 }
@@ -567,6 +570,63 @@ void studilova::AVLTree< Key, Value, Compare >::updateNodeHeight(Node* node)
   size_t right_height = getNodeHeight(node->right_);
 
   node->height_ = 1 + (left_height > right_height ? left_height : right_height);
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::AVLTree< Key, Value, Compare >::Node* studilova::AVLTree< Key, Value, Compare >::balance(Node* node)
+{
+  if (!node)
+  {
+    return nullptr;
+  }
+
+  updateNodeHeight(node);
+
+  int balance = getBalance(node);
+
+  if (balance > 1)
+  {
+    if (getBalance(node->left_) < 0)
+    {
+      return const_cast< Node* >(rotateLargeRight(CIt(node, root_)).node_);
+    }
+
+    return const_cast< Node* >(rotateRight(CIt(node, root_)).node_);
+  }
+
+  if (balance < -1)
+  {
+    if (getBalance(node->right_) > 0)
+    {
+      return const_cast< Node* >(rotateLargeLeft(CIt(node, root_)).node_);
+    }
+
+    return const_cast< Node* >(rotateLeft(CIt(node, root_)).node_);
+  }
+
+  return node;
+}
+
+template< class Key, class Value, class Compare >
+void studilova::AVLTree< Key, Value, Compare >::rebalanceFrom(Node* node)
+{
+  while (node)
+  {
+    Node* parent = node->parent_;
+
+    Node* new_root = balance(node);
+
+    if (!parent)
+    {
+      root_ = new_root;
+    }
+    node = parent;
+  }
+
+  if (root_)
+  {
+    root_->parent_ = nullptr;
+  }
 }
 
 template< class Key, class Value, class Compare >
