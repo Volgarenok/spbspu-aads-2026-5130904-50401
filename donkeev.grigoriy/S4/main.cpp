@@ -1,5 +1,9 @@
 #include <iostream>
 #include <fstream>
+#include <limits>
+
+#include "BSTree.hpp"
+#include "trees-commands.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -9,6 +13,54 @@ int main(int argc, char* argv[])
     return 1;
   }
   std::string filename(argv[1]);
+  std::ifstream file(filename);
+  if (!file.is_open())
+  {
+    std::cerr << "Сannot open file\n";
+    return 1;
+  }
 
-  
+  donkeev::Datasets allDicts;
+
+  std::string dictName;
+  while (file >> dictName)
+  {
+    donkeev::Dataset dict;
+
+    size_t key;
+    std::string value;
+    while (file >> key >> value)
+    {
+      dict.push(key, value);
+    }
+
+    file.clear();
+
+    allDicts.push(dictName, std::move(dict));
+  }
+
+  file.close();
+
+  using cmd_t = void(*)(std::istream&, std::ostream&, donkeev::Datasets&);
+  donkeev::BSTree< std::string, cmd_t, donkeev::Comp< std::string > > commands;
+
+  commands.push("print", donkeev::printDicts);
+  commands.push("complement", donkeev::complementDicts);
+  commands.push("intersect", donkeev::intersectDicts);
+  commands.push("union", donkeev::uniteDicts);
+
+  std::string command;
+  while (std::cin >> command)
+  {
+    try
+    {
+      commands.get(command)(std::cin, std::cout, allDicts);
+    }
+    catch (...)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
+  }
 }
