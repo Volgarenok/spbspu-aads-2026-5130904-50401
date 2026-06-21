@@ -1,4 +1,4 @@
-#include "Budget.hpp"
+#include "budget.hpp"
 
 studilova::Budget::Budget():
   name_()
