@@ -363,13 +363,13 @@ namespace chernov {
     manager.compareTrees(args[1], args[2], out);
   }
 
-  void cmdMergePersons(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdMergePersons(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 6) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<CREATED: " << args[5] << ">\n<MERGE SUCCESS>\n";
+    manager.mergePersons(args[1], args[2], args[3], args[4], args[5], out);
   }
 
   void cmdSave(CommandArgs & args, TreeManager & manager, std::ostream & out)
