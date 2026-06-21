@@ -60,7 +60,7 @@ namespace lukashevich
     }
     return list_.back();
   }
-  
+
   template< class T >
   void Stack< T >::clear()
   {
