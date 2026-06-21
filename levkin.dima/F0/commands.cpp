@@ -75,8 +75,7 @@ namespace rl {
     out << "Node '" << childId << "' added to '" << parentId << "'.\n";
   }
 
-  void
-  createNode(std::istream& in, std::ostream& out, RootDB& db, RLRoot* layout)
+  void createNode(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout)
   {
     if (!layout) {
       out << "Error: no layout initialized\n";
@@ -255,7 +254,16 @@ namespace rl {
       out << "Node '" << id << "' size updated to " << w << "x" << h << ".\n";
     }
   }
+  void printHelp(std::istream&, std::ostream& out, RootDB&, RLRoot*)
+  {
+    out << "Available commands:\n";
 
+    Cmds cmds = getCmds();
+
+    for (auto it = cmds.begin(); it != cmds.end(); ++it) {
+      out << "  - " << it.key() << "\n";
+    }
+  }
   Cmds getCmds()
   {
     Cmds cmds;
