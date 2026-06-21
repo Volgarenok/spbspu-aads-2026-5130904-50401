@@ -31,9 +31,7 @@ namespace rl {
   {
     updateChildrenParent();
 
-    rhs.parent = nullptr;
-    rhs.width = -1.0f;
-    rhs.height = -1.0f;
+    rhs.reset();
   }
 
   RLNode& RLNode::operator=(RLNode&& rhs) noexcept
@@ -57,10 +55,7 @@ namespace rl {
     box = rhs.box;
 
     updateChildrenParent();
-
-    rhs.parent = nullptr;
-    rhs.width = -1.0f;
-    rhs.height = -1.0f;
+    rhs.reset();
 
     return *this;
   }
@@ -71,5 +66,16 @@ namespace rl {
         children[i]->parent = this;
       }
     }
+  }
+  void RLNode::reset() noexcept
+  {
+    parent = nullptr;
+    width = -1.0f;
+    height = -1.0f;
+
+    box.x = 0.0f;
+    box.y = 0.0f;
+    box.width = 0.0f;
+    box.height = 0.0f;
   }
 }

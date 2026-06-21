@@ -59,6 +59,7 @@ namespace rl {
 
   private:
     void updateChildrenParent() noexcept;
+    void reset() noexcept;
   };
 }
 #endif
