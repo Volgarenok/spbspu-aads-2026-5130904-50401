@@ -78,6 +78,11 @@ namespace studilova
       Node* balance(Node* node);
       void rebalanceFrom(Node* node);
 
+      Node* rotateLeft(Node* node);
+      Node* rotateRight(Node* node);
+      Node* rotateLargeLeft(Node* node);
+      Node* rotateLargeRight(Node* node);
+
       void swap(AVLTree& other) noexcept;
   };
 }
@@ -264,109 +269,57 @@ typename studilova::AVLTree< Key, Value, Compare >::CIt studilova::AVLTree< Key,
 template< class Key, class Value, class Compare >
 typename studilova::AVLTree< Key, Value, Compare >::CIt studilova::AVLTree< Key, Value, Compare >::rotateLeft(CIt it)
 {
-  Node* old_root = const_cast< Node* >(it.node_);
+  Node* node = const_cast< Node* >(it.node_);
 
-  if (!old_root || !old_root->right_)
+  if (!node || !node->right_)
   {
     throw std::logic_error("left rotation is impossible");
   }
 
-  Node* new_root = old_root->right_;
-  Node* moved_subtree = new_root->left_;
-
-  old_root->right_ = moved_subtree;
-  if (moved_subtree)
-  {
-    moved_subtree->parent_ = old_root;
-  }
-
-  new_root->parent_ = old_root->parent_;
-
-  if (!old_root->parent_)
-  {
-    root_ = new_root;
-  }
-  else if (old_root == old_root->parent_->left_)
-  {
-    old_root->parent_->left_ = new_root;
-  }
-  else
-  {
-    old_root->parent_->right_ = new_root;
-  }
-
-  new_root->left_ = old_root;
-  old_root->parent_ = new_root;
-
+  Node* new_root = rotateLeft(node);
   return CIt(new_root, root_);
 }
 
 template< class Key, class Value, class Compare >
 typename studilova::AVLTree< Key, Value, Compare >::CIt studilova::AVLTree< Key, Value, Compare >::rotateRight(CIt it)
 {
-  Node* old_root = const_cast< Node* >(it.node_);
+  Node* node = const_cast< Node* >(it.node_);
 
-  if (!old_root || !old_root->left_)
+  if (!node || !node->left_)
   {
     throw std::logic_error("right rotation is impossible");
   }
 
-  Node* new_root = old_root->left_;
-  Node* moved_subtree = new_root->right_;
-
-  old_root->left_ = moved_subtree;
-  if (moved_subtree)
-  {
-    moved_subtree->parent_ = old_root;
-  }
-
-  new_root->parent_ = old_root->parent_;
-
-  if (!old_root->parent_)
-  {
-    root_ = new_root;
-  }
-  else if (old_root == old_root->parent_->left_)
-  {
-    old_root->parent_->left_ = new_root;
-  }
-  else
-  {
-    old_root->parent_->right_ = new_root;
-  }
-
-  new_root->right_ = old_root;
-  old_root->parent_ = new_root;
-
+  Node* new_root = rotateRight(node);
   return CIt(new_root, root_);
 }
 
 template< class Key, class Value, class Compare >
 typename studilova::AVLTree< Key, Value, Compare >::CIt studilova::AVLTree< Key, Value, Compare >::rotateLargeLeft(CIt it)
 {
-  Node* old_root = const_cast< Node* >(it.node_);
+  Node* node = const_cast< Node* >(it.node_);
 
-  if (!old_root || !old_root->right_ || !old_root->right_->left_)
+  if (!node || !node->right_ || !node->right_->left_)
   {
     throw std::logic_error("large left rotation is impossible");
   }
 
-  rotateRight(CIt(old_root->right_, root_));
-  return rotateLeft(CIt(old_root, root_));
+  Node* new_root = rotateLargeLeft(node);
+  return CIt(new_root, root_);
 }
 
 template< class Key, class Value, class Compare >
 typename studilova::AVLTree< Key, Value, Compare >::CIt studilova::AVLTree< Key, Value, Compare >::rotateLargeRight(CIt it)
 {
-  Node* old_root = const_cast< Node* >(it.node_);
+  Node* node = const_cast< Node* >(it.node_);
 
-  if (!old_root || !old_root->left_ || !old_root->left_->right_)
+  if (!node || !node->left_ || !node->left_->right_)
   {
     throw std::logic_error("large right rotation is impossible");
   }
 
-  rotateLeft(CIt(old_root->left_, root_));
-  return rotateRight(CIt(old_root, root_));
+  Node* new_root = rotateLargeRight(node);
+  return CIt(new_root, root_);
 }
 
 template< class Key, class Value, class Compare >
@@ -627,6 +580,116 @@ void studilova::AVLTree< Key, Value, Compare >::rebalanceFrom(Node* node)
   {
     root_->parent_ = nullptr;
   }
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::AVLTree< Key, Value, Compare >::Node*
+studilova::AVLTree< Key, Value, Compare >::rotateLeft(Node* node)
+{
+  if (!node || !node->right_)
+  {
+    return node;
+  }
+
+  Node* new_root = node->right_;
+  Node* moved_subtree = new_root->left_;
+
+  node->right_ = moved_subtree;
+  if (moved_subtree)
+  {
+    moved_subtree->parent_ = node;
+  }
+
+  new_root->parent_ = node->parent_;
+
+  if (!node->parent_)
+  {
+    root_ = new_root;
+  }
+  else if (node == node->parent_->left_)
+  {
+    node->parent_->left_ = new_root;
+  }
+  else
+  {
+    node->parent_->right_ = new_root;
+  }
+
+  new_root->left_ = node;
+  node->parent_ = new_root;
+
+  updateNodeHeight(node);
+  updateNodeHeight(new_root);
+
+  return new_root;
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::AVLTree< Key, Value, Compare >::Node*
+studilova::AVLTree< Key, Value, Compare >::rotateRight(Node* node)
+{
+  if (!node || !node->left_)
+  {
+    return node;
+  }
+
+  Node* new_root = node->left_;
+  Node* moved_subtree = new_root->right_;
+
+  node->left_ = moved_subtree;
+  if (moved_subtree)
+  {
+    moved_subtree->parent_ = node;
+  }
+
+  new_root->parent_ = node->parent_;
+
+  if (!node->parent_)
+  {
+    root_ = new_root;
+  }
+  else if (node == node->parent_->left_)
+  {
+    node->parent_->left_ = new_root;
+  }
+  else
+  {
+    node->parent_->right_ = new_root;
+  }
+
+  new_root->right_ = node;
+  node->parent_ = new_root;
+
+  updateNodeHeight(node);
+  updateNodeHeight(new_root);
+
+  return new_root;
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::AVLTree< Key, Value, Compare >::Node*
+studilova::AVLTree< Key, Value, Compare >::rotateLargeLeft(Node* node)
+{
+  if (!node || !node->right_)
+  {
+    return node;
+  }
+
+  rotateRight(node->right_);
+  return rotateLeft(node);
+}
+
+template< class Key, class Value, class Compare >
+typename studilova::AVLTree< Key, Value, Compare >::Node*
+studilova::AVLTree< Key, Value, Compare >::rotateLargeRight(Node* node)
+{
+  if (!node || !node->left_)
+  {
+    return node;
+  }
+
+  rotateLeft(node->left_);
+  return rotateRight(node);
 }
 
 template< class Key, class Value, class Compare >
