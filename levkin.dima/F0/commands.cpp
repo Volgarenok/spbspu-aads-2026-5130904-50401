@@ -16,7 +16,12 @@ namespace rl {
   {
     out << "Works fine\n";
   }
-
+  void unregisterSubtree(RLNode* node, Map< std::string, RLNode* >& mapOfNodes) {
+      for (size_t i = 0; i < node->children.getSize(); ++i) {
+        unregisterSubtree(node->children[i].get(), mapOfNodes);
+      }
+      mapOfNodes.drop(node->id);
+    }
   Cmds getCmds()
   {
     Cmds cmds;
