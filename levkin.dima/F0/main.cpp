@@ -2,12 +2,13 @@
 #include "dom.hpp"
 #include <iostream>
 #include <string>
+
+using namespace rl;
 int main()
 {
   std::string current;
-  using namespace rl;
   Cmds cmds = getCmds();
-  Database db;
+  RootDB db;
 
   while (std::cin >> current) {
     try {

@@ -2,20 +2,16 @@
 #include "vector.hpp"
 #ifndef DOM
 #define DOM
-struct El {
+struct RLNode {
   std::string id;
-  stuff::Vector< El* > children;
+  stuff::Vector< RLNode* > children;
   // TODO стили и размеры
 };
 
-struct DomTree {
-  El root;
+struct RTRoot {
+  RLNode root;
   // TODO: absolute
   // std::vector<El*>
 };
 
-struct Database {
-  stuff::Vector< DomTree* > history;
-  DomTree* current;
-};
 #endif
