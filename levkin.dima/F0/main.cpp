@@ -9,10 +9,9 @@ int main()
   std::string current;
   Cmds cmds = getCmds();
   RootDB db;
-
   while (std::cin >> current) {
     try {
-      if (cmds.find(current) == cmds.end()) {
+      if (!cmds.has(current)) {
         throw std::logic_error("Unknown command");
       }
       cmds.at(current)(std::cin, std::cout, db);
