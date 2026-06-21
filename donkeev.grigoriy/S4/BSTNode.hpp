@@ -8,7 +8,7 @@ namespace donkeev
   template< class Key, class Value >
   struct BSTNode
   {
-    std::pair< const Key, Value > data_;
+    std::pair< Key, Value > data_;
 
     BSTNode< Key, Value >* left_;
     BSTNode< Key, Value >* right_;

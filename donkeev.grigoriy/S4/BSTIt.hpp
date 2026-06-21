@@ -22,8 +22,8 @@ namespace donkeev
     BSTIterator< Key, Value >& operator=(const BSTIterator< Key, Value >&);
     BSTIterator< Key, Value >& operator=(BSTIterator< Key, Value >&&);
 
-    std::pair< const Key, Value >& operator*() const;
-    std::pair< const Key, Value >* operator->() const;
+    std::pair< Key, Value >& operator*() const;
+    std::pair< Key, Value >* operator->() const;
     BSTIterator< Key, Value >& operator++();
     BSTIterator< Key, Value >& operator--();
 
@@ -49,8 +49,8 @@ namespace donkeev
     BSTCIterator< Key, Value >& operator=(const BSTCIterator< Key, Value >&);
     BSTCIterator< Key, Value >& operator=(BSTCIterator< Key, Value >&&);
 
-    const std::pair< const Key, Value >& operator*() const;
-    const std::pair< const Key, Value >* operator->() const;
+    const std::pair< Key, Value >& operator*() const;
+    const std::pair< Key, Value >* operator->() const;
     BSTCIterator< Key, Value >& operator++();
     BSTCIterator< Key, Value >& operator--();
 
@@ -98,13 +98,13 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  std::pair< const Key, Value >& BSTIterator< Key, Value >::operator*() const
+  std::pair< Key, Value >& BSTIterator< Key, Value >::operator*() const
   {
     return node_->data_;
   }
 
   template< class Key, class Value >
-  std::pair< const Key, Value >* BSTIterator< Key, Value >::operator->() const
+  std::pair< Key, Value >* BSTIterator< Key, Value >::operator->() const
   {
     return &(node_->data_);
   }
@@ -201,13 +201,13 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  const std::pair< const Key, Value >& BSTCIterator< Key, Value >::operator*() const
+  const std::pair< Key, Value >& BSTCIterator< Key, Value >::operator*() const
   {
     return node_->data_;
   }
 
   template< class Key, class Value >
-  const std::pair< const Key, Value >* BSTCIterator< Key, Value >::operator->() const
+  const std::pair< Key, Value >* BSTCIterator< Key, Value >::operator->() const
   {
     return &(node_->data_);
   }
