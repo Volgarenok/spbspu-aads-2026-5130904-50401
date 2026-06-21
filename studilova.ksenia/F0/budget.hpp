@@ -7,14 +7,15 @@
 
 #include "category.hpp"
 #include "operation.hpp"
+#include "avltree.hpp"
 
 namespace studilova
 {
   class Budget
   {
     public:
-      Budget() noexcept;
-      explicit Budget(const std::string& name) noexcept;
+      Budget();
+      explicit Budget(const std::string& name);
       ~Budget();
 
       const std::string& getName() const noexcept;
@@ -27,10 +28,18 @@ namespace studilova
       const Vector< Operation >& getOperations() const noexcept;
       Vector< Operation >& getOperations() noexcept;
 
+      bool hasCategory(const std::string& name) const;
+
+      Category& getCategory(const std::string& name);
+      const Category& getCategory(const std::string& name) const;
+
+      void addCategory(const std::string& name, const std::string& parentName);
+
     private:
       std::string name_;
       Category rootCategory_;
       Vector< Operation > operations_;
+      AVLTree< std::string, Category* > categories_;
 
       void clearCategoryChildren(Category& category);
   };
