@@ -437,5 +437,41 @@ void malashenko::Network::recomendUsers(std::ostream& out, const std::string& us
   }
 }
 
+void malashenko::Network::saveToFile(std::ostream& out) const
+{
+  out << users_.size() << '\n';
+
+  for (userCIter_t it = users_.begin(); it != users_.end(); ++it)
+  {
+    out << it->key << '\n';
+
+    out << it->value.inbox.getSize();
+    for (size_t i = 0; i < it->value.inbox.getSize(); ++i)
+    {
+      out << ' ' << it->value.inbox[i];
+    }
+    out << '\n';
+
+    out << it->value.outbox.getSize();
+    for (size_t i = 0; i < it->value.outbox.getSize(); ++i)
+    {
+      out << ' ' << it->value.outbox[i];
+    }
+    out << '\n';
+  }
+
+  out << messages_.size() << '\n';
+
+  for (msgCIter_t it = messages_.begin(); it != messages_.end(); ++it)
+  {
+    const detail::Message& msg = it->value;
+
+    out << msg.message_id << '\n';
+    out << msg.timestamp << '\n';
+    out << msg.from << '\n';
+    out << msg.to << '\n';
+    out << msg.text << '\n';
+  }
+}
 
 

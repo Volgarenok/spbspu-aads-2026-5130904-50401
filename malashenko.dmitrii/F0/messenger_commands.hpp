@@ -21,6 +21,9 @@ namespace malashenko
     void path(std::istream& in, std::ostream& out);
     void remove_inactive(std::istream& in, std::ostream& out);
     void distance(std::istream& in, std::ostream& out);
+    void help(std::istream& in, std::ostream& out);
+    void save(std::istream& in, std::ostream& out);
+    void load(std::istream& in, std::ostream& out);
   private:
     Network net_;
   };

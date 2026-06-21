@@ -47,6 +47,9 @@ namespace malashenko
     void distanceBetweanUsers(std::ostream& out, const std::string& from, const std::string& to) const;
     void removeInactive();
 
+    void saveToFile(std::ostream& out) const;
+    void loadFromFile(std::istream& in);
+
   private:
     using name_t = std::string;
     using pair_t = std::pair< name_t, name_t >;

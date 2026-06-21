@@ -154,4 +154,80 @@ void malashenko::Messenger::distance(std::istream& in, std::ostream& out)
   net_.distanceBetweanUsers(out, username1, username2);
 }
 
+void malashenko::Messenger::help(std::istream&, std::ostream& out)
+{
+  out << R"(
+
+  ==================== AVAILABLE COMMANDS ====================
+
+  USER MANAGEMENT
+
+  user <username>
+      Create a new user.
+
+  rmuser <username>
+      Remove an existing user and all related data.
+
+  ls
+      Display the list of all users.
+
+
+  MESSAGES
+
+  send <from> <to> <message>
+      Send a message from one user to another.
+
+  rmmsg <message_id>
+      Delete a message by its ID.
+
+  inbox <username>
+      Show all messages received by the user.
+
+  outbox <username>
+      Show all messages sent by the user.
+
+  find <text>
+      Search messages containing the specified text.
+
+
+  CHATS
+
+  chat <user1> <user2>
+      Display the conversation between two users.
+
+  clear <user1> <user2>
+      Delete all messages exchanged between two users.
+
+
+  SOCIAL GRAPH
+
+  mutual <user1> <user2>
+      Show mutual interlocutors of two users.
+
+  recommend <username>
+      Show recommended interlocutors
+      (friends of friends).
+
+  path <user1> <user2>
+      Find the shortest communication path
+      between two users.
+
+  distance <user1> <user2>
+      Show the number of intermediaries
+      between two users.
+
+
+  MAINTENANCE
+
+  remove-inactive
+      Remove inactive users.
+
+  help
+      Display this help message.
+
+  ============================================================
+  )";
+}
+
+
 

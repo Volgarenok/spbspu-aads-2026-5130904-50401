@@ -28,6 +28,7 @@ int main()
   commands.insert("recommend", &Messenger::recommend);
   commands.insert("remove-inactive", &Messenger::remove_inactive);
   commands.insert("mutual", &Messenger::mutual);
+  commands.insert("help", &Messenger::help);
 
 
   detail::printBanner(std::cout);
