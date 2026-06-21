@@ -527,42 +527,41 @@ void chernov::Tree::showTree(const std::string & id, std::ostream & out) const
   out << "<TREE VIEW:>\n";
   out << id << " (" << p->getSurname() << " " << p->getName() << ")\n";
 
-  struct Branch {
-    std::string type;
-    std::string id;
-  };
-  Vector< Branch > branches;
+  Vector< Link > links;
 
   if (p->hasSpouse()) {
-    branches.pushBack({"spouse", p->getSpouse()});
+    links.pushBack({"spouse", p->getSpouse()});
   }
   for (size_t i = 0; i < p->getParentsCount(); ++i) {
-    branches.pushBack({"parent", p->getParents()[i]});
+    links.pushBack({"parent", p->getParents()[i]});
   }
   for (size_t i = 0; i < p->getChildrenCount(); ++i) {
-    branches.pushBack({"child", p->getChildren()[i]});
+    links.pushBack({"child", p->getChildren()[i]});
   }
 
-  for (size_t i = 0; i < branches.getSize(); ++i) {
-    bool isLast = (i == branches.getSize() - 1);
-    const std::string & btype = branches[i].type;
-    const std::string & bid = branches[i].id;
-    const Person * bp = findPerson(bid);
-    if (!bp) {
+  Vector< std::string > visited;
+  visited.pushBack(id);
+
+  for (size_t i = 0; i < links.getSize(); ++i) {
+    const std::string & type = links[i].type;
+    const std::string & nid = links[i].id;
+    const Person * np = findPerson(nid);
+    if (!np) {
       continue;
     }
 
-    out << (isLast ? "└── " : "├── ");
-    if (btype == "spouse") {
-      out << "spouse: ";
-    }
-    out << bid << " (" << bp->getSurname() << " " << bp->getName() << ")\n";
+    bool last = (i == links.getSize() - 1);
+    std::string marker = last ? "└── " : "├── ";
+    out << marker << type << ": " << nid << " (" << np->getSurname() << " " << np->getName() << ")\n";
 
-    std::string childPrefix = (isLast ? "    " : "│   ");
-    if (btype == "parent") {
-      printAncestors(bid, out, childPrefix);
-    } else if (btype == "child") {
-      printDescendants(bid, out, childPrefix);
+    Vector< std::string > branchVisited = visited;
+    branchVisited.pushBack(nid);
+    std::string childPrefix = last ? "    " : "│   ";
+
+    if (type == "parent") {
+      printUp(nid, id, childPrefix, branchVisited, out);
+    } else if (type == "child") {
+      printDown(nid, id, childPrefix, branchVisited, out);
     }
   }
 }
@@ -604,5 +603,145 @@ void chernov::Tree::printDescendants(const std::string & id, std::ostream & out,
     out << prefix << (last ? "└── " : "├── ") << childId;
     out << " (" << child->getSurname() << " " << child->getName() << ")\n";
     printDescendants(childId, out, prefix + (last ? "    " : "│   "));
+  }
+}
+
+void chernov::Tree::printUp(const std::string & id,
+  const std::string & fromId,
+  const std::string & prefix,
+  Vector< std::string > & visited,
+  std::ostream & out) const
+{
+  const Person * p = findPerson(id);
+  if (!p) {
+    return;
+  }
+
+  struct Link {
+    std::string type;
+    std::string id;
+  };
+  Vector< Link > links;
+
+  if (p->hasSpouse() && p->getSpouse() != fromId) {
+    const std::string & spId = p->getSpouse();
+    bool vis = false;
+    for (size_t i = 0; i < visited.getSize(); ++i) {
+      if (visited[i] == spId) {
+        vis = true;
+        break;
+      }
+    }
+    if (!vis) {
+      links.pushBack({"spouse", spId});
+    }
+  }
+
+  for (size_t i = 0; i < p->getParentsCount(); ++i) {
+    const std::string & parId = p->getParents()[i];
+    if (parId == fromId) {
+      continue;
+    }
+    bool vis = false;
+    for (size_t j = 0; j < visited.getSize(); ++j) {
+      if (visited[j] == parId) {
+        vis = true;
+        break;
+      }
+    }
+    if (!vis) {
+      links.pushBack({"parent", parId});
+    }
+  }
+
+  for (size_t i = 0; i < links.getSize(); ++i) {
+    const std::string & type = links[i].type;
+    const std::string & nid = links[i].id;
+    const Person * np = findPerson(nid);
+    if (!np) {
+      continue;
+    }
+
+    bool last = (i == links.getSize() - 1);
+    out << prefix << (last ? "└── " : "├── ") << type << ": " << nid << " (" << np->getSurname() << " " << np->getName()
+        << ")\n";
+
+    Vector< std::string > newVisited = visited;
+    newVisited.pushBack(nid);
+    std::string newPrefix = prefix + (last ? "    " : "│   ");
+
+    if (type == "parent") {
+      printUp(nid, id, newPrefix, newVisited, out);
+    }
+  }
+}
+
+void chernov::Tree::printDown(const std::string & id,
+  const std::string & fromId,
+  const std::string & prefix,
+  Vector< std::string > & visited,
+  std::ostream & out) const
+{
+  const Person * p = findPerson(id);
+  if (!p) {
+    return;
+  }
+
+  struct Link {
+    std::string type;
+    std::string id;
+  };
+  Vector< Link > links;
+
+  if (p->hasSpouse() && p->getSpouse() != fromId) {
+    const std::string & spId = p->getSpouse();
+    bool vis = false;
+    for (size_t i = 0; i < visited.getSize(); ++i) {
+      if (visited[i] == spId) {
+        vis = true;
+        break;
+      }
+    }
+    if (!vis) {
+      links.pushBack({"spouse", spId});
+    }
+  }
+
+  for (size_t i = 0; i < p->getChildrenCount(); ++i) {
+    const std::string & chId = p->getChildren()[i];
+    if (chId == fromId) {
+      continue;
+    }
+    bool vis = false;
+    for (size_t j = 0; j < visited.getSize(); ++j) {
+      if (visited[j] == chId) {
+        vis = true;
+        break;
+      }
+    }
+    if (!vis) {
+      links.pushBack({"child", chId});
+    }
+  }
+
+  for (size_t i = 0; i < links.getSize(); ++i) {
+    const std::string & type = links[i].type;
+    const std::string & nid = links[i].id;
+    const Person * np = findPerson(nid);
+    if (!np) {
+      continue;
+    }
+
+    bool last = (i == links.getSize() - 1);
+    out << prefix << (last ? "└── " : "├── ") << type << ": " << nid << " (" << np->getSurname() << " " << np->getName()
+        << ")\n";
+
+    Vector< std::string > newVisited = visited;
+    newVisited.pushBack(nid);
+    std::string newPrefix = prefix + (last ? "    " : "│   ");
+
+    if (type == "child") {
+      printDown(nid, id, newPrefix, newVisited, out);
+    }
   }
 }

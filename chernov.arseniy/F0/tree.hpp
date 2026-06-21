@@ -61,6 +61,11 @@ namespace chernov {
     void showTree(const std::string & id, std::ostream & out) const;
 
   private:
+    struct Link {
+      std::string type;
+      std::string id;
+    };
+
     std::string name_;
     std::string description_;
     Vector< Person > persons_;
@@ -73,6 +78,18 @@ namespace chernov {
 
     void printAncestors(const std::string & id, std::ostream & out, const std::string & prefix) const;
     void printDescendants(const std::string & id, std::ostream & out, const std::string & prefix) const;
+
+    void printUp(const std::string & id,
+      const std::string & fromId,
+      const std::string & prefix,
+      Vector< std::string > & visited,
+      std::ostream & out) const;
+
+    void printDown(const std::string & id,
+      const std::string & fromId,
+      const std::string & prefix,
+      Vector< std::string > & visited,
+      std::ostream & out) const;
   };
 }
 
