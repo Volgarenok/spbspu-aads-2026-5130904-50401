@@ -15,6 +15,9 @@ namespace studilova
   class AVLTree
   {
     public:
+      using It = studilova::AVLTreeIt< Key, Value >;
+      using CIt = studilova::AVLTreeCIt< Key, Value >;
+
       AVLTree();
       explicit AVLTree(const Compare& cmp);
       ~AVLTree();
@@ -31,9 +34,6 @@ namespace studilova
       const Value& get(const Key& key) const;
 
       Value drop(const Key& key);
-
-      using It = studilova::AVLTreeIt< Key, Value >;
-      using CIt = studilova::AVLTreeCIt< Key, Value >;
 
       It begin();
       It end();
@@ -59,25 +59,34 @@ namespace studilova
 
       void clear(Node* node);
       Node* clone(const Node* node, Node* parent);
+
       Node* findNode(const Key& key);
       const Node* findNode(const Key& key) const;
+
       Node* getMin(Node* node) const;
       const Node* getMin(const Node* node) const;
       Node* getMax(Node* node) const;
+
       void replaceNode(Node* old_node, Node* new_node);
+
       size_t calcHeight(const Node* node) const;
+
+      size_t getNodeHeight(const Node* node) const noexcept;
+      int getBalance(const Node* node) const;
+      void updateNodeHeight(Node* node);
+
       void swap(AVLTree& other) noexcept;
   };
 }
 
 template< class Key, class Value, class Compare >
-studilova::AVLTree< Key, Value, Compare >::AVLTree() :
+studilova::AVLTree< Key, Value, Compare >::AVLTree():
   root_(nullptr),
   cmp_(Compare())
 {}
 
 template< class Key, class Value, class Compare >
-studilova::AVLTree< Key, Value, Compare >::AVLTree(const Compare& cmp) :
+studilova::AVLTree< Key, Value, Compare >::AVLTree(const Compare& cmp):
   root_(nullptr),
   cmp_(cmp)
 {}
@@ -89,7 +98,7 @@ studilova::AVLTree< Key, Value, Compare >::~AVLTree()
 }
 
 template< class Key, class Value, class Compare >
-studilova::AVLTree< Key, Value, Compare >::AVLTree(const AVLTree& other) :
+studilova::AVLTree< Key, Value, Compare >::AVLTree(const AVLTree& other):
   root_(nullptr),
   cmp_(other.cmp_)
 {
@@ -97,7 +106,7 @@ studilova::AVLTree< Key, Value, Compare >::AVLTree(const AVLTree& other) :
 }
 
 template< class Key, class Value, class Compare >
-studilova::AVLTree< Key, Value, Compare >::AVLTree(AVLTree&& other) noexcept :
+studilova::AVLTree< Key, Value, Compare >::AVLTree(AVLTree&& other) noexcept:
   root_(other.root_),
   cmp_(other.cmp_)
 {
@@ -158,7 +167,9 @@ void studilova::AVLTree< Key, Value, Compare >::push(const Key& key, const Value
     else if (cmp_(key, current->key_))
     {
       current = current->left_;
-    } else {
+    }
+    else
+    {
       current = current->right_;
     }
   }
@@ -169,7 +180,9 @@ void studilova::AVLTree< Key, Value, Compare >::push(const Key& key, const Value
   if (cmp_(key, parent->key_))
   {
     parent->left_ = new_node;
-  } else {
+  }
+  else
+  {
     parent->right_ = new_node;
   }
 }
@@ -273,7 +286,9 @@ typename studilova::AVLTree< Key, Value, Compare >::CIt studilova::AVLTree< Key,
   else if (old_root == old_root->parent_->left_)
   {
     old_root->parent_->left_ = new_root;
-  } else {
+  }
+  else
+  {
     old_root->parent_->right_ = new_root;
   }
 
@@ -311,7 +326,9 @@ typename studilova::AVLTree< Key, Value, Compare >::CIt studilova::AVLTree< Key,
   else if (old_root == old_root->parent_->left_)
   {
     old_root->parent_->left_ = new_root;
-  } else {
+  }
+  else
+  {
     old_root->parent_->right_ = new_root;
   }
 
@@ -383,6 +400,7 @@ typename studilova::AVLTree< Key, Value, Compare >::Node* studilova::AVLTree< Ke
 
   Node* copy = new Node(node->key_, node->value_);
   copy->parent_ = parent;
+  copy->height_ = node->height_;
   copy->left_ = clone(node->left_, copy);
   copy->right_ = clone(node->right_, copy);
 
@@ -402,7 +420,9 @@ typename studilova::AVLTree< Key, Value, Compare >::Node* studilova::AVLTree< Ke
     else if (cmp_(key, current->key_))
     {
       current = current->left_;
-    } else {
+    }
+    else
+    {
       current = current->right_;
     }
   }
@@ -422,7 +442,9 @@ const typename studilova::AVLTree< Key, Value, Compare >::Node* studilova::AVLTr
     else if (cmp_(key, current->key_))
     {
       current = current->left_;
-    } else {
+    }
+    else
+    {
       current = current->right_;
     }
   }
@@ -490,7 +512,9 @@ void studilova::AVLTree< Key, Value, Compare >::replaceNode(Node* old_node, Node
   else if (old_node == old_node->parent_->left_)
   {
     old_node->parent_->left_ = new_node;
-  } else {
+  }
+  else
+  {
     old_node->parent_->right_ = new_node;
   }
 }
@@ -507,6 +531,42 @@ size_t studilova::AVLTree< Key, Value, Compare >::calcHeight(const Node* node) c
   size_t right_height = calcHeight(node->right_);
 
   return 1 + (left_height > right_height ? left_height : right_height);
+}
+
+template< class Key, class Value, class Compare >
+size_t studilova::AVLTree< Key, Value, Compare >::getNodeHeight(const Node* node) const noexcept
+{
+  if (!node)
+  {
+    return 0;
+  }
+
+  return node->height_;
+}
+
+template< class Key, class Value, class Compare >
+int studilova::AVLTree< Key, Value, Compare >::getBalance(const Node* node) const
+{
+  if (!node)
+  {
+    return 0;
+  }
+
+  return static_cast< int >(getNodeHeight(node->left_)) - static_cast< int >(getNodeHeight(node->right_));
+}
+
+template< class Key, class Value, class Compare >
+void studilova::AVLTree< Key, Value, Compare >::updateNodeHeight(Node* node)
+{
+  if (!node)
+  {
+    return;
+  }
+
+  size_t left_height = getNodeHeight(node->left_);
+  size_t right_height = getNodeHeight(node->right_);
+
+  node->height_ = 1 + (left_height > right_height ? left_height : right_height);
 }
 
 template< class Key, class Value, class Compare >
