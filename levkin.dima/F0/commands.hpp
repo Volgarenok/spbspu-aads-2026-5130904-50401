@@ -28,6 +28,7 @@ namespace rl {
   };
 
   void healthcheck(std::istream& in, std::ostream& out, RootDB& db);
+  void (std::istream& in, std::ostream& out, RootDB& db);  
   Cmds getCmds();
 
 }
