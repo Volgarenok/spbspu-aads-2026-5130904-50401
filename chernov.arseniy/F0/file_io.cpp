@@ -73,19 +73,6 @@ bool chernov::detail::loadTree(Tree & tree, const std::string & filename, std::s
   std::string line;
   std::string treeName;
   size_t nextId = 0;
-  struct PersonData {
-    std::string id;
-    std::string lastName;
-    std::string firstName;
-    std::string patronymic;
-    std::string gender;
-    std::string birthDate;
-    std::string deathDate;
-    std::string info;
-    std::string parentsStr;
-    std::string spousesStr;
-    std::string childrenStr;
-  };
   Vector< PersonData > personDataList;
   PersonData currentPerson;
   bool personStarted = false;
