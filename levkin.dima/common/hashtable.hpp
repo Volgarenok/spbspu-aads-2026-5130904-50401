@@ -603,6 +603,63 @@ namespace levkin {
 
     const_iterator cbegin() const noexcept { return begin(); }
     const_iterator cend() const noexcept { return end(); }
+    iterator erase(const_iterator pos)
+    {
+      if (pos == end() || pos.table_ != this) {
+        return end();
+      }
+
+      Hash hasher;
+      EqualTo equal;
+
+      if (pos.index_ < pool_.getSize()) {
+        if (pool_[pos.index_].is_valid_) {
+          pool_[pos.index_].is_valid_ = false;
+          count_valid_--;
+        }
+        iterator next_it(this, pos.index_);
+        return ++next_it;
+      } else {
+        auto it = overflow_.begin();
+        while (it != overflow_.end()) {
+          if (it->is_valid_ && equal(it->key_, pos.overflow_it_->key_)) {
+            it->is_valid_ = false;
+            count_valid_--;
+            iterator next_it(this, pool_.getSize(), it);
+            return ++next_it;
+          }
+          ++it;
+        }
+      }
+      return end();
+    }
+
+    bool erase(const Key& key)
+    {
+      Hash hasher;
+      EqualTo equal;
+      size_t bucket_idx = hasher(key) % num_buckets_;
+      size_t home_start = bucket_idx * bucket_capacity_;
+
+      for (size_t i = 0; i < bucket_capacity_; ++i) {
+        size_t curr = home_start + i;
+        if (pool_[curr].is_valid_ && equal(pool_[curr].key_, key)) {
+          pool_[curr].is_valid_ = false;
+          count_valid_--;
+          return true;
+        }
+      }
+
+      for (auto it = overflow_.begin(); it != overflow_.end(); ++it) {
+        if (it->is_valid_ && equal(it->key_, key)) {
+          it->is_valid_ = false;
+          count_valid_--;
+          return true;
+        }
+      }
+
+      return false;
+    }
 
   private:
     size_t findNextValidInPool(size_t index) const noexcept
