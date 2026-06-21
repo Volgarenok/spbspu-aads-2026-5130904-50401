@@ -7,15 +7,15 @@ BOOST_AUTO_TEST_SUITE(FuncsTestSuite)
 
 BOOST_AUTO_TEST_CASE(HelperFunctions)
 {
-  BOOST_CHECK(getOperatorType("5") == 0);
-  BOOST_CHECK(getOperatorType("+") == 1);
-  BOOST_CHECK(getOperatorType("!") == 2);
-  BOOST_CHECK(isOperator("*") == true);
-  BOOST_CHECK(isOperator("10") == false);
-  BOOST_CHECK(getPriority("!") == 3);
-  BOOST_CHECK(getPriority("/") == 2);
-  BOOST_CHECK(getPriority("-") == 1);
-  BOOST_CHECK(getPriority("abc") == 0);
+  BOOST_CHECK(detail::getOperatorType("5") == 0);
+  BOOST_CHECK(detail::getOperatorType("+") == 1);
+  BOOST_CHECK(detail::getOperatorType("!") == 2);
+  BOOST_CHECK(detail::isOperator("*") == true);
+  BOOST_CHECK(detail::isOperator("10") == false);
+  BOOST_CHECK(detail::getPriority("!") == 3);
+  BOOST_CHECK(detail::getPriority("/") == 2);
+  BOOST_CHECK(detail::getPriority("-") == 1);
+  BOOST_CHECK(detail::getPriority("abc") == 0);
 }
 
 BOOST_AUTO_TEST_CASE(TokenizeTest)
@@ -30,17 +30,23 @@ BOOST_AUTO_TEST_CASE(TokenizeTest)
 BOOST_AUTO_TEST_CASE(InfixToPostfixTest)
 {
   List< std::string > tokens = tokenize("2 + 2 * 33");
-  List< std::string > res = infixToPostfix(tokens);
+  Queue< std::string > res = infixToPostfix(tokens);
 
   BOOST_CHECK(res.size() == 5);
 
-  auto it = res.begin();
+  BOOST_CHECK(res.front() == "2");
+  res.pop();
 
-  BOOST_CHECK(*it == "2"); ++it;
-  BOOST_CHECK(*it == "2"); ++it;
-  BOOST_CHECK(*it == "33"); ++it;
-  BOOST_CHECK(*it == "*"); ++it;
-  BOOST_CHECK(*it == "+");
+  BOOST_CHECK(res.front()== "2");
+  res.pop();
+
+  BOOST_CHECK(res.front() == "33");
+  res.pop();
+
+  BOOST_CHECK(res.front()== "*");
+  res.pop();
+
+  BOOST_CHECK(res.front() == "+");
 }
 
 BOOST_AUTO_TEST_CASE(ArithmeticOperations)

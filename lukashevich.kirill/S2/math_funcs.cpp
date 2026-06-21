@@ -1,267 +1,287 @@
 #include "math_funcs.hpp"
+
 #include <string>
 #include <stdexcept>
 #include <limits>
 
-namespace lukashevich
+size_t lukashevich::detail::getOperatorType(const std::string& token)
 {
-  size_t getOperatorType(const std::string& token)
-  {
-    if (token == "!") {
-      return 2;
-    }
-    if (token == "+" || token == "-" || token == "*" || token == "/" || token == "%") {
-      return 1;
-    }
-    return 0;
+  if (token == "!") {
+    return 2;
   }
-
-  bool isOperator(const std::string& token)
-  {
-    return getOperatorType(token) != 0;
+  if (token == "+" || token == "-" || token == "*" || token == "/" || token == "%") {
+    return 1;
   }
+  return 0;
+}
 
-  size_t getPriority(const std::string& token)
-  {
-    if (token == "!") {
-      return 3;
-    }
-    if (token == "*" || token == "/" || token == "%") {
-      return 2;
-    }
-    if (token == "+" || token == "-") {
-      return 1;
-    }
-    return 0;
+bool  lukashevich::detail::isOperator(const std::string& token)
+{
+  return getOperatorType(token) != 0;
+}
+
+size_t lukashevich::detail::getPriority(const std::string& token)
+{
+  if (token == "!") {
+    return 3;
   }
+  if (token == "*" || token == "/" || token == "%") {
+    return 2;
+  }
+  if (token == "+" || token == "-") {
+    return 1;
+  }
+  return 0;
+}
 
-  List< std::string > tokenize(const std::string& str)
-  {
-    List< std::string > res;
-    std::string cur_token = "";
+lukashevich::List< std::string > lukashevich::tokenize(const std::string& str)
+{
+  List< std::string > res;
+  std::string cur_token;
 
-    for (size_t i = 0; i < str.size(); ++i) {
-      if (str[i] != ' ') {
-        cur_token += str[i];
-      }
-      else if (!cur_token.empty()) {
-        res.pushBack(cur_token);
-        cur_token = "";
-      }
-    }
-    if (!cur_token.empty()) {
+  for (size_t i = 0; i < str.size(); ++i) {
+    if (str[i] != ' ') {
+      cur_token += str[i];
+    } else if (!cur_token.empty()) {
       res.pushBack(cur_token);
+      cur_token.clear();
     }
-    return res;
   }
 
-  List< std::string > infixToPostfix(const List< std::string >& tokens)
-  {
-    List< std::string > output;
-    Stack< std::string > op_stack;
+  if (!cur_token.empty()) {
+    res.pushBack(cur_token);
+  }
 
-    for (auto it = tokens.begin(); it != tokens.end(); ++it) {
-      const std::string& token = *it;
-      if (token == "(") {
-        op_stack.push(token);
+  return res;
+}
+
+lukashevich::Queue< std::string > lukashevich::infixToPostfix(const List< std::string >& tokens)
+{
+  Queue< std::string > output;
+  Stack< std::string > op_stack;
+
+  for (auto it = tokens.begin(); it != tokens.end(); ++it) {
+    const std::string& token = *it;
+
+    if (token == "(") {
+      op_stack.push(token);
+    } else if (token == ")") {
+      while (!op_stack.empty() && op_stack.top() != "(") {
+        output.push(op_stack.top());
+        op_stack.pop();
       }
 
-      else if (token == ")") {
-        while (!op_stack.empty() && op_stack.first() != "(") {
-          output.pushBack(op_stack.drop());
-        }
-        if (op_stack.empty()) {
-          throw std::runtime_error("invalid brackets");
-        }
-        op_stack.drop();
-      }
-
-      else if (isOperator(token)) {
-        while (!op_stack.empty() && op_stack.first() != "(") {
-          size_t top_prec = getPriority(op_stack.first());
-          size_t cur_prec = getPriority(token);
-          if (top_prec > cur_prec || (top_prec == cur_prec && token != "!")) {
-            output.pushBack(op_stack.drop());
-          }
-          else {
-            break;
-          }
-        }
-        op_stack.push(token);
-      }
-      else {
-        output.pushBack(token);
-      }
-    }
-
-    while (!op_stack.empty()) {
-      if (op_stack.first() == "(") {
+      if (op_stack.empty()) {
         throw std::runtime_error("invalid brackets");
       }
-      output.pushBack(op_stack.drop());
-    }
-    return output;
-  }
 
-  ll add(ll lhs, ll rhs)
-  {
-    if ((rhs > 0 && lhs > std::numeric_limits< ll >::max() - rhs) || (rhs < 0 && lhs < std::numeric_limits< ll >::min() - rhs)) {
-      throw std::overflow_error("overflow");
-    }
-    return lhs + rhs;
-  }
+      op_stack.pop();
+    } else if (detail::isOperator(token)) {
+      while (!op_stack.empty() && op_stack.top() != "(") {
+        const std::size_t topPriority = detail::getPriority(op_stack.top());
+        const std::size_t currentPriority = detail::getPriority(token);
+        const bool hasHigherPriority = topPriority > currentPriority;
+        const bool hasEqualLeftPriority = topPriority == currentPriority && token != "!";
 
-  ll sub(ll lhs, ll rhs)
-  {
-    if ((rhs < 0 && lhs > std::numeric_limits< ll >::max() + rhs) || (rhs > 0 && lhs < std::numeric_limits< ll >::min() + rhs)) {
-      throw std::overflow_error("overflow");
-    }
-    return lhs - rhs;
-  }
-
-  ll mul(ll lhs, ll rhs)
-  {
-    if (lhs == 0 || rhs == 0) {
-      return 0;
-    }
-    if (lhs == -1 && rhs == std::numeric_limits< ll >::min()) {
-      throw std::overflow_error("overflow");
-    }
-    if (rhs == -1 && lhs == std::numeric_limits< ll >::min()) {
-      throw std::overflow_error("overflow");
-    }
-    if (lhs > 0) {
-      if (rhs > 0) {
-        if (lhs > std::numeric_limits< ll >::max() / rhs) {
-          throw std::overflow_error("overflow");
+        if (hasHigherPriority || hasEqualLeftPriority) {
+          output.push(op_stack.top());
+          op_stack.pop();
+        } else {
+          break;
         }
       }
-      else {
-        if (rhs < std::numeric_limits< ll >::min() / lhs) {
-          throw std::overflow_error("overflow");
-        }
+
+      op_stack.push(token);
+    } else {
+      output.push(token);
+    }
+  }
+
+  while (!op_stack.empty()) {
+    if (op_stack.top() == "(") {
+      throw std::runtime_error("invalid brackets");
+    }
+    output.push(op_stack.top());
+    op_stack.pop();
+  }
+
+  return output;
+}
+
+lukashevich::ll lukashevich::add(lukashevich::ll lhs, lukashevich::ll rhs)
+{
+  const bool upperOverflow = rhs > 0 && lhs > std::numeric_limits< ll >::max() - rhs;
+  const bool lowerOverflow = rhs < 0 && lhs < std::numeric_limits< ll >::min() - rhs;
+
+  if (upperOverflow || lowerOverflow) {
+    throw std::overflow_error("overflow");
+  }
+  return lhs + rhs;
+}
+
+lukashevich::ll lukashevich::sub(lukashevich::ll lhs, lukashevich::ll rhs)
+{
+  const bool upperOverflow = rhs < 0 && lhs > std::numeric_limits< ll >::max() + rhs;
+  const bool lowerOverflow = rhs > 0 && lhs < std::numeric_limits< ll >::min() + rhs;
+
+  if (upperOverflow || lowerOverflow) {
+    throw std::overflow_error("overflow");
+  }
+  return lhs - rhs;
+}
+
+lukashevich::ll lukashevich::mul(lukashevich::ll lhs, lukashevich::ll rhs)
+{
+  if (lhs == 0 || rhs == 0) {
+    return 0;
+  }
+  if (lhs == -1 && rhs == std::numeric_limits< ll >::min()) {
+    throw std::overflow_error("overflow");
+  }
+  if (rhs == -1 && lhs == std::numeric_limits< ll >::min()) {
+    throw std::overflow_error("overflow");
+  }
+  if (lhs > 0) {
+    if (rhs > 0) {
+      if (lhs > std::numeric_limits< ll >::max() / rhs) {
+        throw std::overflow_error("overflow");
       }
     }
     else {
-      if (rhs > 0) {
-        if (lhs < std::numeric_limits< ll >::min() / rhs) {
-          throw std::overflow_error("overflow");
-        }
-      }
-      else {
-        if (rhs < std::numeric_limits< ll >::max() / lhs) {
-          throw std::overflow_error("overflow");
-        }
-      }
-    }
-    return lhs * rhs;
-  }
-
-  ll divide(ll lhs, ll rhs)
-  {
-    if (rhs == 0) {
-      throw std::runtime_error("division by zero");
-    }
-    if (lhs == std::numeric_limits< ll >::min() && rhs == -1) {
-      throw std::overflow_error("overflow");
-    }
-    return lhs / rhs;
-  }
-
-  ll mod(ll lhs, ll rhs)
-  {
-    if (rhs == 0) {
-      throw std::runtime_error("modulo by zero");
-    }
-    if (lhs == std::numeric_limits< ll >::min() && rhs == -1) {
-      throw std::overflow_error("overflow");
-    }
-    ll result = lhs % rhs;
-    if (result < 0) {
-      result += (rhs > 0 ? rhs : -rhs);
-    }
-    return result;
-  }
-
-  ll bitwise_not(ll value)
-  {
-    return ~value;
-  }
-
-  ll parse_ll(const std::string& s)
-  {
-    ll res = 0;
-    size_t i = 0;
-    bool neg = false;
-
-    if (i < s.length() && s[i] == '-') {
-      neg = true;
-      ++i;
-    }
-    for (; i < s.length(); ++i) {
-      if (s[i] < '0' || s[i] > '9') {
-        throw std::runtime_error("invalid number format");
-      }
-      ll digit = s[i] - '0';
-      const ll div_limit = std::numeric_limits< ll >::max() / 10;
-      const ll mod_limit = std::numeric_limits< ll >::max() % 10;
-      const ll allowed_digit = neg ? (mod_limit + 1) : mod_limit;
-
-      if (res > div_limit || (res == div_limit && digit > allowed_digit)) {
+      if (rhs < std::numeric_limits< ll >::min() / lhs) {
         throw std::overflow_error("overflow");
       }
-      res = res * 10 + digit;
     }
-    return neg ? -res : res;
+  }
+  else {
+    if (rhs > 0) {
+      if (lhs < std::numeric_limits< ll >::min() / rhs) {
+        throw std::overflow_error("overflow");
+      }
+    }
+    else {
+      if (rhs < std::numeric_limits< ll >::max() / lhs) {
+        throw std::overflow_error("overflow");
+      }
+    }
+  }
+  return lhs * rhs;
+}
+
+lukashevich::ll lukashevich::divide(lukashevich::ll lhs, lukashevich::ll rhs)
+{
+  if (rhs == 0) {
+    throw std::runtime_error("division by zero");
+  }
+  if (lhs == std::numeric_limits< ll >::min() && rhs == -1) {
+    throw std::overflow_error("overflow");
+  }
+  return lhs / rhs;
+}
+
+lukashevich::ll lukashevich::mod(lukashevich::ll lhs, lukashevich::ll rhs)
+{
+  if (rhs == 0) {
+    throw std::runtime_error("modulo by zero");
   }
 
-  ll evaluate_expression(const std::string& line)
-  {
-    List< std::string > tokens = tokenize(line);
-    List< std::string > postfix = infixToPostfix(tokens);
-    Stack< ll > eval_stack;
+  if (lhs == std::numeric_limits< ll >::min() && rhs == -1) {
+    throw std::overflow_error("overflow");
+  }
 
-    for (auto it = postfix.begin(); it != postfix.end(); ++it) {
-      const std::string& token = *it;
-      size_t type = getOperatorType(token);
-      if (type == 0) {
-        eval_stack.push(parse_ll(token));
-      }
-      else if (type == 1) {
-        if (eval_stack.size() < 2) {
-          throw std::runtime_error("invalid expression: missing operand");
-        }
-        ll rhs = eval_stack.drop();
-        ll lhs = eval_stack.drop();
-        ll res;
-        if (token == "+") {
-          res = add(lhs, rhs);
-        }
-        else if (token == "-") {
-          res = sub(lhs, rhs);
-        }
-        else if (token == "*") {
-          res = mul(lhs, rhs);
-        }
-        else if (token == "/") {
-          res = divide(lhs, rhs);
-        }
-        else {
-          res = mod(lhs, rhs);
-        }
-        eval_stack.push(res);
-      }
-      else if (type == 2) {
-        if (eval_stack.empty()) {
-          throw std::runtime_error("invalid expression: missing operand for !");
-        }
-        ll val = eval_stack.drop();
-        eval_stack.push(bitwise_not(val));
-      }
+  ll result = lhs % rhs;
+
+  if (result < 0) {
+    result += (rhs > 0 ? rhs : -rhs);
+  }
+  return result;
+}
+
+lukashevich::ll lukashevich::bitwise_not(lukashevich::ll value)
+{
+  return ~value;
+}
+
+lukashevich::ll lukashevich::parse_ll(const std::string& s)
+{
+  std::size_t position = 0;
+
+  try {
+    const ll result = std::stoll(s, &position);
+
+    if (position != s.size()) {
+      throw std::runtime_error("invalid number format");
     }
-    if (eval_stack.size() != 1) {
-      throw std::runtime_error("invalid expression");
-    }
-    return eval_stack.drop();
+
+    return result;
+  }
+  catch (const std::invalid_argument&) {
+    throw std::runtime_error("invalid number format");
+  }
+  catch (const std::out_of_range&) {
+    throw std::overflow_error("overflow");
   }
 }
+
+lukashevich::ll lukashevich::evaluate_expression(const std::string& line)
+{
+  List< std::string > tokens = tokenize(line);
+  Queue< std::string > postfix = infixToPostfix(tokens);
+  Stack< ll > eval_stack;
+
+   while (!postfix.empty()) {
+    const std::string token = postfix.front();
+    postfix.pop();
+
+    const std::size_t type = detail::getOperatorType(token);
+
+    if (type == 0) {
+      eval_stack.push(parse_ll(token));
+    } else if (type == 1) {
+      if (eval_stack.size() < 2) {
+        throw std::runtime_error("invalid expression: missing operand");
+      }
+
+      const ll rhs = eval_stack.top();
+      eval_stack.pop();
+
+      const ll lhs = eval_stack.top();
+      eval_stack.pop();
+
+      ll result = 0;
+
+      if (token == "+") {
+        result = add(lhs, rhs);
+      } else if (token == "-") {
+        result = sub(lhs, rhs);
+      } else if (token == "*") {
+        result = mul(lhs, rhs);
+      } else if (token == "/") {
+        result = divide(lhs, rhs);
+      } else {
+        result = mod(lhs, rhs);
+      }
+
+      eval_stack.push(result);
+    } else if (type == 2) {
+      if (eval_stack.empty()) {
+        throw std::runtime_error("invalid expression: missing operand for !");
+      }
+
+      const ll value = eval_stack.top();
+      eval_stack.pop();
+
+      eval_stack.push(bitwise_not(value));
+    }
+  }
+
+  if (eval_stack.size() != 1) {
+    throw std::runtime_error("invalid expression");
+  }
+
+  const ll result = eval_stack.top();
+  eval_stack.pop();
+
+  return result;
+}
+

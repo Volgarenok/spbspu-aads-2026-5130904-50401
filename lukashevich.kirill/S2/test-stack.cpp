@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(PushFirst)
   s.push(2);
 
   BOOST_CHECK(s.size() == 2);
-  BOOST_CHECK(s.first() == 2);
+  BOOST_CHECK(s.top() == 2);
 }
 
 BOOST_AUTO_TEST_CASE(DropClear)
@@ -32,7 +32,8 @@ BOOST_AUTO_TEST_CASE(DropClear)
 
   BOOST_CHECK(s.size() == 3);
 
-  int res = s.drop();
+  int res = s.top();
+  s.pop();
 
   BOOST_CHECK(s.size() == 2);
   BOOST_CHECK(res == 3);
@@ -53,19 +54,19 @@ BOOST_AUTO_TEST_CASE(OperatorsConstructors)
 
   BOOST_CHECK(sCopy.size() == 3);
   BOOST_CHECK(!sCopy.empty());
-  BOOST_CHECK(sCopy.first() == 52);
+  BOOST_CHECK(sCopy.top() == 52);
 
   Stack< int > sMove(std::move(sCopy));
 
   BOOST_CHECK(sCopy.size() == 0);
   BOOST_CHECK(sCopy.empty());
-  BOOST_CHECK(sMove.first() == 52);
+  BOOST_CHECK(sMove.top() == 52);
   BOOST_CHECK(sMove.size() == 3);
 
   Stack< int > sCopyOperator = sMove;
 
   BOOST_CHECK(sCopyOperator.size() == 3);
-  BOOST_CHECK(sCopyOperator.first() == 52);
+  BOOST_CHECK(sCopyOperator.top() == 52);
   BOOST_CHECK(sMove.size() == 3);
 
   Stack< int > sMoveOperator = std::move(sCopyOperator);

@@ -1,85 +1,66 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include "../common/list/list.hpp"
+
 #include <stdexcept>
+#include <list/list.hpp>
+
 namespace lukashevich
 {
   template< class T >
   class Stack
   {
     public:
-      Stack();
+      Stack() = default;
+      Stack(const Stack< T >& stack) = default;
+      Stack(Stack< T >&& stack) = default;
       ~Stack() = default;
-      Stack(const Stack< T >& stack);
-      Stack< T >& operator=(const Stack< T >& stack);
-      Stack(Stack< T >&& stack);
-      Stack< T >& operator=(Stack< T >&& stack);
 
-      bool empty() const;
-      size_t size() const;
-      const T& first() const;
+      Stack< T >& operator=(const Stack< T >& stack) = default;
+      Stack< T >& operator=(Stack< T >&& stack) = default;
+
+      bool empty() const noexcept;
+      size_t size() const noexcept;
+      T& top();
+      const T& top() const;
       void clear();
       void push(const T& rhs);
-      T drop();
+      void push(T&& rhs);
+      void pop();
 
     private:
       List< T > list_;
   };
 
   template< class T >
-  Stack< T >::Stack():
-    list_()
-  {}
-
-  template< class T >
-  Stack< T >::Stack(const Stack< T >& stack):
-    list_(stack.list_)
-  {}
-
-  template< class T >
-  Stack< T >& Stack< T >::operator=(const Stack< T >& stack)
-  {
-    if (this != &stack) {
-      list_ = stack.list_;
-    }
-    return *this;
-  }
-
-  template< class T >
-  Stack< T >::Stack(Stack< T >&& stack):
-    list_(std::move(stack.list_))
-  {}
-
-  template< class T >
-  Stack< T >& Stack< T >::operator=(Stack< T >&& stack)
-  {
-    if (this != &stack) {
-      list_ = std::move(stack.list_);
-    }
-    return *this;
-  }
-
-  template< class T >
-  bool Stack< T >::empty() const
+  bool Stack< T >::empty() const noexcept
   {
     return list_.empty();
   }
 
   template< class T >
-  size_t Stack< T >::size() const
+  size_t Stack< T >::size() const noexcept
   {
     return list_.size();
   }
 
   template< class T >
-  const T& Stack< T >::first() const
+  T& Stack< T >::top()
   {
-    if (empty())
-    {
+    if (empty()) {
       throw std::runtime_error("empty stack");
     }
     return list_.back();
   }
+
+  template< class T >
+  const T& Stack< T >::top() const
+  {
+    if (empty()) {
+      throw std::runtime_error("empty stack");
+    }
+    return list_.back();
+  }
+  
   template< class T >
   void Stack< T >::clear()
   {
@@ -93,14 +74,18 @@ namespace lukashevich
   }
 
   template< class T >
-  T Stack< T >::drop()
+  void Stack< T >::push(T&& rhs)
+  {
+    list_.pushBack(std::move(rhs));
+  }
+
+  template< class T >
+  void Stack< T >::pop()
   {
     if (empty()) {
       throw std::runtime_error("empty stack");
     }
-    T value = list_.back();
     list_.popBack();
-    return value;
   }
 }
 #endif
