@@ -9,6 +9,7 @@ namespace rl {
     p->parent = this;
     children.pushBack(std::move(p));
   }
+
   void RLNode::clearChildren()
   {
     children.erase(children.begin(), children.end());
@@ -72,7 +73,6 @@ namespace rl {
     parent = nullptr;
     width = -1.0f;
     height = -1.0f;
-
     box.x = 0.0f;
     box.y = 0.0f;
     box.width = 0.0f;

@@ -35,7 +35,7 @@ namespace rl {
   struct RLNode {
     std::string id;
     stf::Vector< std::unique_ptr< RLNode > > children;
-    RLNode* parent;
+    RLNode* parent = nullptr;
 
     void addChild(std::unique_ptr< RLNode >);
     void removeChild(const std::string& id);
@@ -51,6 +51,7 @@ namespace rl {
     JustifyContent justify = JustifyContent::FlexStart;
     AlignItems align = AlignItems::FlexStart;
 
+    RLNode() = default;
     ~RLNode() = default;
     RLNode(const RLNode&) = delete;
     RLNode& operator=(const stf::Vector< RLNode >&) = delete;

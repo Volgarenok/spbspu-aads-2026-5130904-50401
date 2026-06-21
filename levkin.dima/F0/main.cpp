@@ -6,15 +6,16 @@
 using namespace rl;
 int main()
 {
-  std::string current;
+  std::string cmd;
   Cmds cmds = getCmds();
   RootDB db;
-  while (std::cin >> current) {
+  
+  while (std::cin >> cmd) {
     try {
-      if (!cmds.has(current)) {
+      if (!cmds.has(cmd)) {
         throw std::logic_error("Unknown command");
       }
-      cmds.at(current)(std::cin, std::cout, db);
+      cmds.at(cmd)(std::cin, std::cout, db, db.selected);
     } catch (const std::exception& e) {
       std::cout << "<INVALID COMMAND>\n";
       std::string dummy;
