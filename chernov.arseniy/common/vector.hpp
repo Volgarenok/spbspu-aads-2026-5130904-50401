@@ -117,6 +117,8 @@ chernov::Vector< T >::Vector(Vector< T > && v) noexcept:
   capacity_(v.capacity_)
 {
   v.data_ = nullptr;
+  v.size_ = 0;
+  v.capacity_ = 0;
 }
 
 template< class T >
