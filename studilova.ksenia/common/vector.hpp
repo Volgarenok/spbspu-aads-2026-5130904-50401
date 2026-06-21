@@ -86,7 +86,7 @@ namespace studilova
       void destroyAll() noexcept;
       explicit Vector(size_t size);
 
-     void unsafePushBack(const T& value);
+      void unsafePushBack(const T& value);
   };
 
   template< class T >
@@ -422,7 +422,7 @@ const T& studilova::Vector< T >::at(size_t id) const
 }
 
 template< class T >
-void studilova  ::Vector< T >::insert(size_t i, const T& v)
+void studilova::Vector< T >::insert(size_t i, const T& v)
 {
   if (i > size_)
   {
