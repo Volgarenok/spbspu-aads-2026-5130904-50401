@@ -7,6 +7,18 @@
 
 namespace donkeev
 {
+  template< class T >
+  struct Comp
+  {
+    bool operator()(const T&, const T&) const;
+  };
+
+  template< class T >
+  bool Comp< T >::operator()(const T& lhs, const T& rhs) const
+  {
+    return lhs < rhs;
+  }
+
   template< class Key, class Value, class Compare >
   class BSTree
   {
@@ -26,6 +38,11 @@ namespace donkeev
 
     BSTree< Key, Value, Compare >& operator=(const BSTree< Key, Value, Compare >&);
     BSTree< Key, Value, Compare >& operator=(BSTree< Key, Value, Compare >&&);
+
+    iterator begin();
+    iterator end();
+    constIterator begin() const;
+    constIterator end() const;
 
     void push(Key, const Value&);
     void push(Key, Value&&);
@@ -137,6 +154,30 @@ namespace donkeev
     }
 
     return *this;
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::iterator BSTree< Key, Value, Compare >::begin()
+  {
+    return iterator(fallLeft(root_));
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::iterator BSTree< Key, Value, Compare >::end()
+  {
+    return iterator(nullptr);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::constIterator BSTree< Key, Value, Compare >::begin() const
+  {
+    return constIterator(fallLeft(root_));
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::constIterator BSTree< Key, Value, Compare >::end() const
+  {
+    return constIterator(nullptr);
   }
 
   template< class Key, class Value, class Compare >
