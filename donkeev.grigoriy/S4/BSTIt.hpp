@@ -269,6 +269,27 @@ namespace donkeev
   template< class Key, class Value >
   BSTNode< Key, Value >* fallLeft(BSTNode< Key, Value >* nodePtr)
   {
+    if (!nodePtr)
+    {
+      return nullptr;
+    }
+
+    while (nodePtr->left_)
+    {
+      nodePtr = nodePtr->left_;
+    }
+
+    return nodePtr;
+  }
+
+  template< class Key, class Value >
+  const BSTNode< Key, Value >* fallLeft(const BSTNode< Key, Value >* nodePtr)
+  {
+    if (!nodePtr)
+    {
+      return nullptr;
+    }
+
     while (nodePtr->left_)
     {
       nodePtr = nodePtr->left_;
@@ -280,6 +301,11 @@ namespace donkeev
   template< class Key, class Value >
   BSTNode< Key, Value >* fallRight(BSTNode< Key, Value >* nodePtr)
   {
+    if (!nodePtr)
+    {
+      return nullptr;
+    }
+    
     while (nodePtr->right_)
     {
       nodePtr = nodePtr->right_;
