@@ -29,8 +29,9 @@ namespace donkeev
 
     void push(Key, const Value&);
     void push(Key, Value&&);
-    Value& get(Key);
-    Value drop(Key);
+    Value& get(const Key);
+    BSTNode< Key, Value >* find(const Key);
+    Value drop(const Key);
     void clear();
     void swap(BSTree< Key, Value, Compare >&);
   private:
@@ -39,6 +40,7 @@ namespace donkeev
     Compare compareFunc_;
 
     BSTNode< Key, Value >* cloneRecursive(const BSTNode< Key, Value >* node, BSTNode< Key, Value >* parent);
+    void removeNode(BSTNode< Key, Value >*);
   };
 
   template< class Key, class Value, class Compare >
@@ -245,6 +247,45 @@ namespace donkeev
     ++size_;
   }
 
+  template< class Key, class Value, class Compare >
+  Value& BSTree< Key, Value, Compare >::get(const Key key)
+  {
+    BSTNode< Key, Value >* curr = root_;
+    while (curr)
+    {
+      if (compareFunc_(key, curr->data_.first))
+      {
+        curr = curr->left_;
+      }
+      else if (compareFunc_(curr->data_.first, key))
+      {
+        curr = curr->right_;
+      }
+      else
+      {
+        return curr->data_.second;
+      }
+    }
+
+    throw std::runtime_error("No such element");
+  }
+
+  template<class Key, class Value, class Compare>
+  Value BSTree<Key, Value, Compare>::drop(const Key key)
+  {
+    BSTNode<Key, Value>* node = findNode(key);
+    if (!node)
+    {
+      throw std::runtime_error("No such element");
+    }
+    
+    Value result = std::move(node->data_.second);
+    
+    removeNode(node);
+    --size_;
+
+    return result;
+  }
 
   template< class Key, class Value, class Compare >
   void BSTree< Key, Value, Compare >::swap(BSTree< Key, Value, Compare >& other)
@@ -272,6 +313,132 @@ namespace donkeev
     new_node->right = cloneRecursive(node->right, new_node);
     
     return new_node;
+  }
+
+  template<class Key, class Value, class Compare>
+  void BSTree<Key, Value, Compare>::removeNode(BSTNode<Key, Value>* node)
+  {
+    if (!node)
+    {
+      return;
+    }
+
+    if (!node->left_ && !node->right_)
+    {
+      if (node->parent_)
+      {
+        if (node->parent_->left_ == node)
+        {  
+          node->parent_->left_ = nullptr;
+        }
+        else
+        {
+          node->parent_->right_ = nullptr;
+        }
+      }
+      else
+      {
+        root_ = nullptr;
+      }
+
+      delete node;
+    }
+    else if (!node->left_)
+    {
+      BSTNode<Key, Value>* child = node->right_;
+      child->parent_ = node->parent_;
+
+      if (node->parent_)
+      {
+        if (node->parent_->left_ == node)
+        {
+          node->parent_->left_ = child;
+        }
+        else
+        {
+          node->parent_->right_ = child;
+        }
+      }
+      else
+      {
+        root_ = child;
+      }
+
+      delete node;
+    }
+    else if (!node->right_)
+    {
+      BSTNode<Key, Value>* child = node->left_;
+      child->parent_ = node->parent_;
+      
+      if (node->parent_)
+      {
+        if (node->parent_->left_ == node)
+        {
+          node->parent_->left_ = child;
+        }
+        else
+        {
+          node->parent_->right_ = child;
+        }
+      }
+      else
+      {
+        root_ = child;
+      }
+      
+      delete node;
+    }
+    else
+    {
+      BSTNode<Key, Value>* minNode = node->right_;
+      while (minNode->left_)
+      {
+        minNode = minNode->left_;
+      }
+
+      if (minNode->parent_->left_ == minNode)
+      {
+        minNode->parent_->left_ = minNode->right_;
+        if (minNode->right_)
+        {
+          minNode->right_->parent_ = minNode->parent_;
+        }
+      }
+      else
+      {
+        minNode->parent_->right_ = minNode->right_;
+        if (minNode->right_)
+        {
+          minNode->right_->parent_ = minNode->parent_;
+        }
+      }
+
+      minNode->left_ = node->left_;
+      minNode->right_ = node->right_;
+      if (minNode->left_)
+      {
+        minNode->left_->parent_ = minNode;
+      }
+      if (minNode->right_)
+      {
+        minNode->right_->parent_ = minNode;
+      }
+      minNode->parent_ = node->parent_;
+      if (node->parent_)
+      {
+        if (node->parent_->left_ == node)
+        {
+          node->parent_->left_ = minNode;
+        }
+        else
+        {
+          node->parent_->right_ = minNode;
+        }
+      }
+
+      delete node;
+    }
   }
 }
 
