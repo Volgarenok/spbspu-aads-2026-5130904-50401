@@ -168,8 +168,7 @@ std::string chernov::detail::MergeContext::mergePair(
     return "";
   }
 
-  Vector< std::pair< std::string, std::string > > visited;
-  if (!areMatching(idA, idB, treeA, treeB, visited)) {
+  if (!fieldsMatch(*a, *b)) {
     error = "Merge conflict! Persons are not matching.";
     return "";
   }
@@ -210,9 +209,11 @@ std::string chernov::detail::MergeContext::mergePair(
         if (mergedParent.empty()) {
           return "";
         }
-        if (!mergedTree.addParent(newId, mergedParent, error)) {
-          error = "failed to add merged parent";
-          return "";
+        Person * newPersonPtr = mergedTree.findPerson(newId);
+        if (!newPersonPtr->hasParent(mergedParent)) {
+          if (!mergedTree.addParent(newId, mergedParent, error)) {
+            return "";
+          }
         }
         usedB[j] = true;
         matched = true;
@@ -224,8 +225,11 @@ std::string chernov::detail::MergeContext::mergePair(
       if (newParent.empty()) {
         return "";
       }
-      if (!mergedTree.addParent(newId, newParent, error)) {
-        return "";
+      Person * newPersonPtr = mergedTree.findPerson(newId);
+      if (!newPersonPtr->hasParent(newParent)) {
+        if (!mergedTree.addParent(newId, newParent, error)) {
+          return "";
+        }
       }
     }
   }
@@ -239,9 +243,9 @@ std::string chernov::detail::MergeContext::mergePair(
     if (!parentB) {
       continue;
     }
-    const Person * mergedPersonPtr = mergedTree.findPerson(newId);
-    if (mergedPersonPtr) {
-      const Vector< std::string > & existingParents = mergedPersonPtr->getParents();
+    const Person * newPersonPtr = mergedTree.findPerson(newId);
+    if (newPersonPtr) {
+      const Vector< std::string > & existingParents = newPersonPtr->getParents();
       bool conflict = false;
       for (size_t k = 0; k < existingParents.getSize(); ++k) {
         const Person * ep = mergedTree.findPerson(existingParents[k]);
@@ -259,8 +263,11 @@ std::string chernov::detail::MergeContext::mergePair(
     if (newParent.empty()) {
       return "";
     }
-    if (!mergedTree.addParent(newId, newParent, error)) {
-      return "";
+    Person * newPersonPtr2 = mergedTree.findPerson(newId);
+    if (!newPersonPtr2->hasParent(newParent)) {
+      if (!mergedTree.addParent(newId, newParent, error)) {
+        return "";
+      }
     }
   }
 
@@ -270,15 +277,23 @@ std::string chernov::detail::MergeContext::mergePair(
   }
 
   if (a->hasSpouse() && b->hasSpouse()) {
+    const std::string & spouseA = a->getSpouse();
+    const std::string & spouseB = b->getSpouse();
     Vector< std::pair< std::string, std::string > > vis;
-    if (areMatching(a->getSpouse(), b->getSpouse(), treeA, treeB, vis)) {
-      std::string mergedSpouse = mergePair(a->getSpouse(), b->getSpouse(), error);
+    if (areMatching(spouseA, spouseB, treeA, treeB, vis)) {
+      std::string mergedSpouse = mergePair(spouseA, spouseB, error);
       if (mergedSpouse.empty()) {
         return "";
       }
-      if (!mergedTree.addSpouse(newId, mergedSpouse, error)) {
-        error = "Merge conflict! Spouse already set.";
-        return "";
+      Person * np = mergedTree.findPerson(newId);
+      if (!np->hasSpouse() || np->getSpouse() != mergedSpouse) {
+        if (np->hasSpouse()) {
+          error = "Merge conflict! Spouse already set.";
+          return "";
+        }
+        if (!mergedTree.addSpouse(newId, mergedSpouse, error)) {
+          return "";
+        }
       }
     } else {
       error = "Merge conflict! Spouses mismatch. Cannot merge.";
@@ -289,7 +304,13 @@ std::string chernov::detail::MergeContext::mergePair(
     if (spouseNew.empty()) {
       return "";
     }
-    if (!mergedTree.addSpouse(newId, spouseNew, error)) {
+    Person * np = mergedTree.findPerson(newId);
+    if (!np->hasSpouse()) {
+      if (!mergedTree.addSpouse(newId, spouseNew, error)) {
+        return "";
+      }
+    } else if (np->getSpouse() != spouseNew) {
+      error = "Merge conflict! Spouse already set.";
       return "";
     }
   } else if (b->hasSpouse()) {
@@ -297,7 +318,13 @@ std::string chernov::detail::MergeContext::mergePair(
     if (spouseNew.empty()) {
       return "";
     }
-    if (!mergedTree.addSpouse(newId, spouseNew, error)) {
+    Person * np = mergedTree.findPerson(newId);
+    if (!np->hasSpouse()) {
+      if (!mergedTree.addSpouse(newId, spouseNew, error)) {
+        return "";
+      }
+    } else if (np->getSpouse() != spouseNew) {
+      error = "Merge conflict! Spouse already set.";
       return "";
     }
   }
@@ -320,8 +347,11 @@ std::string chernov::detail::MergeContext::mergePair(
         if (mergedChild.empty()) {
           return "";
         }
-        if (!mergedTree.addParent(mergedChild, newId, error)) {
-          return "";
+        Person * childPtr = mergedTree.findPerson(mergedChild);
+        if (!childPtr->hasParent(newId)) {
+          if (!mergedTree.addParent(mergedChild, newId, error)) {
+            return "";
+          }
         }
         usedChildB[j] = true;
         matched = true;
@@ -333,8 +363,11 @@ std::string chernov::detail::MergeContext::mergePair(
       if (newChild.empty()) {
         return "";
       }
-      if (!mergedTree.addParent(newChild, newId, error)) {
-        return "";
+      Person * childPtr = mergedTree.findPerson(newChild);
+      if (!childPtr->hasParent(newId)) {
+        if (!mergedTree.addParent(newChild, newId, error)) {
+          return "";
+        }
       }
     }
   }
@@ -344,8 +377,11 @@ std::string chernov::detail::MergeContext::mergePair(
       if (newChild.empty()) {
         return "";
       }
-      if (!mergedTree.addParent(newChild, newId, error)) {
-        return "";
+      Person * childPtr = mergedTree.findPerson(newChild);
+      if (!childPtr->hasParent(newId)) {
+        if (!mergedTree.addParent(newChild, newId, error)) {
+          return "";
+        }
       }
     }
   }
@@ -373,8 +409,11 @@ std::string chernov::detail::MergeContext::copyFromA(const std::string & idA, st
     if (parentNew.empty()) {
       return "";
     }
-    if (!mergedTree.addParent(newId, parentNew, error)) {
-      return "";
+    Person * p = mergedTree.findPerson(newId);
+    if (!p->hasParent(parentNew)) {
+      if (!mergedTree.addParent(newId, parentNew, error)) {
+        return "";
+      }
     }
   }
   if (a->hasSpouse()) {
@@ -382,7 +421,13 @@ std::string chernov::detail::MergeContext::copyFromA(const std::string & idA, st
     if (spouseNew.empty()) {
       return "";
     }
-    if (!mergedTree.addSpouse(newId, spouseNew, error)) {
+    Person * p = mergedTree.findPerson(newId);
+    if (!p->hasSpouse()) {
+      if (!mergedTree.addSpouse(newId, spouseNew, error)) {
+        return "";
+      }
+    } else if (p->getSpouse() != spouseNew) {
+      error = "Merge conflict! Spouse already set.";
       return "";
     }
   }
@@ -391,8 +436,11 @@ std::string chernov::detail::MergeContext::copyFromA(const std::string & idA, st
     if (childNew.empty()) {
       return "";
     }
-    if (!mergedTree.addParent(childNew, newId, error)) {
-      return "";
+    Person * childPtr = mergedTree.findPerson(childNew);
+    if (!childPtr->hasParent(newId)) {
+      if (!mergedTree.addParent(childNew, newId, error)) {
+        return "";
+      }
     }
   }
   return newId;
@@ -418,8 +466,11 @@ std::string chernov::detail::MergeContext::copyFromB(const std::string & idB, st
     if (parentNew.empty()) {
       return "";
     }
-    if (!mergedTree.addParent(newId, parentNew, error)) {
-      return "";
+    Person * p = mergedTree.findPerson(newId);
+    if (!p->hasParent(parentNew)) {
+      if (!mergedTree.addParent(newId, parentNew, error)) {
+        return "";
+      }
     }
   }
   if (b->hasSpouse()) {
@@ -427,7 +478,13 @@ std::string chernov::detail::MergeContext::copyFromB(const std::string & idB, st
     if (spouseNew.empty()) {
       return "";
     }
-    if (!mergedTree.addSpouse(newId, spouseNew, error)) {
+    Person * p = mergedTree.findPerson(newId);
+    if (!p->hasSpouse()) {
+      if (!mergedTree.addSpouse(newId, spouseNew, error)) {
+        return "";
+      }
+    } else if (p->getSpouse() != spouseNew) {
+      error = "Merge conflict! Spouse already set.";
       return "";
     }
   }
@@ -436,8 +493,11 @@ std::string chernov::detail::MergeContext::copyFromB(const std::string & idB, st
     if (childNew.empty()) {
       return "";
     }
-    if (!mergedTree.addParent(childNew, newId, error)) {
-      return "";
+    Person * childPtr = mergedTree.findPerson(childNew);
+    if (!childPtr->hasParent(newId)) {
+      if (!mergedTree.addParent(childNew, newId, error)) {
+        return "";
+      }
     }
   }
   return newId;
