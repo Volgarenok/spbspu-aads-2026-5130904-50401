@@ -434,9 +434,10 @@ template < class T > void stuff::Vector< T >::erase(size_t index)
   }
 
   for (size_t i = index; i < size_ - 1; ++i) {
-    data_[i] = data_[i + 1];
+    data_[i] = std::move(data_[i + 1]);
   }
   size_--;
+  stuff::destroy(&data_[size_]);
 }
 
 template < class T > void stuff::Vector< T >::erase(stuff::VIter< T > it)
