@@ -56,6 +56,8 @@ namespace chernov {
     void setNextId(size_t nextId);
     void setName(const std::string & name);
 
+    std::string addPersonCopy(const Person & source);
+
   private:
     std::string name_;
     std::string description_;

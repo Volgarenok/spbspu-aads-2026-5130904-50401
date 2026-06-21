@@ -497,3 +497,21 @@ void chernov::Tree::setName(const std::string & name)
 {
   name_ = name;
 }
+
+std::string chernov::Tree::addPersonCopy(const Person & source)
+{
+  std::string newId = addPerson(source.getSurname(), source.getName(), source.getPatronymic(), source.getGender());
+  Person * p = findPerson(newId);
+  if (!p) {
+    return "";
+  }
+  std::string dummy;
+  if (!source.getBirthDate().empty()) {
+    p->setBirthDate(toDisplayFormat(source.getBirthDate()), dummy);
+  }
+  if (!source.getDeathDate().empty()) {
+    p->setDeathDate(toDisplayFormat(source.getDeathDate()), dummy);
+  }
+  p->setInfo(source.getInfo());
+  return newId;
+}
