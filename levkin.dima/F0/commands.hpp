@@ -1,6 +1,6 @@
 #ifndef COMMANDS
 #define COMMANDS
-#include "dom.hpp"
+#include "node.hpp"
 #include "hashtable.hpp"
 #include <functional>
 #include <iostream>

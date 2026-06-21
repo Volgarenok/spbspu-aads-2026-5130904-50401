@@ -1,5 +1,5 @@
 #include "commands.hpp"
-#include "dom.hpp"
+#include "node.hpp"
 #include <iostream>
 namespace rl {
   void healthcheck(std::istream&, std::ostream& out, RootDB&)
