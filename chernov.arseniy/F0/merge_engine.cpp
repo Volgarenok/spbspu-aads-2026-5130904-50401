@@ -215,6 +215,7 @@ std::string chernov::detail::MergeContext::mergePair(
     if (!parentA) {
       continue;
     }
+
     bool matched = false;
     for (size_t j = 0; j < parentsB.getSize(); ++j) {
       if (usedB[j]) {
@@ -228,14 +229,15 @@ std::string chernov::detail::MergeContext::mergePair(
       if (parentA->getGender() != parentB->getGender()) {
         continue;
       }
+
       Vector< std::pair< std::string, std::string > > vis;
       if (areMatching(pA, pB, treeA, treeB, vis)) {
         std::string mergedParent = mergePair(pA, pB, error);
         if (mergedParent.empty()) {
           return "";
         }
-        Person * newPersonPtr = mergedTree.findPerson(newId);
-        if (!newPersonPtr->hasParent(mergedParent)) {
+        Person * childPtr = mergedTree.findPerson(newId);
+        if (!childPtr->hasParent(mergedParent)) {
           if (!mergedTree.addParent(newId, mergedParent, error)) {
             return "";
           }
@@ -268,8 +270,8 @@ std::string chernov::detail::MergeContext::mergePair(
       if (newParent.empty()) {
         return "";
       }
-      Person * newPersonPtr = mergedTree.findPerson(newId);
-      if (!newPersonPtr->hasParent(newParent)) {
+      Person * childPtr = mergedTree.findPerson(newId);
+      if (!childPtr->hasParent(newParent)) {
         if (!mergedTree.addParent(newId, newParent, error)) {
           return "";
         }
@@ -286,11 +288,12 @@ std::string chernov::detail::MergeContext::mergePair(
     if (!parentB) {
       continue;
     }
-    const Person * newPersonPtr = mergedTree.findPerson(newId);
-    if (newPersonPtr) {
-      const Vector< std::string > & existingParents = newPersonPtr->getParents();
-      for (size_t k = 0; k < existingParents.getSize(); ++k) {
-        const Person * ep = mergedTree.findPerson(existingParents[k]);
+
+    const Person * childPtr = mergedTree.findPerson(newId);
+    if (childPtr) {
+      const Vector< std::string > & existing = childPtr->getParents();
+      for (size_t k = 0; k < existing.getSize(); ++k) {
+        const Person * ep = mergedTree.findPerson(existing[k]);
         if (ep && ep->getGender() == parentB->getGender() && parentB->getGender() != "Unknown") {
           if (parentB->getGender() == "Male") {
             error = "Merge conflict! Father mismatch. Cannot merge.";
@@ -308,11 +311,6 @@ std::string chernov::detail::MergeContext::mergePair(
     if (!mergedTree.addParent(newId, newParent, error)) {
       return "";
     }
-  }
-
-  if (mergedTree.findPerson(newId) && mergedTree.findPerson(newId)->getParentsCount() > 2) {
-    error = "Merge conflict! Too many parents.";
-    return "";
   }
 
   if (a->hasSpouse() && b->hasSpouse()) {
@@ -366,6 +364,64 @@ std::string chernov::detail::MergeContext::mergePair(
       return "";
     }
   }
+
+  const Vector< std::string > & childrenA = a->getChildren();
+  const Vector< std::string > & childrenB = b->getChildren();
+  Vector< bool > usedChildB(childrenB.getSize(), false);
+
+  for (size_t i = 0; i < childrenA.getSize(); ++i) {
+    const std::string & cA = childrenA[i];
+    bool matched = false;
+    for (size_t j = 0; j < childrenB.getSize(); ++j) {
+      if (usedChildB[j]) {
+        continue;
+      }
+      const std::string & cB = childrenB[j];
+      Vector< std::pair< std::string, std::string > > vis;
+      if (areMatching(cA, cB, treeA, treeB, vis)) {
+        std::string mergedChild = mergePair(cA, cB, error);
+        if (mergedChild.empty()) {
+          return "";
+        }
+        Person * childPtr = mergedTree.findPerson(mergedChild);
+        if (!childPtr->hasParent(newId)) {
+          if (!mergedTree.addParent(mergedChild, newId, error)) {
+            return "";
+          }
+        }
+        usedChildB[j] = true;
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      std::string newChild = copyFromA(cA, error);
+      if (newChild.empty()) {
+        return "";
+      }
+      Person * childPtr = mergedTree.findPerson(newChild);
+      if (!childPtr->hasParent(newId)) {
+        if (!mergedTree.addParent(newChild, newId, error)) {
+          return "";
+        }
+      }
+    }
+  }
+  for (size_t j = 0; j < childrenB.getSize(); ++j) {
+    if (!usedChildB[j]) {
+      std::string newChild = copyFromB(childrenB[j], error);
+      if (newChild.empty()) {
+        return "";
+      }
+      Person * childPtr = mergedTree.findPerson(newChild);
+      if (!childPtr->hasParent(newId)) {
+        if (!mergedTree.addParent(newChild, newId, error)) {
+          return "";
+        }
+      }
+    }
+  }
+
   return newId;
 }
 
