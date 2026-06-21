@@ -403,12 +403,17 @@ namespace chernov {
     manager.loadTree(args[1], forcedName, out);
   }
 
-  void cmdShowTree(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdShowTree(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<TREE VIEW:>\n";
+    if (!manager.hasTree(args[1])) {
+      out << "<ERROR: Tree '" << args[1] << "' not found>\n";
+      return;
+    }
+    Tree & tree = manager.getTree(args[1]);
+    tree.showTree(args[2], out);
   }
 }
