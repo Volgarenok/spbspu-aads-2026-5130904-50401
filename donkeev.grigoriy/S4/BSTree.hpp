@@ -55,6 +55,7 @@ namespace donkeev
     Value drop(const Key);
     void clear();
     void swap(BSTree< Key, Value, Compare >&);
+    bool empty();
 
   private:
     BSTNode< Key, Value >* root_;
@@ -460,6 +461,12 @@ namespace donkeev
   {
     clearRecursive(root_);
     size_ = 0;
+  }
+
+  template< class Key, class Value, class Compare >
+  bool BSTree< Key, Value, Compare >::empty()
+  {
+    return size_ == 0;
   }
 
   template< class Key, class Value, class Compare >
