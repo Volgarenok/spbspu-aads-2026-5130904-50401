@@ -92,20 +92,30 @@ void chernov::TreeManager::saveTree(const std::string & treeName, const std::str
   }
 }
 
-void chernov::TreeManager::loadTree(const std::string & treeName, const std::string & filename, std::ostream & out)
+void chernov::TreeManager::loadTree(const std::string & filename, const std::string & forcedName, std::ostream & out)
 {
-  if (trees_.has(treeName)) {
-    out << "<ERROR: Tree '" << treeName << "' already exists>\n";
+  if (!forcedName.empty() && trees_.has(forcedName)) {
+    out << "<ERROR: Tree '" << forcedName << "' already exists>\n";
     return;
   }
-  Tree emptyTree(treeName, "");
-  trees_.add(treeName, emptyTree);
-  Tree & tree = trees_.at(treeName);
+
+  Tree tempTree("temp", "");
+  std::string treeNameFromFile;
   std::string error;
-  if (!detail::loadTree(tree, filename, error)) {
-    trees_.remove(treeName);
+  if (!detail::loadTree(tempTree, filename, treeNameFromFile, error)) {
     out << "<ERROR: " << error << ">\n";
     return;
   }
-  out << "<OK: Loaded " << treeName << " from " << filename << ">\n";
+
+  std::string finalName = forcedName.empty() ? treeNameFromFile : forcedName;
+  if (forcedName.empty() && trees_.has(treeNameFromFile)) {
+    out << "<ERROR: Tree '" << treeNameFromFile << "' already exists>\n";
+    return;
+  }
+
+  trees_.add(finalName, Tree(finalName, ""));
+  Tree & placed = trees_.at(finalName);
+  placed = std::move(tempTree);
+  placed.setName(finalName);
+  out << "<OK: Loaded " << finalName << " from " << filename << ">\n";
 }

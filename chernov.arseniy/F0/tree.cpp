@@ -483,3 +483,8 @@ void chernov::Tree::setNextId(size_t nextId)
     nextId_ = nextId;
   }
 }
+
+void chernov::Tree::setName(const std::string & name)
+{
+  name_ = name;
+}

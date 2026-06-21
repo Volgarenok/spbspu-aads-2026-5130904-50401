@@ -52,6 +52,7 @@ namespace chernov {
       const std::string & gender,
       std::string & errorMsg);
     void setNextId(size_t nextId);
+    void setName(const std::string & name);
 
   private:
     std::string name_;

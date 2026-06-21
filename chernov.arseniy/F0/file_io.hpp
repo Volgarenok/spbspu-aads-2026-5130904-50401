@@ -24,7 +24,7 @@ namespace chernov {
     };
 
     bool saveTree(const Tree & tree, const std::string & filename);
-    bool loadTree(Tree & tree, const std::string & filename, std::string & errorMsg);
+    bool loadTree(Tree & tree, const std::string & filename, std::string & treeNameFromFile, std::string & errorMsg);
   }
 }
 

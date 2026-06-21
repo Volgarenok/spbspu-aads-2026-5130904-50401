@@ -55,7 +55,8 @@ bool chernov::detail::saveTree(const Tree & tree, const std::string & filename)
   return true;
 }
 
-bool chernov::detail::loadTree(Tree & tree, const std::string & filename, std::string & errorMsg)
+bool chernov::detail::loadTree(
+  Tree & tree, const std::string & filename, std::string & treeNameFromFile, std::string & errorMsg)
 {
   std::ifstream file(filename);
   if (!file.is_open()) {
@@ -71,7 +72,6 @@ bool chernov::detail::loadTree(Tree & tree, const std::string & filename, std::s
   };
   State state = State::Start;
   std::string line;
-  std::string treeName;
   size_t nextId = 0;
   Vector< PersonData > personDataList;
   PersonData currentPerson;
@@ -123,7 +123,7 @@ bool chernov::detail::loadTree(Tree & tree, const std::string & filename, std::s
       std::string key = line.substr(0, eqPos);
       std::string value = line.substr(eqPos + 1);
       if (key == "name") {
-        treeName = value;
+        treeNameFromFile = value;
       } else if (key == "next_id") {
         try {
           nextId = std::stoul(value);
@@ -171,11 +171,6 @@ bool chernov::detail::loadTree(Tree & tree, const std::string & filename, std::s
   }
   if (state != State::End) {
     errorMsg = "missing [END]";
-    return false;
-  }
-
-  if (treeName != tree.getName()) {
-    errorMsg = "tree name in file does not match";
     return false;
   }
 

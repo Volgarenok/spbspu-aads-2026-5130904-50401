@@ -383,11 +383,12 @@ namespace chernov {
 
   void cmdLoad(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
-    if (args.getSize() != 3) {
+    if (args.getSize() < 2 || args.getSize() > 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    manager.loadTree(args[1], args[2], out);
+    std::string forcedName = (args.getSize() == 3) ? args[2] : "";
+    manager.loadTree(args[1], forcedName, out);
   }
 
   void cmdShowTree(CommandArgs & args, TreeManager &, std::ostream & out)
