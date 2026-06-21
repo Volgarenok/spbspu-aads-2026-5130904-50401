@@ -2,6 +2,16 @@
 #include "node.hpp"
 #include <iostream>
 namespace rl {
+  std::string generateUniqueId(const Map< std::string, RLNode* >& mapOfNodes)
+  {
+    static size_t counter = 1;
+    while (true) {
+      std::string candidate = "node" + std::to_string(counter++);
+      if (!mapOfNodes.has(candidate)) {
+        return candidate;
+      }
+    }
+  }
   void healthcheck(std::istream&, std::ostream& out, RootDB&, RLRoot*)
   {
     out << "Works fine\n";
