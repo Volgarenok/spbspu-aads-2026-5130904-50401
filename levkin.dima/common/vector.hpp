@@ -121,6 +121,7 @@ namespace stuff {
     size_t getCapacity() const noexcept;
 
     void pushBack(const T& v);
+    void pushBack(T&& v);
     void popBack();
     void insert(size_t i, const T& v);
     void insertBefore(VIter< T > it, const T&& v);
@@ -359,6 +360,12 @@ template < class T > void stuff::Vector< T >::pushBack(const T& val)
 {
   expandIfFull();
   stuff::construct< T >(&data_[size_++], val);
+}
+
+template < class T > void stuff::Vector< T >::pushBack(T&& val)
+{
+  expandIfFull();
+  stuff::construct< T >(&data_[size_++], std::move(val));
 }
 
 template < class T > size_t stuff::Vector< T >::getSize() const noexcept

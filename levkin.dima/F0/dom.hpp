@@ -1,4 +1,5 @@
 #include "vector.hpp"
+#include <memory>
 #include <string>
 #ifndef DOM
 #define DOM
@@ -33,10 +34,10 @@ namespace rl {
 
   struct RLNode {
     std::string id;
-    stuff::Vector< RLNode* > children;
+    stuff::Vector< std::unique_ptr< RLNode > > children;
     RLNode* parent;
 
-    void addChild(std::string id);
+    void addChild(std::unique_ptr< RLNode >);
     void removeChild(std::string id);
 
     Sides margin;
@@ -48,8 +49,6 @@ namespace rl {
     FlexDirection flexDirection = FlexDirection::Row;
     JustifyContent justify = JustifyContent::FlexStart;
     AlignItems align = AlignItems::FlexStart;
-
-    ~RLNode();
   };
 }
 #endif
