@@ -243,7 +243,7 @@ namespace malashenko
     std::pair< size_t, size_t > pos = hasInTable(key);
     if (pos.first == 2)
     {
-      throw std::invalid_argument("Unknown key");
+      throw std::out_of_range("Unknown key");
     }
     return table_[pos.first][pos.second].value;
   }

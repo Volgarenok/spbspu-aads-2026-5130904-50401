@@ -53,6 +53,13 @@ void malashenko::Network::removeUser(const std::string& username)
 
 void malashenko::Network::showAllUsers(std::ostream& out) const
 {
+  if (users_.empty())
+  {
+    out << "[THERE'S NO USERS]\n";
+    return;
+  }
+
+  out << "[LIST OF ALL USERS]\n";
   size_t counter = 1;
   for (userCIter_t b = users_.begin(); b != users_.end(); ++b, ++counter)
   {
@@ -119,7 +126,10 @@ void malashenko::Network::sendMsg(const std::string& from, const std::string& to
 
 void malashenko::Network::removeMsg(const size_t& messageId)
 {
-
+  if (!messages_.contains(messageId))
+  {
+    throw std::invalid_argument("There's no message with that id");
+  }
   for (chatIter_t b = chats_.begin(); b != chats_.end(); ++b)
   {
     for (size_t i = 0; i < b->value.getSize(); ++i)
@@ -150,16 +160,22 @@ void malashenko::Network::showInOutBox(std::ostream& out, const std::string& use
   }
 
   detail::User user = users_.at(username);
+
   Vector< size_t > msgIdVec = isInbox ? user.inbox : user.outbox;
 
-  if (msgIdVec.getSize() != 0)
+  if (msgIdVec.getSize() == 0)
   {
-    showMsg(out, messages_.at(msgIdVec[0]));
-    for (size_t i = 1; i < msgIdVec.getSize(); ++i)
-    {
-      out << '\n';
-      showMsg(out, messages_.at(msgIdVec[i]));
-    }
+    out << (isInbox ? "[INBOX " : "[OUTBOX ") <<  "OF USER " << username << " IS EMPTY]\n";
+    return;
+  }
+
+  out << (isInbox ? "[INBOX " : "[OUTBOX ") <<  "OF USER" << username << "]\n";
+
+  showMsg(out, messages_.at(msgIdVec[0]));
+  for (size_t i = 1; i < msgIdVec.getSize(); ++i)
+  {
+    out << '\n';
+    showMsg(out, messages_.at(msgIdVec[i]));
   }
 }
 
@@ -199,16 +215,17 @@ void malashenko::Network::showChat(std::ostream& out, const std::string& user1, 
   }
   else
   {
-    std::string errorMsg = user1 + " and " + user2 + " did't communicate";
-    throw std::invalid_argument(errorMsg);
+    out << "[" << user1 << " AND " << user2 << " DIDN'T COMMUNICATE]\n";
+    return;
   }
 
   if (msgIdVec.isEmpty())
   {
-    out << "[EMPTY CHAT]\n";
+    out << "[CHAT BETWEEN " << user1 << " AND " << user2 << " IS EMPTY]\n";
     return;
   }
 
+  out << "[CHAT BETWEEN " << user1 << " AND " << user2 << "]\n";
   showMsg(out, messages_.at(msgIdVec[0]));
   for (size_t i = 1; i < msgIdVec.getSize(); ++i)
   {
@@ -235,9 +252,11 @@ void malashenko::Network::findMsg(std::ostream& out, const std::string& str) con
 
   if (msgIdVec.isEmpty())
   {
-    out << "[There's no messages with that pattern]\n";
+    out << "[THERE'S NO MESSAGE WITH THAT PATTERN]\n";
     return;
   }
+
+  out << "[FOUND MESSAGES]\n";
   showMsg(out, messages_.at(msgIdVec[0]));
   for (size_t i = 1; i < msgIdVec.getSize(); ++i)
   {
@@ -273,7 +292,7 @@ void malashenko::Network::clearChat(const std::string& user1, const std::string&
   }
   else
   {
-    std::string errorMsg = user1 + " and " + user2 + " did't communicate";
+    std::string errorMsg = user1 + " and " + user2 + " did't communicate.There's no chat to be cleared";
     throw std::invalid_argument(errorMsg);
   }
 
@@ -289,6 +308,7 @@ void malashenko::Network::mutualUsers(std::ostream& out, const std::string& user
   Vector< name_t > friendsOfUser2 = graph_.at(user2);
 
   size_t counter = 0;
+  out << "[MUTUAL FRIENDS BETWEEN" << user1 << " AND " << user2 << "]\n";
   for (size_t i = 0; i < friendsOfUser1.getSize(); ++i)
   {
     for (size_t j = 0; j < friendsOfUser2.getSize(); ++j)
@@ -303,7 +323,7 @@ void malashenko::Network::mutualUsers(std::ostream& out, const std::string& user
 
   if (counter == 0)
   {
-    out << "[There's no mutual friends]\n";
+    out << "[THERE'S NO MUTUAL FRIENDS]\n";
   }
 }
 
@@ -366,16 +386,17 @@ void malashenko::Network::pathBetweanUsers(std::ostream& out, const std::string&
   Vector< std::string > path = bfsPath(from, to);
   if (path.isEmpty())
   {
-    std::string msg = "[user " + from + " and user " + to + " aren't connected]";
-    out << msg;
+    out << "[USERS " << from << " AND " << to << " ARE NOT CONNECTED. THERE'S NO PATH BETWEEN THEM]\n";
     return;
   }
 
-  out << path[0];
+  out << "[PATH BETWEEN " << from << " AND " << to << ']';
+  out << '[' << path[0];
   for (size_t i = 1; i < path.getSize(); ++i)
   {
-    out << " --> " << path[i];
+    out << "] --> [" << path[i];
   }
+  out << ']';
   out << '\n';
 }
 
@@ -384,11 +405,9 @@ void malashenko::Network::distanceBetweanUsers(std::ostream& out, const std::str
   Vector< std::string > revPath = bfsPath(from, to);
   if (revPath.isEmpty())
   {
-    std::string msg = "[user " + from + " and user " + to + " aren't connected]";
-    out << msg;
+    out << "[USERS " << from << " AND " << to << " ARE NOT CONNECTED. DISTANCE CANNOT BE CALCULATED]\n";
     return;
   }
-
   out << revPath.getSize() - 2 << '\n';
 }
 

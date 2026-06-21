@@ -1,7 +1,8 @@
-#include "messanger_commands.hpp"
+#include "messenger_commands.hpp"
 #include <iomanip>
+#include "cli_messages.hpp"
 
-void malashenko::Messanger::user(std::iostream& in, std::ostream&)
+void malashenko::Messenger::user(std::istream& in, std::ostream& out)
 {
   std::string username;
   if (!(in >> username))
@@ -9,10 +10,11 @@ void malashenko::Messanger::user(std::iostream& in, std::ostream&)
     throw std::invalid_argument("Input error");
   }
   net_.createUser(username);
+  detail::successMsg(out, "User was successfully created");
 
 }
 
-void malashenko::Messanger::rmuser(std::iostream& in, std::ostream&)
+void malashenko::Messenger::rmuser(std::istream& in, std::ostream& out)
 {
   std::string username;
   if (!(in >> username))
@@ -20,14 +22,15 @@ void malashenko::Messanger::rmuser(std::iostream& in, std::ostream&)
     throw std::invalid_argument("Input error");
   }
   net_.removeUser(username);
+  detail::successMsg(out, "User was successfully removed");
 }
 
-void malashenko::Messanger::ls(std::iostream&, std::ostream& out)
+void malashenko::Messenger::ls(std::istream&, std::ostream& out)
 {
   net_.showAllUsers(out);
 }
 
-void malashenko::Messanger::send(std::iostream& in, std::ostream&)
+void malashenko::Messenger::send(std::istream& in, std::ostream& out)
 {
   std::string usernameFrom, usernameTo, msg;
   if (!(in >> usernameFrom >> usernameTo >> std::quoted(msg)))
@@ -36,9 +39,10 @@ void malashenko::Messanger::send(std::iostream& in, std::ostream&)
   }
 
   net_.sendMsg(usernameFrom, usernameTo, msg);
+  detail::successMsg(out, "The message was sent successfully");
 }
 
-void malashenko::Messanger::rmmsg(std::iostream& in, std::ostream&)
+void malashenko::Messenger::rmmsg(std::istream& in, std::ostream& out)
 {
   size_t msgId;
   if (!(in >> msgId))
@@ -46,9 +50,10 @@ void malashenko::Messanger::rmmsg(std::iostream& in, std::ostream&)
     throw std::invalid_argument("Input error");
   }
   net_.removeMsg(msgId);
+  detail::successMsg(out, "The message was removed successfully");
 }
 
-void malashenko::Messanger::inbox(std::iostream& in, std::ostream& out)
+void malashenko::Messenger::inbox(std::istream& in, std::ostream& out)
 {
   std::string username;
   if (!(in >> username))
@@ -58,7 +63,7 @@ void malashenko::Messanger::inbox(std::iostream& in, std::ostream& out)
   net_.showInbox(out, username);
 }
 
-void malashenko::Messanger::outbox(std::iostream& in, std::ostream& out)
+void malashenko::Messenger::outbox(std::istream& in, std::ostream& out)
 {
   std::string username;
   if (!(in >> username))
@@ -68,7 +73,7 @@ void malashenko::Messanger::outbox(std::iostream& in, std::ostream& out)
   net_.showOutbox(out, username);
 }
 
-void malashenko::Messanger::chat(std::iostream& in, std::ostream& out)
+void malashenko::Messenger::chat(std::istream& in, std::ostream& out)
 {
   std::string username1, username2;
   if (!(in >> username1 >> username2))
@@ -78,7 +83,7 @@ void malashenko::Messanger::chat(std::iostream& in, std::ostream& out)
   net_.showChat(out, username1, username2);
 }
 
-void malashenko::Messanger::find(std::iostream& in, std::ostream& out)
+void malashenko::Messenger::find(std::istream& in, std::ostream& out)
 {
   std::string pattern;
   if (!(in >> pattern))
@@ -88,7 +93,7 @@ void malashenko::Messanger::find(std::iostream& in, std::ostream& out)
   net_.findMsg(out, pattern);
 }
 
-void malashenko::Messanger::clear(std::iostream& in, std::ostream&)
+void malashenko::Messenger::clear(std::istream& in, std::ostream& out)
 {
   std::string username1, username2;
   if (!(in >> username1 >> username2))
@@ -96,9 +101,10 @@ void malashenko::Messanger::clear(std::iostream& in, std::ostream&)
     throw std::invalid_argument("Input error");
   }
   net_.clearChat(username1, username2);
+  detail::successMsg(out, "Chat was successfully cleared");
 }
 
-void malashenko::Messanger::mutual(std::iostream& in, std::ostream& out)
+void malashenko::Messenger::mutual(std::istream& in, std::ostream& out)
 {
   std::string username1, username2;
   if (!(in >> username1 >> username2))
@@ -109,7 +115,7 @@ void malashenko::Messanger::mutual(std::iostream& in, std::ostream& out)
 }
 
 
-void malashenko::Messanger::recommend(std::iostream& in, std::ostream& out)
+void malashenko::Messenger::recommend(std::istream& in, std::ostream& out)
 {
   std::string username;
   if (!(in >> username))
@@ -120,7 +126,7 @@ void malashenko::Messanger::recommend(std::iostream& in, std::ostream& out)
 }
 
 
-void malashenko::Messanger::path(std::iostream& in, std::ostream& out)
+void malashenko::Messenger::path(std::istream& in, std::ostream& out)
 {
   std::string username1, username2;
   if (!(in >> username1 >> username2))
@@ -131,13 +137,14 @@ void malashenko::Messanger::path(std::iostream& in, std::ostream& out)
 }
 
 
-void malashenko::Messanger::remove_inactive(std::iostream&, std::ostream&)
+void malashenko::Messenger::remove_inactive(std::istream&, std::ostream& out)
 {
   net_.removeInactive();
+  detail::successMsg(out, "Inactive users were successfuly removed");
 }
 
 
-void malashenko::Messanger::distance(std::iostream& in, std::ostream& out)
+void malashenko::Messenger::distance(std::istream& in, std::ostream& out)
 {
   std::string username1, username2;
   if (!(in >> username1 >> username2))

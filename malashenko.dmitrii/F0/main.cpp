@@ -1,55 +1,68 @@
 #include <iostream>
-#include "network.hpp"
+#include "messenger_commands.hpp"
+#include "cuckoo_hash_table.hpp"
+#include "cli_messages.hpp"
 int main()
 {
-
-  malashenko::Network net;
-
-  net.createUser("user1");
-  net.createUser("user2");
-  net.createUser("user3");
-  net.createUser("user4");
-  net.createUser("user5");
-  net.createUser("user6");
-  net.createUser("user7");
-  net.createUser("user8");
-  net.createUser("user9");
-  net.createUser("user10");
-  net.createUser("user11");
-  net.createUser("user12");
-  net.createUser("user13");
-
-  net.sendMsg("user1", "user2", "a");
-  net.sendMsg("user1", "user3", "a");
-
-  net.sendMsg("user2", "user4", "a");
-  net.sendMsg("user2", "user5", "a");
-
-  net.sendMsg("user3", "user5", "a");
-  net.sendMsg("user3", "user6", "a");
-
-  net.sendMsg("user4", "user7", "a");
-
-  net.sendMsg("user5", "user7", "a");
-  net.sendMsg("user5", "user8", "a");
-
-  net.sendMsg("user6", "user8", "a");
-
-  net.sendMsg("user7", "user9", "a");
-
-  net.sendMsg("user8", "user10", "a");
-
-  net.sendMsg("user9", "user11", "a");
-
-  net.sendMsg("user10", "user11", "a");
-
-  net.sendMsg("user11", "user12", "a");
+  using namespace malashenko;
 
 
 
+  using cmd_t = void (Messenger::*)(std::istream&, std::ostream&);
+  using str_t = std::string;
 
-  net.pathBetweanUsers(std::cout, "user1", "user12");
+  CuckooHashTable< str_t, cmd_t, HmacHash< str_t >, SipHasher< str_t >, Equal< str_t > > commands;
+
+  commands.insert("user", &Messenger::user);
+  commands.insert("rmuser", &Messenger::rmuser);
+  commands.insert("ls", &Messenger::ls);
+  commands.insert("send", &Messenger::send);
+  commands.insert("rmmsg", &Messenger::rmmsg);
+  commands.insert("find", &Messenger::find);
+  commands.insert("chat", &Messenger::chat);
+  commands.insert("inbox", &Messenger::inbox);
+  commands.insert("outbox", &Messenger::outbox);
+  commands.insert("clear", &Messenger::clear);
+  commands.insert("path", &Messenger::path);
+  commands.insert("distance", &Messenger::distance);
+  commands.insert("recommend", &Messenger::recommend);
+  commands.insert("remove-inactive", &Messenger::remove_inactive);
+  commands.insert("mutual", &Messenger::mutual);
 
 
+  detail::printBanner(std::cout);
+  str_t cmd;
+  Messenger messenger;
 
+  while (std::cin >> cmd)
+  {
+    try
+    {
+      (messenger.*commands.at(cmd))(std::cin, std::cout);
+    }
+    catch(const std::invalid_argument& e)
+    {
+      detail::errorMsg(std::cout, e.what());
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    catch (const std::out_of_range& e)
+    {
+      detail::warningMsg(std::cout, "Unkown command");
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    catch (...)
+    {
+      detail::errorMsg(std::cout, "Invalid command");
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+  }
+
+  return 0;
 }
+
+
+
+
