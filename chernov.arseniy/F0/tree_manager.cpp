@@ -135,3 +135,34 @@ void chernov::TreeManager::compareTrees(const std::string & nameA, const std::st
   }
   detail::compareTrees(trees_.at(nameA), trees_.at(nameB), nameA, nameB, out);
 }
+
+void chernov::TreeManager::mergePersons(const std::string & tree1,
+  const std::string & id1,
+  const std::string & tree2,
+  const std::string & id2,
+  const std::string & newTreeName,
+  std::ostream & out)
+{
+  if (!trees_.has(tree1)) {
+    out << "<ERROR: Tree '" << tree1 << "' not found>\n";
+    return;
+  }
+  if (!trees_.has(tree2)) {
+    out << "<ERROR: Tree '" << tree2 << "' not found>\n";
+    return;
+  }
+  if (trees_.has(newTreeName)) {
+    out << "<ERROR: Tree '" << newTreeName << "' already exists>\n";
+    return;
+  }
+
+  Tree mergedTree(newTreeName, "");
+  std::string error;
+  if (detail::mergePersons(trees_.at(tree1), id1, trees_.at(tree2), id2, mergedTree, error)) {
+    trees_.add(newTreeName, std::move(mergedTree));
+    out << "<CREATED: " << newTreeName << ">\n";
+    out << "<MERGE SUCCESS>\n";
+  } else {
+    out << "<ERROR: " << error << ">\n";
+  }
+}
