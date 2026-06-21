@@ -29,6 +29,8 @@ int main()
   commands.insert("remove-inactive", &Messenger::remove_inactive);
   commands.insert("mutual", &Messenger::mutual);
   commands.insert("help", &Messenger::help);
+  commands.insert("save", &Messenger::save);
+  commands.insert("load", &Messenger::load);
 
 
   detail::printBanner(std::cout);
@@ -47,23 +49,15 @@ int main()
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
-    catch (const std::out_of_range& e)
-    {
-      detail::warningMsg(std::cout, "Unkown command");
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
     catch (...)
     {
-      detail::errorMsg(std::cout, "Invalid command");
+      detail::warningMsg(std::cout, "Invalid command");
       std::cin.clear();
       std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
+
   }
 
   return 0;
 }
-
-
-
 

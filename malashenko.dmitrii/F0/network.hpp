@@ -14,7 +14,7 @@ namespace malashenko
   {
     struct Message {
       size_t message_id;
-      std::time_t timestamp;
+      std::string timestamp;
       std::string from;
       std::string to;
       std::string text;
@@ -45,7 +45,7 @@ namespace malashenko
     void recomendUsers(std::ostream& out, const std::string& user1) const;
     void pathBetweanUsers(std::ostream& out, const std::string& from, const std::string& to) const;
     void distanceBetweanUsers(std::ostream& out, const std::string& from, const std::string& to) const;
-    void removeInactive();
+    size_t removeInactive();
 
     void saveToFile(std::ostream& out) const;
     void loadFromFile(std::istream& in);
@@ -72,9 +72,19 @@ namespace malashenko
     CuckooHashTable< name_t, Vector< name_t >, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > > graph_;
     size_t nextMessageId_ = 0;
 
-    void showMsg(std::ostream& out, const msg_t&) const;
+    void showFullInfoMsg(std::ostream& out, const msg_t&) const;
+    void showInboxMsg(std::ostream& out, const msg_t&) const;
+    void showOutboxMsg(std::ostream& out, const msg_t&) const;
+    void showChatMsg(std::ostream& out, const msg_t&) const;
+
+
     void showInOutBox(std::ostream& out, const std::string& username, bool isInbox) const;
     Vector< name_t > bfsPath(const name_t& from, const name_t& to) const;
+    std::string getCurrentTime();
+    void rebuildInboxes();
+    void rebuildGraph();
+    void rebuildChats();
+
   };
 
 }

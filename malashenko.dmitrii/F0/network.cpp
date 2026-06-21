@@ -18,7 +18,7 @@ void malashenko::Network::removeUser(const std::string& username)
 {
   if (!users_.contains(username))
   {
-    std::string errorMsg = "There's no user with username: " + username;
+    std::string errorMsg = "There's no user with that username: " + username;
     throw std::invalid_argument(errorMsg);
   }
   for (msgIter_t b = messages_.begin(); b != messages_.end(); ++b)
@@ -86,12 +86,7 @@ void malashenko::Network::sendMsg(const std::string& from, const std::string& to
     throw std::invalid_argument(errorMsg);
   }
 
-  namespace chr = std::chrono;
-  chr::time_point< chr::_V2::system_clock, chr::_V2::system_clock::duration > now = chr::system_clock::now();
-
-  std::time_t now_c = chr::system_clock::to_time_t(now);
-
-  detail::Message newMsg{nextMessageId_, now_c, from, to, text};
+  detail::Message newMsg{nextMessageId_, getCurrentTime(), from, to, text};
 
   if (chats_.contains({from, to}))
   {
@@ -130,6 +125,28 @@ void malashenko::Network::removeMsg(const size_t& messageId)
   {
     throw std::invalid_argument("There's no message with that id");
   }
+  detail::Message msg = messages_.at(messageId);
+
+  Vector< size_t >& inbox = users_.at(msg.to).inbox;
+  for (size_t i = 0; i < inbox.getSize(); ++i)
+  {
+    if (inbox[i] == messageId)
+    {
+      inbox.erase(i);
+      break;
+    }
+  }
+
+  Vector< size_t >& outbox = users_.at(msg.from).outbox;
+  for (size_t i = 0; i < outbox.getSize(); ++i)
+  {
+    if (outbox[i] == messageId)
+    {
+      outbox.erase(i);
+      break;
+    }
+  }
+
   for (chatIter_t b = chats_.begin(); b != chats_.end(); ++b)
   {
     for (size_t i = 0; i < b->value.getSize(); ++i)
@@ -144,10 +161,28 @@ void malashenko::Network::removeMsg(const size_t& messageId)
   messages_.erase(messageId);
 }
 
-void malashenko::Network::showMsg(std::ostream& out, const msg_t& msg) const
+void malashenko::Network::showInboxMsg(std::ostream& out, const msg_t& msg) const
 {
-  out << "id " << msg.message_id << ". " << std::ctime(&msg.timestamp);
-  out << "FROM: " << msg.from << " --> TO: " << msg.to << '\n';
+  out << '[' << msg.timestamp << "] " << msg.from << '\n';
+  out << "\"" << msg.text << "\"\n";
+}
+
+void malashenko::Network::showOutboxMsg(std::ostream& out, const msg_t& msg) const
+{
+  out << '[' << msg.timestamp << "] -> " << msg.to << '\n';
+  out << "\"" << msg.text << "\"\n";;
+}
+
+void malashenko::Network::showChatMsg(std::ostream& out, const msg_t& msg) const
+{
+  out << '[' << msg.timestamp << "] " << msg.from << '\n';
+  out << "\"" << msg.text << "\"\n";;
+}
+
+void malashenko::Network::showFullInfoMsg(std::ostream& out, const msg_t& msg) const
+{
+  out << "id " << msg.message_id << ". [" << msg.timestamp << "] ";
+  out << msg.from << " -> " << msg.to << '\n';
   out << "\"" <<  msg.text << "\"\n";
 }
 
@@ -155,7 +190,7 @@ void malashenko::Network::showInOutBox(std::ostream& out, const std::string& use
 {
   if (!users_.contains(username))
   {
-    std::string errorMsg = "There's no user with username: " + username;
+    std::string errorMsg = "There's no user with that username: " + username;
     throw std::invalid_argument(errorMsg);
   }
 
@@ -165,18 +200,37 @@ void malashenko::Network::showInOutBox(std::ostream& out, const std::string& use
 
   if (msgIdVec.getSize() == 0)
   {
-    out << (isInbox ? "[INBOX " : "[OUTBOX ") <<  "OF USER " << username << " IS EMPTY]\n";
+    out << (isInbox ? "[INBOX " : "[OUTBOX ") <<  "OF " << username << " IS EMPTY]\n";
     return;
   }
 
-  out << (isInbox ? "[INBOX " : "[OUTBOX ") <<  "OF USER" << username << "]\n";
+  out << (isInbox ? "[INBOX " : "[OUTBOX ") <<  "OF " << username << "]\n";
+  out << "────────────────────────────\n";
+  if (isInbox)
+  {
+    showInboxMsg(out, messages_.at(msgIdVec[0]));
+  }
+  else
+  {
+    showOutboxMsg(out, messages_.at(msgIdVec[0]));
+  }
+  out << "────────────────────────────";
 
-  showMsg(out, messages_.at(msgIdVec[0]));
   for (size_t i = 1; i < msgIdVec.getSize(); ++i)
   {
     out << '\n';
-    showMsg(out, messages_.at(msgIdVec[i]));
+    if (isInbox)
+    {
+      showInboxMsg(out, messages_.at(msgIdVec[i]));
+    }
+    else
+    {
+      showOutboxMsg(out, messages_.at(msgIdVec[i]));
+    }
+    out << "────────────────────────────";
   }
+  out << '\n';
+
 }
 
 void malashenko::Network::showInbox(std::ostream& out, const std::string& username) const
@@ -225,13 +279,14 @@ void malashenko::Network::showChat(std::ostream& out, const std::string& user1, 
     return;
   }
 
-  out << "[CHAT BETWEEN " << user1 << " AND " << user2 << "]\n";
-  showMsg(out, messages_.at(msgIdVec[0]));
+  out << "========== CHAT: user1 <-> user2 ==========\n";
+  showChatMsg(out, messages_.at(msgIdVec[0]));
   for (size_t i = 1; i < msgIdVec.getSize(); ++i)
   {
     out << '\n';
-    showMsg(out, messages_.at(msgIdVec[i]));
+    showChatMsg(out, messages_.at(msgIdVec[i]));
   }
+  out << "===========================================\n";
 }
 
 void malashenko::Network::findMsg(std::ostream& out, const std::string& str) const
@@ -257,12 +312,17 @@ void malashenko::Network::findMsg(std::ostream& out, const std::string& str) con
   }
 
   out << "[FOUND MESSAGES]\n";
-  showMsg(out, messages_.at(msgIdVec[0]));
+  out << "────────────────────────────\n";
+  showFullInfoMsg(out, messages_.at(msgIdVec[0]));
+  out << "────────────────────────────\n";
   for (size_t i = 1; i < msgIdVec.getSize(); ++i)
   {
     out << '\n';
-    showMsg(out, messages_.at(msgIdVec[i]));
+    showFullInfoMsg(out, messages_.at(msgIdVec[i]));
+    out << "────────────────────────────";
   }
+
+
 }
 
 void malashenko::Network::clearChat(const std::string& user1, const std::string& user2)
@@ -308,7 +368,7 @@ void malashenko::Network::mutualUsers(std::ostream& out, const std::string& user
   Vector< name_t > friendsOfUser2 = graph_.at(user2);
 
   size_t counter = 0;
-  out << "[MUTUAL FRIENDS BETWEEN" << user1 << " AND " << user2 << "]\n";
+  out << "[MUTUAL FRIENDS BETWEEN " << user1 << " AND " << user2 << "]\n";
   for (size_t i = 0; i < friendsOfUser1.getSize(); ++i)
   {
     for (size_t j = 0; j < friendsOfUser2.getSize(); ++j)
@@ -383,6 +443,17 @@ malashenko::Vector< std::string > malashenko::Network::bfsPath( const std::strin
 
 void malashenko::Network::pathBetweanUsers(std::ostream& out, const std::string& from, const std::string& to) const
 {
+  if (!users_.contains(from))
+  {
+    std::string errorMsg = "There's no user with username: " + from;
+    throw std::invalid_argument(errorMsg);
+  }
+  if (!users_.contains(to))
+  {
+    std::string errorMsg = "There's no user with username: " + to;
+    throw std::invalid_argument(errorMsg);
+  }
+
   Vector< std::string > path = bfsPath(from, to);
   if (path.isEmpty())
   {
@@ -390,7 +461,7 @@ void malashenko::Network::pathBetweanUsers(std::ostream& out, const std::string&
     return;
   }
 
-  out << "[PATH BETWEEN " << from << " AND " << to << ']';
+  out << "[PATH BETWEEN " << from << " AND " << to << "]\n";
   out << '[' << path[0];
   for (size_t i = 1; i < path.getSize(); ++i)
   {
@@ -402,6 +473,17 @@ void malashenko::Network::pathBetweanUsers(std::ostream& out, const std::string&
 
 void malashenko::Network::distanceBetweanUsers(std::ostream& out, const std::string& from, const std::string& to) const
 {
+  if (!users_.contains(from))
+  {
+    std::string errorMsg = "There's no user with username: " + from;
+    throw std::invalid_argument(errorMsg);
+  }
+  if (!users_.contains(to))
+  {
+    std::string errorMsg = "There's no user with username: " + to;
+    throw std::invalid_argument(errorMsg);
+  }
+
   Vector< std::string > revPath = bfsPath(from, to);
   if (revPath.isEmpty())
   {
@@ -411,31 +493,46 @@ void malashenko::Network::distanceBetweanUsers(std::ostream& out, const std::str
   out << revPath.getSize() - 2 << '\n';
 }
 
-void malashenko::Network::removeInactive()
+size_t malashenko::Network::removeInactive()
 {
+  size_t counter = 0;
   for (userIter_t b = users_.begin(); b != users_.end(); ++b)
   {
     if (b->value.outbox.getSize() < 2)
     {
       removeUser(b->key);
+      counter++;
     }
   }
+  return counter;
 }
 
-void malashenko::Network::recomendUsers(std::ostream& out, const std::string& user1) const
+void malashenko::Network::recomendUsers(std::ostream& out, const std::string& username) const
 {
+  if (!users_.contains(username))
+  {
+    std::string errorMsg = "There's no user with username: " + username;
+    throw std::invalid_argument(errorMsg);
+  }
+
+  out << "[RECOMMENDED USERS FOR " << username << "]\n";
   size_t counter = 1;
   for (userCIter_t b = users_.begin(); b != users_.end(); ++b)
   {
-    if (user1 != b->key &&  (!chats_.contains({user1, b->key}) || !chats_.contains({user1, b->key})))
+    if (username != b->key &&  (!chats_.contains({username, b->key}) || !chats_.contains({username, b->key})))
     {
-      if (bfsPath(user1, b->key).getSize() - 2 <= 2)
+      if (bfsPath(username, b->key).getSize() - 2 <= 2)
       {
         out << counter++ << ". " << b->key << '\n';
       }
     }
   }
+  if (counter == 1)
+  {
+    out << "[THERE'S NO USERS TO RECOMMEND]\n";
+  }
 }
+
 
 void malashenko::Network::saveToFile(std::ostream& out) const
 {
@@ -444,20 +541,6 @@ void malashenko::Network::saveToFile(std::ostream& out) const
   for (userCIter_t it = users_.begin(); it != users_.end(); ++it)
   {
     out << it->key << '\n';
-
-    out << it->value.inbox.getSize();
-    for (size_t i = 0; i < it->value.inbox.getSize(); ++i)
-    {
-      out << ' ' << it->value.inbox[i];
-    }
-    out << '\n';
-
-    out << it->value.outbox.getSize();
-    for (size_t i = 0; i < it->value.outbox.getSize(); ++i)
-    {
-      out << ' ' << it->value.outbox[i];
-    }
-    out << '\n';
   }
 
   out << messages_.size() << '\n';
@@ -466,12 +549,144 @@ void malashenko::Network::saveToFile(std::ostream& out) const
   {
     const detail::Message& msg = it->value;
 
-    out << msg.message_id << '\n';
-    out << msg.timestamp << '\n';
-    out << msg.from << '\n';
-    out << msg.to << '\n';
-    out << msg.text << '\n';
+    out << msg.message_id << ' ' <<  msg.timestamp << ' ';
+    out << msg.from << ' ' << msg.to << ' ' << msg.text.size() << ' ' << msg.text << '\n';
+  }
+  out << nextMessageId_ << '\n';
+}
+
+std::string malashenko::Network::getCurrentTime()
+{
+  std::chrono::_V2::system_clock::time_point now = std::chrono::system_clock::now();
+  std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+
+  std::tm* local = std::localtime(&now_c);
+
+  std::string result;
+
+  if (local->tm_hour < 10)
+  {
+    result += '0';
+  }
+  result += std::to_string(local->tm_hour);
+
+  result += ':';
+
+  if (local->tm_min < 10)
+  {
+    result += '0';
+  }
+  result += std::to_string(local->tm_min);
+
+  return result;
+}
+
+void malashenko::Network::loadFromFile(std::istream& in)
+{
+  users_.clear();
+  messages_.clear();
+  graph_.clear();
+  chats_.clear();
+
+  size_t userCount = 0;
+  in >> userCount;
+
+  for (size_t i = 0; i < userCount; ++i)
+  {
+    std::string username;
+    in >> username;
+
+    detail::User user;
+    user.username = username;
+
+    users_.insert(username, user);
+  }
+
+  size_t messageCount = 0;
+  in >> messageCount;
+
+  for (size_t i = 0; i < messageCount; ++i)
+  {
+    detail::Message msg;
+
+    size_t textSize = 0;
+
+    in >> msg.message_id;
+    in >> msg.timestamp;
+    in >> msg.from;
+    in >> msg.to;
+    in >> textSize;
+
+    in.get();
+
+    msg.text.resize(textSize);
+    in.read(&msg.text[0], textSize);
+
+    in.ignore(1);
+    messages_.insert(msg.message_id, msg);
+  }
+
+  rebuildInboxes();
+  rebuildGraph();
+  rebuildChats();
+  in >> nextMessageId_;
+}
+
+void malashenko::Network::rebuildInboxes()
+{
+  for (userIter_t it = users_.begin(); it != users_.end(); ++it)
+  {
+    it->value.inbox.clear();
+    it->value.outbox.clear();
+  }
+
+  for (msgIter_t it = messages_.begin(); it != messages_.end(); ++it)
+  {
+    const detail::Message& msg = it->value;
+
+    users_.at(msg.from).outbox.pushBack(msg.message_id);
+    users_.at(msg.to).inbox.pushBack(msg.message_id);
   }
 }
 
 
+void malashenko::Network::rebuildGraph()
+{
+
+  for (msgIter_t it = messages_.begin(); it != messages_.end(); ++it)
+  {
+    const detail::Message& msg = it->value;
+
+    if (!graph_[msg.from].contains(msg.to))
+    {
+      graph_[msg.from].pushBack(msg.to);
+    }
+
+    if (!graph_[msg.to].contains(msg.from))
+    {
+      graph_[msg.to].pushBack(msg.from);
+    }
+  }
+}
+
+void malashenko::Network::rebuildChats()
+{
+
+  for (msgIter_t it = messages_.begin(); it != messages_.end(); ++it)
+  {
+    const detail::Message& msg = it->value;
+
+    std::pair<std::string, std::string> key;
+
+    if (msg.from < msg.to)
+    {
+      key = {msg.from, msg.to};
+    }
+    else
+    {
+      key = {msg.to, msg.from};
+    }
+
+    chats_[key].pushBack(msg.message_id);
+  }
+}

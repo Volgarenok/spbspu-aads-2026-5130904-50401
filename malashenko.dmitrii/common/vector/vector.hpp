@@ -57,7 +57,8 @@ namespace malashenko
     void erase(VecIter< T > pos, size_t s);
     void erase(VecIter< T > start, VecIter< T > end);
     void swap(Vector< T >& rhs) noexcept;
-
+    void reverse() noexcept;
+    void clear() noexcept;
   private:
     void unsafePushBack(const T& value);
     explicit Vector(size_t size);
@@ -601,6 +602,23 @@ bool malashenko::Vector< T >::contains(const T& value) const
   }
   return false;
 }
+
+template< class T >
+void malashenko::Vector< T >::reverse() noexcept
+{
+  size_t l = 0, r = size_ - 1;
+  while (l < r)
+  {
+    std::swap(data_[l++], data_[r--]);
+  }
+}
+
+template< class T >
+void malashenko::Vector< T >::clear() noexcept
+{
+  destroy();
+}
+
 
 
 #endif

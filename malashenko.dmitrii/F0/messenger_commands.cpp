@@ -1,5 +1,6 @@
 #include "messenger_commands.hpp"
 #include <iomanip>
+#include <fstream>
 #include "cli_messages.hpp"
 
 void malashenko::Messenger::user(std::istream& in, std::ostream& out)
@@ -139,8 +140,9 @@ void malashenko::Messenger::path(std::istream& in, std::ostream& out)
 
 void malashenko::Messenger::remove_inactive(std::istream&, std::ostream& out)
 {
-  net_.removeInactive();
-  detail::successMsg(out, "Inactive users were successfuly removed");
+  size_t counter = net_.removeInactive();
+  std::string msg = counter + " inactive users were removed";
+  detail::successMsg(out, msg);
 }
 
 
@@ -225,9 +227,39 @@ void malashenko::Messenger::help(std::istream&, std::ostream& out)
   help
       Display this help message.
 
+  save <filename>
+      Save all users, messages and chats
+      to the specified file.
+
+
+
+  load <filename>
+      Load users, messages and chats
+      from the specified file.
+
   ============================================================
   )";
 }
 
+void malashenko::Messenger::save(std::istream& in,  std::ostream&)
+{
+  std::string filename;
+  if (!(in >> filename))
+  {
+    throw std::invalid_argument("input problems");
+  }
+  std::ofstream file(filename);
+  net_.saveToFile(file);
+}
 
+void malashenko::Messenger::load(std::istream& in,  std::ostream&)
+{
+  std::string filename;
+  if (!(in >> filename))
+  {
+    throw std::invalid_argument("input problems");
+  }
+  std::ifstream file(filename);
+  net_.loadFromFile(file);
+}
 

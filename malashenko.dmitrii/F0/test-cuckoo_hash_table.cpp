@@ -15,7 +15,7 @@ using chtIter_t = mal::Iterator< std::string, int,
               mal::HmacHash< std::string >, mal::SipHasher< std::string >,
               mal::Equal< std::string > >;
 
-BOOST_AUTO_TEST_SUITE(Hash_table_constructors)
+BOOST_AUTO_TEST_SUITE(containsh_table_constructors)
 BOOST_AUTO_TEST_CASE(common_constructors)
 {
   cht_t ht_empty = cht_t();
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(move_constructor)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(Hash_table_operators)
+BOOST_AUTO_TEST_SUITE(containsh_table_operators)
 
 BOOST_AUTO_TEST_CASE(copy_operator)
 {
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(move_operator)
   BOOST_CHECK(ht_copy["c"] == 3);
 }
 
-BOOST_AUTO_TEST_CASE(get_operator)
+BOOST_AUTO_TEST_CASE(at_operator)
 {
   cht_t ht(8);
   ht["a"] = 1;
@@ -128,13 +128,13 @@ BOOST_AUTO_TEST_CASE(get_operator)
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(Hash_table_var_funcs)
-BOOST_AUTO_TEST_CASE(add_func)
+BOOST_AUTO_TEST_SUITE(containsh_table_var_funcs)
+BOOST_AUTO_TEST_CASE(insert_func)
 {
   cht_t ht(8);
-  ht.add("a", 1);
-  ht.add("b", 2);
-  ht.add("c", 3);
+  ht.insert("a", 1);
+  ht.insert("b", 2);
+  ht.insert("c", 3);
 
   BOOST_CHECK(ht["a"] == 1);
   BOOST_CHECK(ht["b"] == 2);
@@ -142,29 +142,29 @@ BOOST_AUTO_TEST_CASE(add_func)
   BOOST_CHECK(ht.size() == 3);
 }
 
-BOOST_AUTO_TEST_CASE(has_func)
+BOOST_AUTO_TEST_CASE(contains_func)
 {
   cht_t ht(8);
-  ht.add("a", 1);
-  ht.add("b", 2);
-  ht.add("c", 3);
+  ht.insert("a", 1);
+  ht.insert("b", 2);
+  ht.insert("c", 3);
 
-  BOOST_CHECK(ht.has("a"));
-  BOOST_CHECK(ht.has("b"));
-  BOOST_CHECK(ht.has("c"));
-  BOOST_CHECK(!ht.has("d"));
+  BOOST_CHECK(ht.contains("a"));
+  BOOST_CHECK(ht.contains("b"));
+  BOOST_CHECK(ht.contains("c"));
+  BOOST_CHECK(!ht.contains("d"));
 }
 
-BOOST_AUTO_TEST_CASE(get_func)
+BOOST_AUTO_TEST_CASE(at_func)
 {
   cht_t ht(8);
-  ht.add("a", 1);
-  ht.add("b", 2);
-  ht.add("c", 3);
+  ht.insert("a", 1);
+  ht.insert("b", 2);
+  ht.insert("c", 3);
 
-  int a_var = ht.get("a");
-  int b_var = ht.get("b");
-  int c_var = ht.get("c");
+  int a_var = ht.at("a");
+  int b_var = ht.at("b");
+  int c_var = ht.at("c");
 
   BOOST_CHECK(a_var == 1);
   BOOST_CHECK(b_var == 2);
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(get_func)
 
   try
   {
-    int _ = ht.get("d");
+    int _ = ht.at("d");
     BOOST_FAIL("Should be an error");
   }
   catch(const std::exception& e)
@@ -181,16 +181,16 @@ BOOST_AUTO_TEST_CASE(get_func)
   }
 }
 
-BOOST_AUTO_TEST_CASE(drop_func)
+BOOST_AUTO_TEST_CASE(erase_func)
 {
   cht_t ht(8);
-  ht.add("a", 1);
-  ht.add("b", 2);
-  ht.add("c", 3);
+  ht.insert("a", 1);
+  ht.insert("b", 2);
+  ht.insert("c", 3);
 
   try
   {
-    ht.drop("d");
+    ht.erase("d");
     BOOST_FAIL("Should be an error");
   }
   catch(const std::exception& e)
@@ -199,10 +199,10 @@ BOOST_AUTO_TEST_CASE(drop_func)
   }
   BOOST_CHECK(ht.size() == 3);
 
-  ht.drop("a");
+  ht.erase("a");
   try
   {
-    int _ = ht.get("a");
+    int _ = ht.at("a");
     BOOST_FAIL("Should be an error");
   }
   catch(const std::exception& e)
@@ -213,12 +213,12 @@ BOOST_AUTO_TEST_CASE(drop_func)
 
 }
 
-BOOST_AUTO_TEST_CASE(rehash_func)
+BOOST_AUTO_TEST_CASE(recontainsh_func)
 {
   cht_t ht(8);
-  ht.add("a", 1);
-  ht.add("b", 2);
-  ht.add("c", 3);
+  ht.insert("a", 1);
+  ht.insert("b", 2);
+  ht.insert("c", 3);
 
   bool aFlag = false;
   bool bFlag = false;
