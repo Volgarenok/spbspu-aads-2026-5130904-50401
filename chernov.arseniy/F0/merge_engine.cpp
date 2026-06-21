@@ -145,7 +145,9 @@ chernov::detail::MergeContext::MergeContext(Tree & mTree, const Tree & a, const 
   treeB(b),
   pairMap(16),
   copyMapA(16),
-  copyMapB(16)
+  copyMapB(16),
+  mergedA(16),
+  mergedB(16)
 {}
 
 std::string chernov::detail::MergeContext::makeKey(const std::string & idA, const std::string & idB)
@@ -204,6 +206,8 @@ std::string chernov::detail::MergeContext::mergePair(
   }
 
   pairMap.add(key, newId);
+  mergedA.add(idA, newId);
+  mergedB.add(idB, newId);
 
   const Vector< std::string > & parentsA = a->getParents();
   const Vector< std::string > & parentsB = b->getParents();
@@ -215,7 +219,6 @@ std::string chernov::detail::MergeContext::mergePair(
     if (!parentA) {
       continue;
     }
-
     bool matched = false;
     for (size_t j = 0; j < parentsB.getSize(); ++j) {
       if (usedB[j]) {
@@ -229,7 +232,6 @@ std::string chernov::detail::MergeContext::mergePair(
       if (parentA->getGender() != parentB->getGender()) {
         continue;
       }
-
       Vector< std::pair< std::string, std::string > > vis;
       if (areMatching(pA, pB, treeA, treeB, vis)) {
         std::string mergedParent = mergePair(pA, pB, error);
@@ -248,6 +250,7 @@ std::string chernov::detail::MergeContext::mergePair(
       }
     }
     if (!matched) {
+      bool conflict = false;
       for (size_t j = 0; j < parentsB.getSize(); ++j) {
         if (usedB[j]) {
           continue;
@@ -257,6 +260,10 @@ std::string chernov::detail::MergeContext::mergePair(
         if (!parentB || parentB->getGender() != parentA->getGender()) {
           continue;
         }
+        conflict = true;
+        break;
+      }
+      if (conflict) {
         if (parentA->getGender() == "Male") {
           error = "Merge conflict! Father mismatch. Cannot merge.";
         } else if (parentA->getGender() == "Female") {
@@ -288,8 +295,7 @@ std::string chernov::detail::MergeContext::mergePair(
     if (!parentB) {
       continue;
     }
-
-    const Person * childPtr = mergedTree.findPerson(newId);
+    Person * childPtr = mergedTree.findPerson(newId);
     if (childPtr) {
       const Vector< std::string > & existing = childPtr->getParents();
       for (size_t k = 0; k < existing.getSize(); ++k) {
@@ -430,6 +436,11 @@ std::string chernov::detail::MergeContext::copyFromA(const std::string & idA, st
   if (copyMapA.has(idA)) {
     return copyMapA.at(idA);
   }
+  if (mergedA.has(idA)) {
+    std::string mergedId = mergedA.at(idA);
+    copyMapA.add(idA, mergedId);
+    return mergedId;
+  }
   const Person * a = treeA.findPerson(idA);
   if (!a) {
     return "";
@@ -459,6 +470,11 @@ std::string chernov::detail::MergeContext::copyFromB(const std::string & idB, st
 {
   if (copyMapB.has(idB)) {
     return copyMapB.at(idB);
+  }
+  if (mergedB.has(idB)) {
+    std::string mergedId = mergedB.at(idB);
+    copyMapB.add(idB, mergedId);
+    return mergedId;
   }
   const Person * b = treeB.findPerson(idB);
   if (!b) {

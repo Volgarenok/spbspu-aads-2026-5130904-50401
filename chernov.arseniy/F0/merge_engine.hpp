@@ -22,6 +22,8 @@ namespace chernov {
       CuckooHT< std::string, std::string, Hasher1, Hasher2, std::equal_to< std::string > > pairMap;
       CuckooHT< std::string, std::string, Hasher1, Hasher2, std::equal_to< std::string > > copyMapA;
       CuckooHT< std::string, std::string, Hasher1, Hasher2, std::equal_to< std::string > > copyMapB;
+      CuckooHT< std::string, std::string, Hasher1, Hasher2, std::equal_to< std::string > > mergedA;
+      CuckooHT< std::string, std::string, Hasher1, Hasher2, std::equal_to< std::string > > mergedB;
 
       MergeContext(Tree & mTree, const Tree & a, const Tree & b);
       std::string makeKey(const std::string & idA, const std::string & idB);
