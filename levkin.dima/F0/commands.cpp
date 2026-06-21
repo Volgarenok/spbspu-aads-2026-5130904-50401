@@ -1,7 +1,6 @@
 #include "commands.hpp"
 #include "dom.hpp"
 #include <iostream>
-#include <unordered_map>
 namespace rl {
   void healthcheck(std::istream&, std::ostream& out, RootDB&)
   {
