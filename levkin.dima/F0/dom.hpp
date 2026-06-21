@@ -5,12 +5,6 @@
 
 namespace rl {
 
-  struct RTRoot {
-    RLNode root;
-    // TODO: absolute
-    // std::vector<El*>
-  };
-
   enum class FlexDirection { Row, Column, RowReverse, ColumnReverse };
 
   enum class JustifyContent {
@@ -57,5 +51,5 @@ namespace rl {
 
     ~RLNode();
   };
-
+}
 #endif

@@ -5,12 +5,18 @@
 #include <functional>
 #include <iostream>
 #include <string>
-namespace rl {
-  struct RootDB {
-    stuff::Vector< RTRoot > data;
-    RTRoot* selected = nullptr;
 
-    void select(RTRoot& item);
+namespace rl {
+  struct RLRoot {
+    RLNode root;
+    float base_width = 1920.0f;
+    float base_height = 1080.0f;
+  };
+  struct RootDB {
+    stuff::Vector< RLRoot > data;
+    RLRoot* selected = nullptr;
+
+    void select(RLRoot& item);
     void select_by_index(size_t index);
   };
 

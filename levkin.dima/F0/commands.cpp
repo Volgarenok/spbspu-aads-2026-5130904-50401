@@ -14,7 +14,7 @@ namespace rl {
     return cmds;
   }
 
-  void RootDB::select(RTRoot& item) { selected = &item; }
+  void RootDB::select(RLRoot& item) { selected = &item; }
   void RootDB::select_by_index(size_t index) { selected = &data[index]; }
 
 }
