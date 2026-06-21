@@ -193,6 +193,8 @@ void studilova::AVLTree< Key, Value, Compare >::push(const Key& key, const Value
   {
     parent->right_ = new_node;
   }
+
+  rebalanceFrom(new_node);
 }
 
 template< class Key, class Value, class Compare >
@@ -225,8 +227,14 @@ Value studilova::AVLTree< Key, Value, Compare >::drop(const Key& key)
 
   Node* child = node->left_ ? node->left_ : node->right_;
   replaceNode(node, child);
+  Node* rebalance_node = child ? child : node->parent_;
 
   delete node;
+
+  if (rebalance_node)
+  {
+    rebalanceFrom(rebalance_node);
+  }
   return result;
 }
 
@@ -541,22 +549,19 @@ typename studilova::AVLTree< Key, Value, Compare >::Node* studilova::AVLTree< Ke
   {
     if (getBalance(node->left_) < 0)
     {
-      return const_cast< Node* >(rotateLargeRight(CIt(node, root_)).node_);
+      return rotateLargeRight(node);
     }
-
-    return const_cast< Node* >(rotateRight(CIt(node, root_)).node_);
+    return rotateRight(node);
   }
 
   if (balance < -1)
   {
     if (getBalance(node->right_) > 0)
     {
-      return const_cast< Node* >(rotateLargeLeft(CIt(node, root_)).node_);
+      return rotateLargeLeft(node);
     }
-
-    return const_cast< Node* >(rotateLeft(CIt(node, root_)).node_);
+    return rotateLeft(node);
   }
-
   return node;
 }
 
