@@ -295,7 +295,7 @@ namespace levkin {
         size_t curr = home_start + i;
         if (pool_[curr].is_valid_) {
           if (equal(pool_[curr].key_, key)) {
-            pool_[curr].value_ = value; // Update instead of throwing!
+            pool_[curr].value_ = value;
             return;
           }
         } else if (first_free_in_pool == pool_.getSize()) {
@@ -308,7 +308,7 @@ namespace levkin {
       while (it != overflow_.end()) {
         if (it->is_valid_) {
           if (equal(it->key_, key)) {
-            it->value_ = value; // Update instead of throwing!
+            it->value_ = value;
             return;
           }
         } else if (first_free_in_list == overflow_.end()) {
@@ -345,8 +345,7 @@ namespace levkin {
         size_t curr = home_start + i;
         if (pool_[curr].is_valid_) {
           if (equal(pool_[curr].key_, key)) {
-            pool_[curr].value_ =
-                std::move(value); // Update instead of throwing!
+            pool_[curr].value_ = std::move(value);
             return;
           }
         } else if (first_free_in_pool == pool_.getSize()) {
@@ -359,7 +358,7 @@ namespace levkin {
       while (it != overflow_.end()) {
         if (it->is_valid_) {
           if (equal(it->key_, key)) {
-            it->value_ = std::move(value); // Update instead of throwing!
+            it->value_ = std::move(value);
             return;
           }
         } else if (first_free_in_list == overflow_.end()) {
@@ -477,19 +476,57 @@ namespace levkin {
       EqualTo equal;
       size_t bucket_idx = hasher(key) % num_buckets_;
       size_t home_start = bucket_idx * bucket_capacity_;
+      size_t first_free_in_pool = pool_.getSize();
+
       for (size_t i = 0; i < bucket_capacity_; ++i) {
         size_t curr = home_start + i;
-        if (pool_[curr].is_valid_ && equal(pool_[curr].key_, key)) {
-          return pool_[curr].value_;
+        if (pool_[curr].is_valid_) {
+          if (equal(pool_[curr].key_, key)) {
+            return pool_[curr].value_;
+          }
+        } else if (first_free_in_pool == pool_.getSize()) {
+          first_free_in_pool = curr;
         }
       }
-      for (auto it = overflow_.begin(); it != overflow_.end(); ++it) {
-        if (it->is_valid_ && equal(it->key_, key)) {
-          return it->value_;
+
+      auto it = overflow_.begin();
+      auto first_free_in_list = overflow_.end();
+      while (it != overflow_.end()) {
+        if (it->is_valid_) {
+          if (equal(it->key_, key)) {
+            return it->value_;
+          }
+        } else if (first_free_in_list == overflow_.end()) {
+          first_free_in_list = it;
         }
+        ++it;
       }
-      add(key, Value{});
-      return get(key);
+
+      if (first_free_in_pool != pool_.getSize()) {
+        pool_[first_free_in_pool].key_ = key;
+        pool_[first_free_in_pool].value_ = Value{};
+        pool_[first_free_in_pool].is_valid_ = true;
+        count_valid_++;
+        return pool_[first_free_in_pool].value_;
+      }
+
+      if (first_free_in_list != overflow_.end()) {
+        first_free_in_list->key_ = key;
+        first_free_in_list->value_ = Value{};
+        first_free_in_list->is_valid_ = true;
+        count_valid_++;
+        return first_free_in_list->value_;
+      }
+
+      overflow_.pushBack(NodeHashTable< Key, Value >{key, Value{}, true});
+      count_valid_++;
+
+      auto last_it = overflow_.begin();
+      auto next_it = last_it;
+      while (++next_it != overflow_.end()) {
+        last_it = next_it;
+      }
+      return last_it->value_;
     }
 
     const Value& operator[](const Key& key) const { return get(key); }
