@@ -354,13 +354,13 @@ namespace chernov {
     tree.showRelationship(args[2], args[3], out);
   }
 
-  void cmdCompareTrees(CommandArgs & args, TreeManager &, std::ostream & out)
+  void cmdCompareTrees(CommandArgs & args, TreeManager & manager, std::ostream & out)
   {
     if (args.getSize() != 3) {
       out << "<ERROR: Invalid arguments>\n";
       return;
     }
-    out << "<COMPARISON RESULTS:>\n";
+    manager.compareTrees(args[1], args[2], out);
   }
 
   void cmdMergePersons(CommandArgs & args, TreeManager &, std::ostream & out)

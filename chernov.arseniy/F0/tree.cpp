@@ -443,8 +443,8 @@ void chernov::Tree::showRelationship(const std::string & id1, const std::string 
 chernov::Vector< std::string > chernov::Tree::getAllPersonIds() const
 {
   Vector< std::string > ids;
-  for (auto it = idToIndex_.cbegin(); it != idToIndex_.cend(); ++it) {
-    ids.pushBack((*it).first);
+  for (size_t i = 0; i < persons_.getSize(); ++i) {
+    ids.pushBack(persons_[i].getId());
   }
   return ids;
 }

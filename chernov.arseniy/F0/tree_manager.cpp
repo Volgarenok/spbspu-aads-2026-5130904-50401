@@ -1,5 +1,6 @@
 #include "tree_manager.hpp"
 #include "file_io.hpp"
+#include "merge_engine.hpp"
 
 chernov::TreeManager::TreeManager():
   trees_(8)
@@ -120,4 +121,17 @@ void chernov::TreeManager::loadTree(const std::string & filename, const std::str
     return;
   }
   out << "<OK: Loaded " << finalName << " from " << filename << ">\n";
+}
+
+void chernov::TreeManager::compareTrees(const std::string & nameA, const std::string & nameB, std::ostream & out)
+{
+  if (!trees_.has(nameA)) {
+    out << "<ERROR: Tree '" << nameA << "' not found>\n";
+    return;
+  }
+  if (!trees_.has(nameB)) {
+    out << "<ERROR: Tree '" << nameB << "' not found>\n";
+    return;
+  }
+  detail::compareTrees(trees_.at(nameA), trees_.at(nameB), nameA, nameB, out);
 }
