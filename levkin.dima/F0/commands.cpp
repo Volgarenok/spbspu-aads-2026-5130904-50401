@@ -74,6 +74,33 @@ namespace rl {
 
     out << "Node '" << childId << "' added to '" << parentId << "'.\n";
   }
+
+  void
+  createNode(std::istream& in, std::ostream& out, RootDB& db, RLRoot* layout)
+  {
+    if (!layout) {
+      out << "Error: no layout initialized\n";
+      return;
+    }
+    std::string id;
+    if (!(in >> id)) {
+      id = generateUniqueId(layout->mapOfNodes);
+    }
+
+    if (layout->mapOfNodes.has(id)) {
+      out << "Error: Node '" << id << "' already exists\n";
+      return;
+    }
+
+    auto newNode = std::make_unique< RLNode >();
+    newNode->id = id;
+
+    layout->mapOfNodes.add(id, newNode.get());
+    layout->root.addChild(std::move(newNode));
+
+    out << "Node '" << id << "' created as child of 'root'\n";
+  }
+
   Cmds getCmds()
   {
     Cmds cmds;
