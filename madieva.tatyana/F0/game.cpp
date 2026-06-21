@@ -1,7 +1,6 @@
 #include "game.hpp"
 #include <fstream>
 #include <sstream>
-#include <stdexcept>
 #include "template.hpp"
 #include "solver.hpp"
 
@@ -53,7 +52,9 @@ madieva::Game::Game(const std::string & filename):
   filledCount_(0),
   totalFilled_(0)
 {
-  loadFromFile(filename);
+  if (!loadFromFile(filename)) {
+    throw std::runtime_error("Failed to load game from file: " + filename);
+  }
 }
 
 bool madieva::Game::isInBounds(size_t row, size_t col) const
@@ -66,7 +67,7 @@ bool madieva::Game::fill(size_t row, size_t col)
   if (!isInBounds(row, col)) {
     return false;
   }
-  if (solution_[row][col] == 1) {
+  if (solution_[row][col] == 1 && state_[row][col] != 1) {
     state_[row][col] = 1;
     ++filledCount_;
     return true;
@@ -79,7 +80,7 @@ bool madieva::Game::emptyCell(size_t row, size_t col)
   if (!isInBounds(row, col)) {
     return false;
   }
-  if (solution_[row][col] == -1) {
+  if (solution_[row][col] == -1 && state_[row][col] != -1) {
     state_[row][col] = -1;
     return true;
   }
@@ -176,8 +177,10 @@ bool madieva::Game::saveToFile(const std::string & filename) const
   file << totalFilled_ << '\n';
   file << filledCount_ << '\n';
 
+  bool success = file.good();
+
   file.close();
-  return true;
+  return success;
 }
 
 bool madieva::Game::loadFromFile(const std::string & filename)
@@ -187,7 +190,16 @@ bool madieva::Game::loadFromFile(const std::string & filename)
   if (!file.is_open()) {
     return false;
   }
-  size_t rows, cols;
+  size_t rows = 0;
+  size_t cols = 0;
+  if (!(file >> rows >> cols)) {
+    file.close();
+    return false;
+  }
+  if (rows == 0 || cols == 0 || rows > 1000 || cols > 1000) {
+    file.close();
+    return false;
+  }
   Vector< Vector< size_t > > tempRowHints;
   Vector< Vector< size_t > > tempColHints;
   Vector< Vector< int > > tempState;
@@ -196,29 +208,39 @@ bool madieva::Game::loadFromFile(const std::string & filename)
 
   std::string line;
 
-  std::getline(file, line);
-  std::istringstream sizeStream(line);
-  sizeStream >> rows >> cols;
-
   tempRowHints.reserve(rows);
   for (size_t i = 0; i < rows; ++i) {
-    std::getline(file, line);
+    if (!std::getline(file, line)) {
+      file.close();
+      return false;
+    }
     std::istringstream iss(line);
     tempRowHints.pushBack(Vector< size_t >());
     size_t num;
     while (iss >> num) {
       tempRowHints[i].pushBack(num);
     }
+    if (iss.fail() && !iss.eof()) {
+      file.close();
+      return false;
+    }
   }
 
   tempColHints.reserve(cols);
   for (size_t i = 0; i < cols; ++i) {
-    std::getline(file, line);
+    if (!std::getline(file, line)) {
+      file.close();
+      return false;
+    }
     std::istringstream iss(line);
     tempColHints.pushBack(Vector< size_t >());
     size_t num;
     while (iss >> num) {
       tempColHints[i].pushBack(num);
+    }
+    if (iss.fail() && !iss.eof()) {
+      file.close();
+      return false;
     }
   }
 
@@ -237,24 +259,45 @@ bool madieva::Game::loadFromFile(const std::string & filename)
     }
   }
 
+  if (file.fail() && !file.eof()) {
+    file.close();
+    return false;
+  }
+  if (tempState.getSize() != rows) {
+      file.close();
+      return false;
+  }
+  for (size_t i = 0; i < tempState.getSize(); ++i) {
+      if (tempState[i].getSize() != cols) {
+          file.close();
+          return false;
+      }
+  }
+
   Vector< Vector< int > > result = solvePuzzle(tempRowHints, tempColHints, rows, cols);
 
   std::getline(file, line);
   std::istringstream totalStream(line);
-  totalStream >> totalFilled;
+  if (!(totalStream >> totalFilled)) {
+      file.close();
+      return false;
+  }
 
   std::getline(file, line);
   std::istringstream filledStream(line);
-  filledStream >> filledCount;
+  if (!(filledStream >> filledCount)) {
+      file.close();
+      return false;
+  }
 
   file.close();
 
   rows_ = rows;
   cols_ = cols;
-  state_ = tempState;
-  rowHints_ = tempRowHints;
-  colHints_ = tempColHints;
-  solution_ = result;
+  state_ =  std::move(tempState);
+  rowHints_ =  std::move(tempRowHints);
+  colHints_ =  std::move(tempColHints);
+  solution_ =  std::move(result);
   totalFilled_ = totalFilled;
   filledCount_ = filledCount;
   return true;

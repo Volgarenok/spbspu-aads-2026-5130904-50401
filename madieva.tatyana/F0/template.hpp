@@ -10,7 +10,7 @@ namespace madieva {
   {
   public:
     Template() = default;
-    Template(size_t rows, size_t cols);
+    Template(const std::string & filename);
 
     bool loadFromFile(const std::string & filename);
 

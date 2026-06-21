@@ -3,25 +3,18 @@
 #include <sstream>
 #include "solver.hpp"
 
-madieva::Template::Template(size_t rows, size_t cols):
-  rows_(rows),
-  cols_(cols),
+madieva::Template::Template(const std::string & filename):
+  rows_(0),
+  cols_(0),
+  fill_(0),
   rowHints_(),
   colHints_(),
   solution_(),
   isSolvable_(false)
 {
-  rowHints_.reserve(rows_);
-  colHints_.reserve(cols_);
-  
-  for (size_t i = 0; i < rows_; ++i) {
-    rowHints_.pushBack(Vector< size_t >());
-  }
-  
-  for (size_t i = 0; i < cols_; ++i) {
-    colHints_.pushBack(Vector< size_t >());
-  }
+  loadFromFile(filename);
 }
+
 
 bool madieva::Template::loadFromFile(const std::string & filename)
 {
@@ -30,45 +23,91 @@ bool madieva::Template::loadFromFile(const std::string & filename)
   if (!file.is_open()) {
     return false;
   }
-  size_t rows, cols;
-  file >> rows >> cols;
-  rows_ = rows;
-  cols_ = cols;
-  rowHints_ = Vector< Vector< size_t > >();
-  colHints_ = Vector< Vector< size_t > >();
-  rowHints_.reserve(rows_);
-  colHints_.reserve(cols_);
+  size_t rows = 0;
+  size_t cols = 0;
+  if (!(file >> rows >> cols)) {
+    file.close();
+    return false;
+  }
+  if (rows == 0 || cols == 0 || rows > 1000 || cols > 1000) {
+    file.close();
+    return false;
+  }
+  Vector< Vector< size_t > > tempRowHints;
+  Vector< Vector< size_t > > tempColHints;
+
+  tempRowHints.reserve(rows);
+  tempColHints.reserve(cols);
   
   for (size_t i = 0; i < rows_; ++i) {
-    rowHints_.pushBack(Vector< size_t >());
+    tempRowHints.pushBack(Vector< size_t >());
   }
   
   for (size_t i = 0; i < cols_; ++i) {
-    colHints_.pushBack(Vector< size_t >());
+    tempColHints.pushBack(Vector< size_t >());
   }
 
   std::string line;
-  std::getline(file, line);
   for (size_t i = 0; i < rows_; ++i) {
-    std::getline(file, line);
+    if (!std::getline(file, line)) {
+      file.close();
+      return false;
+    }
     std::istringstream iss(line);
     size_t num;
     while (iss >> num) {
-      rowHints_[i].pushBack(num);
+      tempRowHints[i].pushBack(num);
+    }
+    if (iss.fail() && !iss.eof()) {
+      file.close();
+      return false;
     }
   }
 
   for (size_t i = 0; i < cols_; ++i) {
-    std::getline(file, line);
+    if (!std::getline(file, line)) {
+      file.close();
+      return false;
+    }
     std::istringstream iss(line);
     size_t num;
     while (iss >> num) {
-      colHints_[i].pushBack(num);
+      tempColHints[i].pushBack(num);
+    }
+    if (iss.fail() && !iss.eof()) {
+      file.close();
+      return false;
     }
   }
 
-  isSolvable_ = solve();
+  if (file.fail() && !file.eof()) {
+    file.close();
+    return false;
+  }
+  file.close();
 
+  size_t totalRowHints = 0;
+  for (size_t i = 0; i < rows; ++i) {
+    for (size_t j = 0; j < tempRowHints[i].getSize(); ++j) {
+      totalRowHints += tempRowHints[i][j];
+    }
+  }
+
+  size_t totalColHints = 0;
+  for (size_t i = 0; i < cols; ++i) {
+    for (size_t j = 0; j < tempColHints[i].getSize(); ++j) {
+      totalColHints += tempColHints[i][j];
+    }
+  }
+  if (totalRowHints != totalColHints) {
+    return false;
+  }
+  rows_ = rows;
+  cols_ = cols;
+  fill_ = 0;
+  rowHints_ = std::move(tempRowHints);
+  colHints_ = std::move(tempColHints);
+  isSolvable_ = solve();
   return true;
 }
 
@@ -100,7 +139,6 @@ const madieva::Vector< madieva::Vector< size_t > > & madieva::Template::getColHi
 const madieva::Vector< madieva::Vector< int > > & madieva::Template::getSolution() const
 {
   return solution_;
-
 }
 
 bool madieva::Template::solve()
@@ -108,24 +146,25 @@ bool madieva::Template::solve()
   size_t sumrow = 0;
   for (size_t i = 0; i < rowHints_.getSize(); ++i) {
     for (size_t j = 0; j < rowHints_[i].getSize(); ++j) {
-      sumrow++;
+      sumrow += rowHints_[i][j];
     }
   }
   size_t sumcol = 0;
   for (size_t i = 0; i < colHints_.getSize(); ++i) {
     for (size_t j = 0; j < colHints_[i].getSize(); ++j) {
-      sumcol++;
+      sumcol += colHints_[i][j];
     }
   }
-  if (sumcol != sumrow){
+  if (sumcol != sumrow) {
     solution_ = Vector< Vector< int > >();
+    isSolvable_ = false;
+    return false;
   }
-  fill_ = sumcol;
   Vector< Vector< int > > result = solvePuzzle(rowHints_, colHints_, rows_, cols_);
   if (result.getSize() != 0) {
     solution_ = result;
     isSolvable_ = true;
-    isSolvable_ = false;
+    fill_ = sumcol;
     return true;
   }
 
