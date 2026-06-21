@@ -98,12 +98,14 @@ void chernov::TreeManager::loadTree(const std::string & treeName, const std::str
     out << "<ERROR: Tree '" << treeName << "' already exists>\n";
     return;
   }
-  Tree newTree(treeName, "");
+  Tree emptyTree(treeName, "");
+  trees_.add(treeName, emptyTree);
+  Tree & tree = trees_.at(treeName);
   std::string error;
-  if (detail::loadTree(newTree, filename, error)) {
-    trees_.add(treeName, std::move(newTree));
-    out << "<OK: Loaded " << treeName << " from " << filename << ">\n";
-  } else {
+  if (!detail::loadTree(tree, filename, error)) {
+    trees_.remove(treeName);
     out << "<ERROR: " << error << ">\n";
+    return;
   }
+  out << "<OK: Loaded " << treeName << " from " << filename << ">\n";
 }

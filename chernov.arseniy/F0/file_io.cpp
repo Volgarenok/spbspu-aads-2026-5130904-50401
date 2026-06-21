@@ -211,8 +211,9 @@ bool chernov::detail::loadTree(Tree & tree, const std::string & filename, std::s
   for (size_t i = 0; i < personDataList.getSize(); ++i) {
     const PersonData & pd = personDataList[i];
     Person * p = tree.findPerson(pd.id);
-    if (!p)
+    if (!p) {
       continue;
+    }
 
     if (!pd.parentsStr.empty()) {
       std::string str = pd.parentsStr;
@@ -234,7 +235,7 @@ bool chernov::detail::loadTree(Tree & tree, const std::string & filename, std::s
         }
       }
     }
-    if (!pd.spousesStr.empty()) {
+    if (!pd.spousesStr.empty() && !p->hasSpouse()) {
       std::string spouseId = pd.spousesStr;
       size_t comma = spouseId.find(',');
       if (comma != std::string::npos) {
