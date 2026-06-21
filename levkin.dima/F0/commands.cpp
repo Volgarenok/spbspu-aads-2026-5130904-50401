@@ -255,10 +255,20 @@ namespace rl {
       out << "Node '" << id << "' size updated to " << w << "x" << h << ".\n";
     }
   }
+
   Cmds getCmds()
   {
     Cmds cmds;
     cmds["healthcheck"] = healthcheck;
+    cmds["init"] = initLayout;
+    cmds["create_child"] = createChild;
+    cmds["create"] = createNode;
+    cmds["empty"] = emptyNode;
+    cmds["delete"] = deleteNode;
+    cmds["move"] = moveNode;
+    cmds["set_width"] = setWidth;
+    cmds["set_height"] = setHeight;
+    cmds["set_size"] = setSize;
     return cmds;
   }
 
