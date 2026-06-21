@@ -100,7 +100,7 @@ namespace rl {
 
     out << "Node '" << id << "' created as child of 'root'\n";
   }
-  
+
   void emptyNode(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout)
   {
     if (!layout) {
@@ -122,103 +122,139 @@ namespace rl {
     node->clearChildren();
     out << "Children of '" << id << "' removed.\n";
   }
-  void deleteNode(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout) {
-      if (!layout) { out << "Error: No layout initialized.\n"; return; }
-  
-      std::string id;
-      if (!(in >> id)) return;
-  
-      if (id == "root") {
-        out << "Error: Cannot delete root node.\n";
+  void deleteNode(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout)
+  {
+    if (!layout) {
+      out << "Error: No layout initialized.\n";
+      return;
+    }
+
+    std::string id;
+    if (!(in >> id))
+      return;
+
+    if (id == "root") {
+      out << "Error: Cannot delete root node.\n";
+      return;
+    }
+    if (!layout->mapOfNodes.has(id)) {
+      out << "Error: Node '" << id << "' not found.\n";
+      return;
+    }
+
+    RLNode* nodeToDelete = layout->mapOfNodes.get(id);
+    RLNode* parentNode = nodeToDelete->parent;
+
+    unregisterSubtree(nodeToDelete, layout->mapOfNodes);
+    parentNode->removeChild(id);
+
+    out << "Node '" << id << "' deleted successfully.\n";
+  }
+
+  void moveNode(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout)
+  {
+    if (!layout) {
+      out << "Error: No layout initialized.\n";
+      return;
+    }
+
+    std::string id, newParentId;
+    if (!(in >> id >> newParentId))
+      return;
+
+    if (!layout->mapOfNodes.has(id)) {
+      out << "Error: Node '" << id << "' not found.\n";
+      return;
+    }
+
+    RLNode* nodeToMove = layout->mapOfNodes.get(id);
+    RLNode* oldParent = nodeToMove->parent;
+    RLNode* newParent = (newParentId == "null")
+                            ? &layout->root
+                            : layout->mapOfNodes.get(newParentId);
+
+    if (!newParent) {
+      out << "Error: New parent '" << newParentId << "' not found.\n";
+      return;
+    }
+
+    RLNode* checkNode = newParent;
+    while (checkNode) {
+      if (checkNode == nodeToMove) {
+        out << "Error: Cannot move node into its own subtree.\n";
         return;
       }
+      checkNode = checkNode->parent;
+    }
+
+    std::unique_ptr< RLNode > movedPtr;
+    for (size_t i = 0; i < oldParent->children.getSize(); ++i) {
+      if (oldParent->children[i]->id == id) {
+        movedPtr = std::move(oldParent->children[i]);
+        oldParent->children.erase(i);
+        break;
+      }
+    }
+
+    newParent->addChild(std::move(movedPtr));
+    out << "Node '" << id << "' moved to '" << newParent->id << "'.\n";
+  }
+
+  void setWidth(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout)
+  {
+    if (!layout) {
+      out << "Error: No layout initialized.\n";
+      return;
+    }
+    std::string id;
+    float val;
+    if (in >> id >> val) {
       if (!layout->mapOfNodes.has(id)) {
-        out << "Error: Node '" << id << "' not found.\n";
+        out << "Error: Not found.\n";
         return;
       }
-  
-      RLNode* nodeToDelete = layout->mapOfNodes.get(id);
-      RLNode* parentNode = nodeToDelete->parent;
-  
-      unregisterSubtree(nodeToDelete, layout->mapOfNodes);
-      parentNode->removeChild(id);
-  
-      out << "Node '" << id << "' deleted successfully.\n";
+      layout->mapOfNodes.get(id)->width = val;
+      out << "Node '" << id << "' width updated.\n";
     }
-  
-    void moveNode(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout) {
-      if (!layout) { out << "Error: No layout initialized.\n"; return; }
-  
-      std::string id, newParentId;
-      if (!(in >> id >> newParentId)) return;
-  
+  }
+
+  void setHeight(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout)
+  {
+    if (!layout) {
+      out << "Error: No layout initialized.\n";
+      return;
+    }
+    std::string id;
+    float val;
+    if (in >> id >> val) {
       if (!layout->mapOfNodes.has(id)) {
-        out << "Error: Node '" << id << "' not found.\n";
+        out << "Error: Not found.\n";
         return;
       }
-  
-      RLNode* nodeToMove = layout->mapOfNodes.get(id);
-      RLNode* oldParent = nodeToMove->parent;
-      RLNode* newParent = (newParentId == "null") ? &layout->root : layout->mapOfNodes.get(newParentId);
-  
-      if (!newParent) {
-        out << "Error: New parent '" << newParentId << "' not found.\n";
+      layout->mapOfNodes.get(id)->height = val;
+      out << "Node '" << id << "' height updated.\n";
+    }
+  }
+
+  void setSize(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout)
+  {
+    if (!layout) {
+      out << "Error: No layout initialized.\n";
+      return;
+    }
+    std::string id;
+    float w, h;
+    if (in >> id >> w >> h) {
+      if (!layout->mapOfNodes.has(id)) {
+        out << "Error: Not found.\n";
         return;
       }
-  
-      RLNode* checkNode = newParent;
-      while (checkNode) {
-        if (checkNode == nodeToMove) {
-          out << "Error: Cannot move node into its own subtree.\n";
-          return;
-        }
-        checkNode = checkNode->parent;
-      }
-  
-      std::unique_ptr< RLNode > movedPtr;
-      for (size_t i = 0; i < oldParent->children.getSize(); ++i) {
-        if (oldParent->children[i]->id == id) {
-          movedPtr = std::move(oldParent->children[i]);
-          oldParent->children.erase(i);
-          break;
-        }
-      }
-  
-      newParent->addChild(std::move(movedPtr));
-      out << "Node '" << id << "' moved to '" << newParent->id << "'.\n";
+      RLNode* node = layout->mapOfNodes.get(id);
+      node->width = w;
+      node->height = h;
+      out << "Node '" << id << "' size updated to " << w << "x" << h << ".\n";
     }
-  
-    void setWidth(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout) {
-      if (!layout) { out << "Error: No layout initialized.\n"; return; }
-      std::string id; float val;
-      if (in >> id >> val) {
-        if (!layout->mapOfNodes.has(id)) { out << "Error: Not found.\n"; return; }
-        layout->mapOfNodes.get(id)->width = val;
-        out << "Node '" << id << "' width updated.\n";
-      }
-    }
-  
-    void setHeight(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout) {
-      if (!layout) { out << "Error: No layout initialized.\n"; return; }
-      std::string id; float val;
-      if (in >> id >> val) {
-        if (!layout->mapOfNodes.has(id)) { out << "Error: Not found.\n"; return; }
-        layout->mapOfNodes.get(id)->height = val;
-        out << "Node '" << id << "' height updated.\n";
-      }
-    }
-  
-    void setSize(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout) {
-      if (!layout) { out << "Error: No layout initialized.\n"; return; }
-      std::string id; float w, h;
-      if (in >> id >> w >> h) {
-        if (!layout->mapOfNodes.has(id)) { out << "Error: Not found.\n"; return; }
-        RLNode* node = layout->mapOfNodes.get(id);
-        node->width = w;
-        node->height = h;
-        out << "Node '" << id << "' size updated to " << w << "x" << h << ".\n";
-      }
-    }
+  }
   Cmds getCmds()
   {
     Cmds cmds;
