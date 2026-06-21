@@ -15,12 +15,61 @@ namespace rl {
   }
 
   void RLNode::removeChild(const std::string& child_id)
-    {
-      for (auto it = children.begin(); it != children.end(); ++it) {
-        if ((*it)->id == child_id) {
-          children.erase(it);
-          return;
-        }
+  {
+    for (auto it = children.begin(); it != children.end(); ++it) {
+      if ((*it)->id == child_id) {
+        children.erase(it);
+        return;
       }
     }
+  }
+  RLNode::RLNode(RLNode&& rhs) noexcept
+      : id(std::move(rhs.id)), children(std::move(rhs.children)),
+        parent(rhs.parent), margin(rhs.margin), padding(rhs.padding),
+        box(rhs.box), width(rhs.width), height(rhs.height),
+        flexDirection(rhs.flexDirection), justify(rhs.justify), align(rhs.align)
+  {
+    updateChildrenParent();
+
+    rhs.parent = nullptr;
+    rhs.width = -1.0f;
+    rhs.height = -1.0f;
+  }
+
+  RLNode& RLNode::operator=(RLNode&& rhs) noexcept
+  {
+    if (this == &rhs) {
+      return *this;
+    }
+
+    clearChildren();
+
+    id = std::move(rhs.id);
+    children = std::move(rhs.children);
+    parent = rhs.parent;
+    margin = rhs.margin;
+    padding = rhs.padding;
+    width = rhs.width;
+    height = rhs.height;
+    flexDirection = rhs.flexDirection;
+    justify = rhs.justify;
+    align = rhs.align;
+    box = rhs.box;
+
+    updateChildrenParent();
+
+    rhs.parent = nullptr;
+    rhs.width = -1.0f;
+    rhs.height = -1.0f;
+
+    return *this;
+  }
+  void RLNode::updateChildrenParent() noexcept
+  {
+    for (size_t i = 0; i < children.getSize(); ++i) {
+      if (children[i]) {
+        children[i]->parent = this;
+      }
+    }
+  }
 }

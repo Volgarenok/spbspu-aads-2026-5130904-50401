@@ -20,7 +20,7 @@ namespace rl {
     float base_height = 1080.0f;
   };
   struct RootDB {
-    stuff::Vector< RLRoot > data;
+    stf::Vector< RLRoot > data;
     RLRoot* selected = nullptr;
 
     void select(RLRoot& item);
@@ -28,7 +28,7 @@ namespace rl {
   };
 
   void healthcheck(std::istream& in, std::ostream& out, RootDB& db);
-  void (std::istream& in, std::ostream& out, RootDB& db);  
+  void aa(std::istream& in, std::ostream& out, RootDB& db);  
   Cmds getCmds();
 
 }

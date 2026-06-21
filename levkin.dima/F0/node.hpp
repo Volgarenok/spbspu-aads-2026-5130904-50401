@@ -34,7 +34,7 @@ namespace rl {
 
   struct RLNode {
     std::string id;
-    stuff::Vector< std::unique_ptr< RLNode > > children;
+    stf::Vector< std::unique_ptr< RLNode > > children;
     RLNode* parent;
 
     void addChild(std::unique_ptr< RLNode >);
@@ -43,7 +43,7 @@ namespace rl {
 
     Sides margin;
     Sides padding;
-
+    Rect box;
     float width = -1.0;
     float height = -1.0;
 
@@ -52,6 +52,13 @@ namespace rl {
     AlignItems align = AlignItems::FlexStart;
 
     ~RLNode() = default;
+    RLNode(const RLNode&) = delete;
+    RLNode& operator=(const stf::Vector< RLNode >&) = delete;
+    RLNode(RLNode&& rhs) noexcept;
+    RLNode& operator=(RLNode&& rhs) noexcept;
+
+  private:
+    void updateChildrenParent() noexcept;
   };
 }
 #endif

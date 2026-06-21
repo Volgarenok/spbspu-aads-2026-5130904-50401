@@ -499,4 +499,5 @@ std::ostream& stuff::operator<<(std::ostream& os, const Vector< T >& v)
   return os;
 }
 
+namespace stf = stuff;
 #endif
