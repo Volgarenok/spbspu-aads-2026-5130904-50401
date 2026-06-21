@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
     std::string line;
 
     while (std::getline(*input, line)) {
-      if (line.empty()) {
+      if (!(line.empty())) {
         results.push(evaluate_expression(line));
       }
     }
