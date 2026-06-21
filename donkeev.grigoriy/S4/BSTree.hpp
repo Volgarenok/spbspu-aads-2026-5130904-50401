@@ -190,6 +190,61 @@ namespace donkeev
     ++size_;
   }
 
+  template< class Key, class Value, class Compare >
+  void BSTree< Key, Value, Compare >::push(Key key, Value&& value)
+  {
+    if (!root_)
+    {
+      root_ = new BSTNode<Key, Value>{
+        {key, std::move(value)},
+        nullptr,
+        nullptr,
+        nullptr
+      };
+      ++size_;
+      return;
+    }
+
+    BSTNode<Key, Value>* curr = root_;
+    BSTNode<Key, Value>* parent = nullptr;
+
+    while (curr)
+    {
+      parent = curr;
+
+      if (compareFunc_(key, curr->data_.first))
+      {
+        curr = curr->left_;
+      }
+      else if (compareFunc_(curr->data_.first, key))
+      {
+        curr = curr->right_;
+      }
+      else
+      {
+        throw std::runtime_error("Invalid key");
+      }
+    }
+
+    BSTNode<Key, Value>* new_node = new BSTNode<Key, Value>{
+        {key, std::move(value)},
+        nullptr,
+        nullptr,
+        parent
+    };
+
+    if (compareFunc_(key, parent->data_.first))
+    {
+        parent->left_ = new_node;
+    }
+    else
+    {
+        parent->right_ = new_node;
+    }
+
+    ++size_;
+  }
+
 
   template< class Key, class Value, class Compare >
   void BSTree< Key, Value, Compare >::swap(BSTree< Key, Value, Compare >& other)
