@@ -1,4 +1,5 @@
 #include "tree_manager.hpp"
+#include "file_io.hpp"
 
 chernov::TreeManager::TreeManager():
   trees_(8)
@@ -76,4 +77,33 @@ chernov::Tree & chernov::TreeManager::getTree(const std::string & name)
 const chernov::Tree & chernov::TreeManager::getTree(const std::string & name) const
 {
   return trees_.at(name);
+}
+
+void chernov::TreeManager::saveTree(const std::string & treeName, const std::string & filename, std::ostream & out)
+{
+  if (!trees_.has(treeName)) {
+    out << "<ERROR: Tree '" << treeName << "' not found>\n";
+    return;
+  }
+  if (detail::saveTree(trees_.at(treeName), filename)) {
+    out << "<OK: Saved to " << filename << ">\n";
+  } else {
+    out << "<ERROR: Failed to save>\n";
+  }
+}
+
+void chernov::TreeManager::loadTree(const std::string & treeName, const std::string & filename, std::ostream & out)
+{
+  if (trees_.has(treeName)) {
+    out << "<ERROR: Tree '" << treeName << "' already exists>\n";
+    return;
+  }
+  Tree newTree(treeName, "");
+  std::string error;
+  if (detail::loadTree(newTree, filename, error)) {
+    trees_.add(treeName, std::move(newTree));
+    out << "<OK: Loaded " << treeName << " from " << filename << ">\n";
+  } else {
+    out << "<ERROR: " << error << ">\n";
+  }
 }

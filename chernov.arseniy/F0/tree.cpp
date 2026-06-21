@@ -430,3 +430,56 @@ void chernov::Tree::showRelationship(const std::string & id1, const std::string 
   std::string rel = detail::getRelationship(*this, id1, id2);
   out << "<RELATION: " << rel << ">\n";
 }
+
+chernov::Vector< std::string > chernov::Tree::getAllPersonIds() const
+{
+  Vector< std::string > ids;
+  for (auto it = idToIndex_.cbegin(); it != idToIndex_.cend(); ++it) {
+    ids.pushBack((*it).first);
+  }
+  return ids;
+}
+
+size_t chernov::Tree::getNextId() const
+{
+  return nextId_;
+}
+
+bool chernov::Tree::addPersonWithId(const std::string & id,
+  const std::string & surname,
+  const std::string & name,
+  const std::string & patronymic,
+  const std::string & gender,
+  std::string & errorMsg)
+{
+  if (idToIndex_.has(id)) {
+    errorMsg = "person with id " + id + " already exists";
+    return false;
+  }
+  if (id.size() < 2 || id[0] != 'P') {
+    errorMsg = "invalid id format";
+    return false;
+  }
+  size_t num = 0;
+  try {
+    num = std::stoul(id.substr(1));
+  } catch (...) {
+    errorMsg = "invalid id number";
+    return false;
+  }
+  Person person(id, surname, name, patronymic, gender);
+  persons_.pushBack(person);
+  size_t index = persons_.getSize() - 1;
+  idToIndex_.add(id, index);
+  if (num >= nextId_) {
+    nextId_ = num + 1;
+  }
+  return true;
+}
+
+void chernov::Tree::setNextId(size_t nextId)
+{
+  if (nextId > nextId_) {
+    nextId_ = nextId;
+  }
+}

@@ -19,6 +19,8 @@ namespace chernov {
     bool hasTree(const std::string & name) const;
     Tree & getTree(const std::string & name);
     const Tree & getTree(const std::string & name) const;
+    void saveTree(const std::string & treeName, const std::string & filename, std::ostream & out);
+    void loadTree(const std::string & treeName, const std::string & filename, std::ostream & out);
 
   private:
     CuckooHT< std::string, Tree, Hasher1, Hasher2, std::equal_to< std::string > > trees_;

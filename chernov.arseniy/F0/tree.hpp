@@ -43,6 +43,16 @@ namespace chernov {
     Vector< std::string > findCommonAncestors(const std::string & id1, const std::string & id2) const;
     void showRelationship(const std::string & id1, const std::string & id2, std::ostream & out) const;
 
+    Vector< std::string > getAllPersonIds() const;
+    size_t getNextId() const;
+    bool addPersonWithId(const std::string & id,
+      const std::string & surname,
+      const std::string & name,
+      const std::string & patronymic,
+      const std::string & gender,
+      std::string & errorMsg);
+    void setNextId(size_t nextId);
+
   private:
     std::string name_;
     std::string description_;
