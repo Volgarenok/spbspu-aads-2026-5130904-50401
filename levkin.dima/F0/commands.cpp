@@ -100,7 +100,29 @@ namespace rl {
 
     out << "Node '" << id << "' created as child of 'root'\n";
   }
+  
+  void emptyNode(std::istream& in, std::ostream& out, RootDB&, RLRoot* layout)
+  {
+    if (!layout) {
+      out << "Error: No layout initialized.\n";
+      return;
+    }
+    std::string id;
+    if (!(in >> id))
+      return;
 
+    if (!layout->mapOfNodes.has(id)) {
+      out << "Error: Node '" << id << "' not found.\n";
+      return;
+    }
+    RLNode* node = layout->mapOfNodes.get(id);
+    for (size_t i = 0; i < node->children.getSize(); ++i) {
+      unregisterSubtree(node->children[i].get(), layout->mapOfNodes);
+    }
+    node->clearChildren();
+    out << "Children of '" << id << "' removed.\n";
+  }
+  
   Cmds getCmds()
   {
     Cmds cmds;
