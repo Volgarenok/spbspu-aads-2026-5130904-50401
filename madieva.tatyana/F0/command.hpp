@@ -8,8 +8,8 @@ namespace madieva
 {
   using TemplateTable = CuckooHashTable< std::string,
     Template, StringHash1, StringHash2, StringEqual >;
-  using GameTable = CuckooHashTable<std::string, Game,
-    StringHash1, StringHash2, StringEqual>;
+  using GameTable = CuckooHashTable< std::string, Game,
+    StringHash1, StringHash2, StringEqual >;
 
   using CommandFunction = void (*)(std::istream &, std::ostream &,
     TemplateTable & templates, GameTable & games);

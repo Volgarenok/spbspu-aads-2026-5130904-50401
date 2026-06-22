@@ -20,8 +20,8 @@ void madieva::cmd_load(std::istream & in, std::ostream & out, TemplateTable & te
   try {
     Template tmpl;
     if (!tmpl.loadFromFile(filename)) {
-        out << "FAILED READING\n";
-        return;
+      out << "FAILED READING\n";
+      return;
     }
     templates.insert(name, tmpl);
   } catch (...) {
@@ -34,12 +34,12 @@ void madieva::cmd_start(std::istream & in, std::ostream & out,
 {
   std::string templateName;
   std::string gameName;
-  if (!(in >> templateName >> gameName)) {
+  if (!(in >> gameName >> templateName)) {
     out << "INVALID COMMAND\n";
     return;
   }
   if (!templates.contains(templateName)) {
-    out << "TEMPLATE NOT FOUND: " << templateName << "\n";
+    out << "TEMPLATE NOT FOUND\n";
     return;
   }
 
@@ -48,16 +48,17 @@ void madieva::cmd_start(std::istream & in, std::ostream & out,
     return;
   }
 
-    if (!templates.get(templateName).solvable()) {
+  if (!templates.get(templateName).solvable()) {
     out << "TEMPLATE NOT SOLVE\n";
     return;
   }
 
   try {
-    Template tmpl = templates.get(templateName);
+    Template & tmpl = templates.get(templateName);
     Game game(tmpl);
-    games.insert(std::move(gameName), std::move(game));
+    games.insert(gameName, std::move(game));
+    games.get(gameName).print(out);
   } catch (...) {
-      out << "INVALID COMMAND\n";
+    out << "INVALID COMMAND\n";
   }
 }

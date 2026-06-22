@@ -9,10 +9,13 @@ namespace madieva {
   class Game
   {
   public:
-    Game() noexcept = default;
+    Game() noexcept;
     Game(const Template & tmpl);
     Game(const Game & game);
     Game(const std::string & filename);
+
+    Game & operator=(const Game & other);
+    Game & operator=(Game && other) noexcept;
 
     bool fill(size_t row, size_t col);
     bool emptyCell(size_t row, size_t col);
@@ -26,11 +29,9 @@ namespace madieva {
     size_t getFilledCount() const noexcept;
     size_t getTotalFilled() const noexcept;
     const Vector< Vector< int > > & getState() const;
-    void getMaxRowHintLength();
-    void getMaxColHintLength();
     bool saveToFile(const std::string & filename) const;
     bool loadFromFile(const std::string & filename);
-    void print(std::ostream& out) const;
+    void print(std::ostream & out) const;
 
   private:
     size_t rows_;
@@ -43,6 +44,12 @@ namespace madieva {
     size_t totalFilled_;
     size_t cachedMaxRowHintLen_;
     size_t cachedMaxColHintLen_;
+    Vector< std::string > colsString_;
+    Vector< std::string > rowsString_;
+    void getMaxRowHintLength();
+    void getMaxColHintLength();
+    void prepareColumnStrings();
+    void prepareRowStrings();
     bool isInBounds(size_t row, size_t col) const;
   };
 }

@@ -3,8 +3,24 @@
 #include <sstream>
 #include <algorithm>
 #include <iterator>
+#include <limits>
 #include "template.hpp"
 #include "solver.hpp"
+
+madieva::Game::Game() noexcept:
+  rows_(0),
+  cols_(0),
+  state_(),
+  rowHints_(),
+  colHints_(),
+  solution_(),
+  filledCount_(0),
+  totalFilled_(0),
+  cachedMaxRowHintLen_(0),
+  cachedMaxColHintLen_(0),
+  colsString_(),
+  rowsString_()
+{}
 
 madieva::Game::Game(const Template & tmpl):
   rows_(tmpl.getRows()),
@@ -16,7 +32,9 @@ madieva::Game::Game(const Template & tmpl):
   filledCount_(0),
   totalFilled_(tmpl.getFill()),
   cachedMaxRowHintLen_(0),
-  cachedMaxColHintLen_(0)
+  cachedMaxColHintLen_(0),
+  colsString_(),
+  rowsString_()
 {
   state_.reserve(rows_);
   for (size_t i = 0; i < rows_; ++i) {
@@ -27,6 +45,8 @@ madieva::Game::Game(const Template & tmpl):
   }
   getMaxRowHintLength();
   getMaxColHintLength();
+  prepareColumnStrings();
+  prepareRowStrings();
 }
 
 madieva::Game::Game(const Game & game):
@@ -39,7 +59,9 @@ madieva::Game::Game(const Game & game):
   filledCount_(0),
   totalFilled_(game.totalFilled_),
   cachedMaxRowHintLen_(game.cachedMaxRowHintLen_),
-  cachedMaxColHintLen_(game.cachedMaxColHintLen_)
+  cachedMaxColHintLen_(game.cachedMaxColHintLen_),
+  colsString_(game.colsString_),
+  rowsString_(game.rowsString_)
 {
   state_.reserve(rows_);
   for (size_t i = 0; i < rows_; ++i) {
@@ -60,13 +82,61 @@ madieva::Game::Game(const std::string & filename):
   filledCount_(0),
   totalFilled_(0),
   cachedMaxRowHintLen_(0),
-  cachedMaxColHintLen_(0)
+  cachedMaxColHintLen_(0),
+  colsString_(),
+  rowsString_()
 {
   if (!loadFromFile(filename)) {
     throw std::runtime_error("Failed to load game from file: " + filename);
   }
   getMaxRowHintLength();
   getMaxColHintLength();
+  prepareColumnStrings();
+  prepareRowStrings();
+}
+
+madieva::Game & madieva::Game::operator=(const Game & other)
+{
+  if (this == &other) {
+    return *this;
+  }
+
+  rows_ = other.rows_;
+  cols_ = other.cols_;
+  state_ = other.state_;
+  rowHints_ = other.rowHints_;
+  colHints_ = other.colHints_;
+  solution_ = other.solution_;
+  filledCount_ = other.filledCount_;
+  totalFilled_ = other.totalFilled_;
+  cachedMaxRowHintLen_ = other.cachedMaxRowHintLen_;
+  cachedMaxColHintLen_ = other.cachedMaxColHintLen_;
+  colsString_ = other.colsString_;
+  rowsString_ = other.rowsString_;
+
+  return *this;
+}
+
+madieva::Game & madieva::Game::operator=(Game && other) noexcept
+{
+  if (this == &other) {
+    return *this;
+  }
+
+  rows_ = other.rows_;
+  cols_ = other.cols_;
+  state_ = std::move(other.state_);
+  rowHints_ = std::move(other.rowHints_);
+  colHints_ = std::move(other.colHints_);
+  solution_ = std::move(other.solution_);
+  filledCount_ = other.filledCount_;
+  totalFilled_ = other.totalFilled_;
+  cachedMaxRowHintLen_ = other.cachedMaxRowHintLen_;
+  cachedMaxColHintLen_ = other.cachedMaxColHintLen_;
+  colsString_ = std::move(other.colsString_);
+  rowsString_ = std::move(other.rowsString_);
+
+  return *this;
 }
 
 bool madieva::Game::isInBounds(size_t row, size_t col) const
@@ -156,7 +226,7 @@ void madieva::Game::getMaxRowHintLength()
         count++;
       }
     }
-    count += rowHints_.getSize() - 1;
+    count += rowHints_[i].getSize() - 1;
     if (count > maxrow) {
       maxrow = count;
     }
@@ -176,7 +246,7 @@ void madieva::Game::getMaxColHintLength()
         count++;
       }
     }
-    count += colHints_.getSize() - 1;
+    count += colHints_[i].getSize() - 1;
     if (count > maxcol) {
       maxcol = count;
     }
@@ -252,6 +322,7 @@ bool madieva::Game::loadFromFile(const std::string & filename)
     file.close();
     return false;
   }
+  file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
   Vector< Vector< size_t > > tempRowHints;
   Vector< Vector< size_t > > tempColHints;
   Vector< Vector< int > > tempState;
@@ -298,7 +369,10 @@ bool madieva::Game::loadFromFile(const std::string & filename)
 
   tempState.reserve(rows);
   for (size_t i = 0; i < rows; ++i) {
-    std::getline(file, line);
+    if (!std::getline(file, line)) {
+      file.close();
+      return false;
+    }
     std::istringstream iss(line);
     tempState.pushBack(Vector< int >());
     int val;
@@ -307,6 +381,10 @@ bool madieva::Game::loadFromFile(const std::string & filename)
         tempState[i].pushBack(-1);
       } else {
         tempState[i].pushBack(val);
+      }
+      if (iss.fail() && !iss.eof()) {
+        file.close();
+        return false;
       }
     }
   }
@@ -355,9 +433,85 @@ bool madieva::Game::loadFromFile(const std::string & filename)
   return true;
 }
 
+void madieva::Game::prepareColumnStrings()
+{
+  Vector< std::string > tempColsString;
+  tempColsString.reserve(colHints_.getSize());
+  for (size_t i = 0; i < colHints_.getSize(); ++i) {
+    std::ostringstream oss;
+    if (colHints_[i].getSize() > 0) {
+      oss << colHints_[i][0];
+      for (size_t j = 1; j < colHints_[i].getSize(); ++j) {
+        oss << ' ' << colHints_[i][j];
+      }
+    }
+    std::string line = oss.str();
+    std::fill_n(std::back_inserter(line),
+      cachedMaxColHintLen_ - line.length(), ' ');
+    tempColsString.pushBack(std::move(line));
+  }
+  colsString_ = std::move(tempColsString);
+}
+
+void madieva::Game::prepareRowStrings()
+{
+  Vector< std::string > tempRowsString;
+  tempRowsString.reserve(rowHints_.getSize());
+  for (size_t i = 0; i < rowHints_.getSize(); ++i) {
+    std::ostringstream oss;
+    if (rowHints_[i].getSize() > 0) {
+      oss << rowHints_[i][0];;
+      for (size_t j = 1; j < rowHints_[i].getSize(); ++j) {
+        oss << ' ' << rowHints_[i][j];
+      }
+    }
+    std::string line = oss.str();
+    std::fill_n(std::back_inserter(line),
+      cachedMaxRowHintLen_ - line.length(), ' ');
+    tempRowsString.pushBack(std::move(line));
+  }
+  rowsString_ = std::move(tempRowsString);
+}
+
 void madieva::Game::print(std::ostream & out) const
 {
-  for (size_t i = 0; i < cachedMaxRowHintLen_ + 2; ++i) {
+  for (size_t i = 0; i < cachedMaxColHintLen_; ++i) {
+    std::fill_n(std::ostream_iterator< char >(out),
+      cachedMaxRowHintLen_ + 2, ' ');
+    for (size_t j = 0; j < cols_; ++j) {
+      if (i < colsString_[j].length()) {
+        out << colsString_[j][i];
+      } else {
+        out << ' ';
+      }
+      if (j < cols_ - 1) {
+        out << ' ';
+      }
+    }
+    out << '\n';
+  }
 
+  std::fill_n(std::ostream_iterator< char >(out),
+    cachedMaxRowHintLen_ + 1, ' ');
+  std::fill_n(std::ostream_iterator< char >(out), cols_ * 2, '-');
+
+  out << '\n';
+
+  for (size_t i = 0; i < rows_; ++i) {
+    out << rowsString_[i];
+    out << "| ";
+    for (size_t j = 0; j < cols_; ++j) {
+      if (state_[i][j] == 1) {
+        out << '0';
+      } else if (state_[i][j] == -1) {
+        out << '-';
+      } else {
+        out << '.';
+      }
+      if (j < cols_ - 1) {
+        out << ' ';
+      }
+    }
+    out << '\n';
   }
 }

@@ -1,7 +1,18 @@
 #include "template.hpp"
 #include <fstream>
 #include <sstream>
+#include <limits>
 #include "solver.hpp"
+
+madieva::Template::Template() noexcept:
+  rows_(0),
+  cols_(0),
+  fill_(0),
+  rowHints_(),
+  colHints_(),
+  solution_(),
+  isSolvable_(false)
+{}
 
 madieva::Template::Template(const std::string & filename):
   rows_(0),
@@ -34,22 +45,23 @@ bool madieva::Template::loadFromFile(const std::string & filename)
       file.close();
       return false;
     }
+    file.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     Vector< Vector< size_t > > tempRowHints;
     Vector< Vector< size_t > > tempColHints;
 
     tempRowHints.reserve(rows);
     tempColHints.reserve(cols);
 
-    for (size_t i = 0; i < rows_; ++i) {
+    for (size_t i = 0; i < rows; ++i) {
       tempRowHints.pushBack(Vector< size_t >());
     }
 
-    for (size_t i = 0; i < cols_; ++i) {
+    for (size_t i = 0; i < cols; ++i) {
       tempColHints.pushBack(Vector< size_t >());
     }
 
     std::string line;
-    for (size_t i = 0; i < rows_; ++i) {
+    for (size_t i = 0; i < rows; ++i) {
       if (!std::getline(file, line)) {
         file.close();
         return false;
@@ -65,7 +77,7 @@ bool madieva::Template::loadFromFile(const std::string & filename)
       }
     }
 
-    for (size_t i = 0; i < cols_; ++i) {
+    for (size_t i = 0; i < cols; ++i) {
       if (!std::getline(file, line)) {
         file.close();
         return false;
@@ -97,11 +109,7 @@ bool madieva::Template::loadFromFile(const std::string & filename)
   } catch (const std::bad_alloc &) {
     file.close();
     throw;
-  } catch (...) {
-    file.close();
-    throw;
   }
-
 }
 
 size_t madieva::Template::getRows() const noexcept

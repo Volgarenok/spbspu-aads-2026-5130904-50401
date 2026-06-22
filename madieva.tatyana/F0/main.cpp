@@ -9,7 +9,13 @@ int main()
   madieva::TemplateTable templates(16, 100);
   madieva::GameTable games(16, 100);
   madieva::CommandTable commands(16, 100);
-  commands.insert("load", madieva::cmd_load);
+  try {
+    commands.insert("load", madieva::cmd_load);
+    commands.insert("start", madieva::cmd_start);
+  } catch (...) {
+    std::cerr << "<INTERNAL ERROR>\n";
+    return 2;
+  }
   std::string line;
   while (std::getline(std::cin, line)) {
     std::istringstream iss(line);
@@ -24,4 +30,5 @@ int main()
       std::cout << "<INVALID COMMAND>\n";
     }
   }
+  return 0;
 }

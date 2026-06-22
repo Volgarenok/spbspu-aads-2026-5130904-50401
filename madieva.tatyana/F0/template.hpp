@@ -9,7 +9,7 @@ namespace madieva {
   class Template
   {
   public:
-    Template() noexcept = default;
+    Template() noexcept;
     Template(const std::string & filename);
 
     bool loadFromFile(const std::string & filename);

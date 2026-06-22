@@ -348,4 +348,110 @@ BOOST_AUTO_TEST_CASE(single_group_middle)
   BOOST_CHECK(result[4] == 0);
 }
 
+BOOST_AUTO_TEST_CASE(empty_puzzle)
+{
+  madieva::Vector< madieva::Vector< size_t > > rowHints;
+  madieva::Vector< madieva::Vector< size_t > > colHints;
+
+  madieva::Vector< madieva::Vector< int > > result =
+    madieva::solvePuzzle(rowHints, colHints, 0, 0);
+
+  BOOST_CHECK(result.getSize() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(single_cell_filled)
+{
+  madieva::Vector< madieva::Vector< size_t > > rowHints;
+  madieva::Vector< madieva::Vector< size_t > > colHints;
+
+  rowHints.pushBack(madieva::Vector< size_t >());
+  rowHints[0].pushBack(1);
+
+  colHints.pushBack(madieva::Vector< size_t >());
+  colHints[0].pushBack(1);
+
+  madieva::Vector< madieva::Vector< int > > result =
+    madieva::solvePuzzle(rowHints, colHints, 1, 1);
+
+  BOOST_CHECK(result.getSize() == 1);
+  BOOST_CHECK(result[0].getSize() == 1);
+  BOOST_CHECK(result[0][0] == 1);
+}
+
+BOOST_AUTO_TEST_CASE(single_cell_empty)
+{
+  madieva::Vector< madieva::Vector< size_t > > rowHints;
+  madieva::Vector< madieva::Vector< size_t > > colHints;
+
+  rowHints.pushBack(madieva::Vector< size_t >());
+  colHints.pushBack(madieva::Vector< size_t >());
+
+  madieva::Vector< madieva::Vector< int > > result =
+    madieva::solvePuzzle(rowHints, colHints, 1, 1);
+
+  BOOST_CHECK(result.getSize() == 1);
+  BOOST_CHECK(result[0].getSize() == 1);
+  BOOST_CHECK(result[0][0] == -1);
+}
+
+
+BOOST_AUTO_TEST_CASE(simple_2x2_filled)
+{
+  madieva::Vector< madieva::Vector< size_t > > rowHints;
+  madieva::Vector< madieva::Vector< size_t > > colHints;
+
+  for (size_t i = 0; i < 2; ++i) {
+    rowHints.pushBack(madieva::Vector< size_t >());
+    rowHints[i].pushBack(2);
+
+    colHints.pushBack(madieva::Vector< size_t >());
+    colHints[i].pushBack(2);
+  }
+
+  madieva::Vector< madieva::Vector< int > > result =
+    madieva::solvePuzzle(rowHints, colHints, 2, 2);
+
+  BOOST_CHECK(result.getSize() == 2);
+  for (size_t i = 0; i < 2; ++i) {
+    BOOST_CHECK(result[i].getSize() == 2);
+    for (size_t j = 0; j < 2; ++j) {
+      BOOST_CHECK(result[i][j] == 1);
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(simple_3x3_cross)
+{
+  madieva::Vector< madieva::Vector< size_t > > rowHints;
+  madieva::Vector< madieva::Vector< size_t > > colHints;
+
+  const int expected[3][3] = {
+    { -1,  1, -1 },
+    {  1,  1,  1 },
+    { -1,  1, -1 }
+  };
+
+  const size_t rowHintValues[3] = { 1, 3, 1 };
+  const size_t colHintValues[3] = { 1, 3, 1 };
+
+  for (size_t i = 0; i < 3; ++i) {
+    rowHints.pushBack(madieva::Vector< size_t >());
+    rowHints[i].pushBack(rowHintValues[i]);
+
+    colHints.pushBack(madieva::Vector< size_t >());
+    colHints[i].pushBack(colHintValues[i]);
+  }
+
+  madieva::Vector< madieva::Vector< int > > result =
+    madieva::solvePuzzle(rowHints, colHints, 3, 3);
+
+  BOOST_CHECK(result.getSize() == 3);
+  for (size_t i = 0; i < 3; ++i) {
+    BOOST_CHECK(result[i].getSize() == 3);
+    for (size_t j = 0; j < 3; ++j) {
+      BOOST_CHECK(result[i][j] == expected[i][j]);
+    }
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

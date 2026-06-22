@@ -5,7 +5,7 @@ bool madieva::analyzeLine(
   const Vector< size_t > & hints,
   Vector< int > & result)
 {
-  size_t lineSize = line.getSize();
+  const size_t lineSize = line.getSize();
 
   if (hints.getSize() == 0) {
     result.reserve(lineSize);
@@ -74,8 +74,8 @@ void madieva::generateVariants(
   Vector< size_t > & counter,
   size_t & totalVariants)
 {
-  size_t lineSize = current.getSize();
-  size_t hintsSize = hints.getSize();
+  const size_t lineSize = current.getSize();
+  const size_t hintsSize = hints.getSize();
   if (groupIndex == hintsSize) {
     for (size_t i = pos; i < lineSize; ++i) {
       if (current[i] == 1) {
@@ -135,7 +135,7 @@ void madieva::generateVariants(
       current[i] = 1;
     }
 
-    size_t nextPos = start + groupLength;
+    const size_t nextPos = start + groupLength;
     if (groupIndex < hintsSize - 1) {
       for (size_t emptyPos = nextPos; emptyPos <= lineSize; ++emptyPos) {
         if (emptyPos < lineSize) {
@@ -186,7 +186,7 @@ madieva::Vector< madieva::Vector< int > > madieva::solvePuzzle(
     ++iterations;
     for (size_t i = 0; i < rows; ++i) {
       Vector< int > newLine;
-      bool lineChanged = analyzeLine(picture[i], rowHints[i], newLine);
+      const bool lineChanged = analyzeLine(picture[i], rowHints[i], newLine);
 
       if (lineChanged) {
         picture[i] = std::move(newLine);
@@ -202,7 +202,7 @@ madieva::Vector< madieva::Vector< int > > madieva::solvePuzzle(
       }
 
       Vector< int > newColumn;
-      bool colChanged = analyzeLine(column, colHints[j], newColumn);
+      const bool colChanged = analyzeLine(column, colHints[j], newColumn);
 
       if (colChanged) {
         for (size_t i = 0; i < rows; ++i) {

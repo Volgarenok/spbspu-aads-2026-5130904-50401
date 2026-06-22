@@ -1,8 +1,8 @@
 #ifndef CUCKOO_HASH_TABLE_HPP
 #define CUCKOO_HASH_TABLE_HPP
-#include <vector.hpp>
 #include <stdexcept>
 #include <utility>
+#include <vector.hpp>
 namespace madieva
 {
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
@@ -224,8 +224,8 @@ namespace madieva
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
   void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::clear()
   {
-    size_t cap1 = table1_.getSize();
-    size_t cap2 = table2_.getSize();
+    const size_t cap1 = table1_.getSize();
+    const size_t cap2 = table2_.getSize();
 
     table1_.clear();
     table2_.clear();
