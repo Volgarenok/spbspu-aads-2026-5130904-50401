@@ -164,26 +164,26 @@ void malashenko::Network::removeMsg(const size_t& messageId)
 void malashenko::Network::showInboxMsg(std::ostream& out, const msg_t& msg) const
 {
   out << '[' << msg.timestamp << "] " << msg.from << '\n';
-  out << "\"" << msg.text << "\"\n";
+  out << msg.text << "\n";
 }
 
 void malashenko::Network::showOutboxMsg(std::ostream& out, const msg_t& msg) const
 {
   out << '[' << msg.timestamp << "] -> " << msg.to << '\n';
-  out << "\"" << msg.text << "\"\n";;
+  out << msg.text << "\n";;
 }
 
 void malashenko::Network::showChatMsg(std::ostream& out, const msg_t& msg) const
 {
   out << '[' << msg.timestamp << "] " << msg.from << '\n';
-  out << "\"" << msg.text << "\"\n";;
+  out << msg.text << "\n";;
 }
 
 void malashenko::Network::showFullInfoMsg(std::ostream& out, const msg_t& msg) const
 {
   out << "id " << msg.message_id << ". [" << msg.timestamp << "] ";
   out << msg.from << " -> " << msg.to << '\n';
-  out << "\"" <<  msg.text << "\"\n";
+  out << msg.text << "\n";
 }
 
 void malashenko::Network::showInOutBox(std::ostream& out, const std::string& username, bool isInbox) const
@@ -364,10 +364,22 @@ void malashenko::Network::clearChat(const std::string& user1, const std::string&
 
 void malashenko::Network::mutualUsers(std::ostream& out, const std::string& user1, const std::string& user2) const
 {
+  if (!users_.contains(user1))
+  {
+    std::string errorMsg = "There's no user with username: " + user1;
+    throw std::invalid_argument(errorMsg);
+  }
+
+  if (!users_.contains(user2))
+  {
+    std::string errorMsg = "There's no user with username: " + user2;
+    throw std::invalid_argument(errorMsg);
+  }
+
   Vector< name_t > friendsOfUser1 = graph_.at(user1);
   Vector< name_t > friendsOfUser2 = graph_.at(user2);
 
-  size_t counter = 0;
+  size_t counter = 1;
   out << "[MUTUAL FRIENDS BETWEEN " << user1 << " AND " << user2 << "]\n";
   for (size_t i = 0; i < friendsOfUser1.getSize(); ++i)
   {

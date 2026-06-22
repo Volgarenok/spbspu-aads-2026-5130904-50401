@@ -141,7 +141,7 @@ void malashenko::Messenger::path(std::istream& in, std::ostream& out)
 void malashenko::Messenger::remove_inactive(std::istream&, std::ostream& out)
 {
   size_t counter = net_.removeInactive();
-  std::string msg = counter + " inactive users were removed";
+  std::string msg = std::to_string(counter) + " inactive users were removed";
   detail::successMsg(out, msg);
 }
 
