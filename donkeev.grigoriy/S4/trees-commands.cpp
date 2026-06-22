@@ -39,10 +39,9 @@ void donkeev::complementDicts(std::istream& input, std::ostream&, donkeev::Datas
     throw std::runtime_error("Bad input");
   }
 
-  Datasets::iterator existing = dicts.find(newName);
   Datasets::iterator it1 = dicts.find(name1);
   Datasets::iterator it2 = dicts.find(name2);
-  if (it1 == dicts.end() || it2 == dicts.end() || existing != dicts.end())
+  if (it1 == dicts.end() || it2 == dicts.end())
   {
     throw std::runtime_error("Bad input");
   }
@@ -68,6 +67,12 @@ void donkeev::complementDicts(std::istream& input, std::ostream&, donkeev::Datas
     ++begin;
   }
 
+  Datasets::iterator existing = dicts.find(newName);
+  if (existing != dicts.end())
+  {
+    dicts.drop(newName);
+  }
+
   dicts.push(newName, std::move(result));
 }
 
@@ -79,10 +84,9 @@ void donkeev::intersectDicts(std::istream& input, std::ostream&, donkeev::Datase
     throw std::runtime_error("Bad input");
   }
 
-  Datasets::iterator existing = dicts.find(newName);
   Datasets::iterator it1 = dicts.find(name1);
   Datasets::iterator it2 = dicts.find(name2);
-  if (existing != dicts.end() || it1 == dicts.end() || it2 == dicts.end())
+  if (it1 == dicts.end() || it2 == dicts.end())
   {
     throw std::runtime_error("Bad input");
   }
@@ -109,6 +113,12 @@ void donkeev::intersectDicts(std::istream& input, std::ostream&, donkeev::Datase
     ++begin1;
   }
 
+  Datasets::iterator existing = dicts.find(newName);
+  if (existing != dicts.end())
+  {
+    dicts.drop(newName);
+  }
+
   dicts.push(newName, std::move(result));
 }
 
@@ -120,10 +130,9 @@ void donkeev::uniteDicts(std::istream& input, std::ostream&, donkeev::Datasets& 
     throw std::runtime_error("Bad input");
   }
 
-  Datasets::iterator existing = dicts.find(newName);
   Datasets::iterator it1 = dicts.find(name1);
   Datasets::iterator it2 = dicts.find(name2);
-  if (existing != dicts.end() || it1 == dicts.end() || it2 == dicts.end())
+  if (it1 == dicts.end() || it2 == dicts.end())
   {
     throw std::runtime_error("Bad input");
   }
@@ -161,5 +170,11 @@ void donkeev::uniteDicts(std::istream& input, std::ostream&, donkeev::Datasets& 
     ++begin2;
   }
 
+  Datasets::iterator existing = dicts.find(newName);
+  if (existing != dicts.end())
+  {
+    dicts.drop(newName);
+  }
+  
   dicts.push(newName, std::move(result));
 }
