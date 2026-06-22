@@ -2,20 +2,22 @@
 #define NODE_PROPERTIES
 
 namespace rl {
+  enum class SizeType { Pixels, Auto };
   struct Size {
-    enum Type { Pixels, Auto } type = Auto;
+    SizeType type = SizeType::Auto;
     float value = 0.0f;
-  };
-  enum class FlexDirection { Row, Column, RowReverse, ColumnReverse };
-  enum class JustifyContent {
-    FlexStart,
-    FlexEnd,
-    Center,
-    SpaceBetween,
-    SpaceAround
+
+    static Size fromFloat(float val)
+    {
+      if (val < 0.0f)
+        return {SizeType::Auto, 0.0f};
+      return {SizeType::Pixels, val};
+    }
   };
 
-  enum class AlignItems { FlexStart, FlexEnd, Center, Stretch };
+  enum class FlexDirection { Row, Column };
+  enum class JustifyContent { FlexStart, FlexEnd, Center, SpaceBetween };
+  enum class AlignItems { FlexStart, FlexEnd, Center };
 
   struct Sides {
     float left = 0.0f;
