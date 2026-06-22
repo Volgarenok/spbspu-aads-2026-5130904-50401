@@ -198,9 +198,54 @@ namespace rl {
   {
     return storage.has(name);
   }
-void calculateLayout() {
-    
-}
 
+  void measureNode(RLNode& node)
+  {
+    for (size_t i = 0; i < node.children.getSize(); ++i) {
+      if (node.children[i]) {
+        measureNode(*node.children[i]);
+      }
+    }
+
+    node.box.width =
+        (node.width.type == SizeType::Pixels) ? node.width.value : 0.0f;
+    node.box.height =
+        (node.height.type == SizeType::Pixels) ? node.height.value : 0.0f;
+
+    if (node.children.getSize() == 0) {
+      return;
+    }
+
+    float childrenMainSum = 0.0f;
+    float childrenCrossMax = 0.0f;
+
+    for (const auto& child : node.children) {
+      if (!child)
+        continue;
+      const auto& childBox = child->box;
+
+      if (node.flexDirection == FlexDirection::Row) {
+        childrenMainSum += childBox.width;
+        if (childBox.height > childrenCrossMax)
+          childrenCrossMax = childBox.height;
+      } else {
+        childrenMainSum += childBox.height;
+        if (childBox.width > childrenCrossMax)
+          childrenCrossMax = childBox.width;
+      }
+    }
+
+    if (node.width.type == SizeType::Auto) {
+      node.box.width = (node.flexDirection == FlexDirection::Row)
+                           ? childrenMainSum
+                           : childrenCrossMax;
+    }
+    if (node.height.type == SizeType::Auto) {
+      node.box.height = (node.flexDirection == FlexDirection::Row)
+                            ? childrenCrossMax
+                            : childrenMainSum;
+    }
+  }
+  void calculateLayout() {}
 
 }
