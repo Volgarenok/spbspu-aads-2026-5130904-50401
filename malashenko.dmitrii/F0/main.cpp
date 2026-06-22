@@ -11,7 +11,7 @@ int main()
   using cmd_t = void (Messenger::*)(std::istream&, std::ostream&);
   using str_t = std::string;
 
-  CuckooHashTable< str_t, cmd_t, HmacHash< str_t >, SipHasher< str_t >, Equal< str_t > > commands;
+  CuckooHashTable< str_t, cmd_t, HmacHash< str_t >, SipHasher< str_t >, std::equal_to< str_t > > commands;
 
   commands.insert("user", &Messenger::user);
   commands.insert("rmuser", &Messenger::rmuser);

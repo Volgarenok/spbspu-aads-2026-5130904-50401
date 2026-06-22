@@ -404,8 +404,8 @@ malashenko::Vector< std::string > malashenko::Network::bfsPath( const std::strin
 {
   Queue< std::string > q;
 
-  CuckooHashTable< std::string, bool, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > > visited;
-  CuckooHashTable< std::string, std::string , HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > > parent;
+  CuckooHashTable< std::string, bool, HmacHash< name_t >, SipHasher< name_t >, eqName_t > visited;
+  CuckooHashTable< std::string, std::string , HmacHash< name_t >, SipHasher< name_t >, eqName_t > parent;
 
   visited[from] = true;
   q.push(from);

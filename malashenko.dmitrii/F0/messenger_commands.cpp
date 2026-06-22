@@ -241,7 +241,7 @@ void malashenko::Messenger::help(std::istream&, std::ostream& out)
   )";
 }
 
-void malashenko::Messenger::save(std::istream& in,  std::ostream&)
+void malashenko::Messenger::save(std::istream& in,  std::ostream& out)
 {
   std::string filename;
   if (!(in >> filename))
@@ -250,9 +250,10 @@ void malashenko::Messenger::save(std::istream& in,  std::ostream&)
   }
   std::ofstream file(filename);
   net_.saveToFile(file);
+  detail::successMsg(out, "Data successfully saved to file");
 }
 
-void malashenko::Messenger::load(std::istream& in,  std::ostream&)
+void malashenko::Messenger::load(std::istream& in,  std::ostream& out)
 {
   std::string filename;
   if (!(in >> filename))
@@ -261,5 +262,6 @@ void malashenko::Messenger::load(std::istream& in,  std::ostream&)
   }
   std::ifstream file(filename);
   net_.loadFromFile(file);
+  detail::successMsg(out, "Data successfully loaded from file");
 }
 

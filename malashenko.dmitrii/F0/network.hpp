@@ -7,7 +7,6 @@
 #include <ctime>
 #include "cuckoo_hash_table.hpp"
 #include "hash_funcs.hpp"
-#include "equal_functor.hpp"
 namespace malashenko
 {
   namespace detail
@@ -55,21 +54,24 @@ namespace malashenko
     using pair_t = std::pair< name_t, name_t >;
     using user_t = detail::User;
     using msg_t = detail::Message;
+    using eqName_t = std::equal_to< name_t >;
+    using eqSize_t = std::equal_to< size_t >;
+    using eqPair_t = std::equal_to< pair_t >;
 
-    using userIter_t = Iterator< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > >;
-    using userCIter_t = ConstIterator< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > >;
+    using userIter_t = Iterator< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, eqName_t >;
+    using userCIter_t = ConstIterator< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, eqName_t >;
 
-    using msgIter_t = Iterator< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, Equal< size_t > >;
-    using msgCIter_t = ConstIterator< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, Equal< size_t > >;
+    using msgIter_t = Iterator< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, eqSize_t >;
+    using msgCIter_t = ConstIterator< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, eqSize_t >;
 
-    using chatIter_t = Iterator< pair_t, Vector< size_t >, HmacHash< pair_t >, SipHasher< pair_t >, Equal< pair_t > >;
-    using graphIter_t = Iterator< name_t, Vector< name_t >, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > >;
+    using chatIter_t = Iterator< pair_t, Vector< size_t >, HmacHash< pair_t >, SipHasher< pair_t >, eqPair_t >;
+    using graphIter_t = Iterator< name_t, Vector< name_t >, HmacHash< name_t >, SipHasher< name_t >, eqName_t >;
 
 
-    CuckooHashTable< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > > users_;
-    CuckooHashTable< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, Equal< size_t > > messages_;
-    CuckooHashTable< pair_t, Vector< size_t >, HmacHash< pair_t >, SipHasher< pair_t >, Equal< pair_t > > chats_;
-    CuckooHashTable< name_t, Vector< name_t >, HmacHash< name_t >, SipHasher< name_t >, Equal< name_t > > graph_;
+    CuckooHashTable< name_t, user_t, HmacHash< name_t >, SipHasher< name_t >, eqName_t > users_;
+    CuckooHashTable< size_t, msg_t, HmacHash< size_t >, SipHasher< size_t >, eqSize_t > messages_;
+    CuckooHashTable< pair_t, Vector< size_t >, HmacHash< pair_t >, SipHasher< pair_t >, eqPair_t > chats_;
+    CuckooHashTable< name_t, Vector< name_t >, HmacHash< name_t >, SipHasher< name_t >, eqName_t > graph_;
     size_t nextMessageId_ = 0;
 
     void showFullInfoMsg(std::ostream& out, const msg_t&) const;

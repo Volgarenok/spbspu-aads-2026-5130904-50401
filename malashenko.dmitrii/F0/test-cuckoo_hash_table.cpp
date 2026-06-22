@@ -3,17 +3,16 @@
 #include <boost/test/unit_test.hpp>
 #include "cuckoo_hash_table.hpp"
 #include "hash_funcs.hpp"
-#include "equal_functor.hpp"
 #include "cuckoo_iterator.hpp"
 
 namespace mal = malashenko;
 using cht_t = mal::CuckooHashTable< std::string, int,
               mal::HmacHash< std::string >, mal::SipHasher< std::string >,
-              mal::Equal< std::string > >;
+              std::equal_to< std::string > >;
 
 using chtIter_t = mal::Iterator< std::string, int,
               mal::HmacHash< std::string >, mal::SipHasher< std::string >,
-              mal::Equal< std::string > >;
+              std::equal_to< std::string > >;
 
 BOOST_AUTO_TEST_SUITE(containsh_table_constructors)
 BOOST_AUTO_TEST_CASE(common_constructors)

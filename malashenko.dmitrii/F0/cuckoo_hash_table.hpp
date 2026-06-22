@@ -18,7 +18,7 @@ namespace malashenko
   class Iterator;
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
   class ConstIterator;
-  template<class Key, class Value, class Hash1, class Hash2, class Equal >
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
   struct CuckooHashTable {
   public:
 
@@ -59,7 +59,7 @@ namespace malashenko
     cIter_t end() const noexcept;
     cIter_t cend() const noexcept;
 
-    void rehash(const size_t& newSize) noexcept;
+    void rehash(const size_t& newSize);
 
     size_t size() const noexcept;
     size_t max_size() const noexcept;
@@ -377,7 +377,7 @@ namespace malashenko
 
 
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
-  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::rehash(const size_t& newSize) noexcept
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::rehash(const size_t& newSize)
   {
     chTable_t newTable(newSize);
     newTable.max_steps_ = 2 * std::log2(newSize);
@@ -392,12 +392,9 @@ namespace malashenko
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
   void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::clear() noexcept
   {
-    chTable_t newTable(*this);
-    for (iter_t beg = begin(); beg != end(); ++beg)
-    {
-      newTable.erase(beg->key);
-    }
-    swap(newTable);
+    table_[0] = vec_t(capacity_, node_t{});
+    table_[1] = vec_t(capacity_, node_t{});
+    size_ = 0;
   }
 
   template<class Key, class Value, class Hash1, class Hash2, class Equal >
