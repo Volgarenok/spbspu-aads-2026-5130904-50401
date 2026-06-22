@@ -67,3 +67,44 @@ void donkeev::complementDicts(std::istream& input, std::ostream&, donkeev::Datas
 
   dicts.push(newName, std::move(result));
 }
+
+void donkeev::intersectDicts(std::istream& input, std::ostream&, donkeev::Datasets& dicts)
+{
+  std::string newName, name1, name2;
+  if (!(input >> newName >> name1 >> name2))
+  {
+    throw std::runtime_error("Bad input");
+  }
+
+  Datasets::iterator existing = dicts.find(newName);
+  Datasets::iterator it1 = dicts.find(name1);
+  Datasets::iterator it2 = dicts.find(name2);
+  if (existing != dicts.end() || it1 == dicts.end() || it2 == dicts.end())
+  {
+    throw std::runtime_error("Bad input");
+  }
+
+  const Dataset& dict1 = it1->second;
+  const Dataset& dict2 = it2->second;
+
+  Dataset result;
+
+  Dataset::constIterator begin1 = dict1.begin();
+  Dataset::constIterator end1 = dict1.end();
+  
+  while (begin1 != end1)
+  {
+    int key = begin1->first;
+    const std::string& value = begin1->second;
+    
+    Dataset::constIterator found = dict2.find(key);
+    if (found != dict2.end())
+    {
+      result.push(key, value);
+    }
+    
+    ++begin1;
+  }
+
+  dicts.push(newName, std::move(result));
+}
