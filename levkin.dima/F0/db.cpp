@@ -246,6 +246,72 @@ namespace rl {
                             : childrenMainSum;
     }
   }
+
+  void arrangeNode(RLNode& node)
+  {
+    if (node.children.getSize() == 0)
+      return;
+
+    bool isRow = (node.flexDirection == FlexDirection::Row);
+    float mainParentSize = isRow ? node.box.width : node.box.height;
+
+    float totalChildrenMainSize = 0.0f;
+    size_t validChildrenCount = 0;
+    for (size_t i = 0; i < node.children.getSize(); ++i) {
+      if (!node.children[i])
+        continue;
+      totalChildrenMainSize +=
+          isRow ? node.children[i]->box.width : node.children[i]->box.height;
+      validChildrenCount++;
+    }
+
+    if (validChildrenCount == 0)
+      return;
+
+    float freeSpace = mainParentSize - totalChildrenMainSize;
+    float currentMainPos = 0.0f;
+    float gap = 0.0f;
+
+    if (node.justify == JustifyContent::FlexEnd) {
+      currentMainPos = freeSpace;
+    } else if (node.justify == JustifyContent::Center) {
+      currentMainPos = freeSpace / 2.0f;
+    } else if (node.justify == JustifyContent::SpaceBetween) {
+      currentMainPos = 0.0f;
+      if (validChildrenCount > 1) {
+        gap = freeSpace / static_cast< float >(validChildrenCount - 1);
+      }
+    }
+
+    for (size_t i = 0; i < node.children.getSize(); ++i) {
+      if (!node.children[i])
+        continue;
+      auto& child = *node.children[i];
+      if (isRow) {
+        child.box.x = node.box.x + currentMainPos;
+      } else {
+        child.box.y = node.box.y + currentMainPos;
+      }
+      float crossParentSize = isRow ? node.box.height : node.box.width;
+      float crossChildSize = isRow ? child.box.height : child.box.width;
+      float currentCrossPos = 0.0f;
+
+      if (node.align == AlignItems::FlexEnd) {
+        currentCrossPos = crossParentSize - crossChildSize;
+      } else if (node.align == AlignItems::Center) {
+        currentCrossPos = (crossParentSize - crossChildSize) / 2.0f;
+      }
+
+      if (isRow) {
+        child.box.y = node.box.y + currentCrossPos;
+        currentMainPos += child.box.width + gap;
+      } else {
+        child.box.x = node.box.x + currentCrossPos;
+        currentMainPos += child.box.height + gap;
+      }
+      arrangeNode(child);
+    }
+  }
   void calculateLayout() {}
 
 }
