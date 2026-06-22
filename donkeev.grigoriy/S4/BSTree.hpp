@@ -44,10 +44,10 @@ namespace donkeev
     constIterator begin() const;
     constIterator end() const;
 
-    constIterator rotateRight(iterator);
-    constIterator rotateLeft(iterator);
-    constIterator largeRotateRight(iterator);
-    constIterator largeRotateLeft(iterator);
+    iterator rotateRight(iterator);
+    iterator rotateLeft(iterator);
+    iterator largeRotateRight(iterator);
+    iterator largeRotateLeft(iterator);
     void push(Key, const Value&);
     void push(Key, Value&&);
     Value& get(const Key);
@@ -58,6 +58,8 @@ namespace donkeev
     void swap(BSTree< Key, Value, Compare >&);
     bool empty() const;
     size_t size() const;
+    size_t height() const;
+    size_t height(constIterator) const;
 
   private:
     BSTNode< Key, Value >* root_;
@@ -68,6 +70,7 @@ namespace donkeev
     void removeNode(BSTNode< Key, Value >*);
     void clearRecursive(BSTNode< Key, Value >*);
     BSTNode< Key, Value >* findNode(const Key) const;
+    size_t heightRecursive(const BSTNode<Key, Value>*) const;
   };
 
   template< class Key, class Value, class Compare >
@@ -189,7 +192,7 @@ namespace donkeev
   }
 
   template<class Key, class Value, class Compare>
-  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::rotateRight(iterator it)
+  typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::rotateRight(iterator it)
   {
     BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->left_)
@@ -227,11 +230,11 @@ namespace donkeev
       rightGrandSon->parent_ = parent;
     }
 
-    return const_iterator(leftChild);
+    return leftChild;
   }
 
   template<class Key, class Value, class Compare>
-  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::rotateLeft(iterator it)
+  typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::rotateLeft(iterator it)
   {
     BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->right_)
@@ -269,11 +272,11 @@ namespace donkeev
       leftGrandSon->parent_ = parent;
     }
 
-    return const_iterator(rightChild);
+    return rightChild;
   }
 
   template<class Key, class Value, class Compare>
-  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::largeRotateRight(iterator it)
+  typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::largeRotateRight(iterator it)
   {
     BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->left_)
@@ -284,11 +287,11 @@ namespace donkeev
     iterator leftIt(parent->left_);
     rotateLeft(leftIt);
 
-    return rotateRight(it);
+    return it;
   }
 
   template<class Key, class Value, class Compare>
-  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::largeRotateLeft(iterator it)
+  typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::largeRotateLeft(iterator it)
   {
     BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->right_)
@@ -299,7 +302,7 @@ namespace donkeev
     iterator rightIt(parent->right_);
     rotateRight(rightIt);
 
-    return rotateLeft(it);
+    return it;
   }
 
   template< class Key, class Value, class Compare >
@@ -493,6 +496,19 @@ namespace donkeev
     return size_;
   }
 
+  template<class Key, class Value, class Compare>
+  size_t BSTree<Key, Value, Compare>::height() const
+  {
+    return heightRecursive(root_);
+  }
+
+  template<class Key, class Value, class Compare>
+  size_t BSTree<Key, Value, Compare>::height(constIterator it) const
+  {
+    BSTNode<Key, Value>* node = it.getNode();
+    return heightRecursive(node);
+  }
+
   template< class Key, class Value, class Compare >
   BSTNode< Key, Value >* BSTree< Key, Value, Compare >::cloneRecursive(const BSTNode< Key, Value >* node, BSTNode< Key, Value >* parent)
   {
@@ -676,6 +692,20 @@ namespace donkeev
     }
 
     return nullptr;
+  }
+
+  template<class Key, class Value, class Compare>
+  size_t BSTree<Key, Value, Compare>::heightRecursive(const BSTNode<Key, Value>* node) const
+  {
+    if (!node)
+    {
+      return 0;
+    }
+    
+    size_t leftHeight = heightRecursive(node->left_);
+    size_t rightHeight = heightRecursive(node->right_);
+    
+    return 1 + (leftHeight > rightHeight ? leftHeight : rightHeight);
   }
 }
 

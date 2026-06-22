@@ -9,6 +9,9 @@ namespace donkeev
   template< class Key, class Value >
   class BSTIterator
   {
+    template<class K, class V, class C>
+    friend class BSTree;
+
   public:
     BSTIterator();
 
