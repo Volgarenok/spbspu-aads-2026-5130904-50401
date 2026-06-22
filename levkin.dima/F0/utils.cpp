@@ -35,18 +35,18 @@ namespace rl {
        << "width: " << node.box.width << "px; " << "height: " << node.box.height
        << "px; " << "border: 2px solid " << borderColor << "; "
        << "box-sizing: border-box; "
-       << "background-color: rgba(0, 0, 0, 0.03);\">" << "<span style=\""
-       << "position: absolute; " << "background: white; "
+       << "background-color: rgba(0, 0, 0, 0.02);\">\n"
+       << "<span style=\"" << "position: absolute; " << "background: white; "
        << "font-family: monospace; " << "font-size: 11px; "
        << "padding: 1px 3px; " << "border: 1px solid #ccc;\">" << node.id
-       << "</span>";
+       << "</span>\n"
+       << "</div>\n";
 
     for (size_t i = 0; i < node.children.getSize(); ++i) {
       if (node.children[i]) {
         exportNodeToHtml(os, *node.children[i]);
       }
     }
-    os << "</div>\n";
   }
 
   void saveVisualTree(const RLRootNode* rootNode, const std::string& filename)
@@ -72,5 +72,4 @@ namespace rl {
 
     file << "</div>\n</body>\n</html>\n";
   }
-
 }
