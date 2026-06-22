@@ -31,6 +31,8 @@ namespace donkeev
     bool operator!=(const BSTIterator< Key, Value >&) const noexcept;
   private:
     BSTNode< Key, Value >* node_;
+
+    BSTNode< Key, Value >* getNode();
   };
 
   template< class Key, class Value >
@@ -58,6 +60,8 @@ namespace donkeev
     bool operator!=(const BSTCIterator< Key, Value >&) const noexcept;
   private:
     const BSTNode< Key, Value >* node_;
+
+    const BSTNode< Key, Value >* getNode();
   };
 
   template< class Key, class Value >
@@ -164,6 +168,12 @@ namespace donkeev
   }
 
   template< class Key, class Value >
+  BSTNode< Key, Value>* BSTIterator< Key, Value >::getNode()
+  {
+    return node_;
+  }
+
+  template< class Key, class Value >
   BSTCIterator< Key, Value >::BSTCIterator():
     node_(nullptr)
   {}
@@ -267,6 +277,12 @@ namespace donkeev
   }
 
   template< class Key, class Value >
+  const BSTNode< Key, Value>* BSTCIterator< Key, Value >::getNode()
+  {
+    return node_;
+  }
+
+  template< class Key, class Value >
   BSTNode< Key, Value >* fallLeft(BSTNode< Key, Value >* nodePtr)
   {
     if (!nodePtr)
@@ -305,7 +321,7 @@ namespace donkeev
     {
       return nullptr;
     }
-    
+
     while (nodePtr->right_)
     {
       nodePtr = nodePtr->right_;
@@ -327,7 +343,31 @@ namespace donkeev
   }
 
   template< class Key, class Value >
+  const BSTNode< Key, Value >* getNextParent(const BSTNode< Key, Value >* nodePtr)
+  {
+    while (nodePtr->parent_ && nodePtr == nodePtr->parent_->right_)
+    {
+      nodePtr = nodePtr->parent_;
+    }
+
+    nodePtr = nodePtr->parent_;
+    return nodePtr;
+  }
+
+  template< class Key, class Value >
   BSTNode< Key, Value >* getPrevParent(BSTNode< Key, Value >* nodePtr)
+  {
+    while (nodePtr->parent_ && nodePtr == nodePtr->parent_->left_)
+    {
+      nodePtr = nodePtr->parent_;
+    }
+
+    nodePtr = nodePtr->parent_;
+    return nodePtr;
+  }
+
+  template< class Key, class Value >
+  const BSTNode< Key, Value >* getPrevParent(const BSTNode< Key, Value >* nodePtr)
   {
     while (nodePtr->parent_ && nodePtr == nodePtr->parent_->left_)
     {
