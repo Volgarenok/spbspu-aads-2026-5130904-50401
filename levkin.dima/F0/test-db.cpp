@@ -211,5 +211,81 @@ BOOST_AUTO_TEST_CASE(test_layout_with_margins_and_paddings)
     BOOST_CHECK_EQUAL(child1->box.width, 200.0f);
     BOOST_CHECK_EQUAL(child2->box.width, 300.0f);
     
-    rl::saveVisualTree(db.getActive(), "layout_offsets_debug.html");
+    //rl::saveVisualTree(db.getActive(), "layout_offsets_debug.html");
+}
+
+BOOST_AUTO_TEST_CASE(test_deeply_nested_complex_layout)
+{
+    RootDB db;
+    db.createNewLayout("complex_app", "dummy_path", 1920.0f, 1080.0f);
+    RLRootNode* rootNode = db.getActive();
+    
+    rootNode->root.flexDirection = FlexDirection::Column;
+    rootNode->root.justify = JustifyContent::FlexStart;
+    rootNode->root.align = AlignItems::FlexStart;
+    rootNode->root.padding = {10.0f, 10.0f, 10.0f, 10.0f};
+
+    auto headerNode = std::make_unique<RLNode>("header", 1900.0f, 80.0f, FlexDirection::Row);
+    headerNode->margin.bottom = 20.0f; 
+    RLNode* headerPtr = headerNode.get();
+    rootNode->root.addChild(std::move(headerNode));
+
+    auto mainContainer = std::make_unique<RLNode>("main_container", 1900.0f, -1.0f, FlexDirection::Row);
+    mainContainer->padding = {15.0f, 15.0f, 15.0f, 15.0f};
+    RLNode* mainContainerPtr = mainContainer.get();
+
+    auto sidebar = std::make_unique<RLNode>("sidebar", 300.0f, 600.0f, FlexDirection::Column);
+    sidebar->margin.right = 30.0f;
+    RLNode* sidebarPtr = sidebar.get();
+    mainContainerPtr->addChild(std::move(sidebar));
+
+    auto contentArea = std::make_unique<RLNode>("content_area", -1.0f, -1.0f, FlexDirection::Column);
+    contentArea->justify = JustifyContent::SpaceBetween; 
+    RLNode* contentAreaPtr = contentArea.get();
+
+    auto cardRow = std::make_unique<RLNode>("card_row", 1200.0f, 250.0f, FlexDirection::Row);
+    cardRow->justify = JustifyContent::Center; 
+    cardRow->align = AlignItems::Center;
+    RLNode* cardRowPtr = cardRow.get();
+    contentAreaPtr->addChild(std::move(cardRow));
+
+    auto card1 = std::make_unique<RLNode>("card_1", 400.0f, 180.0f, FlexDirection::Row);
+    card1->margin.right = 20.0f;
+    auto card2 = std::make_unique<RLNode>("card_2", 400.0f, 180.0f, FlexDirection::Row);
+    
+    RLNode* card1Ptr = card1.get();
+    RLNode* card2Ptr = card2.get();
+    cardRowPtr->addChild(std::move(card1));
+    cardRowPtr->addChild(std::move(card2));
+
+    mainContainerPtr->addChild(std::move(contentArea));
+    rootNode->root.addChild(std::move(mainContainer));
+
+    rootNode->mapOfNodes.add("header", headerPtr);
+    rootNode->mapOfNodes.add("main_container", mainContainerPtr);
+    rootNode->mapOfNodes.add("sidebar", sidebarPtr);
+    rootNode->mapOfNodes.add("content_area", contentAreaPtr);
+    rootNode->mapOfNodes.add("card_row", cardRowPtr);
+    rootNode->mapOfNodes.add("card_1", card1Ptr);
+    rootNode->mapOfNodes.add("card_2", card2Ptr);
+
+    db.calculateLayout();
+
+    BOOST_CHECK_EQUAL(headerPtr->box.x, 10.0f);
+    BOOST_CHECK_EQUAL(headerPtr->box.y, 10.0f);
+    BOOST_CHECK_EQUAL(mainContainerPtr->box.x, 10.0f);
+    BOOST_CHECK_EQUAL(mainContainerPtr->box.y, 110.0f);
+    BOOST_CHECK_EQUAL(sidebarPtr->box.x, 25.0f);
+    BOOST_CHECK_EQUAL(sidebarPtr->box.y, 125.0f);
+    BOOST_CHECK_EQUAL(contentAreaPtr->box.x, 355.0f);
+    BOOST_CHECK_EQUAL(contentAreaPtr->box.y, 125.0f);
+    BOOST_CHECK_EQUAL(cardRowPtr->box.x, 355.0f);
+    BOOST_CHECK_EQUAL(cardRowPtr->box.y, 125.0f);
+    BOOST_CHECK_EQUAL(card1Ptr->box.x, 545.0f);
+    BOOST_CHECK_EQUAL(card1Ptr->box.y, 160.0f);
+    BOOST_CHECK_EQUAL(card2Ptr->box.x, 965.0f);
+    BOOST_CHECK_EQUAL(card2Ptr->box.y, 160.0f);
+    BOOST_CHECK_EQUAL(cardRowPtr->box.width, 1200.0f);
+    BOOST_CHECK_EQUAL(contentAreaPtr->box.width, 1200.0f);
+    rl::saveVisualTree(db.getActive(), "complex_nesting_debug.html");
 }
