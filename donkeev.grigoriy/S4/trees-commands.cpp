@@ -28,9 +28,9 @@ void donkeev::printDicts(std::istream& input, std::ostream& output, donkeev::Dat
     output << " " << begin->first << " " << begin->second;
   }
 
-  if (!tree.empty())
+  if (tree.empty())
   {
-    output << "\n";
+    output << "<EMPTY>\n";
   }
 }
 
