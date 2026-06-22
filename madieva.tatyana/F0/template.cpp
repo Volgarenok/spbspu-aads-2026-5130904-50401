@@ -15,7 +15,6 @@ madieva::Template::Template(const std::string & filename):
   loadFromFile(filename);
 }
 
-
 bool madieva::Template::loadFromFile(const std::string & filename)
 {
   std::fstream file;
@@ -23,92 +22,86 @@ bool madieva::Template::loadFromFile(const std::string & filename)
   if (!file.is_open()) {
     return false;
   }
-  size_t rows = 0;
-  size_t cols = 0;
-  if (!(file >> rows >> cols)) {
+
+  try {
+    size_t rows = 0;
+    size_t cols = 0;
+    if (!(file >> rows >> cols)) {
+      file.close();
+      return false;
+    }
+    if (rows == 0 || cols == 0 || rows > 1000 || cols > 1000) {
+      file.close();
+      return false;
+    }
+    Vector< Vector< size_t > > tempRowHints;
+    Vector< Vector< size_t > > tempColHints;
+
+    tempRowHints.reserve(rows);
+    tempColHints.reserve(cols);
+
+    for (size_t i = 0; i < rows_; ++i) {
+      tempRowHints.pushBack(Vector< size_t >());
+    }
+
+    for (size_t i = 0; i < cols_; ++i) {
+      tempColHints.pushBack(Vector< size_t >());
+    }
+
+    std::string line;
+    for (size_t i = 0; i < rows_; ++i) {
+      if (!std::getline(file, line)) {
+        file.close();
+        return false;
+      }
+      std::istringstream iss(line);
+      size_t num;
+      while (iss >> num) {
+        tempRowHints[i].pushBack(num);
+      }
+      if (iss.fail() && !iss.eof()) {
+        file.close();
+        return false;
+      }
+    }
+
+    for (size_t i = 0; i < cols_; ++i) {
+      if (!std::getline(file, line)) {
+        file.close();
+        return false;
+      }
+      std::istringstream iss(line);
+      size_t num;
+      while (iss >> num) {
+        tempColHints[i].pushBack(num);
+      }
+      if (iss.fail() && !iss.eof()) {
+        file.close();
+        return false;
+      }
+    }
+
+    if (file.fail() && !file.eof()) {
+      file.close();
+      return false;
+    }
     file.close();
-    return false;
-  }
-  if (rows == 0 || cols == 0 || rows > 1000 || cols > 1000) {
+
+    rows_ = rows;
+    cols_ = cols;
+    fill_ = 0;
+    rowHints_ = std::move(tempRowHints);
+    colHints_ = std::move(tempColHints);
+    isSolvable_ = solve();
+    return true;
+  } catch (const std::bad_alloc &) {
     file.close();
-    return false;
-  }
-  Vector< Vector< size_t > > tempRowHints;
-  Vector< Vector< size_t > > tempColHints;
-
-  tempRowHints.reserve(rows);
-  tempColHints.reserve(cols);
-  
-  for (size_t i = 0; i < rows_; ++i) {
-    tempRowHints.pushBack(Vector< size_t >());
-  }
-  
-  for (size_t i = 0; i < cols_; ++i) {
-    tempColHints.pushBack(Vector< size_t >());
-  }
-
-  std::string line;
-  for (size_t i = 0; i < rows_; ++i) {
-    if (!std::getline(file, line)) {
-      file.close();
-      return false;
-    }
-    std::istringstream iss(line);
-    size_t num;
-    while (iss >> num) {
-      tempRowHints[i].pushBack(num);
-    }
-    if (iss.fail() && !iss.eof()) {
-      file.close();
-      return false;
-    }
-  }
-
-  for (size_t i = 0; i < cols_; ++i) {
-    if (!std::getline(file, line)) {
-      file.close();
-      return false;
-    }
-    std::istringstream iss(line);
-    size_t num;
-    while (iss >> num) {
-      tempColHints[i].pushBack(num);
-    }
-    if (iss.fail() && !iss.eof()) {
-      file.close();
-      return false;
-    }
-  }
-
-  if (file.fail() && !file.eof()) {
+    throw;
+  } catch (...) {
     file.close();
-    return false;
-  }
-  file.close();
-
-  size_t totalRowHints = 0;
-  for (size_t i = 0; i < rows; ++i) {
-    for (size_t j = 0; j < tempRowHints[i].getSize(); ++j) {
-      totalRowHints += tempRowHints[i][j];
-    }
+    throw;
   }
 
-  size_t totalColHints = 0;
-  for (size_t i = 0; i < cols; ++i) {
-    for (size_t j = 0; j < tempColHints[i].getSize(); ++j) {
-      totalColHints += tempColHints[i][j];
-    }
-  }
-  if (totalRowHints != totalColHints) {
-    return false;
-  }
-  rows_ = rows;
-  cols_ = cols;
-  fill_ = 0;
-  rowHints_ = std::move(tempRowHints);
-  colHints_ = std::move(tempColHints);
-  isSolvable_ = solve();
-  return true;
 }
 
 size_t madieva::Template::getRows() const noexcept
@@ -141,6 +134,12 @@ const madieva::Vector< madieva::Vector< int > > & madieva::Template::getSolution
   return solution_;
 }
 
+bool madieva::Template::solvable() const noexcept
+{
+  return isSolvable_;
+}
+
+
 bool madieva::Template::solve()
 {
   size_t sumrow = 0;
@@ -162,7 +161,7 @@ bool madieva::Template::solve()
   }
   Vector< Vector< int > > result = solvePuzzle(rowHints_, colHints_, rows_, cols_);
   if (result.getSize() != 0) {
-    solution_ = result;
+    solution_ = std::move(result);
     isSolvable_ = true;
     fill_ = sumcol;
     return true;

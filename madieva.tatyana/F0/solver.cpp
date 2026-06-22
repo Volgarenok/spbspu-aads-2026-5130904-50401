@@ -162,15 +162,16 @@ void madieva::generateVariants(
 }
 
 madieva::Vector< madieva::Vector< int > > madieva::solvePuzzle(
-    const Vector< Vector< size_t > > & rowHints,
-    const Vector< Vector< size_t > > & colHints,
-    size_t rows,
-    size_t cols)
+  const Vector< Vector< size_t > > & rowHints,
+  const Vector< Vector< size_t > > & colHints,
+  size_t rows,
+  size_t cols)
 {
   Vector< Vector< int > > picture;
   picture.reserve(rows);
   for (size_t i = 0; i < rows; ++i) {
     picture.pushBack(Vector< int >());
+    picture[i].reserve(cols);
     for (size_t j = 0; j < cols; ++j) {
       picture[i].pushBack(0);
     }
@@ -188,7 +189,7 @@ madieva::Vector< madieva::Vector< int > > madieva::solvePuzzle(
       bool lineChanged = analyzeLine(picture[i], rowHints[i], newLine);
 
       if (lineChanged) {
-        picture[i] = newLine;
+        picture[i] = std::move(newLine);
         changed = true;
       }
     }

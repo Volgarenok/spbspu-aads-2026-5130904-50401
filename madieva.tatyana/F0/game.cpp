@@ -1,6 +1,8 @@
 #include "game.hpp"
 #include <fstream>
 #include <sstream>
+#include <algorithm>
+#include <iterator>
 #include "template.hpp"
 #include "solver.hpp"
 
@@ -12,7 +14,9 @@ madieva::Game::Game(const Template & tmpl):
   colHints_(tmpl.getColHints()),
   solution_(tmpl.getSolution()),
   filledCount_(0),
-  totalFilled_(tmpl.getFill())
+  totalFilled_(tmpl.getFill()),
+  cachedMaxRowHintLen_(0),
+  cachedMaxColHintLen_(0)
 {
   state_.reserve(rows_);
   for (size_t i = 0; i < rows_; ++i) {
@@ -21,6 +25,8 @@ madieva::Game::Game(const Template & tmpl):
       state_[i].pushBack(0);
     }
   }
+  getMaxRowHintLength();
+  getMaxColHintLength();
 }
 
 madieva::Game::Game(const Game & game):
@@ -31,7 +37,9 @@ madieva::Game::Game(const Game & game):
   colHints_(game.colHints_),
   solution_(game.solution_),
   filledCount_(0),
-  totalFilled_(game.totalFilled_)
+  totalFilled_(game.totalFilled_),
+  cachedMaxRowHintLen_(game.cachedMaxRowHintLen_),
+  cachedMaxColHintLen_(game.cachedMaxColHintLen_)
 {
   state_.reserve(rows_);
   for (size_t i = 0; i < rows_; ++i) {
@@ -50,11 +58,15 @@ madieva::Game::Game(const std::string & filename):
   colHints_(),
   solution_(),
   filledCount_(0),
-  totalFilled_(0)
+  totalFilled_(0),
+  cachedMaxRowHintLen_(0),
+  cachedMaxColHintLen_(0)
 {
   if (!loadFromFile(filename)) {
     throw std::runtime_error("Failed to load game from file: " + filename);
   }
+  getMaxRowHintLength();
+  getMaxColHintLength();
 }
 
 bool madieva::Game::isInBounds(size_t row, size_t col) const
@@ -130,6 +142,46 @@ size_t madieva::Game::getTotalFilled() const noexcept
 const madieva::Vector< madieva::Vector< int > > & madieva::Game::getState() const
 {
   return state_;
+}
+
+void madieva::Game::getMaxRowHintLength()
+{
+  size_t maxrow = 0;
+  for (size_t i = 0; i < rowHints_.getSize(); ++i) {
+    size_t count = 0;
+    for (size_t j = 0; j < rowHints_[i].getSize(); ++j) {
+      if (rowHints_[i][j] > 9) {
+        count += 2;
+      } else {
+        count++;
+      }
+    }
+    count += rowHints_.getSize() - 1;
+    if (count > maxrow) {
+      maxrow = count;
+    }
+  }
+  cachedMaxRowHintLen_ = maxrow;
+}
+
+void madieva::Game::getMaxColHintLength()
+{
+  size_t maxcol = 0;
+  for (size_t i = 0; i < colHints_.getSize(); ++i) {
+    size_t count = 0;
+    for (size_t j = 0; j < colHints_[i].getSize(); ++j) {
+      if (colHints_[i][j] > 9) {
+        count += 2;
+      } else {
+        count++;
+      }
+    }
+    count += colHints_.getSize() - 1;
+    if (count > maxcol) {
+      maxcol = count;
+    }
+  }
+  cachedMaxColHintLen_ = maxcol;
 }
 
 bool madieva::Game::saveToFile(const std::string & filename) const
@@ -264,14 +316,14 @@ bool madieva::Game::loadFromFile(const std::string & filename)
     return false;
   }
   if (tempState.getSize() != rows) {
-      file.close();
-      return false;
+    file.close();
+    return false;
   }
   for (size_t i = 0; i < tempState.getSize(); ++i) {
-      if (tempState[i].getSize() != cols) {
-          file.close();
-          return false;
-      }
+    if (tempState[i].getSize() != cols) {
+      file.close();
+      return false;
+    }
   }
 
   Vector< Vector< int > > result = solvePuzzle(tempRowHints, tempColHints, rows, cols);
@@ -301,4 +353,11 @@ bool madieva::Game::loadFromFile(const std::string & filename)
   totalFilled_ = totalFilled;
   filledCount_ = filledCount;
   return true;
+}
+
+void madieva::Game::print(std::ostream & out) const
+{
+  for (size_t i = 0; i < cachedMaxRowHintLen_ + 2; ++i) {
+
+  }
 }

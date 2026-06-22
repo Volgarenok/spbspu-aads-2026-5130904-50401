@@ -16,7 +16,8 @@ namespace madieva
     CuckooHashTable & operator=(const CuckooHashTable & other);
     ~CuckooHashTable() = default;
 
-    void insert(const Key & key, const Value & value);
+    template< typename K, typename V >
+    void insert(K && key, V && value);
     bool contains(const Key & key) const;
     Value & get(const Key & key);
     const Value & get(const Key & key) const;
@@ -89,55 +90,56 @@ namespace madieva
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >
-  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insert(const Key & key, const Value & value)
+  template< typename K, typename V >
+  void CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::insert(K && key, V && value)
   {
     if (contains(key)) {
       size_t idx1 = index1(key);
       if (isOccupied(table1_[idx1]) && equal_(table1_[idx1].first, key)) {
-        table1_[idx1].second = value;
+        table1_[idx1].second = std::forward< V >(value);
         return;
       }
 
       size_t idx2 = index2(key);
       if (isOccupied(table2_[idx2]) && equal_(table2_[idx2].first, key)) {
-        table2_[idx2].second = value;
+        table2_[idx2].second = std::forward< V >(value);
         return;
       }
     }
 
-    Pair newPair(key, value);
+    Pair newPair(std::forward< K >(key), std::forward< V >(value));
     size_t steps = 0;
 
     while (steps < maxRehashSteps_) {
       size_t idx1 = index1(newPair.first);
 
       if (!isOccupied(table1_[idx1])) {
-        table1_[idx1] = newPair;
+        table1_[idx1] = std::move(newPair);
         ++size_;
         return;
       }
 
-      Pair displaced = table1_[idx1];
-      table1_[idx1] = newPair;
-      newPair = displaced;
+      Pair displaced = std::move(table1_[idx1]);
+      table1_[idx1] = std::move(newPair);
+      newPair = std::move(displaced);
       ++steps;
 
       size_t idx2 = index2(newPair.first);
 
       if (!isOccupied(table2_[idx2])) {
-        table2_[idx2] = newPair;
+        table2_[idx2] = std::move(newPair);
         ++size_;
         return;
       }
 
-      displaced = table2_[idx2];
-      table2_[idx2] = newPair;
-      newPair = displaced;
+      displaced = std::move(table2_[idx2]);
+      table2_[idx2] = std::move(newPair);
+      newPair = std::move(displaced);
       ++steps;
     }
 
     rehash();
-    insert(newPair.first, newPair.second);
+    insert(std::move(newPair.first), std::move(newPair.second));
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >

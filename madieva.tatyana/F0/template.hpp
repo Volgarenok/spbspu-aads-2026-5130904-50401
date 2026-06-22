@@ -9,7 +9,7 @@ namespace madieva {
   class Template
   {
   public:
-    Template() = default;
+    Template() noexcept = default;
     Template(const std::string & filename);
 
     bool loadFromFile(const std::string & filename);
@@ -20,6 +20,7 @@ namespace madieva {
     const Vector< Vector< size_t > > & getRowHints() const;
     const Vector< Vector< size_t > > & getColHints() const;
     const Vector< Vector< int > > & getSolution() const;
+    bool solvable() const noexcept;
 
   private:
     size_t rows_;
