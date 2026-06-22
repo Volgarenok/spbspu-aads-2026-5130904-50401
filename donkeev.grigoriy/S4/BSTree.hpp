@@ -57,6 +57,7 @@ namespace donkeev
     void clear();
     void swap(BSTree< Key, Value, Compare >&);
     bool empty() const;
+    size_t size() const;
 
   private:
     BSTNode< Key, Value >* root_;
@@ -486,6 +487,12 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Compare >
+  size_t BSTree< Key, Value, Compare >::size() const
+  {
+    return size_;
+  }
+
+  template< class Key, class Value, class Compare >
   BSTNode< Key, Value >* BSTree< Key, Value, Compare >::cloneRecursive(const BSTNode< Key, Value >* node, BSTNode< Key, Value >* parent)
   {
     if (!node)
@@ -494,14 +501,14 @@ namespace donkeev
     }
 
     BSTNode< Key, Value >* new_node = new BSTNode< Key, Value >{
-      {node->data.first, node->data.second},
+      {node->data_.first, node->data_.second},
       nullptr,
       nullptr,
       nullptr
     };
-    new_node->parent = parent;
-    new_node->left = cloneRecursive(node->left, new_node);
-    new_node->right = cloneRecursive(node->right, new_node);
+    new_node->parent_ = parent;
+    new_node->left_ = cloneRecursive(node->left_, new_node);
+    new_node->right_ = cloneRecursive(node->right_, new_node);
 
     return new_node;
   }
