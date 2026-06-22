@@ -51,11 +51,11 @@ namespace donkeev
     void push(Key, const Value&);
     void push(Key, Value&&);
     Value& get(const Key);
-    BSTNode< Key, Value >* find(const Key);
+    BSTNode< Key, Value >* find(const Key) const;
     Value drop(const Key);
     void clear();
     void swap(BSTree< Key, Value, Compare >&);
-    bool empty();
+    bool empty() const;
 
   private:
     BSTNode< Key, Value >* root_;
@@ -433,9 +433,33 @@ namespace donkeev
   }
 
   template<class Key, class Value, class Compare>
+  BSTNode<Key, Value>* BSTree<Key, Value, Compare>::find(const Key key) const
+  {
+    BSTNode<Key, Value>* current = root_;
+    
+    while (current)
+    {
+      if (compareFunc_(key, current->data_.first))
+      {
+        current = current->left_;
+      }
+      else if (compareFunc_(current->data_.first, key))
+      {
+        current = current->right_;
+      }
+      else
+      {
+        return current;
+      }
+    }
+    
+    return nullptr;
+}
+
+  template<class Key, class Value, class Compare>
   Value BSTree<Key, Value, Compare>::drop(const Key key)
   {
-    BSTNode<Key, Value>* node = findNode(key);
+    BSTNode<Key, Value>* node = find(key);
     if (!node)
     {
       throw std::runtime_error("No such element");
@@ -464,7 +488,7 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Compare >
-  bool BSTree< Key, Value, Compare >::empty()
+  bool BSTree< Key, Value, Compare >::empty() const
   {
     return size_ == 0;
   }
