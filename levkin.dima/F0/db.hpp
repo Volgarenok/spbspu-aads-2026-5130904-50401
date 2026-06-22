@@ -13,7 +13,7 @@ namespace rl {
     std::string filePath;
     RLNode root;
     Map< std::string, RLNode* > mapOfNodes;
-
+    void calculateLayout();
     RLRootNode()
     {
       root.id = "root";

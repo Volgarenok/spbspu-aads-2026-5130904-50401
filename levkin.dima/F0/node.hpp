@@ -20,8 +20,8 @@ namespace rl {
     Sides margin;
     Sides padding;
 
-    float width = -1.0f;
-    float height = -1.0f;
+    Size width{SizeType::Auto, 0.0f};
+    Size height{SizeType::Auto, 0.0f};
 
     FlexDirection flexDirection = FlexDirection::Row;
     JustifyContent justify = JustifyContent::FlexStart;

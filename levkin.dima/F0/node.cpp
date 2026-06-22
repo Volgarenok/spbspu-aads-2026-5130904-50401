@@ -26,7 +26,8 @@ namespace rl {
   }
 
   RLNode::RLNode(std::string nodeId, float w, float h, FlexDirection dir)
-      : id(std::move(nodeId)), width(w), height(h), flexDirection(dir)
+      : id(std::move(nodeId)), width(Size::fromFloat(w)),
+        height(Size::fromFloat(h)), flexDirection(dir)
   {
   }
 
@@ -77,8 +78,8 @@ namespace rl {
   void RLNode::reset() noexcept
   {
     parent = nullptr;
-    width = -1.0f;
-    height = -1.0f;
+    width = Size::fromFloat(-1.0f);
+    height = Size::fromFloat(-1.0f);
     box.x = 0.0f;
     box.y = 0.0f;
     box.width = 0.0f;

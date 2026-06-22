@@ -4,6 +4,31 @@
 #include <iostream>
 #include <sstream>
 namespace rl {
+  void initLayout(std::istream& in, std::ostream& out, RootDB& db, RLRootNode*)
+  {
+    std::string layoutName;
+    if (!(in >> layoutName)) {
+      out << "Error: init requires a layout name\n";
+      return;
+    }
+
+    std::string filePath;
+    if (in >> filePath) {
+      db.createNewLayout(
+          layoutName, filePath, config::DEFAULT_WIDTH, config::DEFAULT_HEIGHT);
+
+      db.loadFromFile(filePath);
+    } else {
+      std::string defaultPath = generateLayoutPath(layoutName);
+      db.createNewLayout(
+          layoutName, defaultPath, config::DEFAULT_WIDTH,
+          config::DEFAULT_HEIGHT);
+    }
+
+    db.selectLayout(layoutName);
+
+    out << "Layout '" << layoutName << "' initialized successfully.\n";
+  }
   std::string generateUniqueId(const Map< std::string, RLNode* >& mapOfNodes)
   {
     static size_t counter = 1;

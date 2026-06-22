@@ -198,5 +198,9 @@ namespace rl {
   {
     return storage.has(name);
   }
+void calculateLayout() {
+    
+}
+
 
 }
