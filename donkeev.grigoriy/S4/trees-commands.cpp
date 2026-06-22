@@ -175,6 +175,6 @@ void donkeev::uniteDicts(std::istream& input, std::ostream&, donkeev::Datasets& 
   {
     dicts.drop(newName);
   }
-  
+
   dicts.push(newName, std::move(result));
 }
