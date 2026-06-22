@@ -199,7 +199,7 @@ namespace rl {
     return storage.has(name);
   }
 
-  void measureNode(RLNode& node)
+  static void measureNode(RLNode& node)
   {
     for (size_t i = 0; i < node.children.getSize(); ++i) {
       if (node.children[i]) {
@@ -212,60 +212,54 @@ namespace rl {
     node.box.height =
         (node.height.type == SizeType::Pixels) ? node.height.value : 0.0f;
 
-    if (node.children.getSize() == 0) {
+    if (node.children.getSize() == 0)
       return;
-    }
 
     float childrenMainSum = 0.0f;
     float childrenCrossMax = 0.0f;
+    const FlexDirection dir = node.flexDirection;
 
-    for (const auto& child : node.children) {
-      if (!child)
+    for (size_t i = 0; i < node.children.getSize(); ++i) {
+      if (!node.children[i]) {
         continue;
-      const auto& childBox = child->box;
+      }
+      const auto& childBox = node.children[i]->box;
 
-      if (node.flexDirection == FlexDirection::Row) {
-        childrenMainSum += childBox.width;
-        if (childBox.height > childrenCrossMax)
-          childrenCrossMax = childBox.height;
-      } else {
-        childrenMainSum += childBox.height;
-        if (childBox.width > childrenCrossMax)
-          childrenCrossMax = childBox.width;
+      childrenMainSum += childBox.mainSize(dir);
+      if (childBox.crossSize(dir) > childrenCrossMax) {
+        childrenCrossMax = childBox.crossSize(dir);
       }
     }
 
     if (node.width.type == SizeType::Auto) {
-      node.box.width = (node.flexDirection == FlexDirection::Row)
-                           ? childrenMainSum
-                           : childrenCrossMax;
+      node.box.mainSize(dir) =
+          (dir == FlexDirection::Row) ? childrenMainSum : childrenCrossMax;
     }
     if (node.height.type == SizeType::Auto) {
-      node.box.height = (node.flexDirection == FlexDirection::Row)
-                            ? childrenCrossMax
-                            : childrenMainSum;
+      node.box.crossSize(dir) =
+          (dir == FlexDirection::Row) ? childrenCrossMax : childrenMainSum;
     }
   }
 
-  void arrangeNode(RLNode& node)
+  static void arrangeNode(RLNode& node)
   {
     if (node.children.getSize() == 0)
       return;
 
-    bool isRow = (node.flexDirection == FlexDirection::Row);
-    float mainParentSize = isRow ? node.box.width : node.box.height;
+    const FlexDirection dir = node.flexDirection;
+    const float mainParentSize = node.box.mainSize(dir);
 
     float totalChildrenMainSize = 0.0f;
-    size_t validChildrenCount = 0;
+    size_t validChildren = 0;
+
     for (size_t i = 0; i < node.children.getSize(); ++i) {
       if (!node.children[i])
         continue;
-      totalChildrenMainSize +=
-          isRow ? node.children[i]->box.width : node.children[i]->box.height;
-      validChildrenCount++;
+      totalChildrenMainSize += node.children[i]->box.mainSize(dir);
+      validChildren++;
     }
 
-    if (validChildrenCount == 0)
+    if (validChildren == 0)
       return;
 
     float freeSpace = mainParentSize - totalChildrenMainSize;
@@ -276,24 +270,18 @@ namespace rl {
       currentMainPos = freeSpace;
     } else if (node.justify == JustifyContent::Center) {
       currentMainPos = freeSpace / 2.0f;
-    } else if (node.justify == JustifyContent::SpaceBetween) {
-      currentMainPos = 0.0f;
-      if (validChildrenCount > 1) {
-        gap = freeSpace / static_cast< float >(validChildrenCount - 1);
-      }
+    } else if (
+        node.justify == JustifyContent::SpaceBetween && validChildren > 1) {
+      gap = freeSpace / static_cast< float >(validChildren - 1);
     }
 
     for (size_t i = 0; i < node.children.getSize(); ++i) {
       if (!node.children[i])
         continue;
       auto& child = *node.children[i];
-      if (isRow) {
-        child.box.x = node.box.x + currentMainPos;
-      } else {
-        child.box.y = node.box.y + currentMainPos;
-      }
-      float crossParentSize = isRow ? node.box.height : node.box.width;
-      float crossChildSize = isRow ? child.box.height : child.box.width;
+      child.box.mainPos(dir) = node.box.mainPos(dir) + currentMainPos;
+      float crossParentSize = node.box.crossSize(dir);
+      float crossChildSize = child.box.crossSize(dir);
       float currentCrossPos = 0.0f;
 
       if (node.align == AlignItems::FlexEnd) {
@@ -301,36 +289,33 @@ namespace rl {
       } else if (node.align == AlignItems::Center) {
         currentCrossPos = (crossParentSize - crossChildSize) / 2.0f;
       }
+      child.box.crossPos(dir) = node.box.crossPos(dir) + currentCrossPos;
+      currentMainPos += child.box.mainSize(dir) + gap;
 
-      if (isRow) {
-        child.box.y = node.box.y + currentCrossPos;
-        currentMainPos += child.box.width + gap;
-      } else {
-        child.box.x = node.box.x + currentCrossPos;
-        currentMainPos += child.box.height + gap;
-      }
       arrangeNode(child);
     }
   }
-  void RootDB::calculateLayout() {
-      if (!selected) return;
-  
-      selected->root.box.x = 0.0f;
-      selected->root.box.y = 0.0f;
-      
-      if (selected->root.width.type == SizeType::Auto) {
-          selected->root.box.width = 1920.0f; 
-      } else {
-          selected->root.box.width = selected->root.width.value;
-      }
-      
-      if (selected->root.height.type == SizeType::Auto) {
-          selected->root.box.height = 1080.0f;
-      } else {
-          selected->root.box.height = selected->root.height.value;
-      }
-  
-      measureNode(selected->root);
-      arrangeNode(selected->root);
+  void RootDB::calculateLayout()
+  {
+    if (!selected)
+      return;
+
+    selected->root.box.x = 0.0f;
+    selected->root.box.y = 0.0f;
+
+    if (selected->root.width.type == SizeType::Auto) {
+      selected->root.box.width = 1920.0f;
+    } else {
+      selected->root.box.width = selected->root.width.value;
     }
+
+    if (selected->root.height.type == SizeType::Auto) {
+      selected->root.box.height = 1080.0f;
+    } else {
+      selected->root.box.height = selected->root.height.value;
+    }
+
+    measureNode(selected->root);
+    arrangeNode(selected->root);
+  }
 }

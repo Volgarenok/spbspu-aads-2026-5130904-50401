@@ -44,7 +44,41 @@ namespace rl {
     float y = 0.0f;
     float width = 0.0f;
     float height = 0.0f;
+    float& mainSize(FlexDirection dir)
+    {
+      return (dir == FlexDirection::Row) ? width : height;
+    }
+    float& crossSize(FlexDirection dir)
+    {
+      return (dir == FlexDirection::Row) ? height : width;
+    }
+    float& mainPos(FlexDirection dir)
+    {
+      return (dir == FlexDirection::Row) ? x : y;
+    }
+    float& crossPos(FlexDirection dir)
+    {
+      return (dir == FlexDirection::Row) ? y : x;
+    }
+
+    float mainSize(FlexDirection dir) const
+    {
+      return (dir == FlexDirection::Row) ? width : height;
+    }
+    float crossSize(FlexDirection dir) const
+    {
+      return (dir == FlexDirection::Row) ? height : width;
+    }
+    float mainPos(FlexDirection dir) const
+    {
+      return (dir == FlexDirection::Row) ? x : y;
+    }
+    float crossPos(FlexDirection dir) const
+    {
+      return (dir == FlexDirection::Row) ? y : x;
+    }
   };
   std::ostream& operator<<(std::ostream& os, const Size& size);
+
 }
 #endif
