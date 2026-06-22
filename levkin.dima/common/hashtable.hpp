@@ -81,7 +81,7 @@ namespace levkin {
     {
     }
 
-    typename std::conditional< IsConst, const Key&, Key& >::type
+    typename std::conditional< IsConst, const Key&, const Key& >::type
     key() const noexcept
     {
       if (index_ < table_->pool_.getSize()) {
