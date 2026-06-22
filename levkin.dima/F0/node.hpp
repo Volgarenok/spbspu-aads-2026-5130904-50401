@@ -52,6 +52,7 @@ namespace rl {
     AlignItems align = AlignItems::FlexStart;
 
     RLNode() = default;
+    RLNode(std::string nodeId, float w, float h, FlexDirection dir);
     ~RLNode() = default;
     RLNode(const RLNode&) = delete;
     RLNode& operator=(const stf::Vector< RLNode >&) = delete;
