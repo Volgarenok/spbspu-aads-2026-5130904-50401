@@ -12,6 +12,10 @@ int main()
   try {
     commands.insert("load", madieva::cmd_load);
     commands.insert("start", madieva::cmd_start);
+    commands.insert("reset", madieva::cmd_reset);
+    commands.insert("save", madieva::cmd_save);
+    commands.insert("continue", madieva::cmd_continue);
+    commands.insert("exists", madieva::cmd_exists);
   } catch (...) {
     std::cerr << "<INTERNAL ERROR>\n";
     return 2;

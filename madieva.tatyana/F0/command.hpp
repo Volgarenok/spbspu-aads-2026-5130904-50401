@@ -20,5 +20,14 @@ namespace madieva
     TemplateTable & templates, GameTable & games);
   void cmd_start(std::istream & in, std::ostream & out,
     TemplateTable & templates, GameTable & games);
+  void cmd_reset(std::istream & in, std::ostream & out,
+    TemplateTable & templates, GameTable & games);
+  void cmd_save(std::istream & in, std::ostream & out,
+    TemplateTable & templates, GameTable & games);
+  void cmd_continue(std::istream & in, std::ostream & out,
+    TemplateTable & templates, GameTable & games);
+  void cmd_exists(std::istream & in, std::ostream & out,
+    TemplateTable & templates, GameTable & games);
+
 }
 #endif
