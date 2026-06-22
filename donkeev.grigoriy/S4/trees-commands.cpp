@@ -31,7 +31,7 @@ void donkeev::printDicts(std::istream& input, std::ostream& output, donkeev::Dat
   if (!tree.empty())
   {
     output << "\n";
-  } 
+  }
 }
 
 void donkeev::complementDicts(std::istream& input, std::ostream&, donkeev::Datasets& dicts)
