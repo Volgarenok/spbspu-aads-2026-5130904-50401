@@ -9,7 +9,7 @@ void RLNode::addChild(std::unique_ptr<RLNode> p) {
   children.pushBack(std::move(p));
 }
 
-void RLNode::clearChildren() {
+void RLNode::clearChildren() noexcept {
   children.erase(children.begin(), children.end());
 }
 
@@ -28,8 +28,8 @@ RLNode::RLNode(std::string nodeId, float w, float h, FlexDirection dir)
 RLNode::RLNode(RLNode &&rhs) noexcept
     : id(std::move(rhs.id)), children(std::move(rhs.children)),
       parent(rhs.parent), margin(rhs.margin), padding(rhs.padding),
-      box(rhs.box), width(rhs.width), height(rhs.height),
-      flexDirection(rhs.flexDirection), justify(rhs.justify), align(rhs.align) {
+      width(rhs.width), height(rhs.height), flexDirection(rhs.flexDirection),
+      justify(rhs.justify), align(rhs.align), box(rhs.box) {
   updateChildrenParent();
 
   rhs.reset();
