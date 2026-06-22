@@ -130,8 +130,8 @@ namespace rl {
 
       if (parentId == "null" && !isRootHandled) {
         layout->root.id = id;
-        layout->root.width = w;
-        layout->root.height = h;
+        layout->root.width = Size::fromFloat(w);
+        layout->root.height = Size::fromFloat(h);
         layout->root.flexDirection = stringToDir(dirStr);
         layout->root.justify = stringToJustify(justifyStr);
         layout->root.align = stringToAlign(alignStr);

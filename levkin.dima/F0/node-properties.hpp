@@ -1,12 +1,25 @@
 #ifndef NODE_PROPERTIES
 #define NODE_PROPERTIES
 
+#include <iosfwd>
+
 namespace rl {
   enum class SizeType { Pixels, Auto };
   struct Size {
     SizeType type = SizeType::Auto;
     float value = 0.0f;
 
+    Size& operator=(float val)
+    {
+      if (val < 0.0f) {
+        type = SizeType::Auto;
+        value = 0.0f;
+      } else {
+        type = SizeType::Pixels;
+        value = val;
+      }
+      return *this;
+    }
     static Size fromFloat(float val)
     {
       if (val < 0.0f)
@@ -32,5 +45,6 @@ namespace rl {
     float width = 0.0f;
     float height = 0.0f;
   };
+  std::ostream& operator<<(std::ostream& os, const Size& size);
 }
 #endif
