@@ -1,5 +1,9 @@
 #include "budget.hpp"
 
+#include <cstddef>
+#include <memory>
+#include <stdexcept>
+
 studilova::Budget::Budget():
   name_(),
   rootCategory_("root", nullptr),
@@ -18,6 +22,51 @@ studilova::Budget::Budget(const std::string& name):
   categories_.push("root", &rootCategory_);
 }
 
+void studilova::Budget::cloneCategoryChildren(const Category& from, Category& to)
+{
+  const Vector< Category* >& children = from.getChildren();
+
+  for (size_t i = 0; i < children.getSize(); ++i)
+  {
+    const Category* fromChild = children[i];
+
+    Category* copiedChild = new Category(fromChild->getName(), &to);
+
+    try
+    {
+      to.addChild(copiedChild);
+      categories_.push(copiedChild->getName(), copiedChild);
+
+      cloneCategoryChildren(*fromChild, *copiedChild);
+    }
+    catch (...)
+    {
+      clearCategoryChildren(*copiedChild);
+      delete copiedChild;
+      throw;
+    }
+  }
+}
+
+studilova::Budget::Budget(const Budget& other):
+  name_(other.name_),
+  rootCategory_("root", nullptr),
+  operations_(other.operations_),
+  categories_()
+{
+  categories_.push("root", &rootCategory_);
+
+  try
+  {
+    cloneCategoryChildren(other.rootCategory_, rootCategory_);
+  }
+  catch(...)
+  {
+    clearCategoryChildren(rootCategory_);
+    throw;
+  }
+}
+
 void studilova::Budget::clearCategoryChildren(Category& category)
 {
   Vector< Category* >& children = category.getChildren();
@@ -32,6 +81,32 @@ void studilova::Budget::clearCategoryChildren(Category& category)
 studilova::Budget::~Budget()
 {
   clearCategoryChildren(rootCategory_);
+}
+
+studilova::Budget& studilova::Budget::operator=(const Budget& other)
+{
+  if (this != std::addressof(other))
+  {
+    clearCategoryChildren(rootCategory_);
+
+    name_ = other.name_;
+    operations_ = other.operations_;
+
+    categories_ = AVLTree< std::string, Category* >();
+    rootCategory_ = Category("root", nullptr);
+    categories_.push("root", &rootCategory_);
+
+    try
+    {
+      cloneCategoryChildren(other.rootCategory_, rootCategory_);
+    }
+    catch(...)
+    {
+      clearCategoryChildren(rootCategory_);
+      throw;
+    }
+  }
+  return *this;
 }
 
 const std::string& studilova::Budget::getName() const noexcept

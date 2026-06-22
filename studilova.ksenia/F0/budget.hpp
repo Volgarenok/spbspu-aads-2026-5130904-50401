@@ -16,7 +16,12 @@ namespace studilova
     public:
       Budget();
       explicit Budget(const std::string& name);
+      Budget(const Budget& other);
+      Budget(Budget&& other) = delete;
       ~Budget();
+
+      Budget& operator=(const Budget& other);
+      Budget& operator=(Budget&& other) = delete;
 
       const std::string& getName() const noexcept;
 
@@ -42,6 +47,7 @@ namespace studilova
       AVLTree< std::string, Category* > categories_;
 
       void clearCategoryChildren(Category& category);
+      void cloneCategoryChildren(const Category& from, Category& to);
   };
 }
 
