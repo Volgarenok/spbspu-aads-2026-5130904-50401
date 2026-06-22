@@ -12,6 +12,6 @@ namespace donkeev
   void printDicts(std::istream&, std::ostream&, donkeev::Datasets&);
   void complementDicts(std::istream&, std::ostream&, donkeev::Datasets&);
   void intersectDicts(std::istream&, std::ostream&, donkeev::Datasets&);
-  /*void uniteDicts(std::istream&, std::ostream&, donkeev::Datasets&);*/
+  void uniteDicts(std::istream&, std::ostream&, donkeev::Datasets&);
 }
 #endif
