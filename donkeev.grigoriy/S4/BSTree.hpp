@@ -51,7 +51,8 @@ namespace donkeev
     void push(Key, const Value&);
     void push(Key, Value&&);
     Value& get(const Key);
-    BSTNode< Key, Value >* find(const Key) const;
+    iterator find(const Key&);
+    constIterator find(const Key&) const;
     Value drop(const Key);
     void clear();
     void swap(BSTree< Key, Value, Compare >&);
@@ -65,6 +66,7 @@ namespace donkeev
     BSTNode< Key, Value >* cloneRecursive(const BSTNode< Key, Value >*, BSTNode< Key, Value >*);
     void removeNode(BSTNode< Key, Value >*);
     void clearRecursive(BSTNode< Key, Value >*);
+    BSTNode< Key, Value >* findNode(const Key) const;
   };
 
   template< class Key, class Value, class Compare >
@@ -433,33 +435,23 @@ namespace donkeev
   }
 
   template<class Key, class Value, class Compare>
-  BSTNode<Key, Value>* BSTree<Key, Value, Compare>::find(const Key key) const
+  typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::find(const Key& key)
   {
-    BSTNode<Key, Value>* current = root_;
-    
-    while (current)
-    {
-      if (compareFunc_(key, current->data_.first))
-      {
-        current = current->left_;
-      }
-      else if (compareFunc_(current->data_.first, key))
-      {
-        current = current->right_;
-      }
-      else
-      {
-        return current;
-      }
-    }
-    
-    return nullptr;
-}
+    BSTNode<Key, Value>* node = findNode(key);
+    return iterator(node);
+  }
+
+  template<class Key, class Value, class Compare>
+  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::find(const Key& key) const
+  {
+    BSTNode<Key, Value>* node = findNode(key);
+    return constIterator(node);
+  }
 
   template<class Key, class Value, class Compare>
   Value BSTree<Key, Value, Compare>::drop(const Key key)
   {
-    BSTNode<Key, Value>* node = find(key);
+    BSTNode<Key, Value>* node = findNode(key);
     if (!node)
     {
       throw std::runtime_error("No such element");
@@ -652,6 +644,30 @@ namespace donkeev
     clearRecursive(node->right_);
 
     delete node;
+  }
+
+  template<class Key, class Value, class Compare>
+  BSTNode<Key, Value>* BSTree<Key, Value, Compare>::findNode(const Key key) const
+  {
+    BSTNode<Key, Value>* current = root_;
+    
+    while (current)
+    {
+      if (compareFunc_(key, current->data_.first))
+      {
+        current = current->left_;
+      }
+      else if (compareFunc_(current->data_.first, key))
+      {
+        current = current->right_;
+      }
+      else
+      {
+        return current;
+      }
+    }
+    
+    return nullptr;
   }
 }
 
