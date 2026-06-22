@@ -9,6 +9,22 @@
 
 namespace rl {
   namespace {
+    struct ColorRGB {
+      uint8_t r, g, b;
+    };
+    ColorRGB getBackgroundColorPng(const std::string& id)
+    {
+      static const ColorRGB BEAUTIFUL_COLORS_RGB[] = {
+          {255, 127, 80},  {255, 105, 180}, {255, 99, 71},  {255, 140, 0},
+          {255, 215, 0},   {186, 85, 211},  {0, 191, 255},  {0, 250, 154},
+          {100, 149, 237}, {220, 20, 60},   {244, 164, 96}, {64, 224, 208},
+          {154, 205, 50},  {221, 160, 221}};
+
+      constexpr size_t colorCount =
+          sizeof(BEAUTIFUL_COLORS_RGB) / sizeof(BEAUTIFUL_COLORS_RGB[0]);
+      size_t colorIdx = (std::hash< std::string >{}(id) + 3) % colorCount;
+      return BEAUTIFUL_COLORS_RGB[colorIdx];
+    }
     std::string getBackgroundColor(const std::string& id)
     {
       static const char* const BEAUTIFUL_COLORS[] = {
