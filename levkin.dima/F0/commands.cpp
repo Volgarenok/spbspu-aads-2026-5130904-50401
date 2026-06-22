@@ -2,7 +2,6 @@
 #include "db.hpp"
 #include <boost/filesystem.hpp>
 #include <iostream>
-#include <sstream>
 namespace rl {
   void initLayout(std::istream& in, std::ostream& out, RootDB& db, RLRootNode*)
   {

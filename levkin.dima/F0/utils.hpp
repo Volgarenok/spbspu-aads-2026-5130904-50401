@@ -21,6 +21,8 @@ namespace rl {
   std::string generateLayoutName(float width, float height);
   std::string generateLayoutPath(const std::string& layoutName);
   void exportToFlatHtml(std::ostream& os, const RLNode& node);
-  void saveVisualTree(const RLRootNode* rootNode, const std::string& filename);
+  void saveVisualTree(const RLRootNode*, const std::string&);
+  void saveVisualTreeToPng(const RLRootNode*, const std::string&);
+
 }
 #endif

@@ -66,6 +66,21 @@ namespace rl {
       return BEAUTIFUL_COLORS[colorIdx];
     }
 
+    void renderNodeToBuffer(
+        stf::Vector< uint8_t >& buffer, int w, int h, const RLNode& node)
+    {
+      ColorRGB color = getBackgroundColorPng(node.id);
+      drawRect(
+          buffer, w, h, node.box.x, node.box.y, node.box.width, node.box.height,
+          color);
+
+      for (size_t i = 0; i < node.children.getSize(); ++i) {
+        if (node.children[i]) {
+          renderNodeToBuffer(buffer, w, h, *node.children[i]);
+        }
+      }
+    }
+
     std::string getContainerStyle(const RLNode& node)
     {
       std::string color = getBackgroundColor(node.id);
@@ -136,7 +151,26 @@ namespace rl {
       }
     }
   }
+  void
+  saveVisualTreeToPng(const RLRootNode* rootNode, const std::string& filename)
+  {
+    if (!rootNode)
+      return;
 
+    int width = static_cast< int >(rootNode->root.box.width);
+    int height = static_cast< int >(rootNode->root.box.height);
+
+    if (width <= 0 || height <= 0)
+      return;
+
+    stuff::Vector< uint8_t > canvasBuffer;
+    canvasBuffer.pushBackCount(static_cast< size_t >(width * height * 3), 255);
+
+    renderNodeToBuffer(canvasBuffer, width, height, rootNode->root);
+
+    stbi_write_png(
+        filename.c_str(), width, height, 3, &canvasBuffer[0], width * 3);
+  }
   void saveVisualTree(const RLRootNode* rootNode, const std::string& filename)
   {
     if (!rootNode)
