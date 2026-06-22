@@ -19,7 +19,10 @@ void donkeev::printDicts(std::istream& input, std::ostream& output, donkeev::Dat
 
   Dataset& tree = it->second;
 
-  output << datasetName;
+  if (!tree.empty())
+  {
+    output << datasetName;
+  }
   for (Dataset::iterator begin = tree.begin(); begin != tree.end(); ++begin)
   {
     output << " " << begin->first << " " << begin->second;
