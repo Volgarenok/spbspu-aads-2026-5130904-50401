@@ -33,6 +33,8 @@ BOOST_AUTO_TEST_CASE(test_basic_row_layout)
 
   BOOST_CHECK_EQUAL(child1->box.width, 200.0f);
   BOOST_CHECK_EQUAL(child2->box.width, 400.0f);
+  rl::saveVisualTree(db.getActive(), "layout_debug.html");
+  
 }
 
 BOOST_AUTO_TEST_CASE(test_basic_column_layout)
@@ -63,6 +65,7 @@ BOOST_AUTO_TEST_CASE(test_basic_column_layout)
 
   BOOST_CHECK_EQUAL(child1->box.height, 150.0f);
   BOOST_CHECK_EQUAL(child2->box.height, 300.0f);
+  
 }
 
 BOOST_AUTO_TEST_CASE(test_justify_content_center_and_space_between)
@@ -115,6 +118,7 @@ BOOST_AUTO_TEST_CASE(test_justify_content_center_and_space_between)
 
     BOOST_CHECK_EQUAL(child1->box.y, 200.0f);
     BOOST_CHECK_EQUAL(child2->box.y, 300.0f);
+    
   }
 }
 
