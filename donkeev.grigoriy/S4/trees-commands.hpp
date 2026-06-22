@@ -10,8 +10,8 @@ namespace donkeev
   using Datasets = BSTree< std::string, Dataset, Comp< std::string > >;
 
   void printDicts(std::istream&, std::ostream&, donkeev::Datasets&);
-  /*void complementDicts(std::istream&, std::ostream&, donkeev::Datasets&);
-  void intersectDicts(std::istream&, std::ostream&, donkeev::Datasets&);
+  void complementDicts(std::istream&, std::ostream&, donkeev::Datasets&);
+  /*void intersectDicts(std::istream&, std::ostream&, donkeev::Datasets&);
   void uniteDicts(std::istream&, std::ostream&, donkeev::Datasets&);*/
 }
 #endif
