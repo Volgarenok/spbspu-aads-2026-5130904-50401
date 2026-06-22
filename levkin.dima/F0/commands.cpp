@@ -23,21 +23,22 @@ void unregisterSubtree(RLNode *node, Map<std::string, RLNode *> &mapOfNodes) {
   mapOfNodes.drop(node->id);
 }
 
-void initLayout(std::istream &in, std::ostream &out, RootDB &db, RLRootNode *) {
-  float w = 1920.0f;
-  float h = 1080.0f;
+void initLayoutCommand(std::istream &in, std::ostream &out, RootDB &db,
+                       RLRootNode *) {
+  float w = config::DEFAULT_WIDTH;
+  float h = config::DEFAULT_HEIGHT;
 
-  std::string line;
-  if (std::getline(in, line) && !line.empty()) {
-    std::stringstream ss(line);
-    ss >> w >> h;
+  if (!(in >> w >> h)) {
+      out << "Error: Parent ID required.\n";
+      return;
   }
 
-  RLRootNode newRoot(w, h);
-  db.data.pushBack(std::move(newRoot));
-  db.selectByIndex(db.data.getSize() - 1);
+  std::string name = rl::generateLayoutName(w, h);
+  std::string path = rl::generateLayoutPath(name);
 
-  out << "Layout initialized: " << w << "x" << h << ". Root node created.\n";
+  db.createNewLayout(name, path, w, h);
+
+  out << "Layout successfully initialized with size: " << w << "x" << h << "\n";
 }
 void createChild(std::istream &in, std::ostream &out, RootDB &,
                  RLRootNode *layout) {

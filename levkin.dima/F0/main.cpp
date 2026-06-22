@@ -13,7 +13,7 @@ int main()
       if (!cmds.has(cmd)) {
         throw std::logic_error("Unknown command");
       }
-      cmds.at(cmd)(std::cin, std::cout, db, db.selected);
+      cmds.at(cmd)(std::cin, std::cout, db, db.getActive());
     } catch (const std::exception& e) {
       std::cout << "<INVALID COMMAND>\n";
       std::string dummy;

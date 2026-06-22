@@ -18,6 +18,12 @@ struct RLRootNode {
     root.id = "root";
     mapOfNodes.add("root", &root);
   }
+  RLRootNode(float w, float h) : name("unnamed"), filePath("unnamed.rl") {
+    root.id = "root";
+    root.width = w;
+    root.height = h;
+    mapOfNodes.add("root", &root);
+  }
   RLRootNode(std::string layoutName, std::string path, float w, float h)
       : name(std::move(layoutName)), filePath(std::move(path)) {
     root.id = "root";
