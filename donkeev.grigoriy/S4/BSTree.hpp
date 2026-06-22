@@ -478,6 +478,7 @@ namespace donkeev
   {
     clearRecursive(root_);
     size_ = 0;
+    root_ = nullptr;
   }
 
   template< class Key, class Value, class Compare >
