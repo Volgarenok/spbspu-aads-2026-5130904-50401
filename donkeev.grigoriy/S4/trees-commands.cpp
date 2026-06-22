@@ -28,7 +28,10 @@ void donkeev::printDicts(std::istream& input, std::ostream& output, donkeev::Dat
     output << " " << begin->first << " " << begin->second;
   }
 
-  output << "\n";
+  if (!tree.empty())
+  {
+    output << "\n";
+  } 
 }
 
 void donkeev::complementDicts(std::istream& input, std::ostream&, donkeev::Datasets& dicts)
