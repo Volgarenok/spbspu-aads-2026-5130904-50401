@@ -32,6 +32,10 @@ void donkeev::printDicts(std::istream& input, std::ostream& output, donkeev::Dat
   {
     output << "<EMPTY>\n";
   }
+  else
+  {
+    output << "\n";
+  }
 }
 
 void donkeev::complementDicts(std::istream& input, std::ostream&, donkeev::Datasets& dicts)
