@@ -17,7 +17,7 @@ namespace rl {
       db.createNewLayout(
           layoutName, filePath, config::DEFAULT_WIDTH, config::DEFAULT_HEIGHT);
 
-      db.loadFromFile(filePath);
+      // db.loadFromFile(filePath);
     } else {
       std::string defaultPath = generateLayoutPath(layoutName);
       db.createNewLayout(

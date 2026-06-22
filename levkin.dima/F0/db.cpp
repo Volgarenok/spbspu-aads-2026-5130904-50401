@@ -232,11 +232,11 @@ namespace rl {
     }
 
     if (node.width.type == SizeType::Auto) {
-      node.box.mainSize(dir) =
+      node.box.width =
           (dir == FlexDirection::Row) ? childrenMainSum : childrenCrossMax;
     }
     if (node.height.type == SizeType::Auto) {
-      node.box.crossSize(dir) =
+      node.box.height =
           (dir == FlexDirection::Row) ? childrenCrossMax : childrenMainSum;
     }
   }

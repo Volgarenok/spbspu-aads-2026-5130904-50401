@@ -2,6 +2,7 @@
 #define UTILS_RL
 
 #include "hashtable.hpp"
+#include "node.hpp"
 #include <string>
 
 namespace rl {
@@ -17,6 +18,6 @@ namespace rl {
 
   std::string generateLayoutName(float width, float height);
   std::string generateLayoutPath(const std::string& layoutName);
-
+  void exportToFlatHtml(std::ostream& os, const RLNode& node);
 }
 #endif
