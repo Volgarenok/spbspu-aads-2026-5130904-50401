@@ -18,7 +18,7 @@ namespace donkeev
     BSTIterator(BSTNode< Key, Value >*);
 
     ~BSTIterator() = default;
-    
+
     BSTIterator< Key, Value >& operator=(const BSTIterator< Key, Value >&);
     BSTIterator< Key, Value >& operator=(BSTIterator< Key, Value >&&);
 
@@ -47,7 +47,7 @@ namespace donkeev
     BSTCIterator(const BSTNode< Key, Value >*);
 
     ~BSTCIterator() = default;
-    
+
     BSTCIterator< Key, Value >& operator=(const BSTCIterator< Key, Value >&);
     BSTCIterator< Key, Value >& operator=(BSTCIterator< Key, Value >&&);
 
@@ -250,7 +250,7 @@ namespace donkeev
     {
       return *this;
     }
-    
+
     if (node_->left_)
     {
       node_ = node_->left_;

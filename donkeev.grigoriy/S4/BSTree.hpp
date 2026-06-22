@@ -190,7 +190,7 @@ namespace donkeev
   template<class Key, class Value, class Compare>
   typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::rotateRight(iterator it)
   {
-    BSTNode<Key, Value>* parent = it.getNode(); 
+    BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->left_)
     {
       return it;
@@ -456,9 +456,9 @@ namespace donkeev
     {
       throw std::runtime_error("No such element");
     }
-    
+
     Value result = std::move(node->data_.second);
-    
+
     removeNode(node);
     --size_;
 
@@ -502,7 +502,7 @@ namespace donkeev
     new_node->parent = parent;
     new_node->left = cloneRecursive(node->left, new_node);
     new_node->right = cloneRecursive(node->right, new_node);
-    
+
     return new_node;
   }
 
@@ -519,7 +519,7 @@ namespace donkeev
       if (node->parent_)
       {
         if (node->parent_->left_ == node)
-        {  
+        {
           node->parent_->left_ = nullptr;
         }
         else
@@ -561,7 +561,7 @@ namespace donkeev
     {
       BSTNode<Key, Value>* child = node->left_;
       child->parent_ = node->parent_;
-      
+
       if (node->parent_)
       {
         if (node->parent_->left_ == node)
@@ -577,7 +577,7 @@ namespace donkeev
       {
         root_ = child;
       }
-      
+
       delete node;
     }
     else
@@ -650,7 +650,7 @@ namespace donkeev
   BSTNode<Key, Value>* BSTree<Key, Value, Compare>::findNode(const Key key) const
   {
     BSTNode<Key, Value>* current = root_;
-    
+
     while (current)
     {
       if (compareFunc_(key, current->data_.first))
@@ -666,7 +666,7 @@ namespace donkeev
         return current;
       }
     }
-    
+
     return nullptr;
   }
 }

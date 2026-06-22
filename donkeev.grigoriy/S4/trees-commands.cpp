@@ -24,7 +24,7 @@ void donkeev::printDicts(std::istream& input, std::ostream& output, donkeev::Dat
   {
     output << " " << begin->first << " " << begin->second;
   }
-  
+
   output << "\n";
 }
 
@@ -55,13 +55,13 @@ void donkeev::complementDicts(std::istream& input, std::ostream&, donkeev::Datas
   {
     int key = begin->first;
     const std::string& value = begin->second;
-    
+
     Dataset::constIterator found = dict2.find(key);
     if (found == dict2.end())
     {
       result.push(key, value);
     }
-    
+
     ++begin;
   }
 
@@ -91,18 +91,18 @@ void donkeev::intersectDicts(std::istream& input, std::ostream&, donkeev::Datase
 
   Dataset::constIterator begin1 = dict1.begin();
   Dataset::constIterator end1 = dict1.end();
-  
+
   while (begin1 != end1)
   {
     int key = begin1->first;
     const std::string& value = begin1->second;
-    
+
     Dataset::constIterator found = dict2.find(key);
     if (found != dict2.end())
     {
       result.push(key, value);
     }
-    
+
     ++begin1;
   }
 
@@ -132,7 +132,7 @@ void donkeev::uniteDicts(std::istream& input, std::ostream&, donkeev::Datasets& 
 
   Dataset::constIterator begin1 = dict1.begin();
   Dataset::constIterator end1 = dict1.end();
-  
+
   while (begin1 != end1)
   {
     int key = begin1->first;
@@ -143,18 +143,18 @@ void donkeev::uniteDicts(std::istream& input, std::ostream&, donkeev::Datasets& 
 
   Dataset::constIterator begin2 = dict2.begin();
   Dataset::constIterator end2 = dict2.end();
-  
+
   while (begin2 != end2)
   {
     int key = begin2->first;
     const std::string& value = begin2->second;
-    
+
     Dataset::iterator found = result.find(key);
     if (found == result.end())
     {
       result.push(key, value);
     }
-    
+
     ++begin2;
   }
 
