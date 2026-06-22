@@ -1,52 +1,26 @@
 #ifndef COMMANDS_RL
 #define COMMANDS_RL
 
-#include "hashtable.hpp"
-#include "node.hpp"
-#include "vector.hpp"
+#include "db.hpp"
+#include "utils.hpp"
 #include <iostream>
 #include <string>
 
 namespace rl {
-
-struct RootDB;
-struct RLRoot;
-
-template <typename Key, typename Value>
-using Map = levkin::HashTable<Key, Value>;
-
-using cmd_t = void (*)(std::istream &, std::ostream &, RootDB &, RLRoot *);
+using cmd_t = void (*)(std::istream &, std::ostream &, RootDB &, RLRootNode *);
 using Cmds = Map<std::string, cmd_t>;
-
-struct RLRoot {
-  RLRoot() = default;
-  RLRoot(float width, float height);
-
-  RLNode root;
-  Map<std::string, RLNode *> mapOfNodes;
-  float baseWidth = 1920.0f;
-  float baseHeight = 1080.0f;
-};
-
-struct RootDB {
-  stf::Vector<RLRoot> data;
-  RLRoot *selected = nullptr;
-
-  void select(RLRoot &item);
-  void selectByIndex(size_t index);
-};
 void bootstrapSession(RootDB &, std::ostream &);
-void healthcheck(std::istream &, std::ostream &, RootDB &, RLRoot *);
-void initLayout(std::istream &, std::ostream &, RootDB &, RLRoot *);
-void createChild(std::istream &, std::ostream &, RootDB &, RLRoot *);
-void createNode(std::istream &, std::ostream &, RootDB &, RLRoot *);
-void emptyNode(std::istream &, std::ostream &, RootDB &, RLRoot *);
-void deleteNode(std::istream &, std::ostream &, RootDB &, RLRoot *);
-void moveNode(std::istream &, std::ostream &, RootDB &, RLRoot *);
-void setWidth(std::istream &, std::ostream &, RootDB &, RLRoot *);
-void setHeight(std::istream &, std::ostream &, RootDB &, RLRoot *);
-void setSize(std::istream &, std::ostream &, RootDB &, RLRoot *);
-void printHelp(std::istream &, std::ostream &, RootDB &, RLRoot *);
+void healthcheck(std::istream &, std::ostream &, RootDB &, RLRootNode *);
+void initLayout(std::istream &, std::ostream &, RootDB &, RLRootNode *);
+void createChild(std::istream &, std::ostream &, RootDB &, RLRootNode *);
+void createNode(std::istream &, std::ostream &, RootDB &, RLRootNode *);
+void emptyNode(std::istream &, std::ostream &, RootDB &, RLRootNode *);
+void deleteNode(std::istream &, std::ostream &, RootDB &, RLRootNode *);
+void moveNode(std::istream &, std::ostream &, RootDB &, RLRootNode *);
+void setWidth(std::istream &, std::ostream &, RootDB &, RLRootNode *);
+void setHeight(std::istream &, std::ostream &, RootDB &, RLRootNode *);
+void setSize(std::istream &, std::ostream &, RootDB &, RLRootNode *);
+void printHelp(std::istream &, std::ostream &, RootDB &, RLRootNode *);
 Cmds getCmds();
 } // namespace rl
 
