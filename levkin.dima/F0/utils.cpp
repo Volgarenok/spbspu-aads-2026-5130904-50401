@@ -1,3 +1,4 @@
+#include "stb_image_write.hpp"
 #include "utils.hpp"
 #include <iomanip>
 #include <sstream>
@@ -10,15 +11,14 @@ namespace rl {
   namespace {
     std::string getBackgroundColor(const std::string& id)
     {
-      static const std::string BEAUTIFUL_COLORS[] = {
+      static const char* const BEAUTIFUL_COLORS[] = {
           "coral",          "hotpink",      "tomato",      "darkorange",
           "gold",           "mediumorchid", "deepskyblue", "mediumspringgreen",
           "cornflowerblue", "crimson",      "sandybrown",  "turquoise",
           "yellowgreen",    "plum"};
-
       constexpr size_t colorCount =
           sizeof(BEAUTIFUL_COLORS) / sizeof(BEAUTIFUL_COLORS[0]);
-      size_t colorIdx = (std::hash< std::string >{}(id)+2) % colorCount;
+      size_t colorIdx = (std::hash< std::string >{}(id) + 3) % colorCount;
       return BEAUTIFUL_COLORS[colorIdx];
     }
 
@@ -81,7 +81,7 @@ namespace rl {
   {
     return std::string(config::DEFAULT_LAYOUT_DIR) + layoutName + ".rl";
   }
-  
+
   void exportNodeToHtml(std::ostream& os, const RLNode& node)
   {
     renderSingleNodeHtml(os, node);
