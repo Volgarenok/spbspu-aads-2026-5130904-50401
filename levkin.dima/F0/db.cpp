@@ -312,6 +312,25 @@ namespace rl {
       arrangeNode(child);
     }
   }
-  void calculateLayout() {}
-
+  void RootDB::calculateLayout() {
+      if (!selected) return;
+  
+      selected->root.box.x = 0.0f;
+      selected->root.box.y = 0.0f;
+      
+      if (selected->root.width.type == SizeType::Auto) {
+          selected->root.box.width = 1920.0f; 
+      } else {
+          selected->root.box.width = selected->root.width.value;
+      }
+      
+      if (selected->root.height.type == SizeType::Auto) {
+          selected->root.box.height = 1080.0f;
+      } else {
+          selected->root.box.height = selected->root.height.value;
+      }
+  
+      measureNode(selected->root);
+      arrangeNode(selected->root);
+    }
 }

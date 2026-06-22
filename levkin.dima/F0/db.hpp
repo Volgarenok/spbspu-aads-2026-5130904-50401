@@ -13,7 +13,6 @@ namespace rl {
     std::string filePath;
     RLNode root;
     Map< std::string, RLNode* > mapOfNodes;
-    void calculateLayout();
     RLRootNode()
     {
       root.id = "root";
@@ -43,6 +42,7 @@ namespace rl {
     RLRootNode* selected = nullptr;
 
   public:
+    void calculateLayout();
     bool loadDatabase(const std::string& dbPath);
     bool saveDatabase(const std::string& dbPath);
     bool loadLayout(const std::string& name);
