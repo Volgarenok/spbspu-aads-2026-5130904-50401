@@ -1,5 +1,4 @@
 #include "commands.hpp"
-#include "node.hpp"
 #include <iostream>
 #include <string>
 
@@ -9,7 +8,6 @@ int main()
   std::string cmd;
   Cmds cmds = getCmds();
   RootDB db;
-  
   while (std::cin >> cmd) {
     try {
       if (!cmds.has(cmd)) {
