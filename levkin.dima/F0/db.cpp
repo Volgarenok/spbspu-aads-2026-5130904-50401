@@ -4,14 +4,17 @@
 #include <sstream>
 
 namespace rl {
+
   static std::string dirToString(FlexDirection d)
   {
     return d == FlexDirection::Column ? "Column" : "Row";
   }
+
   static FlexDirection stringToDir(const std::string& s)
   {
     return s == "Column" ? FlexDirection::Column : FlexDirection::Row;
   }
+
   static std::string justifyToString(JustifyContent j)
   {
     if (j == JustifyContent::FlexEnd)
@@ -22,6 +25,7 @@ namespace rl {
       return "SpaceBetween";
     return "FlexStart";
   }
+
   static JustifyContent stringToJustify(const std::string& s)
   {
     if (s == "FlexEnd")
@@ -41,6 +45,7 @@ namespace rl {
       return "Center";
     return "FlexStart";
   }
+
   static AlignItems stringToAlign(const std::string& s)
   {
     if (s == "FlexEnd")
@@ -53,8 +58,8 @@ namespace rl {
   static void serializeNode(
       std::ostream& os, const RLNode& node, const std::string& parentId)
   {
-    os << parentId << " " << node.id << " " << node.width << " " << node.height
-       << " " << dirToString(node.flexDirection) << " "
+    os << parentId << " " << node.id << " " << node.width.value << " "
+       << node.height.value << " " << dirToString(node.flexDirection) << " "
        << justifyToString(node.justify) << " " << alignToString(node.align)
        << "\n";
 
@@ -77,8 +82,8 @@ namespace rl {
 
     std::string name, path;
     while (file >> name >> path) {
-      auto layout =
-          std::make_unique< RLRootNode >(name, path, 1920.0f, 1080.0f);
+      auto layout = std::make_unique< RLRootNode >(
+          name, path, config::DEFAULT_WIDTH, config::DEFAULT_HEIGHT);
       storage.add(name, std::move(layout));
     }
     return true;
@@ -86,28 +91,26 @@ namespace rl {
 
   bool RootDB::saveDatabase(const std::string& dbPath)
   {
-    std::ofstream file(dbPath);
-    if (!file.is_open()) {
+    std::ifstream file(dbPath);
+    std::ofstream outfile(dbPath);
+    if (!outfile.is_open())
       return false;
-    }
 
     for (auto it = storage.begin(); it != storage.end(); ++it) {
-      file << it.key() << " " << it.value()->filePath << "\n";
+      outfile << it.key() << " " << it.value()->filePath << "\n";
     }
     return true;
   }
 
   bool RootDB::loadLayout(const std::string& name)
   {
-    if (!storage.has(name)) {
+    if (!storage.has(name))
       return false;
-    }
 
     RLRootNode* layout = storage.get(name).get();
     std::ifstream file(layout->filePath);
-    if (!file.is_open()) {
+    if (!file.is_open())
       return false;
-    }
 
     layout->root.clearChildren();
     layout->mapOfNodes = Map< std::string, RLNode* >();
@@ -118,8 +121,8 @@ namespace rl {
     while (std::getline(file, line)) {
       if (line.empty())
         continue;
-      std::stringstream ss(line);
 
+      std::stringstream ss(line);
       std::string parentId, id, dirStr, justifyStr, alignStr;
       float w, h;
 
@@ -146,14 +149,13 @@ namespace rl {
         }
 
         RLNode* parentNode = layout->mapOfNodes.get(parentId);
-
         auto child = std::make_unique< RLNode >(id, w, h, stringToDir(dirStr));
+
         child->justify = stringToJustify(justifyStr);
         child->align = stringToAlign(alignStr);
 
         RLNode* childPtr = child.get();
         parentNode->addChild(std::move(child));
-
         layout->mapOfNodes.add(id, childPtr);
       }
     }
@@ -164,14 +166,12 @@ namespace rl {
 
   bool RootDB::saveActiveLayout()
   {
-    if (!selected) {
+    if (!selected)
       return false;
-    }
 
     std::ofstream file(selected->filePath);
-    if (!file.is_open()) {
+    if (!file.is_open())
       return false;
-    }
 
     serializeNode(file, selected->root, "null");
     return true;
@@ -193,7 +193,6 @@ namespace rl {
   }
 
   RLRootNode* RootDB::getActive() const { return selected; }
-
   bool RootDB::hasLayout(const std::string& name) const
   {
     return storage.has(name);
@@ -211,88 +210,64 @@ namespace rl {
         (node.width.type == SizeType::Pixels) ? node.width.value : 0.0f;
     node.box.height =
         (node.height.type == SizeType::Pixels) ? node.height.value : 0.0f;
-
-    if (node.children.getSize() == 0)
+    if (node.children.getSize() == 0) {
       return;
-
+    }
     float childrenMainSum = 0.0f;
     float childrenCrossMax = 0.0f;
     const FlexDirection dir = node.flexDirection;
-
     for (size_t i = 0; i < node.children.getSize(); ++i) {
-      if (!node.children[i])
+      if (!node.children[i]) {
         continue;
+      }
 
-      auto& child = *node.children[i];
-      float childOuterMain =
-          child.box.mainSize(dir) + getMarginMain(child, dir);
-      float childOuterCross =
-          child.box.crossSize(dir) + getMarginCross(child, dir);
+      const Rect& childBox = node.children[i]->box;
+      childrenMainSum += childBox.mainSize(dir);
 
-      childrenMainSum += childOuterMain;
-      if (childOuterCross > childrenCrossMax) {
-        childrenCrossMax = childOuterCross;
+      if (childBox.crossSize(dir) > childrenCrossMax) {
+        childrenCrossMax = childBox.crossSize(dir);
       }
     }
 
-    float paddingMain = (dir == FlexDirection::Row)
-                            ? (node.padding.left + node.padding.right)
-                            : (node.padding.top + node.padding.bottom);
-    float paddingCross = (dir == FlexDirection::Row)
-                             ? (node.padding.top + node.padding.bottom)
-                             : (node.padding.left + node.padding.right);
-
     if (node.width.type == SizeType::Auto) {
-      node.box.width = (dir == FlexDirection::Row)
-                           ? (childrenMainSum + paddingMain)
-                           : (childrenCrossMax + paddingCross);
+      node.box.width =
+          (dir == FlexDirection::Row) ? childrenMainSum : childrenCrossMax;
     }
     if (node.height.type == SizeType::Auto) {
-      node.box.height = (dir == FlexDirection::Row)
-                            ? (childrenCrossMax + paddingCross)
-                            : (childrenMainSum + paddingMain);
+      node.box.height =
+          (dir == FlexDirection::Row) ? childrenCrossMax : childrenMainSum;
     }
   }
+
   static void arrangeNode(RLNode& node)
   {
     if (node.children.getSize() == 0)
       return;
 
     const FlexDirection dir = node.flexDirection;
-
-    float paddingMainStart =
-        (dir == FlexDirection::Row) ? node.padding.left : node.padding.top;
-    float paddingMainEnd =
-        (dir == FlexDirection::Row) ? node.padding.right : node.padding.bottom;
-    float paddingCrossStart =
-        (dir == FlexDirection::Row) ? node.padding.top : node.padding.left;
-    float paddingCrossEnd =
-        (dir == FlexDirection::Row) ? node.padding.bottom : node.padding.right;
-
-    float innerParentMainSize =
-        node.box.mainSize(dir) - paddingMainStart - paddingMainEnd;
+    const float mainParentSize = node.box.mainSize(dir);
 
     float totalChildrenMainSize = 0.0f;
     size_t validChildren = 0;
+
     for (size_t i = 0; i < node.children.getSize(); ++i) {
       if (!node.children[i])
         continue;
-      totalChildrenMainSize += node.children[i]->box.mainSize(dir) +
-                               getMarginMain(*node.children[i], dir);
+      totalChildrenMainSize += node.children[i]->box.mainSize(dir);
       validChildren++;
     }
 
     if (validChildren == 0)
       return;
 
-    float freeSpace = innerParentMainSize - totalChildrenMainSize;
-    float currentMainPos = paddingMainStart;
+    float freeSpace = mainParentSize - totalChildrenMainSize;
+    float currentMainPos = 0.0f;
     float gap = 0.0f;
 
     if (node.justify == JustifyContent::FlexEnd) {
-      currentMainPos += freeSpace;
+      currentMainPos = freeSpace;
     } else if (node.justify == JustifyContent::Center) {
-      currentMainPos += freeSpace / 2.0f;
+      currentMainPos = freeSpace / 2.0f;
     } else if (
         node.justify == JustifyContent::SpaceBetween && validChildren > 1) {
       gap = freeSpace / static_cast< float >(validChildren - 1);
@@ -301,42 +276,27 @@ namespace rl {
     for (size_t i = 0; i < node.children.getSize(); ++i) {
       if (!node.children[i])
         continue;
+
       auto& child = *node.children[i];
+      child.box.mainPos(dir) = node.box.mainPos(dir) + currentMainPos;
 
-      float marginMainStart =
-          (dir == FlexDirection::Row) ? child.margin.left : child.margin.top;
-      float marginCrossStart =
-          (dir == FlexDirection::Row) ? child.margin.top : child.margin.left;
-
-      child.box.mainPos(dir) =
-          node.box.mainPos(dir) + currentMainPos + marginMainStart;
-
-      float innerParentCrossSize =
-          node.box.crossSize(dir) - paddingCrossStart - paddingCrossEnd;
-      float childOuterCrossSize =
-          child.box.crossSize(dir) + getMarginCross(child, dir);
-
-      float currentCrossPos =
-          paddingCrossStart + marginCrossStart; // Базовое смещение (FlexStart)
+      float crossParentSize = node.box.crossSize(dir);
+      float crossChildSize = child.box.crossSize(dir);
+      float currentCrossPos = 0.0f;
 
       if (node.align == AlignItems::FlexEnd) {
-        currentCrossPos = node.box.crossSize(dir) - paddingCrossEnd -
-                          child.box.crossSize(dir) -
-                          ((dir == FlexDirection::Row) ? child.margin.bottom
-                                                       : child.margin.right);
+        currentCrossPos = crossParentSize - crossChildSize;
       } else if (node.align == AlignItems::Center) {
-        float centerOffset =
-            (innerParentCrossSize - childOuterCrossSize) / 2.0f;
-        currentCrossPos = paddingCrossStart + centerOffset + marginCrossStart;
+        currentCrossPos = (crossParentSize - crossChildSize) / 2.0f;
       }
 
       child.box.crossPos(dir) = node.box.crossPos(dir) + currentCrossPos;
+      currentMainPos += child.box.mainSize(dir) + gap;
 
-      currentMainPos +=
-          child.box.mainSize(dir) + getMarginMain(child, dir) + gap;
       arrangeNode(child);
     }
   }
+
   void RootDB::calculateLayout()
   {
     if (!selected)
@@ -360,4 +320,5 @@ namespace rl {
     measureNode(selected->root);
     arrangeNode(selected->root);
   }
+
 }

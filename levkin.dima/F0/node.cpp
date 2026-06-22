@@ -1,11 +1,11 @@
 #include "node.hpp"
 
 namespace rl {
+
   void RLNode::addChild(std::unique_ptr< RLNode > p)
   {
     if (!p)
       return;
-
     p->parent = this;
     children.pushBack(std::move(p));
   }
@@ -38,7 +38,6 @@ namespace rl {
         justify(rhs.justify), align(rhs.align), box(rhs.box)
   {
     updateChildrenParent();
-
     rhs.reset();
   }
 
@@ -67,6 +66,7 @@ namespace rl {
 
     return *this;
   }
+
   void RLNode::updateChildrenParent() noexcept
   {
     for (size_t i = 0; i < children.getSize(); ++i) {
@@ -75,6 +75,7 @@ namespace rl {
       }
     }
   }
+
   void RLNode::reset() noexcept
   {
     parent = nullptr;
@@ -85,4 +86,5 @@ namespace rl {
     box.width = 0.0f;
     box.height = 0.0f;
   }
+
 }
