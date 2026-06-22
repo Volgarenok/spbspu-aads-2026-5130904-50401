@@ -6,7 +6,7 @@
 #include "node.hpp"
 #include "db.hpp"
 #include <fstream>
-
+#include "vector.hpp"
 namespace rl {
   namespace {
     struct ColorRGB {
@@ -25,6 +25,34 @@ namespace rl {
       size_t colorIdx = (std::hash< std::string >{}(id) + 3) % colorCount;
       return BEAUTIFUL_COLORS_RGB[colorIdx];
     }
+    void drawRect(
+        stf::Vector< uint8_t >& buffer,
+        int canvasW,
+        int canvasH,
+        float rx,
+        float ry,
+        float rw,
+        float rh,
+        ColorRGB color)
+    {
+      int xStart = std::max(0, static_cast< int >(rx));
+      int yStart = std::max(0, static_cast< int >(ry));
+      int xEnd = std::min(canvasW, static_cast< int >(rx + rw));
+      int yEnd = std::min(canvasH, static_cast< int >(ry + rh));
+
+      for (int y = yStart; y < yEnd; ++y) {
+        for (int x = xStart; x < xEnd; ++x) {
+          size_t pixelIdx =
+              (static_cast< size_t >(y) * static_cast< size_t >(canvasW) +
+               static_cast< size_t >(x)) *
+              3;
+          buffer[pixelIdx] = color.r;
+          buffer[pixelIdx + 1] = color.g;
+          buffer[pixelIdx + 2] = color.b;
+        }
+      }
+    }
+
     std::string getBackgroundColor(const std::string& id)
     {
       static const char* const BEAUTIFUL_COLORS[] = {
