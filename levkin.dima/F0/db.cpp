@@ -55,7 +55,33 @@ namespace rl {
     return AlignItems::FlexStart;
   }
 
-  static void serializeNode(
+  float getMarginMain(const RLNode& node, FlexDirection dir)
+  {
+    return (dir == FlexDirection::Row) ? (node.margin.left + node.margin.right)
+                                       : (node.margin.top + node.margin.bottom);
+  }
+
+  float getMarginCross(const RLNode& node, FlexDirection dir)
+  {
+    return (dir == FlexDirection::Row) ? (node.margin.top + node.margin.bottom)
+                                       : (node.margin.left + node.margin.right);
+  }
+
+  float getPaddingMain(const RLNode& node, FlexDirection dir)
+  {
+    return (dir == FlexDirection::Row)
+               ? (node.padding.left + node.padding.right)
+               : (node.padding.top + node.padding.bottom);
+  }
+
+  float getPaddingCross(const RLNode& node, FlexDirection dir)
+  {
+    return (dir == FlexDirection::Row)
+               ? (node.padding.top + node.padding.bottom)
+               : (node.padding.left + node.padding.right);
+  }
+
+  void serializeNode(
       std::ostream& os, const RLNode& node, const std::string& parentId)
   {
     os << parentId << " " << node.id << " " << node.width.value << " "
@@ -73,9 +99,8 @@ namespace rl {
   bool RootDB::loadDatabase(const std::string& dbPath)
   {
     std::ifstream file(dbPath);
-    if (!file.is_open()) {
+    if (!file.is_open())
       return false;
-    }
 
     storage = Map< std::string, std::unique_ptr< RLRootNode > >();
     selected = nullptr;
@@ -91,7 +116,6 @@ namespace rl {
 
   bool RootDB::saveDatabase(const std::string& dbPath)
   {
-    std::ifstream file(dbPath);
     std::ofstream outfile(dbPath);
     if (!outfile.is_open())
       return false;
@@ -217,25 +241,33 @@ namespace rl {
     float childrenCrossMax = 0.0f;
     const FlexDirection dir = node.flexDirection;
     for (size_t i = 0; i < node.children.getSize(); ++i) {
-      if (!node.children[i]) {
+      if (!node.children[i])
         continue;
-      }
 
-      const Rect& childBox = node.children[i]->box;
-      childrenMainSum += childBox.mainSize(dir);
+      const auto& child = *node.children[i];
+      float childOuterMain =
+          child.box.mainSize(dir) + getMarginMain(child, dir);
+      float childOuterCross =
+          child.box.crossSize(dir) + getMarginCross(child, dir);
 
-      if (childBox.crossSize(dir) > childrenCrossMax) {
-        childrenCrossMax = childBox.crossSize(dir);
+      childrenMainSum += childOuterMain;
+      if (childOuterCross > childrenCrossMax) {
+        childrenCrossMax = childOuterCross;
       }
     }
+
+    float paddingMain = getPaddingMain(node, dir);
+    float paddingCross = getPaddingCross(node, dir);
 
     if (node.width.type == SizeType::Auto) {
-      node.box.width =
-          (dir == FlexDirection::Row) ? childrenMainSum : childrenCrossMax;
+      node.box.width = (dir == FlexDirection::Row)
+                           ? (childrenMainSum + paddingMain)
+                           : (childrenCrossMax + paddingCross);
     }
     if (node.height.type == SizeType::Auto) {
-      node.box.height =
-          (dir == FlexDirection::Row) ? childrenCrossMax : childrenMainSum;
+      node.box.height = (dir == FlexDirection::Row)
+                            ? (childrenCrossMax + paddingCross)
+                            : (childrenMainSum + paddingMain);
     }
   }
 
@@ -245,7 +277,18 @@ namespace rl {
       return;
 
     const FlexDirection dir = node.flexDirection;
-    const float mainParentSize = node.box.mainSize(dir);
+
+    float paddingMainStart =
+        (dir == FlexDirection::Row) ? node.padding.left : node.padding.top;
+    float paddingMainEnd =
+        (dir == FlexDirection::Row) ? node.padding.right : node.padding.bottom;
+    float paddingCrossStart =
+        (dir == FlexDirection::Row) ? node.padding.top : node.padding.left;
+    float paddingCrossEnd =
+        (dir == FlexDirection::Row) ? node.padding.bottom : node.padding.right;
+
+    float innerParentMainSize =
+        node.box.mainSize(dir) - paddingMainStart - paddingMainEnd;
 
     float totalChildrenMainSize = 0.0f;
     size_t validChildren = 0;
@@ -253,21 +296,22 @@ namespace rl {
     for (size_t i = 0; i < node.children.getSize(); ++i) {
       if (!node.children[i])
         continue;
-      totalChildrenMainSize += node.children[i]->box.mainSize(dir);
+      totalChildrenMainSize += node.children[i]->box.mainSize(dir) +
+                               getMarginMain(*node.children[i], dir);
       validChildren++;
     }
 
     if (validChildren == 0)
       return;
 
-    float freeSpace = mainParentSize - totalChildrenMainSize;
-    float currentMainPos = 0.0f;
+    float freeSpace = innerParentMainSize - totalChildrenMainSize;
+    float currentMainPos = paddingMainStart;
     float gap = 0.0f;
 
     if (node.justify == JustifyContent::FlexEnd) {
-      currentMainPos = freeSpace;
+      currentMainPos += freeSpace;
     } else if (node.justify == JustifyContent::Center) {
-      currentMainPos = freeSpace / 2.0f;
+      currentMainPos += freeSpace / 2.0f;
     } else if (
         node.justify == JustifyContent::SpaceBetween && validChildren > 1) {
       gap = freeSpace / static_cast< float >(validChildren - 1);
@@ -278,20 +322,37 @@ namespace rl {
         continue;
 
       auto& child = *node.children[i];
-      child.box.mainPos(dir) = node.box.mainPos(dir) + currentMainPos;
 
-      float crossParentSize = node.box.crossSize(dir);
-      float crossChildSize = child.box.crossSize(dir);
-      float currentCrossPos = 0.0f;
+      float marginMainStart =
+          (dir == FlexDirection::Row) ? child.margin.left : child.margin.top;
+      float marginCrossStart =
+          (dir == FlexDirection::Row) ? child.margin.top : child.margin.left;
+
+      child.box.mainPos(dir) =
+          node.box.mainPos(dir) + currentMainPos + marginMainStart;
+
+      float innerParentCrossSize =
+          node.box.crossSize(dir) - paddingCrossStart - paddingCrossEnd;
+      float childOuterCrossSize =
+          child.box.crossSize(dir) + getMarginCross(child, dir);
+
+      float currentCrossPos = paddingCrossStart + marginCrossStart;
 
       if (node.align == AlignItems::FlexEnd) {
-        currentCrossPos = crossParentSize - crossChildSize;
+        float marginCrossEnd = (dir == FlexDirection::Row) ? child.margin.bottom
+                                                           : child.margin.right;
+        currentCrossPos = node.box.crossSize(dir) - paddingCrossEnd -
+                          child.box.crossSize(dir) - marginCrossEnd;
       } else if (node.align == AlignItems::Center) {
-        currentCrossPos = (crossParentSize - crossChildSize) / 2.0f;
+        float centerOffset =
+            (innerParentCrossSize - childOuterCrossSize) / 2.0f;
+        currentCrossPos = paddingCrossStart + centerOffset + marginCrossStart;
       }
 
       child.box.crossPos(dir) = node.box.crossPos(dir) + currentCrossPos;
-      currentMainPos += child.box.mainSize(dir) + gap;
+
+      currentMainPos +=
+          child.box.mainSize(dir) + getMarginMain(child, dir) + gap;
 
       arrangeNode(child);
     }
@@ -321,4 +382,4 @@ namespace rl {
     arrangeNode(selected->root);
   }
 
-}
+} 

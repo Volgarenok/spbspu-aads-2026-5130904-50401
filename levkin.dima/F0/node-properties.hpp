@@ -79,8 +79,6 @@ namespace rl {
   };
   std::ostream& operator<<(std::ostream& os, const Size& size);
 
-  class RLNode;
-  float getMarginMain(const rl::RLNode& node, rl::FlexDirection dir);
-  float getMarginCross(const rl::RLNode& node, rl::FlexDirection dir);
+  struct RLNode;
 }
 #endif
