@@ -27,10 +27,15 @@ namespace levkin {
     LCIter< T > end() const { return cend(); }
     LCIter< T > cend() const { return LCIter< T >(pseudo); }
 
-    void pushFront(T val) { insertAfter(LIter< T >(pseudo), std::move(val)); }
-    void pushBack(T val)
-    {
-      insertAfter(LIter< T >(pseudo->prev), std::move(val));
+    void pushFront(const T& val) { insertAfter(LIter< T >(pseudo), val); }
+    void pushFront(T&& val) { insertAfter(LIter< T >(pseudo), std::move(val)); }
+
+    void pushBack(const T& val) { 
+        insertAfter(end(), val); 
+    }
+    
+    void pushBack(T&& val) { 
+        insertAfter(end(), std::move(val)); 
     }
 
     List() : pseudo(new NodeBase())
@@ -82,8 +87,7 @@ namespace levkin {
         erase(LIter< T >(pseudo->prev));
       }
     };
-    void pushBack(T&& val) { insertAfter(end(), std::move(val)); }
-    LIter< T > insertAfter(LIter< T > it, const T&& val)
+    LIter< T > insertAfter(LIter< T > it,  T&& val)
     {
       if (it.curr == nullptr)
         throw std::out_of_range("out of bounds or null. wierd");

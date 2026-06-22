@@ -20,7 +20,10 @@ namespace levkin {
     bool is_valid_;
 
     NodeHashTable() : is_valid_(false) {}
-
+    NodeHashTable(const Key& k, Value&& v, bool valid)
+        : key_(k), value_(std::move(v)), is_valid_(valid)
+    {
+    }
     NodeHashTable(NodeHashTable&& other) noexcept
         : key_(std::move(other.key_)), value_(std::move(other.value_)),
           is_valid_(other.is_valid_)

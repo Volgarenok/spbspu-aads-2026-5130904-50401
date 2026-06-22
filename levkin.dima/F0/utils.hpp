@@ -13,7 +13,7 @@ namespace rl {
     extern const float DEFAULT_WIDTH;
     extern const float DEFAULT_HEIGHT;
     extern const char* const DEFAULT_LAYOUT_DIR;
-  } // namespace config
+  }
 
   std::string generateLayoutName(float width, float height);
   std::string generateLayoutPath(const std::string& layoutName);
