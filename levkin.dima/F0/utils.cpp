@@ -7,6 +7,62 @@
 #include <fstream>
 
 namespace rl {
+  namespace {
+    std::string getBackgroundColor(const std::string& id)
+    {
+      static const std::string BEAUTIFUL_COLORS[] = {
+          "coral",          "hotpink",      "tomato",      "darkorange",
+          "gold",           "mediumorchid", "deepskyblue", "mediumspringgreen",
+          "cornflowerblue", "crimson",      "sandybrown",  "turquoise",
+          "yellowgreen",    "plum"};
+
+      constexpr size_t colorCount =
+          sizeof(BEAUTIFUL_COLORS) / sizeof(BEAUTIFUL_COLORS[0]);
+      size_t colorIdx = (std::hash< std::string >{}(id)+2) % colorCount;
+      return BEAUTIFUL_COLORS[colorIdx];
+    }
+
+    std::string getContainerStyle(const RLNode& node)
+    {
+      std::string color = getBackgroundColor(node.id);
+      return "position: absolute; "
+             "left: " +
+             std::to_string(node.box.x) +
+             "px; "
+             "top: " +
+             std::to_string(node.box.y) +
+             "px; "
+             "width: " +
+             std::to_string(node.box.width) +
+             "px; "
+             "height: " +
+             std::to_string(node.box.height) +
+             "px; "
+             "box-sizing: border-box; "
+             "background-color: " +
+             color + ";";
+    }
+
+    const char* getLabelStyle()
+    {
+      return "position: absolute; "
+             "background: rgba(255, 255, 255, 0.85); "
+             "font-family: monospace; "
+             "font-size: 11px; "
+             "font-weight: bold; "
+             "padding: 1px 4px; "
+             "border-right: 1px solid #ccc; "
+             "border-bottom: 1px solid #ccc;";
+    }
+
+    void renderSingleNodeHtml(std::ostream& os, const RLNode& node)
+    {
+      os << "<div style=\"" << getContainerStyle(node) << "\">\n"
+         << "<span style=\"" << getLabelStyle() << "\">" << node.id
+         << "</span>\n"
+         << "</div>\n";
+    }
+  }
   namespace config {
     const float DEFAULT_WIDTH = 1920.0f;
     const float DEFAULT_HEIGHT = 1080.0f;
@@ -25,22 +81,10 @@ namespace rl {
   {
     return std::string(config::DEFAULT_LAYOUT_DIR) + layoutName + ".rl";
   }
+  
   void exportNodeToHtml(std::ostream& os, const RLNode& node)
   {
-    std::string borderColor =
-        (node.flexDirection == FlexDirection::Row) ? "blue" : "green";
-
-    os << "<div style=\"" << "position: absolute; " << "left: " << node.box.x
-       << "px; " << "top: " << node.box.y << "px; "
-       << "width: " << node.box.width << "px; " << "height: " << node.box.height
-       << "px; " << "border: 2px solid " << borderColor << "; "
-       << "box-sizing: border-box; "
-       << "background-color: rgba(0, 0, 0, 0.02);\">\n"
-       << "<span style=\"" << "position: absolute; " << "background: white; "
-       << "font-family: monospace; " << "font-size: 11px; "
-       << "padding: 1px 3px; " << "border: 1px solid #ccc;\">" << node.id
-       << "</span>\n"
-       << "</div>\n";
+    renderSingleNodeHtml(os, node);
 
     for (size_t i = 0; i < node.children.getSize(); ++i) {
       if (node.children[i]) {
