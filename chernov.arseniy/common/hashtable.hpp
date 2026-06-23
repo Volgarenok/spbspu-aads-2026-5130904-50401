@@ -47,6 +47,9 @@ namespace chernov {
     Value & at(const Key & k);
     const Value & at(const Key & k) const;
 
+    Value & operator[](const Key & k);
+    const Value & operator[](const Key & k) const;
+
     iterator begin();
     const_iterator begin() const;
     const_iterator cbegin() const;
@@ -341,12 +344,24 @@ void chernov::HashTable< Key, Value, Hash, Equal >::rehash(size_t num_buckets, s
 template < class Key, class Value, class Hash, class Equal >
 Value & chernov::HashTable< Key, Value, Hash, Equal >::at(const Key & k)
 {
-  const HashTable< Key, Value, Hash, Equal > * cthis = this;
-  return const_cast< Value & >(cthis->at(k));
+  return operator[](k);
 }
 
 template < class Key, class Value, class Hash, class Equal >
 const Value & chernov::HashTable< Key, Value, Hash, Equal >::at(const Key & k) const
+{
+  return operator[](k);
+}
+
+template < class Key, class Value, class Hash, class Equal >
+Value & chernov::HashTable< Key, Value, Hash, Equal >::operator[](const Key & k)
+{
+  const HashTable< Key, Value, Hash, Equal > * cthis = this;
+  return const_cast< Value & >(cthis->operator[](k));
+}
+
+template < class Key, class Value, class Hash, class Equal >
+const Value & chernov::HashTable< Key, Value, Hash, Equal >::operator[](const Key & k) const
 {
   size_t index = getElementIndex(k);
   return data_[index].second;
