@@ -3,16 +3,15 @@
 
 #include <cstddef>
 #include <string>
-
-#include "hasher.hpp"
 #include <hashtable.hpp>
 #include <vector.hpp>
+#include "hasher.hpp"
 
 namespace chernov {
   struct KeyComparator {
     bool operator()(const std::string & s1, const std::string & s2) const
     {
-      return s1 == s2;
+      return std::equal_to< std::string >{}(s1, s2);
     }
   };
 
@@ -20,7 +19,7 @@ namespace chernov {
   struct Comparator {
     bool operator()(const T & p1, const T & p2)
     {
-      return p1 < p2;
+      return std::less< T >{}(p1, p2);
     }
   };
 
@@ -70,17 +69,29 @@ namespace chernov {
     void addVertex(std::string graph_name, std::string vertex, std::ostream & output);
     void createGraphWithoutCheckingExisting(std::string graph_name);
     void createGraph(std::string graph_name);
-    bool hasGraph(const std::string& name) const;
+    bool hasGraph(const std::string & name) const;
     void addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight);
     void showGraphs(std::ostream & output);
     void showGraphVertexes(std::string graph_name, std::ostream & output);
     void showGraphEdges(Vector< std::pair< std::string, size_t > > & edges, std::ostream & output);
     void showGraphOutbound(std::string graph_name, std::string vertex, std::ostream & output);
     void showGraphInbound(std::string graph_name, std::string vertex, std::ostream & output);
-    void bindGraphVertexes(std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output);
-    void cutGraphEdge(std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output);
+    void bindGraphVertexes(std::string graph_name,
+      std::string vertex_a,
+      std::string vertex_b,
+      size_t weight,
+      std::ostream & output);
+    void cutGraphEdge(std::string graph_name,
+      std::string vertex_a,
+      std::string vertex_b,
+      size_t weight,
+      std::ostream & output);
     void mergeGraphs(std::string new_graph, std::string old_graph1, std::string old_graph2, std::ostream & output);
-    void extractGraphs(std::string new_graph, std::string old_graph, size_t count_k, Vector< std::string > & vertexes, std::ostream & output);
+    void extractGraphs(std::string new_graph,
+      std::string old_graph,
+      size_t count_k,
+      Vector< std::string > & vertexes,
+      std::ostream & output);
   };
 }
 
