@@ -296,7 +296,6 @@ namespace donkeev
     BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->right_)
     {
-      std::cout << "kkk\n";
       return it;
     }
 
