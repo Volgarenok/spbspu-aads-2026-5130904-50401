@@ -237,3 +237,43 @@ ulanova::Graph ulanova::Graph::merge(const std::string& name, const Graph& rhs) 
     const Vector< Edge >& edges = (*it).second;
     for (auto edgeIt = edges.begin(); edgeIt != edges.end(); ++edgeIt)
     {
+      result.addEdge(from, edgeIt->vertex, edgeIt->weight);
+    }
+  }
+
+  return result;
+}
+
+ulanova::Graph ulanova::Graph::extract(const std::string& name, const Vector< std::string >& vertices) const
+{
+  Graph result(name);
+
+  for (auto it = vertices.begin(); it != vertices.end(); ++it)
+  {
+    if (!hasVertex(*it))
+    {
+      throw std::out_of_range("vertex not found");
+    }
+    result.addVertex(*it);
+  }
+
+  for (auto it = vertices.begin(); it != vertices.end(); ++it)
+  {
+    const std::string& from = *it;
+    auto edgeIt = outbound_.find(from);
+    if (edgeIt == outbound_.end())
+    {
+      continue;
+    }
+    const Vector< Edge >& edges = (*edgeIt).second;
+    for (auto eIt = edges.begin(); eIt != edges.end(); ++eIt)
+    {
+      if (result.hasVertex(eIt->vertex))
+      {
+        result.addEdge(from, eIt->vertex, eIt->weight);
+      }
+    }
+  }
+
+  return result;
+}
