@@ -40,7 +40,8 @@ namespace
     }
   }
 
-  bool hasString(const zhuravleva::myVector< std::string >& vector, const std::string& value)
+  bool hasString(const zhuravleva::myVector< std::string >& vector,
+      const std::string& value)
   {
     for (size_t i = 0; i < vector.size(); i++)
     {
@@ -52,25 +53,30 @@ namespace
     return false;
   }
 
-  void printGroupedPairs(std::ostream& out, zhuravleva::myVector< std::pair< std::string, size_t > >& result)
+  void printGroupedPairs(std::ostream& out,
+      zhuravleva::myVector< std::pair< std::string, size_t > >& result)
   {
     if (result.empty())
     {
-      out << '\n';
       return;
     }
     sortVector(result, PairComparator());
     size_t i = 0;
+    bool firstLine = true;
     while (i < result.size())
     {
+      if (!firstLine)
+      {
+        out << '\n';
+      }
+      firstLine = false;
       std::string vertex = result[i].first;
       out << vertex;
       while (i < result.size() && result[i].first == vertex)
       {
         out << ' ' << result[i].second;
-        i++;
+        ++i;
       }
-      out << '\n';
     }
   }
 }
@@ -145,13 +151,14 @@ void zhuravleva::outbound(std::ostream& out, std::istream& in, const GraphTable&
     {
       const List< size_t >& weights = it->second;
       for (LCIter< size_t > weightIt = weights.cbegin();
-        weightIt != weights.cend(); ++weightIt)
+          weightIt != weights.cend(); ++weightIt)
       {
         result.pushBack(std::make_pair(it->first.second, *weightIt));
       }
     }
   }
   printGroupedPairs(out, result);
+  out << '\n';
 }
 
 void zhuravleva::inbound(std::ostream& out, std::istream& in, const GraphTable& graphs)
@@ -188,6 +195,7 @@ void zhuravleva::inbound(std::ostream& out, std::istream& in, const GraphTable& 
     }
   }
   printGroupedPairs(out, result);
+  out << '\n';
 }
 
 void zhuravleva::bind(std::ostream&, std::istream& in, GraphTable& graphs)
@@ -289,7 +297,8 @@ void zhuravleva::merge(std::ostream&, std::istream& in, GraphTable& graphs)
   }
 
   const EdgeTable& firstEdges = firstGraph.getEdges();
-  for (EdgeTable::ConstIterator it = firstEdges.cbegin(); it != firstEdges.cend(); ++it)
+  for (EdgeTable::ConstIterator it = firstEdges.cbegin();
+      it != firstEdges.cend(); ++it)
   {
     for (LCIter< size_t > weightIt = it->second.cbegin();
         weightIt != it->second.cend(); ++weightIt)
@@ -298,7 +307,8 @@ void zhuravleva::merge(std::ostream&, std::istream& in, GraphTable& graphs)
     }
   }
   const EdgeTable& secondEdges = secondGraph.getEdges();
-  for (EdgeTable::ConstIterator it = secondEdges.cbegin(); it != secondEdges.cend(); ++it)
+  for (EdgeTable::ConstIterator it = secondEdges.cbegin();
+      it != secondEdges.cend(); ++it)
   {
     for (LCIter< size_t > weightIt = it->second.cbegin();
         weightIt != it->second.cend(); ++weightIt)

@@ -14,8 +14,8 @@ namespace zhuravleva
       size_t capacity_;
 
     public:
-      typedef T* iterator;
-      typedef const T* constIterator;
+      using iterator = T*;
+      using constIterator = const T*;
 
       myVector();
       ~myVector();
@@ -240,7 +240,7 @@ namespace zhuravleva
     return data_ + size_;
   }
 
-    template< class T >
+  template< class T >
   typename myVector< T >::constIterator myVector< T >::cbegin() const noexcept
   {
     return data_;
