@@ -149,21 +149,11 @@ bool madieva::Game::fill(size_t row, size_t col)
   if (!isInBounds(row, col)) {
     return false;
   }
-  if (solution_[row][col] == 1 && state_[row][col] != 1) {
-    state_[row][col] = 1;
-    ++filledCount_;
-    return true;
-  }
-  return false;
-}
-
-bool madieva::Game::emptyCell(size_t row, size_t col)
-{
-  if (!isInBounds(row, col)) {
-    return false;
-  }
-  if (solution_[row][col] == -1 && state_[row][col] != -1) {
-    state_[row][col] = -1;
+  if (solution_[row][col] == 1) {
+    if (state_[row][col] != 1) {
+      state_[row][col] = 1;
+      ++filledCount_;
+    }
     return true;
   }
   return false;

@@ -16,6 +16,9 @@ int main()
     commands.insert("save", madieva::cmd_save);
     commands.insert("continue", madieva::cmd_continue);
     commands.insert("exists", madieva::cmd_exists);
+    commands.insert("fill", madieva::cmd_fill);
+    commands.insert("fill_row", madieva::cmd_fill_row);
+    commands.insert("fill_col", madieva::cmd_fill_col);
   } catch (...) {
     std::cerr << "<INTERNAL ERROR>\n";
     return 2;

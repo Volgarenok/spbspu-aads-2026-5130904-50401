@@ -4,6 +4,20 @@
 #include <fstream>
 #include <sstream>
 
+namespace {
+  bool readCell(std::istream & in, size_t & row, size_t & col)
+  {
+    size_t r = 0;
+    size_t c = 0;
+    if (!(in >> r >> c)) {
+      return false;
+    }
+    row = r - 1;
+    col = c - 1;
+    return true;
+  }
+}
+
 void madieva::cmd_load(std::istream & in, std::ostream & out,
   TemplateTable & templates, GameTable &) {
   std::string name;
@@ -164,3 +178,141 @@ void madieva::cmd_exists(std::istream & in, std::ostream & out,
   }
 }
 
+void madieva::cmd_fill(std::istream & in, std::ostream & out,
+  TemplateTable &, GameTable & games)
+{
+  std::string gameName;
+  if (!(in >> gameName)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  if (!games.contains(gameName)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  size_t row = 0;
+  size_t col = 0;
+  if (!readCell(in, row, col)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  try {
+    Game & game = games.get(gameName);
+    if (game.getRows() <= row || game.getCols() <= col) {
+      out << "<OUT OF RANGE>\n";
+      return;
+    }
+    bool success = game.fill(row, col);
+    if (!success) {
+      out << "<MISS>\n";
+      return;
+    }
+    game.print(out);
+    out << '\n';
+    if (game.win()) {
+      out << "<YOU WIN>\n";
+    }
+  } catch (...) {
+    out << "<INVALID COMMAND>\n";
+  }
+}
+
+void madieva::cmd_fill_row(std::istream & in, std::ostream & out,
+  TemplateTable &, GameTable & games)
+{
+  std::string gameName;
+  if (!(in >> gameName)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  if (!games.contains(gameName)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  size_t row = 0;
+  size_t col = 0;
+  if (!readCell(in, row, col)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  size_t count = 0;
+  if (!(in >> count) || count == 0) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  try {
+    Game & game = games.get(gameName);
+    if (game.getRows() <= row || game.getCols() < col + count) {
+      out << "OUT OF RANGE>\n";
+      return;
+    }
+    for (size_t i = 0; i < count; ++i) {
+      size_t currentCol = col + i;
+      bool success = game.fill(row, currentCol);
+      if (!success) {
+        out << "<MISS>\n";
+        return;
+      }
+    }
+    game.print(out);
+    out << '\n';
+    if (game.win()) {
+      out << "<YOU WIN>\n";
+    }
+  } catch (...) {
+    out << "<INVALID COMMAND>\n";
+  }
+}
+
+void madieva::cmd_fill_col(std::istream & in, std::ostream & out,
+  TemplateTable &, GameTable & games)
+{
+  std::string gameName;
+  if (!(in >> gameName)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  if (!games.contains(gameName)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  size_t row = 0;
+  size_t col = 0;
+  if (!readCell(in, row, col)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  size_t count = 0;
+  if (!(in >> count) || count == 0) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  try {
+    Game & game = games.get(gameName);
+    if (game.getRows() <= row || game.getCols() < col + count) {
+      out << "OUT OF RANGE>\n";
+      return;
+    }
+    for (size_t i = 0; i < count; ++i) {
+      size_t currentRow = row + i;
+      bool success = game.fill(currentRow, col);
+      if (!success) {
+        out << "<MISS>\n";
+        return;
+      }
+    }
+    game.print(out);
+    out << '\n';
+
+    if (game.win()) {
+      out << "<YOU WIN>\n";
+    }
+  } catch (...) {
+    out << "<INVALID COMMAND>\n";
+  }
+}
