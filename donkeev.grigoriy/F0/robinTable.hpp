@@ -121,6 +121,46 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  void RobinTable<Key, Value, Hash, Equal>::insert(const Key& key, const Value& value)
+  {
+    if (static_cast<double>(size_) / slots_.size() >= 0.75)
+    {
+      rehash(slots_.size() * 2);
+    }
+    
+    size_t cap = slots_.size();
+    size_t index = hasher_(k) % cap;
+    
+    Node toAdd{key, value, true, 0};
+    
+    for (size_t i = 0; i < cap; ++i)
+    {
+      if (!slots_[index].isOccupied_)
+      {
+        slots_[index] = toAdd;
+        size_++;
+        return;
+      }
+        
+      if (equal_(slots_[index].key_, key))
+      {
+        slots_[index].value_ = value;
+        return;
+      }
+        
+      if (toAdd.psl_ > slots_[index].psl_)
+      {
+        std::swap(toAdd, slots_[index]);
+      }
+        
+      toAdd.psl_++;
+      index = (index + 1) % cap;
+    }
+    
+    throw std::runtime_error("Overflow");
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
   Value& RobinTable<Key, Value, Hash, Equal>::at(const Key& key)
   {
     auto result = findNode(key);
