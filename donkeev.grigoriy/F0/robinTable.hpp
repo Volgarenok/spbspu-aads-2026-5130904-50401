@@ -24,18 +24,18 @@ namespace donkeev
 
     ~RobinHashTable() = default;
 
-    RobinTable& operator=(const RobinTable& other);
-    RobinTable& operator=(RobinTable&& other) noexcept;
-    Value& operator[](const Key& k);
+    RobinTable& operator=(const RobinTable&);
+    RobinTable& operator=(RobinTable&&) noexcept;
+    Value& operator[](const Key&);
 
-    Value& at(const Key& id);
-    const Value& at(const Key& id) const;
+    Value& at(const Key&);
+    const Value& at(const Key&) const;
 
-    bool contains(const Key& k) const;
+    bool contains(const Key&) const;
     
-    void insert(const Key& k, const Value& v);
-    Value remove(const Key& k);
-    void rehash(size_t slots);
+    void insert(const Key&, const Value&);
+    Value remove(const Key&);
+    void rehash(ssize_t);
     
     size_t size() const;
     size_t capacity() const;
@@ -48,8 +48,26 @@ namespace donkeev
     Hash hasher_;
     Equal equal_;
 
-    Node& findNode(const Key key&);
+    Node& findNode(const Key&);
   };
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinTable<Key, Value, Hash, Equal>::RobinTable(const RobinTable& other):
+    slots_(other.slots_),
+    size_(other.size_),
+    hasher_(other.hasher_),
+    equal_(other.equal_)
+  {}
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinTable<Key, Value, Hash, Equal>::RobinTable(RobinTable&& other) noexcept:
+    slots_(std::move(other.slots_)),
+    size_(other.size_),
+    hasher_(std::move(other.hasher_)),
+    equal_(std::move(other.equal_))
+  {
+    other.size_ = 0;
+  }
 
   template< class Key, class Value, class Hash, class Equal >
   RobinTable<Key, Value, Hash, Equal>::RobinTable(size_t capacity):
@@ -61,6 +79,8 @@ namespace donkeev
     assert(capacity > 0);
     slots_ = topit::Vector(capacity, Node());
   }
+
+  
 }
 
 #endif
