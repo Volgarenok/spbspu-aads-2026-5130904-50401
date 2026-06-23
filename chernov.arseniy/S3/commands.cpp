@@ -54,8 +54,9 @@ void chernov::cmdCut(std::istream & input, std::ostream &, Graphs & graphs)
 void chernov::cmdCreate(std::istream & input, std::ostream & output, Graphs & graphs)
 {
   std::string graph_name;
-  if (!(input >> graph_name))
+  if (!(input >> graph_name)) {
     return;
+  }
 
   if (graphs.hasGraph(graph_name)) {
     input.setstate(std::ios::failbit);
