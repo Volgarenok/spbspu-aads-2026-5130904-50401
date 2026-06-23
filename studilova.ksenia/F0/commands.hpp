@@ -10,6 +10,8 @@ namespace studilova
 {
   void createBudget(std::istream&, std::ostream&, BudgetManager&);
   void createCategory(std::istream&, std::ostream&, BudgetManager&);
+  void showBalance(std::istream&, std::ostream&, BudgetManager&);
+  void showExpenses(std::istream&, std::ostream&, BudgetManager&);
 }
 
 #endif
