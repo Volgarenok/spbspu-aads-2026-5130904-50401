@@ -28,6 +28,8 @@ namespace studilova
 			bool hasBudget(const std::string& name) const;
 			void removeBudget(const std::string& name);
 
+			Vector<std::string> getBudgetNames() const;
+
 		private:
   		BudgetTable budgets_;
 	};
@@ -64,6 +66,16 @@ bool studilova::BudgetManager::hasBudget(const std::string& name) const
 void studilova::BudgetManager::removeBudget(const std::string& name)
 {
   budgets_.erase(name);
+}
+
+studilova::Vector<std::string> studilova::BudgetManager::getBudgetNames() const
+{
+  Vector< std::string > result;
+  for (auto it = budgets_.begin(); it != budgets_.end(); ++it)
+  {
+    result.pushBack(it->first);
+  }
+  return result;
 }
 
 #endif
