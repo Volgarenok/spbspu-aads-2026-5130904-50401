@@ -1,6 +1,5 @@
-#include "graph.hpp"
 #include <boost/test/unit_test.hpp>
-
+#include "graph.hpp"
 
 #include <stdexcept>
 #include <string>

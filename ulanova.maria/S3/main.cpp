@@ -15,7 +15,13 @@ int main(int argc, char* argv[])
   try
   {
     ulanova::GraphStorage storage;
-    ulanova::loadGraphsFromFile(argv[1], storage);
+    std::ifstream file("graphs.txt");
+    if (!file)
+    {
+      std::cerr << "cannot open file\n";
+      return 1;
+    }
+    ulanova::loadGraphs(file, storage);
 
     ulanova::CommandProcessor processor(storage);
     processor.run(std::cin, std::cout);

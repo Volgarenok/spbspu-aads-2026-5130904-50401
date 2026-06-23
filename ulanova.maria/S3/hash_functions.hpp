@@ -42,12 +42,6 @@ namespace ulanova
     boost::hash2::hmac_sha2_256 hmac_;
   };
 
-  template< class Hash, class Flavor >
-  void hash_append(Hash& hash, const Flavor& flavor, const EdgeKey& key);
-
-  using EdgeKeyHash = HmacHash< EdgeKey >;
-  using EdgeKeyEqual = EqualTo< EdgeKey >;
-
   using StringHash = HmacHash< std::string >;
   using StringEqual = EqualTo< std::string >;
 }
@@ -75,14 +69,6 @@ size_t ulanova::HmacHash< T >::operator()(const T& value) const
   boost::hash2::hmac_sha2_256 hmac(hmac_);
   boost::hash2::hash_append(hmac, {}, value);
   return boost::hash2::get_integral_result< size_t >(hmac);
-}
-
-template< class Hash, class Flavor >
-void ulanova::hash_append(Hash& hash, const Flavor& flavor, const EdgeKey& key)
-{
-  boost::hash2::hash_append(hash, flavor, key.from);
-  boost::hash2::hash_append(hash, flavor, key.to);
-  boost::hash2::hash_append(hash, flavor, key.weight);
 }
 
 #endif

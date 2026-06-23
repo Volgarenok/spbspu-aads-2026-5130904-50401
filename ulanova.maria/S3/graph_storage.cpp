@@ -1,122 +1,89 @@
 #include "graph_storage.hpp"
 
-#include <fstream>
-#include <sstream>
 #include <stdexcept>
+#include <string>
 
-namespace ulanova
+namespace
 {
-  GraphStorage::GraphStorage():
-    graphs_(128)
-  {}
-
-  bool GraphStorage::hasGraph(const std::string& name) const
+  bool isEmptyLine(const std::string& line)
   {
-    return graphs_.has(name);
+    return line.empty() || line.find_first_not_of(" \t\r") == std::string::npos;
   }
+}
 
-  Graph* GraphStorage::findGraph(const std::string& name)
+ulanova::GraphStorage::GraphStorage():
+  graphs_(128)
+{}
+
+bool ulanova::GraphStorage::hasGraph(const std::string& name) const
+{
+  return graphs_.contains(name);
+}
+
+ulanova::Graph* ulanova::GraphStorage::findGraph(const std::string& name)
+{
+  auto it = graphs_.find(name);
+  if (it == graphs_.end())
   {
-    return graphs_.find(name);
+    return nullptr;
   }
+  return &(*it).second;
+}
 
-  const Graph* GraphStorage::findGraph(const std::string& name) const
+const ulanova::Graph* ulanova::GraphStorage::findGraph(const std::string& name) const
+{
+  auto it = graphs_.find(name);
+  if (it == graphs_.end())
   {
-    return graphs_.find(name);
+    return nullptr;
   }
+  return &(*it).second;
+}
 
-  void GraphStorage::addGraph(const Graph& graph)
+void ulanova::GraphStorage::addGraph(const Graph& graph)
+{
+  if (graphs_.contains(graph.getName()))
   {
-    if (graphs_.has(graph.getName()))
+    throw std::invalid_argument("graph already exists");
+  }
+  graphs_.add(graph.getName(), graph);
+}
+
+ulanova::Vector< std::string > ulanova::GraphStorage::getGraphNames() const
+{
+  Vector< std::string > result;
+  for (auto it = graphs_.cbegin(); it != graphs_.cend(); ++it)
+  {
+    result.push_back((*it).first);
+  }
+  return result;
+}
+
+std::istream& ulanova::loadGraphs(std::istream& input, GraphStorage& storage)
+{
+  std::string graphName;
+  size_t edgeCount = 0;
+
+  while (input >> graphName >> edgeCount)
+  {
+    Graph graph(graphName);
+
+    for (size_t i = 0; i < edgeCount; ++i)
     {
-      throw std::invalid_argument("graph already exists");
-    }
+      std::string from;
+      std::string to;
+      unsigned weight = 0;
 
-    graphs_.add(graph.getName(), graph);
-  }
-
-  Vector<std::string> GraphStorage::getGraphNames() const
-  {
-    Vector<std::string> result;
-
-    for (auto it = graphs_.cbegin(); it != graphs_.cend(); ++it)
-    {
-      result.push_back(it.key());
-    }
-
-    return result;
-  }
-
-  static bool isEmptyLine(const std::string& line)
-  {
-    for (size_t i = 0; i < line.size(); ++i)
-    {
-      if (line[i] != ' ' && line[i] != '\t' && line[i] != '\r')
+      if (!(input >> from >> to >> weight))
       {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  void loadGraphsFromFile(const std::string& filename, GraphStorage& storage)
-  {
-    std::ifstream input(filename);
-
-    if (!input)
-    {
-      throw std::runtime_error("cannot open input file");
-    }
-
-    std::string line;
-
-    while (std::getline(input, line))
-    {
-      if (isEmptyLine(line))
-      {
-        continue;
-      }
-
-      std::istringstream header(line);
-      std::string graphName;
-      size_t edgeCount = 0;
-
-      if (!(header >> graphName >> edgeCount))
-      {
-        throw std::runtime_error("bad graph header");
+        return input;
       }
 
-      Graph graph(graphName);
-
-      size_t readEdges = 0;
-      while (readEdges < edgeCount && std::getline(input, line))
-      {
-        if (isEmptyLine(line))
-        {
-          continue;
-        }
-
-        std::istringstream edgeLine(line);
-        std::string from;
-        std::string to;
-        unsigned weight = 0;
-
-        if (!(edgeLine >> from >> to >> weight))
-        {
-          throw std::runtime_error("bad edge line");
-        }
-
-        graph.addEdge(from, to, weight);
-        ++readEdges;
-      }
-
-      if (readEdges != edgeCount)
-      {
-        throw std::runtime_error("not enough edge lines");
-      }
-
-      storage.addGraph(graph);
+      graph.addEdge(from, to, weight);
     }
+
+    storage.addGraph(graph);
   }
+
+  return input;
 }

@@ -2,384 +2,290 @@
 
 #include <algorithm>
 #include <iostream>
-#include <sstream>
+#include <stdexcept>
 
-namespace ulanova
+void ulanova::sortStrings(Vector< std::string >& values)
 {
-  CommandProcessor::CommandProcessor(GraphStorage& storage):
-    storage_(storage),
-    handlers_()
+  std::sort(values.begin(), values.end());
+}
+
+bool edgeLess(const ulanova::Edge& lhs, const ulanova::Edge& rhs)
+{
+  if (lhs.vertex != rhs.vertex)
   {
-    handlers_["graphs"] = &CommandProcessor::handleGraphs;
-    handlers_["vertexes"] = &CommandProcessor::handleVertices;
-    handlers_["vertices"] = &CommandProcessor::handleVertices;
-    handlers_["outbound"] = &CommandProcessor::handleOutbound;
-    handlers_["inbound"] = &CommandProcessor::handleInbound;
-    handlers_["bind"] = &CommandProcessor::handleBind;
-    handlers_["cut"] = &CommandProcessor::handleCut;
-    handlers_["create"] = &CommandProcessor::handleCreate;
-    handlers_["merge"] = &CommandProcessor::handleMerge;
-    handlers_["extract"] = &CommandProcessor::handleExtract;
+    return lhs.vertex < rhs.vertex;
+  }
+  return lhs.weight < rhs.weight;
+}
+
+void ulanova::sortEdges(Vector< Edge >& edges)
+{
+  std::sort(edges.begin(), edges.end(), edgeLess);
+}
+
+void ulanova::printEdges(const Vector< Edge >& edges, std::ostream& output)
+{
+  if (edges.isEmpty())
+  {
+    output << '\n';
+    return;
   }
 
-  void CommandProcessor::run(std::istream& input, std::ostream& output)
+  size_t i = 0;
+  while (i < edges.getsize())
   {
-    std::string line;
+    output << edges[i].vertex << ' ' << edges[i].weight;
 
-    while (std::getline(input, line))
+    size_t j = i + 1;
+    while (j < edges.getsize() && edges[j].vertex == edges[i].vertex)
     {
-      Args args = split(line);
-
-      if (args.empty())
-      {
-        continue;
-      }
-
-      auto it = handlers_.find(args[0]);
-
-      if (it == handlers_.end())
-      {
-        printInvalid(output);
-        continue;
-      }
-
-      try
-      {
-        Handler handler = it->second;
-        (this->*handler)(args, output);
-      }
-      catch (...)
-      {
-        printInvalid(output);
-      }
-    }
-  }
-
-  CommandProcessor::Args CommandProcessor::split(const std::string& line)
-  {
-    Args args;
-    std::istringstream input(line);
-    std::string word;
-
-    while (input >> word)
-    {
-      args.push_back(word);
+      output << ' ' << edges[j].weight;
+      ++j;
     }
 
-    return args;
+    output << '\n';
+    i = j;
   }
+}
 
-  bool CommandProcessor::parseUnsigned(const std::string& text, unsigned& value)
+void ulanova::printInvalid(std::ostream& output)
+{
+  output << "<INVALID COMMAND>\n";
+}
+
+ulanova::CommandProcessor::CommandProcessor(GraphStorage& storage):
+  storage_(storage),
+  handlers_()
+{
+  handlers_.add("graphs",   &CommandProcessor::handleGraphs);
+  handlers_.add("vertexes", &CommandProcessor::handleVertices);
+  handlers_.add("vertices", &CommandProcessor::handleVertices);
+  handlers_.add("outbound", &CommandProcessor::handleOutbound);
+  handlers_.add("inbound",  &CommandProcessor::handleInbound);
+  handlers_.add("bind",     &CommandProcessor::handleBind);
+  handlers_.add("cut",      &CommandProcessor::handleCut);
+  handlers_.add("create",   &CommandProcessor::handleCreate);
+  handlers_.add("merge",    &CommandProcessor::handleMerge);
+  handlers_.add("extract",  &CommandProcessor::handleExtract);
+}
+
+void ulanova::CommandProcessor::run(std::istream& input, std::ostream& output)
+{
+  std::string cmd;
+  while (input >> cmd)
   {
-    std::istringstream input(text);
-    unsigned tmp = 0;
-    char tail = '\0';
-
-    if (!(input >> tmp))
+    auto it = handlers_.find(cmd);
+    if (it == handlers_.end())
     {
-      return false;
-    }
-
-    if (input >> tail)
-    {
-      return false;
-    }
-
-    value = tmp;
-    return true;
-  }
-
-  bool CommandProcessor::parseSize(const std::string& text, size_t& value)
-  {
-    std::istringstream input(text);
-    size_t tmp = 0;
-    char tail = '\0';
-
-    if (!(input >> tmp))
-    {
-      return false;
-    }
-
-    if (input >> tail)
-    {
-      return false;
-    }
-
-    value = tmp;
-    return true;
-  }
-
-  void CommandProcessor::sortStrings(Vector<std::string>& values)
-  {
-    std::sort(values.begin(), values.end());
-  }
-
-  void CommandProcessor::sortEdges(Vector<Edge>& edges)
-  {
-    std::sort(edges.begin(), edges.end(), [](const Edge& lhs, const Edge& rhs)
-    {
-      if (lhs.vertex != rhs.vertex)
-      {
-        return lhs.vertex < rhs.vertex;
-      }
-
-      return lhs.weight < rhs.weight;
-    });
-  }
-
-  void CommandProcessor::printEdges(const Vector<Edge>& edges, std::ostream& output)
-  {
-    if (edges.isEmpty())
-    {
-      output << '\n';
-      return;
-    }
-
-    size_t i = 0;
-
-    while (i < edges.getsize())
-    {
-      output << edges[i].vertex << ' ' << edges[i].weight;
-
-      size_t j = i + 1;
-      while (j < edges.getsize() && edges[j].vertex == edges[i].vertex)
-      {
-        output << ' ' << edges[j].weight;
-        ++j;
-      }
-
-      output << '\n';
-      i = j;
-    }
-  }
-
-  void CommandProcessor::printInvalid(std::ostream& output)
-  {
-    output << "<INVALID COMMAND>\n";
-  }
-
-  void CommandProcessor::handleGraphs(const Args& args, std::ostream& output)
-  {
-    if (args.size() != 1)
-    {
+      std::string rest;
+      std::getline(input, rest);
       printInvalid(output);
-      return;
+      continue;
     }
-
-    Vector<std::string> names = storage_.getGraphNames();
-    sortStrings(names);
-
-    if (names.isEmpty())
+    try
     {
-      output << '\n';
-      return;
+      Handler handler = (*it).second;
+      (this->*handler)(input, output);
     }
-
-    for (auto it = names.begin(); it != names.end(); ++it)
-    {
-      output << *it << '\n';
-    }
-  }
-
-  void CommandProcessor::handleVertices(const Args& args, std::ostream& output)
-  {
-    if (args.size() != 2)
-    {
-      printInvalid(output);
-      return;
-    }
-
-    const Graph* graph = storage_.findGraph(args[1]);
-
-    if (graph == nullptr)
-    {
-      printInvalid(output);
-      return;
-    }
-
-    Vector<std::string> vertices = graph->getVertices();
-    sortStrings(vertices);
-    if (vertices.isEmpty())
-    {
-      output << '\n';
-      return;
-    }
-
-    for (auto it = vertices.begin(); it != vertices.end(); ++it)
-    {
-      output << *it << '\n';
-    }
-  }
-
-  void CommandProcessor::handleOutbound(const Args& args, std::ostream& output)
-  {
-    if (args.size() != 3)
-    {
-      printInvalid(output);
-      return;
-    }
-
-    const Graph* graph = storage_.findGraph(args[1]);
-
-    if (graph == nullptr || !graph->hasVertex(args[2]))
-    {
-      printInvalid(output);
-      return;
-    }
-
-    Vector<Edge> edges = graph->getOutbound(args[2]);
-    sortEdges(edges);
-    printEdges(edges, output);
-
-  }
-
-  void CommandProcessor::handleInbound(const Args& args, std::ostream& output)
-  {
-    if (args.size() != 3)
-    {
-      printInvalid(output);
-      return;
-    }
-
-    const Graph* graph = storage_.findGraph(args[1]);
-
-    if (graph == nullptr || !graph->hasVertex(args[2]))
-    {
-      printInvalid(output);
-      return;
-    }
-
-    Vector<Edge> edges = graph->getInbound(args[2]);
-    sortEdges(edges);
-    printEdges(edges, output);
-
-  }
-
-  void CommandProcessor::handleBind(const Args& args, std::ostream&)
-  {
-    if (args.size() != 5)
-    {
-      throw std::runtime_error("bad bind");
-    }
-
-    Graph* graph = storage_.findGraph(args[1]);
-    unsigned weight = 0;
-
-    if (graph == nullptr || !parseUnsigned(args[4], weight))
-    {
-      throw std::runtime_error("bad bind");
-    }
-
-    graph->addEdge(args[2], args[3], weight);
-  }
-
-  void CommandProcessor::handleCut(const Args& args, std::ostream& output)
-  {
-    if (args.size() != 5)
-    {
-      printInvalid(output);
-      return;
-    }
-
-    Graph* graph = storage_.findGraph(args[1]);
-    unsigned weight = 0;
-
-    if (graph == nullptr || !parseUnsigned(args[4], weight))
-    {
-      printInvalid(output);
-      return;
-    }
-
-    if (!graph->removeEdge(args[2], args[3], weight))
+    catch (...)
     {
       printInvalid(output);
     }
   }
+}
 
-  void CommandProcessor::handleCreate(const Args& args, std::ostream& output)
+void ulanova::CommandProcessor::handleGraphs(std::istream&, std::ostream& output)
+{
+  Vector< std::string > names = storage_.getGraphNames();
+  sortStrings(names);
+  if (names.isEmpty())
   {
-    if (args.size() < 3)
-    {
-      printInvalid(output);
-      return;
-    }
-
-    size_t count = 0;
-
-    if (!parseSize(args[2], count) || args.size() != count + 3 || storage_.hasGraph(args[1]))
-    {
-      printInvalid(output);
-      return;
-    }
-
-    Graph graph(args[1]);
-
-    for (size_t i = 0; i < count; ++i)
-    {
-      graph.addVertex(args[i + 3]);
-    }
-
-    storage_.addGraph(graph);
+    output << '\n';
+    return;
   }
-
-  void CommandProcessor::handleMerge(const Args& args, std::ostream& output)
+  for (auto it = names.begin(); it != names.end(); ++it)
   {
-    if (args.size() != 4)
-    {
-      printInvalid(output);
-      return;
-    }
-
-    if (storage_.hasGraph(args[1]))
-    {
-      printInvalid(output);
-      return;
-    }
-
-    const Graph* lhs = storage_.findGraph(args[2]);
-    const Graph* rhs = storage_.findGraph(args[3]);
-
-    if (lhs == nullptr || rhs == nullptr)
-    {
-      printInvalid(output);
-      return;
-    }
-
-    Graph result = Graph::merge(args[1], *lhs, *rhs);
-    storage_.addGraph(result);
+    output << *it << '\n';
   }
+}
 
-  void CommandProcessor::handleExtract(const Args& args, std::ostream& output)
+void ulanova::CommandProcessor::handleVertices(std::istream& input, std::ostream& output)
+{
+  std::string graphName;
+  if (!(input >> graphName))
   {
-    if (args.size() < 4)
-    {
-      printInvalid(output);
-      return;
-    }
-
-    if (storage_.hasGraph(args[1]))
-    {
-      printInvalid(output);
-      return;
-    }
-
-    const Graph* graph = storage_.findGraph(args[2]);
-    size_t count = 0;
-
-    if (graph == nullptr || !parseSize(args[3], count) || args.size() != count + 4)
-    {
-      printInvalid(output);
-      return;
-    }
-
-    Vector<std::string> vertices;
-
-    for (size_t i = 0; i < count; ++i)
-    {
-      vertices.push_back(args[i + 4]);
-    }
-
-    Graph result = graph->extract(args[1], vertices);
-    storage_.addGraph(result);
+    throw std::runtime_error("bad vertices");
   }
+  const Graph* graph = storage_.findGraph(graphName);
+  if (graph == nullptr)
+  {
+    throw std::runtime_error("graph not found");
+  }
+  Vector< std::string > vertices = graph->getVertices();
+  sortStrings(vertices);
+  if (vertices.isEmpty())
+  {
+    output << '\n';
+    return;
+  }
+  for (auto it = vertices.begin(); it != vertices.end(); ++it)
+  {
+    output << *it << '\n';
+  }
+}
+
+void ulanova::CommandProcessor::handleOutbound(std::istream& input, std::ostream& output)
+{
+  std::string graphName;
+  std::string vertex;
+  if (!(input >> graphName >> vertex))
+  {
+    throw std::runtime_error("bad outbound");
+  }
+  const Graph* graph = storage_.findGraph(graphName);
+  if (graph == nullptr || !graph->hasVertex(vertex))
+  {
+    throw std::runtime_error("graph or vertex not found");
+  }
+  Vector< Edge > edges = graph->getOutbound(vertex);
+  sortEdges(edges);
+  printEdges(edges, output);
+}
+
+void ulanova::CommandProcessor::handleInbound(std::istream& input, std::ostream& output)
+{
+  std::string graphName;
+  std::string vertex;
+  if (!(input >> graphName >> vertex))
+  {
+    throw std::runtime_error("bad inbound");
+  }
+  const Graph* graph = storage_.findGraph(graphName);
+  if (graph == nullptr || !graph->hasVertex(vertex))
+  {
+    throw std::runtime_error("graph or vertex not found");
+  }
+  Vector< Edge > edges = graph->getInbound(vertex);
+  sortEdges(edges);
+  printEdges(edges, output);
+}
+
+void ulanova::CommandProcessor::handleBind(std::istream& input, std::ostream&)
+{
+  std::string graphName;
+  std::string from;
+  std::string to;
+  unsigned weight = 0;
+  if (!(input >> graphName >> from >> to >> weight))
+  {
+    throw std::runtime_error("bad bind");
+  }
+  Graph* graph = storage_.findGraph(graphName);
+  if (graph == nullptr)
+  {
+    throw std::runtime_error("graph not found");
+  }
+  graph->addEdge(from, to, weight);
+}
+
+void ulanova::CommandProcessor::handleCut(std::istream& input, std::ostream& output)
+{
+  std::string graphName;
+  std::string from;
+  std::string to;
+  unsigned weight = 0;
+  if (!(input >> graphName >> from >> to >> weight))
+  {
+    throw std::runtime_error("bad cut");
+  }
+  Graph* graph = storage_.findGraph(graphName);
+  if (graph == nullptr || !graph->removeEdge(from, to, weight))
+  {
+    printInvalid(output);
+  }
+}
+
+void ulanova::CommandProcessor::handleCreate(std::istream& input, std::ostream& output)
+{
+  std::string graphName;
+  size_t count = 0;
+  if (!(input >> graphName >> count))
+  {
+    throw std::runtime_error("bad create");
+  }
+  if (storage_.hasGraph(graphName))
+  {
+    std::string rest;
+    std::getline(input, rest);
+    printInvalid(output);
+    return;
+  }
+  Graph graph(graphName);
+  for (size_t i = 0; i < count; ++i)
+  {
+    std::string vertex;
+    if (!(input >> vertex))
+    {
+      throw std::runtime_error("bad create: not enough vertices");
+    }
+    graph.addVertex(vertex);
+  }
+  storage_.addGraph(graph);
+}
+
+void ulanova::CommandProcessor::handleMerge(std::istream& input, std::ostream& output)
+{
+  std::string newName;
+  std::string lhsName;
+  std::string rhsName;
+  if (!(input >> newName >> lhsName >> rhsName))
+  {
+    throw std::runtime_error("bad merge");
+  }
+  if (storage_.hasGraph(newName))
+  {
+    printInvalid(output);
+    return;
+  }
+  const Graph* lhs = storage_.findGraph(lhsName);
+  const Graph* rhs = storage_.findGraph(rhsName);
+  if (lhs == nullptr || rhs == nullptr)
+  {
+    throw std::runtime_error("graph not found");
+  }
+  Graph result = lhs->merge(newName, *rhs);
+  storage_.addGraph(result);
+}
+
+void ulanova::CommandProcessor::handleExtract(std::istream& input, std::ostream& output)
+{
+  std::string newName;
+  std::string srcName;
+  size_t count = 0;
+  if (!(input >> newName >> srcName >> count))
+  {
+    throw std::runtime_error("bad extract");
+  }
+  if (storage_.hasGraph(newName))
+  {
+    printInvalid(output);
+    return;
+  }
+  const Graph* graph = storage_.findGraph(srcName);
+  if (graph == nullptr)
+  {
+    throw std::runtime_error("graph not found");
+  }
+  Vector< std::string > vertices;
+  for (size_t i = 0; i < count; ++i)
+  {
+    std::string vertex;
+    if (!(input >> vertex))
+    {
+      throw std::runtime_error("bad extract: not enough vertices");
+    }
+    vertices.push_back(vertex);
+  }
+  Graph result = graph->extract(newName, vertices);
+  storage_.addGraph(result);
 }
