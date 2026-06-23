@@ -159,8 +159,31 @@ bool madieva::Game::fill(size_t row, size_t col)
   return false;
 }
 
-bool madieva::Game::win() const
+bool madieva::Game::emptyCell(size_t row, size_t col)
 {
+  if (!isInBounds(row, col)) {
+    return false;
+  }
+  if (solution_[row][col] == -1) {
+    if (state_[row][col] != -1) {
+      state_[row][col] = -1;
+    }
+    return true;
+  }
+  return false;
+}
+
+bool madieva::Game::win()
+{
+  if (filledCount_ == totalFilled_) {
+    for (size_t i = 0; i < rows_; ++i) {
+      for (size_t j = 0; j < cols_; ++j) {
+        if (state_[i][j] == 0) {
+          state_[i][j] = -1;
+        }
+      }
+    }
+  }
   return filledCount_ == totalFilled_;
 }
 

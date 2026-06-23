@@ -19,6 +19,9 @@ int main()
     commands.insert("fill", madieva::cmd_fill);
     commands.insert("fill_row", madieva::cmd_fill_row);
     commands.insert("fill_col", madieva::cmd_fill_col);
+    commands.insert("empty", madieva::cmd_empty);
+    commands.insert("empty_row", madieva::cmd_empty_row);
+    commands.insert("empty_col", madieva::cmd_empty_col);
   } catch (...) {
     std::cerr << "<INTERNAL ERROR>\n";
     return 2;

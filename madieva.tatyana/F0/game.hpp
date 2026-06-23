@@ -19,7 +19,7 @@ namespace madieva {
 
     bool fill(size_t row, size_t col);
     bool emptyCell(size_t row, size_t col);
-    bool win() const;
+    bool win();
 
     size_t getRows() const noexcept;
     size_t getCols() const noexcept;
