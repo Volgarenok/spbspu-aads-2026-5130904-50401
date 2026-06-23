@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <istream>
 
 
 ulanova::GraphStorage::GraphStorage():
