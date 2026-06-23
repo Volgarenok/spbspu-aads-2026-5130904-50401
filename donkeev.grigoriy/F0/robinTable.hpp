@@ -120,6 +120,28 @@ namespace donkeev
     return findNode(k).second->value_;
   }
 
+  template< class Key, class Value, class Hash, class Equal >
+  Value& RobinTable<Key, Value, Hash, Equal>::at(const Key& key)
+  {
+    auto result = findNode(key);
+    if (result.second)
+    {
+      return result.second->value_;
+    }
+
+    throw std::out_of_range("No such elemnt");
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  const Value& RobinTable<Key, Value, Hash, Equal>::at(const Key& key) const
+  {
+    auto result = findNode(key);
+    if (result.second)
+    {
+      return result.second->value_;
+    }
+    throw std::out_of_range("No such elemnt");
+  }
 
   template< class Key, class Value, class Hash, class Equal >
   std::pair<size_t, typename RobinTable<Key, Value, Hash, Equal>::Node*>
