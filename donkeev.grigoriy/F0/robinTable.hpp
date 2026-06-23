@@ -161,6 +161,38 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  Value RobinTable<Key, Value, Hash, Equal>::remove(const Key& key)
+  {
+    std::pair< size_t, Node* > result = findNode(key);
+    Node* toDel = result.second;
+    size_t currId = result.first;
+    
+    if (!toDel)
+    {
+      throw std::out_of_range("Invalid key");
+    }
+    
+    Value saved = std::move(toDel->value_);
+    
+    size_t cap = slots_.getSize();
+    size_t nextId = (currId + 1) % cap;
+    
+    while (slots_[nextId].isOccupied_ && slots_[nextId].psl_ != 0)
+    {
+      slots_[currId] = slots_[nextId];
+      slots_[currId].psl_--;
+      
+      currId = nextId;
+      nextId = (nextId + 1) % cap;
+    }
+    
+    slots_[currId] = Node{};
+    size_--;
+    
+    return saved;
+}
+
+  template< class Key, class Value, class Hash, class Equal >
   Value& RobinTable<Key, Value, Hash, Equal>::at(const Key& key)
   {
     auto result = findNode(key);
