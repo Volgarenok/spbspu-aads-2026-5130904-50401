@@ -230,7 +230,7 @@ namespace donkeev
       rightGrandSon->parent_ = parent;
     }
 
-    return leftChild;
+    return iterator(leftChild);
   }
 
   template<class Key, class Value, class Compare>
@@ -272,7 +272,7 @@ namespace donkeev
       leftGrandSon->parent_ = parent;
     }
 
-    return rightChild;
+    return iterator(rightChild);
   }
 
   template<class Key, class Value, class Compare>
@@ -287,7 +287,7 @@ namespace donkeev
     iterator leftIt(parent->left_);
     rotateLeft(leftIt);
 
-    return it;
+    return rotateRight(it);
   }
 
   template<class Key, class Value, class Compare>
@@ -296,13 +296,14 @@ namespace donkeev
     BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->right_)
     {
+      std::cout << "kkk\n";
       return it;
     }
 
     iterator rightIt(parent->right_);
     rotateRight(rightIt);
 
-    return it;
+    return rotateLeft(it);
   }
 
   template< class Key, class Value, class Compare >
