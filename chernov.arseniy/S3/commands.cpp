@@ -4,6 +4,7 @@
 void chernov::cmdGraphs(std::istream &, std::ostream & output, Graphs & graphs)
 {
   graphs.showGraphs(output);
+  output << "\n";
 }
 
 void chernov::cmdVertexes(std::istream & input, std::ostream & output, Graphs & graphs)
@@ -11,6 +12,7 @@ void chernov::cmdVertexes(std::istream & input, std::ostream & output, Graphs & 
   std::string graph_name;
   input >> graph_name;
   graphs.showGraphVertexes(graph_name, output);
+  output << "\n";
 }
 
 void chernov::cmdOutbound(std::istream & input, std::ostream & output, Graphs & graphs)
@@ -18,6 +20,7 @@ void chernov::cmdOutbound(std::istream & input, std::ostream & output, Graphs & 
   std::string graph_name, vertex;
   input >> graph_name >> vertex;
   graphs.showGraphOutbound(graph_name, vertex, output);
+  output << "\n";
 }
 
 void chernov::cmdInbound(std::istream & input, std::ostream & output, Graphs & graphs)
@@ -25,6 +28,7 @@ void chernov::cmdInbound(std::istream & input, std::ostream & output, Graphs & g
   std::string graph_name, vertex;
   input >> graph_name >> vertex;
   graphs.showGraphInbound(graph_name, vertex, output);
+  output << "\n";
 }
 
 void chernov::cmdBind(std::istream & input, std::ostream &, Graphs & graphs)

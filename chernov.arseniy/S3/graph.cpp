@@ -207,11 +207,12 @@ void chernov::Graphs::showGraphs(std::ostream & output)
     graphs.pushBack(iter->first);
   }
   detail::sort(graphs, Comparator< std::string >{});
-  for (auto iter = graphs.cbegin(); iter != graphs.cend(); ++iter) {
-    output << *iter << "\n";
-  }
-  if (graphs.isEmpty()) {
-    output << "\n";
+  auto iter = graphs.cbegin();
+  if (iter != graphs.cend()) {
+    output << *iter;
+    for (++iter; iter != graphs.cend(); ++iter) {
+      output << "\n" << *iter;
+    }
   }
 }
 
@@ -219,18 +220,18 @@ void chernov::Graphs::showGraphVertexes(const std::string & graph_name, std::ost
 {
   Vector< std::string > vertexes = graphs_.at(graph_name).getVertexes();
   detail::sort(vertexes, Comparator< std::string >{});
-  for (auto iter = vertexes.cbegin(); iter != vertexes.cend(); ++iter) {
-    output << *iter << "\n";
-  }
-  if (vertexes.isEmpty()) {
-    output << "\n";
+  auto iter = vertexes.cbegin();
+  if (iter != vertexes.cend()) {
+    output << *iter;
+    for (++iter; iter != vertexes.cend(); ++iter) {
+      output << "\n" << *iter;
+    }
   }
 }
 
 void chernov::Graphs::showGraphEdges(Vector< std::pair< std::string, size_t > > & edges, std::ostream & output)
 {
   if (edges.isEmpty()) {
-    output << "\n";
     return;
   }
 
@@ -245,7 +246,9 @@ void chernov::Graphs::showGraphEdges(Vector< std::pair< std::string, size_t > > 
       output << " " << iter->second;
       ++iter;
     }
-    output << "\n";
+    if (iter != edges.cend()) {
+      output << "\n";
+    }
   }
 }
 
