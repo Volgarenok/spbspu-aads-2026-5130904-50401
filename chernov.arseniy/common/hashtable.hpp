@@ -38,9 +38,9 @@ namespace chernov {
 
     void clear() noexcept;
 
-    void add(Key k, Value v);
-    void remove(Key k);
-    bool has(Key k) const;
+    void add(const Key & k, const Value & v);
+    void remove(const Key & k);
+    bool has(const Key & k) const;
     void rehash(size_t slots);
     void rehash(size_t num_buckets, size_t bucket_cap, size_t overflow_cap);
 
@@ -272,7 +272,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::clear() noexcept
 }
 
 template < class Key, class Value, class Hash, class Equal >
-void chernov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
+void chernov::HashTable< Key, Value, Hash, Equal >::add(const Key & k, const Value & v)
 {
   HashTable< Key, Value, Hash, Equal > new_ht{*this};
 
@@ -287,7 +287,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
 }
 
 template < class Key, class Value, class Hash, class Equal >
-void chernov::HashTable< Key, Value, Hash, Equal >::remove(Key k)
+void chernov::HashTable< Key, Value, Hash, Equal >::remove(const Key & k)
 {
   HashTable< Key, Value, Hash, Equal > new_ht{*this};
 
@@ -298,7 +298,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::remove(Key k)
 }
 
 template < class Key, class Value, class Hash, class Equal >
-bool chernov::HashTable< Key, Value, Hash, Equal >::has(Key k) const
+bool chernov::HashTable< Key, Value, Hash, Equal >::has(const Key & k) const
 {
   try {
     getElementIndex(k);
