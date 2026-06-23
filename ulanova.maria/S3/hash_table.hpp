@@ -502,7 +502,7 @@ ulanova::HashTableConstIterator< Key, Value, Hash, Equal >::HashTableConstIterat
 
 template< class Key, class Value, class Hash, class Equal >
 ulanova::HashTableConstIterator< Key, Value, Hash, Equal >::HashTableConstIterator(
-  const HashTable< Key, Value, Hash, Equal >& it):
+    const HashTableIterator< Key, Value, Hash, Equal >& it):
   table_(it.table_),
   index_(it.index_)
 {}

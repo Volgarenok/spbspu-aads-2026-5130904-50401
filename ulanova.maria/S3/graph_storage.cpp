@@ -55,13 +55,13 @@ ulanova::Vector< std::string > ulanova::GraphStorage::getGraphNames() const
 std::istream& ulanova::loadGraphs(std::istream& input, GraphStorage& storage)
 {
   std::string graphName;
-  size_t edgeCount = 0;
+  unsigned edgeCount = 0;
 
   while (input >> graphName >> edgeCount)
   {
     Graph graph(graphName);
 
-    for (size_t i = 0; i < edgeCount; ++i)
+    for (unsigned i = 0; i < edgeCount; ++i)
     {
       std::string from;
       std::string to;
@@ -71,12 +71,9 @@ std::istream& ulanova::loadGraphs(std::istream& input, GraphStorage& storage)
       {
         return input;
       }
-
       graph.addEdge(from, to, weight);
     }
-
     storage.addGraph(graph);
   }
-
   return input;
 }

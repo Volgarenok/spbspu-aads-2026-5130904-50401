@@ -3,7 +3,7 @@
 #include "commands.hpp"
 #include "graph_storage.hpp"
 
-int main(int argc, char* argv[])
+int main(int argc, char* [])
 {
   if (argc != 2)
   {
