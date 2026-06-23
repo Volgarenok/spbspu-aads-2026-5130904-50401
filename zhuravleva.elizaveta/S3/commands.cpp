@@ -1,4 +1,5 @@
 #include "commands.hpp"
+#include <functional>
 #include <istream>
 #include <ostream>
 #include <stdexcept>
@@ -6,14 +7,6 @@
 
 namespace
 {
-  struct StringComparator
-  {
-    bool operator()(const std::string& a, const std::string& b) const
-    {
-      return a < b;
-    }
-  };
-
   struct PairComparator
   {
     bool operator()(const std::pair< std::string, size_t >& a,
@@ -42,14 +35,13 @@ namespace
       }
       if (minIndex != i)
       {
-        T temp = vector[i];
-        vector[i] = vector[minIndex];
-        vector[minIndex] = temp;
+        std::swap(vector[i], vector[minIndex]);
       }
     }
   }
 
-  bool hasString(const zhuravleva::myVector< std::string >& vector, const std::string& value)
+  bool hasString(const zhuravleva::myVector< std::string >& vector,
+      const std::string& value)
   {
     for (size_t i = 0; i < vector.size(); i++)
     {
@@ -61,25 +53,30 @@ namespace
     return false;
   }
 
-  void printGroupedPairs(std::ostream& out, zhuravleva::myVector< std::pair< std::string, size_t > >& result)
+  void printGroupedPairs(std::ostream& out,
+      zhuravleva::myVector< std::pair< std::string, size_t > >& result)
   {
     if (result.empty())
     {
-      out << '\n';
       return;
     }
     sortVector(result, PairComparator());
     size_t i = 0;
+    bool firstLine = true;
     while (i < result.size())
     {
+      if (!firstLine)
+      {
+        out << '\n';
+      }
+      firstLine = false;
       std::string vertex = result[i].first;
       out << vertex;
       while (i < result.size() && result[i].first == vertex)
       {
         out << ' ' << result[i].second;
-        i++;
+        ++i;
       }
-      out << '\n';
     }
   }
 }
@@ -96,7 +93,7 @@ void zhuravleva::graphs(std::ostream& out, std::istream&, const GraphTable& grap
     out << '\n';
     return;
   }
-  sortVector(names, StringComparator());
+  sortVector(names, std::less< std::string >());
   for (size_t i = 0; i < names.size(); i++)
   {
     out << names[i] << '\n';
@@ -120,7 +117,7 @@ void zhuravleva::vertexes(std::ostream& out, std::istream& in, const GraphTable&
     out << '\n';
     return;
   }
-  sortVector(result, StringComparator());
+  sortVector(result, std::less< std::string >());
   for (size_t i = 0; i < result.size(); i++)
   {
     out << result[i] << '\n';
@@ -146,24 +143,22 @@ void zhuravleva::outbound(std::ostream& out, std::istream& in, const GraphTable&
   }
   myVector< std::pair< std::string, size_t > > result;
 
-  const HashTable< std::pair< std::string, std::string >, List< size_t >,
-    Blake2Hasher< std::pair< std::string, std::string > >, KeyEqual >& edges = graph.getEdges();
+  const EdgeTable& edges = graph.getEdges();
 
-    for (HashTable< std::pair< std::string, std::string >,
-      List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
-      KeyEqual >::ConstIterator it = edges.cbegin(); it != edges.cend(); ++it)
+  for (EdgeTable::ConstIterator it = edges.cbegin(); it != edges.cend(); ++it)
   {
     if (it->first.first == vertex)
     {
       const List< size_t >& weights = it->second;
       for (LCIter< size_t > weightIt = weights.cbegin();
-        weightIt != weights.cend(); ++weightIt)
+          weightIt != weights.cend(); ++weightIt)
       {
         result.pushBack(std::make_pair(it->first.second, *weightIt));
       }
     }
   }
   printGroupedPairs(out, result);
+  out << '\n';
 }
 
 void zhuravleva::inbound(std::ostream& out, std::istream& in, const GraphTable& graphs)
@@ -185,12 +180,9 @@ void zhuravleva::inbound(std::ostream& out, std::istream& in, const GraphTable& 
   }
   myVector< std::pair< std::string, size_t > > result;
 
-  const HashTable< std::pair< std::string, std::string >, List< size_t >,
-    Blake2Hasher< std::pair< std::string, std::string > >, KeyEqual >& edges = graph.getEdges();
+  const EdgeTable& edges = graph.getEdges();
 
-  for (HashTable< std::pair< std::string, std::string >,
-      List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
-      KeyEqual >::ConstIterator it = edges.cbegin(); it != edges.cend(); ++it)
+  for (EdgeTable::ConstIterator it = edges.cbegin(); it != edges.cend(); ++it)
   {
     if (it->first.second == vertex)
     {
@@ -203,6 +195,7 @@ void zhuravleva::inbound(std::ostream& out, std::istream& in, const GraphTable& 
     }
   }
   printGroupedPairs(out, result);
+  out << '\n';
 }
 
 void zhuravleva::bind(std::ostream&, std::istream& in, GraphTable& graphs)
@@ -303,12 +296,9 @@ void zhuravleva::merge(std::ostream&, std::istream& in, GraphTable& graphs)
     result.addVertex(secondVertexes[i]);
   }
 
-  const HashTable< std::pair< std::string, std::string >,
-    List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
-    KeyEqual >& firstEdges = firstGraph.getEdges();
-  for (HashTable< std::pair< std::string, std::string >,
-      List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
-      KeyEqual >::ConstIterator it = firstEdges.cbegin(); it != firstEdges.cend(); ++it)
+  const EdgeTable& firstEdges = firstGraph.getEdges();
+  for (EdgeTable::ConstIterator it = firstEdges.cbegin();
+      it != firstEdges.cend(); ++it)
   {
     for (LCIter< size_t > weightIt = it->second.cbegin();
         weightIt != it->second.cend(); ++weightIt)
@@ -316,12 +306,9 @@ void zhuravleva::merge(std::ostream&, std::istream& in, GraphTable& graphs)
       result.bind(it->first.first, it->first.second, *weightIt);
     }
   }
-  const HashTable< std::pair< std::string, std::string >,
-    List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
-    KeyEqual >& secondEdges = secondGraph.getEdges();
-  for (HashTable< std::pair< std::string, std::string >,
-      List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
-      KeyEqual >::ConstIterator it = secondEdges.cbegin(); it != secondEdges.cend(); ++it)
+  const EdgeTable& secondEdges = secondGraph.getEdges();
+  for (EdgeTable::ConstIterator it = secondEdges.cbegin();
+      it != secondEdges.cend(); ++it)
   {
     for (LCIter< size_t > weightIt = it->second.cbegin();
         weightIt != it->second.cend(); ++weightIt)
@@ -366,12 +353,8 @@ void zhuravleva::extract(std::ostream&, std::istream& in, GraphTable& graphs)
     result.addVertex(vertex);
     selectedVertexes.pushBack(vertex);
   }
-  const HashTable< std::pair< std::string, std::string >,
-    List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
-    KeyEqual >& oldEdges = oldGraph.getEdges();
-  for (HashTable< std::pair< std::string, std::string >,
-      List< size_t >, Blake2Hasher< std::pair< std::string, std::string > >,
-      KeyEqual >::ConstIterator it = oldEdges.cbegin(); it != oldEdges.cend(); ++it)
+  const EdgeTable& oldEdges = oldGraph.getEdges();
+  for (EdgeTable::ConstIterator it = oldEdges.cbegin(); it != oldEdges.cend(); ++it)
   {
     if (hasString(selectedVertexes, it->first.first) &&
         hasString(selectedVertexes, it->first.second))

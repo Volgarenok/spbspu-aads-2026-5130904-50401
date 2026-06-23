@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <functional>
 #include <limits>
 #include <string>
 #include "commands.hpp"
@@ -37,10 +38,16 @@ int main(int argc, char** argv)
     graphs.add(graphName, graph);
   }
 
-  typedef void (*Command)(std::ostream&, std::istream&, zhuravleva::GraphTable&);
-  typedef void (*ConstCommand)(std::ostream&, std::istream&, const zhuravleva::GraphTable&);
-  zhuravleva::HashTable< std::string, Command, zhuravleva::Blake2Hasher< std::string >, zhuravleva::KeyEqual > commands;
-  zhuravleva::HashTable< std::string, ConstCommand, zhuravleva::Blake2Hasher< std::string >, zhuravleva::KeyEqual > constCommands;
+  using Command = void (*)(std::ostream&, std::istream&, zhuravleva::GraphTable&);
+  using ConstCommand = void (*)(std::ostream&,
+      std::istream&, const zhuravleva::GraphTable&);
+  using CommandTable = zhuravleva::HashTable< std::string, Command,
+      zhuravleva::Blake2Hasher< std::string >, std::equal_to< std::string > >;
+
+  using ConstCommandTable = zhuravleva::HashTable< std::string, ConstCommand,
+      zhuravleva::Blake2Hasher< std::string >, std::equal_to< std::string > >;
+  CommandTable commands;
+  ConstCommandTable constCommands;
 
   constCommands.add("graphs", zhuravleva::graphs);
   constCommands.add("vertexes", zhuravleva::vertexes);

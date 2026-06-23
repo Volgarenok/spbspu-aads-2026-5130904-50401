@@ -1,78 +1,99 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 
+#include <cstddef>
 #include <stdexcept>
-#include "../common/list.hpp"
-#include "../common/node.hpp"
-#include "../common/iterator.hpp"
+#include <utility>
+#include <list.hpp>
 
 namespace zhuravleva
 {
-  template<class T>
+  template< class T >
   class Queue
   {
-  private:
-    List<T> data;
-
   public:
     void push(const T& value);
+    void push(T&& value);
     void pop();
     T& front();
-    T drop();
-    bool empty() const;
-    void clear();
+    const T& front() const;
+    bool empty() const noexcept;
+    void clear() noexcept;
+    size_t size() const noexcept;
+
+    template< class... Args >
+    void emplace(Args&&... args);
+
+  private:
+    List< T > data_;
   };
 }
 
 template< class T >
 void zhuravleva::Queue< T >::push(const T& value)
 {
-  data.addEnd(value);
+  data_.emplaceBack(value);
 }
 
+template< class T >
+void zhuravleva::Queue< T >::push(T&& value)
+{
+  data_.emplaceBack(std::forward< T >(value));
+}
 
 template< class T >
 void zhuravleva::Queue< T >::pop()
 {
-  if (data.empty())
+  if (data_.empty())
   {
     throw std::runtime_error("empty data error");
   }
-  data.deleteStart();
+  data_.popFront();
 }
 
 template< class T >
 T& zhuravleva::Queue< T >::front()
 {
-  if (data.empty())
+  if (data_.empty())
   {
     throw std::runtime_error("error");
   }
-  return (*data.begin());
+  return (*data_.begin());
 }
 
 template< class T >
-T zhuravleva::Queue< T >::drop()
+const T& zhuravleva::Queue< T >::front() const
 {
-  if (data.empty())
+  if (data_.empty())
   {
-    throw std::runtime_error("empty data error when drop");
+    throw std::runtime_error("empty queue");
   }
-  T val = *data.begin();
-  data.deleteStart();
-  return val;
+  return *data_.cbegin();
 }
 
 template< class T >
-bool zhuravleva::Queue< T >::empty() const
+bool zhuravleva::Queue< T >::empty() const noexcept
 {
-  return data.empty();
+  return data_.empty();
 }
 
 template< class T >
-void zhuravleva::Queue< T >::clear()
+void zhuravleva::Queue< T >::clear() noexcept
 {
-  data.clear();
+  data_.clear();
+}
+
+template< class T >
+size_t zhuravleva::Queue< T >::size() const noexcept
+{
+  return data_.size();
+}
+
+template< class T >
+template< class... Args >
+void zhuravleva::Queue< T >::emplace(Args&&... args)
+{
+  data_.emplaceBack(std::forward< Args >(args)...);
 }
 
 #endif

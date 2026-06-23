@@ -1,5 +1,6 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
+#include <functional>
 #include <iosfwd>
 #include <string>
 #include "graph.hpp"
@@ -8,7 +9,8 @@
 
 namespace zhuravleva
 {
-  typedef HashTable< std::string, Graph, Blake2Hasher< std::string >, KeyEqual > GraphTable;
+  using GraphTable = HashTable< std::string, Graph,
+      Blake2Hasher< std::string >, std::equal_to< std::string > >;
   void graphs(std::ostream& out, std::istream& in, const GraphTable& graphs);
   void vertexes(std::ostream& out, std::istream& in, const GraphTable& graphs);
   void outbound(std::ostream& out, std::istream& in, const GraphTable& graphs);
