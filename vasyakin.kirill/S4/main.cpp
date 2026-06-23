@@ -80,20 +80,29 @@ int main(int argc, char* argv[])
   file.close();
 
   using cmd_t = void(*)(std::istream&, std::ostream&, vasyakin::Datasets&);
-  vasyakin::BSTree< std::string, cmd_t > cmds;
+  vasyakin::BSTree< std::string, cmd_t > mutableCmds;
+  vasyakin::BSTree< std::string, cmd_t > constCmds;
 
-  cmds.insert("print", vasyakin::cmdPrint);
-  cmds.insert("complement", vasyakin::cmdComplement);
-  cmds.insert("intersect", vasyakin::cmdIntersect);
-  cmds.insert("union", vasyakin::cmdUnion);
+  mutableCmds.insert("complement", vasyakin::cmdComplement);
+  mutableCmds.insert("intersect", vasyakin::cmdIntersect);
+  mutableCmds.insert("union", vasyakin::cmdUnion);
+
+  constCmds.insert("print", vasyakin::cmdPrint);
 
   std::string cmd;
   while (std::cin >> cmd)
   {
     try
     {
-      cmds.at(cmd)(std::cin, std::cout, datasets);
-      std::cout << '\n';
+      if (mutableCmds.count(cmd) > 0)
+      {
+        mutableCmds.at(cmd)(std::cin, std::cout, datasets);
+      }
+      else if (constCmds.count(cmd) > 0)
+      {
+        constCmds.at(cmd)(std::cin, std::cout, datasets);
+        std::cout << '\n';
+      }
     }
     catch (const std::exception&)
     {
