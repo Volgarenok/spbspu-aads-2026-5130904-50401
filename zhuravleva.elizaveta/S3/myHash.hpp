@@ -46,6 +46,7 @@ namespace zhuravleva
       void rehash(size_t newSize);
       bool empty() const noexcept;
       void clear();
+      void swap(HashTable& other) noexcept;
 
     private:
       size_t size_;
@@ -110,14 +111,14 @@ zhuravleva::HIter< Key, Value, Hash, Equal >
   {
     return end();
   }
-  return HIter(this, 0, table_[0].begin());
+  return HIter< Key, Value, Hash, Equal >(this, 0, table_[0].begin());
 }
 
 template< class Key, class Value, class Hash, class Equal >
 zhuravleva::HIter< Key, Value, Hash, Equal >
     zhuravleva::HashTable< Key, Value, Hash, Equal >::end()
 {
-  return HIter(this, table_.size(), LIter< std::pair< Key, Value > >());
+  return HIter< Key, Value, Hash, Equal >(this, table_.size(), LIter< std::pair< Key, Value > >());
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -128,14 +129,14 @@ zhuravleva::HCIter< Key, Value, Hash, Equal >
   {
     return end();
   }
-  return HCIter(this, 0, table_[0].cbegin());
+  return HCIter< Key, Value, Hash, Equal (this, 0, table_[0].cbegin());
 }
 
 template< class Key, class Value, class Hash, class Equal >
 zhuravleva::HCIter< Key, Value, Hash, Equal >
     zhuravleva::HashTable< Key, Value, Hash, Equal >::end() const
 {
-  return HCIter(this, table_.size(), LCIter< std::pair< Key, Value > >());
+  return HCIter< Key, Value, Hash, Equal >(this, table_.size(), LCIter< std::pair< Key, Value > >());
 }
 
 template< class Key, class Value, class Hash, class Equal >
