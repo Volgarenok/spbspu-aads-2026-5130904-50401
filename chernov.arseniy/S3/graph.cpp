@@ -1,6 +1,21 @@
 #include "graph.hpp"
 #include <iostream>
 
+namespace {
+  template< typename Table >
+  void ensureExists(Table & table, const std::string & key)
+  {
+    if (!table.has(key)) {
+      try {
+        table.add(key, chernov::Edges());
+      } catch (const std::length_error &) {
+        table.rehash(table.maxCapacity() ? table.maxCapacity() * 2 : 2);
+        table.add(key, chernov::Edges());
+      }
+    }
+  }
+}
+
 template< class T, class Cmp >
 void chernov::detail::sort(Vector< T > & v, Cmp cmp)
 {
@@ -77,20 +92,8 @@ void chernov::Graph::addVertex(const std::string & vertex)
 
 void chernov::Graph::addEdge(const std::string & start_vertex, const std::string & end_vertex, size_t weight)
 {
-  auto ensure_exists = [&](auto & table, const std::string & key)
-  {
-    if (!table.has(key)) {
-      try {
-        table.add(key, Edges());
-      } catch (const std::length_error &) {
-        table.rehash(table.maxCapacity() ? table.maxCapacity() * 2 : 2);
-        table.add(key, Edges());
-      }
-    }
-  };
-
-  ensure_exists(incoming_, end_vertex);
-  ensure_exists(outgoing_, start_vertex);
+  ensureExists(incoming_, end_vertex);
+  ensureExists(outgoing_, start_vertex);
 
   incoming_.at(end_vertex).addEdge(start_vertex, weight);
   try {
