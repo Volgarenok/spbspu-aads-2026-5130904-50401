@@ -702,10 +702,10 @@ namespace donkeev
     {
       return 0;
     }
-    
+
     size_t leftHeight = heightRecursive(node->left_);
     size_t rightHeight = heightRecursive(node->right_);
-    
+
     return 1 + (leftHeight > rightHeight ? leftHeight : rightHeight);
   }
 }

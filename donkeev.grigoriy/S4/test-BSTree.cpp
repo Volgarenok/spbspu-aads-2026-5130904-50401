@@ -111,12 +111,12 @@ BOOST_AUTO_TEST_CASE(rotateLeft)
   tree.push(35, "35");
 
   BOOST_CHECK_EQUAL(tree.height(), 4);
-    
+
   donkeev::BSTree<int, std::string, donkeev::Comp<int> >::iterator it = tree.find(20);
   tree.rotateLeft(it);
 
   BOOST_CHECK_EQUAL(tree.height(), 3);
-  
+
   int expectedKeys[] = {10, 20, 30, 35};
   size_t i = 0;
   for (auto tit = tree.begin(); tit != tree.end(); ++tit, ++i)
@@ -135,12 +135,12 @@ BOOST_AUTO_TEST_CASE(rotateRight)
   tree.push(10, "10");
 
   BOOST_CHECK_EQUAL(tree.height(), 4);
-  
+
   donkeev::BSTree<int, std::string, donkeev::Comp<int> >::iterator it = tree.find(30);
   tree.rotateRight(it);
 
   BOOST_CHECK_EQUAL(tree.height(), 3);
-  
+
   int expectedKeys[] = {10, 20, 30, 35};
   size_t i = 0;
   for (auto tit = tree.begin(); tit != tree.end(); ++tit, ++i)
@@ -161,14 +161,14 @@ BOOST_AUTO_TEST_CASE(largeRotateLeft)
 
 
     BOOST_CHECK_EQUAL(tree.height(), 4);
-    
+
     auto it = tree.find(10);
     tree.largeRotateLeft(it);
 
-    
+
 
     BOOST_CHECK_EQUAL(tree.height(), 3);
-    
+
     int expectedKeys[] = {10, 15, 20, 25, 30};
     size_t i = 0;
     for (auto tit = tree.begin(); tit != tree.end(); ++tit, ++i)
@@ -188,12 +188,12 @@ BOOST_AUTO_TEST_CASE(largeRotateRight)
     tree.push(25, "25");
 
     BOOST_CHECK_EQUAL(tree.height(), 4);
-    
+
     auto it = tree.find(30);
     tree.largeRotateRight(it);
 
     BOOST_CHECK_EQUAL(tree.height(), 3);
-    
+
     int expectedKeys[] = {10, 15, 20, 25, 30};
     size_t i = 0;
     for (auto tit = tree.begin(); tit != tree.end(); ++tit, ++i)
