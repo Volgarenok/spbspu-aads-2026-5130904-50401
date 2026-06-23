@@ -31,7 +31,12 @@ void chernov::Edges::addEdge(const std::string & vertex, size_t weight)
       edges_.add(vertex, Vector< size_t >());
     }
   }
-  edges_.at(vertex).pushBack(weight);
+  try {
+    edges_.at(vertex).pushBack(weight);
+  } catch (...) {
+    edges_.remove(vertex);
+    throw;
+  }
 }
 
 void chernov::Edges::cutEdge(const std::string & vertex, size_t weight)
@@ -88,7 +93,11 @@ void chernov::Graph::addEdge(const std::string & start_vertex, const std::string
   ensure_exists(outgoing_, start_vertex);
 
   incoming_.at(end_vertex).addEdge(start_vertex, weight);
-  outgoing_.at(start_vertex).addEdge(end_vertex, weight);
+  try {
+    outgoing_.at(start_vertex).addEdge(end_vertex, weight);
+  } catch (...) {
+    incoming_.at(end_vertex).cutEdge(start_vertex, weight);
+  }
 }
 
 void chernov::Graph::cutEdge(const std::string & start_vertex, const std::string & end_vertex, size_t weight)
@@ -182,8 +191,14 @@ void chernov::Graphs::addEdge(const std::string & graph_name,
 {
   if (!graphs_.has(graph_name)) {
     createGraphWithoutCheckingExisting(graph_name);
+    try {
+      graphs_.at(graph_name).addEdge(start_vertex, end_vertex, weight);
+    } catch (...) {
+      graphs_.remove(graph_name);
+    }
+  } else {
+    graphs_.at(graph_name).addEdge(start_vertex, end_vertex, weight);
   }
-  graphs_.at(graph_name).addEdge(start_vertex, end_vertex, weight);
 }
 
 void chernov::Graphs::showGraphs(std::ostream & output)
