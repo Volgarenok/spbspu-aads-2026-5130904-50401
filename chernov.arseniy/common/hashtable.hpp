@@ -134,24 +134,16 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable & ht):
 
 template < class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable && ht) noexcept:
-  data_(ht.data_),
-  bucket_sizes_(ht.bucket_sizes_),
-  total_size_(ht.total_size_),
-  num_buckets_(ht.num_buckets_),
-  bucket_cap_(ht.bucket_cap_),
-  overflow_size_(ht.overflow_size_),
-  overflow_cap_(ht.overflow_cap_),
+  data_(std::exchange(ht.data_, nullptr)),
+  bucket_sizes_(std::exchange(ht.bucket_sizes_, nullptr)),
+  total_size_(std::exchange(ht.total_size_, 0)),
+  num_buckets_(std::exchange(ht.num_buckets_, 0)),
+  bucket_cap_(std::exchange(ht.bucket_cap_, 0)),
+  overflow_size_(std::exchange(ht.overflow_size_, 0)),
+  overflow_cap_(std::exchange(ht.overflow_cap_, 0)),
   hasher_(ht.hasher_),
   equal_(ht.equal_)
-{
-  ht.data_ = nullptr;
-  ht.bucket_sizes_ = nullptr;
-  ht.total_size_ = 0;
-  ht.num_buckets_ = 0;
-  ht.bucket_cap_ = 0;
-  ht.overflow_size_ = 0;
-  ht.overflow_cap_ = 0;
-}
+{}
 
 template < class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
