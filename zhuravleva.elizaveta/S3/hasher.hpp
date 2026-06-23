@@ -2,6 +2,7 @@
 #define HASHER_HPP
 
 #include <cstddef>
+#include <functional>
 #include <utility>
 #include <boost/hash2/blake2.hpp>
 #include <boost/hash2/hash_append.hpp>
@@ -29,15 +30,6 @@ namespace zhuravleva
       boost::hash2::hash_append(hash, {}, value.first);
       boost::hash2::hash_append(hash, {}, value.second);
       return boost::hash2::get_integral_result< size_t >(hash);
-    }
-  };
-
-  struct KeyEqual
-  {
-    template< class T >
-    bool operator()(const T& a, const T& b) const
-    {
-      return a == b;
     }
   };
 }
