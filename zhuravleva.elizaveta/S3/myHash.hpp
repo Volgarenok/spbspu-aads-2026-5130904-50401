@@ -129,7 +129,7 @@ zhuravleva::HCIter< Key, Value, Hash, Equal >
   {
     return end();
   }
-  return HCIter< Key, Value, Hash, Equal (this, 0, table_[0].cbegin());
+  return HCIter< Key, Value, Hash, Equal >(this, 0, table_[0].cbegin());
 }
 
 template< class Key, class Value, class Hash, class Equal >
