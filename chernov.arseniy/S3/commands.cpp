@@ -1,6 +1,5 @@
-#include <iostream>
-
 #include "commands.hpp"
+#include <iostream>
 
 void chernov::cmdGraphs(std::istream &, std::ostream & output, Graphs & graphs)
 {
@@ -28,30 +27,31 @@ void chernov::cmdInbound(std::istream & input, std::ostream & output, Graphs & g
   graphs.showGraphInbound(graph_name, vertex, output);
 }
 
-void chernov::cmdBind(std::istream & input, std::ostream & output, Graphs & graphs)
+void chernov::cmdBind(std::istream & input, std::ostream &, Graphs & graphs)
 {
   std::string graph_name, vertex_a, vertex_b;
   size_t weight;
   if (!(input >> graph_name >> vertex_a >> vertex_b >> weight)) {
     return;
   }
-  graphs.bindGraphVertexes(graph_name, vertex_a, vertex_b, weight, output);
+  graphs.bindGraphVertexes(graph_name, vertex_a, vertex_b, weight);
 }
 
-void chernov::cmdCut(std::istream & input, std::ostream & output, Graphs & graphs)
+void chernov::cmdCut(std::istream & input, std::ostream &, Graphs & graphs)
 {
   std::string graph_name, vertex_a, vertex_b;
   size_t weight;
   if (!(input >> graph_name >> vertex_a >> vertex_b >> weight)) {
     return;
   }
-  graphs.cutGraphEdge(graph_name, vertex_a, vertex_b, weight, output);
+  graphs.cutGraphEdge(graph_name, vertex_a, vertex_b, weight);
 }
 
 void chernov::cmdCreate(std::istream & input, std::ostream & output, Graphs & graphs)
 {
   std::string graph_name;
-  if (!(input >> graph_name)) return;
+  if (!(input >> graph_name))
+    return;
 
   if (graphs.hasGraph(graph_name)) {
     input.setstate(std::ios::failbit);
@@ -61,7 +61,8 @@ void chernov::cmdCreate(std::istream & input, std::ostream & output, Graphs & gr
   graphs.createGraphWithoutCheckingExisting(graph_name);
 
   size_t count;
-  if (!(input >> count)) return;
+  if (!(input >> count))
+    return;
 
   std::string vertex;
   for (size_t i = 0; i < count; ++i) {
@@ -73,16 +74,16 @@ void chernov::cmdCreate(std::istream & input, std::ostream & output, Graphs & gr
   }
 }
 
-void chernov::cmdMerge(std::istream & input, std::ostream & output, Graphs & graphs)
+void chernov::cmdMerge(std::istream & input, std::ostream &, Graphs & graphs)
 {
   std::string new_graph, old_graph1, old_graph2;
   if (!(input >> new_graph >> old_graph1 >> old_graph2)) {
     return;
   }
-  graphs.mergeGraphs(new_graph, old_graph1, old_graph2, output);
+  graphs.mergeGraphs(new_graph, old_graph1, old_graph2);
 }
 
-void chernov::cmdExtract(std::istream & input, std::ostream & output, Graphs & graphs)
+void chernov::cmdExtract(std::istream & input, std::ostream &, Graphs & graphs)
 {
   std::string new_graph, old_graph;
   size_t count_k;
@@ -100,5 +101,5 @@ void chernov::cmdExtract(std::istream & input, std::ostream & output, Graphs & g
     vertexes.pushBack(s);
   }
 
-  graphs.extractGraphs(new_graph, old_graph, count_k, vertexes, output);
+  graphs.extractGraphs(new_graph, old_graph, count_k, vertexes);
 }

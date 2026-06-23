@@ -84,22 +84,16 @@ namespace chernov {
     void bindGraphVertexes(const std::string & graph_name,
       const std::string & vertex_a,
       const std::string & vertex_b,
-      size_t weight,
-      std::ostream & output);
+      size_t weight);
     void cutGraphEdge(const std::string & graph_name,
       const std::string & vertex_a,
       const std::string & vertex_b,
-      size_t weight,
-      std::ostream & output);
-    void mergeGraphs(const std::string & new_graph,
-      const std::string & old_graph1,
-      const std::string & old_graph2,
-      std::ostream & output);
+      size_t weight);
+    void mergeGraphs(const std::string & new_graph, const std::string & old_graph1, const std::string & old_graph2);
     void extractGraphs(const std::string & new_graph,
       const std::string & old_graph,
       size_t count_k,
-      Vector< std::string > & vertexes,
-      std::ostream & output);
+      Vector< std::string > & vertexes);
   };
 }
 

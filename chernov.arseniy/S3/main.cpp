@@ -2,12 +2,11 @@
 #include <iostream>
 #include <limits>
 #include <string>
-
+#include <hashtable.hpp>
+#include <vector.hpp>
 #include "commands.hpp"
 #include "graph.hpp"
 #include "hasher.hpp"
-#include <hashtable.hpp>
-#include <vector.hpp>
 
 int main(int args, char ** argv)
 {
@@ -62,6 +61,9 @@ int main(int args, char ** argv)
         input.ignore(max_streamsize, '\n');
       }
     } catch (const std::out_of_range & e) {
+      output << "<INVALID COMMAND>\n";
+      input.ignore(max_streamsize, '\n');
+    } catch (const std::runtime_error & e) {
       output << "<INVALID COMMAND>\n";
       input.ignore(max_streamsize, '\n');
     }

@@ -156,13 +156,9 @@ chernov::Graphs::Graphs():
   graphs_(64)
 {}
 
-void chernov::Graphs::addVertex(const std::string & graph_name, const std::string & vertex, std::ostream & output)
+void chernov::Graphs::addVertex(const std::string & graph_name, const std::string & vertex, std::ostream &)
 {
-  try {
-    graphs_.at(graph_name).addVertex(vertex);
-  } catch (const std::out_of_range &) {
-    output << "<INVALID COMMAND>\n";
-  }
+  graphs_.at(graph_name).addVertex(vertex);
 }
 
 void chernov::Graphs::createGraphWithoutCheckingExisting(const std::string & graph_name)
@@ -221,17 +217,13 @@ void chernov::Graphs::showGraphs(std::ostream & output)
 
 void chernov::Graphs::showGraphVertexes(const std::string & graph_name, std::ostream & output)
 {
-  try {
-    Vector< std::string > vertexes = graphs_.at(graph_name).getVertexes();
-    detail::sort(vertexes, Comparator< std::string >{});
-    for (auto iter = vertexes.cbegin(); iter != vertexes.cend(); ++iter) {
-      output << *iter << "\n";
-    }
-    if (vertexes.isEmpty()) {
-      output << "\n";
-    }
-  } catch (const std::out_of_range & e) {
-    output << "<INVALID COMMAND>\n";
+  Vector< std::string > vertexes = graphs_.at(graph_name).getVertexes();
+  detail::sort(vertexes, Comparator< std::string >{});
+  for (auto iter = vertexes.cbegin(); iter != vertexes.cend(); ++iter) {
+    output << *iter << "\n";
+  }
+  if (vertexes.isEmpty()) {
+    output << "\n";
   }
 }
 
@@ -261,60 +253,40 @@ void chernov::Graphs::showGraphOutbound(const std::string & graph_name,
   const std::string & vertex,
   std::ostream & output)
 {
-  try {
-    Vector< std::pair< std::string, size_t > > edges = graphs_.at(graph_name).getOutbound(vertex);
-    showGraphEdges(edges, output);
-  } catch (const std::out_of_range & e) {
-    output << "<INVALID COMMAND>\n";
-  }
+  Vector< std::pair< std::string, size_t > > edges = graphs_.at(graph_name).getOutbound(vertex);
+  showGraphEdges(edges, output);
 }
 
 void chernov::Graphs::showGraphInbound(const std::string & graph_name,
   const std::string & vertex,
   std::ostream & output)
 {
-  try {
-    Vector< std::pair< std::string, size_t > > edges = graphs_.at(graph_name).getInbound(vertex);
-    showGraphEdges(edges, output);
-  } catch (const std::out_of_range & e) {
-    output << "<INVALID COMMAND>\n";
-  }
+  Vector< std::pair< std::string, size_t > > edges = graphs_.at(graph_name).getInbound(vertex);
+  showGraphEdges(edges, output);
 }
 
 void chernov::Graphs::bindGraphVertexes(const std::string & graph_name,
   const std::string & vertex_a,
   const std::string & vertex_b,
-  size_t weight,
-  std::ostream & output)
+  size_t weight)
 {
-  try {
-    graphs_.at(graph_name).addEdge(vertex_a, vertex_b, weight);
-  } catch (const std::out_of_range & e) {
-    output << "<INVALID COMMAND>\n";
-  }
+  graphs_.at(graph_name).addEdge(vertex_a, vertex_b, weight);
 }
 
 void chernov::Graphs::cutGraphEdge(const std::string & graph_name,
   const std::string & vertex_a,
   const std::string & vertex_b,
-  size_t weight,
-  std::ostream & output)
+  size_t weight)
 {
-  try {
-    graphs_.at(graph_name).cutEdge(vertex_a, vertex_b, weight);
-  } catch (const std::out_of_range & e) {
-    output << "<INVALID COMMAND>\n";
-  }
+  graphs_.at(graph_name).cutEdge(vertex_a, vertex_b, weight);
 }
 
 void chernov::Graphs::mergeGraphs(const std::string & new_graph,
   const std::string & old_graph1,
-  const std::string & old_graph2,
-  std::ostream & output)
+  const std::string & old_graph2)
 {
   if (graphs_.has(new_graph) || !graphs_.has(old_graph1) || !graphs_.has(old_graph2)) {
-    output << "<INVALID COMMAND>\n";
-    return;
+    throw std::runtime_error("invalid arguments");
   }
 
   Graph graph(new_graph);
@@ -343,47 +315,41 @@ void chernov::Graphs::mergeGraphs(const std::string & new_graph,
 void chernov::Graphs::extractGraphs(const std::string & new_graph,
   const std::string & old_graph,
   size_t count_k,
-  Vector< std::string > & vertexes,
-  std::ostream & output)
+  Vector< std::string > & vertexes)
 {
   if (graphs_.has(new_graph) || !graphs_.has(old_graph)) {
-    output << "<INVALID COMMAND>\n";
-    return;
+    throw std::runtime_error("invalid arguments");
+  }
+
+  Graph new_gr(new_graph);
+  const Graph & old_gr = graphs_.at(old_graph);
+
+  for (size_t i = 0; i < count_k && i < vertexes.getSize(); ++i) {
+    const std::string & src = vertexes[i];
+    Vector< std::pair< std::string, size_t > > edges = old_gr.getOutbound(src);
+
+    for (size_t j = 0; j < edges.getSize(); ++j) {
+      const std::string & dst = edges[j].first;
+      size_t weight = edges[j].second;
+
+      bool dst_allowed = false;
+      for (size_t k = 0; k < count_k && k < vertexes.getSize(); ++k) {
+        if (dst == vertexes[k]) {
+          dst_allowed = true;
+          break;
+        }
+      }
+
+      if (dst_allowed) {
+        new_gr.addEdge(src, dst, weight);
+      }
+    }
   }
 
   try {
-    Graph new_gr(new_graph);
-    const Graph & old_gr = graphs_.at(old_graph);
-
-    for (size_t i = 0; i < count_k && i < vertexes.getSize(); ++i) {
-      const std::string & src = vertexes[i];
-      Vector< std::pair< std::string, size_t > > edges = old_gr.getOutbound(src);
-
-      for (size_t j = 0; j < edges.getSize(); ++j) {
-        const std::string & dst = edges[j].first;
-        size_t weight = edges[j].second;
-
-        bool dst_allowed = false;
-        for (size_t k = 0; k < count_k && k < vertexes.getSize(); ++k) {
-          if (dst == vertexes[k]) {
-            dst_allowed = true;
-            break;
-          }
-        }
-
-        if (dst_allowed) {
-          new_gr.addEdge(src, dst, weight);
-        }
-      }
-    }
-
-    try {
-      graphs_.add(new_graph, new_gr);
-    } catch (const std::length_error &) {
-      graphs_.rehash(graphs_.maxCapacity() ? graphs_.maxCapacity() * 2 : 2);
-      graphs_.add(new_graph, new_gr);
-    }
-  } catch (const std::out_of_range &) {
-    output << "<INVALID COMMAND>\n";
+    graphs_.add(new_graph, new_gr);
+  } catch (const std::length_error &) {
+    graphs_.rehash(graphs_.maxCapacity() ? graphs_.maxCapacity() * 2 : 2);
+    graphs_.add(new_graph, new_gr);
   }
 }
