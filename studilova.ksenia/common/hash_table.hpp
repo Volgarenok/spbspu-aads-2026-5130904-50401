@@ -35,6 +35,7 @@ namespace studilova
           Iterator();
 
           std::pair< Key&, Value& > operator*() const;
+          std::pair< Key&, Value& >* operator->() const;
 
           Iterator& operator++();
 
@@ -58,6 +59,7 @@ namespace studilova
           ConstIterator(const Iterator& other);
 
           std::pair< const Key&, const Value& > operator*() const;
+          const std::pair< const Key&, const Value& >* operator->() const;
 
           ConstIterator& operator++();
 
@@ -156,6 +158,12 @@ std::pair< Key&, Value& > studilova::HashTable< Key, Value, Hash, Equal >::Itera
 }
 
 template< class Key, class Value, class Hash, class Equal >
+std::pair<Key&, Value&>* studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator->() const
+{
+  return &(*(*this));
+}
+
+template< class Key, class Value, class Hash, class Equal >
 typename studilova::HashTable< Key, Value, Hash, Equal >::Iterator&
 studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator++()
 {
@@ -210,6 +218,12 @@ std::pair< const Key&, const Value& > studilova::HashTable< Key, Value, Hash, Eq
 {
   const Entry& entry = hashTable_->table_[index_];
   return std::pair< const Key&, const Value& >(entry.key, entry.value);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+const std::pair< const Key&, const Value& >* studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::operator->() const
+{
+  return &(*(*this));
 }
 
 template< class Key, class Value, class Hash, class Equal >
