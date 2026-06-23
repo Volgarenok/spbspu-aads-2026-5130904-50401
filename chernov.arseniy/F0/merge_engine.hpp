@@ -3,9 +3,9 @@
 
 #include <iosfwd>
 #include <string>
-#include "hashers.hpp"
 #include <cuckooht.hpp>
 #include <vector.hpp>
+#include "hashers.hpp"
 
 namespace chernov {
 
@@ -38,8 +38,11 @@ namespace chernov {
       const Tree & treeB,
       Vector< std::pair< std::string, std::string > > & visited);
 
-    void compareTrees(
-      const Tree & treeA, const Tree & treeB, const std::string & nameA, const std::string & nameB, std::ostream & out);
+    void compareTrees(const Tree & treeA,
+      const Tree & treeB,
+      const std::string & nameA,
+      const std::string & nameB,
+      std::ostream & out);
 
     std::string formatPersonDisplay(const Person & p);
     bool visitContains(const Vector< std::pair< std::string, std::string > > & visited,

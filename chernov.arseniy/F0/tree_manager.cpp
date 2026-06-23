@@ -49,8 +49,9 @@ void chernov::TreeManager::renameTree(const std::string & oldName, const std::st
   out << "<OK: Renamed to " << newName << ">\n";
 }
 
-void chernov::TreeManager::editTreeDescription(
-  const std::string & name, const std::string & description, std::ostream & out)
+void chernov::TreeManager::editTreeDescription(const std::string & name,
+  const std::string & description,
+  std::ostream & out)
 {
   if (!trees_.has(name)) {
     out << "<ERROR: Tree '" << name << "' not found>\n";

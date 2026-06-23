@@ -49,8 +49,10 @@ std::string chernov::Tree::generateId()
   return "P" + num;
 }
 
-std::string chernov::Tree::addPerson(
-  const std::string & surname, const std::string & name, const std::string & patronymic, const std::string & gender)
+std::string chernov::Tree::addPerson(const std::string & surname,
+  const std::string & name,
+  const std::string & patronymic,
+  const std::string & gender)
 {
   std::string id = generateId();
   Person person(id, surname, name, patronymic, gender);
@@ -174,8 +176,10 @@ bool chernov::Tree::showPerson(const std::string & id, std::ostream & out) const
   return true;
 }
 
-bool chernov::Tree::editPerson(
-  const std::string & id, const std::string & field, const std::string & value, std::string & errorMsg)
+bool chernov::Tree::editPerson(const std::string & id,
+  const std::string & field,
+  const std::string & value,
+  std::string & errorMsg)
 {
   Person * p = findPerson(id);
   if (!p) {
@@ -428,8 +432,8 @@ void chernov::Tree::showRelatives(const std::string & id, int maxDepth, std::ost
   }
 }
 
-chernov::Vector< std::string > chernov::Tree::findCommonAncestors(
-  const std::string & id1, const std::string & id2) const
+chernov::Vector< std::string >
+  chernov::Tree::findCommonAncestors(const std::string & id1, const std::string & id2) const
 {
   return detail::findCommonAncestors(*this, id1, id2);
 }

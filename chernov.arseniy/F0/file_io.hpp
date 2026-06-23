@@ -25,8 +25,8 @@ namespace chernov {
 
     bool saveTree(const Tree & tree, const std::string & filename);
     bool loadTree(Tree & tree, const std::string & filename, std::string & errorMsg);
-    bool peekTreeMetadata(
-      const std::string & filename, std::string & treeName, size_t & nextId, std::string & errorMsg);
+    bool
+      peekTreeMetadata(const std::string & filename, std::string & treeName, size_t & nextId, std::string & errorMsg);
   }
 }
 

@@ -3,9 +3,9 @@
 
 #include <iostream>
 #include <string>
+#include <cuckooht.hpp>
 #include "hashers.hpp"
 #include "tree.hpp"
-#include <cuckooht.hpp>
 
 namespace chernov {
   class TreeManager {

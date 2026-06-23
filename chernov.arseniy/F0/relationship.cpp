@@ -1,8 +1,8 @@
 #include "relationship.hpp"
 #include <string>
-#include "tree.hpp"
 #include <queue.hpp>
 #include <stack.hpp>
+#include "tree.hpp"
 
 chernov::Vector< std::string > chernov::detail::findAncestors(const Tree & tree, const std::string & id, int maxDepth)
 {
@@ -84,8 +84,8 @@ chernov::Vector< std::string > chernov::detail::findDescendants(const Tree & tre
   return result;
 }
 
-chernov::Vector< chernov::detail::Relative > chernov::detail::findRelatives(
-  const Tree & tree, const std::string & id, int maxDepth)
+chernov::Vector< chernov::detail::Relative >
+  chernov::detail::findRelatives(const Tree & tree, const std::string & id, int maxDepth)
 {
   Vector< Relative > result;
   const Person * start = tree.findPerson(id);
@@ -270,8 +270,8 @@ std::string chernov::detail::getDescendantTitle(const std::string & gender, int 
   }
 }
 
-chernov::Vector< std::string > chernov::detail::findCommonAncestors(
-  const Tree & tree, const std::string & id1, const std::string & id2)
+chernov::Vector< std::string >
+  chernov::detail::findCommonAncestors(const Tree & tree, const std::string & id1, const std::string & id2)
 {
   Vector< std::string > result;
   AncestorDistances map1(16), map2(16);

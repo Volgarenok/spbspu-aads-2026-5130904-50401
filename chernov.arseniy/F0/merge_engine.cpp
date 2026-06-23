@@ -20,8 +20,9 @@ std::string chernov::detail::formatPersonDisplay(const Person & p)
   return s + " " + n + " " + patr;
 }
 
-bool chernov::detail::visitContains(
-  const Vector< std::pair< std::string, std::string > > & visited, const std::string & idA, const std::string & idB)
+bool chernov::detail::visitContains(const Vector< std::pair< std::string, std::string > > & visited,
+  const std::string & idA,
+  const std::string & idB)
 {
   for (size_t i = 0; i < visited.getSize(); ++i) {
     if (visited[i].first == idA && visited[i].second == idB) {
@@ -109,8 +110,11 @@ bool chernov::detail::areMatching(const std::string & idA,
   return true;
 }
 
-void chernov::detail::compareTrees(
-  const Tree & treeA, const Tree & treeB, const std::string & nameA, const std::string & nameB, std::ostream & out)
+void chernov::detail::compareTrees(const Tree & treeA,
+  const Tree & treeB,
+  const std::string & nameA,
+  const std::string & nameB,
+  std::ostream & out)
 {
   Vector< std::string > idsA = treeA.getAllPersonIds();
   Vector< std::pair< std::string, std::string > > matches;
@@ -155,8 +159,8 @@ std::string chernov::detail::MergeContext::makeKey(const std::string & idA, cons
   return idA + "|" + idB;
 }
 
-std::string chernov::detail::MergeContext::mergePair(
-  const std::string & idA, const std::string & idB, std::string & error)
+std::string
+  chernov::detail::MergeContext::mergePair(const std::string & idA, const std::string & idB, std::string & error)
 {
   std::string key = makeKey(idA, idB);
   if (pairMap.has(key)) {

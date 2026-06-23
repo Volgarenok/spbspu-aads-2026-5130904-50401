@@ -245,8 +245,10 @@ bool chernov::detail::loadTree(Tree & tree, const std::string & filename, std::s
   return true;
 }
 
-bool chernov::detail::peekTreeMetadata(
-  const std::string & filename, std::string & treeName, size_t & nextId, std::string & errorMsg)
+bool chernov::detail::peekTreeMetadata(const std::string & filename,
+  std::string & treeName,
+  size_t & nextId,
+  std::string & errorMsg)
 {
   std::ifstream file(filename);
   if (!file.is_open()) {

@@ -2,9 +2,9 @@
 #define RELATIONSHIP_HPP
 
 #include <string>
-#include "hashers.hpp"
 #include <cuckooht.hpp>
 #include <vector.hpp>
+#include "hashers.hpp"
 
 namespace chernov {
   class Tree;

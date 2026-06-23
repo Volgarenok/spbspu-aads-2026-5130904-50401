@@ -2,10 +2,10 @@
 #define TREE_HPP
 
 #include <string>
-#include "hashers.hpp"
-#include "person.hpp"
 #include <cuckooht.hpp>
 #include <vector.hpp>
+#include "hashers.hpp"
+#include "person.hpp"
 
 namespace chernov {
   class Tree {
@@ -29,8 +29,8 @@ namespace chernov {
     Vector< std::string > searchPerson(const std::string & field, const std::string & value) const;
     void listPersons(std::ostream & out, const std::string & filter) const;
     bool showPerson(const std::string & id, std::ostream & out) const;
-    bool editPerson(
-      const std::string & id, const std::string & field, const std::string & value, std::string & errorMsg);
+    bool
+      editPerson(const std::string & id, const std::string & field, const std::string & value, std::string & errorMsg);
 
     bool addParent(const std::string & childId, const std::string & parentId, std::string & errorMsg);
     bool removeParent(const std::string & childId, const std::string & parentId);
