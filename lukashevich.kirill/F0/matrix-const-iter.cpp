@@ -18,15 +18,13 @@ lukashevich::MatrixConstIterator::MatrixConstIterator(const Matrix * matrix,
   index_(index)
 {}
 
-lukashevich::MatrixConstIterator & lukashevich::MatrixConstIterator::operator++()
-    noexcept
+lukashevich::MatrixConstIterator & lukashevich::MatrixConstIterator::operator++() noexcept
 {
   ++index_;
   return *this;
 }
 
-lukashevich::MatrixConstIterator lukashevich::MatrixConstIterator::operator++(int)
-    noexcept
+lukashevich::MatrixConstIterator lukashevich::MatrixConstIterator::operator++(int) noexcept
 {
   MatrixConstIterator temp = *this;
   ++(*this);
