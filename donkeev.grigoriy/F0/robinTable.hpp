@@ -144,6 +144,12 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  bool RobinTable<Key, Value, Hash, Equal>::contains(const Key& key) const
+  {
+    return findNode(key).second != nullptr;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
   std::pair<size_t, typename RobinTable<Key, Value, Hash, Equal>::Node*>
   RobinTable<Key, Value, Hash, Equal>::findNode(const Key& key)
   {
