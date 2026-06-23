@@ -1,6 +1,7 @@
 #include "command.hpp"
 #include "hash_functions.hpp"
 #include "cuckoo_hash_table.hpp"
+#include "solver.hpp"
 #include <fstream>
 #include <sstream>
 
@@ -54,7 +55,7 @@ void madieva::cmd_start(std::istream & in, std::ostream & out,
     return;
   }
   if (!templates.contains(templateName)) {
-    out << "TEMPLATE NOT FOUND\n";
+    out << "<TEMPLATE NOT FOUND>\n";
     return;
   }
 
@@ -64,7 +65,7 @@ void madieva::cmd_start(std::istream & in, std::ostream & out,
   }
 
   if (!templates.get(templateName).solvable()) {
-    out << "<INVALID COMMAND>\n";
+    out << "<INVALID COMMANDddd>\n";
     return;
   }
 
@@ -172,9 +173,9 @@ void madieva::cmd_exists(std::istream & in, std::ostream & out,
   }
 
   if (templates.get(name).solvable()) {
-    out << "exists\n";
+    out << "<EXISTS>\n";
   } else {
-    out << "doesn't exist\n";
+    out << "<DOESN'T EXIST>\n";
   }
 }
 
@@ -255,6 +256,9 @@ void madieva::cmd_fill_row(std::istream & in, std::ostream & out,
       size_t currentCol = col + i;
       bool success = game.fill(row, currentCol);
       if (!success) {
+        game.emptyCell(row, currentCol);
+        game.print(out);
+        out << '\n';
         out << "<MISS>\n";
         return;
       }
@@ -298,14 +302,17 @@ void madieva::cmd_fill_col(std::istream & in, std::ostream & out,
 
   try {
     Game & game = games.get(gameName);
-    if (game.getRows() <= row || game.getCols() < col + count) {
-      out << "OUT OF RANGE>\n";
+    if (game.getRows() < row + count || game.getCols() <= col) {
+      out << "<OUT OF RANGE>\n";
       return;
     }
     for (size_t i = 0; i < count; ++i) {
       size_t currentRow = row + i;
       bool success = game.fill(currentRow, col);
       if (!success) {
+        game.fill(currentRow, col);
+        game.print(out);
+        out << '\n';
         out << "<MISS>\n";
         return;
       }
@@ -350,9 +357,13 @@ void madieva::cmd_empty(std::istream & in, std::ostream & out,
     }
     bool success = game.emptyCell(row, col);
     if (!success) {
+      game.fill(row, col);
+      game.print(out);
+      out << '\n';
       out << "<MISS>\n";
       return;
     }
+    out << '\n';
     game.print(out);
     out << '\n';
   } catch (...) {
@@ -388,17 +399,21 @@ void madieva::cmd_empty_row(std::istream & in, std::ostream & out,
   try {
     Game & game = games.get(gameName);
     if (game.getRows() <= row || game.getCols() < col + count) {
-      out << "OUT OF RANGE>\n";
+      out << "<OUT OF RANGE>\n";
       return;
     }
     for (size_t i = 0; i < count; ++i) {
       size_t currentCol = col + i;
       bool success = game.emptyCell(row, currentCol);
       if (!success) {
+        game.fill(row, currentCol);
+        game.print(out);
+        out << '\n';
         out << "<MISS>\n";
         return;
       }
     }
+    out << '\n';
     game.print(out);
     out << '\n';
   } catch (...) {
@@ -433,20 +448,146 @@ void madieva::cmd_empty_col(std::istream & in, std::ostream & out,
 
   try {
     Game & game = games.get(gameName);
-    if (game.getRows() <= row || game.getCols() < col + count) {
-      out << "OUT OF RANGE>\n";
+    if (game.getRows() < row + count || game.getCols() <= col) {
+      out << "<OUT OF RANGE>\n";
       return;
     }
     for (size_t i = 0; i < count; ++i) {
       size_t currentRow = row + i;
       bool success = game.emptyCell(currentRow, col);
       if (!success) {
+        game.fill(currentRow, col);
+        game.print(out);
+        out << '\n';
         out << "<MISS>\n";
         return;
       }
     }
+    out << '\n';
     game.print(out);
     out << '\n';
+  } catch (...) {
+    out << "<INVALID COMMAND>\n";
+  }
+}
+
+void madieva::cmd_help(std::istream & in, std::ostream & out,
+  TemplateTable &, GameTable & games)
+{
+  std::string gameName;
+  if (!(in >> gameName)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+  if (!games.contains(gameName)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  try {
+    const Game & game = games.get(gameName);
+    const size_t rows = game.getRows();
+    const size_t cols = game.getCols();
+    const Vector< Vector< int > > & state = game.getState();
+    const Vector< Vector< size_t > > & rowHints = game.getRowHints();
+    const Vector< Vector< size_t > > & colHints = game.getColHints();
+
+    Vector< std::pair< size_t, size_t > > toFill;
+    Vector< std::pair< size_t, size_t > > toEmpty;
+
+    bool find = false;
+    for (size_t i = 0; i < rows && !find; ++i) {
+      Vector< int > newLine;
+      const bool lineChanged = analyzeLine(state[i], rowHints[i], newLine);
+
+      if (lineChanged) {
+        for (size_t j = 0; j < cols; ++j) {
+          if (state[i][j] == 0 && newLine[j] == 1) {
+            toFill.pushBack(std::make_pair(i + 1, j + 1));
+          } else if (state[i][j] == 0 && newLine[j] == -1) {
+            toEmpty.pushBack(std::make_pair(i + 1, j + 1));
+          }
+        }
+        find = true;
+      }
+    }
+
+    for (size_t j = 0; j < cols && !find; ++j) {
+      Vector< int > column;
+      column.reserve(rows);
+      for (size_t i = 0; i < rows; ++i) {
+        column.pushBack(state[i][j]);
+      }
+
+      Vector< int > newColumn;
+      const bool colChanged = analyzeLine(column, colHints[j], newColumn);
+
+      if (colChanged) {
+        for (size_t i = 0; i < rows; ++i) {
+          if (state[i][j] == 0 && newColumn[i] == 1) {
+            toFill.pushBack(std::make_pair(i + 1, j + 1));
+          } else if (state[i][j] == 0 && newColumn[i] == -1) {
+            toEmpty.pushBack(std::make_pair(i + 1, j + 1));
+          }
+          find = true;
+        }
+      }
+    }
+
+    out << "fill";
+    out << '\n';
+    if (toFill.getSize() > 0) {
+      out << "(" << toFill[0].first << ", " << toFill[0].second << ")";
+    }
+    for (size_t i = 1; i < toFill.getSize(); ++i) {
+      out << " (" << toFill[i].first << ", " << toFill[i].second << ")";
+    }
+    out <<'\n';
+    out << "empty";
+    out << '\n';
+    if (toFill.getSize() > 0) {
+      out << "(" << toEmpty[0].first << ", " << toEmpty[0].second << ")";
+    }
+    for (size_t i = 0; i < toEmpty.getSize(); ++i) {
+      out << " (" << toEmpty[i].first << ", " << toEmpty[i].second << ")";
+    }
+    out << "\n";
+  } catch (...) {
+    out << "<INVALID COMMAND>\n";
+  }
+}
+
+void madieva::cmd_list_tmpl(std::istream &, std::ostream & out,
+  TemplateTable & templates, GameTable &)
+{
+  try {
+    Vector< std::string > templateKeys = templates.getKeys();
+    if (templateKeys.getSize() == 0) {
+      out << '\n';
+    } else {
+      for (size_t i = 0; i < templateKeys.getSize(); ++i) {
+        out << templateKeys[i];
+        out << "\n";
+      }
+    }
+  } catch (...) {
+    out << "<INVALID COMMAND>\n";
+  }
+}
+
+void madieva::cmd_list_game(std::istream &, std::ostream & out,
+  TemplateTable &, GameTable & games)
+{
+  try {
+    Vector< std::string > gameKeys = games.getKeys();
+    if (gameKeys.getSize() == 0) {
+      out << '\n';
+    } else {
+      for (size_t i = 0; i < gameKeys.getSize(); ++i) {
+        out << gameKeys[i];
+        out << '\n';
+      }
+    }
   } catch (...) {
     out << "<INVALID COMMAND>\n";
   }

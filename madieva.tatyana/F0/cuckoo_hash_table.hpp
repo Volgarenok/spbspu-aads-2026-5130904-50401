@@ -21,6 +21,7 @@ namespace madieva
     bool contains(const Key & key) const;
     Value & get(const Key & key);
     const Value & get(const Key & key) const;
+    Vector< Key > getKeys() const;
     Value & operator[](const Key & key);
     Value erase(const Key & key);
     void clear();
@@ -186,6 +187,24 @@ namespace madieva
       return table2_[idx2].second;
     }
     throw std::out_of_range("Key not found");
+  }
+
+  template< class Key, class Value, class Hash1, class Hash2, class Equal >
+  Vector< Key > CuckooHashTable< Key, Value, Hash1, Hash2, Equal >::getKeys() const
+  {
+    Vector< Key > keys;
+    keys.reserve(size_);
+    for (size_t i = 0; i < table1_.getSize(); ++i) {
+      if (isOccupied(table1_[i])) {
+        keys.pushBack(table1_[i].first);
+      }
+    }
+    for (size_t i = 0; i < table2_.getSize(); ++i) {
+      if (isOccupied(table2_[i])) {
+        keys.pushBack(table2_[i].first);
+      }
+    }
+    return keys;
   }
 
   template< class Key, class Value, class Hash1, class Hash2, class Equal >

@@ -40,5 +40,11 @@ void cmd_empty_row(std::istream & in, std::ostream & out,
   TemplateTable & templates, GameTable & games);
 void cmd_empty_col(std::istream & in, std::ostream & out,
   TemplateTable & templates, GameTable & games);
+void cmd_help(std::istream & in, std::ostream & out,
+  TemplateTable & templates, GameTable & games);
+void cmd_list_tmpl(std::istream & in, std::ostream & out,
+  TemplateTable & templates, GameTable & games);
+void cmd_list_game(std::istream & in, std::ostream & out,
+  TemplateTable & templates, GameTable & games);
 }
 #endif

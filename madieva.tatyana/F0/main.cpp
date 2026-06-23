@@ -22,6 +22,9 @@ int main()
     commands.insert("empty", madieva::cmd_empty);
     commands.insert("empty_row", madieva::cmd_empty_row);
     commands.insert("empty_col", madieva::cmd_empty_col);
+    commands.insert("help", madieva::cmd_help);
+    commands.insert("list_tmpl", madieva::cmd_list_tmpl);
+    commands.insert("list_game", madieva::cmd_list_game);
   } catch (...) {
     std::cerr << "<INTERNAL ERROR>\n";
     return 2;
