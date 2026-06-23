@@ -44,8 +44,8 @@ namespace chernov {
     HashTable< std::string, Vector< size_t >, HasherXx< std::string >, KeyComparator > edges_;
 
     Edges();
-    void addEdge(std::string vertex, size_t weight);
-    void cutEdge(std::string vertex, size_t weight);
+    void addEdge(const std::string & vertex, size_t weight);
+    void cutEdge(const std::string & vertex, size_t weight);
     Vector< std::pair< std::string, size_t > > getEdges() const;
   };
 
@@ -55,42 +55,48 @@ namespace chernov {
     HashTable< std::string, Edges, HasherXx< std::string >, KeyComparator > outgoing_;
 
     Graph() = delete;
-    Graph(std::string name);
-    void addVertex(std::string vertex);
-    void addEdge(std::string start_vertex, std::string end_vertex, size_t weight);
-    void cutEdge(std::string start_vertex, std::string end_vertex, size_t weight);
+    Graph(const std::string & name);
+    void addVertex(const std::string & vertex);
+    void addEdge(const std::string & start_vertex, const std::string & end_vertex, size_t weight);
+    void cutEdge(const std::string & start_vertex, const std::string & end_vertex, size_t weight);
     Vector< std::string > getVertexes() const;
-    Vector< std::pair< std::string, size_t > > getOutbound(std::string vertex) const;
-    Vector< std::pair< std::string, size_t > > getInbound(std::string vertex) const;
+    Vector< std::pair< std::string, size_t > > getOutbound(const std::string & vertex) const;
+    Vector< std::pair< std::string, size_t > > getInbound(const std::string & vertex) const;
   };
 
   struct Graphs {
     HashTable< std::string, Graph, HasherXx< std::string >, KeyComparator > graphs_;
 
     Graphs();
-    void addVertex(std::string graph_name, std::string vertex, std::ostream & output);
-    void createGraphWithoutCheckingExisting(std::string graph_name);
-    void createGraph(std::string graph_name);
+    void addVertex(const std::string & graph_name, const std::string & vertex, std::ostream & output);
+    void createGraphWithoutCheckingExisting(const std::string & graph_name);
+    void createGraph(const std::string & graph_name);
     bool hasGraph(const std::string & name) const;
-    void addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight);
+    void addEdge(const std::string & graph_name,
+      const std::string & start_vertex,
+      const std::string & end_vertex,
+      size_t weight);
     void showGraphs(std::ostream & output);
-    void showGraphVertexes(std::string graph_name, std::ostream & output);
+    void showGraphVertexes(const std::string & graph_name, std::ostream & output);
     void showGraphEdges(Vector< std::pair< std::string, size_t > > & edges, std::ostream & output);
-    void showGraphOutbound(std::string graph_name, std::string vertex, std::ostream & output);
-    void showGraphInbound(std::string graph_name, std::string vertex, std::ostream & output);
-    void bindGraphVertexes(std::string graph_name,
-      std::string vertex_a,
-      std::string vertex_b,
+    void showGraphOutbound(const std::string & graph_name, const std::string & vertex, std::ostream & output);
+    void showGraphInbound(const std::string & graph_name, const std::string & vertex, std::ostream & output);
+    void bindGraphVertexes(const std::string & graph_name,
+      const std::string & vertex_a,
+      const std::string & vertex_b,
       size_t weight,
       std::ostream & output);
-    void cutGraphEdge(std::string graph_name,
-      std::string vertex_a,
-      std::string vertex_b,
+    void cutGraphEdge(const std::string & graph_name,
+      const std::string & vertex_a,
+      const std::string & vertex_b,
       size_t weight,
       std::ostream & output);
-    void mergeGraphs(std::string new_graph, std::string old_graph1, std::string old_graph2, std::ostream & output);
-    void extractGraphs(std::string new_graph,
-      std::string old_graph,
+    void mergeGraphs(const std::string & new_graph,
+      const std::string & old_graph1,
+      const std::string & old_graph2,
+      std::ostream & output);
+    void extractGraphs(const std::string & new_graph,
+      const std::string & old_graph,
       size_t count_k,
       Vector< std::string > & vertexes,
       std::ostream & output);

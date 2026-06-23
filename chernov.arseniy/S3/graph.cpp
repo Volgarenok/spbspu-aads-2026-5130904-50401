@@ -21,7 +21,7 @@ chernov::Edges::Edges():
   edges_(64)
 {}
 
-void chernov::Edges::addEdge(std::string vertex, size_t weight)
+void chernov::Edges::addEdge(const std::string & vertex, size_t weight)
 {
   if (!edges_.has(vertex)) {
     try {
@@ -34,7 +34,7 @@ void chernov::Edges::addEdge(std::string vertex, size_t weight)
   edges_.at(vertex).pushBack(weight);
 }
 
-void chernov::Edges::cutEdge(std::string vertex, size_t weight)
+void chernov::Edges::cutEdge(const std::string & vertex, size_t weight)
 {
   Vector< size_t > & weights = edges_.at(vertex);
   for (auto iter = weights.begin(); iter != weights.end(); ++iter) {
@@ -57,20 +57,20 @@ chernov::Vector< std::pair< std::string, size_t > > chernov::Edges::getEdges() c
   return edges;
 }
 
-chernov::Graph::Graph(std::string name):
+chernov::Graph::Graph(const std::string & name):
   name_(name),
   incoming_(64),
   outgoing_(64)
 {}
 
-void chernov::Graph::addVertex(std::string vertex)
+void chernov::Graph::addVertex(const std::string & vertex)
 {
   if (!outgoing_.has(vertex)) {
     outgoing_.add(vertex, Edges());
   }
 }
 
-void chernov::Graph::addEdge(std::string start_vertex, std::string end_vertex, size_t weight)
+void chernov::Graph::addEdge(const std::string & start_vertex, const std::string & end_vertex, size_t weight)
 {
   auto ensure_exists = [&](auto & table, const std::string & key)
   {
@@ -91,7 +91,7 @@ void chernov::Graph::addEdge(std::string start_vertex, std::string end_vertex, s
   outgoing_.at(start_vertex).addEdge(end_vertex, weight);
 }
 
-void chernov::Graph::cutEdge(std::string start_vertex, std::string end_vertex, size_t weight)
+void chernov::Graph::cutEdge(const std::string & start_vertex, const std::string & end_vertex, size_t weight)
 {
   incoming_.at(end_vertex).cutEdge(start_vertex, weight);
   outgoing_.at(start_vertex).cutEdge(end_vertex, weight);
@@ -118,7 +118,7 @@ chernov::Vector< std::string > chernov::Graph::getVertexes() const
   return vertexes;
 }
 
-chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getOutbound(std::string vertex) const
+chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getOutbound(const std::string & vertex) const
 {
   if (!outgoing_.has(vertex) && !incoming_.has(vertex)) {
     throw std::out_of_range("vertex not found");
@@ -129,7 +129,7 @@ chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getOutbound(
   return outgoing_.at(vertex).getEdges();
 }
 
-chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getInbound(std::string vertex) const
+chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getInbound(const std::string & vertex) const
 {
   if (!incoming_.has(vertex) && !outgoing_.has(vertex)) {
     throw std::out_of_range("vertex not found");
@@ -144,7 +144,7 @@ chernov::Graphs::Graphs():
   graphs_(64)
 {}
 
-void chernov::Graphs::addVertex(std::string graph_name, std::string vertex, std::ostream & output)
+void chernov::Graphs::addVertex(const std::string & graph_name, const std::string & vertex, std::ostream & output)
 {
   try {
     graphs_.at(graph_name).addVertex(vertex);
@@ -153,7 +153,7 @@ void chernov::Graphs::addVertex(std::string graph_name, std::string vertex, std:
   }
 }
 
-void chernov::Graphs::createGraphWithoutCheckingExisting(std::string graph_name)
+void chernov::Graphs::createGraphWithoutCheckingExisting(const std::string & graph_name)
 {
   try {
     graphs_.add(graph_name, Graph(graph_name));
@@ -163,7 +163,7 @@ void chernov::Graphs::createGraphWithoutCheckingExisting(std::string graph_name)
   }
 }
 
-void chernov::Graphs::createGraph(std::string graph_name)
+void chernov::Graphs::createGraph(const std::string & graph_name)
 {
   if (!graphs_.has(graph_name)) {
     createGraphWithoutCheckingExisting(graph_name);
@@ -175,7 +175,10 @@ bool chernov::Graphs::hasGraph(const std::string & name) const
   return graphs_.has(name);
 }
 
-void chernov::Graphs::addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight)
+void chernov::Graphs::addEdge(const std::string & graph_name,
+  const std::string & start_vertex,
+  const std::string & end_vertex,
+  size_t weight)
 {
   if (!graphs_.has(graph_name)) {
     createGraphWithoutCheckingExisting(graph_name);
@@ -198,7 +201,7 @@ void chernov::Graphs::showGraphs(std::ostream & output)
   }
 }
 
-void chernov::Graphs::showGraphVertexes(std::string graph_name, std::ostream & output)
+void chernov::Graphs::showGraphVertexes(const std::string & graph_name, std::ostream & output)
 {
   try {
     Vector< std::string > vertexes = graphs_.at(graph_name).getVertexes();
@@ -236,7 +239,9 @@ void chernov::Graphs::showGraphEdges(Vector< std::pair< std::string, size_t > > 
   }
 }
 
-void chernov::Graphs::showGraphOutbound(std::string graph_name, std::string vertex, std::ostream & output)
+void chernov::Graphs::showGraphOutbound(const std::string & graph_name,
+  const std::string & vertex,
+  std::ostream & output)
 {
   try {
     Vector< std::pair< std::string, size_t > > edges = graphs_.at(graph_name).getOutbound(vertex);
@@ -246,7 +251,9 @@ void chernov::Graphs::showGraphOutbound(std::string graph_name, std::string vert
   }
 }
 
-void chernov::Graphs::showGraphInbound(std::string graph_name, std::string vertex, std::ostream & output)
+void chernov::Graphs::showGraphInbound(const std::string & graph_name,
+  const std::string & vertex,
+  std::ostream & output)
 {
   try {
     Vector< std::pair< std::string, size_t > > edges = graphs_.at(graph_name).getInbound(vertex);
@@ -256,9 +263,9 @@ void chernov::Graphs::showGraphInbound(std::string graph_name, std::string verte
   }
 }
 
-void chernov::Graphs::bindGraphVertexes(std::string graph_name,
-  std::string vertex_a,
-  std::string vertex_b,
+void chernov::Graphs::bindGraphVertexes(const std::string & graph_name,
+  const std::string & vertex_a,
+  const std::string & vertex_b,
   size_t weight,
   std::ostream & output)
 {
@@ -269,9 +276,9 @@ void chernov::Graphs::bindGraphVertexes(std::string graph_name,
   }
 }
 
-void chernov::Graphs::cutGraphEdge(std::string graph_name,
-  std::string vertex_a,
-  std::string vertex_b,
+void chernov::Graphs::cutGraphEdge(const std::string & graph_name,
+  const std::string & vertex_a,
+  const std::string & vertex_b,
   size_t weight,
   std::ostream & output)
 {
@@ -282,9 +289,9 @@ void chernov::Graphs::cutGraphEdge(std::string graph_name,
   }
 }
 
-void chernov::Graphs::mergeGraphs(std::string new_graph,
-  std::string old_graph1,
-  std::string old_graph2,
+void chernov::Graphs::mergeGraphs(const std::string & new_graph,
+  const std::string & old_graph1,
+  const std::string & old_graph2,
   std::ostream & output)
 {
   if (graphs_.has(new_graph) || !graphs_.has(old_graph1) || !graphs_.has(old_graph2)) {
@@ -315,8 +322,8 @@ void chernov::Graphs::mergeGraphs(std::string new_graph,
   }
 }
 
-void chernov::Graphs::extractGraphs(std::string new_graph,
-  std::string old_graph,
+void chernov::Graphs::extractGraphs(const std::string & new_graph,
+  const std::string & old_graph,
   size_t count_k,
   Vector< std::string > & vertexes,
   std::ostream & output)
