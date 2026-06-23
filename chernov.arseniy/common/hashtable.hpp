@@ -118,14 +118,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable & ht):
       ++total_size_;
     }
   } catch (...) {
-    for (size_t i = 0; i < num_buckets_; ++i) {
-      for (size_t j = 0; j < bucket_sizes_[i]; ++j) {
-        data_[i * bucket_cap_ + j].~slot();
-      }
-    }
-    for (size_t i = 0; i < overflow_size_; ++i) {
-      data_[num_buckets_ * bucket_cap_ + i].~slot();
-    }
+    clear();
     ::operator delete(data_);
     delete[] bucket_sizes_;
     throw;
