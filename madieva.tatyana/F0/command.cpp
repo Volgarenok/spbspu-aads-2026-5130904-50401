@@ -1,9 +1,9 @@
 #include "command.hpp"
+#include <fstream>
+#include <sstream>
 #include "hash_functions.hpp"
 #include "cuckoo_hash_table.hpp"
 #include "solver.hpp"
-#include <fstream>
-#include <sstream>
 
 namespace {
   bool readCell(std::istream & in, size_t & row, size_t & col)
@@ -65,7 +65,7 @@ void madieva::cmd_start(std::istream & in, std::ostream & out,
   }
 
   if (!templates.get(templateName).solvable()) {
-    out << "<INVALID COMMANDddd>\n";
+    out << "<INVALID COMMAND>\n";
     return;
   }
 
@@ -121,7 +121,7 @@ void madieva::cmd_save(std::istream & in, std::ostream & out,
 
   try {
     if (!games.get(name).saveToFile(filename)) {
-      out << "FAILED SAVING\n";
+      out << "<FAILED SAVING>\n";
       return;
     }
   } catch (...) {
@@ -139,17 +139,13 @@ void madieva::cmd_continue(std::istream & in, std::ostream & out,
     return;
   }
 
-  if (!games.contains(name)) {
+  if (games.contains(name)) {
     out << "<INVALID COMMAND>\n";
     return;
   }
 
   try {
-    Game game;
-    if (!game.loadFromFile(filename)) {
-      out << "<FAILED READING>\n";
-      return;
-    }
+    Game game(filename);
     games.insert(name, std::move(game));
     games.get(name).print(out);
     out << '\n';
@@ -206,6 +202,9 @@ void madieva::cmd_fill(std::istream & in, std::ostream & out,
     }
     bool success = game.fill(row, col);
     if (!success) {
+      game.emptyCell(row, col);
+      game.print(out);
+      out << '\n';
       out << "<MISS>\n";
       return;
     }
@@ -249,7 +248,7 @@ void madieva::cmd_fill_row(std::istream & in, std::ostream & out,
   try {
     Game & game = games.get(gameName);
     if (game.getRows() <= row || game.getCols() < col + count) {
-      out << "OUT OF RANGE>\n";
+      out << "<OUT OF RANGE>\n";
       return;
     }
     for (size_t i = 0; i < count; ++i) {
@@ -310,7 +309,7 @@ void madieva::cmd_fill_col(std::istream & in, std::ostream & out,
       size_t currentRow = row + i;
       bool success = game.fill(currentRow, col);
       if (!success) {
-        game.fill(currentRow, col);
+        game.emptyCell(currentRow, col);
         game.print(out);
         out << '\n';
         out << "<MISS>\n";
@@ -328,7 +327,6 @@ void madieva::cmd_fill_col(std::istream & in, std::ostream & out,
     out << "<INVALID COMMAND>\n";
   }
 }
-
 
 void madieva::cmd_empty(std::istream & in, std::ostream & out,
   TemplateTable &, GameTable & games)
@@ -529,8 +527,8 @@ void madieva::cmd_help(std::istream & in, std::ostream & out,
           } else if (state[i][j] == 0 && newColumn[i] == -1) {
             toEmpty.pushBack(std::make_pair(i + 1, j + 1));
           }
-          find = true;
         }
+        find = true;
       }
     }
 
@@ -545,7 +543,7 @@ void madieva::cmd_help(std::istream & in, std::ostream & out,
     out <<'\n';
     out << "empty";
     out << '\n';
-    if (toFill.getSize() > 0) {
+    if (toEmpty.getSize() > 0) {
       out << "(" << toEmpty[0].first << ", " << toEmpty[0].second << ")";
     }
     for (size_t i = 0; i < toEmpty.getSize(); ++i) {

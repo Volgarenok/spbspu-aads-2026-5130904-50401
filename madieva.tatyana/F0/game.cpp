@@ -52,25 +52,17 @@ madieva::Game::Game(const Template & tmpl):
 madieva::Game::Game(const Game & game):
   rows_(game.rows_),
   cols_(game.cols_),
-  state_(),
+  state_(game.state_),
   rowHints_(game.rowHints_),
   colHints_(game.colHints_),
   solution_(game.solution_),
-  filledCount_(0),
+  filledCount_(game.filledCount_),
   totalFilled_(game.totalFilled_),
   cachedMaxRowHintLen_(game.cachedMaxRowHintLen_),
   cachedMaxColHintLen_(game.cachedMaxColHintLen_),
   colsString_(game.colsString_),
   rowsString_(game.rowsString_)
-{
-  state_.reserve(rows_);
-  for (size_t i = 0; i < rows_; ++i) {
-    state_.pushBack(Vector< int >());
-    for (size_t j = 0; j < cols_; ++j) {
-      state_[i].pushBack(0);
-    }
-  }
-}
+{}
 
 madieva::Game::Game(const std::string & filename):
   rows_(0),
@@ -339,8 +331,8 @@ bool madieva::Game::loadFromFile(const std::string & filename)
   Vector< Vector< size_t > > tempRowHints;
   Vector< Vector< size_t > > tempColHints;
   Vector< Vector< int > > tempState;
-  size_t totalFilled;
-  size_t filledCount;
+  size_t totalFilled = 0;
+  size_t filledCount = 0;
 
   std::string line;
 
@@ -395,10 +387,9 @@ bool madieva::Game::loadFromFile(const std::string & filename)
       } else {
         tempState[i].pushBack(val);
       }
-      if (iss.fail() && !iss.eof()) {
-        file.close();
-        return false;
-      }
+    }
+    if (iss.fail() && !iss.eof()) {
+      return false;
     }
   }
 
@@ -437,7 +428,7 @@ bool madieva::Game::loadFromFile(const std::string & filename)
 
   rows_ = rows;
   cols_ = cols;
-  state_ =  std::move(tempState);
+  state_ = std::move(tempState);
   rowHints_ =  std::move(tempRowHints);
   colHints_ =  std::move(tempColHints);
   solution_ =  std::move(result);
@@ -473,7 +464,7 @@ void madieva::Game::prepareRowStrings()
   for (size_t i = 0; i < rowHints_.getSize(); ++i) {
     std::ostringstream oss;
     if (rowHints_[i].getSize() > 0) {
-      oss << rowHints_[i][0];;
+      oss << rowHints_[i][0];
       for (size_t j = 1; j < rowHints_[i].getSize(); ++j) {
         oss << ' ' << rowHints_[i][j];
       }
