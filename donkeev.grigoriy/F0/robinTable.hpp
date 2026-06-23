@@ -1,6 +1,8 @@
 #ifndef ROBIN_HASHTABLE_HPP
 #define ROBIN_HASHTABLE_HPP
 
+#include <cassert>
+
 #include "robinNode.hpp"
 #include "../common/top-it-vector.hpp"
 
@@ -18,7 +20,7 @@ namespace donkeev
     RobinTable(const RobinTable&);
     RobinTable(RobinTable&&) noexcept;
 
-    explicit RobinHashTable(size_t);
+    explicit RobinTable(size_t);
 
     ~RobinHashTable() = default;
 
@@ -48,6 +50,17 @@ namespace donkeev
 
     Node& findNode(const Key key&);
   };
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinTable<Key, Value, Hash, Equal>::RobinTable(size_t capacity):
+    slots_(),
+    size_(0),
+    hasher_(),
+    equal_()
+  {
+    assert(capacity > 0);
+    slots_ = topit::Vector(capacity, Node());
+  }
 }
 
 #endif
