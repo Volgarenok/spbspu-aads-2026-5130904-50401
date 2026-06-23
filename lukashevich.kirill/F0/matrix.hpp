@@ -12,6 +12,8 @@
 #include "matrix-iter.hpp"
 #include "matrix-row-const-iter.hpp"
 #include "matrix-row-iter.hpp"
+#include "matrix-diag-const-iter.hpp"
+#include "matrix-diag-iter.hpp"
 
 namespace lukashevich {
   class Matrix
@@ -60,6 +62,11 @@ namespace lukashevich {
     MatrixColIterator colEnd(size_t col);
     MatrixColConstIterator colBegin(size_t col) const;
     MatrixColConstIterator colEnd(size_t col) const;
+
+    MatrixDiagIterator diagBegin(bool isMainDiagonal);
+    MatrixDiagIterator diagEnd(bool isMainDiagonal);
+    MatrixDiagConstIterator diagBegin(bool isMainDiagonal) const;
+    MatrixDiagConstIterator diagEnd(bool isMainDiagonal) const;
 
   private:
     size_t getIndex(size_t row, size_t col) const;
