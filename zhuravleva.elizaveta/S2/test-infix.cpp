@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(infinix_basic)
 
 BOOST_AUTO_TEST_CASE(infix_priority)
 {
-    auto q = zhuravleva::infToPostfix("2 + 3 * 4");
+  auto q = zhuravleva::infToPostfix("2 + 3 * 4");
   BOOST_CHECK_EQUAL(q.front(), "2");
   q.pop();
   BOOST_CHECK_EQUAL(q.front(), "3");

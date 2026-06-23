@@ -1,77 +1,100 @@
 #ifndef STACK_HPP
 #define STACK_HPP
 
+#include <cstddef>
+#include <utility>
 #include <stdexcept>
-#include "../common/list.hpp"
-#include "../common/node.hpp"
-#include "../common/iterator.hpp"
+#include <list.hpp>
 
 namespace zhuravleva
 {
-  template<class T>
+  template< class T >
   class Stack
   {
-  private:
-    List<T> data;
-
   public:
     void push(const T& value);
+    void push(T&& value);
     void pop();
     T& top();
-    T drop();
-    bool empty() const;
-    void clear();
+    const T& top() const;
+    bool empty() const noexcept;
+    void clear() noexcept;
+    size_t size() const noexcept;
+
+    template< class... Args >
+    void emplace(Args&&... args);
+
+  private:
+    List< T > data_;
   };
 }
 
 template< class T >
 void zhuravleva::Stack< T >::push(const T& value)
 {
-  data.AddStart(value);
+  data_.emplaceFront(value);
+}
+
+template< class T >
+void zhuravleva::Stack< T >::push(T&& value)
+{
+  data_.emplaceFront(std::forward< T >(value));
 }
 
 template< class T >
 void zhuravleva::Stack< T >::pop()
 {
-  if(data.empty())
+  if (data_.empty())
   {
     throw std::runtime_error("empty data error");
   }
-  data.deleteStart();
+  data_.popFront();
 }
 
 template< class T >
 T& zhuravleva::Stack< T >::top()
 {
-  if(data.empty())
+  if (data_.empty())
   {
     throw std::runtime_error("empty data error");
   }
-  return *data.begin();
+  return *data_.begin();
 }
 
 template< class T >
-T zhuravleva::Stack< T >::drop()
+const T& zhuravleva::Stack< T >::top() const
 {
-  if (data.empty())
+  if (data_.empty())
   {
-    throw std::runtime_error("empty data error when drop");
+    throw std::runtime_error("empty stack");
   }
-  T val = *data.begin();
-  data.deleteStart();
-  return val;
+  return *data_.cbegin();
+}
+
+
+template< class T >
+bool zhuravleva::Stack< T >::empty() const noexcept
+{
+  return data_.empty();
 }
 
 template< class T >
-bool zhuravleva::Stack< T >::empty() const
+void zhuravleva::Stack< T >::clear() noexcept
 {
-  return data.empty();
+  data_.clear();
 }
 
 template< class T >
-void zhuravleva::Stack< T >::clear()
+size_t zhuravleva::Stack< T >::size() const noexcept
 {
-  data.clear();
+  return data_.size();
+}
+
+template< class T >
+template< class... Args >
+void zhuravleva::Stack< T >::emplace(Args&&... args)
+{
+  data_.emplaceFront(std::forward< Args >(args)...);
 }
 
 #endif

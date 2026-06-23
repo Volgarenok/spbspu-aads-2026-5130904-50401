@@ -3,166 +3,157 @@
 
 #include <stdexcept>
 #include "node.hpp"
+
 namespace zhuravleva
 {
-  template<class T>
+  template< class T >
   class List;
 
-  template<class T>
+  template< class T >
   class LIter
   {
-    friend class List<T>;
-
-  private:
-    Node<T>* current;
+    friend class List< T >;
 
   public:
     LIter() noexcept:
-      current(nullptr)
+      current_(nullptr)
     {}
 
-    LIter(Node<T>* ptr) noexcept:
-      current(ptr)
+    LIter(detail::Node< T >* ptr) noexcept:
+      current_(ptr)
     {}
 
     bool hasNext() const noexcept
     {
-      return current != nullptr;
+      return current_ != nullptr;
     }
 
     LIter next() const
     {
-      if(!current)
+      if (!current_)
       {
         throw std::runtime_error("null iterator");
       }
-      return LIter(current->next);
-    }
-
-    T& operator*() const
-    {
-      if(!current)
-      {
-        throw std::runtime_error("null iterator");
-      }
-      return current->data;
-    }
-
-    bool operator==(const LIter& other) const noexcept
-    {
-      return current == other.current;
-    }
-
-    bool operator!=(const LIter& other) const noexcept
-    {
-      return current != other.current;
+      return LIter(current_->next);
     }
 
     LIter& operator++()
     {
-      if (!current)
+      if (!current_)
       {
         throw std::runtime_error("null iterator");
       }
-      current = current->next;
+      current_ = current_->next;
       return *this;
     }
 
     LIter operator++(int)
     {
-      LIter<T> temp(*this);
+      LIter result(*this);
       ++(*this);
-      return temp;
+      return result;
+    }
+
+    T& operator*() const
+    {
+      if (!current_)
+      {
+        throw std::runtime_error("null iterator");
+      }
+      return current_->data;
     }
 
     T* operator->() const
     {
-      if (!current)
-      {
-        throw std::runtime_error("null iterator");
-      }
-      return &(current->data);
+      return &(**this);
     }
+
+    bool operator==(const LIter& other) const noexcept
+    {
+      return current_ == other.current_;
+    }
+
+    bool operator!=(const LIter& other) const noexcept
+    {
+      return current_ != other.current_;
+    }
+
+  private:
+    detail::Node< T >* current_;
   };
 
 
-  template<class T>
+  template< class T >
   class LCIter
   {
-    friend class List<T>;
-
-  private:
-    const Node<T>* current;
+    friend class List< T >;
 
   public:
-
     LCIter() noexcept:
-      current(nullptr)
+      current_(nullptr)
     {}
 
-    LCIter(const Node<T>* ptr) noexcept:
-      current(ptr)
+    LCIter(const detail::Node< T >* ptr) noexcept:
+      current_(ptr)
     {}
 
     bool hasNext() const noexcept
     {
-      return current != nullptr;
+      return current_ != nullptr;
     }
 
     LCIter next() const
     {
-      if(!current)
+      if (!current_)
       {
         throw std::runtime_error("null iterator");
       }
-      return LCIter(current->next);
-    }
-
-    const T& operator*() const
-    {
-      if(!current)
-      {
-        throw std::runtime_error("null iterator");
-      }
-      return current->data;
-    }
-
-    bool operator==(const LCIter& other) const noexcept
-    {
-      return current == other.current;
-    }
-
-    bool operator!=(const LCIter& other) const noexcept
-    {
-      return current != other.current;
+      return LCIter(current_->next);
     }
 
     LCIter& operator++()
     {
-      if (!current)
+      if (!current_)
       {
         throw std::runtime_error("null iterator");
       }
-      current = current->next;
+      current_ = current_->next;
       return *this;
     }
 
     LCIter operator++(int)
     {
-      LCIter<T> temp(*this);
+      LCIter result(*this);
       ++(*this);
-      return temp;
+      return result;
+    }
+
+    const T& operator*() const
+    {
+      if (!current_)
+      {
+        throw std::runtime_error("null iterator");
+      }
+      return current_->data;
     }
 
     const T* operator->() const
     {
-      if (!current)
-      {
-        throw std::runtime_error("null iterator");
-      }
-      return &(current->data);
+      return &(**this);
     }
-  };
 
+    bool operator==(const LCIter& other) const noexcept
+    {
+      return current_ == other.current_;
+    }
+
+    bool operator!=(const LCIter& other) const noexcept
+    {
+      return current_ != other.current_;
+    }
+
+  private:
+    const detail::Node< T >* current_;
+  };
 }
 #endif
