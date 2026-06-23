@@ -1,24 +1,29 @@
 #ifndef TREENODE_HPP
 #define TREENODE_HPP
+
 #include <utility>
+
 namespace zhuravleva
 {
-  template< class Key, class Value >
-  struct TreeNode
+  namespace detail
   {
-    std::pair< Key, Value > data_;
-    TreeNode< Key, Value >* parent_;
-    TreeNode< Key, Value >* left_;
-    TreeNode< Key, Value >* right_;
+    template< class Key, class Value >
+    struct TreeNode
+    {
+      std::pair< Key, Value > data;
+      TreeNode< Key, Value >* parent;
+      TreeNode< Key, Value >* left;
+      TreeNode< Key, Value >* right;
 
-    TreeNode(const Key& key, const Value& value,
-      TreeNode< Key, Value >* parent = nullptr):
-      data_(key, value),
-      parent_(parent),
-      left_(nullptr),
-      right_(nullptr)
-    {}
-  };
+      TreeNode(const Key& key, const Value& value,
+        TreeNode< Key, Value >* parentNode = nullptr):
+        data(key, value),
+        parent(parentNode),
+        left(nullptr),
+        right(nullptr)
+      {}
+    };
+  }
 }
 
 #endif

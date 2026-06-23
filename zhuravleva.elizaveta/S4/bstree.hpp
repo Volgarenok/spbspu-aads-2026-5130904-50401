@@ -64,12 +64,12 @@ namespace zhuravleva
     constIterator rotateLargeRight(constIterator it) noexcept;
 
   private:
-    TreeNode< Key, Value >* root_;
+    detail::TreeNode< Key, Value >* root_;
     size_t size_;
     Compare compare_;
-    void clear(TreeNode< Key, Value >* node) noexcept;
-    TreeNode< Key, Value >* copy(const TreeNode< Key, Value >* node, TreeNode< Key, Value >* parent);
-    size_t height(TreeNode< Key, Value >* node) const noexcept;
+    void clear(detail::TreeNode< Key, Value >* node) noexcept;
+    detail::TreeNode< Key, Value >* copy(const detail::TreeNode< Key, Value >* node, detail::TreeNode< Key, Value >* parent);
+    size_t height(detail::TreeNode< Key, Value >* node) const noexcept;
   };
 }
 
@@ -111,7 +111,7 @@ zhuravleva::BSTree< Key, Value, Compare >::operator=(const BSTree& other)
 {
   if (this != &other)
   {
-    zhuravleva::TreeNode< Key, Value >* newRoot = copy(other.root_, nullptr);
+    zhuravleva::detail::TreeNode< Key, Value >* newRoot = copy(other.root_, nullptr);
     clear();
     root_ = newRoot;
     size_ = other.size_;
@@ -151,14 +151,14 @@ size_t zhuravleva::BSTree< Key, Value, Compare >::size() const noexcept
 template< class Key, class Value, class Compare >
 zhuravleva::BSTIterator< Key, Value > zhuravleva::BSTree< Key, Value, Compare >::begin() noexcept
 {
-  zhuravleva::TreeNode< Key, Value >* current = root_;
+  zhuravleva::detail::TreeNode< Key, Value >* current = root_;
   if (!current)
   {
     return zhuravleva::BSTIterator< Key, Value >(nullptr);
   }
-  while (current->left_)
+  while (current->left)
   {
-    current = current->left_;
+    current = current->left;
   }
   return zhuravleva::BSTIterator< Key, Value >(current);
 }
@@ -172,14 +172,14 @@ zhuravleva::BSTIterator< Key, Value > zhuravleva::BSTree< Key, Value, Compare >:
 template< class Key, class Value, class Compare >
 zhuravleva::BSTConstIterator< Key, Value > zhuravleva::BSTree< Key, Value, Compare >::cbegin() const noexcept
 {
-  const zhuravleva::TreeNode< Key, Value >* current = root_;
+  const zhuravleva::detail::TreeNode< Key, Value >* current = root_;
   if (!current)
   {
     return zhuravleva::BSTConstIterator< Key, Value >(nullptr);
   }
-  while (current->left_)
+  while (current->left)
   {
-    current = current->left_;
+    current = current->left;
   }
   return zhuravleva::BSTConstIterator< Key, Value >(current);
 }
@@ -194,16 +194,16 @@ template< class Key, class Value, class Compare >
 zhuravleva::BSTIterator< Key, Value >
 zhuravleva::BSTree< Key, Value, Compare >::find(const Key& key) noexcept
 {
-  zhuravleva::TreeNode< Key, Value >* node = root_;
+  zhuravleva::detail::TreeNode< Key, Value >* node = root_;
   while (node)
   {
-    if (compare_(key, node->data_.first))
+    if (compare_(key, node->data.first))
     {
-      node = node->left_;
+      node = node->left;
     }
-    else if (compare_(node->data_.first, key))
+    else if (compare_(node->data.first, key))
     {
-      node = node->right_;
+      node = node->right;
     }
     else
     {
@@ -217,16 +217,16 @@ template< class Key, class Value, class Compare >
 zhuravleva::BSTConstIterator< Key, Value >
 zhuravleva::BSTree< Key, Value, Compare >::find(const Key& key) const noexcept
 {
-  const zhuravleva::TreeNode< Key, Value >* node = root_;
+  const zhuravleva::detail::TreeNode< Key, Value >* node = root_;
   while (node)
   {
-    if (compare_(key, node->data_.first))
+    if (compare_(key, node->data.first))
     {
-      node = node->left_;
+      node = node->left;
     }
-    else if (compare_(node->data_.first, key))
+    else if (compare_(node->data.first, key))
     {
-      node = node->right_;
+      node = node->right;
     }
     else
     {
@@ -247,37 +247,37 @@ void zhuravleva::BSTree< Key, Value, Compare >::push(const Key& key, const Value
 {
   if (!root_)
   {
-    root_ = new zhuravleva::TreeNode< Key, Value >(key, value);
+    root_ = new zhuravleva::detail::TreeNode< Key, Value >(key, value);
     size_++;
     return;
   }
-  zhuravleva::TreeNode< Key, Value >* node = root_;
-  zhuravleva::TreeNode< Key, Value >* parent = nullptr;
+  zhuravleva::detail::TreeNode< Key, Value >* node = root_;
+  zhuravleva::detail::TreeNode< Key, Value >* parent = nullptr;
   while (node)
   {
     parent = node;
-    if (compare_(key, node->data_.first))
+    if (compare_(key, node->data.first))
     {
-      node = node->left_;
+      node = node->left;
     }
-    else if (compare_(node->data_.first, key))
+    else if (compare_(node->data.first, key))
     {
-      node = node->right_;
+      node = node->right;
     }
     else
     {
-      node->data_.second = value;
+      node->data.second = value;
       return;
     }
   }
-  zhuravleva::TreeNode< Key, Value >* newNode = new zhuravleva::TreeNode< Key, Value >(key, value, parent);
-  if (compare_(key, parent->data_.first))
+  zhuravleva::detail::TreeNode< Key, Value >* newNode = new zhuravleva::detail::TreeNode< Key, Value >(key, value, parent);
+  if (compare_(key, parent->data.first))
   {
-    parent->left_ = newNode;
+    parent->left = newNode;
   }
   else
   {
-    parent->right_ = newNode;
+    parent->right = newNode;
   }
   size_++;
 }
@@ -307,16 +307,16 @@ const Value& zhuravleva::BSTree< Key, Value, Compare >::get(const Key& key) cons
 template< class Key, class Value, class Compare >
 void zhuravleva::BSTree< Key, Value, Compare >::drop(const Key& key)
 {
-  zhuravleva::TreeNode< Key, Value >* node = root_;
+  zhuravleva::detail::TreeNode< Key, Value >* node = root_;
   while (node)
   {
-    if (compare_(key, node->data_.first))
+    if (compare_(key, node->data.first))
     {
-      node = node->left_;
+      node = node->left;
     }
-    else if (compare_(node->data_.first, key))
+    else if (compare_(node->data.first, key))
     {
-      node = node->right_;
+      node = node->right;
     }
     else
     {
@@ -327,36 +327,36 @@ void zhuravleva::BSTree< Key, Value, Compare >::drop(const Key& key)
   {
     throw std::runtime_error("key not found");
   }
-  if (node->left_ && node->right_)
+  if (node->left && node->right)
   {
-    zhuravleva::TreeNode< Key, Value >* successor = node->right_;
-    while (successor->left_)
+    zhuravleva::detail::TreeNode< Key, Value >* successor = node->right;
+    while (successor->left)
     {
-      successor = successor->left_;
+      successor = successor->left;
     }
-    node->data_ = successor->data_;
+    node->data = successor->data;
     node = successor;
   }
-  zhuravleva::TreeNode< Key, Value >* child = node->left_;
+  zhuravleva::detail::TreeNode< Key, Value >* child = node->left;
   if (!child)
   {
-    child = node->right_;
+    child = node->right;
   }
   if (child)
   {
-    child->parent_ = node->parent_;
+    child->parent = node->parent;
   }
-  if (!node->parent_)
+  if (!node->parent)
   {
     root_ = child;
   }
-  else if (node == node->parent_->left_)
+  else if (node == node->parent->left)
   {
-    node->parent_->left_ = child;
+    node->parent->left = child;
   }
   else
   {
-    node->parent_->right_ = child;
+    node->parent->right = child;
   }
   delete node;
   size_--;
@@ -379,44 +379,44 @@ size_t zhuravleva::BSTree< Key, Value, Compare >::height() const noexcept
 template< class Key, class Value, class Compare >
 size_t zhuravleva::BSTree< Key, Value, Compare >::height(constIterator it) const noexcept
 {
-  return height(const_cast< zhuravleva::TreeNode< Key, Value >* >(it.current_));
+  return height(const_cast< zhuravleva::detail::TreeNode< Key, Value >* >(it.current_));
 }
 
 template< class Key, class Value, class Compare >
 zhuravleva::BSTConstIterator< Key, Value >
 zhuravleva::BSTree< Key, Value, Compare >::rotateLeft(constIterator it) noexcept
 {
-  zhuravleva::TreeNode< Key, Value >* node = const_cast< zhuravleva::TreeNode< Key, Value >* >(it.current_);
-  if (!node || !node->parent_)
+  zhuravleva::detail::TreeNode< Key, Value >* node = const_cast< zhuravleva::detail::TreeNode< Key, Value >* >(it.current_);
+  if (!node || !node->parent)
   {
     return cend();
   }
-  zhuravleva::TreeNode< Key, Value >* parent = node->parent_;
-  if (parent->right_ != node)
+  zhuravleva::detail::TreeNode< Key, Value >* parent = node->parent;
+  if (parent->right != node)
   {
     return cend();
   }
-  zhuravleva::TreeNode< Key, Value >* middle = node->left_;
-  parent->right_ = middle;
+  zhuravleva::detail::TreeNode< Key, Value >* middle = node->left;
+  parent->right = middle;
   if (middle)
   {
-    middle->parent_ = parent;
+    middle->parent = parent;
   }
-  node->parent_ = parent->parent_;
-  if (!parent->parent_)
+  node->parent = parent->parent;
+  if (!parent->parent)
   {
     root_ = node;
   }
-  else if (parent == parent->parent_->left_)
+  else if (parent == parent->parent->left)
   {
-    parent->parent_->left_ = node;
+    parent->parent->left = node;
   }
   else
   {
-    parent->parent_->right_ = node;
+    parent->parent->right = node;
   }
-  node->left_ = parent;
-  parent->parent_ = node;
+  node->left = parent;
+  parent->parent = node;
   return zhuravleva::BSTConstIterator< Key, Value >(node);
 }
 
@@ -424,38 +424,38 @@ template< class Key, class Value, class Compare >
 zhuravleva::BSTConstIterator< Key, Value >
 zhuravleva::BSTree< Key, Value, Compare >::rotateRight(constIterator it) noexcept
 {
-  zhuravleva::TreeNode< Key, Value >* node = const_cast< zhuravleva::TreeNode< Key, Value >* >(it.current_);
-  if (!node || !node->parent_)
+  zhuravleva::detail::TreeNode< Key, Value >* node = const_cast< zhuravleva::detail::TreeNode< Key, Value >* >(it.current_);
+  if (!node || !node->parent)
   {
     return cend();
   }
-  zhuravleva::TreeNode< Key, Value >* parent = node->parent_;
-  if (parent->left_ != node)
+  zhuravleva::detail::TreeNode< Key, Value >* parent = node->parent;
+  if (parent->left != node)
   {
     return cend();
   }
-  zhuravleva::TreeNode< Key, Value >* middle = node->right_;
-  parent->left_ = middle;
+  zhuravleva::detail::TreeNode< Key, Value >* middle = node->right;
+  parent->left = middle;
   if (middle)
   {
-    middle->parent_ = parent;
+    middle->parent = parent;
   }
-  node->parent_ = parent->parent_;
-  if (!parent->parent_)
+  node->parent = parent->parent;
+  if (!parent->parent)
   {
     root_ = node;
   }
-  else if (parent == parent->parent_->left_)
+  else if (parent == parent->parent->left)
   {
-    parent->parent_->left_ = node;
+    parent->parent->left = node;
   }
   else
   {
-    parent->parent_->right_ = node;
+    parent->parent->right = node;
   }
 
-  node->right_ = parent;
-  parent->parent_ = node;
+  node->right = parent;
+  parent->parent = node;
 
   return zhuravleva::BSTConstIterator< Key, Value >(node);
 }
@@ -464,16 +464,16 @@ template< class Key, class Value, class Compare >
 zhuravleva::BSTConstIterator< Key, Value >
 zhuravleva::BSTree< Key, Value, Compare >::rotateLargeLeft(constIterator it) noexcept
 {
-  zhuravleva::TreeNode< Key, Value >* node = const_cast< zhuravleva::TreeNode< Key, Value >* >(it.current_);
-  if (!node || !node->parent_ || !node->parent_->parent_)
+  zhuravleva::detail::TreeNode< Key, Value >* node = const_cast< zhuravleva::detail::TreeNode< Key, Value >* >(it.current_);
+  if (!node || !node->parent || !node->parent->parent)
   {
     return cend();
   }
-  if (node != node->parent_->left_)
+  if (node != node->parent->left)
   {
     return cend();
   }
-  if (node->parent_ != node->parent_->parent_->right_)
+  if (node->parent != node->parent->parent->right)
   {
     return cend();
   }
@@ -485,17 +485,17 @@ template< class Key, class Value, class Compare >
 zhuravleva::BSTConstIterator< Key, Value >
 zhuravleva::BSTree< Key, Value, Compare >::rotateLargeRight(constIterator it) noexcept
 {
-  zhuravleva::TreeNode< Key, Value >* node = const_cast< zhuravleva::TreeNode< Key, Value >* >(it.current_);
+  zhuravleva::detail::TreeNode< Key, Value >* node = const_cast< zhuravleva::detail::TreeNode< Key, Value >* >(it.current_);
 
-  if (!node || !node->parent_ || !node->parent_->parent_)
+  if (!node || !node->parent || !node->parent->parent)
   {
     return cend();
   }
-  if (node != node->parent_->right_)
+  if (node != node->parent->right)
   {
     return cend();
   }
-  if (node->parent_ != node->parent_->parent_->left_)
+  if (node->parent != node->parent->parent->left)
   {
     return cend();
   }
@@ -504,41 +504,41 @@ zhuravleva::BSTree< Key, Value, Compare >::rotateLargeRight(constIterator it) no
 }
 
 template< class Key, class Value, class Compare >
-void zhuravleva::BSTree< Key, Value, Compare >::clear(zhuravleva::TreeNode< Key, Value >* node) noexcept
+void zhuravleva::BSTree< Key, Value, Compare >::clear(zhuravleva::detail::TreeNode< Key, Value >* node) noexcept
 {
   if (!node)
   {
     return;
   }
-  clear(node->left_);
-  clear(node->right_);
+  clear(node->left);
+  clear(node->right);
   delete node;
 }
 
 template< class Key, class Value, class Compare >
-zhuravleva::TreeNode< Key, Value >* zhuravleva::BSTree< Key, Value, Compare >::copy
-  (const zhuravleva::TreeNode< Key, Value >* node, zhuravleva::TreeNode< Key, Value >* parent)
+zhuravleva::detail::TreeNode< Key, Value >* zhuravleva::BSTree< Key, Value, Compare >::copy
+  (const zhuravleva::detail::TreeNode< Key, Value >* node, zhuravleva::detail::TreeNode< Key, Value >* parent)
 {
   if (!node)
   {
     return nullptr;
   }
-  zhuravleva::TreeNode< Key, Value >* newNode = new zhuravleva::TreeNode< Key, Value >
-    (node->data_.first, node->data_.second, parent);
-  newNode->left_ = copy(node->left_, newNode);
-  newNode->right_ = copy(node->right_, newNode);
+  zhuravleva::detail::TreeNode< Key, Value >* newNode = new zhuravleva::detail::TreeNode< Key, Value >
+    (node->data.first, node->data.second, parent);
+  newNode->left = copy(node->left, newNode);
+  newNode->right = copy(node->right, newNode);
   return newNode;
 }
 
 template< class Key, class Value, class Compare >
-size_t zhuravleva::BSTree< Key, Value, Compare >::height(zhuravleva::TreeNode< Key, Value >* node) const noexcept
+size_t zhuravleva::BSTree< Key, Value, Compare >::height(zhuravleva::detail::TreeNode< Key, Value >* node) const noexcept
 {
   if (!node)
   {
     return 0;
   }
-  size_t leftHeight = height(node->left_);
-  size_t rightHeight = height(node->right_);
+  size_t leftHeight = height(node->left);
+  size_t rightHeight = height(node->right);
   size_t maxHeight = leftHeight;
   if (rightHeight > maxHeight)
   {
