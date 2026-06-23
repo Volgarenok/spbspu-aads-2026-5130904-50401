@@ -13,6 +13,7 @@ namespace donkeev
   class RobinTable
   {
     using Node = RobinNode<Key, Value>;
+    using Table = RobinTable<Key, Value, Hash, Equal>;
       
   public:
     RobinTable() = delete;
@@ -49,6 +50,7 @@ namespace donkeev
     Equal equal_;
 
     Node& findNode(const Key&);
+    void swap(Table&) noexcept;
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -78,6 +80,30 @@ namespace donkeev
   {
     assert(capacity > 0);
     slots_ = topit::Vector(capacity, Node());
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinTable<Key, Value, Hash, Equal>& RobinTable<Key, Value, Hash, Equal>::operator=(const RobinTable& other)
+  {
+    if (this != &other)
+    {
+      RobinTable copy(other);
+      swap(copy);
+    }
+
+    return *this;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinTable<Key, Value, Hash, Equal>& RobinTable<Key, Value, Hash, Equal>::operator=(RobinTable&& other) noexcept
+  {
+    if (this != &other)
+    {
+      RobinTable copy(std::move(other));
+      swap(copy);
+    }
+
+    return *this;
   }
 
   
