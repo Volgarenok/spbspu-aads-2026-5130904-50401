@@ -1,9 +1,8 @@
 #include "graph.hpp"
-
 #include <iostream>
 
 template< class T, class Cmp >
-void chernov::sort(Vector< T > & v, Cmp cmp)
+void chernov::detail::sort(Vector< T > & v, Cmp cmp)
 {
   for (size_t i = 0; i < v.getSize(); ++i) {
     size_t min = i;
@@ -73,7 +72,8 @@ void chernov::Graph::addVertex(std::string vertex)
 
 void chernov::Graph::addEdge(std::string start_vertex, std::string end_vertex, size_t weight)
 {
-  auto ensure_exists = [&](auto & table, const std::string & key) {
+  auto ensure_exists = [&](auto & table, const std::string & key)
+  {
     if (!table.has(key)) {
       try {
         table.add(key, Edges());
@@ -131,7 +131,7 @@ chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getOutbound(
 
 chernov::Vector< std::pair< std::string, size_t > > chernov::Graph::getInbound(std::string vertex) const
 {
-   if (!incoming_.has(vertex) && !outgoing_.has(vertex)) {
+  if (!incoming_.has(vertex) && !outgoing_.has(vertex)) {
     throw std::out_of_range("vertex not found");
   }
   if (!incoming_.has(vertex)) {
@@ -148,7 +148,7 @@ void chernov::Graphs::addVertex(std::string graph_name, std::string vertex, std:
 {
   try {
     graphs_.at(graph_name).addVertex(vertex);
-  } catch (const std::out_of_range&) {
+  } catch (const std::out_of_range &) {
     output << "<INVALID COMMAND>\n";
   }
 }
@@ -170,8 +170,9 @@ void chernov::Graphs::createGraph(std::string graph_name)
   }
 }
 
-bool chernov::Graphs::hasGraph(const std::string& name) const {
-    return graphs_.has(name);
+bool chernov::Graphs::hasGraph(const std::string & name) const
+{
+  return graphs_.has(name);
 }
 
 void chernov::Graphs::addEdge(std::string graph_name, std::string start_vertex, std::string end_vertex, size_t weight)
@@ -188,7 +189,7 @@ void chernov::Graphs::showGraphs(std::ostream & output)
   for (auto iter = graphs_.begin(); iter != graphs_.end(); ++iter) {
     graphs.pushBack(iter->first);
   }
-  sort(graphs, Comparator< std::string >{});
+  detail::sort(graphs, Comparator< std::string >{});
   for (auto iter = graphs.cbegin(); iter != graphs.cend(); ++iter) {
     output << *iter << "\n";
   }
@@ -201,7 +202,7 @@ void chernov::Graphs::showGraphVertexes(std::string graph_name, std::ostream & o
 {
   try {
     Vector< std::string > vertexes = graphs_.at(graph_name).getVertexes();
-    sort(vertexes, Comparator< std::string >{});
+    detail::sort(vertexes, Comparator< std::string >{});
     for (auto iter = vertexes.cbegin(); iter != vertexes.cend(); ++iter) {
       output << *iter << "\n";
     }
@@ -220,7 +221,7 @@ void chernov::Graphs::showGraphEdges(Vector< std::pair< std::string, size_t > > 
     return;
   }
 
-  sort(edges, PairComparator< std::string, size_t >{});
+  detail::sort(edges, detail::PairComparator< std::string, size_t >{});
 
   auto iter = edges.cbegin();
   while (iter != edges.cend()) {
@@ -255,8 +256,11 @@ void chernov::Graphs::showGraphInbound(std::string graph_name, std::string verte
   }
 }
 
-void chernov::Graphs::bindGraphVertexes(
-  std::string graph_name, std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output)
+void chernov::Graphs::bindGraphVertexes(std::string graph_name,
+  std::string vertex_a,
+  std::string vertex_b,
+  size_t weight,
+  std::ostream & output)
 {
   try {
     graphs_.at(graph_name).addEdge(vertex_a, vertex_b, weight);
@@ -266,7 +270,10 @@ void chernov::Graphs::bindGraphVertexes(
 }
 
 void chernov::Graphs::cutGraphEdge(std::string graph_name,
-  std::string vertex_a, std::string vertex_b, size_t weight, std::ostream & output)
+  std::string vertex_a,
+  std::string vertex_b,
+  size_t weight,
+  std::ostream & output)
 {
   try {
     graphs_.at(graph_name).cutEdge(vertex_a, vertex_b, weight);
@@ -276,7 +283,9 @@ void chernov::Graphs::cutGraphEdge(std::string graph_name,
 }
 
 void chernov::Graphs::mergeGraphs(std::string new_graph,
-  std::string old_graph1, std::string old_graph2, std::ostream & output)
+  std::string old_graph1,
+  std::string old_graph2,
+  std::ostream & output)
 {
   if (graphs_.has(new_graph) || !graphs_.has(old_graph1) || !graphs_.has(old_graph2)) {
     output << "<INVALID COMMAND>\n";
@@ -285,7 +294,8 @@ void chernov::Graphs::mergeGraphs(std::string new_graph,
 
   Graph graph(new_graph);
 
-  auto add_edges = [&graph](Graph gr) {
+  auto add_edges = [&graph](Graph gr)
+  {
     for (auto iter = gr.outgoing_.cbegin(); iter != gr.outgoing_.cend(); ++iter) {
       Vector< std::pair< std::string, size_t > > edges = iter->second.getEdges();
       for (auto v_iter = edges.cbegin(); v_iter != edges.cend(); ++v_iter) {
@@ -306,7 +316,10 @@ void chernov::Graphs::mergeGraphs(std::string new_graph,
 }
 
 void chernov::Graphs::extractGraphs(std::string new_graph,
-  std::string old_graph, size_t count_k, Vector< std::string > & vertexes, std::ostream & output)
+  std::string old_graph,
+  size_t count_k,
+  Vector< std::string > & vertexes,
+  std::ostream & output)
 {
   if (graphs_.has(new_graph) || !graphs_.has(old_graph)) {
     output << "<INVALID COMMAND>\n";
@@ -341,11 +354,11 @@ void chernov::Graphs::extractGraphs(std::string new_graph,
 
     try {
       graphs_.add(new_graph, new_gr);
-    } catch (const std::length_error&) {
+    } catch (const std::length_error &) {
       graphs_.rehash(graphs_.maxCapacity() ? graphs_.maxCapacity() * 2 : 2);
       graphs_.add(new_graph, new_gr);
     }
-  } catch (const std::out_of_range&) {
+  } catch (const std::out_of_range &) {
     output << "<INVALID COMMAND>\n";
   }
 }
