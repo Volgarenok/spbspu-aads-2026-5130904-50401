@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(hash_table_get_missing_key_test)
 {
   TestTable table;
   table.add("a", 1);
-  BOOST_CHECK_THROW(table.get("b"), std::runtime_error);
+  BOOST_CHECK_THROW(table.at("b"), std::out_of_range);
 }
 
 BOOST_AUTO_TEST_CASE(hash_table_rehash_test)
