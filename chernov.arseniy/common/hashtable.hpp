@@ -160,7 +160,12 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
   if (slots) {
     setParamsByCountSlots(slots);
     data_ = static_cast< slot * >(::operator new(sizeof(slot) * (num_buckets_ * bucket_cap_ + overflow_cap_)));
-    bucket_sizes_ = new size_t[num_buckets_]{0};
+    try {
+      bucket_sizes_ = new size_t[num_buckets_]{0};
+    } catch (...) {
+      ::operator delete(data_);
+      throw;
+    }
   }
 }
 
