@@ -53,12 +53,12 @@ const std::string& ulanova::Graph::getName() const noexcept
 
 bool ulanova::Graph::hasVertex(const std::string& vertex) const
 {
-  return vertices_.has(vertex);
+  return vertices_.contains(vertex);
 }
 
 void ulanova::Graph::addVertex(const std::string& vertex)
 {
-  if (!vertices_.has(vertex))
+  if (!vertices_.contains(vertex))
   {
     vertices_.add(vertex, true);
     outbound_.add(vertex, Vector< Edge >());
@@ -68,28 +68,26 @@ void ulanova::Graph::addVertex(const std::string& vertex)
 
 bool ulanova::Graph::hasEdge(const std::string& from, const std::string& to, unsigned weight) const
 {
-  const Vector< Edge >* edges = outbound_.find(from);
-
-  if (edges == nullptr)
+  auto it = outbound_.find(from);
+  if (it == outbound_.end())
   {
     return false;
   }
-
-  for (auto it = edges->begin(); it != edges->end(); ++it)
+  const Vector< Edge >& edges = (*it).second;
+  for (auto edgeIt = edges.begin(); edgeIt != edges.end(); ++edgeIt)
   {
-    if (it->vertex == to && it->weight == weight)
+    if (edgeIt->vertex == to && edgeIt->weight == weight)
     {
       return true;
     }
   }
-
   return false;
 }
 
 void ulanova::Graph::addEdge(const std::string& from, const std::string& to, unsigned weight)
 {
-  bool fromNew = !vertices_.has(from);
-  bool toNew = !vertices_.has(to);
+  bool fromNew = !vertices_.contains(from);
+  bool toNew = !vertices_.contains(to);
 
   addVertex(from);
 
@@ -108,18 +106,18 @@ void ulanova::Graph::addEdge(const std::string& from, const std::string& to, uns
     throw;
   }
 
-  Vector< Edge >* outEdges = outbound_.find(from);
-  Vector< Edge >* inEdges = inbound_.find(to);
+  auto outIt = outbound_.find(from);
+  auto inIt = inbound_.find(to);
 
-  outEdges->push_back(Edge(to, weight));
+  (*outIt).second.push_back(Edge(to, weight));
 
   try
   {
-    inEdges->push_back(Edge(from, weight));
+    (*inIt).second.push_back(Edge(from, weight));
   }
   catch (...)
   {
-    outEdges->popback();
+    (*outIt).second.popback();
     if (toNew)
     {
       vertices_.erase(to);
@@ -138,21 +136,23 @@ void ulanova::Graph::addEdge(const std::string& from, const std::string& to, uns
 
 bool ulanova::Graph::removeEdge(const std::string& from, const std::string& to, unsigned weight)
 {
-  Vector< Edge >* outEdges = outbound_.find(from);
-  Vector< Edge >* inEdges = inbound_.find(to);
+  auto outIt = outbound_.find(from);
+  auto inIt = inbound_.find(to);
 
-  if (outEdges == nullptr || inEdges == nullptr)
+  if (outIt == outbound_.end() || inIt == inbound_.end())
   {
     return false;
   }
 
-  bool removedOut = false;
+  Vector< Edge >& outEdges = (*outIt).second;
+  Vector< Edge >& inEdges = (*inIt).second;
 
-  for (size_t i = 0; i < outEdges->getsize(); ++i)
+  bool removedOut = false;
+  for (size_t i = 0; i < outEdges.getsize(); ++i)
   {
-    if ((*outEdges)[i].vertex == to && (*outEdges)[i].weight == weight)
+    if (outEdges[i].vertex == to && outEdges[i].weight == weight)
     {
-      outEdges->erase(i);
+      outEdges.erase(i);
       removedOut = true;
       break;
     }
@@ -163,11 +163,11 @@ bool ulanova::Graph::removeEdge(const std::string& from, const std::string& to, 
     return false;
   }
 
-  for (size_t i = 0; i < inEdges->getsize(); ++i)
+  for (size_t i = 0; i < inEdges.getsize(); ++i)
   {
-    if ((*inEdges)[i].vertex == from && (*inEdges)[i].weight == weight)
+    if (inEdges[i].vertex == from && inEdges[i].weight == weight)
     {
-      inEdges->erase(i);
+      inEdges.erase(i);
       return true;
     }
   }
@@ -180,29 +180,29 @@ ulanova::Vector< std::string > ulanova::Graph::getVertices() const
   Vector< std::string > result;
   for (auto it = vertices_.cbegin(); it != vertices_.cend(); ++it)
   {
-    result.push_back(it.key());
+    result.push_back((*it).first);
   }
   return result;
 }
 
 ulanova::Vector< ulanova::Edge > ulanova::Graph::getOutbound(const std::string& vertex) const
 {
-  const Vector< Edge >* edges = outbound_.find(vertex);
-  if (edges == nullptr)
+  auto it = outbound_.find(vertex);
+  if (it == outbound_.end())
   {
     return Vector< Edge >();
   }
-  return *edges;
+  return (*it).second;
 }
 
 ulanova::Vector< ulanova::Edge > ulanova::Graph::getInbound(const std::string& vertex) const
 {
-  const Vector< Edge >* edges = inbound_.find(vertex);
-  if (edges == nullptr)
+  auto it = inbound_.find(vertex);
+  if (it == inbound_.end())
   {
     return Vector< Edge >();
   }
-  return *edges;
+  return (*it).second;
 }
 
 ulanova::Graph ulanova::Graph::merge(const std::string& name, const Graph& rhs) const
@@ -223,8 +223,8 @@ ulanova::Graph ulanova::Graph::merge(const std::string& name, const Graph& rhs) 
 
   for (auto it = outbound_.cbegin(); it != outbound_.cend(); ++it)
   {
-    const std::string& from = it.key();
-    const Vector< Edge >& edges = it.value();
+    const std::string& from = (*it).first;
+    const Vector< Edge >& edges = (*it).second;
     for (auto edgeIt = edges.begin(); edgeIt != edges.end(); ++edgeIt)
     {
       result.addEdge(from, edgeIt->vertex, edgeIt->weight);
@@ -233,46 +233,7 @@ ulanova::Graph ulanova::Graph::merge(const std::string& name, const Graph& rhs) 
 
   for (auto it = rhs.outbound_.cbegin(); it != rhs.outbound_.cend(); ++it)
   {
-    const std::string& from = it.key();
-    const Vector< Edge >& edges = it.value();
+    const std::string& from = (*it).first;
+    const Vector< Edge >& edges = (*it).second;
     for (auto edgeIt = edges.begin(); edgeIt != edges.end(); ++edgeIt)
     {
-      result.addEdge(from, edgeIt->vertex, edgeIt->weight);
-    }
-  }
-
-  return result;
-}
-
-ulanova::Graph ulanova::Graph::extract(const std::string& name, const Vector< std::string >& vertices) const
-{
-  Graph result(name);
-
-  for (auto it = vertices.begin(); it != vertices.end(); ++it)
-  {
-    if (!hasVertex(*it))
-    {
-      throw std::out_of_range("vertex not found");
-    }
-    result.addVertex(*it);
-  }
-
-  for (auto it = vertices.begin(); it != vertices.end(); ++it)
-  {
-    const std::string& from = *it;
-    const Vector< Edge >* edges = outbound_.find(from);
-    if (edges == nullptr)
-    {
-      continue;
-    }
-    for (auto edgeIt = edges->begin(); edgeIt != edges->end(); ++edgeIt)
-    {
-      if (result.hasVertex(edgeIt->vertex))
-      {
-        result.addEdge(from, edgeIt->vertex, edgeIt->weight);
-      }
-    }
-  }
-
-  return result;
-}

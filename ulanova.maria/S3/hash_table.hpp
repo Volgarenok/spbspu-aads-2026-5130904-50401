@@ -106,6 +106,9 @@ namespace ulanova
     const_iterator cend() const noexcept;
 
   private:
+    friend class HashTableIterator< Key, Value, Hash, Equal >;
+    friend class HashTableConstIterator< Key, Value, Hash, Equal >;
+
     enum class BucketState
     {
       Empty,

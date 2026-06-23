@@ -3,13 +3,6 @@
 #include <stdexcept>
 #include <string>
 
-namespace
-{
-  bool isEmptyLine(const std::string& line)
-  {
-    return line.empty() || line.find_first_not_of(" \t\r") == std::string::npos;
-  }
-}
 
 ulanova::GraphStorage::GraphStorage():
   graphs_(128)
