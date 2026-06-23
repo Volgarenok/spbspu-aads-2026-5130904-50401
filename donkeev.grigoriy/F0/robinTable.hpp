@@ -49,7 +49,8 @@ namespace donkeev
     Hash hasher_;
     Equal equal_;
 
-    Node& findNode(const Key&);
+    std::pair< size_t, Node* > findNode(const Key&);
+    std::pair< size_t, const Node* > findNode(const Key&) const;
     void swap(Table&) noexcept;
   };
 
@@ -106,6 +107,84 @@ namespace donkeev
     return *this;
   }
 
+
+  template< class Key, class Value, class Hash, class Equal >
+  std::pair<size_t, typename RobinTable<Key, Value, Hash, Equal>::Node*>
+  RobinTable<Key, Value, Hash, Equal>::findNode(const Key& key)
+  {
+    if (empty())
+    {
+      return {0, nullptr};
+    }
+    
+    size_t cap = slots_.getSize();
+    size_t index = hasher_(key) % cap;
+    int currPsl = 0;
+    
+    for (size_t i = 0; i < cap; ++i)
+    {
+      Node& node = slots_[index];
+      
+      if (!node.isOccupied_)
+      {
+        return {index, nullptr};
+      }
+      
+      if (currPsl > node.psl_)
+      {
+        return {index, nullptr};
+      }
+      
+      if (equal_(key, node.key_))
+      {
+        return {index, &slots_[index]};
+      }
+      
+      index = (index + 1) % cap;
+      cur_psl++;
+    }
+    
+    return {cap, nullptr};
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+std::pair<size_t, const typename RobinTable<Key, Value, Hash, Equal>::Node*>
+RobinTable<Key, Value, Hash, Equal>::findNode(const Key& key) const
+{
+  if (empty())
+  {
+    return {0, nullptr};
+  }
+  
+  size_t cap = slots_.size();
+  size_t index = hasher_(key) % cap;
+  int cur_psl = 0;
+  
+  for (size_t i = 0; i < cap; ++i)
+  {
+    const Node& node = slots_[index];
+    
+    if (!node.isOccupied_)
+    {
+      return {index, nullptr};
+    }
+    
+    if (cur_psl > node.psl_)
+    {
+      return {index, nullptr};
+    }
+    
+    if (equal_(key, node.key_))
+    {
+      return {index, &slots_[index]};
+    }
+    
+    index = (index + 1) % cap;
+    cur_psl++;
+  }
+  
+  return {cap, nullptr};
+}
   
 }
 
