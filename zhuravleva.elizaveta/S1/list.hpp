@@ -1,0 +1,266 @@
+#ifndef LIST_HPP
+#define LIST_HPP
+
+#include <cstddef>
+#include <stdexcept>
+#include "node.hpp"
+#include "iterator.hpp"
+
+namespace zhuravleva
+{
+
+  template< class T >
+  class List
+  {
+  public:
+    List();
+    ~List() noexcept;
+
+    List(const List& other);
+    List(List&& other) noexcept;
+
+    List& operator=(const List& other);
+    List& operator=(List&& other) noexcept;
+
+    LIter< T > begin() noexcept;
+    LCIter< T > cbegin() const noexcept;
+
+    LIter< T > end() noexcept;
+    LCIter< T > cend() const noexcept;
+
+    bool empty() const noexcept;
+    size_t size() const noexcept;
+
+    LIter< T > insertAfter(LIter< T > pos, const T& value);
+    LIter< T > pushBack(const T& value);
+    LIter< T > pushFront(const T& value);
+    LIter< T > beforeBegin();
+
+    void popFront() noexcept;
+    void popBack() noexcept;
+    void eraseAfter(LIter< T > pos);
+    void clear() noexcept;
+    void swap(List& other) noexcept;
+
+  private:
+
+    detail::Node< T >* fake_;
+    detail::Node< T >* createFake();
+  };
+
+  template< class T >
+  List< T >::List():
+    fake_(createFake())
+  {}
+
+
+  template< class T >
+  List< T >::~List() noexcept
+  {
+    clear();
+    delete fake_;
+  }
+
+  template< class T >
+  List< T >::List(const List& other):
+    fake_(createFake())
+  {
+    try
+    {
+      for (LCIter< T > it = other.cbegin(); it != other.cend(); ++it)
+      {
+        pushBack(*it);
+      }
+    }
+    catch (...)
+    {
+      clear();
+      delete fake_;
+      throw;
+    }
+  }
+
+  template< class T >
+  List< T >::List(List&& other) noexcept:
+    fake_(other.fake_)
+  {
+    other.fake_ = createFake();
+  }
+
+  template< class T >
+  List< T >& List< T >::operator=(const List& other)
+  {
+    if (this != &other)
+    {
+      List< T > temp(other);
+      swap(temp);
+    }
+    return *this;
+  }
+
+  template< class T >
+  List< T >& List< T >::operator=(List&& other) noexcept
+  {
+    if (this != &other)
+    {
+      clear();
+      delete fake_;
+      fake_ = other.fake_;
+      other.fake_ = createFake();
+    }
+    return *this;
+  }
+
+  template< class T >
+  bool List< T >::empty() const noexcept
+  {
+    return fake_->next == fake_;
+  }
+
+  template< class T >
+  size_t List< T >::size() const noexcept
+  {
+    size_t count = 0;
+    detail::Node< T >* cur = fake_->next;
+    while (cur != fake_)
+    {
+      ++count;
+      cur = cur->next;
+    }
+    return count;
+  }
+
+  template< class T >
+  detail::Node< T >* List< T >::createFake()
+  {
+    detail::Node< T >* node = new detail::Node< T >(T());
+    node->next = node;
+    return node;
+  }
+
+  template< class T >
+  LIter< T > List< T >::begin() noexcept
+  {
+    return LIter< T >(fake_->next);
+  }
+
+  template< class T >
+  LCIter< T > List< T >::cbegin() const noexcept
+  {
+    return LCIter< T >(fake_->next);
+  }
+
+  template< class T >
+  LIter< T > List< T >::end() noexcept
+  {
+    return LIter< T >(fake_);
+  }
+
+  template< class T >
+  LCIter< T > List< T >::cend() const noexcept
+  {
+    return LCIter< T >(fake_);
+  }
+
+  template< class T >
+  LIter< T > List< T >::pushFront(const T& value)
+  {
+    detail::Node< T >* node = new detail::Node< T >(value, fake_->next);
+    fake_->next = node;
+    return LIter< T >(node);
+  }
+
+  template< class T >
+  void List< T >::popFront() noexcept
+  {
+    if (fake_->next != fake_)
+    {
+      detail::Node< T >* tmp = fake_->next;
+      fake_->next = tmp->next;
+      delete tmp;
+    }
+  }
+
+  template< class T >
+  void List< T >::eraseAfter(LIter< T > pos)
+  {
+    if ((pos.current_) && (pos.current_->next != fake_))
+    {
+      detail::Node< T >* tmp = pos.current_->next;
+      pos.current_->next = tmp->next;
+      delete tmp;
+    }
+  }
+
+  template< class T >
+  void List< T >::popBack() noexcept
+  {
+    if (fake_->next != fake_)
+    {
+      detail::Node< T >* prev = fake_;
+      detail::Node< T >* cur = fake_->next;
+      while (cur->next != fake_)
+      {
+        prev = cur;
+        cur = cur->next;
+      }
+      prev->next = fake_;
+      delete cur;
+    }
+  }
+
+  template< class T >
+  LIter< T > List< T >::insertAfter(LIter< T > pos, const T& value)
+  {
+    if (!pos.current_)
+    {
+      throw std::runtime_error("invalid iterator");
+    }
+
+    detail::Node< T >* node = new detail::Node< T >(value, pos.current_->next);
+    pos.current_->next = node;
+    return LIter< T >(node);
+  }
+
+  template< class T >
+  LIter< T > List< T >::pushBack(const T& value)
+  {
+    detail::Node< T >* cur = fake_;
+    while (cur->next != fake_)
+    {
+      cur = cur->next;
+    }
+    detail::Node< T >* node = new detail::Node< T >(value, fake_);
+    cur->next = node;
+    return LIter< T >(node);
+  }
+
+  template< class T >
+  LIter< T > List< T >::beforeBegin()
+  {
+    return LIter< T >(fake_);
+  }
+
+  template< class T >
+  void List< T >::clear() noexcept
+  {
+    detail::Node< T >* cur = fake_->next;
+    while (cur != fake_)
+    {
+      detail::Node< T >* tmp = cur;
+      cur = cur->next;
+      delete tmp;
+    }
+    fake_->next = fake_;
+  }
+
+  template< class T >
+  void List< T >::swap(List& other) noexcept
+  {
+    detail::Node< T >* tmp = fake_;
+    fake_ = other.fake_;
+    other.fake_ = tmp;
+  }
+}
+
+#endif
