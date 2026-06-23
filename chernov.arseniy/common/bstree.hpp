@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-
 #include <stack.hpp>
 
 namespace chernov {
@@ -27,7 +26,7 @@ namespace chernov {
     };
 
     template< class Key, class Value >
-    struct Node: NodeBase {
+    struct Node : NodeBase {
       std::pair< const Key, Value > key_value_;
 
       Node(const Key & k, const Value & v, NodeBase * p, NodeBase * l, NodeBase * r, size_t h):
@@ -56,8 +55,8 @@ namespace chernov {
 
     void swap(BSTree & other) noexcept;
 
-    template< class U >
-    void push(const Key & k, U && v);
+    void push(const Key & k, const Value & v);
+    void push(const Key & k, Value && v);
     void remove(const Key & k);
 
     void clear() noexcept;
@@ -103,6 +102,9 @@ namespace chernov {
     void createFakes();
     void updateHeights(detail::NodeBase * node) noexcept;
     detail::NodeBase * findNode(const Key & k) const;
+
+    template< class U >
+    void privatePush(const Key & k, U && v);
   };
 
   template< class Key, class Value, bool IsConst >
@@ -184,8 +186,8 @@ namespace chernov {
 
     detail::NodeBase * src_root = other.fake_root_->left;
     const std::pair< const Key, Value > & root_kv = static_cast< detail::Node< Key, Value > * >(src_root)->key_value_;
-    detail::NodeBase * dst_root = new detail::Node< Key, Value >(root_kv.first,
-      root_kv.second, temp.fake_root_, temp.fake_leaf_, temp.fake_leaf_, src_root->height);
+    detail::NodeBase * dst_root = new detail::Node< Key, Value >(
+      root_kv.first, root_kv.second, temp.fake_root_, temp.fake_leaf_, temp.fake_leaf_, src_root->height);
     temp.fake_root_->left = dst_root;
     temp.fake_root_->right = dst_root;
     stack.push({src_root, dst_root});
@@ -197,8 +199,8 @@ namespace chernov {
 
       if (src->left != other.fake_leaf_) {
         const std::pair< const Key, Value > & l_kv = static_cast< detail::Node< Key, Value > * >(src->left)->key_value_;
-        detail::NodeBase * new_left = new detail::Node< Key, Value >(l_kv.first,
-          l_kv.second, dst, temp.fake_leaf_, temp.fake_leaf_, src->height);
+        detail::NodeBase * new_left =
+          new detail::Node< Key, Value >(l_kv.first, l_kv.second, dst, temp.fake_leaf_, temp.fake_leaf_, src->height);
         dst->left = new_left;
         new_left->parent = dst;
         stack.push({src->left, new_left});
@@ -207,9 +209,10 @@ namespace chernov {
       }
 
       if (src->right != other.fake_leaf_) {
-        const std::pair< const Key, Value > & r_kv = static_cast< detail::Node< Key, Value > * >(src->right)->key_value_;
-        detail::NodeBase * new_right = new detail::Node< Key, Value >(r_kv.first,
-          r_kv.second, dst, temp.fake_leaf_, temp.fake_leaf_, src->height);
+        const std::pair< const Key, Value > & r_kv =
+          static_cast< detail::Node< Key, Value > * >(src->right)->key_value_;
+        detail::NodeBase * new_right =
+          new detail::Node< Key, Value >(r_kv.first, r_kv.second, dst, temp.fake_leaf_, temp.fake_leaf_, src->height);
         dst->right = new_right;
         new_right->parent = dst;
         stack.push({src->right, new_right});
@@ -274,38 +277,15 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  template< class U >
-  void BSTree< Key, Value, Compare >::push(const Key & k, U && v)
+  void BSTree< Key, Value, Compare >::push(const Key & k, const Value & v)
   {
-    detail::NodeBase * parent = fake_root_;
-    detail::NodeBase * curr = parent->left;
-    while (curr != fake_leaf_) {
-      parent = curr;
-      const Key & curr_key = static_cast< detail::Node< Key, Value > * >(curr)->key_value_.first;
-      if (cmp_(k, curr_key)) {
-        curr = curr->left;
-      } else if (cmp_(curr_key, k)) {
-        curr = curr->right;
-      } else {
-        static_cast< detail::Node< Key, Value > * >(curr)->key_value_.second = std::forward< U >(v);
-        return;
-      }
-    }
+    privatePush(k, v);
+  }
 
-    detail::NodeBase * new_node = new detail::Node< Key, Value >(k, std::forward< U >(v),
-      parent, fake_leaf_, fake_leaf_, 1);
-
-    if (parent == fake_root_) {
-      fake_root_->left = new_node;
-      fake_root_->right = new_node;
-    } else if (cmp_(k, static_cast< detail::Node< Key, Value > * >(parent)->key_value_.first)) {
-      parent->left = new_node;
-    } else {
-      parent->right = new_node;
-    }
-
-    ++size_;
-    updateHeights(new_node);
+  template< class Key, class Value, class Compare >
+  void BSTree< Key, Value, Compare >::push(const Key & k, Value && v)
+  {
+    privatePush(k, std::move(v));
   }
 
   template< class Key, class Value, class Compare >
@@ -347,8 +327,8 @@ namespace chernov {
       return;
     }
 
-    detail::NodeBase * node_left   = node->left;
-    detail::NodeBase * node_right  = node->right;
+    detail::NodeBase * node_left = node->left;
+    detail::NodeBase * node_right = node->right;
     detail::NodeBase * node_parent = node->parent;
 
     moved_node->parent = node_parent;
@@ -362,10 +342,12 @@ namespace chernov {
     }
 
     moved_node->left = node_left;
-    if (node_left != fake_leaf_) node_left->parent = moved_node;
+    if (node_left != fake_leaf_)
+      node_left->parent = moved_node;
 
     moved_node->right = node_right;
-    if (node_right != fake_leaf_) node_right->parent = moved_node;
+    if (node_right != fake_leaf_)
+      node_right->parent = moved_node;
 
     delete node;
     --size_;
@@ -400,8 +382,7 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::rotateLeft(const_iterator iter)
+  typename BSTree< Key, Value, Compare >::const_iterator BSTree< Key, Value, Compare >::rotateLeft(const_iterator iter)
   {
     detail::NodeBase * root = iter.node_;
     detail::NodeBase * new_root = root->right;
@@ -433,8 +414,7 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::rotateRight(const_iterator iter)
+  typename BSTree< Key, Value, Compare >::const_iterator BSTree< Key, Value, Compare >::rotateRight(const_iterator iter)
   {
     detail::NodeBase * root = iter.node_;
     detail::NodeBase * new_root = root->left;
@@ -467,7 +447,7 @@ namespace chernov {
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator iter)
+    BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator iter)
   {
     detail::NodeBase * root = iter.node_;
     if (root->right == fake_leaf_) {
@@ -480,7 +460,7 @@ namespace chernov {
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator iter)
+    BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator iter)
   {
     detail::NodeBase * root = iter.node_;
     if (root->left == fake_leaf_) {
@@ -540,29 +520,25 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::iterator
-  BSTree< Key, Value, Compare >::beforeBegin() noexcept
+  typename BSTree< Key, Value, Compare >::iterator BSTree< Key, Value, Compare >::beforeBegin() noexcept
   {
     return iterator(fake_root_, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::beforeBegin() const noexcept
+  typename BSTree< Key, Value, Compare >::const_iterator BSTree< Key, Value, Compare >::beforeBegin() const noexcept
   {
     return const_iterator(fake_root_, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::cbeforeBegin() const noexcept
+  typename BSTree< Key, Value, Compare >::const_iterator BSTree< Key, Value, Compare >::cbeforeBegin() const noexcept
   {
     return beforeBegin();
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::iterator
-  BSTree< Key, Value, Compare >::begin() noexcept
+  typename BSTree< Key, Value, Compare >::iterator BSTree< Key, Value, Compare >::begin() noexcept
   {
     detail::NodeBase * first = fake_root_->left;
     if (first != fake_leaf_) {
@@ -574,8 +550,7 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::begin() const noexcept
+  typename BSTree< Key, Value, Compare >::const_iterator BSTree< Key, Value, Compare >::begin() const noexcept
   {
     detail::NodeBase * first = fake_root_->left;
     if (first != fake_leaf_) {
@@ -587,36 +562,31 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::cbegin() const noexcept
+  typename BSTree< Key, Value, Compare >::const_iterator BSTree< Key, Value, Compare >::cbegin() const noexcept
   {
     return begin();
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::iterator
-  BSTree< Key, Value, Compare >::end() noexcept
+  typename BSTree< Key, Value, Compare >::iterator BSTree< Key, Value, Compare >::end() noexcept
   {
     return iterator(fake_leaf_, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::end() const noexcept
+  typename BSTree< Key, Value, Compare >::const_iterator BSTree< Key, Value, Compare >::end() const noexcept
   {
     return const_iterator(fake_leaf_, fake_root_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::cend() const noexcept
+  typename BSTree< Key, Value, Compare >::const_iterator BSTree< Key, Value, Compare >::cend() const noexcept
   {
     return end();
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::iterator
-  BSTree< Key, Value, Compare >::findIter(const Key & k) noexcept
+  typename BSTree< Key, Value, Compare >::iterator BSTree< Key, Value, Compare >::findIter(const Key & k) noexcept
   {
     try {
       return iterator(findNode(k), fake_root_, fake_leaf_);
@@ -626,8 +596,8 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::findIter(const Key & k) const noexcept
+  typename BSTree< Key, Value, Compare >::const_iterator
+    BSTree< Key, Value, Compare >::findIter(const Key & k) const noexcept
   {
     try {
       return const_iterator(findNode(k), fake_root_, fake_leaf_);
@@ -637,8 +607,8 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  typename BSTree< Key, Value, Compare>::const_iterator
-  BSTree< Key, Value, Compare >::cfindIter(const Key & k) const noexcept
+  typename BSTree< Key, Value, Compare >::const_iterator
+    BSTree< Key, Value, Compare >::cfindIter(const Key & k) const noexcept
   {
     return findIter(k);
   }
@@ -671,9 +641,45 @@ namespace chernov {
     throw std::out_of_range("element not found");
   }
 
+  template< class Key, class Value, class Compare >
+  template< class U >
+  void BSTree< Key, Value, Compare >::privatePush(const Key & k, U && v)
+  {
+    detail::NodeBase * parent = fake_root_;
+    detail::NodeBase * curr = parent->left;
+    while (curr != fake_leaf_) {
+      parent = curr;
+      const Key & curr_key = static_cast< detail::Node< Key, Value > * >(curr)->key_value_.first;
+      if (cmp_(k, curr_key)) {
+        curr = curr->left;
+      } else if (cmp_(curr_key, k)) {
+        curr = curr->right;
+      } else {
+        static_cast< detail::Node< Key, Value > * >(curr)->key_value_.second = std::forward< U >(v);
+        return;
+      }
+    }
+
+    detail::NodeBase * new_node =
+      new detail::Node< Key, Value >(k, std::forward< U >(v), parent, fake_leaf_, fake_leaf_, 1);
+
+    if (parent == fake_root_) {
+      fake_root_->left = new_node;
+      fake_root_->right = new_node;
+    } else if (cmp_(k, static_cast< detail::Node< Key, Value > * >(parent)->key_value_.first)) {
+      parent->left = new_node;
+    } else {
+      parent->right = new_node;
+    }
+
+    ++size_;
+    updateHeights(new_node);
+  }
+
   template< class Key, class Value, bool IsConst >
   BSTIterator< Key, Value, IsConst >::BSTIterator(detail::NodeBase * node,
-    detail::NodeBase * fake_root, detail::NodeBase * fake_leaf):
+    detail::NodeBase * fake_root,
+    detail::NodeBase * fake_leaf):
     node_(node),
     fake_root_(fake_root),
     fake_leaf_(fake_leaf)
@@ -758,16 +764,16 @@ namespace chernov {
 
   template< class Key, class Value, bool IsConst >
   template< bool OtherConst >
-  bool BSTIterator< Key, Value, IsConst >::
-  operator==(const BSTIterator< Key, Value, OtherConst > & other) const noexcept
+  bool
+    BSTIterator< Key, Value, IsConst >::operator==(const BSTIterator< Key, Value, OtherConst > & other) const noexcept
   {
     return node_ == other.node_;
   }
 
   template< class Key, class Value, bool IsConst >
   template< bool OtherConst >
-  bool BSTIterator< Key, Value, IsConst >::
-  operator!=(const BSTIterator< Key, Value, OtherConst > & other) const noexcept
+  bool
+    BSTIterator< Key, Value, IsConst >::operator!=(const BSTIterator< Key, Value, OtherConst > & other) const noexcept
   {
     return !(*this == other);
   }
