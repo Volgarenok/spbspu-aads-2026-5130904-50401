@@ -10,11 +10,11 @@ void vasyakin::cmdPrint(std::istream& in, std::ostream& out, Datasets& datasets)
     throw std::runtime_error("Invalid input");
   }
 
-  const auto& ds = datasets.get(map_name);
+  const auto& ds = datasets.at(map_name);
 
   if (ds.empty())
   {
-    out << "<EMPTY>" << '\n';
+    out << "<EMPTY>";
     return;
   }
   else
@@ -23,10 +23,9 @@ void vasyakin::cmdPrint(std::istream& in, std::ostream& out, Datasets& datasets)
 
     for (auto cit = ds.cbegin(); cit != ds.cend(); ++cit)
     {
-      const auto& pair = *cit;
+      const std::pair< const int, std::string >& pair = *cit;
       out << ' ' << pair.first << ' ' << pair.second;
     }
-    out << '\n';
   }
 }
 
@@ -38,25 +37,25 @@ void vasyakin::cmdComplement(std::istream& in, std::ostream&, vasyakin::Datasets
     throw std::runtime_error("Invalid input");
   }
 
-  const auto& ds1 = datasets.get(map_name1);
-  const auto& ds2 = datasets.get(map_name2);
+  const auto& ds1 = datasets.at(map_name1);
+  const auto& ds2 = datasets.at(map_name2);
   vasyakin::Dataset new_ds;
 
   for (auto cit = ds1.cbegin(); cit != ds1.cend(); ++cit)
   {
-    const auto& pair = *cit;
+    const std::pair< const int, std::string >& pair = *cit;
 
     try
     {
-      ds2.get(pair.first);
+      ds2.at(pair.first);
     }
     catch (const std::out_of_range&)
     {
-      new_ds.push(pair.first, pair.second);
+      new_ds.insert(pair.first, pair.second);
     }
   }
 
-  datasets.push(new_map_name, std::move(new_ds));
+  datasets.insert(new_map_name, std::move(new_ds));
 }
 
 void vasyakin::cmdIntersect(std::istream& in, std::ostream&, vasyakin::Datasets& datasets)
@@ -67,25 +66,25 @@ void vasyakin::cmdIntersect(std::istream& in, std::ostream&, vasyakin::Datasets&
     throw std::runtime_error("Invalid input");
   }
 
-  const auto& ds1 = datasets.get(map_name1);
-  const auto& ds2 = datasets.get(map_name2);
+  const auto& ds1 = datasets.at(map_name1);
+  const auto& ds2 = datasets.at(map_name2);
   vasyakin::Dataset new_ds;
 
   for (auto cit = ds1.cbegin(); cit != ds1.cend(); ++cit)
   {
-    const auto& pair = *cit;
+    const std::pair< const int, std::string >& pair = *cit;
 
     try
     {
-      ds2.get(pair.first);
-      new_ds.push(pair.first, pair.second);
+      ds2.at(pair.first);
+      new_ds.insert(pair.first, pair.second);
     }
     catch (const std::out_of_range&)
     {
     }
   }
 
-  datasets.push(new_map_name, new_ds);
+  datasets.insert(new_map_name, new_ds);
 }
 
 void vasyakin::cmdUnion(std::istream& in, std::ostream&, vasyakin::Datasets& datasets)
@@ -96,28 +95,28 @@ void vasyakin::cmdUnion(std::istream& in, std::ostream&, vasyakin::Datasets& dat
     throw std::runtime_error("Invalid input");
   }
 
-  const auto& ds1 = datasets.get(map_name1);
-  const auto& ds2 = datasets.get(map_name2);
+  const auto& ds1 = datasets.at(map_name1);
+  const auto& ds2 = datasets.at(map_name2);
   vasyakin::Dataset new_ds;
 
   for (auto cit = ds1.cbegin(); cit != ds1.cend(); ++cit)
   {
-    const auto& pair = *cit;
-    new_ds.push(pair.first, pair.second);
+    const std::pair< const int, std::string >& pair = *cit;
+    new_ds.insert(pair.first, pair.second);
   }
 
   for (auto cit = ds2.cbegin(); cit != ds2.cend(); ++cit)
   {
-    const auto& pair = *cit;
+    const std::pair< const int, std::string >& pair = *cit;
     try
     {
-      new_ds.get(pair.first);
+      new_ds.at(pair.first);
     }
     catch (const std::out_of_range&)
     {
-      new_ds.push(pair.first, pair.second);
+      new_ds.insert(pair.first, pair.second);
     }
   }
 
-  datasets.push(new_map_name, new_ds);
+  datasets.insert(new_map_name, new_ds);
 }

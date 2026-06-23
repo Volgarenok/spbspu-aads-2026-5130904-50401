@@ -5,9 +5,9 @@
 #include "commands.hpp"
 #include "bstree.hpp"
 
-namespace vasyakin
+namespace
 {
-  bool isInteger(const std::string& token)
+  bool tryParseInt(const std::string& token, int& result)
   {
     if (token.empty())
     {
@@ -17,7 +17,7 @@ namespace vasyakin
     size_t pos = 0;
     try
     {
-      std::stoi(token, &pos);
+      result = std::stoi(token, std::addressof(pos));
       return pos == token.size();
     }
     catch (...)
@@ -49,18 +49,18 @@ int main(int argc, char* argv[])
 
   while (file >> token)
   {
-    if (vasyakin::isInteger(token))
+    int key = 0;
+    if (tryParseInt(token, key))
     {
       if (currDataset.empty())
       {
         continue;
       }
 
-      int key = std::stoi(token);
       std::string value;
       if (file >> value)
       {
-        datasets.get(currDataset).push(key, value);
+        datasets.at(currDataset).insert(key, value);
       }
     }
     else
@@ -69,11 +69,11 @@ int main(int argc, char* argv[])
 
       try
       {
-        datasets.get(currDataset);
+        datasets.at(currDataset);
       }
       catch (const std::out_of_range&)
       {
-        datasets.push(currDataset, vasyakin::Dataset{});
+        datasets.insert(currDataset, vasyakin::Dataset{});
       }
     }
   }
@@ -82,17 +82,18 @@ int main(int argc, char* argv[])
   using cmd_t = void(*)(std::istream&, std::ostream&, vasyakin::Datasets&);
   vasyakin::BSTree< std::string, cmd_t > cmds;
 
-  cmds.push("print", vasyakin::cmdPrint);
-  cmds.push("complement", vasyakin::cmdComplement);
-  cmds.push("intersect", vasyakin::cmdIntersect);
-  cmds.push("union", vasyakin::cmdUnion);
+  cmds.insert("print", vasyakin::cmdPrint);
+  cmds.insert("complement", vasyakin::cmdComplement);
+  cmds.insert("intersect", vasyakin::cmdIntersect);
+  cmds.insert("union", vasyakin::cmdUnion);
 
   std::string cmd;
   while (std::cin >> cmd)
   {
     try
     {
-      cmds.get(cmd)(std::cin, std::cout, datasets);
+      cmds.at(cmd)(std::cin, std::cout, datasets);
+      std::cout << '\n';
     }
     catch (const std::exception&)
     {

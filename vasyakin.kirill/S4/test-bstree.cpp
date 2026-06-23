@@ -3,14 +3,17 @@
 #include <string>
 #include "bstree.hpp"
 
-std::vector< int > collect_keys(const vasyakin::BSTree< int, std::string >& tree)
+namespace
 {
-  std::vector< int > keys;
-  for (auto it = tree.begin(); it != tree.end(); ++it)
+  std::vector< int > collect_keys(const vasyakin::BSTree< int, std::string >& tree)
   {
-    keys.push_back((*it).first);
+    std::vector< int > keys;
+    for (auto it = tree.begin(); it != tree.end(); ++it)
+    {
+      keys.push_back((*it).first);
+    }
+    return keys;
   }
-  return keys;
 }
 
 BOOST_AUTO_TEST_SUITE(BstTests)
@@ -22,37 +25,37 @@ BOOST_AUTO_TEST_CASE(test_construction_empty_height)
   BOOST_CHECK_EQUAL(tree.height(), 0);
   BOOST_CHECK(tree.begin() == tree.end());
 
-  tree.push(42, "answer");
+  tree.insert(42, "answer");
   BOOST_CHECK(!tree.empty());
   BOOST_CHECK_EQUAL(tree.height(), 1);
-  BOOST_CHECK_EQUAL(tree.get(42), "answer");
+  BOOST_CHECK_EQUAL(tree.at(42), "answer");
 }
 
 BOOST_AUTO_TEST_CASE(test_push_get_update)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(10, "ten");
-  tree.push(5, "five");
-  tree.push(15, "fifteen");
+  tree.insert(10, "ten");
+  tree.insert(5, "five");
+  tree.insert(15, "fifteen");
 
-  BOOST_CHECK_EQUAL(tree.get(10), "ten");
-  BOOST_CHECK_EQUAL(tree.get(5), "five");
-  BOOST_CHECK_EQUAL(tree.get(15), "fifteen");
+  BOOST_CHECK_EQUAL(tree.at(10), "ten");
+  BOOST_CHECK_EQUAL(tree.at(5), "five");
+  BOOST_CHECK_EQUAL(tree.at(15), "fifteen");
 
-  tree.push(10, "TEN_UPDATED");
-  BOOST_CHECK_EQUAL(tree.get(10), "TEN_UPDATED");
-  BOOST_CHECK_THROW(tree.get(999), std::out_of_range);
+  tree.insert(10, "TEN_UPDATED");
+  BOOST_CHECK_EQUAL(tree.at(10), "TEN_UPDATED");
+  BOOST_CHECK_THROW(tree.at(999), std::out_of_range);
 }
 
 BOOST_AUTO_TEST_CASE(test_drop_leaf)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(10, "ten");
-  tree.push(5, "five");
-  tree.push(15, "fifteen");
+  tree.insert(10, "ten");
+  tree.insert(5, "five");
+  tree.insert(15, "fifteen");
 
-  BOOST_CHECK_EQUAL(tree.drop(5), "five");
-  BOOST_CHECK_THROW(tree.get(5), std::out_of_range);
+  BOOST_CHECK_EQUAL(tree.erase(5), 1);
+  BOOST_CHECK_THROW(tree.at(5), std::out_of_range);
 
   auto keys = collect_keys(tree);
   BOOST_REQUIRE_EQUAL(keys.size(), 2);
@@ -63,11 +66,11 @@ BOOST_AUTO_TEST_CASE(test_drop_leaf)
 BOOST_AUTO_TEST_CASE(test_drop_one_child)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(10, "ten");
-  tree.push(15, "fifteen");
-  tree.push(20, "twenty");
+  tree.insert(10, "ten");
+  tree.insert(15, "fifteen");
+  tree.insert(20, "twenty");
 
-  BOOST_CHECK_EQUAL(tree.drop(15), "fifteen");
+  BOOST_CHECK_EQUAL(tree.erase(15), 1);
 
   auto keys = collect_keys(tree);
   BOOST_REQUIRE_EQUAL(keys.size(), 2);
@@ -78,12 +81,12 @@ BOOST_AUTO_TEST_CASE(test_drop_one_child)
 BOOST_AUTO_TEST_CASE(test_drop_two_children)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(10, "ten");
-  tree.push(5, "five");
-  tree.push(15, "fifteen");
-  tree.push(20, "twenty");
+  tree.insert(10, "ten");
+  tree.insert(5, "five");
+  tree.insert(15, "fifteen");
+  tree.insert(20, "twenty");
 
-  BOOST_CHECK_EQUAL(tree.drop(10), "ten");
+  BOOST_CHECK_EQUAL(tree.erase(10), 1);
 
   auto keys = collect_keys(tree);
   BOOST_REQUIRE_EQUAL(keys.size(), 3);
@@ -91,24 +94,24 @@ BOOST_AUTO_TEST_CASE(test_drop_two_children)
   BOOST_CHECK_EQUAL(keys[1], 15);
   BOOST_CHECK_EQUAL(keys[2], 20);
 
-  BOOST_CHECK_EQUAL(tree.get(15), "fifteen");
+  BOOST_CHECK_EQUAL(tree.at(15), "fifteen");
 }
 
 BOOST_AUTO_TEST_CASE(test_drop_exceptions)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  BOOST_CHECK_THROW(tree.drop(999), std::out_of_range);
+  tree.insert(1, "one");
+  BOOST_CHECK_EQUAL(tree.erase(999), 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_iterators_forward)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(30, "30");
-  tree.push(10, "10");
-  tree.push(20, "20");
-  tree.push(40, "40");
-  tree.push(5, "5");
+  tree.insert(30, "30");
+  tree.insert(10, "10");
+  tree.insert(20, "20");
+  tree.insert(40, "40");
+  tree.insert(5, "5");
 
   auto keys = collect_keys(tree);
   BOOST_REQUIRE_EQUAL(keys.size(), 5);
@@ -122,9 +125,9 @@ BOOST_AUTO_TEST_CASE(test_iterators_forward)
 BOOST_AUTO_TEST_CASE(test_iterators_backward)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(1, "a");
-  tree.push(2, "b");
-  tree.push(3, "c");
+  tree.insert(1, "a");
+  tree.insert(2, "b");
+  tree.insert(3, "c");
 
   auto it = tree.begin();
   while (true)
@@ -154,8 +157,8 @@ BOOST_AUTO_TEST_CASE(test_iterators_backward)
 BOOST_AUTO_TEST_CASE(test_iterators_comparison)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
 
   auto it1 = tree.begin();
   auto it2 = tree.begin();
@@ -171,8 +174,8 @@ BOOST_AUTO_TEST_CASE(test_iterators_comparison)
 BOOST_AUTO_TEST_CASE(test_const_iterators)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
 
   const auto& ct = tree;
   auto cit = ct.cbegin();
@@ -186,7 +189,7 @@ BOOST_AUTO_TEST_CASE(test_const_iterators)
 BOOST_AUTO_TEST_CASE(test_iterator_conversion)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(42, "answer");
+  tree.insert(42, "answer");
 
   vasyakin::BSTree< int, std::string >::iterator it = tree.begin();
   vasyakin::BSTree< int, std::string >::const_iterator cit = it;
@@ -199,9 +202,9 @@ BOOST_AUTO_TEST_CASE(test_height_full)
   vasyakin::BSTree< int, std::string > tree;
   BOOST_CHECK_EQUAL(tree.height(), 0);
 
-  tree.push(1, "1");
-  tree.push(2, "2");
-  tree.push(3, "3");
+  tree.insert(1, "1");
+  tree.insert(2, "2");
+  tree.insert(3, "3");
   BOOST_CHECK_EQUAL(tree.height(), 3);
 
   auto it = tree.begin();
@@ -211,19 +214,19 @@ BOOST_AUTO_TEST_CASE(test_height_full)
   ++it;
   BOOST_CHECK_EQUAL(tree.height(it), 1);
 
-  tree.drop(1);
+  tree.erase(1);
   BOOST_CHECK_EQUAL(tree.height(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_rotate_left)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(10, "10");
-  tree.push(15, "15");
-  tree.push(8, "8");
-  tree.push(13, "13");
-  tree.push(17, "17");
-  tree.push(20, "20");
+  tree.insert(10, "10");
+  tree.insert(15, "15");
+  tree.insert(8, "8");
+  tree.insert(13, "13");
+  tree.insert(17, "17");
+  tree.insert(20, "20");
 
   BOOST_CHECK_EQUAL(tree.height(), 4);
 
@@ -250,12 +253,12 @@ BOOST_AUTO_TEST_CASE(test_rotate_left)
 BOOST_AUTO_TEST_CASE(test_rotate_right)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(10, "10");
-  tree.push(8, "8");
-  tree.push(15, "15");
-  tree.push(9, "9");
-  tree.push(7, "7");
-  tree.push(6, "6");
+  tree.insert(10, "10");
+  tree.insert(8, "8");
+  tree.insert(15, "15");
+  tree.insert(9, "9");
+  tree.insert(7, "7");
+  tree.insert(6, "6");
 
   BOOST_CHECK_EQUAL(tree.height(), 4);
 
@@ -281,13 +284,13 @@ BOOST_AUTO_TEST_CASE(test_rotate_right)
 BOOST_AUTO_TEST_CASE(test_rotate_large_left)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(10, "10");
-  tree.push(7, "7");
-  tree.push(15, "15");
-  tree.push(12, "12");
-  tree.push(11, "11");
-  tree.push(13, "13");
-  tree.push(16, "16");
+  tree.insert(10, "10");
+  tree.insert(7, "7");
+  tree.insert(15, "15");
+  tree.insert(12, "12");
+  tree.insert(11, "11");
+  tree.insert(13, "13");
+  tree.insert(16, "16");
 
   BOOST_CHECK_EQUAL(tree.height(), 4);
 
@@ -315,13 +318,13 @@ BOOST_AUTO_TEST_CASE(test_rotate_large_left)
 BOOST_AUTO_TEST_CASE(test_rotate_large_right)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(10, "10");
-  tree.push(6, "6");
-  tree.push(5, "5");
-  tree.push(8, "8");
-  tree.push(7, "7");
-  tree.push(9, "9");
-  tree.push(15, "15");
+  tree.insert(10, "10");
+  tree.insert(6, "6");
+  tree.insert(5, "5");
+  tree.insert(8, "8");
+  tree.insert(7, "7");
+  tree.insert(9, "9");
+  tree.insert(15, "15");
 
   BOOST_CHECK_EQUAL(tree.height(), 4);
 
@@ -349,8 +352,8 @@ BOOST_AUTO_TEST_CASE(test_rotate_large_right)
 BOOST_AUTO_TEST_CASE(test_rotation_exceptions)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(10, "10");
-  tree.push(20, "20");
+  tree.insert(10, "10");
+  tree.insert(20, "20");
 
   BOOST_CHECK_THROW(tree.rotateLeft(tree.end()), std::invalid_argument);
   BOOST_CHECK_THROW(tree.rotateRight(tree.begin()), std::invalid_argument);
@@ -361,64 +364,64 @@ BOOST_AUTO_TEST_CASE(test_rotation_exceptions)
 BOOST_AUTO_TEST_CASE(test_copy_constructor)
 {
   vasyakin::BSTree< int, std::string > tree1;
-  tree1.push(1, "one");
-  tree1.push(2, "two");
-  tree1.push(3, "three");
+  tree1.insert(1, "one");
+  tree1.insert(2, "two");
+  tree1.insert(3, "three");
 
   vasyakin::BSTree< int, std::string > tree2(tree1);
-  BOOST_CHECK_EQUAL(tree2.get(1), "one");
+  BOOST_CHECK_EQUAL(tree2.at(1), "one");
 
-  tree2.drop(1);
-  BOOST_CHECK_EQUAL(tree1.get(1), "one");
-  BOOST_CHECK_THROW(tree2.get(1), std::out_of_range);
+  tree2.erase(1);
+  BOOST_CHECK_EQUAL(tree1.at(1), "one");
+  BOOST_CHECK_THROW(tree2.at(1), std::out_of_range);
 }
 
 BOOST_AUTO_TEST_CASE(test_copy_assignment)
 {
   vasyakin::BSTree< int, std::string > tree1;
-  tree1.push(1, "one");
-  tree1.push(2, "two");
+  tree1.insert(1, "one");
+  tree1.insert(2, "two");
 
   vasyakin::BSTree< int, std::string > tree2;
   tree2 = tree1;
 
-  BOOST_CHECK_EQUAL(tree2.get(2), "two");
+  BOOST_CHECK_EQUAL(tree2.at(2), "two");
   BOOST_CHECK_EQUAL(collect_keys(tree2).size(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_move_constructor)
 {
   vasyakin::BSTree< int, std::string > tree1;
-  tree1.push(1, "one");
-  tree1.push(2, "two");
+  tree1.insert(1, "one");
+  tree1.insert(2, "two");
 
   vasyakin::BSTree< int, std::string > tree2(std::move(tree1));
 
   BOOST_CHECK(tree1.empty());
-  BOOST_CHECK_EQUAL(tree2.get(1), "one");
-  BOOST_CHECK_EQUAL(tree2.get(2), "two");
+  BOOST_CHECK_EQUAL(tree2.at(1), "one");
+  BOOST_CHECK_EQUAL(tree2.at(2), "two");
 }
 
 BOOST_AUTO_TEST_CASE(test_move_assignment)
 {
   vasyakin::BSTree< int, std::string > tree1;
-  tree1.push(1, "one");
+  tree1.insert(1, "one");
 
   vasyakin::BSTree< int, std::string > tree2;
   tree2 = std::move(tree1);
 
   BOOST_CHECK(tree1.empty());
-  BOOST_CHECK_EQUAL(tree2.get(1), "one");
+  BOOST_CHECK_EQUAL(tree2.at(1), "one");
 }
 
 BOOST_AUTO_TEST_CASE(test_edge_duplicates)
 {
   vasyakin::BSTree< int, std::string > tree;
-  tree.push(5, "A");
-  tree.push(5, "B");
-  tree.push(5, "C");
+  tree.insert(5, "A");
+  tree.insert(5, "B");
+  tree.insert(5, "C");
 
-  BOOST_CHECK_EQUAL(tree.get(5), "C");
+  BOOST_CHECK_EQUAL(tree.at(5), "C");
   BOOST_CHECK_EQUAL(collect_keys(tree).size(), 1);
 }
 
@@ -426,8 +429,8 @@ BOOST_AUTO_TEST_CASE(test_edge_empty_operations)
 {
   vasyakin::BSTree< int, std::string > tree;
 
-  BOOST_CHECK_THROW(tree.drop(1), std::out_of_range);
-  BOOST_CHECK_THROW(tree.get(1), std::out_of_range);
+  BOOST_CHECK_EQUAL(tree.erase(1), 0);
+  BOOST_CHECK_THROW(tree.at(1), std::out_of_range);
   BOOST_CHECK(tree.begin() == tree.end());
 }
 
@@ -437,7 +440,7 @@ BOOST_AUTO_TEST_CASE(test_stress_large_tree)
 
   for (int i = 0; i < 1000; ++i)
   {
-    tree.push(i, std::to_string(i));
+    tree.insert(i, std::to_string(i));
   }
 
   BOOST_CHECK_EQUAL(tree.height(), 1000);
@@ -451,7 +454,7 @@ BOOST_AUTO_TEST_CASE(test_stress_large_tree)
 
   for (int i = 0; i < 1000; ++i)
   {
-    tree.drop(i);
+    tree.erase(i);
   }
 
   BOOST_CHECK(tree.empty());

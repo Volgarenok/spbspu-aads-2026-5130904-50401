@@ -1,13 +1,11 @@
 #ifndef BSTTREE_HPP
 #define BSTTREE_HPP
-#include "treenode.hpp"
-#include "bstiterators.hpp"
 #include <functional>
 #include <stdexcept>
-#include <utility>
 #include <cstddef>
 #include <algorithm>
-#include <memory>
+#include "treenode.hpp"
+#include "bstiterators.hpp"
 
 namespace vasyakin
 {
@@ -15,20 +13,29 @@ namespace vasyakin
   class BSTree
   {
   public:
+    using const_iterator = BSTConstIterator< Key, Value >;
+    using iterator = BSTIterator< Key, Value >;
+
     BSTree(const Compare& cmp = Compare());
-    ~BSTree();
     BSTree(const BSTree& other);
     BSTree(BSTree&& other) noexcept;
+    ~BSTree();
     BSTree& operator=(const BSTree& other);
     BSTree& operator=(BSTree&& other) noexcept;
 
-    void push(const Key& k, const Value& v);
-    Value& get(const Key& k);
-    const Value& get(const Key& k) const;
-    Value drop(Key k);
+    template < class K, class V >
+    std::pair< iterator, bool > insert(K&& k, V&& v);
 
-    using const_iterator = BSTConstIterator< Key, Value >;
-    using iterator = BSTIterator< Key, Value >;
+    Value& at(const Key& k);
+    const Value& at(const Key& k) const;
+
+    Value& operator[](const Key& k);
+    size_t erase(const Key& k);
+
+    iterator find(const Key& k);
+    const_iterator find(const Key& k) const;
+  
+    size_t count(const Key& k) const;
 
     const_iterator rotateLeft(const_iterator it);
     const_iterator rotateRight(const_iterator it);
@@ -47,6 +54,7 @@ namespace vasyakin
     const_iterator cend() const;
 
     bool empty() const;
+    void swap(BSTree& other) noexcept;
 
   private:
     using Node = ::vasyakin::Node< Key, Value >;
@@ -56,7 +64,6 @@ namespace vasyakin
     Compare cmp_;
 
     void clear(Node* node);
-    void swap(BSTree& other) noexcept;
     Node* cloneNode(const Node* src, Node* parent, const Node* src_fake_leaf);
     Node* findNode(const Key& k);
     const Node* findNode(const Key& k) const;
@@ -66,9 +73,9 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >::BSTree(const Compare& cmp):
+    fake_leaf_(new Node(Key{}, Value{})),
     cmp_(cmp)
   {
-    fake_leaf_ = new Node(Key{}, Value{});
     fake_leaf_->left_ = fake_leaf_;
     fake_leaf_->right_ = fake_leaf_;
     fake_leaf_->parent_ = nullptr;
@@ -84,6 +91,8 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >::BSTree(const BSTree& other):
+    root_(nullptr),
+    fake_leaf_(nullptr),
     cmp_(other.cmp_)
   {
     fake_leaf_ = new Node(Key{}, Value{});
@@ -91,18 +100,24 @@ namespace vasyakin
     fake_leaf_->right_ = fake_leaf_;
     fake_leaf_->parent_ = nullptr;
 
-    root_ = cloneNode(other.root_, nullptr, other.fake_leaf_);
+    try
+    {
+      root_ = cloneNode(other.root_, nullptr, other.fake_leaf_);
+    }
+    catch (...)
+    {
+      delete fake_leaf_;
+      fake_leaf_ = nullptr;
+      throw;
+    }
   }
 
   template< class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >::BSTree(BSTree&& other) noexcept:
-    root_(std::move(other.root_)),
-    fake_leaf_(std::move(other.fake_leaf_)),
+    root_(std::exchange(other.root_, nullptr)),
+    fake_leaf_(std::exchange(other.fake_leaf_, nullptr)),
     cmp_(std::move(other.cmp_))
-  {
-    other.root_ = nullptr;
-    other.fake_leaf_ = nullptr;
-  }
+  {}
 
   template< class Key, class Value, class Compare >
   BSTree< Key, Value, Compare >& BSTree< Key, Value, Compare >::operator=(const BSTree& other)
@@ -145,17 +160,28 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::Node*
-  BSTree< Key, Value, Compare >::cloneNode(const Node* src, Node* parent, const Node* src_fake_leaf)
+    BSTree< Key, Value, Compare >::cloneNode(const Node* src, Node* parent, const Node* src_fake_leaf)
   {
     if (src == src_fake_leaf)
     {
       return fake_leaf_;
     }
 
-    Node* new_node = new Node(src->key_, src->value_);
+    Node* new_node = new Node(src->data_.first, src->data_.second);
     new_node->parent_ = parent;
-    new_node->left_ = cloneNode(src->left_, new_node, src_fake_leaf);
-    new_node->right_ = cloneNode(src->right_, new_node, src_fake_leaf);
+    new_node->left_ = fake_leaf_;
+    new_node->right_ = fake_leaf_;
+
+    try
+    {
+      new_node->left_ = cloneNode(src->left_, new_node, src_fake_leaf);
+      new_node->right_ = cloneNode(src->right_, new_node, src_fake_leaf);
+    }
+    catch (...)
+    {
+      clear(new_node);
+      throw;
+    }
 
     return new_node;
   }
@@ -170,44 +196,25 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::Node*
-  BSTree< Key, Value, Compare >::findNode(const Key& k)
+    BSTree< Key, Value, Compare >::findNode(const Key& k)
   {
-    Node* curr = root_;
-
-    while (curr != fake_leaf_)
-    {
-      if (!cmp_(k, curr->key_) && !cmp_(curr->key_, k))
-      {
-        return curr;
-      }
-
-      if (cmp_(k, curr->key_))
-      {
-        curr = curr->left_;
-      }
-      else
-      {
-        curr = curr->right_;
-      }
-    }
-
-    throw std::out_of_range("Tree has not this key");
+    return const_cast< Node* >(const_cast< const BSTree* >(this)->findNode(k));
   }
 
   template< class Key, class Value, class Compare >
   const typename BSTree< Key, Value, Compare >::Node*
-  BSTree< Key, Value, Compare >::findNode(const Key& k) const
+    BSTree< Key, Value, Compare >::findNode(const Key& k) const
   {
     Node* curr = root_;
 
     while (curr != fake_leaf_)
     {
-      if (!cmp_(k, curr->key_) && !cmp_(curr->key_, k))
+      if (!cmp_(k, curr->data_.first) && !cmp_(curr->data_.first, k))
       {
         return curr;
       }
 
-      if (cmp_(k, curr->key_))
+      if (cmp_(k, curr->data_.first))
       {
         curr = curr->left_;
       }
@@ -221,20 +228,22 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Compare >
-  void BSTree< Key, Value, Compare >::push(const Key& k, const Value& v)
+  template < class K, class V >
+  std::pair< typename BSTree< Key, Value, Compare >::iterator, bool >
+    BSTree< Key, Value, Compare >::insert(K&& k, V&& v)
   {
     Node* parent = nullptr;
     Node* curr = root_;
 
     while (curr != fake_leaf_)
     {
-      if (!cmp_(curr->key_, k) && !cmp_(k, curr->key_))
+      if (!cmp_(curr->data_.first, k) && !cmp_(k, curr->data_.first))
       {
-        curr->value_ = v;
-        return;
+        curr->data_.second = std::forward< V >(v);
+        return std::make_pair(iterator(curr, fake_leaf_), false);
       }
 
-      if (cmp_(k, curr->key_))
+      if (cmp_(k, curr->data_.first))
       {
         parent = curr;
         curr = curr->left_;
@@ -246,14 +255,14 @@ namespace vasyakin
       }
     }
 
-    Node* new_node = new Node(k, v);
+    Node* new_node = new Node(std::forward< K >(k), std::forward< V >(v));
     new_node->parent_ = parent;
     new_node->left_ = fake_leaf_;
     new_node->right_ = fake_leaf_;
 
     if (parent != nullptr)
     {
-      if (cmp_(k, parent->key_))
+      if (cmp_(k, parent->data_.first))
       {
         parent->left_ = new_node;
       }
@@ -266,135 +275,163 @@ namespace vasyakin
     {
       root_ = new_node;
     }
+
+    return std::make_pair(iterator(new_node, fake_leaf_), true);
   }
 
   template< class Key, class Value, class Compare >
-  Value& BSTree< Key, Value, Compare >::get(const Key& k)
+  Value& BSTree< Key, Value, Compare >::at(const Key& k)
   {
-    return const_cast< Node* >(findNode(k))->value_;
+    return const_cast< Value& >(const_cast< const BSTree* >(this)->at(k));
   }
 
   template< class Key, class Value, class Compare >
-  const Value& BSTree< Key, Value, Compare >::get(const Key& k) const
+  const Value& BSTree< Key, Value, Compare >::at(const Key& k) const
   {
-    return const_cast< Node* >(findNode(k))->value_;
+    const Node* node = findNode(k);
+    return node->data_.second;
   }
 
   template< class Key, class Value, class Compare >
-  Value BSTree< Key, Value, Compare >::drop(Key k)
+  Value& BSTree< Key, Value, Compare >::operator[](const Key& k)
+  {
+    auto it = find(k);
+    if (it != end())
+    {
+      return (*it).second;
+    }
+
+    return (*insert(k, Value{}).first).second;
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t BSTree< Key, Value, Compare >::erase(const Key& k)
   {
     Node* curr = root_;
 
     while (curr != fake_leaf_)
     {
-      if (!cmp_(k, curr->key_) && !cmp_(curr->key_, k))
+      if (!cmp_(k, curr->data_.first) && !cmp_(curr->data_.first, k))
       {
-
-        Value val = curr->value_;
-
-        if (curr->left_ == fake_leaf_ && curr->right_ == fake_leaf_)
-        {
-          if (curr->parent_)
-          {
-            if (curr->parent_->left_ == curr)
-            {
-              curr->parent_->left_ = fake_leaf_;
-            }
-            else
-            {
-              curr->parent_->right_ = fake_leaf_;
-            }
-          }
-          else
-          {
-            root_ = fake_leaf_;
-          }
-        }
-        else if (curr->left_ == fake_leaf_)
-        {
-          curr->right_->parent_ = curr->parent_;
-
-          if (curr->parent_)
-          {
-            if (curr->parent_->left_ == curr)
-            {
-              curr->parent_->left_ = curr->right_;
-            }
-            else
-            {
-              curr->parent_->right_ = curr->right_;
-            }
-          }
-          else
-          {
-            root_ = curr->right_;
-          }
-        }
-        else if (curr->right_ == fake_leaf_)
-        {
-          curr->left_->parent_ = curr->parent_;
-
-          if (curr->parent_)
-          {
-            if (curr->parent_->left_ == curr)
-            {
-              curr->parent_->left_ = curr->left_;
-            }
-            else
-            {
-              curr->parent_->right_ = curr->left_;
-            }
-          }
-          else
-          {
-            root_ = curr->left_;
-          }
-        }
-        else
-        {
-          Node* min_in_right = curr->right_;
-
-          while (min_in_right->left_ != fake_leaf_)
-          {
-            min_in_right = min_in_right->left_;
-          }
-
-          curr->key_ = min_in_right->key_;
-          curr->value_ = min_in_right->value_;
-
-          if (min_in_right->right_ != fake_leaf_)
-          {
-            min_in_right->right_->parent_ = min_in_right->parent_;
-          }
-
-          if (min_in_right->parent_->left_ == min_in_right)
-          {
-            min_in_right->parent_->left_ = min_in_right->right_;
-          }
-          else
-          {
-            min_in_right->parent_->right_ = min_in_right->right_;
-          }
-
-          delete min_in_right;
-          return val;
-        }
-
-        delete curr;
-        return val;
+        break;
       }
 
-      if (cmp_(k, curr->key_))
+      curr = cmp_(k, curr->data_.first) ? curr->left_ : curr->right_;
+    }
+
+    if (curr == fake_leaf_)
+    {
+      return 0;
+    }
+
+    if (curr->left_ == fake_leaf_ && curr->right_ == fake_leaf_)
+    {
+      if (curr->parent_ == nullptr)
       {
-        curr = curr->left_;
+        root_ = fake_leaf_;
+      }
+      else if (curr->parent_->left_ == curr)
+      {
+        curr->parent_->left_ = fake_leaf_;
       }
       else
       {
-        curr = curr->right_;
+        curr->parent_->right_ = fake_leaf_;
       }
     }
+    else if (curr->left_ == fake_leaf_)
+    {
+      curr->right_->parent_ = curr->parent_;
 
-    throw std::out_of_range("Tree has not this key");
+      if (curr->parent_ == nullptr)
+      {
+        root_ = curr->right_;
+      }
+      else if (curr->parent_->left_ == curr)
+      {
+        curr->parent_->left_ = curr->right_;
+      }
+      else
+      {
+        curr->parent_->right_ = curr->right_;
+      }
+    }
+    else if (curr->right_ == fake_leaf_)
+    {
+      curr->left_->parent_ = curr->parent_;
+
+      if (curr->parent_ == nullptr)
+      {
+        root_ = curr->left_;
+      }
+      else if (curr->parent_->left_ == curr)
+      {
+        curr->parent_->left_ = curr->left_;
+      }
+      else
+      {
+        curr->parent_->right_ = curr->left_;
+      }
+    }
+    else
+    {
+      Node* min_in_right = curr->right_;
+
+      while (min_in_right->left_ != fake_leaf_)
+      {
+        min_in_right = min_in_right->left_;
+      }
+
+      curr->data_.first = min_in_right->data_.first;
+      curr->data_.second = min_in_right->data_.second;
+
+      if (min_in_right->right_ != fake_leaf_)
+      {
+        min_in_right->right_->parent_ = min_in_right->parent_;
+      }
+
+      if (min_in_right->parent_->left_ == min_in_right)
+      {
+        min_in_right->parent_->left_ = min_in_right->right_;
+      }
+      else
+      {
+        min_in_right->parent_->right_ = min_in_right->right_;
+      }
+
+      delete min_in_right;
+      return 1;
+    }
+
+    delete curr;
+    return 1;
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::iterator
+  BSTree< Key, Value, Compare >::find(const Key& k)
+  {
+    return iterator(const_cast< Node* >(const_cast< const BSTree* >(this)->find(k).node_), fake_leaf_);
+  }
+
+  template< class Key, class Value, class Compare >
+  typename BSTree< Key, Value, Compare >::const_iterator
+  BSTree< Key, Value, Compare >::find(const Key& k) const
+  {
+    try
+    {
+      return const_iterator(findNode(k), fake_leaf_);
+    }
+    catch (const std::out_of_range&)
+    {
+      return end();
+    }
+  }
+
+  template< class Key, class Value, class Compare >
+  size_t BSTree< Key, Value, Compare >::count(const Key& k) const
+  {
+    return (this->find(k) != this->end()) ? 1 : 0;
   }
 
   template< class Key, class Value, class Compare >
@@ -426,7 +463,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::Node*
-  BSTree< Key, Value, Compare >::fallLeft(Node* node) const
+    BSTree< Key, Value, Compare >::fallLeft(Node* node) const
   {
     while (node != fake_leaf_ && node->left_ != fake_leaf_)
     {
@@ -438,42 +475,42 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::iterator
-  BSTree< Key, Value, Compare >::begin()
+    BSTree< Key, Value, Compare >::begin()
   {
     return iterator(fallLeft(root_), fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::iterator
-  BSTree< Key, Value, Compare >::end()
+    BSTree< Key, Value, Compare >::end()
   {
     return iterator(fake_leaf_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::begin() const
+    BSTree< Key, Value, Compare >::begin() const
   {
     return const_iterator(fallLeft(root_), fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::end() const
+    BSTree< Key, Value, Compare >::end() const
   {
     return const_iterator(fake_leaf_, fake_leaf_);
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::cbegin() const
+    BSTree< Key, Value, Compare >::cbegin() const
   {
     return begin();
   }
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::cend() const
+    BSTree< Key, Value, Compare >::cend() const
   {
     return end();
   }
@@ -486,7 +523,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::rotateLeft(const_iterator it)
+    BSTree< Key, Value, Compare >::rotateLeft(const_iterator it)
   {
     Node* x = const_cast< Node* >(it.node_);
 
@@ -525,7 +562,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::rotateRight(const_iterator it)
+    BSTree< Key, Value, Compare >::rotateRight(const_iterator it)
   {
     Node* x = const_cast< Node* >(it.node_);
 
@@ -564,7 +601,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator it)
+    BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator it)
   {
     Node* node = const_cast< Node* >(it.node_);
     if (node == fake_leaf_ || node->parent_ == nullptr || node->parent_->parent_ == nullptr)
@@ -578,7 +615,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::const_iterator
-  BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator it)
+    BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator it)
   {
     Node* node = const_cast< Node* >(it.node_);
     if (node == fake_leaf_ || node->parent_ == nullptr || node->parent_->parent_ == nullptr)

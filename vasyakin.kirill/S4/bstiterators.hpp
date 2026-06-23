@@ -1,12 +1,12 @@
 #ifndef BSTITERATORS_HPP
 #define BSTITERATORS_HPP
-#include <utility>
+#include <memory>
 #include "treenode.hpp"
 
 namespace vasyakin
 {
-  template< class Key, class Value, class Compare >
-  class BSTree;
+  template< class Key, class Value >
+  class BSTConstIterator;
 
   template< class Key, class Value >
   class BSTIterator
@@ -14,10 +14,8 @@ namespace vasyakin
   public:
     using Node = vasyakin::Node< Key, Value >;
 
-    BSTIterator();
-    explicit BSTIterator(Node* node, Node* fake_leaf);
-
-    std::pair< Key, Value > operator*() const;
+    std::pair< Key, Value >& operator*() const;
+    std::pair< Key, Value >* operator->() const;
 
     BSTIterator& operator++();
     BSTIterator operator++(int);
@@ -33,6 +31,9 @@ namespace vasyakin
     Node* node_;
     Node* fake_leaf_;
 
+    BSTIterator();
+    explicit BSTIterator(Node* node, Node* fake_leaf);
+
     template< class K, class V, class C >
     friend class BSTree;
   };
@@ -42,9 +43,6 @@ namespace vasyakin
   {
   public:
     using Node = vasyakin::Node< Key, Value >;
-
-    BSTConstIterator();
-    explicit BSTConstIterator(const Node* node, const Node* fake_leaf);
 
     const std::pair< Key, Value > operator*() const;
 
@@ -59,6 +57,12 @@ namespace vasyakin
   private:
     const Node* node_;
     const Node* fake_leaf_;
+
+    BSTConstIterator();
+    explicit BSTConstIterator(const Node* node, const Node* fake_leaf);
+
+    template< class K, class V >
+    friend class BSTIterator;
 
     template< class K, class V, class C >
     friend class BSTree;
@@ -77,9 +81,15 @@ namespace vasyakin
   {}
 
   template< class Key, class Value >
-  std::pair< Key, Value > BSTIterator< Key, Value >::operator*() const
+  std::pair< Key, Value >& BSTIterator< Key, Value >::operator*() const
   {
-    return {node_->key_, node_->value_};
+    return node_->data_;
+  }
+
+  template< class Key, class Value >
+  std::pair< Key, Value >* BSTIterator< Key, Value >::operator->() const
+  {
+    return std::addressof(node_->data_);
   }
 
   template< class Key, class Value >
@@ -172,7 +182,7 @@ namespace vasyakin
   }
 
   template< class Key, class Value >
-  BSTIterator< Key, Value >::operator vasyakin::BSTConstIterator< Key, Value >() const
+  BSTIterator< Key, Value >::operator BSTConstIterator< Key, Value >() const
   {
     return BSTConstIterator< Key, Value >(node_, fake_leaf_);
   }
@@ -192,7 +202,7 @@ namespace vasyakin
   template< class Key, class Value >
   const std::pair< Key, Value > BSTConstIterator< Key, Value >::operator*() const
   {
-    return {node_->key_, node_->value_};
+    return {node_->data_.first, node_->data_.second};
   }
 
   template< class Key, class Value >
