@@ -30,8 +30,8 @@ namespace chernov {
     HTIter();
     HTIter(const HashTable< Key, Value, Hash, Equal > * ht, size_t index);
 
-    reference operator*() const;
-    point operator->() const;
+    reference operator*();
+    point operator->();
 
     HTIter & operator++();
     HTIter operator++(int);
@@ -63,14 +63,14 @@ chernov::HTIter< Key, Value, Hash, Equal, IsConst >::HTIter(const HashTable< Key
 
 template < class Key, class Value, class Hash, class Equal, bool IsConst >
 typename chernov::HTIter< Key, Value, Hash, Equal, IsConst >::reference
-  chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator*() const
+  chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator*()
 {
   return ht_->data_[index_];
 }
 
 template < class Key, class Value, class Hash, class Equal, bool IsConst >
 typename chernov::HTIter< Key, Value, Hash, Equal, IsConst >::point
-  chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator->() const
+  chernov::HTIter< Key, Value, Hash, Equal, IsConst >::operator->()
 {
   return ht_->data_ + index_;
 }
