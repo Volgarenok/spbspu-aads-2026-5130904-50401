@@ -34,7 +34,7 @@ namespace vasyakin
 
     iterator find(const Key& k);
     const_iterator find(const Key& k) const;
-  
+
     size_t count(const Key& k) const;
 
     const_iterator rotateLeft(const_iterator it);
