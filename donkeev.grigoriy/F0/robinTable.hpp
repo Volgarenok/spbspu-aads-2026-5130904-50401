@@ -107,6 +107,19 @@ namespace donkeev
     return *this;
   }
 
+  template< class Key, class Value, class Hash, class Equal >
+  Value& RobinTable<Key, Value, Hash, Equal>::operator[](const Key& key)
+  {
+    std::pair< size_t, Node > result = findNode(key);
+    if (result.second)
+    {
+      return result.second->value_;
+    }
+    
+    insert(k, Value{});
+    return findNode(k).second->value_;
+  }
+
 
   template< class Key, class Value, class Hash, class Equal >
   std::pair<size_t, typename RobinTable<Key, Value, Hash, Equal>::Node*>
@@ -148,43 +161,43 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Hash, class Equal >
-std::pair<size_t, const typename RobinTable<Key, Value, Hash, Equal>::Node*>
-RobinTable<Key, Value, Hash, Equal>::findNode(const Key& key) const
-{
-  if (empty())
+  std::pair<size_t, const typename RobinTable<Key, Value, Hash, Equal>::Node*>
+  RobinTable<Key, Value, Hash, Equal>::findNode(const Key& key) const
   {
-    return {0, nullptr};
+    if (empty())
+    {
+      return {0, nullptr};
+    }
+    
+    size_t cap = slots_.size();
+    size_t index = hasher_(key) % cap;
+    int cur_psl = 0;
+    
+    for (size_t i = 0; i < cap; ++i)
+    {
+      const Node& node = slots_[index];
+      
+      if (!node.isOccupied_)
+      {
+        return {index, nullptr};
+      }
+      
+      if (cur_psl > node.psl_)
+      {
+        return {index, nullptr};
+      }
+      
+      if (equal_(key, node.key_))
+      {
+        return {index, &slots_[index]};
+      }
+      
+      index = (index + 1) % cap;
+      cur_psl++;
+    }
+    
+    return {cap, nullptr};
   }
-  
-  size_t cap = slots_.size();
-  size_t index = hasher_(key) % cap;
-  int cur_psl = 0;
-  
-  for (size_t i = 0; i < cap; ++i)
-  {
-    const Node& node = slots_[index];
-    
-    if (!node.isOccupied_)
-    {
-      return {index, nullptr};
-    }
-    
-    if (cur_psl > node.psl_)
-    {
-      return {index, nullptr};
-    }
-    
-    if (equal_(key, node.key_))
-    {
-      return {index, &slots_[index]};
-    }
-    
-    index = (index + 1) % cap;
-    cur_psl++;
-  }
-  
-  return {cap, nullptr};
-}
   
 }
 
