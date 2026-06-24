@@ -24,14 +24,14 @@ namespace donkeev
     Node& operator*() const noexcept;
     Node* operator->() const noexcept;
 
-    RobinIter& operator++();
-    RobinIter operator++(int);
+    RobinIter& operator++() noexcept;
+    RobinIter operator++(int) noexcept;
 
-    RobinIter& operator--();
-    RobinIter operator--(int);
+    RobinIter& operator--() noexcept;
+    RobinIter operator--(int) noexcept;
 
-    bool operator==(const RobinIter& rhs) const;
-    bool operator!=(const RobinIter& rhs) const;
+    bool operator==(const RobinIter& rhs) const noexcept;
+    bool operator!=(const RobinIter& rhs) const noexcept;
     
   private:
     size_t index_ = 0;
@@ -56,6 +56,31 @@ namespace donkeev
   RobinNode< Key, Value >* RobinIter< Key, Value, Hash, Equal >::operator->() const noexcept
   {
     return std::addressof(operator*());
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinIter< Key, Value, Hash, Equal >& RobinIter< Key, Value, Hash, Equal >::operator++() noexcept
+  {
+    if (table_)
+    {
+      size_t cap = table_->slots_.size();
+      ++index_;
+      while (index_ < cap && !table_->slots_[index_].isOccupied_)
+      {
+        ++index;
+      }
+    }
+
+    return *this;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinIter< Key, Value, Hash, Equal > RobinIter< Key, Value, Hash, Equal >::operator++(int) noexcept
+  {
+    RobinIter tmp = *this;
+    ++(*this);
+    
+    return tmp;
   }
 }
 #endif
