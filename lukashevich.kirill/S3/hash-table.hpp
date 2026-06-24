@@ -80,15 +80,15 @@ namespace lukashevich {
     private:
       using StoredValue = std::pair< Key, Value >;
 
-  struct Node
-  {
-    StoredValue value_;
-    bool occupied_;
+    struct Node
+    {
+      StoredValue value_;
+      bool occupied_;
 
-    Node();
-    Node(const Key & key, const Value & value);
-    Node(const Key & key, Value && value);
-  };
+      Node();
+      Node(const Key & key, const Value & value);
+      Node(const Key & key, Value && value);
+    };
 
   Vector< Node > buckets_;
   List< Node > overflow_;
