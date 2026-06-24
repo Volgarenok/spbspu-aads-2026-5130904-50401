@@ -185,13 +185,7 @@ void studilova::loadOperations(std::istream& in, std::ostream& out, BudgetManage
 
   in >> budgetName >> filename;
 
-  if (!in)
-  {
-    out << "<INVALID COMMAND>\n";
-    return;
-  }
-
-  if (!state.hasBudget(budgetName))
+  if (!in || !state.hasBudget(budgetName))
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -205,44 +199,27 @@ void studilova::loadOperations(std::istream& in, std::ostream& out, BudgetManage
   }
 
   Budget& budget = state.getBudget(budgetName);
+  Operation operation;
 
-  std::string type;
-  std::string category;
-  int amount;
-  Date date;
-
-  while (file >> type >> category >> amount >> date)
+  while (file >> operation)
   {
-    try
-    {
-      OperationType opType;
-
-      if (type == "income")
-      {
-        opType = OperationType::Income;
-      }
-      else if (type == "expense")
-      {
-        opType = OperationType::Expense;
-      }
-      else
-      {
-        throw std::invalid_argument("bad type");
-      }
-
-      budget.addOperation(Operation(opType, category, amount, date));
-    }
-    catch (...)
+    if (!budget.hasCategory(operation.getCategory()))
     {
       out << "<INVALID COMMAND>\n";
       return;
     }
+
+    budget.addOperation(operation);
+  }
+
+  if (!file.eof())
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
   }
 
   out << "<OK>\n";
 }
-
-#include <fstream>
 
 void studilova::save(std::istream& in, std::ostream& out, BudgetManager& state)
 {
@@ -266,7 +243,15 @@ void studilova::save(std::istream& in, std::ostream& out, BudgetManager& state)
 
   for (size_t i = 0; i < names.getSize(); ++i)
   {
-    file << names[i] << '\n';
+    const Budget& budget = state.getBudget(names[i]);
+    file << "budget " << budget.getName() << '\n';
+
+    const Vector< Operation >& operations = budget.getOperations();
+
+    for (size_t j = 0; j < operations.getSize(); ++j)
+    {
+      file << operations[j] << '\n';
+    }
   }
 
   out << "<OK>\n";
