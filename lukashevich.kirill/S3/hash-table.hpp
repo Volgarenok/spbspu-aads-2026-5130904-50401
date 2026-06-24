@@ -5,205 +5,389 @@
 #include <memory>
 #include <stdexcept>
 #include <utility>
-#include "../common/list/list.hpp"
-#include "../common/vector/vector.hpp"
+#include <functional>
+#include <limits>
+
+#include "list/list.hpp"
+#include "vector/vector.hpp"
 
 namespace lukashevich {
+  namespace detail {
+    template< class Value >
+    class HashTableArrow
+    {
+    public:
+      explicit HashTableArrow(const Value & value);
+
+      Value * operator->();
+      const Value * operator->() const;
+
+    private:
+      Value value_;
+    };
+  }
+
+  template< class Key, class Value, class Hash,
+      class Equal = std::equal_to< Key > >
+  class HashTable;
+
+  template< class Key, class Value, class Hash,
+    class Equal = std::equal_to< Key > >
+  class HashTableIterator;
+
+  template< class Key,class Value,class Hash,
+    class Equal = std::equal_to< Key > >
+  class HashTableConstIterator;
+
   template< class Key, class Value, class Hash, class Equal >
   class HashTable
   {
     public:
-      struct Node
-      {
-        Node():
-          key_(),
-          value_(),
-          occupied_(false)
-        {}
+      using value_type = std::pair< const Key, Value >;
+      using iterator = HashTableIterator< Key, Value, Hash, Equal >;
+      using const_iterator = HashTableConstIterator< Key, Value, Hash, Equal >;
 
-        Node(const Key & key, const Value & value):
-          key_(key),
-          value_(value),
-          occupied_(true)
-        {}
-
-        Key key_;
-        Value value_;
-        bool occupied_;
-      };
-
-      using OverflowIterator = LIter< Node >;
-      using OverflowConstIterator = LCIter< Node >;
-
-      class ConstIterator
-      {
-        public:
-          ConstIterator():
-            table_(nullptr),
-            index_(0)
-          {}
-
-          const Node & operator*() const
-          {
-            return table_->nodeAt(index_);
-          }
-
-          const Node * operator->() const
-          {
-            return std::addressof(table_->nodeAt(index_));
-          }
-
-          ConstIterator & operator++()
-          {
-            ++index_;
-            skipEmpty();
-            return *this;
-          }
-
-          bool operator==(const ConstIterator & rhs) const noexcept
-          {
-            return (table_ == rhs.table_) && (index_ == rhs.index_);
-          }
-
-          bool operator!=(const ConstIterator & rhs) const noexcept
-          {
-            return !(*this == rhs);
-          }
-
-        private:
-          ConstIterator(const HashTable * table, size_t index):
-            table_(table),
-            index_(index)
-          {
-            skipEmpty();
-          }
-
-          void skipEmpty()
-          {
-            while ((index_ < table_->totalNodes()) && !table_->nodeAt(index_).occupied_) {
-              ++index_;
-            }
-          }
-
-          const HashTable * table_;
-          size_t index_;
-          friend class HashTable< Key, Value, Hash, Equal >;
-      };
-    class Iterator
-    {
-      public:
-        Iterator():
-          table_(nullptr),
-          index_(0)
-        {}
-
-        Node & operator*() const
-        {
-          return table_->nodeAt(index_);
-        }
-
-        Node * operator->() const
-        {
-          return std::addressof(table_->nodeAt(index_));
-        }
-
-        Iterator & operator++()
-        {
-          ++index_;
-          skipEmpty();
-          return *this;
-        }
-
-        bool operator==(const Iterator & rhs) const noexcept
-        {
-          return (table_ == rhs.table_) && (index_ == rhs.index_);
-        }
-
-        bool operator!=(const Iterator & rhs) const noexcept
-        {
-          return !(*this == rhs);
-        }
-
-      private:
-        Iterator(HashTable * table, size_t index):
-          table_(table),
-          index_(index)
-        {
-          skipEmpty();
-        }
-
-        void skipEmpty()
-        {
-          while ((index_ < table_->totalNodes()) && !table_->nodeAt(index_).occupied_) {
-            ++index_;
-          }
-        }
-
-        HashTable * table_;
-        size_t index_;
-        friend class HashTable< Key, Value, Hash, Equal >;
-    };
-
-    using iterator = Iterator;
-    using const_iterator = ConstIterator;
-
-    HashTable();
-    HashTable(size_t bucketCount,
-        size_t bucketSize,
-        Hash hash = Hash(),
+      HashTable();
+      HashTable(size_t bucketCount, size_t bucketSize, Hash hash = Hash(),
         Equal equal = Equal());
 
-    HashTable(const HashTable & rhs) = default;
-    HashTable(HashTable && rhs) noexcept = default;
-    HashTable & operator=(const HashTable & rhs) = default;
-    HashTable & operator=(HashTable && rhs) noexcept = default;
-    ~HashTable() = default;
+      Value & operator[](const Key & key);
 
-    bool empty() const noexcept;
-    size_t size() const noexcept;
-    size_t bucketCount() const noexcept;
-    size_t bucketSize() const noexcept;
-    size_t overflowSize() const noexcept;
+      iterator begin();
+      iterator end();
+      const_iterator begin() const;
+      const_iterator end() const;
+      const_iterator cbegin() const;
+      const_iterator cend() const;
 
-    bool has(const Key & key) const;
-    Value & at(const Key & key);
-    const Value & at(const Key & key) const;
+      bool empty() const noexcept;
+      size_t size() const noexcept;
+      size_t bucketCount() const noexcept;
+      size_t bucketSize() const noexcept;
+      size_t overflowSize() const noexcept;
+      bool has(const Key & key) const;
 
-    void add(const Key & key, const Value & value);
-    Value & operator[](const Key & key);
+      Value & at(const Key & key);
+      const Value & at(const Key & key) const;
 
-    Value drop(const Key & key);
-    void clear() noexcept;
-
-    iterator begin();
-    iterator end();
-    const_iterator begin() const;
-    const_iterator end() const;
-    const_iterator cbegin() const;
-    const_iterator cend() const;
-
-    void rehash(size_t bucketCount, size_t bucketSize);
-    void swap(HashTable & rhs) noexcept;
+      void add(const Key & key, const Value & value);
+      void add(const Key & key, Value && value);
+      bool erase(const Key & key);
+      void clear() noexcept;
+      void rehash(std::size_t bucketCount, std::size_t bucketSize);
+      void swap(HashTable & rhs) noexcept;
 
     private:
-      static size_t checkedMainSize(size_t bucketCount, size_t bucketSize);
-      size_t getHomeBucket(const Key & key) const;
-      Node * findNode(const Key & key);
-      const Node * findNode(const Key & key) const;
-      Node * findFreeInHomeBucket(const Key & key);
-      size_t totalNodes() const noexcept;
-      Node & nodeAt(size_t index);
-      const Node & nodeAt(size_t index) const;
+      using StoredValue = std::pair< Key, Value >;
 
-      Vector< Node > buckets_;
-      List< Node > overflow_;
-      size_t bucketCount_;
-      size_t bucketSize_;
-      size_t size_;
-      Hash hash_;
-      Equal equal_;
+  struct Node
+  {
+    StoredValue value_;
+    bool occupied_;
+
+    Node();
+    Node(const Key & key, const Value & value);
+    Node(const Key & key, Value && value);
+  };
+
+  Vector< Node > buckets_;
+  List< Node > overflow_;
+  size_t bucketCount_;
+  size_t bucketSize_;
+  size_t size_;
+  Hash hash_;
+  Equal equal_;
+
+  static size_t checkedMainSize(size_t bucketCount, size_t bucketSize);
+
+  size_t totalNodes() const noexcept;
+  size_t getHomeBucket(const Key & key) const;
+  Node & nodeAt(size_t index);
+  const Node & nodeAt(size_t index) const;
+  Node * findNode(const Key & key);
+  const Node * findNode(const Key & key) const;
+  Node * findFreeInHomeBucket(const Key & key);
+
+  template< class ValueArg >
+  void insertImpl(const Key & key, ValueArg && value);
+
+  friend class HashTableIterator< Key, Value, Hash, Equal >;
+  friend class HashTableConstIterator< Key, Value, Hash, Equal >;
   };
 }
+
+template< class Value >
+lukashevich::detail::HashTableArrow< Value >::HashTableArrow(
+    const Value & value):
+  value_(value)
+{}
+
+template< class Value >
+Value * lukashevich::detail::HashTableArrow< Value >::operator->()
+{
+  return std::addressof(value_);
+}
+
+template< class Value >
+const Value * lukashevich::detail::HashTableArrow< Value >::operator->() const
+{
+  return std::addressof(value_);
+}
+
+namespace lukashevich {
+  template< class Key, class Value, class Hash, class Equal >
+  class HashTableIterator
+  {
+  public:
+    using value_type = std::pair< const Key &, Value & >;
+    using pointer = detail::HashTableArrow< value_type >;
+
+    HashTableIterator();
+
+    value_type operator*() const;
+    pointer operator->() const;
+    HashTableIterator & operator++();
+    HashTableIterator operator++(int);
+    bool operator==(const HashTableIterator & rhs) const noexcept;
+    bool operator!=(const HashTableIterator & rhs) const noexcept;
+
+  private:
+    HashTableIterator(HashTable< Key, Value, Hash, Equal > * table,
+        std::size_t index);
+
+    void skipEmpty();
+
+    HashTable< Key, Value, Hash, Equal > * table_;
+    std::size_t index_;
+
+    friend class HashTable< Key, Value, Hash, Equal >;
+    friend class HashTableConstIterator< Key, Value, Hash, Equal >;
+  };
+
+  template< class Key, class Value, class Hash, class Equal >
+  class HashTableConstIterator
+  {
+  public:
+    using value_type = std::pair< const Key &, const Value & >;
+    using pointer = detail::HashTableArrow< value_type >;
+
+    HashTableConstIterator();
+    HashTableConstIterator(
+        const HashTableIterator< Key, Value, Hash, Equal > & rhs);
+
+    value_type operator*() const;
+    pointer operator->() const;
+    HashTableConstIterator & operator++();
+    HashTableConstIterator operator++(int);
+    bool operator==(const HashTableConstIterator & rhs) const noexcept;
+    bool operator!=(const HashTableConstIterator & rhs) const noexcept;
+
+  private:
+    HashTableConstIterator(const HashTable< Key, Value, Hash, Equal > * table,
+        std::size_t index);
+
+    void skipEmpty();
+
+    const HashTable< Key, Value, Hash, Equal > * table_;
+    std::size_t index_;
+
+    friend class HashTable< Key, Value, Hash, Equal >;
+  };
+}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTableIterator< Key, Value, Hash, Equal >::HashTableIterator():
+  table_(nullptr),
+  index_(0)
+{}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTableIterator< Key, Value, Hash, Equal >::HashTableIterator(
+    HashTable< Key, Value, Hash, Equal > * table,
+    std::size_t index):
+  table_(table),
+  index_(index)
+{
+  skipEmpty();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename lukashevich::HashTableIterator< Key, Value, Hash, Equal >::value_type
+    lukashevich::HashTableIterator< Key, Value, Hash, Equal >::operator*()
+        const
+{
+  typename HashTable< Key, Value, Hash, Equal >::Node & node =
+      table_->nodeAt(index_);
+  return value_type(node.value_.first, node.value_.second);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename lukashevich::HashTableIterator< Key, Value, Hash, Equal >::pointer
+    lukashevich::HashTableIterator< Key, Value, Hash, Equal >::operator->()
+        const
+{
+  return pointer(operator*());
+}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTableIterator< Key, Value, Hash, Equal > &
+    lukashevich::HashTableIterator< Key, Value, Hash, Equal >::operator++()
+{
+  ++index_;
+  skipEmpty();
+  return *this;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTableIterator< Key, Value, Hash, Equal >
+    lukashevich::HashTableIterator< Key, Value, Hash, Equal >::operator++(int)
+{
+  HashTableIterator temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool lukashevich::HashTableIterator< Key, Value, Hash, Equal >::operator==(
+    const HashTableIterator & rhs) const noexcept
+{
+  return (table_ == rhs.table_) && (index_ == rhs.index_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool lukashevich::HashTableIterator< Key, Value, Hash, Equal >::operator!=(
+    const HashTableIterator & rhs) const noexcept
+{
+  return !(*this == rhs);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void lukashevich::HashTableIterator< Key, Value, Hash, Equal >::skipEmpty()
+{
+  if (table_ == nullptr) {
+    return;
+  }
+
+  while ((index_ < table_->totalNodes()) && !table_->nodeAt(index_).occupied_) {
+    ++index_;
+  }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTableConstIterator< Key, Value, Hash,
+    Equal >::HashTableConstIterator():
+  table_(nullptr),
+  index_(0)
+{}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTableConstIterator< Key, Value, Hash,
+    Equal >::HashTableConstIterator(
+        const HashTableIterator< Key, Value, Hash, Equal > & rhs):
+  table_(rhs.table_),
+  index_(rhs.index_)
+{}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTableConstIterator< Key, Value, Hash,
+    Equal >::HashTableConstIterator(
+        const HashTable< Key, Value, Hash, Equal > * table,
+        std::size_t index):
+  table_(table),
+  index_(index)
+{
+  skipEmpty();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename lukashevich::HashTableConstIterator< Key, Value, Hash,
+    Equal >::value_type
+    lukashevich::HashTableConstIterator< Key, Value, Hash,
+        Equal >::operator*() const
+{
+  const typename HashTable< Key, Value, Hash, Equal >::Node & node =
+      table_->nodeAt(index_);
+  return value_type(node.value_.first, node.value_.second);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename lukashevich::HashTableConstIterator< Key, Value, Hash,
+    Equal >::pointer
+    lukashevich::HashTableConstIterator< Key, Value, Hash,
+        Equal >::operator->() const
+{
+  return pointer(operator*());
+}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTableConstIterator< Key, Value, Hash, Equal > &
+    lukashevich::HashTableConstIterator< Key, Value, Hash,
+        Equal >::operator++()
+{
+  ++index_;
+  skipEmpty();
+  return *this;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTableConstIterator< Key, Value, Hash, Equal >
+    lukashevich::HashTableConstIterator< Key, Value, Hash,
+        Equal >::operator++(int)
+{
+  HashTableConstIterator temp(*this);
+  ++(*this);
+  return temp;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool lukashevich::HashTableConstIterator< Key, Value, Hash,
+    Equal >::operator==(const HashTableConstIterator & rhs) const noexcept
+{
+  return (table_ == rhs.table_) && (index_ == rhs.index_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool lukashevich::HashTableConstIterator< Key, Value, Hash,
+    Equal >::operator!=(const HashTableConstIterator & rhs) const noexcept
+{
+  return !(*this == rhs);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void lukashevich::HashTableConstIterator< Key, Value, Hash,
+    Equal >::skipEmpty()
+{
+  if (table_ == nullptr) {
+    return;
+  }
+
+  while ((index_ < table_->totalNodes()) && !table_->nodeAt(index_).occupied_) {
+    ++index_;
+  }
+}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTable< Key, Value, Hash, Equal >::Node::Node():
+  value_(),
+  occupied_(false)
+{}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTable< Key, Value, Hash, Equal >::Node::Node(
+    const Key & key,
+    const Value & value):
+  value_(key, value),
+  occupied_(true)
+{}
+
+template< class Key, class Value, class Hash, class Equal >
+lukashevich::HashTable< Key, Value, Hash, Equal >::Node::Node(
+    const Key & key,
+    Value && value):
+  value_(key, std::move(value)),
+  occupied_(true)
+{}
+
 
 template< class Key, class Value, class Hash, class Equal >
 lukashevich::HashTable< Key, Value, Hash, Equal >::HashTable():
@@ -260,26 +444,15 @@ void lukashevich::HashTable< Key, Value, Hash, Equal >::add(
     const Key & key,
     const Value & value)
 {
-  if (has(key)) {
-    throw std::logic_error("duplicate key in hash table");
-  }
+  insertImpl(key, value);
+}
 
-  Node * freeNode = findFreeInHomeBucket(key);
-
-  if (freeNode != nullptr) {
-    freeNode->key_ = key;
-    freeNode->value_ = value;
-    freeNode->occupied_ = true;
-    ++size_;
-    return;
-  }
-
-  if (overflow_.size() >= bucketSize_) {
-    throw std::overflow_error("hash table overflow bucket is full");
-  }
-
-  overflow_.pushBack(Node(key, value));
-  ++size_;
+template< class Key, class Value, class Hash, class Equal >
+void lukashevich::HashTable< Key, Value, Hash, Equal >::add(
+    const Key & key,
+    Value && value)
+{
+  insertImpl(key, std::move(value));
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -293,41 +466,39 @@ Value & lukashevich::HashTable< Key, Value, Hash, Equal >::operator[](const Key 
 }
 
 template< class Key, class Value, class Hash, class Equal >
-Value lukashevich::HashTable< Key, Value, Hash, Equal >::drop(const Key & key)
+bool lukashevich::HashTable< Key, Value, Hash, Equal >::erase(
+    const Key & key)
 {
-  const size_t bucket = getHomeBucket(key);
-  const size_t begin = bucket * bucketSize_;
-  const size_t finish = begin + bucketSize_;
+  const std::size_t bucket = getHomeBucket(key);
+  const std::size_t beginIndex = bucket * bucketSize_;
+  const std::size_t endIndex = beginIndex + bucketSize_;
 
-  for (size_t index = begin; index < finish; ++index) {
-    if (buckets_[index].occupied_ && equal_(buckets_[index].key_, key)) {
-      Value value = buckets_[index].value_;
+  for (std::size_t index = beginIndex; index < endIndex; ++index) {
+    if (buckets_[index].occupied_
+        && equal_(buckets_[index].value_.first, key)) {
       buckets_[index].occupied_ = false;
       --size_;
-      return value;
+      return true;
     }
   }
 
   List< Node > temp;
-  bool found = false;
-  Value value = Value();
+  bool removed = false;
 
-  for (OverflowIterator it = overflow_.begin(); it != overflow_.end(); ++it) {
-    if (!found && equal_(it->key_, key)) {
-      value = it->value_;
-      found = true;
+  for (LIter< Node > it = overflow_.begin(); it != overflow_.end(); ++it) {
+    if (!removed && equal_(it->value_.first, key)) {
+      removed = true;
     } else {
       temp.pushBack(*it);
     }
   }
 
-  if (found) {
+  if (removed) {
     overflow_ = std::move(temp);
     --size_;
-    return value;
   }
 
-  throw std::out_of_range("hash table key not found");
+  return removed;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -356,7 +527,7 @@ typename lukashevich::HashTable< Key, Value, Hash, Equal >::Node &
   }
 
   size_t overflowIndex = index - buckets_.getSize();
-  OverflowIterator it = overflow_.begin();
+  LIter< Node > it = overflow_.begin();
 
   while (overflowIndex != 0) {
     --overflowIndex;
@@ -375,7 +546,7 @@ const typename lukashevich::HashTable< Key, Value, Hash, Equal >::Node &
   }
 
   size_t overflowIndex = index - buckets_.getSize();
-  OverflowConstIterator it = overflow_.begin();
+  LCIter< Node > it = overflow_.begin();
 
   while (overflowIndex != 0) {
     --overflowIndex;
@@ -389,14 +560,14 @@ template< class Key, class Value, class Hash, class Equal >
 typename lukashevich::HashTable< Key, Value, Hash, Equal >::iterator
     lukashevich::HashTable< Key, Value, Hash, Equal >::begin()
 {
-  return Iterator(this, 0);
+  return iterator(this, 0);
 }
 
 template< class Key, class Value, class Hash, class Equal >
 typename lukashevich::HashTable< Key, Value, Hash, Equal >::iterator
     lukashevich::HashTable< Key, Value, Hash, Equal >::end()
 {
-  return Iterator(this, totalNodes());
+  return iterator(this, totalNodes());
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -417,14 +588,14 @@ template< class Key, class Value, class Hash, class Equal >
 typename lukashevich::HashTable< Key, Value, Hash, Equal >::const_iterator
     lukashevich::HashTable< Key, Value, Hash, Equal >::cbegin() const
 {
-  return ConstIterator(this, 0);
+  return const_iterator(this, 0);
 }
 
 template< class Key, class Value, class Hash, class Equal >
 typename lukashevich::HashTable< Key, Value, Hash, Equal >::const_iterator
     lukashevich::HashTable< Key, Value, Hash, Equal >::cend() const
 {
-  return ConstIterator(this, totalNodes());
+  return const_iterator(this, totalNodes());
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -435,7 +606,7 @@ void lukashevich::HashTable< Key, Value, Hash, Equal >::rehash(
   HashTable temp(bucketCount, bucketSize, hash_, equal_);
 
   for (const_iterator it = cbegin(); it != cend(); ++it) {
-    temp.add(it->key_, it->value_);
+    temp.add(it->first, it->second);
   }
 
   swap(temp);
@@ -456,8 +627,11 @@ void lukashevich::HashTable< Key, Value, Hash, Equal >::swap(HashTable & rhs) no
 template< class Key, class Value, class Hash, class Equal >
 size_t lukashevich::HashTable< Key, Value, Hash, Equal >::checkedMainSize(size_t bucketCount, size_t bucketSize)
 {
-  if ((bucketCount != 0)
-      && (bucketSize > static_cast< size_t >(-1) / bucketCount)) {
+  if ((bucketCount == 0) || (bucketSize == 0)) {
+    throw std::invalid_argument("bad hash table bucket parameters");
+  }
+
+  if (bucketSize > std::numeric_limits< std::size_t >::max() / bucketCount) {
     throw std::overflow_error("hash table size overflow");
   }
 
@@ -479,7 +653,7 @@ Value & lukashevich::HashTable< Key, Value, Hash, Equal >::at(const Key & key)
     throw std::out_of_range("hash table key not found");
   }
 
-  return node->value_;
+  return node->value_.second;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -491,7 +665,7 @@ const Value & lukashevich::HashTable< Key, Value, Hash, Equal >::at(const Key & 
     throw std::out_of_range("hash table key not found");
   }
 
-  return node->value_;
+  return node->value_.second;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -509,13 +683,13 @@ typename lukashevich::HashTable< Key, Value, Hash, Equal >::Node *
   const size_t finish = begin + bucketSize_;
 
   for (size_t index = begin; index < finish; ++index) {
-    if (buckets_[index].occupied_ && equal_(buckets_[index].key_, key)) {
+    if (buckets_[index].occupied_ && equal_(buckets_[index].value_.first, key)) {
       return std::addressof(buckets_[index]);
     }
   }
 
-  for (OverflowIterator it = overflow_.begin(); it != overflow_.end(); ++it) {
-    if (equal_(it->key_, key)) {
+  for (LIter< Node > it = overflow_.begin(); it != overflow_.end(); ++it) {
+    if (equal_(it->value_.first, key)) {
       return std::addressof(*it);
     }
   }
@@ -532,13 +706,13 @@ const typename lukashevich::HashTable< Key, Value, Hash, Equal >::Node *
   const size_t finish = begin + bucketSize_;
 
   for (size_t index = begin; index < finish; ++index) {
-    if (buckets_[index].occupied_ && equal_(buckets_[index].key_, key)) {
+    if (buckets_[index].occupied_ && equal_(buckets_[index].value_.first, key)) {
       return std::addressof(buckets_[index]);
     }
   }
 
-  for (OverflowConstIterator it = overflow_.begin(); it != overflow_.end(); ++it) {
-    if (equal_(it->key_, key)) {
+  for (LCIter< Node > it = overflow_.begin(); it != overflow_.end(); ++it) {
+    if (equal_(it->value_.first, key)) {
       return std::addressof(*it);
     }
   }
@@ -562,6 +736,34 @@ typename lukashevich::HashTable< Key, Value, Hash, Equal >::Node *
   }
 
   return nullptr;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+template< class ValueArg >
+void lukashevich::HashTable< Key, Value, Hash, Equal >::insertImpl(
+    const Key & key,
+    ValueArg && value)
+{
+  if (has(key)) {
+    throw std::logic_error("duplicate key in hash table");
+  }
+
+  Node * freeNode = findFreeInHomeBucket(key);
+
+  if (freeNode != nullptr) {
+    freeNode->value_.first = key;
+    freeNode->value_.second = std::forward< ValueArg >(value);
+    freeNode->occupied_ = true;
+    ++size_;
+    return;
+  }
+
+  if (overflow_.size() >= bucketSize_) {
+    throw std::overflow_error("hash table overflow bucket is full");
+  }
+
+  overflow_.pushBack(Node(key, std::forward< ValueArg >(value)));
+  ++size_;
 }
 
 #endif

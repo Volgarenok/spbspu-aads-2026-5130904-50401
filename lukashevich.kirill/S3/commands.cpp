@@ -1,4 +1,5 @@
 #include "commands.hpp"
+
 #include <istream>
 #include <ostream>
 #include <stdexcept>
@@ -7,212 +8,250 @@
 namespace {
   const char * INVALID_COMMAND = "<INVALID COMMAND>";
 
-  void printGraphNames(lukashevich::Vector< std::string > & names, std::ostream & out)
+  void checkNoExtraArguments(std::istream & in)
   {
-    for (size_t i = 0; i < names.getSize(); ++i) {
-      size_t min = i;
+    std::string extra;
 
-      for (size_t j = i + 1; j < names.getSize(); ++j) {
-        if (names[j] < names[min]) {
-          min = j;
-        }
+    if (in >> extra) {
+      throw std::logic_error("extra command arguments");
+    }
+  }
+
+  void copyVertexes(const lukashevich::Graph & source,
+      lukashevich::Graph & result)
+  {
+    for (lukashevich::Graph::VertexTable::const_iterator it =
+        source.getVertexes().cbegin();
+        it != source.getVertexes().cend();
+        ++it) {
+      result.addVertex(it->first);
+    }
+  }
+
+  void copyEdges(const lukashevich::Graph & source,
+      lukashevich::Graph & result)
+  {
+    for (lukashevich::Graph::EdgeTable::const_iterator it =
+        source.getEdges().cbegin();
+        it != source.getEdges().cend();
+        ++it) {
+      for (std::size_t i = 0; i < it->second.getSize(); ++i) {
+        result.bind(it->first.first, it->first.second, it->second[i]);
       }
+    }
+  }
+}
 
-      if (min != i) {
-        std::swap(names[i], names[min]);
+void lukashevich::printGraphNames(lukashevich::Vector< std::string > & names,
+  std::ostream & out)
+{
+  std::less< std::string > less;
+
+  for (size_t i = 0; i < names.getSize(); ++i) {
+    size_t min = i;
+
+    for (size_t j = i + 1; j < names.getSize(); ++j) {
+      if (less(names[j], names[min])) {
+        min = j;
       }
     }
 
-    if (names.isEmpty()) {
-    out << '\n';
-    return;
-    }
-
-    for (size_t i = 0; i < names.getSize(); ++i) {
-      out << names[i] << '\n';
+    if (min != i) {
+      std::swap(names[i], names[min]);
     }
   }
 
-  void cmdGraphs(const lukashevich::Vector< std::string > & tokens,
-      lukashevich::GraphTable & graphs,
-      std::ostream & out)
-  {
-    if (tokens.getSize() != 1) {
-      throw std::logic_error("bad graphs command");
+  for (size_t i = 0; i < names.getSize(); ++i) {
+     if (i != 0) {
+      out << '\n';
     }
+    out << names[i];
+  }
+}
 
-    lukashevich::Vector< std::string > names;
+void lukashevich::cmdGraphs(std::istream & in,
+    lukashevich::GraphTable & graphs,
+    std::ostream & out)
+{
+  checkNoExtraArguments(in);
+  Vector< std::string > names;
 
-    for (lukashevich::GraphTable::const_iterator it = graphs.cbegin(); it != graphs.cend(); ++it) {
-      names.pushBack(it->key_);
-    }
-
-    printGraphNames(names, out);
+  for (GraphTable::const_iterator it = graphs.cbegin(); it != graphs.cend(); ++it) {
+    names.pushBack(it->first);
   }
 
-  void cmdVertexes(const lukashevich::Vector< std::string > & tokens,
-      lukashevich::GraphTable & graphs,
-      std::ostream & out)
-  {
-    if ((tokens.getSize() != 2) || !graphs.has(tokens[1])) {
-      throw std::logic_error("bad vertexes command");
-    }
+  printGraphNames(names, out);
+}
 
-    graphs.at(tokens[1]).printVertexes(out);
+void lukashevich::cmdVertexes(std::istream & in,
+    lukashevich::GraphTable & graphs, std::ostream & out)
+{
+  std::string graphName;
+
+  if (!(in >> graphName) || !graphs.has(graphName)) {
+    throw std::logic_error("bad vertexes command");
   }
 
-  void cmdOutbound(const lukashevich::Vector< std::string > & tokens,
-      lukashevich::GraphTable & graphs,
-      std::ostream & out)
-  {
-    if ((tokens.getSize() != 3) || !graphs.has(tokens[1])) {
-      throw std::logic_error("bad outbound command");
-    }
+  checkNoExtraArguments(in);
+  graphs.at(graphName).printVertexes(out);
+}
 
-    graphs.at(tokens[1]).printOutbound(tokens[2], out);
+void lukashevich::cmdOutbound(std::istream & in,
+    lukashevich::GraphTable & graphs, std::ostream & out)
+{
+  std::string graphName;
+  std::string vertex;
+
+  if (!(in >> graphName >> vertex) || !graphs.has(graphName)) {
+    throw std::logic_error("bad outbound command");
   }
 
-  void cmdInbound(const lukashevich::Vector< std::string > & tokens,
-      lukashevich::GraphTable & graphs,
-      std::ostream & out)
-  {
-    if ((tokens.getSize() != 3) || !graphs.has(tokens[1])) {
-      throw std::logic_error("bad inbound command");
-    }
+  checkNoExtraArguments(in);
+  graphs.at(graphName).printOutbound(vertex, out);
+}
 
-    graphs.at(tokens[1]).printInbound(tokens[2], out);
+void lukashevich::cmdInbound(std::istream & in,
+    lukashevich::GraphTable & graphs, std::ostream & out)
+{
+  std::string graphName;
+  std::string vertex;
+
+  if (!(in >> graphName >> vertex) || !graphs.has(graphName)) {
+    throw std::logic_error("bad inbound command");
   }
 
-  void cmdBind(const lukashevich::Vector< std::string > & tokens,
-      lukashevich::GraphTable & graphs,
-      std::ostream &)
-  {
-    size_t weight = 0;
+  checkNoExtraArguments(in);
+  graphs.at(graphName).printInbound(vertex, out);
+}
 
-    if ((tokens.getSize() != 5) || !graphs.has(tokens[1])
-        || !lukashevich::parseUnsigned(tokens[4], weight)) {
-      throw std::logic_error("bad bind command");
-    }
+void lukashevich::cmdBind(std::istream & in,
+    lukashevich::GraphTable & graphs, std::ostream &)
+{
+  std::string graphName;
+  std::string from;
+  std::string to;
+  Weight weight = 0;
 
-    graphs.at(tokens[1]).bind(tokens[2], tokens[3], weight);
+  if (!(in >> graphName >> from >> to >> weight) || !graphs.has(graphName)) {
+    throw std::logic_error("bad bind command");
   }
 
-  void cmdCut(const lukashevich::Vector< std::string > & tokens,
-      lukashevich::GraphTable & graphs,
-      std::ostream &)
-  {
-    size_t weight = 0;
+  checkNoExtraArguments(in);
+  graphs.at(graphName).bind(from, to, weight);
+}
 
-    if ((tokens.getSize() != 5) || !graphs.has(tokens[1])
-        || !lukashevich::parseUnsigned(tokens[4], weight)) {
-      throw std::logic_error("bad cut command");
-    }
+void lukashevich::cmdCut(std::istream & in,
+    lukashevich::GraphTable & graphs, std::ostream &)
+{
+  std::string graphName;
+  std::string from;
+  std::string to;
+  Weight weight = 0;
 
-    graphs.at(tokens[1]).cut(tokens[2], tokens[3], weight);
+  if (!(in >> graphName >> from >> to >> weight) || !graphs.has(graphName)) {
+    throw std::logic_error("bad cut command");
   }
 
-  void cmdCreate(const lukashevich::Vector< std::string > & tokens,
-      lukashevich::GraphTable & graphs,
-      std::ostream &)
-  {
-    if ((tokens.getSize() < 2) || graphs.has(tokens[1])) {
-      throw std::logic_error("bad create command");
-    }
+  graphs.at(graphName).cut(from, to, weight);
+}
 
-    lukashevich::Graph graph;
+void lukashevich::cmdCreate(std::istream & in,
+    lukashevich::GraphTable & graphs, std::ostream &)
+{
+  std::string graphName;
 
-    if (tokens.getSize() == 2) {
-      graphs.add(tokens[1], graph);
+  if (!(in >> graphName) || graphs.has(graphName)) {
+    throw std::logic_error("bad create command");
+  }
+
+  Graph graph;
+  size_t count = 0;
+
+  if (!(in >> count)) {
+    if (in.eof()) {
+      graphs.add(graphName, graph);
       return;
     }
 
-    size_t count = 0;
+    throw std::logic_error("bad create command");
+  }
 
-    if (!lukashevich::parseUnsigned(tokens[2], count) || (tokens.getSize() != count + 3)) {
+  for (std::size_t i = 0; i < count; ++i) {
+    std::string vertex;
+
+    if (!(in >> vertex)) {
       throw std::logic_error("bad create command");
     }
 
-    for (size_t i = 0; i < count; ++i) {
-      graph.addVertex(tokens[i + 3]);
-    }
-
-    graphs.add(tokens[1], graph);
+    graph.addVertex(vertex);
   }
 
-  void copyVertexes(const lukashevich::Graph & source, lukashevich::Graph & result)
-  {
-    for (lukashevich::Graph::VertexTable::const_iterator it = source.getVertexes().cbegin();
-        it != source.getVertexes().cend(); ++it) {
-      result.addVertex(it->key_);
-    }
-  }
-
-  void copyEdges(const lukashevich::Graph & source, lukashevich::Graph & result)
-  {
-    for (lukashevich::Graph::EdgeTable::const_iterator it = source.getEdges().cbegin();
-        it != source.getEdges().cend(); ++it) {
-      for (size_t i = 0; i < it->value_.getSize(); ++i) {
-        result.bind(it->key_.first, it->key_.second, it->value_[i]);
-      }
-    }
-  }
-
-  void cmdMerge(const lukashevich::Vector< std::string > & tokens,
-      lukashevich::GraphTable & graphs,
-      std::ostream &)
-  {
-    if ((tokens.getSize() != 4) || graphs.has(tokens[1])
-        || !graphs.has(tokens[2]) || !graphs.has(tokens[3])) {
-      throw std::logic_error("bad merge command");
-    }
-
-    lukashevich::Graph result;
-
-    copyVertexes(graphs.at(tokens[2]), result);
-    copyVertexes(graphs.at(tokens[3]), result);
-    copyEdges(graphs.at(tokens[2]), result);
-    copyEdges(graphs.at(tokens[3]), result);
-
-    graphs.add(tokens[1], result);
-  }
-
-  void cmdExtract(const lukashevich::Vector< std::string > & tokens,
-      lukashevich::GraphTable & graphs,
-      std::ostream &)
-  {
-    if ((tokens.getSize() < 4) || graphs.has(tokens[1]) || !graphs.has(tokens[2])) {
-      throw std::logic_error("bad extract command");
-    }
-
-    size_t count = 0;
-
-    if (!lukashevich::parseUnsigned(tokens[3], count) || (tokens.getSize() != count + 4)) {
-      throw std::logic_error("bad extract command");
-    }
-
-    const lukashevich::Graph & source = graphs.at(tokens[2]);
-    lukashevich::Graph result;
-
-    for (size_t i = 0; i < count; ++i) {
-      if (!source.hasVertex(tokens[i + 4])) {
-        throw std::logic_error("bad extract command");
-      }
-
-      result.addVertex(tokens[i + 4]);
-    }
-
-    for (lukashevich::Graph::EdgeTable::const_iterator it = source.getEdges().cbegin();
-        it != source.getEdges().cend(); ++it) {
-      if (result.hasVertex(it->key_.first) && result.hasVertex(it->key_.second)) {
-        for (size_t i = 0; i < it->value_.getSize(); ++i) {
-          result.bind(it->key_.first, it->key_.second, it->value_[i]);
-        }
-      }
-    }
-
-    graphs.add(tokens[1], result);
-  }
+  checkNoExtraArguments(in);
+  graphs.add(graphName, graph);
 }
+
+void lukashevich::cmdMerge(std::istream & in,
+    lukashevich::GraphTable & graphs, std::ostream &)
+{
+  std::string newName;
+  std::string firstName;
+  std::string secondName;
+
+  if (!(in >> newName >> firstName >> secondName) || graphs.has(newName)
+      || !graphs.has(firstName) || !graphs.has(secondName)) {
+    throw std::logic_error("bad merge command");
+  }
+
+  checkNoExtraArguments(in);
+
+  Graph result;
+
+  copyVertexes(graphs.at(firstName), result);
+  copyVertexes(graphs.at(secondName), result);
+  copyEdges(graphs.at(firstName), result);
+  copyEdges(graphs.at(secondName), result);
+
+  graphs.add(newName, result);
+}
+
+void lukashevich::cmdExtract(std::istream & in,
+    lukashevich::GraphTable & graphs, std::ostream &)
+{
+  std::string newName;
+  std::string sourceName;
+  size_t count = 0;
+
+  if (!(in >> newName >> sourceName >> count) || graphs.has(newName) || !graphs.has(sourceName)) {
+    throw std::logic_error("bad extract command");
+  }
+
+  const Graph & source = graphs.at(sourceName);
+  Graph result;
+
+  for (size_t i = 0; i < count; ++i) {
+    std::string vertex;
+  
+    if (!(in >> vertex) || !source.hasVertex(vertex)) {
+      throw std::logic_error("bad extract command");
+    }
+
+    result.addVertex(vertex);
+  }
+
+  checkNoExtraArguments(in);
+
+  for (Graph::EdgeTable::const_iterator it = source.getEdges().cbegin();
+      it != source.getEdges().cend(); ++it) {
+    if (result.hasVertex(it->first.first) && result.hasVertex(it->first.second)) {
+      for (size_t i = 0; i < it->second.getSize(); ++i) {
+        result.bind(it->first.first, it->first.second, it->second[i]);
+      }
+    }
+  }
+
+  graphs.add(newName, result);
+}
+
 
 lukashevich::CommandTable lukashevich::createCommandTable()
 {
@@ -229,38 +268,4 @@ lukashevich::CommandTable lukashevich::createCommandTable()
   commands.add("extract", cmdExtract);
 
   return commands;
-}
-
-void lukashevich::processCommandLine(const std::string & line,
-    GraphTable & graphs,
-    const CommandTable & commands,
-    std::ostream & out)
-{
-  Vector< std::string > tokens = splitLine(line);
-
-  if (tokens.isEmpty()) {
-    return;
-  }
-
-  try {
-    if (!commands.has(tokens[0])) {
-      throw std::logic_error("unknown command");
-    }
-
-    commands.at(tokens[0])(tokens, graphs, out);
-  } catch (...) {
-    out << INVALID_COMMAND << '\n';
-  }
-}
-
-void lukashevich::processCommands(std::istream & in,
-    std::ostream & out,
-    GraphTable & graphs,
-    const CommandTable & commands)
-{
-  std::string line;
-
-  while (std::getline(in, line)) {
-    processCommandLine(line, graphs, commands, out);
-  }
 }

@@ -1,58 +1,19 @@
 #include "input.hpp"
+
+#include <istream>
 #include <limits>
 #include <stdexcept>
 
-bool lukashevich::parseUnsigned(const std::string & text, size_t & value)
+bool lukashevich::hasExtraData(std::istream & in)
 {
-  if (text.empty()) {
-    return false;
+  int symbol = in.peek();
+
+  while ((symbol == ' ') || (symbol == '\t')) {
+    in.get();
+    symbol = in.peek();
   }
 
-  size_t result = 0;
-
-  for (size_t i = 0; i < text.size(); ++i) {
-    const char ch = text[i];
-
-    if ((ch < '0') || (ch > '9')) {
-      return false;
-    }
-
-    const size_t digit = static_cast< size_t >(ch - '0');
-
-    if (result > (std::numeric_limits< size_t >::max() - digit) / 10) {
-      return false;
-    }
-
-    result = result * 10 + digit;
-  }
-
-  value = result;
-  return true;
-}
-
-lukashevich::Vector< std::string > lukashevich::splitLine(const std::string & line)
-{
-  Vector< std::string > tokens;
-  size_t pos = 0;
-
-  while (pos < line.size()) {
-    while ((pos < line.size()) && ((line[pos] == ' ') || (line[pos] == '\t'))) {
-      ++pos;
-    }
-
-    std::string token;
-
-    while ((pos < line.size()) && (line[pos] != ' ') && (line[pos] != '\t')) {
-      token.push_back(line[pos]);
-      ++pos;
-    }
-
-    if (!token.empty()) {
-      tokens.pushBack(token);
-    }
-  }
-
-  return tokens;
+  return (symbol != std::char_traits< char >::eof());
 }
 
 void lukashevich::readGraphs(std::istream & in, GraphTable & graphs)

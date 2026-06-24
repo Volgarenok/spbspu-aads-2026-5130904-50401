@@ -21,7 +21,7 @@ namespace lukashevich {
       boost::hash2::hash_append(hasher, {}, value);
 
       std::size_t result = 0;
-      const auto digest = hasher.result();
+      const boost::hash2::blake2b_512::result_type digest = hasher.result();
       std::memcpy(&result, digest.data(), sizeof(result));
       return result;
     }
@@ -31,21 +31,6 @@ namespace lukashevich {
   };
 
   using Blake2StringHash = Blake2Hasher< std::string >;
-
-  struct StringEqual {
-    bool operator()(const std::string & lhs, const std::string & rhs) const
-    {
-      return lhs == rhs;
-    }
-  };
-
-  struct EdgeEqual {
-    bool operator()(const std::pair< std::string, std::string > & lhs,
-        const std::pair< std::string, std::string > & rhs) const
-    {
-      return (lhs.first == rhs.first) && (lhs.second == rhs.second);
-    }
-  };
 
   struct Blake2EdgeHash {
     explicit Blake2EdgeHash(std::size_t seed = 0):
@@ -61,7 +46,7 @@ namespace lukashevich {
       boost::hash2::hash_append(hasher, {}, edge.second);
 
       std::size_t result = 0;
-      const auto digest = hasher.result();
+      const boost::hash2::blake2b_512::result_type digest = hasher.result();
       std::memcpy(&result, digest.data(), sizeof(result));
       return result;
     }
