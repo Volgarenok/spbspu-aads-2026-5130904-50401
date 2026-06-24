@@ -59,22 +59,25 @@ void levkin::cmdCreate(std::istream& input, std::ostream& output, DB& graphs)
     return;
   }
   if (graphs.hasGraph(graph_name)) {
-    input.setstate(std::ios::failbit);
-    return;
+    throw std::out_of_range("Graph already exists");
   }
-  graphs.createGraphUnsafe(graph_name);
   size_t count;
   if (!(input >> count)) {
     input.setstate(std::ios::failbit);
     return;
   }
+  stuff::Vector< std::string > verts;
   std::string vertex;
   for (size_t i = 0; i < count; ++i) {
     if (!(input >> vertex)) {
       input.setstate(std::ios::failbit);
       return;
     }
-    graphs.addVertex(graph_name, vertex, output);
+    verts.pushBack(vertex);
+  }
+  graphs.createGraphUnsafe(graph_name);
+  for (size_t i = 0; i < count; ++i) {
+    graphs.addVertex(graph_name, verts[i], output);
   }
 }
 void levkin::cmdMerge(std::istream& input, std::ostream& output, DB& graphs)
