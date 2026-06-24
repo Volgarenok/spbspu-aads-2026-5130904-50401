@@ -55,7 +55,8 @@ BOOST_AUTO_TEST_CASE(drop_removes_value)
 
   table.add(1, "one");
 
-  BOOST_TEST(table.erase(1) == "one");
+  BOOST_TEST(table.at(1) == "one");
+  BOOST_TEST(table.erase(1));
   BOOST_TEST(!table.has(1));
   BOOST_TEST(table.size() == 0);
 }
