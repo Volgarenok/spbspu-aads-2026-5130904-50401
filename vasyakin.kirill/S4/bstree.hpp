@@ -23,8 +23,8 @@ namespace vasyakin
     BSTree& operator=(const BSTree& other);
     BSTree& operator=(BSTree&& other) noexcept;
 
-    template < class K, class V >
-    std::pair< iterator, bool > insert(K&& k, V&& v);
+    std::pair< iterator, bool > insert(const Key& k, const Value& v);
+    std::pair< iterator, bool > insert(Key&& k, Value&& v);
 
     Value& at(const Key& k);
     const Value& at(const Key& k) const;
@@ -62,6 +62,9 @@ namespace vasyakin
     Node* root_;
     Node* fake_leaf_;
     Compare cmp_;
+
+    template < class K, class V >
+    std::pair< iterator, bool > insertImpl(K&& k, V&& v);
 
     void clear(Node* node);
     Node* cloneNode(const Node* src, Node* parent, const Node* src_fake_leaf);
@@ -205,7 +208,7 @@ namespace vasyakin
   const typename BSTree< Key, Value, Compare >::Node*
     BSTree< Key, Value, Compare >::findNode(const Key& k) const
   {
-    Node* curr = root_;
+    const Node* curr = root_;
 
     while (curr != fake_leaf_)
     {
@@ -228,9 +231,23 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Compare >
+  std::pair< typename BSTree< Key, Value, Compare >::iterator, bool >
+    BSTree< Key, Value, Compare >::insert(const Key& k, const Value& v)
+  {
+    return insertImpl(k, v);
+  }
+
+  template< class Key, class Value, class Compare >
+  std::pair< typename BSTree< Key, Value, Compare >::iterator, bool >
+    BSTree< Key, Value, Compare >::insert(Key&& k, Value&& v)
+  {
+    return insertImpl(std::forward< Key >(k), std::forward< Value >(v));
+  }
+
+  template< class Key, class Value, class Compare >
   template < class K, class V >
   std::pair< typename BSTree< Key, Value, Compare >::iterator, bool >
-    BSTree< Key, Value, Compare >::insert(K&& k, V&& v)
+    BSTree< Key, Value, Compare >::insertImpl(K&& k, V&& v)
   {
     Node* parent = nullptr;
     Node* curr = root_;
