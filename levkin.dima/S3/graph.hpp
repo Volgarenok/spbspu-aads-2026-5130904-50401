@@ -1,11 +1,9 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
-
 #include <cstddef>
 #include <iosfwd>
 #include <string>
 #include <utility>
-
 #include "hasher.hpp"
 #include "hashtable.hpp"
 #include "vector.hpp"
@@ -79,6 +77,10 @@ namespace levkin {
     HashTable< std::string, Graph, Sha1Hasher< std::string >, KeyComp > graphs_;
     DB();
     void showGraphs(std::ostream& output) const;
+    void addEdge(const std::string& graphName,
+                 const std::string& startVertex,
+                 const std::string& endVertex,
+                 size_t weight);
     void showGraphVertexes(const std::string& graphName,
                            std::ostream& output) const;
     void showGraphOutbound(const std::string& graphName,
