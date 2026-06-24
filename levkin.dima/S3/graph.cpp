@@ -270,17 +270,31 @@ void levkin::DB::mergeGraphs(std::string new_graph,
   Graph union_set(new_graph);
   auto append_graph = [&](const std::string& g_name) {
     const Graph& g = graphs_.at(g_name);
-    auto verts = g.getVertexes();
-    for (size_t i = 0; i < verts.getSize(); ++i) {
-      union_set.addVertex(verts[i]);
+    for (auto it = g.outgoing_.cbegin(); it != g.outgoing_.cend(); ++it) {
+      if (it->is_valid_) {
+        union_set.addVertex(it->key_);
+      }
     }
-    for (size_t i = 0; i < verts.getSize(); ++i) {
-      try {
-        auto out_edges = g.getOutbound(verts[i]);
-        for (size_t j = 0; j < out_edges.getSize(); ++j) {
-          union_set.addEdge(verts[i], out_edges[j].first, out_edges[j].second);
+    for (auto it = g.incoming_.cbegin(); it != g.incoming_.cend(); ++it) {
+      if (it->is_valid_) {
+        union_set.addVertex(it->key_);
+      }
+    }
+    for (auto it = g.outgoing_.cbegin(); it != g.outgoing_.cend(); ++it) {
+      if (it->is_valid_) {
+        const std::string& src = it->key_;
+        const Edges& edge_container = it->value_;
+        for (auto e_it = edge_container.edges_.cbegin();
+             e_it != edge_container.edges_.cend();
+             ++e_it) {
+          if (e_it->is_valid_) {
+            const std::string& dest = e_it->key_;
+            const stuff::Vector< size_t >& weights = e_it->value_;
+            for (size_t w = 0; w < weights.getSize(); ++w) {
+              union_set.addEdge(src, dest, weights[w]);
+            }
+          }
         }
-      } catch (const std::out_of_range&) {
       }
     }
   };
@@ -301,14 +315,9 @@ void levkin::DB::extractGraphs(std::string new_graph,
   size_t boundary = count_k < vertexes.getSize() ? count_k : vertexes.getSize();
   levkin::HashTable< std::string, bool > valid_verts(64, 4);
   for (size_t i = 0; i < boundary; ++i) {
-    try {
-      source_ref.getOutbound(vertexes[i]);
-    } catch (const std::out_of_range&) {
-      try {
-        source_ref.getInbound(vertexes[i]);
-      } catch (const std::out_of_range&) {
-        throw std::out_of_range("vertex not in graph");
-      }
+    if (!source_ref.outgoing_.has(vertexes[i])
+        && !source_ref.incoming_.has(vertexes[i])) {
+      throw std::out_of_range("vertex not in graph");
     }
     valid_verts.add(vertexes[i], true);
   }
@@ -318,15 +327,21 @@ void levkin::DB::extractGraphs(std::string new_graph,
   }
   for (size_t i = 0; i < boundary; ++i) {
     const std::string& start_pt = vertexes[i];
-    try {
-      auto tracks = source_ref.getOutbound(start_pt);
-      for (size_t j = 0; j < tracks.getSize(); ++j) {
-        const std::string& destination_pt = tracks[j].first;
-        if (valid_verts.has(destination_pt)) {
-          subsection.addEdge(start_pt, destination_pt, tracks[j].second);
+    if (source_ref.outgoing_.has(start_pt)) {
+      const Edges& edge_container = source_ref.outgoing_.at(start_pt);
+      for (auto e_it = edge_container.edges_.cbegin();
+           e_it != edge_container.edges_.cend();
+           ++e_it) {
+        if (e_it->is_valid_) {
+          const std::string& destination_pt = e_it->key_;
+          if (valid_verts.has(destination_pt)) {
+            const stuff::Vector< size_t >& weights = e_it->value_;
+            for (size_t w = 0; w < weights.getSize(); ++w) {
+              subsection.addEdge(start_pt, destination_pt, weights[w]);
+            }
+          }
         }
       }
-    } catch (const std::out_of_range&) {
     }
   }
   graphs_.add(new_graph, subsection);
