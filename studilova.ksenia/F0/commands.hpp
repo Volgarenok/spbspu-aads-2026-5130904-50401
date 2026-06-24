@@ -25,6 +25,7 @@ namespace studilova
   void compareTrends(std::istream&, std::ostream&, BudgetManager&);
 
   void mergeBudgets(std::istream&, std::ostream&, BudgetManager&);
+  void showCategoryDiagram(std::istream&, std::ostream&, BudgetManager&);
 }
 
 #endif

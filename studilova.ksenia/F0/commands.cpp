@@ -77,6 +77,28 @@ namespace
       dest.addOperation(operations[i]);
     }
   }
+
+  const char* getDiagramSymbols()
+  {
+    return "#&@%+=*xo";
+  }
+
+  int calculateCategoryExpenses(const studilova::Budget& budget, const std::string& categoryName)
+  {
+    int sum = 0;
+    const studilova::Vector< studilova::Operation >& operations = budget.getOperations();
+
+    for (size_t i = 0; i < operations.getSize(); ++i)
+    {
+      const studilova::Operation& operation = operations[i];
+
+      if (operation.getType() == studilova::OperationType::Expense && operation.getCategory() == categoryName)
+      {
+        sum += operation.getAmount();
+      }
+    }
+    return sum;
+  }
 }
 
 void studilova::createBudget(std::istream& in, std::ostream& out, BudgetManager& state)
@@ -499,4 +521,73 @@ void studilova::mergeBudgets(std::istream& in, std::ostream& out, BudgetManager&
   {
     out << "<INVALID COMMAND>\n";
   }
+}
+
+void studilova::showCategoryDiagram(std::istream& in, std::ostream& out, BudgetManager& state)
+{
+  std::string budgetName;
+  in >> budgetName;
+
+  if (!in || !state.hasBudget(budgetName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  const Budget& budget = state.getBudget(budgetName);
+  const Vector< Category* >& categories = budget.getRootCategory().getChildren();
+
+  if (categories.isEmpty())
+  {
+    out << "<EMPTY>\n";
+    return;
+  }
+
+  const char* symbols = getDiagramSymbols();
+  const size_t maxWidth = 30;
+
+  Vector< int > sums;
+  int total = 0;
+
+  for (size_t i = 0; i < categories.getSize(); ++i)
+  {
+    int sum = calculateCategoryExpenses(budget, categories[i]->getName());
+    sums.pushBack(sum);
+    total += sum;
+  }
+
+  if (total == 0)
+  {
+    out << "<EMPTY>\n";
+    return;
+  }
+
+  for (size_t i = 0; i < categories.getSize(); ++i)
+  {
+    out << categories[i]->getName() << ' ' << symbols[i % 9] << '\n';
+  }
+
+  out << '[';
+
+  for (size_t i = 0; i < categories.getSize(); ++i)
+  {
+    int count = static_cast< int >((sums[i] * maxWidth) / total);
+
+    if (sums[i] > 0 && count == 0)
+    {
+      count = 1;
+    }
+
+    if (i != 0)
+    {
+      out << ' ';
+    }
+
+    for (int j = 0; j < count; ++j)
+    {
+      out << symbols[i % 9];
+    }
+  }
+
+  out << "]\n";
 }
