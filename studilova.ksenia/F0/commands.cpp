@@ -404,3 +404,42 @@ void studilova::categoryTrend(std::istream& in, std::ostream& out, BudgetManager
     out << "<STABLE>\n";
   }
 }
+
+void studilova::compareTrends(std::istream& in, std::ostream& out, BudgetManager& state)
+{
+  std::string budgetName;
+  std::string categoryName1;
+  std::string categoryName2;
+
+  in >> budgetName >> categoryName1 >> categoryName2;
+
+  if (!in || !state.hasBudget(budgetName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  const Budget& budget = state.getBudget(budgetName);
+
+  if (!budget.hasCategory(categoryName1) || !budget.hasCategory(categoryName2))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  int trend1 = getCategoryTrendValue(budget, categoryName1);
+  int trend2 = getCategoryTrendValue(budget, categoryName2);
+
+  if (trend1 > trend2)
+  {
+    out << "<" << categoryName1 << " GROWS FASTER>\n";
+  }
+  else if (trend2 > trend1)
+  {
+    out << "<" << categoryName2 << " GROWS FASTER>\n";
+  }
+  else
+  {
+    out << "<TRENDS ARE EQUAL>\n";
+  }
+}
