@@ -37,6 +37,7 @@ namespace levkin {
     friend class HashTable;
     template < class K, class V, class H, class E, bool C >
     friend class HashTableIterator;
+
   public:
     using iterator_category = std::forward_iterator_tag;
     using value_type = NodeHashTable< Key, Value >;
@@ -157,6 +158,7 @@ namespace levkin {
     {
       return !(*this == rhs);
     }
+
   private:
     HashTable< Key, Value, Hash, EqualTo >* table_;
     size_t index_;
@@ -167,6 +169,7 @@ namespace levkin {
   {
     template < class K, class V, class H, class E, bool C >
     friend class HashTableIterator;
+
   public:
     using iterator = HashTableIterator< Key, Value, Hash, EqualTo, false >;
     using const_iterator = HashTableIterator< Key, Value, Hash, EqualTo, true >;
@@ -176,10 +179,6 @@ namespace levkin {
       bucket_capacity_(bucket_capacity == 0 ? 4 : bucket_capacity),
       count_valid_(0)
     {
-      size_t total_slots = num_buckets_ * bucket_capacity_;
-      for (size_t i = 0; i < total_slots; ++i) {
-        pool_.pushBack(NodeHashTable< Key, Value >());
-      }
     }
     HashTable(const HashTable& other) :
       pool_(other.pool_),
@@ -212,6 +211,9 @@ namespace levkin {
     }
     Value& at(const Key& key)
     {
+      if (pool_.getSize() == 0) {
+        throw std::out_of_range("key not found");
+      }
       Hash hasher;
       EqualTo equal;
       size_t bucket_idx = hasher(key) % num_buckets_;
@@ -231,6 +233,9 @@ namespace levkin {
     }
     const Value& at(const Key& key) const
     {
+      if (pool_.getSize() == 0) {
+        throw std::out_of_range("key not found");
+      }
       Hash hasher;
       EqualTo equal;
       size_t bucket_idx = hasher(key) % num_buckets_;
@@ -250,6 +255,7 @@ namespace levkin {
     }
     void add(const Key& key, const Value& value)
     {
+      ensurePoolCreated();
       Hash hasher;
       EqualTo equal;
       size_t bucket_idx = hasher(key) % num_buckets_;
@@ -294,11 +300,12 @@ namespace levkin {
         count_valid_++;
       }
       if (count_valid_ >= pool_.getSize()) {
-          rehash(num_buckets_ * 2, bucket_capacity_);
+        rehash(num_buckets_ * 2, bucket_capacity_);
       }
     }
     void add(const Key& key, Value&& value)
     {
+      ensurePoolCreated();
       Hash hasher;
       EqualTo equal;
       size_t bucket_idx = hasher(key) % num_buckets_;
@@ -344,11 +351,14 @@ namespace levkin {
         count_valid_++;
       }
       if (count_valid_ >= pool_.getSize()) {
-          rehash(num_buckets_ * 2, bucket_capacity_);
+        rehash(num_buckets_ * 2, bucket_capacity_);
       }
     }
     Value drop(const Key& key)
     {
+      if (pool_.getSize() == 0) {
+        throw std::out_of_range("key not found");
+      }
       Hash hasher;
       EqualTo equal;
       size_t bucket_idx = hasher(key) % num_buckets_;
@@ -374,6 +384,9 @@ namespace levkin {
     }
     bool has(const Key& key) const noexcept
     {
+      if (pool_.getSize() == 0) {
+        return false;
+      }
       Hash hasher;
       EqualTo equal;
       size_t bucket_idx = hasher(key) % num_buckets_;
@@ -393,6 +406,9 @@ namespace levkin {
     }
     Value& get(const Key& key)
     {
+      if (pool_.getSize() == 0) {
+        throw std::logic_error("No such key");
+      }
       Hash hasher;
       EqualTo equal;
       size_t bucket_idx = hasher(key) % num_buckets_;
@@ -412,6 +428,9 @@ namespace levkin {
     }
     const Value& get(const Key& key) const
     {
+      if (pool_.getSize() == 0) {
+        throw std::logic_error("No such key");
+      }
       Hash hasher;
       EqualTo equal;
       size_t bucket_idx = hasher(key) % num_buckets_;
@@ -431,6 +450,7 @@ namespace levkin {
     }
     Value& operator[](const Key& key)
     {
+      ensurePoolCreated();
       Hash hasher;
       EqualTo equal;
       size_t bucket_idx = hasher(key) % num_buckets_;
@@ -449,7 +469,11 @@ namespace levkin {
       add(key, Value{});
       return get(key);
     }
-    const Value& operator[](const Key& key) const { return get(key); }
+    const Value& operator[](const Key& key) const
+    {
+      ensurePoolCreated();
+      return get(key);
+    }
     void rehash(size_t new_num_buckets, size_t new_bucket_capacity)
     {
       HashTable< Key, Value, Hash, EqualTo > new_table(new_num_buckets,
@@ -479,6 +503,9 @@ namespace levkin {
     size_t capacity() const noexcept { return bucket_capacity_; }
     iterator begin() noexcept
     {
+      if (pool_.getSize() == 0) {
+        return end();
+      }
       size_t idx = findNextValidInPool(0);
       if (idx < pool_.getSize()) {
         return iterator(this, idx, overflow_.end());
@@ -495,6 +522,9 @@ namespace levkin {
     }
     const_iterator begin() const noexcept
     {
+      if (pool_.getSize() == 0) {
+        return end();
+      }
       size_t idx = findNextValidInPool(0);
       if (idx < pool_.getSize()) {
         return const_iterator(this, idx, overflow_.cend());
@@ -511,7 +541,17 @@ namespace levkin {
     }
     const_iterator cbegin() const noexcept { return begin(); }
     const_iterator cend() const noexcept { return end(); }
+
   private:
+    void ensurePoolCreated()
+    {
+      if (pool_.getSize() == 0) {
+        size_t total_slots = num_buckets_ * bucket_capacity_;
+        for (size_t i = 0; i < total_slots; ++i) {
+          pool_.pushBack(NodeHashTable< Key, Value >());
+        }
+      }
+    }
     size_t findNextValidInPool(size_t index) const noexcept
     {
       while (index < pool_.getSize() && !pool_[index].is_valid_) {
