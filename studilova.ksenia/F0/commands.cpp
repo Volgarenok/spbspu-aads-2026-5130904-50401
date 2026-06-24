@@ -22,6 +22,40 @@ namespace
       printCategory(out, *children[i], depth + 1);
     }
   }
+
+  int getCategoryTrendValue(
+    const studilova::Budget& budget,
+    const std::string& categoryName
+  )
+  {
+    const studilova::Vector< studilova::Operation >& operations = budget.getOperations();
+
+    int firstHalf = 0;
+    int secondHalf = 0;
+    size_t middle = operations.getSize() / 2;
+
+    for (size_t i = 0; i < operations.getSize(); ++i)
+    {
+      const studilova::Operation& operation = operations[i];
+
+      if (
+        operation.getType() == studilova::OperationType::Expense &&
+        operation.getCategory() == categoryName
+      )
+      {
+        if (i < middle)
+        {
+          firstHalf += operation.getAmount();
+        }
+        else
+        {
+          secondHalf += operation.getAmount();
+        }
+      }
+    }
+
+    return secondHalf - firstHalf;
+  }
 }
 
 void studilova::createBudget(std::istream& in, std::ostream& out, BudgetManager& state)
@@ -355,34 +389,13 @@ void studilova::categoryTrend(std::istream& in, std::ostream& out, BudgetManager
     return;
   }
 
-  const Vector< Operation >& operations = budget.getOperations();
+  int trend = getCategoryTrendValue(budget, categoryName);
 
-  int firstHalf = 0;
-  int secondHalf = 0;
-  size_t middle = operations.getSize() / 2;
-
-  for (size_t i = 0; i < operations.getSize(); ++i)
-  {
-    const Operation& operation = operations[i];
-
-    if (operation.getType() == OperationType::Expense && operation.getCategory() == categoryName)
-    {
-      if (i < middle)
-      {
-        firstHalf += operation.getAmount();
-      }
-      else
-      {
-        secondHalf += operation.getAmount();
-      }
-    }
-  }
-
-  if (secondHalf > firstHalf)
+  if (trend > 0)
   {
     out << "<INCREASING>\n";
   }
-  else if (secondHalf < firstHalf)
+  else if (trend < 0)
   {
     out << "<DECREASING>\n";
   }
