@@ -1,0 +1,8 @@
+c_cpp_properties.json
+settings.json
+build/
+bin/
+*.gcda
+.cache/
+.vscode/
+.DS_Store
