@@ -74,8 +74,8 @@ void ulanova::CommandProcessor::run(std::istream& input, std::ostream& output)
   std::string cmd;
   while (input >> cmd)
   {
-    auto it = handlers_.find(cmd);
-    if (it == handlers_.end())
+    Handler* it = handlers_.find(cmd);
+    if (it == nullptr)
     {
       std::string rest;
       std::getline(input, rest);
@@ -84,7 +84,7 @@ void ulanova::CommandProcessor::run(std::istream& input, std::ostream& output)
     }
     try
     {
-      Handler handler = (*it).second;
+      Handler handler = *it;
       (this->*handler)(input, output);
     }
     catch (...)
