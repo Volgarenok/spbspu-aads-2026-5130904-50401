@@ -8,6 +8,8 @@
 
 namespace studilova
 {
+  using cmd_t = void(*)(std::istream&, std::ostream&, BudgetManager&);
+
   void createBudget(std::istream&, std::ostream&, BudgetManager&);
   void createCategory(std::istream&, std::ostream&, BudgetManager&);
 
