@@ -79,15 +79,13 @@ namespace {
   {
     selectionSort(info, EdgeInfoLess());
 
-    if (info.isEmpty()) {
-      out << '\n';
-      return;
-    }
-
     for (size_t i = 0; i < info.getSize(); ++i) {
+      if (i != 0) {
+        out << '\n';
+      }
+
       out << info[i].vertex_;
       printWeights(info[i].weights_, out);
-      out << '\n';
     }
   }
 }
@@ -156,13 +154,11 @@ void lukashevich::Graph::printVertexes(std::ostream & out) const
 
   selectionSort(names, std::less< std::string >());
 
-  if (names.isEmpty()) {
-    out << '\n';
-    return;
-  }
-
   for (size_t i = 0; i < names.getSize(); ++i) {
-    out << names[i] << '\n';
+    if (i != 0) {
+      out << '\n';
+    }
+    out << names[i];
   }
 }
 

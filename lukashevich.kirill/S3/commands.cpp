@@ -140,7 +140,7 @@ bool lukashevich::cmdBind(std::istream & in,
 
   checkNoExtraArguments(in);
   graphs.at(graphName).bind(from, to, weight);
-  return true;
+  return false;
 }
 
 bool lukashevich::cmdCut(std::istream & in,
@@ -157,7 +157,7 @@ bool lukashevich::cmdCut(std::istream & in,
 
   checkNoExtraArguments(in);
   graphs.at(graphName).cut(from, to, weight);
-  return true;
+  return false;
 }
 
 bool lukashevich::cmdCreate(std::istream & in,
