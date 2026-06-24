@@ -9,7 +9,9 @@
 namespace levkin {
   using boost_digest_t = boost::uuids::detail::sha1::digest_type;
 
-  template <class T> struct Sha1Hasher {
+  template < class T >
+  struct Sha1Hasher
+  {
     size_t operator()(const T& key) const
     {
       boost::uuids::detail::sha1 sha1;
@@ -19,13 +21,15 @@ namespace levkin {
       sha1.get_digest(digest);
 
       if (sizeof(size_t) >= 8) {
-        return (static_cast<size_t>(digest[0]) << 32) | digest[1];
+        return (static_cast< size_t >(digest[0]) << 32) | digest[1];
       }
-      return static_cast<size_t>(digest[0]);
+      return static_cast< size_t >(digest[0]);
     }
   };
 
-  template <> struct Sha1Hasher<std::string> {
+  template <>
+  struct Sha1Hasher< std::string >
+  {
     size_t operator()(const std::string& key) const
     {
       boost::uuids::detail::sha1 sha1;
@@ -35,14 +39,16 @@ namespace levkin {
       sha1.get_digest(digest);
 
       if (sizeof(size_t) >= 8) {
-        return (static_cast<size_t>(digest[0]) << 32) | digest[1];
+        return (static_cast< size_t >(digest[0]) << 32) | digest[1];
       }
-      return static_cast<size_t>(digest[0]);
+      return static_cast< size_t >(digest[0]);
     }
   };
 
-  template <> struct Sha1Hasher<std::pair<std::string, std::string>> {
-    size_t operator()(const std::pair<std::string, std::string>& key) const
+  template <>
+  struct Sha1Hasher< std::pair< std::string, std::string > >
+  {
+    size_t operator()(const std::pair< std::string, std::string >& key) const
     {
       boost::uuids::detail::sha1 sha1;
       sha1.process_bytes(key.first.data(), key.first.size());
@@ -54,9 +60,9 @@ namespace levkin {
       sha1.get_digest(digest);
 
       if (sizeof(size_t) >= 8) {
-        return (static_cast<size_t>(digest[0]) << 32) | digest[1];
+        return (static_cast< size_t >(digest[0]) << 32) | digest[1];
       }
-      return static_cast<size_t>(digest[0]);
+      return static_cast< size_t >(digest[0]);
     }
   };
 }
