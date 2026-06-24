@@ -10,7 +10,7 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   class RobinTable;
 
-  template< class Key, class Value >
+  template< class Key, class Value, class Hash, class Equal >
   class RobinIter
   {
     friend class RobinTable<Key, Value, Hash, Equal>;
@@ -40,5 +40,11 @@ namespace donkeev
     RobinIter(size_t, Table*);
   };
 
+  template< class Key, class Value, class Hash, class Equal >
+  RobinIter< Key, Value, Hash, Equal >::RobinIter():
+    index_(0),
+    table_(nullptr)
+  {}
+  
 }
 #endif
