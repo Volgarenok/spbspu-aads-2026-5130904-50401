@@ -205,11 +205,11 @@ ulanova::Vector< ulanova::Edge > ulanova::Graph::getInbound(const std::string& v
   return (*it).second;
 }
 
-ulanova::Graph ulanova::Graph::merge(const std::string& name, const Graph& rhs) const
+ulanova::Graph ulanova::Graph::merge(const std::string& name, const Graph& lhs, const Graph& rhs)
 {
   Graph result(name);
 
-  Vector< std::string > lhsVertices = getVertices();
+  Vector< std::string > lhsVertices = lhs.getVertices();
   for (auto it = lhsVertices.begin(); it != lhsVertices.end(); ++it)
   {
     result.addVertex(*it);
@@ -221,7 +221,7 @@ ulanova::Graph ulanova::Graph::merge(const std::string& name, const Graph& rhs) 
     result.addVertex(*it);
   }
 
-  for (auto it = outbound_.cbegin(); it != outbound_.cend(); ++it)
+  for (auto it = lhs.outbound_.cbegin(); it != lhs.outbound_.cend(); ++it)
   {
     const std::string& from = (*it).first;
     const Vector< Edge >& edges = (*it).second;

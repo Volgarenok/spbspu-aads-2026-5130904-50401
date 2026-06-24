@@ -253,7 +253,7 @@ void ulanova::CommandProcessor::handleMerge(std::istream& input, std::ostream& o
   {
     throw std::runtime_error("graph not found");
   }
-  Graph result = lhs->merge(newName, *rhs);
+  Graph result = Graph::merge(newName, *lhs, *rhs);
   storage_.addGraph(result);
 }
 
