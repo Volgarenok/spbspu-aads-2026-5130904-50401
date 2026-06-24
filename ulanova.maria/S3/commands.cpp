@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 
 void ulanova::sortStrings(Vector< std::string >& values)
@@ -89,8 +90,8 @@ void ulanova::CommandProcessor::run(std::istream& input, std::ostream& output)
     }
     catch (...)
     {
-      std::string rest;
-      std::getline(input, rest);
+      input.clear();
+      input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       printInvalid(output);
     }
   }
