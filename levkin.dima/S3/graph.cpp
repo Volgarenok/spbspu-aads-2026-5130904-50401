@@ -284,3 +284,31 @@ void levkin::DB::extractGraphs(const std::string& newGraph,
   }
   graphs_.add(newGraph, subsection);
 }
+
+void levkin::DB::addEdge(const std::string& graphName,
+                         const std::string& startVertex,
+                         const std::string& endVertex,
+                         size_t weight)
+{
+  if (!graphs_.has(graphName)) {
+    graphs_.add(graphName, Graph(graphName));
+  }
+  graphs_.at(graphName).addEdge(startVertex, endVertex, weight);
+}
+
+void levkin::DB::createGraphUnsafe(const std::string& graphName)
+{
+  graphs_.add(graphName, Graph(graphName));
+}
+
+void levkin::DB::createGraph(const std::string& graphName)
+{
+  if (!graphs_.has(graphName)) {
+    createGraphUnsafe(graphName);
+  }
+}
+
+bool levkin::DB::hasGraph(const std::string& name) const
+{
+  return graphs_.has(name);
+}
