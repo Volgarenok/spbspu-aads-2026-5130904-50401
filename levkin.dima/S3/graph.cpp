@@ -193,12 +193,14 @@ void levkin::DB::showGraphs(std::ostream& output)
   }
   size_t len = keys.getSize();
   if (len == 0) {
-    output << "\n";
     return;
   }
   sort(keys, Comp< std::string >{});
   for (size_t i = 0; i < len; ++i) {
-    output << keys[i] << "\n";
+    output << keys[i];
+    if (i + 1 < len) {
+      output << "\n";
+    }
   }
 }
 void levkin::DB::showGraphVertexes(std::string graph_name, std::ostream& output)
@@ -206,13 +208,19 @@ void levkin::DB::showGraphVertexes(std::string graph_name, std::ostream& output)
   stuff::Vector< std::string > collection
       = graphs_.at(graph_name).getVertexes();
   if (collection.getSize() == 0) {
-    output << "\n";
     return;
   }
   sort(collection, Comp< std::string >{});
   size_t cap = collection.getSize();
+  if (cap == 0) {
+    return;
+  }
+  sort(collection, Comp< std::string >{});
   for (size_t i = 0; i < cap; ++i) {
-    output << collection[i] << "\n";
+    output << collection[i];
+    if (i + 1 < cap) {
+      output << "\n";
+    }
   }
 }
 void levkin::DB::showGraphEdges(
@@ -225,14 +233,18 @@ void levkin::DB::showGraphEdges(
   }
   sort(edges, PairComp< std::string, size_t >{});
   size_t cursor = 0;
+  bool first = true;
   while (cursor < total) {
+    if (!first) {
+      output << "\n";
+    }
     std::string identity = edges[cursor].first;
     output << identity;
     while (cursor < total && edges[cursor].first == identity) {
       output << " " << edges[cursor].second;
       ++cursor;
     }
-    output << "\n";
+    first = false;
   }
 }
 void levkin::DB::showGraphOutbound(std::string graph_name,
@@ -242,7 +254,6 @@ void levkin::DB::showGraphOutbound(std::string graph_name,
   stuff::Vector< std::pair< std::string, size_t > > paths
       = graphs_.at(graph_name).getOutbound(vertex);
   if (paths.getSize() == 0) {
-    output << "\n";
   }
   showGraphEdges(paths, output);
 }
@@ -253,7 +264,6 @@ void levkin::DB::showGraphInbound(std::string graph_name,
   stuff::Vector< std::pair< std::string, size_t > > paths
       = graphs_.at(graph_name).getInbound(vertex);
   if (paths.getSize() == 0) {
-    output << "\n";
     return;
   }
   showGraphEdges(paths, output);

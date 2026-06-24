@@ -5,6 +5,7 @@
 void levkin::cmdGraphs(std::istream&, std::ostream& output, DB& graphs)
 {
   graphs.showGraphs(output);
+  output << "\n";
 }
 void levkin::cmdVertexes(std::istream& input, std::ostream& output, DB& graphs)
 {
@@ -14,6 +15,7 @@ void levkin::cmdVertexes(std::istream& input, std::ostream& output, DB& graphs)
     return;
   }
   graphs.showGraphVertexes(graph_name, output);
+  output << "\n";
 }
 void levkin::cmdOutbound(std::istream& input, std::ostream& output, DB& graphs)
 {
@@ -23,6 +25,7 @@ void levkin::cmdOutbound(std::istream& input, std::ostream& output, DB& graphs)
     return;
   }
   graphs.showGraphOutbound(graph_name, vertex, output);
+  output << "\n";
 }
 void levkin::cmdInbound(std::istream& input, std::ostream& output, DB& graphs)
 {
@@ -32,6 +35,7 @@ void levkin::cmdInbound(std::istream& input, std::ostream& output, DB& graphs)
     return;
   }
   graphs.showGraphInbound(graph_name, vertex, output);
+  output << "\n";
 }
 void levkin::cmdBind(std::istream& input, std::ostream& output, DB& graphs)
 {
@@ -57,33 +61,30 @@ void levkin::cmdCreate(std::istream& input, std::ostream& output, DB& graphs)
 {
   std::string graph_name;
   if (!(input >> graph_name)) {
-    output << "<INVALID COMMAND>\n";
+    input.setstate(std::ios::failbit);
+    return;
+  }
+  while (input.peek() == ' ' || input.peek() == '\t') {
+    input.get();
+  }
+  if (input.peek() == '\n' || input.peek() == EOF) {
+    input.setstate(std::ios::failbit);
     return;
   }
   size_t count;
   if (!(input >> count)) {
-    output << "<INVALID COMMAND>\n";
-    if (input.fail() && !input.bad()) {
-      input.clear();
-    }
+    input.setstate(std::ios::failbit);
     return;
   }
   if (graphs.hasGraph(graph_name)) {
-    output << "<INVALID COMMAND>\n";
-    std::string dummy;
-    for (size_t i = 0; i < count; ++i) {
-      input >> dummy;
-    }
+    input.setstate(std::ios::failbit);
     return;
   }
   stuff::Vector< std::string > verts;
   std::string vertex;
   for (size_t i = 0; i < count; ++i) {
     if (!(input >> vertex)) {
-      output << "<INVALID COMMAND>\n";
-      if (input.fail() && !input.bad()) {
-        input.clear();
-      }
+      input.setstate(std::ios::failbit);
       return;
     }
     verts.pushBack(vertex);
