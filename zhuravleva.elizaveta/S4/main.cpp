@@ -28,6 +28,7 @@ namespace
     }
 
     zhuravleva::print(out, name, dictionaries);
+    out << '\n';
   }
 
   void readComplement( std::istream& in, std::ostream&,
@@ -149,7 +150,6 @@ int main(int argc, char** argv)
       }
 
       commandIt->second(std::cin, std::cout, dictionaries);
-      std::cout << '\n';
     }
     catch (const std::exception&)
     {
