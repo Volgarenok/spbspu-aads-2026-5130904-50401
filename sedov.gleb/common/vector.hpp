@@ -580,7 +580,6 @@ sedov::CIter< T > sedov::Vector< T >::erase(CIter< T > start, CIter< T > end, C 
   }
   size_t startIndex = start - CIter< T >(data_);
   size_t endIndex = end - CIter< T >(data_);
-  size_t count = endIndex - startIndex;
   Vector< T > temp;
   for (size_t i = 0; i < startIndex; ++i)
   {

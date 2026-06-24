@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <utility>
 #include "bstree.hpp"
-#include "../common/vector.hpp"
+#include <vector.hpp>
 
 using namespace sedov;
 
@@ -17,41 +17,41 @@ BOOST_AUTO_TEST_CASE(test_default_constructor)
   BOOST_CHECK(tree.begin() == tree.end());
 }
 
-BOOST_AUTO_TEST_CASE(test_push_and_size)
+BOOST_AUTO_TEST_CASE(test_insert_and_size)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
+  tree.insert(1, "one");
   BOOST_CHECK_EQUAL(tree.size(), 1);
   BOOST_CHECK(!tree.empty());
 
-  tree.push(2, "two");
-  tree.push(3, "three");
+  tree.insert(2, "two");
+  tree.insert(3, "three");
   BOOST_CHECK_EQUAL(tree.size(), 3);
 }
 
-BOOST_AUTO_TEST_CASE(test_push_update_existing)
+BOOST_AUTO_TEST_CASE(test_insert_update_existing)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(1, "ONE");
+  tree.insert(1, "one");
+  tree.insert(1, "ONE");
 
   BOOST_CHECK_EQUAL(tree.size(), 1);
   BOOST_CHECK_EQUAL(tree.at(1), "ONE");
 }
 
-BOOST_AUTO_TEST_CASE(test_push_rvalue)
+BOOST_AUTO_TEST_CASE(test_insert_rvalue)
 {
   BSTree< int, std::string > tree;
   std::string val = "rvalue";
-  tree.push(1, std::move(val));
+  tree.insert(1, std::move(val));
   BOOST_CHECK_EQUAL(tree.at(1), "rvalue");
 }
 
 BOOST_AUTO_TEST_CASE(test_at_const)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
 
   BOOST_CHECK_EQUAL(tree.at(1), "one");
   BOOST_CHECK_EQUAL(tree.at(2), "two");
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(test_at_const)
 BOOST_AUTO_TEST_CASE(test_at_non_const)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
+  tree.insert(1, "one");
   tree.at(1) = "ONE";
   BOOST_CHECK_EQUAL(tree.at(1), "ONE");
 }
@@ -68,36 +68,37 @@ BOOST_AUTO_TEST_CASE(test_at_non_const)
 BOOST_AUTO_TEST_CASE(test_at_not_found)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
+  tree.insert(1, "one");
 
   BOOST_CHECK_THROW(tree.at(2), std::out_of_range);
   const BSTree< int, std::string > & ctree = tree;
   BOOST_CHECK_THROW(ctree.at(2), std::out_of_range);
 }
 
-BOOST_AUTO_TEST_CASE(test_drop)
+BOOST_AUTO_TEST_CASE(test_erase)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
-  tree.push(3, "three");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
+  tree.insert(3, "three");
 
-  std::string val = tree.drop(2);
-  BOOST_CHECK_EQUAL(val, "two");
+  size_t erased = tree.erase(2);
+  BOOST_CHECK_EQUAL(erased, 1);
   BOOST_CHECK_EQUAL(tree.size(), 2);
   BOOST_CHECK_EQUAL(tree.at(1), "one");
   BOOST_CHECK_EQUAL(tree.at(3), "three");
   BOOST_CHECK_THROW(tree.at(2), std::out_of_range);
 }
 
-BOOST_AUTO_TEST_CASE(test_drop_root_with_two_children)
+BOOST_AUTO_TEST_CASE(test_erase_root_with_two_children)
 {
   BSTree< int, std::string > tree;
-  tree.push(2, "two");
-  tree.push(1, "one");
-  tree.push(3, "three");
+  tree.insert(2, "two");
+  tree.insert(1, "one");
+  tree.insert(3, "three");
 
-  tree.drop(2);
+  size_t erased = tree.erase(2);
+  BOOST_CHECK_EQUAL(erased, 1);
   BOOST_CHECK_EQUAL(tree.size(), 2);
 
   bool hasOne = false;
@@ -116,36 +117,38 @@ BOOST_AUTO_TEST_CASE(test_drop_root_with_two_children)
   BOOST_CHECK(hasOne && hasThree);
 }
 
-BOOST_AUTO_TEST_CASE(test_drop_leaf)
+BOOST_AUTO_TEST_CASE(test_erase_leaf)
 {
   BSTree< int, std::string > tree;
-  tree.push(2, "two");
-  tree.push(1, "one");
-  tree.push(3, "three");
+  tree.insert(2, "two");
+  tree.insert(1, "one");
+  tree.insert(3, "three");
 
-  tree.drop(1);
+  size_t erased = tree.erase(1);
+  BOOST_CHECK_EQUAL(erased, 1);
   BOOST_CHECK_EQUAL(tree.size(), 2);
   BOOST_CHECK_THROW(tree.at(1), std::out_of_range);
   BOOST_CHECK_EQUAL(tree.at(2), "two");
   BOOST_CHECK_EQUAL(tree.at(3), "three");
 }
 
-BOOST_AUTO_TEST_CASE(test_drop_nonexistent)
+BOOST_AUTO_TEST_CASE(test_erase_nonexistent)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
+  tree.insert(1, "one");
 
-  BOOST_CHECK_THROW(tree.drop(999), std::out_of_range);
+  size_t erased = tree.erase(999);
+  BOOST_CHECK_EQUAL(erased, 0);
   BOOST_CHECK_EQUAL(tree.size(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_iterator_traversal)
 {
   BSTree< int, std::string > tree;
-  tree.push(3, "three");
-  tree.push(1, "one");
-  tree.push(2, "two");
-  tree.push(4, "four");
+  tree.insert(3, "three");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
+  tree.insert(4, "four");
 
   sedov::Vector< std::pair< const int, std::string > > result;
   for (auto it = tree.begin(); it != tree.end(); ++it)
@@ -163,8 +166,8 @@ BOOST_AUTO_TEST_CASE(test_iterator_traversal)
 BOOST_AUTO_TEST_CASE(test_const_iterator)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
 
   const BSTree< int, std::string > & ctree = tree;
   BOOST_CHECK(ctree.cbegin() != ctree.cend());
@@ -182,7 +185,7 @@ BOOST_AUTO_TEST_CASE(test_const_iterator)
 BOOST_AUTO_TEST_CASE(test_iterator_equality)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
+  tree.insert(1, "one");
 
   auto it1 = tree.begin();
   auto it2 = tree.begin();
@@ -196,8 +199,8 @@ BOOST_AUTO_TEST_CASE(test_iterator_equality)
 BOOST_AUTO_TEST_CASE(test_end_iterator)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
 
   auto it = tree.begin();
   ++it;
@@ -208,9 +211,9 @@ BOOST_AUTO_TEST_CASE(test_end_iterator)
 BOOST_AUTO_TEST_CASE(test_copy_constructor)
 {
   BSTree< int, std::string > tree1;
-  tree1.push(1, "one");
-  tree1.push(2, "two");
-  tree1.push(3, "three");
+  tree1.insert(1, "one");
+  tree1.insert(2, "two");
+  tree1.insert(3, "three");
 
   BSTree< int, std::string > tree2(tree1);
 
@@ -227,10 +230,10 @@ BOOST_AUTO_TEST_CASE(test_copy_constructor)
 BOOST_AUTO_TEST_CASE(test_copy_assignment)
 {
   BSTree< int, std::string > tree1;
-  tree1.push(1, "one");
+  tree1.insert(1, "one");
 
   BSTree< int, std::string > tree2;
-  tree2.push(99, "ninety-nine");
+  tree2.insert(99, "ninety-nine");
 
   tree2 = tree1;
 
@@ -242,8 +245,8 @@ BOOST_AUTO_TEST_CASE(test_copy_assignment)
 BOOST_AUTO_TEST_CASE(test_move_constructor)
 {
   BSTree< int, std::string > tree1;
-  tree1.push(1, "one");
-  tree1.push(2, "two");
+  tree1.insert(1, "one");
+  tree1.insert(2, "two");
 
   BSTree< int, std::string > tree2(std::move(tree1));
 
@@ -256,10 +259,10 @@ BOOST_AUTO_TEST_CASE(test_move_constructor)
 BOOST_AUTO_TEST_CASE(test_move_assignment)
 {
   BSTree< int, std::string > tree1;
-  tree1.push(1, "one");
+  tree1.insert(1, "one");
 
   BSTree< int, std::string > tree2;
-  tree2.push(99, "ninety-nine");
+  tree2.insert(99, "ninety-nine");
 
   tree2 = std::move(tree1);
 
@@ -271,11 +274,11 @@ BOOST_AUTO_TEST_CASE(test_move_assignment)
 BOOST_AUTO_TEST_CASE(test_swap)
 {
   BSTree< int, std::string > tree1;
-  tree1.push(1, "one");
+  tree1.insert(1, "one");
 
   BSTree< int, std::string > tree2;
-  tree2.push(2, "two");
-  tree2.push(3, "three");
+  tree2.insert(2, "two");
+  tree2.insert(3, "three");
 
   tree1.swap(tree2);
 
@@ -288,9 +291,9 @@ BOOST_AUTO_TEST_CASE(test_swap)
 BOOST_AUTO_TEST_CASE(test_clear)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
-  tree.push(3, "three");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
+  tree.insert(3, "three");
 
   tree.clear();
   BOOST_CHECK(tree.empty());
@@ -307,35 +310,35 @@ BOOST_AUTO_TEST_CASE(test_height_empty)
 BOOST_AUTO_TEST_CASE(test_height_single)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
+  tree.insert(1, "one");
   BOOST_CHECK_EQUAL(tree.height(), 1);
 }
 
 BOOST_AUTO_TEST_CASE(test_height_balanced)
 {
   BSTree< int, std::string > tree;
-  tree.push(2, "two");
-  tree.push(1, "one");
-  tree.push(3, "three");
+  tree.insert(2, "two");
+  tree.insert(1, "one");
+  tree.insert(3, "three");
   BOOST_CHECK_EQUAL(tree.height(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(test_height_degenerate)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
-  tree.push(3, "three");
-  tree.push(4, "four");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
+  tree.insert(3, "three");
+  tree.insert(4, "four");
   BOOST_CHECK_EQUAL(tree.height(), 4);
 }
 
 BOOST_AUTO_TEST_CASE(test_height_iterator)
 {
   BSTree< int, std::string > tree;
-  tree.push(2, "two");
-  tree.push(1, "one");
-  tree.push(3, "three");
+  tree.insert(2, "two");
+  tree.insert(1, "one");
+  tree.insert(3, "three");
 
   auto it = tree.cbegin();
   ++it;
@@ -348,8 +351,8 @@ BOOST_AUTO_TEST_CASE(test_height_iterator)
 BOOST_AUTO_TEST_CASE(test_rotate_left)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
 
   auto it = tree.cbegin();
   ++it;
@@ -364,8 +367,8 @@ BOOST_AUTO_TEST_CASE(test_rotate_left)
 BOOST_AUTO_TEST_CASE(test_rotate_right)
 {
   BSTree< int, std::string > tree;
-  tree.push(2, "two");
-  tree.push(1, "one");
+  tree.insert(2, "two");
+  tree.insert(1, "one");
 
   auto it = tree.cbegin();
   ++it;
@@ -380,9 +383,9 @@ BOOST_AUTO_TEST_CASE(test_rotate_right)
 BOOST_AUTO_TEST_CASE(test_rotate_large_left)
 {
   BSTree< int, std::string > tree;
-  tree.push(3, "three");
-  tree.push(1, "one");
-  tree.push(2, "two");
+  tree.insert(3, "three");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
 
   auto it = tree.cbegin();
   ++it;
@@ -398,9 +401,9 @@ BOOST_AUTO_TEST_CASE(test_rotate_large_left)
 BOOST_AUTO_TEST_CASE(test_rotate_large_right)
 {
   BSTree< int, std::string > tree;
-  tree.push(1, "one");
-  tree.push(3, "three");
-  tree.push(2, "two");
+  tree.insert(1, "one");
+  tree.insert(3, "three");
+  tree.insert(2, "two");
 
   auto it = tree.cbegin();
   tree.rotateLargeRight(it);
@@ -422,8 +425,8 @@ BOOST_AUTO_TEST_CASE(test_empty_tree_operations)
 BOOST_AUTO_TEST_CASE(test_different_key_types)
 {
   BSTree< double, int > tree;
-  tree.push(3.14, 314);
-  tree.push(2.71, 271);
+  tree.insert(3.14, 314);
+  tree.insert(2.71, 271);
 
   BOOST_CHECK_EQUAL(tree.size(), 2);
   BOOST_CHECK_EQUAL(tree.at(3.14), 314);
@@ -433,8 +436,8 @@ BOOST_AUTO_TEST_CASE(test_different_key_types)
 BOOST_AUTO_TEST_CASE(test_string_keys)
 {
   BSTree< std::string, int > tree;
-  tree.push("apple", 1);
-  tree.push("banana", 2);
+  tree.insert("apple", 1);
+  tree.insert("banana", 2);
 
   BOOST_CHECK_EQUAL(tree.size(), 2);
   BOOST_CHECK_EQUAL(tree.at("apple"), 1);
@@ -444,9 +447,9 @@ BOOST_AUTO_TEST_CASE(test_string_keys)
 BOOST_AUTO_TEST_CASE(test_custom_comparator)
 {
   BSTree< int, std::string, std::greater< int > > tree;
-  tree.push(1, "one");
-  tree.push(2, "two");
-  tree.push(3, "three");
+  tree.insert(1, "one");
+  tree.insert(2, "two");
+  tree.insert(3, "three");
 
   sedov::Vector<int> keys;
   for (auto it = tree.begin(); it != tree.end(); ++it)

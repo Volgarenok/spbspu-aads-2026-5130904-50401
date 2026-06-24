@@ -31,16 +31,17 @@ namespace sedov
 
     void clear() noexcept;
 
-    friend class BSTConstIterator< Key, Value >;
-    friend class BSTIterator< Key, Value >;
-
-    TreeNode< Key, Value > * findNode(const Key & k) const;
     const Value & at(const Key & k) const;
     Value & at(const Key & k);
-    void push(const Key & k, const Value & v);
-    void push(Key && k, Value && v);
-    TreeNode< Key, Value > * fallLeft(TreeNode< Key, Value > * node) const;
-    Value drop(const Key & k);
+
+    template < class K, class V >
+    std::pair< iterator, bool > insert(K && k, V && v);
+
+    Value & operator[](const Key & k);
+    size_t erase(const Key & k);
+    iterator find(const Key & k);
+    const_iterator find(const Key & k) const;
+    size_t count(const Key & k) const;
 
     iterator begin();
     iterator end() noexcept;
@@ -48,7 +49,6 @@ namespace sedov
     const_iterator end() const noexcept;
     const_iterator cbegin() const noexcept;
     const_iterator cend() const noexcept;
-    size_t calcHeight(TreeNode< Key, Value > * node) const;
     size_t height() const;
     size_t height(const_iterator it) const;
 
@@ -58,26 +58,21 @@ namespace sedov
     const_iterator rotateLargeRight(const_iterator it);
 
   private:
-    TreeNode< Key, Value > * root_;
+    using Node = detail::TreeNode< Key, Value >;
+    Node * root_;
     size_t size_;
     Compare comp_;
 
-    static void initFakeLeaf();
-    TreeNode< Key, Value > * clone(TreeNode< Key, Value > * src, TreeNode< Key, Value > * parent);
-    void clearImpl(TreeNode< Key, Value > * node) noexcept;
-  };
-}
+    Node * clone(Node * src, Node * parent);
+    void clearImpl(Node * node) noexcept;
 
-template < class Key, class Value, class Compare >
-void sedov::BSTree< Key, Value, Compare >::initFakeLeaf()
-{
-  if (TreeNode< Key, Value >::fakeLeaf == nullptr)
-  {
-    TreeNode< Key, Value >::fakeLeaf = new TreeNode< Key, Value >(Key(), Value(), nullptr);
-    TreeNode< Key, Value >::fakeLeaf->left_ = TreeNode< Key, Value >::fakeLeaf;
-    TreeNode< Key, Value >::fakeLeaf->right_ = TreeNode< Key, Value >::fakeLeaf;
-    TreeNode< Key, Value >::fakeLeaf->parent_ = TreeNode< Key, Value >::fakeLeaf;
-  }
+    Node * findNode(const Key & k) const;
+    Node * fallLeft(Node * node) const;
+    size_t calcHeight(Node * node) const;
+
+    friend class BSTConstIterator< Key, Value >;
+    friend class BSTIterator< Key, Value >;
+  };
 }
 
 template < class Key, class Value, class Compare >
@@ -86,8 +81,8 @@ sedov::BSTree< Key, Value, Compare >::BSTree():
   size_(0),
   comp_()
 {
-  initFakeLeaf();
-  root_ = TreeNode< Key, Value >::fakeLeaf;
+  Node::initFakeLeaf();
+  root_ = Node::fakeLeaf;
 }
 
 template < class Key, class Value, class Compare >
@@ -96,9 +91,9 @@ sedov::BSTree< Key, Value, Compare >::BSTree(const BSTree & other):
   size_(0),
   comp_(other.comp_)
 {
-  initFakeLeaf();
-  root_ = TreeNode< Key, Value >::fakeLeaf;
-  root_ = clone(other.root_, TreeNode< Key, Value >::fakeLeaf);
+  Node::initFakeLeaf();
+  root_ = Node::fakeLeaf;
+  root_ = clone(other.root_, Node::fakeLeaf);
   size_ = other.size_;
 }
 
@@ -108,8 +103,8 @@ sedov::BSTree< Key, Value, Compare >::BSTree(BSTree && other) noexcept:
   size_(other.size_),
   comp_(std::move(other.comp_))
 {
-  initFakeLeaf();
-  other.root_ = TreeNode< Key, Value >::fakeLeaf;
+  Node::initFakeLeaf();
+  other.root_ = Node::fakeLeaf;
   other.size_ = 0;
 }
 
@@ -135,12 +130,8 @@ sedov::BSTree< Key, Value, Compare > & sedov::BSTree< Key, Value, Compare >::ope
 {
   if (this != std::addressof(other))
   {
-    clear();
-    root_ = other.root_;
-    size_ = other.size_;
-    comp_ = std::move(other.comp_);
-    other.root_ = TreeNode< Key, Value >::fakeLeaf;
-    other.size_ = 0;
+    BSTree temp(std::move(other));
+    swap(temp);
   }
   return *this;
 }
@@ -166,14 +157,14 @@ void sedov::BSTree< Key, Value, Compare >::swap(BSTree & other) noexcept
 }
 
 template < class Key, class Value, class Compare >
-void sedov::BSTree< Key, Value, Compare >::clearImpl(TreeNode< Key, Value > * node) noexcept
+void sedov::BSTree< Key, Value, Compare >::clearImpl(Node * node) noexcept
 {
   if (node->isFake())
   {
     return;
   }
-  clearImpl(node->left_);
-  clearImpl(node->right_);
+  clearImpl(node->left);
+  clearImpl(node->right);
   delete node;
 }
 
@@ -181,38 +172,46 @@ template < class Key, class Value, class Compare >
 void sedov::BSTree< Key, Value, Compare >::clear() noexcept
 {
   clearImpl(root_);
-  root_ = TreeNode< Key, Value >::fakeLeaf;
+  root_ = Node::fakeLeaf;
   size_ = 0;
 }
 
 template < class Key, class Value, class Compare >
-sedov::TreeNode< Key, Value > *
-sedov::BSTree< Key, Value, Compare >::clone(TreeNode< Key, Value > * src,
-                                              TreeNode< Key, Value > * parent)
+typename sedov::BSTree< Key, Value, Compare >::Node * sedov::BSTree< Key, Value, Compare >::clone(Node * src,
+  Node * parent)
 {
   if (src->isFake())
   {
-    return TreeNode< Key, Value >::fakeLeaf;
+    return Node::fakeLeaf;
   }
-  TreeNode< Key, Value > * n = new TreeNode< Key, Value >(src->key_, src->value_, parent);
-  n->left_ = clone(src->left_, n);
-  n->right_ = clone(src->right_, n);
+  Node * n = new Node(src->data.first, src->data.second, parent);
+  try
+  {
+    n->left = clone(src->left, n);
+    n->right = clone(src->right, n);
+  }
+  catch (...)
+  {
+    delete n;
+    throw;
+  }
   return n;
 }
 
 template < class Key, class Value, class Compare >
-sedov::TreeNode< Key, Value > * sedov::BSTree< Key, Value, Compare >::findNode(const Key & k) const
+typename sedov::BSTree< Key, Value, Compare >::Node *
+  sedov::BSTree< Key, Value, Compare >::findNode(const Key & k) const
 {
-  TreeNode< Key, Value > * cur = root_;
+  Node * cur = root_;
   while (!cur->isFake())
   {
-    if (comp_(k, cur->key_))
+    if (comp_(k, cur->data.first))
     {
-      cur = cur->left_;
+      cur = cur->left;
     }
-    else if (comp_(cur->key_, k))
+    else if (comp_(cur->data.first, k))
     {
-      cur = cur->right_;
+      cur = cur->right;
     }
     else
     {
@@ -225,162 +224,158 @@ sedov::TreeNode< Key, Value > * sedov::BSTree< Key, Value, Compare >::findNode(c
 template < class Key, class Value, class Compare >
 const Value & sedov::BSTree< Key, Value, Compare >::at(const Key & k) const
 {
-  TreeNode< Key, Value > * n = findNode(k);
+  Node * n = findNode(k);
   if (n == nullptr)
   {
     throw std::out_of_range("Key not found");
   }
-  return n->value_;
+  return n->data.second;
 }
 
 template < class Key, class Value, class Compare >
 Value & sedov::BSTree< Key, Value, Compare >::at(const Key & k)
 {
-  TreeNode< Key, Value > * n = findNode(k);
+  Node * n = findNode(k);
   if (n == nullptr)
   {
     throw std::out_of_range("Key not found");
   }
-  return n->value_;
+  return n->data.second;
 }
 
 template < class Key, class Value, class Compare >
-void sedov::BSTree< Key, Value, Compare >::push(const Key & k, const Value & v)
+template < class K, class V >
+std::pair< typename sedov::BSTree< Key, Value, Compare >::iterator, bool >
+  sedov::BSTree< Key, Value, Compare >::insert(K && k, V && v)
 {
-  if (root_->isFake())
+  Node * parent = nullptr;
+  Node * cur = root_;
+  while (!cur->isFake())
   {
-    root_ = new TreeNode< Key, Value >(k, v, TreeNode< Key, Value >::fakeLeaf);
-    ++size_;
-    return;
-  }
-
-  TreeNode< Key, Value > * cur = root_;
-  while (true)
-  {
-    if (comp_(k, cur->key_))
+    if (!comp_(cur->data.first, k) && !comp_(k, cur->data.first))
     {
-      if (cur->left_->isFake())
-      {
-        cur->left_ = new TreeNode< Key, Value >(k, v, cur);
-        ++size_;
-        return;
-      }
-      cur = cur->left_;
+      cur->data.second = std::forward< V >(v);
+      return std::make_pair(iterator(cur), false);
     }
-    else if (comp_(cur->key_, k))
+    if (comp_(k, cur->data.first))
     {
-      if (cur->right_->isFake())
-      {
-        cur->right_ = new TreeNode< Key, Value >(k, v, cur);
-        ++size_;
-        return;
-      }
-      cur = cur->right_;
+      parent = cur;
+      cur = cur->left;
     }
     else
     {
-      cur->value_ = v;
-      return;
+      parent = cur;
+      cur = cur->right;
     }
   }
-}
-
-template < class Key, class Value, class Compare >
-void sedov::BSTree< Key, Value, Compare >::push(Key && k, Value && v)
-{
-  if (root_->isFake())
+  Node * newNode = new Node(std::forward< K >(k), std::forward< V >(v), Node::fakeLeaf);
+  if (parent != nullptr)
   {
-    root_ = new TreeNode< Key, Value >(std::move(k), std::move(v), TreeNode< Key, Value >::fakeLeaf);
-    ++size_;
-    return;
-  }
-  TreeNode< Key, Value > * cur = root_;
-  while (true)
-  {
-    if (comp_(k, cur->key_))
+    if (comp_(k, parent->data.first))
     {
-      if (cur->left_->isFake())
-      {
-        cur->left_ = new TreeNode< Key, Value >(std::move(k), std::move(v), cur);
-        ++size_;
-        return;
-      }
-      cur = cur->left_;
-    }
-    else if (comp_(cur->key_, k))
-    {
-      if (cur->right_->isFake())
-      {
-        cur->right_ = new TreeNode< Key, Value >(std::move(k), std::move(v), cur);
-        ++size_;
-        return;
-      }
-      cur = cur->right_;
+      parent->left = newNode;
     }
     else
     {
-      cur->value_ = std::move(v);
-      return;
+      parent->right = newNode;
     }
+    newNode->parent = parent;
   }
+  else
+  {
+    root_ = newNode;
+  }
+  ++size_;
+  return std::make_pair(iterator(newNode), true);
 }
 
 template < class Key, class Value, class Compare >
-sedov::TreeNode< Key, Value > *
-sedov::BSTree< Key, Value, Compare >::fallLeft(TreeNode< Key, Value > * node) const
+Value & sedov::BSTree< Key, Value, Compare >::operator[](const Key & k)
 {
-  while (!node->left_->isFake())
+  Node * n = findNode(k);
+  if (n != nullptr)
   {
-    node = node->left_;
+    return n->data.second;
+  }
+  std::pair< iterator, bool > result = insert(k, Value{});
+  return (*result.first).second;
+}
+
+template < class Key, class Value, class Compare >
+size_t sedov::BSTree< Key, Value, Compare >::erase(const Key & k)
+{
+  Node * node = findNode(k);
+  if (node == nullptr)
+  {
+    return 0;
+  }
+  Value res = std::move(node->data.second);
+  if (!node->left->isFake() && !node->right->isFake())
+  {
+    Node * succ = fallLeft(node->right);
+    node->data.first = std::move(succ->data.first);
+    node->data.second = std::move(succ->data.second);
+    node = succ;
+  }
+  Node * child = (!node->left->isFake()) ? node->left : node->right;
+  if (child->isFake())
+  {
+    child = Node::fakeLeaf;
+  }
+  else
+  {
+    child->parent = node->parent;
+  }
+  if (node->parent->isFake())
+  {
+    root_ = child;
+  }
+  else if (node->parent->left == node)
+  {
+    node->parent->left = child;
+  }
+  else
+  {
+    node->parent->right = child;
+  }
+  delete node;
+  --size_;
+  return 1;
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::iterator sedov::BSTree< Key, Value, Compare >::find(const Key & k)
+{
+  Node * n = findNode(k);
+  return (n != nullptr) ? iterator(n) : end();
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::const_iterator
+  sedov::BSTree< Key, Value, Compare >::find(const Key & k) const
+{
+  Node * n = findNode(k);
+  return (n != nullptr) ? const_iterator(n) : end();
+}
+
+template < class Key, class Value, class Compare >
+size_t sedov::BSTree< Key, Value, Compare >::count(const Key & k) const
+{
+  return (findNode(k) != nullptr) ? 1 : 0;
+}
+
+template < class Key, class Value, class Compare >
+typename sedov::BSTree< Key, Value, Compare >::Node * sedov::BSTree< Key, Value, Compare >::fallLeft(Node * node) const
+{
+  while (!node->left->isFake())
+  {
+    node = node->left;
   }
   return node;
 }
 
 template < class Key, class Value, class Compare >
-Value sedov::BSTree< Key, Value, Compare >::drop(const Key & k)
-{
-  TreeNode< Key, Value > * node = findNode(k);
-  if (node == nullptr)
-  {
-    throw std::out_of_range("Key not found");
-  }
-  Value res = std::move(node->value_);
-  if (!node->left_->isFake() && !node->right_->isFake())
-  {
-    TreeNode< Key, Value > * succ = fallLeft(node->right_);
-    node->key_ = std::move(succ->key_);
-    node->value_ = std::move(succ->value_);
-    node = succ;
-  }
-  TreeNode< Key, Value > * child = (!node->left_->isFake()) ? node->left_ : node->right_;
-  if (child->isFake())
-  {
-    child = TreeNode< Key, Value >::fakeLeaf;
-  }
-  else
-  {
-    child->parent_ = node->parent_;
-  }
-  if (node->parent_->isFake())
-  {
-    root_ = child;
-  }
-  else if (node->parent_->left_ == node)
-  {
-    node->parent_->left_ = child;
-  }
-  else
-  {
-    node->parent_->right_ = child;
-  }
-  delete node;
-  --size_;
-  return res;
-}
-
-template < class Key, class Value, class Compare >
-typename sedov::BSTree< Key, Value, Compare >::iterator
-sedov::BSTree< Key, Value, Compare >::begin()
+typename sedov::BSTree< Key, Value, Compare >::iterator sedov::BSTree< Key, Value, Compare >::begin()
 {
   if (root_->isFake())
   {
@@ -390,15 +385,13 @@ sedov::BSTree< Key, Value, Compare >::begin()
 }
 
 template < class Key, class Value, class Compare >
-typename sedov::BSTree< Key, Value, Compare >::iterator
-sedov::BSTree< Key, Value, Compare >::end() noexcept
+typename sedov::BSTree< Key, Value, Compare >::iterator sedov::BSTree< Key, Value, Compare >::end() noexcept
 {
   return iterator(nullptr);
 }
 
 template < class Key, class Value, class Compare >
-typename sedov::BSTree< Key, Value, Compare >::const_iterator
-sedov::BSTree< Key, Value, Compare >::begin() const
+typename sedov::BSTree< Key, Value, Compare >::const_iterator sedov::BSTree< Key, Value, Compare >::begin() const
 {
   if (root_->isFake())
   {
@@ -409,14 +402,14 @@ sedov::BSTree< Key, Value, Compare >::begin() const
 
 template < class Key, class Value, class Compare >
 typename sedov::BSTree< Key, Value, Compare >::const_iterator
-sedov::BSTree< Key, Value, Compare >::end() const noexcept
+  sedov::BSTree< Key, Value, Compare >::end() const noexcept
 {
   return const_iterator(nullptr);
 }
 
 template < class Key, class Value, class Compare >
 typename sedov::BSTree< Key, Value, Compare >::const_iterator
-sedov::BSTree< Key, Value, Compare >::cbegin() const noexcept
+  sedov::BSTree< Key, Value, Compare >::cbegin() const noexcept
 {
   if (root_->isFake())
   {
@@ -427,20 +420,20 @@ sedov::BSTree< Key, Value, Compare >::cbegin() const noexcept
 
 template < class Key, class Value, class Compare >
 typename sedov::BSTree< Key, Value, Compare >::const_iterator
-sedov::BSTree< Key, Value, Compare >::cend() const noexcept
+  sedov::BSTree< Key, Value, Compare >::cend() const noexcept
 {
   return const_iterator(nullptr);
 }
 
 template < class Key, class Value, class Compare >
-size_t sedov::BSTree< Key, Value, Compare >::calcHeight(TreeNode< Key, Value > * node) const
+size_t sedov::BSTree< Key, Value, Compare >::calcHeight(Node * node) const
 {
   if (node->isFake())
   {
     return 0;
   }
-  size_t l = calcHeight(node->left_);
-  size_t r = calcHeight(node->right_);
+  size_t l = calcHeight(node->left);
+  size_t r = calcHeight(node->right);
   return 1 + ((l > r) ? l : r);
 }
 
@@ -458,94 +451,94 @@ size_t sedov::BSTree< Key, Value, Compare >::height(const_iterator it) const
 
 template < class Key, class Value, class Compare >
 typename sedov::BSTree< Key, Value, Compare >::const_iterator
-sedov::BSTree< Key, Value, Compare >::rotateLeft(const_iterator it)
+  sedov::BSTree< Key, Value, Compare >::rotateLeft(const_iterator it)
 {
-  TreeNode< Key, Value > * x = it.node_;
-  if (x->isFake() || x->right_->isFake())
+  Node * x = it.node_;
+  if (x->isFake() || x->right->isFake())
   {
     return it;
   }
-  TreeNode< Key, Value > * y = x->right_;
-  x->right_ = y->left_;
-  if (!y->left_->isFake())
+  Node * y = x->right;
+  x->right = y->left;
+  if (!y->left->isFake())
   {
-    y->left_->parent_ = x;
+    y->left->parent = x;
   }
-  y->parent_ = x->parent_;
-  if (x->parent_->isFake())
+  y->parent = x->parent;
+  if (x->parent->isFake())
   {
     root_ = y;
   }
-  else if (x == x->parent_->left_)
+  else if (x == x->parent->left)
   {
-    x->parent_->left_ = y;
+    x->parent->left = y;
   }
   else
   {
-    x->parent_->right_ = y;
+    x->parent->right = y;
   }
 
-  y->left_ = x;
-  x->parent_ = y;
+  y->left = x;
+  x->parent = y;
   return const_iterator(y);
 }
 
 template < class Key, class Value, class Compare >
 typename sedov::BSTree< Key, Value, Compare >::const_iterator
-sedov::BSTree< Key, Value, Compare >::rotateRight(const_iterator it)
+  sedov::BSTree< Key, Value, Compare >::rotateRight(const_iterator it)
 {
-  TreeNode< Key, Value > * y = it.node_;
-  if (y->isFake() || y->left_->isFake())
+  Node * y = it.node_;
+  if (y->isFake() || y->left->isFake())
   {
     return it;
   }
-  TreeNode< Key, Value > * x = y->left_;
-  y->left_ = x->right_;
-  if (!x->right_->isFake())
+  Node * x = y->left;
+  y->left = x->right;
+  if (!x->right->isFake())
   {
-    x->right_->parent_ = y;
+    x->right->parent = y;
   }
-  x->parent_ = y->parent_;
-  if (y->parent_->isFake())
+  x->parent = y->parent;
+  if (y->parent->isFake())
   {
     root_ = x;
   }
-  else if (y == y->parent_->left_)
+  else if (y == y->parent->left)
   {
-    y->parent_->left_ = x;
+    y->parent->left = x;
   }
   else
   {
-    y->parent_->right_ = x;
+    y->parent->right = x;
   }
-  x->right_ = y;
-  y->parent_ = x;
+  x->right = y;
+  y->parent = x;
   return const_iterator(x);
 }
 
 template < class Key, class Value, class Compare >
 typename sedov::BSTree< Key, Value, Compare >::const_iterator
-sedov::BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator it)
+  sedov::BSTree< Key, Value, Compare >::rotateLargeLeft(const_iterator it)
 {
-  TreeNode< Key, Value > * node = it.node_;
-  if (node->isFake() || node->left_->isFake() || node->left_->right_->isFake())
+  Node * node = it.node_;
+  if (node->isFake() || node->left->isFake() || node->left->right->isFake())
   {
     return it;
   }
-  rotateRight(const_iterator(node->left_));
+  rotateRight(const_iterator(node->left));
   return rotateLeft(it);
 }
 
 template < class Key, class Value, class Compare >
 typename sedov::BSTree< Key, Value, Compare >::const_iterator
-sedov::BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator it)
+  sedov::BSTree< Key, Value, Compare >::rotateLargeRight(const_iterator it)
 {
-  TreeNode< Key, Value > * node = it.node_;
-  if (node->isFake() || node->right_->isFake() || node->right_->left_->isFake())
+  Node * node = it.node_;
+  if (node->isFake() || node->right->isFake() || node->right->left->isFake())
   {
     return it;
   }
-  rotateLeft(const_iterator(node->right_));
+  rotateLeft(const_iterator(node->right));
   return rotateRight(it);
 }
 

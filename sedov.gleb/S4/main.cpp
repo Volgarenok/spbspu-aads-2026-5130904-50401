@@ -5,7 +5,7 @@
 #include <string>
 #include "commands.hpp"
 
-namespace sedov
+namespace
 {
   bool isInteger(const std::string & str)
   {
@@ -13,41 +13,16 @@ namespace sedov
     {
       return false;
     }
-    size_t start = 0;
-    if (str[0] == '-' || str[0] == '+')
+    try
     {
-      start = 1;
+      size_t pos = 0;
+      std::stoi(str, std::addressof(pos));
+      return pos == str.size();
     }
-    if (start == str.size())
+    catch (const std::exception &)
     {
       return false;
     }
-    for (size_t i = start; i < str.size(); ++i)
-    {
-      if (str[i] < '0' || str[i] > '9')
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  template< class Key, class Value >
-  void initFake()
-  {
-    if (TreeNode< Key, Value >::fakeLeaf == nullptr)
-    {
-      TreeNode< Key, Value >::fakeLeaf = new TreeNode< Key, Value >(Key(), Value(), nullptr);
-      TreeNode< Key, Value >::fakeLeaf->left_ = TreeNode< Key, Value >::fakeLeaf;
-      TreeNode< Key, Value >::fakeLeaf->right_ = TreeNode< Key, Value >::fakeLeaf;
-      TreeNode< Key, Value >::fakeLeaf->parent_ = TreeNode< Key, Value >::fakeLeaf;
-    }
-  }
-
-  void initFakes()
-  {
-    initFake< int, std::string >();
-    initFake< std::string, pairs >();
   }
 }
 
@@ -58,7 +33,6 @@ int main(int argc, char ** argv)
     std::cerr << "bad num of args" << '\n';
     return 1;
   }
-  sedov::initFakes();
   sedov::trees trees;
   std::ifstream file(argv[1]);
   if (!file.is_open())
@@ -70,7 +44,7 @@ int main(int argc, char ** argv)
   std::string curp;
   while (file >> token)
   {
-    if (sedov::isInteger(token))
+    if (isInteger(token))
     {
       int key = std::stoi(token);
       std::string value;
@@ -78,10 +52,13 @@ int main(int argc, char ** argv)
       {
         try
         {
-          trees.at(curp).push(key, value);
+          trees.at(curp);
         }
         catch (const std::out_of_range &)
-        {}
+        {
+          trees.insert(curp, sedov::pairs{});
+        }
+        trees.at(curp).insert(key, value);
       }
     }
     else
@@ -93,27 +70,42 @@ int main(int argc, char ** argv)
       }
       catch (const std::out_of_range &)
       {
-        trees.push(curp, sedov::pairs{});
+        trees.insert(curp, sedov::pairs{});
       }
     }
   }
   file.close();
   using cmdT = void (*)(std::istream &, std::ostream &, sedov::trees &);
-  sedov::BSTree< std::string, cmdT > commands;
-  commands.push("print", sedov::print);
-  commands.push("complement", sedov::complement);
-  commands.push("intersect", sedov::intersect);
-  commands.push("union", sedov::cUnion);
+  sedov::BSTree< std::string, cmdT > mutableCmds;
+  mutableCmds.insert("complement", sedov::complement);
+  mutableCmds.insert("intersect", sedov::intersect);
+  mutableCmds.insert("union", sedov::cUnion);
+
+  sedov::BSTree< std::string, cmdT > constCmds;
+  constCmds.insert("print", sedov::print);
+
   std::string cmd;
   while (std::cin >> cmd)
   {
     try
     {
-      commands.at(cmd)(std::cin, std::cout, trees);
+      if (mutableCmds.count(cmd) > 0)
+      {
+        mutableCmds.at(cmd)(std::cin, std::cout, trees);
+      }
+      else if (constCmds.count(cmd) > 0)
+      {
+        constCmds.at(cmd)(std::cin, std::cout, trees);
+        std::cout << '\n';
+      }
+      else
+      {
+        throw std::runtime_error("Unknown command");
+      }
     }
     catch (const std::exception &)
     {
-      std::cout << "<INVALID COMMAND>" << '\n';
+      std::cout << "<INVALID COMMAND>\n";
       std::cin.clear();
       std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
     }

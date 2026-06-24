@@ -1,6 +1,7 @@
 #ifndef BSTITERATORS_HPP
 #define BSTITERATORS_HPP
 #include <utility>
+#include <memory>
 #include "treenode.hpp"
 
 namespace sedov
@@ -12,8 +13,8 @@ namespace sedov
   class BSTConstIterator
   {
   public:
-    explicit BSTConstIterator(TreeNode< Key, Value > * node = nullptr);
-    std::pair< const Key, Value > operator*() const;
+    const std::pair< Key, Value > & operator*() const;
+    const std::pair< Key, Value > * operator->() const;
     BSTConstIterator & operator++();
     BSTConstIterator operator++(int);
     BSTConstIterator & operator--();
@@ -25,15 +26,16 @@ namespace sedov
     friend class BSTree;
 
   private:
-    TreeNode< Key, Value > * node_;
+    detail::TreeNode< Key, Value > * node_;
+    explicit BSTConstIterator(detail::TreeNode< Key, Value > * node = nullptr);
   };
 
   template < class Key, class Value >
   class BSTIterator
   {
   public:
-    explicit BSTIterator(TreeNode< Key, Value > * node = nullptr);
-    std::pair< const Key, Value > operator*() const;
+    std::pair< Key, Value > & operator*() const;
+    std::pair< Key, Value > * operator->() const;
     BSTIterator & operator++();
     BSTIterator operator++(int);
     BSTIterator & operator--();
@@ -45,19 +47,26 @@ namespace sedov
     friend class BSTree;
 
   private:
-    TreeNode< Key, Value > * node_;
+    detail::TreeNode< Key, Value > * node_;
+    explicit BSTIterator(detail::TreeNode< Key, Value > * node = nullptr);
   };
 }
 
 template < class Key, class Value >
-sedov::BSTConstIterator< Key, Value >::BSTConstIterator(TreeNode< Key, Value > * node):
+sedov::BSTConstIterator< Key, Value >::BSTConstIterator(detail::TreeNode< Key, Value > * node):
   node_(node)
 {}
 
 template < class Key, class Value >
-std::pair< const Key, Value > sedov::BSTConstIterator< Key, Value >::operator*() const
+const std::pair< Key, Value > & sedov::BSTConstIterator< Key, Value >::operator*() const
 {
-  return std::pair< const Key, Value >(node_->key_, node_->value_);
+  return node_->data;
+}
+
+template < class Key, class Value >
+const std::pair< Key, Value > * sedov::BSTConstIterator< Key, Value >::operator->() const
+{
+  return std::addressof(node_->data);
 }
 
 template < class Key, class Value >
@@ -67,21 +76,21 @@ sedov::BSTConstIterator< Key, Value > & sedov::BSTConstIterator< Key, Value >::o
   {
     return *this;
   }
-  if (!node_->right_->isFake())
+  if (!node_->right->isFake())
   {
-    node_ = node_->right_;
-    while (!node_->left_->isFake())
+    node_ = node_->right;
+    while (!node_->left->isFake())
     {
-      node_ = node_->left_;
+      node_ = node_->left;
     }
   }
   else
   {
-    TreeNode< Key, Value > * parent = node_->parent_;
-    while (!parent->isFake() && node_ == parent->right_)
+    detail::TreeNode< Key, Value > * parent = node_->parent;
+    while (!parent->isFake() && node_ == parent->right)
     {
       node_ = parent;
-      parent = node_->parent_;
+      parent = node_->parent;
     }
     node_ = parent;
     if (node_->isFake())
@@ -107,21 +116,21 @@ sedov::BSTConstIterator< Key, Value > & sedov::BSTConstIterator< Key, Value >::o
   {
     return *this;
   }
-  if (!node_->left_->isFake())
+  if (!node_->left->isFake())
   {
-    node_ = node_->left_;
-    while (!node_->right_->isFake())
+    node_ = node_->left;
+    while (!node_->right->isFake())
     {
-      node_ = node_->right_;
+      node_ = node_->right;
     }
   }
   else
   {
-    TreeNode< Key, Value > * parent = node_->parent_;
-    while (!parent->isFake() && node_ == parent->left_)
+    detail::TreeNode< Key, Value > * parent = node_->parent;
+    while (!parent->isFake() && node_ == parent->left)
     {
       node_ = parent;
-      parent = node_->parent_;
+      parent = node_->parent;
     }
     node_ = parent;
   }
@@ -149,14 +158,20 @@ bool sedov::BSTConstIterator< Key, Value >::operator!=(const BSTConstIterator & 
 }
 
 template < class Key, class Value >
-sedov::BSTIterator< Key, Value >::BSTIterator(TreeNode< Key, Value > * node):
+sedov::BSTIterator< Key, Value >::BSTIterator(detail::TreeNode< Key, Value > * node):
   node_(node)
 {}
 
 template < class Key, class Value >
-std::pair< const Key, Value > sedov::BSTIterator< Key, Value >::operator*() const
+std::pair< Key, Value > & sedov::BSTIterator< Key, Value >::operator*() const
 {
-  return std::pair< const Key, Value >(node_->key_, node_->value_);
+  return const_cast< std::pair< Key, Value > & >(node_->data);
+}
+
+template < class Key, class Value >
+std::pair< Key, Value > * sedov::BSTIterator< Key, Value >::operator->() const
+{
+  return const_cast< std::pair< Key, Value > * >(std::addressof(node_->data));
 }
 
 template < class Key, class Value >
@@ -166,21 +181,21 @@ sedov::BSTIterator< Key, Value > & sedov::BSTIterator< Key, Value >::operator++(
   {
     return *this;
   }
-  if (!node_->right_->isFake())
+  if (!node_->right->isFake())
   {
-    node_ = node_->right_;
-    while (!node_->left_->isFake())
+    node_ = node_->right;
+    while (!node_->left->isFake())
     {
-      node_ = node_->left_;
+      node_ = node_->left;
     }
   }
   else
   {
-    TreeNode< Key, Value > * parent = node_->parent_;
-    while (!parent->isFake() && node_ == parent->right_)
+    detail::TreeNode< Key, Value > * parent = node_->parent;
+    while (!parent->isFake() && node_ == parent->right)
     {
       node_ = parent;
-      parent = node_->parent_;
+      parent = node_->parent;
     }
     node_ = parent;
     if (node_->isFake())
@@ -206,21 +221,21 @@ sedov::BSTIterator< Key, Value > & sedov::BSTIterator< Key, Value >::operator--(
   {
     return *this;
   }
-  if (!node_->left_->isFake())
+  if (!node_->left->isFake())
   {
-    node_ = node_->left_;
-    while (!node_->right_->isFake())
+    node_ = node_->left;
+    while (!node_->right->isFake())
     {
-      node_ = node_->right_;
+      node_ = node_->right;
     }
   }
   else
   {
-    TreeNode< Key, Value > * parent = node_->parent_;
-    while (!parent->isFake() && node_ == parent->left_)
+    detail::TreeNode< Key, Value > * parent = node_->parent;
+    while (!parent->isFake() && node_ == parent->left)
     {
       node_ = parent;
-      parent = node_->parent_;
+      parent = node_->parent;
     }
     node_ = parent;
   }

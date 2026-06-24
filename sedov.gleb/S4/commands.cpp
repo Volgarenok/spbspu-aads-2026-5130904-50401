@@ -9,34 +9,26 @@ void sedov::print(std::istream & in, std::ostream & out, sedov::trees & trees)
   {
     throw std::runtime_error("Invalid input");
   }
-  try
+  const sedov::pairs & ps = trees.at(name);
+  if (ps.empty())
   {
-    const sedov::pairs & ps = trees.at(name);
-    if (ps.empty())
-    {
-      out << "<EMPTY>" << '\n';
-    }
-    else
-    {
-      out << name;
-      for (auto it = ps.cbegin(); it != ps.cend(); ++it)
-      {
-        auto pair = *it;
-        out << ' ' << pair.first << ' ' << pair.second;
-      }
-      out << '\n';
-    }
+    out << "<EMPTY>";
   }
-  catch (const std::out_of_range &)
+  else
   {
-    throw std::runtime_error("pairs not found");
+    out << name;
+    for (auto it = ps.cbegin(); it != ps.cend(); ++it)
+    {
+      auto pair = *it;
+      out << ' ' << pair.first << ' ' << pair.second;
+    }
   }
 }
 
 void sedov::complement(std::istream & in, std::ostream &, sedov::trees & trees)
 {
-  std::string new_name, name1, name2;
-  if (!(in >> new_name >> name1 >> name2))
+  std::string newName, name1, name2;
+  if (!(in >> newName >> name1 >> name2))
   {
     throw std::runtime_error("Invalid input");
   }
@@ -52,16 +44,16 @@ void sedov::complement(std::istream & in, std::ostream &, sedov::trees & trees)
     }
     catch (const std::out_of_range &)
     {
-      new_ps.push(pair.first, pair.second);
+      new_ps.insert(pair.first, pair.second);
     }
   }
-  trees.push(new_name, std::move(new_ps));
+  trees.insert(newName, std::move(new_ps));
 }
 
 void sedov::intersect(std::istream & in, std::ostream &, sedov::trees & trees)
 {
-  std::string new_name, name1, name2;
-  if (!(in >> new_name >> name1 >> name2))
+  std::string newName, name1, name2;
+  if (!(in >> newName >> name1 >> name2))
   {
     throw std::runtime_error("Invalid input");
   }
@@ -74,18 +66,18 @@ void sedov::intersect(std::istream & in, std::ostream &, sedov::trees & trees)
     try
     {
       ps2.at(pair.first);
-      new_ps.push(pair.first, pair.second);
+      new_ps.insert(pair.first, pair.second);
     }
     catch (const std::out_of_range &)
     {}
   }
-  trees.push(new_name, std::move(new_ps));
+  trees.insert(newName, std::move(new_ps));
 }
 
 void sedov::cUnion(std::istream & in, std::ostream &, sedov::trees & trees)
 {
-  std::string new_name, name1, name2;
-  if (!(in >> new_name >> name1 >> name2))
+  std::string newName, name1, name2;
+  if (!(in >> newName >> name1 >> name2))
   {
     throw std::runtime_error("Invalid input");
   }
@@ -95,7 +87,7 @@ void sedov::cUnion(std::istream & in, std::ostream &, sedov::trees & trees)
   for (auto it = ps1.cbegin(); it != ps1.cend(); ++it)
   {
     auto pair = *it;
-    new_ps.push(pair.first, pair.second);
+    new_ps.insert(pair.first, pair.second);
   }
   for (auto it = ps2.cbegin(); it != ps2.cend(); ++it)
   {
@@ -106,8 +98,8 @@ void sedov::cUnion(std::istream & in, std::ostream &, sedov::trees & trees)
     }
     catch (const std::out_of_range &)
     {
-      new_ps.push(pair.first, pair.second);
+      new_ps.insert(pair.first, pair.second);
     }
   }
-  trees.push(new_name, std::move(new_ps));
+  trees.insert(newName, std::move(new_ps));
 }
