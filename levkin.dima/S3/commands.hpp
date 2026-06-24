@@ -1,5 +1,5 @@
 #ifndef COMMANDS_HPP
-#define COMMANDS_HPP
+#define COMMANDS_HPP 
 #include <iosfwd>
 namespace levkin {
   struct DB;
