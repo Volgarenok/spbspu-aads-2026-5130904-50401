@@ -23,10 +23,7 @@ namespace
     }
   }
 
-  int getCategoryTrendValue(
-    const studilova::Budget& budget,
-    const std::string& categoryName
-  )
+  int getCategoryTrendValue(const studilova::Budget& budget, const std::string& categoryName)
   {
     const studilova::Vector< studilova::Operation >& operations = budget.getOperations();
 
@@ -38,10 +35,7 @@ namespace
     {
       const studilova::Operation& operation = operations[i];
 
-      if (
-        operation.getType() == studilova::OperationType::Expense &&
-        operation.getCategory() == categoryName
-      )
+      if (operation.getType() == studilova::OperationType::Expense && operation.getCategory() == categoryName)
       {
         if (i < middle)
         {
@@ -55,6 +49,33 @@ namespace
     }
 
     return secondHalf - firstHalf;
+  }
+
+  void copyCategoryChildren(const studilova::Category& from, studilova::Budget& dest, const std::string& destParent)
+  {
+    const studilova::Vector< studilova::Category* >& children = from.getChildren();
+
+    for (size_t i = 0; i < children.getSize(); ++i)
+    {
+      const studilova::Category* child = children[i];
+
+      if (!dest.hasCategory(child->getName()))
+      {
+        dest.addCategory(child->getName(), destParent);
+      }
+
+      copyCategoryChildren(*child, dest, child->getName());
+    }
+  }
+
+  void copyOperations(const studilova::Budget& from, studilova::Budget& dest)
+  {
+    const studilova::Vector< studilova::Operation >& operations = from.getOperations();
+
+    for (size_t i = 0; i < operations.getSize(); ++i)
+    {
+      dest.addOperation(operations[i]);
+    }
   }
 }
 
@@ -441,5 +462,41 @@ void studilova::compareTrends(std::istream& in, std::ostream& out, BudgetManager
   else
   {
     out << "<TRENDS ARE EQUAL>\n";
+  }
+}
+
+void studilova::mergeBudgets(std::istream& in, std::ostream& out, BudgetManager& state)
+{
+  std::string newName;
+  std::string firstName;
+  std::string secondName;
+
+  in >> newName >> firstName >> secondName;
+
+  if (!in || state.hasBudget(newName) || !state.hasBudget(firstName) || !state.hasBudget(secondName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  try
+  {
+    const Budget& first = state.getBudget(firstName);
+    const Budget& second = state.getBudget(secondName);
+
+    state.createBudget(newName);
+    Budget& merged = state.getBudget(newName);
+
+    copyCategoryChildren(first.getRootCategory(), merged, "root");
+    copyCategoryChildren(second.getRootCategory(), merged, "root");
+
+    copyOperations(first, merged);
+    copyOperations(second, merged);
+
+    out << "<OK>\n";
+  }
+  catch (...)
+  {
+    out << "<INVALID COMMAND>\n";
   }
 }

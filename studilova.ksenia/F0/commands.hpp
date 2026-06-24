@@ -23,6 +23,8 @@ namespace studilova
   void checkBalanceTrend(std::istream&, std::ostream&, BudgetManager&);
   void categoryTrend(std::istream&, std::ostream&, BudgetManager&);
   void compareTrends(std::istream&, std::ostream&, BudgetManager&);
+
+  void mergeBudgets(std::istream&, std::ostream&, BudgetManager&);
 }
 
 #endif
