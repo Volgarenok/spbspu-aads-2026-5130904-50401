@@ -89,6 +89,8 @@ void ulanova::CommandProcessor::run(std::istream& input, std::ostream& output)
     }
     catch (...)
     {
+      std::string rest;
+      std::getline(input, rest);
       printInvalid(output);
     }
   }
