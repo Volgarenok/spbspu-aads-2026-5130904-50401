@@ -79,7 +79,34 @@ namespace donkeev
   {
     RobinIter tmp = *this;
     ++(*this);
-    
+
+    return tmp;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinIter< Key, Value, Hash, Equal >& RobinIter< Key, Value, Hash, Equal >::operator--() noexcept
+  {
+    if (table_)
+    {
+      while (index_ > 0)
+      {
+        --index;
+        if (table_->slots_[index_].isOccupied_)
+        {
+          break;
+        }
+      }
+    }
+
+    return *this;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinIter< Key, Value, Hash, Equal > RobinIter< Key, Value, Hash, Equal >::operator--(int) noexcept
+  {
+    RobinIter tmp = *this;
+    --(*this);
+
     return tmp;
   }
 }
