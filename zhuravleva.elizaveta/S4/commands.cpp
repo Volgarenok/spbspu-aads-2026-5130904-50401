@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
-#include <limits>
 
 void zhuravleva::print(
   std::ostream& out,
@@ -13,22 +12,19 @@ void zhuravleva::print(
   DictionaryStorage::constIterator dictIt = dictionaries.find(name);
   if (dictIt == dictionaries.cend())
   {
-    out << "<INVALID COMMAND>" << '\n';
-    return;
+    throw std::runtime_error("dataset not found");
   }
   const Dictionary& dict = dictIt->second;
-  if(dict.empty())
+  if (dict.empty())
   {
-    out << "<EMPTY>" << '\n';
+    out << "<EMPTY>";
     return;
   }
   out << name;
-  for (Dictionary::constIterator it = dict.cbegin(); it != dict.cend();
-      ++it)
+  for (Dictionary::constIterator it = dict.cbegin(); it != dict.cend(); ++it)
   {
     out << ' ' << it->first << ' ' << it->second;
   }
-  out << '\n';
 }
 
 void zhuravleva::complement(
@@ -118,86 +114,4 @@ void zhuravleva::unite(
     dictionaries.drop(newName);
   }
   dictionaries.push(newName, result);
-}
-
-void zhuravleva::processCommand(
-  std::istream& in,
-  std::ostream& out,
-  DictionaryStorage& dictionaries
-)
-{
-  std::string command;
-  in >> command;
-  if (!in)
-  {
-    return;
-  }
-  try
-  {
-    if (command == "print")
-    {
-      std::string name;
-      in >> name;
-      if (!in)
-      {
-        out << "<INVALID COMMAND>" << '\n';
-        return;
-      }
-      print(out, name, dictionaries);
-    }
-    else if (command == "complement")
-    {
-      std::string newName;
-      in >> newName;
-      std::string name1;
-      in >> name1;
-      std::string name2;
-      in >> name2;
-      if (!in)
-      {
-        out << "<INVALID COMMAND>" << '\n';
-        return;
-      }
-      complement(dictionaries, newName, name1, name2);
-    }
-    else if (command == "intersect")
-    {
-      std::string newName;
-      in >> newName;
-      std::string name1;
-      in >> name1;
-      std::string name2;
-      in >> name2;
-      if (!in)
-      {
-        out << "<INVALID COMMAND>" << '\n';
-        return;
-      }
-      intersect(dictionaries, newName, name1, name2);
-    }
-    else if (command == "union")
-    {
-      std::string newName;
-      in >> newName;
-      std::string name1;
-      in >> name1;
-      std::string name2;
-      in >> name2;
-      if (!in)
-      {
-        out << "<INVALID COMMAND>" << '\n';
-        return;
-      }
-      unite(dictionaries, newName, name1, name2);
-    }
-    else
-    {
-      out << "<INVALID COMMAND>" << '\n';
-      in.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
-    }
-  }
-  catch (const std::exception&)
-  {
-    out << "<INVALID COMMAND>" << '\n';
-  }
 }
