@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
       {
         mutableCmds.at(cmd)(std::cin, std::cout, datasets);
       }
-      else if (constCmds.count(cmd) > 0)
+      else
       {
         constCmds.at(cmd)(std::cin, std::cout, datasets);
         std::cout << '\n';
