@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(drop_leaf_test)
   tree.push(5, "five");
   tree.push(2, "two");
   tree.push(7, "seven");
-  tree.drop(2);
+  BOOST_TEST(tree.drop(2) == 1);
   BOOST_TEST(tree.size() == 2);
   BOOST_TEST(!tree.contains(2));
   BOOST_TEST(tree.contains(5));
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(drop_node_with_one_child_test)
   tree.push(5, "five");
   tree.push(2, "two");
   tree.push(1, "one");
-  tree.drop(2);
+  BOOST_TEST(tree.drop(2) == 1);
 
   BOOST_TEST(tree.size() == 2);
   BOOST_TEST(!tree.contains(2));
@@ -180,8 +180,7 @@ BOOST_AUTO_TEST_CASE(drop_node_with_two_children_test)
   tree.push(7, "seven");
   tree.push(6, "six");
   tree.push(8, "eight");
-  tree.drop(7);
-
+  BOOST_TEST(tree.drop(7) == 1);
   BOOST_TEST(tree.size() == 4);
   BOOST_TEST(!tree.contains(7));
   BOOST_TEST(tree.contains(6));
@@ -192,7 +191,9 @@ BOOST_AUTO_TEST_CASE(drop_missing_key_test)
 {
   zhuravleva::BSTree< int, std::string > tree;
   tree.push(1, "one");
-  BOOST_CHECK_THROW(tree.drop(10), std::runtime_error);
+  BOOST_TEST(tree.drop(10) == 0);
+  BOOST_TEST(tree.size() == 1);
+  BOOST_TEST(tree.contains(1));
 }
 
 BOOST_AUTO_TEST_CASE(left_rotate_test)
