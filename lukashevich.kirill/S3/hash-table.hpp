@@ -395,7 +395,8 @@ lukashevich::HashTable< Key, Value, Hash, Equal >::HashTable():
 {}
 
 template< class Key, class Value, class Hash, class Equal >
-lukashevich::HashTable< Key, Value, Hash, Equal >::HashTable(size_t bucketCount, size_t bucketSize, Hash hash, Equal equal):
+lukashevich::HashTable< Key, Value, Hash, Equal >::HashTable(size_t bucketCount,
+    size_t bucketSize, Hash hash, Equal equal):
   buckets_(checkedMainSize(bucketCount, bucketSize), Node()),
   overflow_(),
   bucketCount_(bucketCount),
