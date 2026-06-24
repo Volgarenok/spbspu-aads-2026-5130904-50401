@@ -1,19 +1,14 @@
-#ifndef HASH
-#define HASH
+#ifndef HASHTABLE_HPP
+#define HASHTABLE_HPP
 #include "hasher.hpp"
 #include "list.hpp"
 #include "vector.hpp"
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <stdexcept>
-#include <string>
 #include <utility>
 namespace levkin {
-  template < class T >
-  struct Equal
-  {
-    bool operator()(const T& a, const T& b) const { return a == b; }
-  };
   template < class Key, class Value >
   struct NodeHashTable
   {
@@ -33,7 +28,7 @@ namespace levkin {
   template < class Key,
              class Value,
              class Hash = Sha1Hasher< Key >,
-             class EqualTo = Equal< Key > >
+             class EqualTo = std::equal_to< Key > >
   class HashTable;
   template < class Key, class Value, class Hash, class EqualTo, bool IsConst >
   class HashTableIterator
@@ -45,10 +40,10 @@ namespace levkin {
 
   public:
     using iterator_category = std::forward_iterator_tag;
-    using valueType = NodeHashTable< Key, Value >;
+    using value_type = NodeHashTable< Key, Value >;
     using difference_type = std::ptrdiff_t;
     using pointer = typename std::
-        conditional< IsConst, const valueType*, valueType* >::type;
+        conditional< IsConst, const value_type*, value_type* >::type;
     using reference = typename std::
         conditional< IsConst, const value_type&, value_type& >::type;
     using list_iterator =
@@ -81,17 +76,17 @@ namespace levkin {
     key() const noexcept
     {
       if (index_ < table_->pool_.getSize()) {
-        return table_->pool_[index_].key;
+        return table_->pool_[index_].key_;
       }
-      return overflow_it_->key;
+      return overflow_it_->key_;
     }
     typename std::conditional< IsConst, const Value&, Value& >::type
     value() const noexcept
     {
       if (index_ < table_->pool_.getSize()) {
-        return table_->pool_[index_].value;
+        return table_->pool_[index_].value_;
       }
-      return overflow_it_->value;
+      return overflow_it_->value_;
     }
     reference operator*() const noexcept
     {
@@ -111,6 +106,7 @@ namespace levkin {
     {
       if (!table_) {
         return *this;
+      }
       if (index_ < table_->pool_.getSize()) {
         index_++;
         while (index_ < table_->pool_.getSize()
@@ -140,6 +136,7 @@ namespace levkin {
       }
       if (index_ != rhs.index_) {
         return false;
+      }
       if (index_ == table_->pool_.getSize()) {
         return overflow_it_ == rhs.overflow_it_;
       }
@@ -208,14 +205,6 @@ namespace levkin {
       }
       return *this;
     }
-    HashTable& operator=(HashTable&& other) noexcept
-    {
-      if (this != &other) {
-        HashTable tmp(std::move(other));
-        swap(tmp);
-      }
-      return *this;
-    }
     void swap(HashTable& other) noexcept
     {
       std::swap(pool_, other.pool_);
@@ -232,13 +221,13 @@ namespace levkin {
       size_t home_start = bucket_idx * bucket_capacity_;
       for (size_t i = 0; i < bucket_capacity_; ++i) {
         size_t curr = home_start + i;
-        if (pool_[curr].valid && equal(pool_[curr].key, key)) {
-          return pool_[curr].value;
+        if (pool_[curr].is_valid_ && equal(pool_[curr].key_, key)) {
+          return pool_[curr].value_;
         }
       }
       for (auto it = overflow_.begin(); it != overflow_.end(); ++it) {
-        if (it->valid && equal(it->key, key)) {
-          return it->value;
+        if (it->is_valid_ && equal(it->key_, key)) {
+          return it->value_;
         }
       }
       throw std::out_of_range("key not found");
@@ -251,13 +240,13 @@ namespace levkin {
       size_t home_start = bucket_idx * bucket_capacity_;
       for (size_t i = 0; i < bucket_capacity_; ++i) {
         size_t curr = home_start + i;
-        if (pool_[curr].valid && equal(pool_[curr].key, key)) {
-          return pool_[curr].value;
+        if (pool_[curr].is_valid_ && equal(pool_[curr].key_, key)) {
+          return pool_[curr].value_;
         }
       }
       for (auto it = overflow_.cbegin(); it != overflow_.cend(); ++it) {
-        if (it->valid && equal(it->key, key)) {
-          return it->value;
+        if (it->is_valid_ && equal(it->key_, key)) {
+          return it->value_;
         }
       }
       throw std::out_of_range("key not found");
@@ -294,14 +283,14 @@ namespace levkin {
         ++it;
       }
       if (first_free_in_pool != pool_.getSize()) {
-        pool_[first_free_in_pool].key = key;
-        pool_[first_free_in_pool].value = value;
-        pool_[first_free_in_pool].valid = true;
+        pool_[first_free_in_pool].key_ = key;
+        pool_[first_free_in_pool].value_ = value;
+        pool_[first_free_in_pool].is_valid_ = true;
         count_valid_++;
       } else if (first_free_in_list != overflow_.end()) {
-        first_free_in_list->key = key;
-        first_free_in_list->value = value;
-        first_free_in_list->valid = true;
+        first_free_in_list->key_ = key;
+        first_free_in_list->value_ = value;
+        first_free_in_list->is_valid_ = true;
         count_valid_++;
       } else {
         overflow_.pushBack(NodeHashTable< Key, Value >{key, value, true});
@@ -340,14 +329,14 @@ namespace levkin {
         ++it;
       }
       if (first_free_in_pool != pool_.getSize()) {
-        pool_[first_free_in_pool].key = key;
-        pool_[first_free_in_pool].value = std::move(value);
-        pool_[first_free_in_pool].valid = true;
+        pool_[first_free_in_pool].key_ = key;
+        pool_[first_free_in_pool].value_ = std::move(value);
+        pool_[first_free_in_pool].is_valid_ = true;
         count_valid_++;
       } else if (first_free_in_list != overflow_.end()) {
-        first_free_in_list->key = key;
-        first_free_in_list->value = std::move(value);
-        first_free_in_list->valid = true;
+        first_free_in_list->key_ = key;
+        first_free_in_list->value_ = std::move(value);
+        first_free_in_list->is_valid_ = true;
         count_valid_++;
       } else {
         overflow_.pushBack(
@@ -363,17 +352,19 @@ namespace levkin {
       size_t home_start = bucket_idx * bucket_capacity_;
       for (size_t i = 0; i < bucket_capacity_; ++i) {
         size_t curr = home_start + i;
-        if (pool_[curr].valid && equal(pool_[curr].key, key)) {
-          pool_[curr].valid = false;
+        if (pool_[curr].is_valid_ && equal(pool_[curr].key_, key)) {
+          Value removed_value = std::move(pool_[curr].value_);
+          pool_[curr].is_valid_ = false;
           count_valid_--;
-          return;
+          return removed_value;
         }
       }
       for (auto it = overflow_.begin(); it != overflow_.end(); ++it) {
-        if (it->valid && equal(it->key, key)) {
-          it->valid = false;
+        if (it->is_valid_ && equal(it->key_, key)) {
+          Value removed_value = std::move(it->value_);
+          it->is_valid_ = false;
           count_valid_--;
-          return;
+          return removed_value;
         }
       }
       throw std::out_of_range("key not found");
@@ -386,12 +377,12 @@ namespace levkin {
       size_t home_start = bucket_idx * bucket_capacity_;
       for (size_t i = 0; i < bucket_capacity_; ++i) {
         size_t curr = home_start + i;
-        if (pool_[curr].valid && equal(pool_[curr].key, key)) {
+        if (pool_[curr].is_valid_ && equal(pool_[curr].key_, key)) {
           return true;
         }
       }
       for (auto it = overflow_.cbegin(); it != overflow_.cend(); ++it) {
-        if (it->valid && equal(it->key, key)) {
+        if (it->is_valid_ && equal(it->key_, key)) {
           return true;
         }
       }
@@ -461,13 +452,13 @@ namespace levkin {
       HashTable< Key, Value, Hash, EqualTo > new_table(new_num_buckets,
                                                        new_bucket_capacity);
       for (size_t i = 0; i < pool_.getSize(); ++i) {
-        if (pool_[i].valid) {
-          new_table.add(std::move(pool_[i].key), std::move(pool_[i].value));
+        if (pool_[i].is_valid_) {
+          new_table.add(pool_[i].key_, pool_[i].value_);
         }
       }
       for (auto it = overflow_.begin(); it != overflow_.end(); ++it) {
-        if (it->valid) {
-          new_table.add(std::move(it->key), std::move(it->value));
+        if (it->is_valid_) {
+          new_table.add(it->key_, it->value_);
         }
       }
       this->swap(new_table);
@@ -475,7 +466,7 @@ namespace levkin {
     void clear() noexcept
     {
       for (size_t i = 0; i < pool_.getSize(); ++i) {
-        pool_[i].valid = false;
+        pool_[i].is_valid_ = false;
       }
       overflow_.clear();
       count_valid_ = 0;
@@ -490,7 +481,7 @@ namespace levkin {
         return iterator(this, idx, overflow_.end());
       }
       auto it = overflow_.begin();
-      while (it != overflow_.end() && !it->valid) {
+      while (it != overflow_.end() && !it->is_valid_) {
         ++it;
       }
       return iterator(this, pool_.getSize(), it);
@@ -506,7 +497,7 @@ namespace levkin {
         return const_iterator(this, idx, overflow_.cend());
       }
       auto it = overflow_.cbegin();
-      while (it != overflow_.cend() && !it->valid) {
+      while (it != overflow_.cend() && !it->is_valid_) {
         ++it;
       }
       return const_iterator(this, pool_.getSize(), it);
@@ -521,7 +512,7 @@ namespace levkin {
   private:
     size_t findNextValidInPool(size_t index) const noexcept
     {
-      while (index < pool_.getSize() && !pool_[index].valid) {
+      while (index < pool_.getSize() && !pool_[index].is_valid_) {
         index++;
       }
       return index;

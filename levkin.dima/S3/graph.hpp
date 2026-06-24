@@ -1,7 +1,7 @@
 #ifndef GRAPH_HPP
-#define GRAPH_HPP
+#define GRAPH_HPP 
 #include <cstddef>
-#include <iosfwd>
+#include <iostream>
 #include <string>
 #include <utility>
 #include "hasher.hpp"
@@ -24,7 +24,7 @@ namespace levkin {
   struct PairComp
   {
     using pair_t = std::pair< F, S >;
-    bool operator()(const pair_t& p1, const pair_t& p2) const
+    bool operator()(const pair_t& p1, const pair_t& p2)
     {
       if (p1.first != p2.first) {
         return p1.first < p2.first;
@@ -54,19 +54,17 @@ namespace levkin {
     HashTable< std::string, Edges, Sha1Hasher< std::string >, KeyComp >
         outgoing_;
     Graph() = default;
-    explicit Graph(std::string name);
-    void addVertex(const std::string& vertex);
-    void addEdge(const std::string& startVertex,
-                 const std::string& endVertex,
-                 size_t weight);
-    void cutEdge(const std::string& startVertex,
-                 const std::string& endVertex,
-                 size_t weight);
+    Graph(std::string name);
+    void addVertex(std::string vertex);
+    void
+    addEdge(std::string start_vertex, std::string end_vertex, size_t weight);
+    void
+    cutEdge(std::string start_vertex, std::string end_vertex, size_t weight);
     stuff::Vector< std::string > getVertexes() const;
     stuff::Vector< std::pair< std::string, size_t > >
-    getOutbound(const std::string& vertex) const;
+    getOutbound(std::string vertex) const;
     stuff::Vector< std::pair< std::string, size_t > >
-    getInbound(const std::string& vertex) const;
+    getInbound(std::string vertex) const;
   };
   struct DB
   {

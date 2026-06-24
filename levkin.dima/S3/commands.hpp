@@ -1,5 +1,5 @@
 #ifndef COMMANDS_HPP
-#define COMMANDS_HPP
+#define COMMANDS_HPP 
 #include "graph.hpp"
 #include <iosfwd>
 namespace levkin {

@@ -58,9 +58,6 @@ void levkin::cmdCreate(std::istream& input, std::ostream& output, DB& graphs)
     input.setstate(std::ios::failbit);
     return;
   }
-  if (graphs.hasGraph(graph_name)) {
-    throw std::out_of_range("Graph already exists");
-  }
   size_t count;
   if (!(input >> count)) {
     input.setstate(std::ios::failbit);
@@ -74,6 +71,9 @@ void levkin::cmdCreate(std::istream& input, std::ostream& output, DB& graphs)
       return;
     }
     verts.pushBack(vertex);
+  }
+  if (graphs.hasGraph(graph_name)) {
+    throw std::out_of_range("Graph already exists");
   }
   graphs.createGraphUnsafe(graph_name);
   for (size_t i = 0; i < count; ++i) {
