@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
         std::cout << '\n';
       }
     }
-    catch (const std::exception&)
+    catch (...)
     {
       std::cout << "<INVALID COMMAND>" << '\n';
       std::cin.clear();
