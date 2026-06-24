@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include <stdexcept>
+#include <string>
 #include "stack.hpp"
 
 BOOST_AUTO_TEST_CASE(stack_push_drop)
@@ -57,4 +58,11 @@ BOOST_AUTO_TEST_CASE(stack_check)
   BOOST_CHECK_EQUAL(s.top(), 10);
   s.pop();
   BOOST_CHECK_EQUAL(s.top(), 5);
+}
+
+BOOST_AUTO_TEST_CASE(stack_emplace)
+{
+  zhuravleva::Stack< std::string > s;
+  s.emplace(3, 'a');
+  BOOST_CHECK_EQUAL(s.top(), "aaa");
 }

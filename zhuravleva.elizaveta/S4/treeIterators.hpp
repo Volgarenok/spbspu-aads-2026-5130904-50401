@@ -1,5 +1,6 @@
 #ifndef TREEITERATORS_HPP
 #define TREEITERATORS_HPP
+#include <memory>
 #include <stdexcept>
 #include <utility>
 #include "treeNode.hpp"
@@ -15,31 +16,28 @@ namespace zhuravleva
   template< class Key, class Value >
   class BSTIterator
   {
-    template< class K, class V, class C >
-    friend class BSTree;
-    friend class BSTConstIterator< Key, Value >;
   public:
     BSTIterator() noexcept;
-    explicit BSTIterator(TreeNode< Key, Value >* node) noexcept;
-    std::pair< Key, Value >& operator*() const;
-    std::pair< Key, Value >* operator->() const;
+    std::pair< Key, Value >& operator*();
+    std::pair< Key, Value >* operator->();
     bool operator==(const BSTIterator& other) const noexcept;
     bool operator!=(const BSTIterator& other) const noexcept;
     BSTIterator& operator++();
     BSTIterator operator++(int);
 
   private:
-    TreeNode< Key, Value >* current_;
+    template< class K, class V, class C >
+    friend class BSTree;
+    friend class BSTConstIterator< Key, Value >;
+    explicit BSTIterator(detail::TreeNode< Key, Value >* node) noexcept;
+    detail::TreeNode< Key, Value >* current_;
   };
 
   template< class Key, class Value >
   class BSTConstIterator
   {
-    template< class K, class V, class C >
-    friend class BSTree;
   public:
     BSTConstIterator() noexcept;
-    explicit BSTConstIterator(const TreeNode< Key, Value >* node) noexcept;
     BSTConstIterator(const BSTIterator< Key, Value >& other) noexcept;
     const std::pair< Key, Value >& operator*() const;
     const std::pair< Key, Value >* operator->() const;
@@ -49,7 +47,10 @@ namespace zhuravleva
     BSTConstIterator operator++(int);
 
   private:
-    const TreeNode< Key, Value >* current_;
+    template< class K, class V, class C >
+    friend class BSTree;
+    explicit BSTConstIterator(const detail::TreeNode< Key, Value >* node) noexcept;
+    const detail::TreeNode< Key, Value >* current_;
   };
 }
 
@@ -59,28 +60,29 @@ zhuravleva::BSTIterator< Key, Value >::BSTIterator() noexcept:
 {}
 
 template< class Key, class Value >
-zhuravleva::BSTIterator< Key, Value >::BSTIterator(zhuravleva::TreeNode< Key, Value >* node) noexcept:
+zhuravleva::BSTIterator< Key, Value >::BSTIterator(
+    zhuravleva::detail::TreeNode< Key, Value >* node) noexcept:
   current_(node)
 {}
 
 template< class Key, class Value >
-std::pair< Key, Value >& zhuravleva::BSTIterator< Key, Value >::operator*() const
+std::pair< Key, Value >& zhuravleva::BSTIterator< Key, Value >::operator*()
 {
   if (!current_)
   {
     throw std::runtime_error("null iterator");
   }
-  return current_->data_;
+  return current_->data;
 }
 
 template< class Key, class Value >
-std::pair< Key, Value >* zhuravleva::BSTIterator< Key, Value >::operator->() const
+std::pair< Key, Value >* zhuravleva::BSTIterator< Key, Value >::operator->()
 {
   if (!current_)
   {
     throw std::runtime_error("null iterator");
   }
-  return &(current_->data_);
+  return std::addressof(current_->data);
 }
 
 template< class Key, class Value >
@@ -102,21 +104,21 @@ zhuravleva::BSTIterator< Key, Value >& zhuravleva::BSTIterator< Key, Value >::op
   {
     throw std::runtime_error("null iterator");
   }
-  if (current_->right_)
+  if (current_->right)
   {
-    current_ = current_->right_;
-    while (current_->left_)
+    current_ = current_->right;
+    while (current_->left)
     {
-      current_ = current_->left_;
+      current_ = current_->left;
     }
   }
   else
   {
-    zhuravleva::TreeNode< Key, Value >* parent = current_->parent_;
-    while (parent && current_ == parent->right_)
+    zhuravleva::detail::TreeNode< Key, Value >* parent = current_->parent;
+    while (parent && current_ == parent->right)
     {
       current_ = parent;
-      parent = parent->parent_;
+      parent = parent->parent;
     }
     current_ = parent;
   }
@@ -137,7 +139,7 @@ zhuravleva::BSTConstIterator< Key, Value >::BSTConstIterator() noexcept:
 {}
 
 template< class Key, class Value >
-zhuravleva::BSTConstIterator< Key, Value >::BSTConstIterator(const zhuravleva::TreeNode< Key, Value >* node) noexcept:
+zhuravleva::BSTConstIterator< Key, Value >::BSTConstIterator(const zhuravleva::detail::TreeNode< Key, Value >* node) noexcept:
   current_(node)
 {}
 
@@ -153,7 +155,7 @@ const std::pair< Key, Value >& zhuravleva::BSTConstIterator< Key, Value >::opera
   {
     throw std::runtime_error("null iterator");
   }
-  return current_->data_;
+  return current_->data;
 }
 
 template< class Key, class Value >
@@ -163,7 +165,7 @@ const std::pair< Key, Value >* zhuravleva::BSTConstIterator< Key, Value >::opera
   {
     throw std::runtime_error("null iterator");
   }
-  return &(current_->data_);
+  return std::addressof(current_->data);
 }
 
 template< class Key, class Value >
@@ -185,21 +187,21 @@ zhuravleva::BSTConstIterator< Key, Value >& zhuravleva::BSTConstIterator< Key, V
   {
     throw std::runtime_error("null iterator");
   }
-  if (current_->right_)
+  if (current_->right)
   {
-    current_ = current_->right_;
-    while (current_->left_)
+    current_ = current_->right;
+    while (current_->left)
     {
-      current_ = current_->left_;
+      current_ = current_->left;
     }
   }
   else
   {
-    const zhuravleva::TreeNode< Key, Value >* parent = current_->parent_;
-    while (parent && current_ == parent->right_)
+    const zhuravleva::detail::TreeNode< Key, Value >* parent = current_->parent;
+    while (parent && current_ == parent->right)
     {
       current_ = parent;
-      parent = parent->parent_;
+      parent = parent->parent;
     }
     current_ = parent;
   }

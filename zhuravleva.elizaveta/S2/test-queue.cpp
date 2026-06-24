@@ -1,5 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <stdexcept>
+#include <string>
+#include <utility>
 #include "queue.hpp"
 
 BOOST_AUTO_TEST_CASE(queue_push_drop)
@@ -55,4 +57,19 @@ BOOST_AUTO_TEST_CASE(queue_front)
   BOOST_CHECK_EQUAL(q.front(), 5);
   q.pop();
   BOOST_CHECK_EQUAL(q.front(), 10);
+}
+
+BOOST_AUTO_TEST_CASE(queue_emplace)
+{
+  zhuravleva::Queue< std::string > q;
+  q.emplace(4, 'b');
+  BOOST_CHECK_EQUAL(q.front(), "bbbb");
+}
+
+BOOST_AUTO_TEST_CASE(queue_emplace_pair)
+{
+  zhuravleva::Queue< std::pair< int, std::string > > q;
+  q.emplace(1, "one");
+  BOOST_CHECK_EQUAL(q.front().first, 1);
+  BOOST_CHECK_EQUAL(q.front().second, "one");
 }
