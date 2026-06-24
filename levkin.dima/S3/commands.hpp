@@ -1,8 +1,8 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
-#include "graph.hpp"
 #include <iosfwd>
 namespace levkin {
+  struct DB;
   using cmd_t = void (*)(std::istream&, std::ostream&, DB&);
   void cmdGraphs(std::istream& input, std::ostream& output, DB& graphs);
   void cmdVertexes(std::istream& input, std::ostream& output, DB& graphs);

@@ -1,13 +1,13 @@
 #ifndef HASHTABLE_HPP
 #define HASHTABLE_HPP
-#include "hasher.hpp"
-#include "list.hpp"
-#include "vector.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <functional>
 #include <stdexcept>
 #include <utility>
+#include "hasher.hpp"
+#include "list.hpp"
+#include "vector.hpp"
 namespace levkin {
   template < class Key, class Value >
   struct NodeHashTable

@@ -75,12 +75,34 @@ void levkin::Graph::addEdge(std::string start_vertex,
                             std::string end_vertex,
                             size_t weight)
 {
-  if (!incoming_.has(end_vertex))
+  bool added_incoming_node = false;
+  bool added_outgoing_node = false;
+  if (!incoming_.has(end_vertex)) {
     incoming_.add(end_vertex, Edges());
-  if (!outgoing_.has(start_vertex))
+    added_incoming_node = true;
+  }
+  if (!outgoing_.has(start_vertex)) {
     outgoing_.add(start_vertex, Edges());
-  incoming_.at(end_vertex).addEdge(start_vertex, weight);
-  outgoing_.at(start_vertex).addEdge(end_vertex, weight);
+    added_outgoing_node = true;
+  }
+  try {
+    incoming_.at(end_vertex).addEdge(start_vertex, weight);
+    outgoing_.at(start_vertex).addEdge(end_vertex, weight);
+  } catch (...) {
+    if (added_incoming_node) {
+      incoming_.drop(end_vertex);
+    }
+    if (added_outgoing_node) {
+      outgoing_.drop(start_vertex);
+    }
+    if (!added_incoming_node) {
+      try {
+        incoming_.at(end_vertex).cutEdge(start_vertex, weight);
+      } catch (...) {
+      }
+    }
+    throw;
+  }
 }
 void levkin::Graph::cutEdge(std::string start_vertex,
                             std::string end_vertex,
@@ -111,8 +133,10 @@ levkin::Graph::getOutbound(std::string vertex) const
   if (!out_check && !in_check) {
     throw std::out_of_range("vertex not found");
   }
-  return out_check ? outgoing_.at(vertex).getEdges()
-                   : stuff::Vector< std::pair< std::string, size_t > >();
+  if (out_check) {
+    return outgoing_.at(vertex).getEdges();
+  }
+  return stuff::Vector< std::pair< std::string, size_t > >();
 }
 stuff::Vector< std::pair< std::string, size_t > >
 levkin::Graph::getInbound(std::string vertex) const
@@ -160,12 +184,14 @@ void levkin::DB::showGraphs(std::ostream& output)
 {
   stuff::Vector< std::string > keys;
   for (auto it = graphs_.cbegin(); it != graphs_.cend(); ++it) {
-    if (it->is_valid_)
+    if (it->is_valid_) {
       keys.pushBack(it->key_);
+    }
   }
   size_t len = keys.getSize();
-  if (len == 0)
+  if (len == 0) {
     return;
+  }
   sort(keys, Comp< std::string >{});
   for (size_t i = 0; i < len; ++i) {
     output << keys[i] << "\n";

@@ -1,5 +1,7 @@
 #include "commands.hpp"
 #include <iostream>
+#include <string>
+#include "graph.hpp"
 void levkin::cmdGraphs(std::istream&, std::ostream& output, DB& graphs)
 {
   graphs.showGraphs(output);
