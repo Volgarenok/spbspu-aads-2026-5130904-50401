@@ -99,6 +99,22 @@ namespace
     }
     return sum;
   }
+
+
+  void saveCategoryChildren(std::ostream& out, const studilova::Category& category)
+  {
+    const studilova::Vector< studilova::Category* >& children = category.getChildren();
+
+    for (size_t i = 0; i < children.getSize(); ++i)
+    {
+      const studilova::Category* child = children[i];
+
+      out << "category " << child->getName() << ' ';
+      out << category.getName() << '\n';
+
+      saveCategoryChildren(out, *child);
+    }
+  }
 }
 
 void studilova::createBudget(std::istream& in, std::ostream& out, BudgetManager& state)
@@ -316,13 +332,14 @@ void studilova::save(std::istream& in, std::ostream& out, BudgetManager& state)
     return;
   }
 
-  Vector<std::string> names = state.getBudgetNames();
+  Vector< std::string > names = state.getBudgetNames();
 
   for (size_t i = 0; i < names.getSize(); ++i)
   {
     const Budget& budget = state.getBudget(names[i]);
     file << "budget " << budget.getName() << '\n';
 
+    saveCategoryChildren(file, budget.getRootCategory());
     const Vector< Operation >& operations = budget.getOperations();
 
     for (size_t j = 0; j < operations.getSize(); ++j)
