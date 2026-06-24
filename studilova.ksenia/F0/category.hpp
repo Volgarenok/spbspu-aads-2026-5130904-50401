@@ -17,7 +17,6 @@ namespace studilova
 			Category* getParent() const noexcept;
 
 			void addChild(Category* child);
-
 			const Vector< Category* >& getChildren() const noexcept;
 			Vector< Category* >& getChildren() noexcept;
 

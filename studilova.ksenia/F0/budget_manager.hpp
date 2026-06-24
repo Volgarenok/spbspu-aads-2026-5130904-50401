@@ -12,7 +12,7 @@ namespace studilova
 {
 	class BudgetManager
 	{
-		public:
+    public:
   		using BudgetTable = HashTable< std::string, Budget, HMACHash, std::equal_to< std::string > >;
 
   		BudgetManager() = default;
@@ -30,7 +30,7 @@ namespace studilova
 
 			Vector<std::string> getBudgetNames() const;
 
-		private:
+    private:
   		BudgetTable budgets_;
 	};
 }
