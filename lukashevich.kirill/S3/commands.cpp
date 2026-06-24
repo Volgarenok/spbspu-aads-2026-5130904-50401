@@ -175,7 +175,7 @@ bool lukashevich::cmdCreate(std::istream & in,
   if (!(in >> count)) {
     if (in.eof()) {
       graphs.add(graphName, graph);
-      return;
+      return false;
     }
 
     throw std::logic_error("bad create command");
