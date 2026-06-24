@@ -68,7 +68,7 @@ void ulanova::Graph::addVertex(const std::string& vertex)
 
 bool ulanova::Graph::hasEdge(const std::string& from, const std::string& to, unsigned weight) const
 {
-  auto it = outbound_.find(from);
+  auto it = outbound_.findIter(from);
   if (it == outbound_.end())
   {
     return false;
@@ -106,8 +106,8 @@ void ulanova::Graph::addEdge(const std::string& from, const std::string& to, uns
     throw;
   }
 
-  auto outIt = outbound_.find(from);
-  auto inIt = inbound_.find(to);
+  auto outIt = outbound_.findIter(from);
+  auto inIt = inbound_.findIter(to);
 
   (*outIt).second.push_back(Edge(to, weight));
 
@@ -136,8 +136,8 @@ void ulanova::Graph::addEdge(const std::string& from, const std::string& to, uns
 
 bool ulanova::Graph::removeEdge(const std::string& from, const std::string& to, unsigned weight)
 {
-  auto outIt = outbound_.find(from);
-  auto inIt = inbound_.find(to);
+  auto outIt = outbound_.findIter(from);
+  auto inIt = inbound_.findIter(to);
 
   if (outIt == outbound_.end() || inIt == inbound_.end())
   {
@@ -187,7 +187,7 @@ ulanova::Vector< std::string > ulanova::Graph::getVertices() const
 
 ulanova::Vector< ulanova::Edge > ulanova::Graph::getOutbound(const std::string& vertex) const
 {
-  auto it = outbound_.find(vertex);
+  auto it = outbound_.findIter(vertex);
   if (it == outbound_.end())
   {
     return Vector< Edge >();
@@ -197,7 +197,7 @@ ulanova::Vector< ulanova::Edge > ulanova::Graph::getOutbound(const std::string& 
 
 ulanova::Vector< ulanova::Edge > ulanova::Graph::getInbound(const std::string& vertex) const
 {
-  auto it = inbound_.find(vertex);
+  auto it = inbound_.findIter(vertex);
   if (it == inbound_.end())
   {
     return Vector< Edge >();
@@ -260,7 +260,7 @@ ulanova::Graph ulanova::Graph::extract(const std::string& name, const Vector< st
   for (auto it = vertices.begin(); it != vertices.end(); ++it)
   {
     const std::string& from = *it;
-    auto edgeIt = outbound_.find(from);
+    auto edgeIt = outbound_.findIter(from);
     if (edgeIt == outbound_.end())
     {
       continue;
