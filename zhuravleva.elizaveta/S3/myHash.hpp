@@ -438,14 +438,18 @@ bool zhuravleva::HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
 {
   size_t idx = getIndex(key);
   List< std::pair< Key, Value > >& bucket = table_[idx];
-  for (auto it = bucket.begin(); it != bucket.end(); it++)
+  LIter< std::pair< Key, Value > > prev = bucket.beforeBegin();
+  LIter< std::pair< Key, Value > > it = bucket.begin();
+  while (it != bucket.end())
   {
     if (equal_(it->first, key))
     {
-      bucket.erase(it);
-      size_--;
+      bucket.eraseAfter(prev);
+      --size_;
       return true;
     }
+    ++prev;
+    ++it;
   }
   return false;
 }

@@ -59,11 +59,13 @@ bool zhuravleva::Graph::cut(const std::string& a, const std::string& b,
   }
   Graph temp(*this);
   List< size_t >& weights = temp.edges_.get(key);
-  for (auto it = weights.begin(); it != weights.end(); ++it)
+  LIter< size_t > prev = weights.beforeBegin();
+  LIter< size_t > it = weights.begin();
+  while (it != weights.end())
   {
     if (*it == weight)
     {
-      weights.erase(it);
+      weights.eraseAfter(prev);
       if (weights.empty())
       {
         temp.edges_.drop(key);
@@ -71,6 +73,8 @@ bool zhuravleva::Graph::cut(const std::string& a, const std::string& b,
       swap(temp);
       return true;
     }
+    ++prev;
+    ++it;
   }
   return false;
 }
