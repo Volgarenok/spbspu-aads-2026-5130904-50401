@@ -294,3 +294,100 @@ void studilova::findExpenses(std::istream& in, std::ostream& out, BudgetManager&
 
   out << '\n';
 }
+
+void studilova::checkBalanceTrend(std::istream& in, std::ostream& out, BudgetManager& state)
+{
+  std::string budgetName;
+  in >> budgetName;
+
+  if (!in || !state.hasBudget(budgetName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  const Budget& budget = state.getBudget(budgetName);
+  const Vector< Operation >& operations = budget.getOperations();
+
+  int balance = 0;
+
+  for (size_t i = 0; i < operations.getSize(); ++i)
+  {
+    const Operation& operation = operations[i];
+
+    if (operation.getType() == OperationType::Income)
+    {
+      balance += operation.getAmount();
+    }
+    else
+    {
+      balance -= operation.getAmount();
+    }
+
+    if (balance < 0)
+    {
+      out << "<EXPENSES EXCEED INCOME>\n";
+      return;
+    }
+  }
+
+  out << "<INCOME COVERS EXPENSES>\n";
+}
+
+void studilova::categoryTrend(std::istream& in, std::ostream& out, BudgetManager& state)
+{
+  std::string budgetName;
+  std::string categoryName;
+
+  in >> budgetName >> categoryName;
+
+  if (!in || !state.hasBudget(budgetName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  const Budget& budget = state.getBudget(budgetName);
+
+  if (!budget.hasCategory(categoryName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  const Vector< Operation >& operations = budget.getOperations();
+
+  int firstHalf = 0;
+  int secondHalf = 0;
+  size_t middle = operations.getSize() / 2;
+
+  for (size_t i = 0; i < operations.getSize(); ++i)
+  {
+    const Operation& operation = operations[i];
+
+    if (operation.getType() == OperationType::Expense && operation.getCategory() == categoryName)
+    {
+      if (i < middle)
+      {
+        firstHalf += operation.getAmount();
+      }
+      else
+      {
+        secondHalf += operation.getAmount();
+      }
+    }
+  }
+
+  if (secondHalf > firstHalf)
+  {
+    out << "<INCREASING>\n";
+  }
+  else if (secondHalf < firstHalf)
+  {
+    out << "<DECREASING>\n";
+  }
+  else
+  {
+    out << "<STABLE>\n";
+  }
+}

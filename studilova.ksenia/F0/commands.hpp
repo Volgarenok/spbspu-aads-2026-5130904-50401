@@ -20,6 +20,8 @@ namespace studilova
   void save(std::istream&, std::ostream&, BudgetManager&);
 
   void findExpenses(std::istream&, std::ostream&, BudgetManager&);
+  void checkBalanceTrend(std::istream&, std::ostream&, BudgetManager&);
+  void categoryTrend(std::istream&, std::ostream&, BudgetManager&);
 }
 
 #endif
