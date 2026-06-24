@@ -2,6 +2,27 @@
 
 #include <fstream>
 #include <stdexcept>
+#include <string>
+
+namespace
+{
+  void printCategory(std::ostream& out, const studilova::Category& category, size_t depth)
+  {
+    for (size_t i = 0; i < depth; ++i)
+    {
+      out << "  ";
+    }
+
+    out << category.getName() << '\n';
+
+    const studilova::Vector< studilova::Category* >& children = category.getChildren();
+
+    for (size_t i = 0; i < children.getSize(); ++i)
+    {
+      printCategory(out, *children[i], depth + 1);
+    }
+  }
+}
 
 void studilova::createBudget(std::istream& in, std::ostream& out, BudgetManager& state)
 {
@@ -49,6 +70,37 @@ void studilova::createCategory(std::istream& in, std::ostream& out, BudgetManage
   {
     out << "<INVALID COMMAND>\n";
   }
+}
+
+void studilova::showBudgets(std::istream&, std::ostream& out, BudgetManager& state)
+{
+  Vector< std::string > names = state.getBudgetNames();
+
+  for (size_t i = 0; i < names.getSize(); ++i)
+  {
+    if (i != 0)
+    {
+      out << ' ';
+    }
+    out << names[i];
+  }
+
+  out << '\n';
+}
+
+void studilova::showCategories(std::istream& in, std::ostream& out, BudgetManager& state)
+{
+  std::string budgetName;
+  in >> budgetName;
+
+  if (!in || !state.hasBudget(budgetName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  const Budget& budget = state.getBudget(budgetName);
+  printCategory(out, budget.getRootCategory(), 0);
 }
 
 void studilova::showBalance(std::istream& in, std::ostream& out, BudgetManager& state)
