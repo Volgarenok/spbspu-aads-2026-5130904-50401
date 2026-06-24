@@ -10,136 +10,148 @@
 
 namespace ulanova
 {
-  template< class Key, class Value, class Hash, class Equal >
-  class HashTable;
+template< class Key, class Value, class Hash, class Equal >
+class HashTable;
 
-  template< class Key, class Value, class Hash, class Equal >
-  class HashTableIterator
+template< class Key, class Value, class Hash, class Equal >
+class HashTableIterator
+{
+public:
+  HashTableIterator();
+
+  HashTableIterator& operator++();
+  HashTableIterator operator++(int);
+
+  bool operator==(const HashTableIterator& rhs) const noexcept;
+  bool operator!=(const HashTableIterator& rhs) const noexcept;
+
+  std::pair< const Key&, Value& > operator*() const;
+  std::pair< const Key*, Value* > operator->() const;
+
+  const Key& key() const;
+
+private:
+  friend class HashTable< Key, Value, Hash, Equal >;
+
+  using Table = HashTable< Key, Value, Hash, Equal >;
+
+  Table* table_;
+  size_t index_;
+
+  HashTableIterator(Table* table, size_t index);
+  void skipEmpty();
+};
+
+template< class Key, class Value, class Hash, class Equal >
+class HashTableConstIterator
+{
+public:
+  HashTableConstIterator();
+  HashTableConstIterator(const HashTableIterator< Key, Value, Hash, Equal >& it);
+
+  HashTableConstIterator& operator++();
+  HashTableConstIterator operator++(int);
+
+  bool operator==(const HashTableConstIterator& rhs) const noexcept;
+  bool operator!=(const HashTableConstIterator& rhs) const noexcept;
+
+  std::pair< const Key&, const Value& > operator*() const;
+  std::pair< const Key*, const Value* > operator->() const;
+
+  const Key& key() const;
+
+private:
+  friend class HashTable< Key, Value, Hash, Equal >;
+
+  using Table = HashTable< Key, Value, Hash, Equal >;
+
+  const Table* table_;
+  size_t index_;
+
+  HashTableConstIterator(const Table* table, size_t index);
+  void skipEmpty();
+};
+
+template< class Key, class Value, class Hash, class Equal >
+class HashTable
+{
+public:
+  using iterator = HashTableIterator< Key, Value, Hash, Equal >;
+  using const_iterator = HashTableConstIterator< Key, Value, Hash, Equal >;
+
+  explicit HashTable(size_t slots = 8);
+  HashTable(const HashTable& rhs);
+  HashTable(HashTable&& rhs) noexcept;
+
+  HashTable& operator=(const HashTable& rhs);
+  HashTable& operator=(HashTable&& rhs) noexcept;
+
+  void swap(HashTable& rhs) noexcept;
+
+  bool empty() const noexcept;
+  bool isEmpty() const noexcept;
+  size_t size() const noexcept;
+  size_t getsize() const noexcept;
+  size_t capacity() const noexcept;
+  size_t getcapacity() const noexcept;
+
+  void add(const Key& key, const Value& value);
+  void add(const Key& key, Value&& value);
+  void erase(const Key& key);
+  Value drop(const Key& key);
+  bool contains(const Key& key) const;
+  bool has(const Key& key) const;
+
+  Value* find(const Key& key);
+  const Value* find(const Key& key) const;
+
+  iterator findIter(const Key& key);
+  const_iterator findIter(const Key& key) const;
+
+  void rehash(size_t slots);
+
+  iterator begin() noexcept;
+  iterator end() noexcept;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
+
+private:
+  friend class HashTableIterator< Key, Value, Hash, Equal >;
+  friend class HashTableConstIterator< Key, Value, Hash, Equal >;
+
+  enum class BucketState
   {
-  public:
-    HashTableIterator();
-
-    HashTableIterator& operator++();
-    HashTableIterator operator++(int);
-
-    bool operator==(const HashTableIterator& rhs) const noexcept;
-    bool operator!=(const HashTableIterator& rhs) const noexcept;
-
-    std::pair< const Key&, Value& > operator*() const;
-    std::pair< const Key*, Value* > operator->() const;
-
-  private:
-    friend class HashTable< Key, Value, Hash, Equal >;
-
-    using Table = HashTable< Key, Value, Hash, Equal >;
-
-    Table* table_;
-    size_t index_;
-
-    HashTableIterator(Table* table, size_t index);
-    void skipEmpty();
+    Empty,
+    Occupied,
+    Deleted
   };
 
-  template< class Key, class Value, class Hash, class Equal >
-  class HashTableConstIterator
+  struct Bucket
   {
-  public:
-    HashTableConstIterator();
-    HashTableConstIterator(const HashTableIterator< Key, Value, Hash, Equal >& it);
+    BucketState state;
+    Key key;
+    Value value;
 
-    HashTableConstIterator& operator++();
-    HashTableConstIterator operator++(int);
-
-    bool operator==(const HashTableConstIterator& rhs) const noexcept;
-    bool operator!=(const HashTableConstIterator& rhs) const noexcept;
-
-    std::pair< const Key&, const Value& > operator*() const;
-    std::pair< const Key*, const Value* > operator->() const;
-
-  private:
-    friend class HashTable< Key, Value, Hash, Equal >;
-
-    using Table = HashTable< Key, Value, Hash, Equal >;
-
-    const Table* table_;
-    size_t index_;
-
-    HashTableConstIterator(const Table* table, size_t index);
-    void skipEmpty();
+    Bucket():
+      state(BucketState::Empty),
+      key(),
+      value()
+    {}
   };
 
-  template< class Key, class Value, class Hash, class Equal >
-  class HashTable
-  {
-  public:
-    using iterator = HashTableIterator< Key, Value, Hash, Equal >;
-    using const_iterator = HashTableConstIterator< Key, Value, Hash, Equal >;
+  Vector< Bucket > buckets_;
+  size_t size_;
+  Hash hash_;
+  Equal equal_;
 
-    explicit HashTable(size_t slots = 8);
-    HashTable(const HashTable& rhs);
-    HashTable(HashTable&& rhs) noexcept;
+  static constexpr size_t npos = static_cast< size_t >(-1);
 
-    HashTable& operator=(const HashTable& rhs);
-    HashTable& operator=(HashTable&& rhs) noexcept;
-
-    void swap(HashTable& rhs) noexcept;
-
-    bool empty() const noexcept;
-    size_t size() const noexcept;
-    size_t capacity() const noexcept;
-
-    void add(const Key& key, const Value& value);
-    void add(const Key& key, Value&& value);
-    void erase(const Key& key);
-    bool contains(const Key& key) const;
-
-    iterator find(const Key& key);
-    const_iterator find(const Key& key) const;
-
-    void rehash(size_t slots);
-
-    iterator begin() noexcept;
-    iterator end() noexcept;
-    const_iterator begin() const noexcept;
-    const_iterator end() const noexcept;
-    const_iterator cbegin() const noexcept;
-    const_iterator cend() const noexcept;
-
-  private:
-    friend class HashTableIterator< Key, Value, Hash, Equal >;
-    friend class HashTableConstIterator< Key, Value, Hash, Equal >;
-
-    enum class BucketState
-    {
-      Empty,
-      Occupied,
-      Deleted
-    };
-
-    struct Bucket
-    {
-      BucketState state;
-      Key key;
-      Value value;
-
-      Bucket():
-        state(BucketState::Empty),
-        key(),
-        value()
-      {}
-    };
-
-    Vector< Bucket > buckets_;
-    size_t size_;
-    Hash hash_;
-    Equal equal_;
-
-    static constexpr size_t npos = static_cast< size_t >(-1);
-
-    size_t findIndex(const Key& key) const;
-    size_t findPlace(const Key& key, bool& found) const;
-    size_t nextIndex(size_t index) const noexcept;
-  };
+  size_t findIndex(const Key& key) const;
+  size_t findPlace(const Key& key, bool& found) const;
+  size_t nextIndex(size_t index) const noexcept;
+};
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -207,13 +219,31 @@ bool ulanova::HashTable< Key, Value, Hash, Equal >::empty() const noexcept
 }
 
 template< class Key, class Value, class Hash, class Equal >
+bool ulanova::HashTable< Key, Value, Hash, Equal >::isEmpty() const noexcept
+{
+  return size_ == 0;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 size_t ulanova::HashTable< Key, Value, Hash, Equal >::size() const noexcept
 {
   return size_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
+size_t ulanova::HashTable< Key, Value, Hash, Equal >::getsize() const noexcept
+{
+  return size_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 size_t ulanova::HashTable< Key, Value, Hash, Equal >::capacity() const noexcept
+{
+  return buckets_.getsize();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t ulanova::HashTable< Key, Value, Hash, Equal >::getcapacity() const noexcept
 {
   return buckets_.getsize();
 }
@@ -275,14 +305,56 @@ void ulanova::HashTable< Key, Value, Hash, Equal >::erase(const Key& key)
 }
 
 template< class Key, class Value, class Hash, class Equal >
+Value ulanova::HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
+{
+  size_t index = findIndex(key);
+  if (index == npos)
+  {
+    throw std::out_of_range("key not found");
+  }
+  Value result = std::move(buckets_[index].value);
+  buckets_[index].state = BucketState::Deleted;
+  --size_;
+  return result;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 bool ulanova::HashTable< Key, Value, Hash, Equal >::contains(const Key& key) const
 {
   return findIndex(key) != npos;
 }
 
 template< class Key, class Value, class Hash, class Equal >
+bool ulanova::HashTable< Key, Value, Hash, Equal >::has(const Key& key) const
+{
+  return findIndex(key) != npos;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+Value* ulanova::HashTable< Key, Value, Hash, Equal >::find(const Key& key)
+{
+  size_t index = findIndex(key);
+  if (index == npos)
+  {
+    return nullptr;
+  }
+  return &buckets_[index].value;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+const Value* ulanova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) const
+{
+  size_t index = findIndex(key);
+  if (index == npos)
+  {
+    return nullptr;
+  }
+  return &buckets_[index].value;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 typename ulanova::HashTable< Key, Value, Hash, Equal >::iterator
-ulanova::HashTable< Key, Value, Hash, Equal >::find(const Key& key)
+ulanova::HashTable< Key, Value, Hash, Equal >::findIter(const Key& key)
 {
   size_t index = findIndex(key);
   if (index == npos)
@@ -294,7 +366,7 @@ ulanova::HashTable< Key, Value, Hash, Equal >::find(const Key& key)
 
 template< class Key, class Value, class Hash, class Equal >
 typename ulanova::HashTable< Key, Value, Hash, Equal >::const_iterator
-ulanova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) const
+ulanova::HashTable< Key, Value, Hash, Equal >::findIter(const Key& key) const
 {
   size_t index = findIndex(key);
   if (index == npos)
@@ -307,6 +379,10 @@ ulanova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) const
 template< class Key, class Value, class Hash, class Equal >
 void ulanova::HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
 {
+  if (slots < size_ * 2)
+  {
+    throw std::invalid_argument("new capacity is too small");
+  }
   HashTable tmp(slots);
   tmp.hash_ = hash_;
   tmp.equal_ = equal_;
@@ -484,6 +560,12 @@ ulanova::HashTableIterator< Key, Value, Hash, Equal >::operator->() const
 }
 
 template< class Key, class Value, class Hash, class Equal >
+const Key& ulanova::HashTableIterator< Key, Value, Hash, Equal >::key() const
+{
+  return table_->buckets_[index_].key;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 void ulanova::HashTableIterator< Key, Value, Hash, Equal >::skipEmpty()
 {
   using BucketState = typename Table::BucketState;
@@ -502,7 +584,7 @@ ulanova::HashTableConstIterator< Key, Value, Hash, Equal >::HashTableConstIterat
 
 template< class Key, class Value, class Hash, class Equal >
 ulanova::HashTableConstIterator< Key, Value, Hash, Equal >::HashTableConstIterator(
-    const HashTableIterator< Key, Value, Hash, Equal >& it):
+  const HashTableIterator< Key, Value, Hash, Equal >& it):
   table_(it.table_),
   index_(it.index_)
 {}
@@ -562,6 +644,12 @@ ulanova::HashTableConstIterator< Key, Value, Hash, Equal >::operator->() const
 {
   const auto& bucket = table_->buckets_[index_];
   return { &bucket.key, &bucket.value };
+}
+
+template< class Key, class Value, class Hash, class Equal >
+const Key& ulanova::HashTableConstIterator< Key, Value, Hash, Equal >::key() const
+{
+  return table_->buckets_[index_].key;
 }
 
 template< class Key, class Value, class Hash, class Equal >

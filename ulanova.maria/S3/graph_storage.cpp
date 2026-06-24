@@ -4,7 +4,6 @@
 #include <string>
 #include <istream>
 
-
 ulanova::GraphStorage::GraphStorage():
   graphs_(128)
 {}
@@ -16,7 +15,7 @@ bool ulanova::GraphStorage::hasGraph(const std::string& name) const
 
 ulanova::Graph* ulanova::GraphStorage::findGraph(const std::string& name)
 {
-  auto it = graphs_.find(name);
+  auto it = graphs_.findIter(name);
   if (it == graphs_.end())
   {
     return nullptr;
@@ -26,7 +25,7 @@ ulanova::Graph* ulanova::GraphStorage::findGraph(const std::string& name)
 
 const ulanova::Graph* ulanova::GraphStorage::findGraph(const std::string& name) const
 {
-  auto it = graphs_.find(name);
+  auto it = graphs_.findIter(name);
   if (it == graphs_.end())
   {
     return nullptr;

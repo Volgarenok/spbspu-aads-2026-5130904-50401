@@ -3,7 +3,7 @@
 #include "commands.hpp"
 #include "graph_storage.hpp"
 
-int main(int argc, char* [])
+int main(int argc, char* argv[])
 {
   if (argc != 2)
   {
@@ -14,7 +14,7 @@ int main(int argc, char* [])
   try
   {
     ulanova::GraphStorage storage;
-    std::ifstream file("graphs.txt");
+    std::ifstream file(argv[1]);
     if (!file)
     {
       std::cerr << "cannot open file\n";
