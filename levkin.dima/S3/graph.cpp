@@ -201,6 +201,10 @@ void levkin::DB::showGraphVertexes(std::string graph_name, std::ostream& output)
 {
   stuff::Vector< std::string > collection
       = graphs_.at(graph_name).getVertexes();
+  if (collection.getSize() == 0) {
+    output << "\n";
+    return;
+  }
   sort(collection, Comp< std::string >{});
   size_t cap = collection.getSize();
   for (size_t i = 0; i < cap; ++i) {
@@ -212,8 +216,10 @@ void levkin::DB::showGraphEdges(
     std::ostream& output)
 {
   size_t total = edges.getSize();
-  if (total == 0)
+  if (total == 0) {
+    output << "\n";
     return;
+  }
   sort(edges, PairComp< std::string, size_t >{});
   size_t cursor = 0;
   while (cursor < total) {

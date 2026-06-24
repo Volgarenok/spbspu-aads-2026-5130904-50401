@@ -4,7 +4,6 @@
 #include <string>
 #include "commands.hpp"
 #include "graph.hpp"
-
 int main(int args, char** argv)
 {
   if (args != 2) {
@@ -16,12 +15,10 @@ int main(int args, char** argv)
     std::cerr << "could not open file\n";
     return 1;
   }
-
   std::istream& in = std::cin;
   std::ostream& out = std::cout;
   levkin::DB graphs;
   std::string graph_name;
-
   while (file >> graph_name) {
     graphs.createGraph(graph_name);
     size_t edges_count = 0;
@@ -36,13 +33,11 @@ int main(int args, char** argv)
       }
     }
   }
-
   levkin::HashTable< std::string,
                      levkin::cmd_t,
                      levkin::Sha1Hasher< std::string >,
                      levkin::KeyComp >
       cmds(64, 4);
-
   cmds.add("graphs", levkin::cmdGraphs);
   cmds.add("vertexes", levkin::cmdVertexes);
   cmds.add("outbound", levkin::cmdOutbound);
@@ -52,7 +47,6 @@ int main(int args, char** argv)
   cmds.add("create", levkin::cmdCreate);
   cmds.add("merge", levkin::cmdMerge);
   cmds.add("extract", levkin::cmdExtract);
-
   std::string cmd;
   while (in >> cmd) {
     try {
@@ -69,12 +63,9 @@ int main(int args, char** argv)
       out << "<INVALID COMMAND>\n";
       in.clear();
     }
-
-    // Железная очистка потока до конца строки в конце КАЖДОЙ итерации
     std::string dummy;
     std::getline(in, dummy);
   }
-
   if (!in.eof() && in.fail()) {
     std::cerr << "bad input\n";
     return 1;
