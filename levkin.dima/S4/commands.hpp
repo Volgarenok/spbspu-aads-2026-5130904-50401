@@ -15,10 +15,18 @@ namespace levkin {
 
   using cmd_t = void (*)(std::istream&, std::ostream&, DatasetStore&);
 
-  void loadDatasets(std::istream& in, DB& datasets);
-  void printDataset(std::istream& in, std::ostream& out, DB& datasets);
-  void complementDatasets(std::istream& in, std::ostream& out, DB& datasets);
-  void intersectDatasets(std::istream& in, std::ostream& out, DB& datasets);
-  void unionDatasets(std::istream& in, std::ostream& out, DB& datasets);}
+  void
+  cmdPrint(std::istream& input, std::ostream& output, DatasetStore& datasets);
+  void cmdComplement(std::istream& input,
+                     std::ostream& output,
+                     DatasetStore& datasets);
+  void cmdIntersect(std::istream& input,
+                    std::ostream& output,
+                    DatasetStore& datasets);
+  void
+  cmdUnion(std::istream& input, std::ostream& output, DatasetStore& datasets);
+
+  bool loadDictionaries(const std::string& filename, DatasetStore& datasets);
+}
 
 #endif
