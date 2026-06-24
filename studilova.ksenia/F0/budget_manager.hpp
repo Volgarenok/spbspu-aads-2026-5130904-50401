@@ -74,7 +74,7 @@ studilova::Vector<std::string> studilova::BudgetManager::getBudgetNames() const
   Vector< std::string > result;
   for (auto it = budgets_.begin(); it != budgets_.end(); ++it)
   {
-    result.pushBack(it->first);
+    result.pushBack((*it).first);
   }
   return result;
 }
