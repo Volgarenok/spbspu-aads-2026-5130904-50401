@@ -1,6 +1,8 @@
 #ifndef ROBIN_NODE_HPP
 #define ROBIN_NODE_HPP
 
+#include <utility>
+
 namespace donkeev
 {
   template<class Key, class Value>
@@ -22,7 +24,7 @@ namespace donkeev
   
     void swap(RobinNode&);
   };
-  
+
   template< class Key, class Value >
   RobinNode< Key, Value >::RobinNode():
     key_(),

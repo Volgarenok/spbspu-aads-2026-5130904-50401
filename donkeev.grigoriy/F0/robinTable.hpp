@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "robinNode.hpp"
+#include "robinIterators.hpp"
 #include "../common/top-it-vector.hpp"
 
 namespace donkeev
@@ -23,7 +24,7 @@ namespace donkeev
 
     explicit RobinTable(size_t);
 
-    ~RobinHashTable() = default;
+    ~RobinTable() = default;
 
     RobinTable& operator=(const RobinTable&);
     RobinTable& operator=(RobinTable&&) noexcept;
@@ -80,7 +81,7 @@ namespace donkeev
     equal_()
   {
     assert(capacity > 0);
-    slots_ = topit::Vector(capacity, Node());
+    slots_ = topit::Vector< Node >(capacity, Node());
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -116,8 +117,8 @@ namespace donkeev
       return result.second->value_;
     }
     
-    insert(k, Value{});
-    return findNode(k).second->value_;
+    insert(key, Value{});
+    return findNode(key).second->value_;
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -158,7 +159,7 @@ namespace donkeev
     }
     
     size_t cap = slots_.size();
-    size_t index = hasher_(k) % cap;
+    size_t index = hasher_(key) % cap;
     
     Node toAdd{key, value, true, 0};
     
@@ -263,7 +264,7 @@ namespace donkeev
     {
       slots_[i] = Node{};
     }
-    
+
     size_ = 0;
   }
 
@@ -310,7 +311,7 @@ RobinTable<Key, Value, Hash, Equal>::swap(RobinTable& other) noexcept
       }
       
       index = (index + 1) % cap;
-      cur_psl++;
+      currPsl++;
     }
     
     return {cap, nullptr};
