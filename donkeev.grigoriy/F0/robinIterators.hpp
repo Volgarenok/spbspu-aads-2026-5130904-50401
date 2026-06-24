@@ -109,5 +109,17 @@ namespace donkeev
 
     return tmp;
   }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool RobinIter< Key, Value, Hash, Equal >::operator==(const RobinIter& rhs) const noexcept
+  {
+    return index_ == rhs.index_ && table_ == rhs.table_;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool RobinIter< Key, Value, Hash, Equal >::operator!=(const RobinIter& rhs) const noexcept
+  {
+    return !(*this == rhs);
+  }
 }
 #endif
