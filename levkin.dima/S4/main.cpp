@@ -10,19 +10,11 @@ int main(int argc, char* argv[])
     return 1;
   }
   levkin::DatasetStore datasets;
-  if (!levkin::loadDictionaries(argv[1], datasets)) {
-    std::cerr << "Error: could not open file " << argv[1] << "\n";
-    return 1;
-  }
   levkin::BSTree< std::string, levkin::cmd_t > cmds;
   cmds.push("print", levkin::cmdPrint);
-  cmds.push("complement", levkin::cmdComplement);
-  cmds.push("intersect", levkin::cmdIntersect);
   cmds.push("union", levkin::cmdUnion);
   std::string line;
   while (std::getline(std::cin, line)) {
-    if (line.empty())
-      continue;
     std::stringstream ss(line);
     std::string cmd_name;
     ss >> cmd_name;
