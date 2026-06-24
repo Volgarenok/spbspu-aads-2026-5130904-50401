@@ -3,64 +3,73 @@
 #include <limits>
 #include <cctype>
 
-vasyakin::Date readDate(std::istream& in)
+namespace
 {
-  std::string token;
-  if (!(in >> token))
+  vasyakin::Date readDate(std::istream& in)
   {
-    throw std::runtime_error("Invalid date");
+    std::string token;
+    if (!(in >> token))
+    {
+      throw std::runtime_error("Invalid date");
+    }
+
+    return vasyakin::Date::fromString(token);
   }
 
-  return vasyakin::Date::fromString(token);
-}
-
-std::string readQuotedToken(std::istream& in)
-{
-  std::string token;
-  in >> token;
-
-  if (token.empty())
+  std::string readQuotedToken(std::istream& in)
   {
+    std::string token;
+    in >> token;
+
+    if (token.empty())
+    {
+      return token;
+    }
+
+    if (token.front() == '"')
+    {
+      token = token.substr(1);
+
+      if (!token.empty() && token.back() == '"')
+      {
+        return token.substr(0, token.size() - 1);
+      }
+
+      std::string rest;
+      std::getline(in, rest, '"');
+      token += rest;
+    }
+
     return token;
   }
 
-  if (token.front() == '"')
+  std::string escapeSpaces(const std::string& s)
   {
-    token = token.substr(1);
-
-    if (!token.empty() && token.back() == '"')
+    std::string result = s;
+    for (char& c : result)
     {
-      return token.substr(0, token.size() - 1);
+      if (c == ' ')
+      {
+        c = '_';
+      }
     }
 
-    std::string rest;
-    std::getline(in, rest, '"');
-    token += rest;
+    return result;
   }
 
-  return token;
-}
-
-std::string escapeSpaces(const std::string& s)
-{
-  std::string result = s;
-  for (char& c : result)
+  std::string unescapeSpaces(const std::string& s)
   {
-    if (c == ' ') c = '_';
+    std::string result = s;
+    for (char& c : result)
+    {
+      if (c == '_')
+      {
+        c = ' ';
+      }
+    }
+
+    return result;
   }
-
-  return result;
-}
-
-std::string unescapeSpaces(const std::string& s)
-{
-  std::string result = s;
-  for (char& c : result)
-  {
-    if (c == '_') c = ' ';
-  }
-
-  return result;
 }
 
 void vasyakin::cmdCreateWarehouse(
@@ -80,7 +89,7 @@ void vasyakin::cmdCreateWarehouse(
     throw std::runtime_error("Invalid create-warehouse args");
   }
 
-  if (state.warehouses_.has(name))
+  if (state.warehouses_.count(name))
   {
     out << "<ERROR: WAREHOUSE ALREADY EXISTS>" << '\n';
     return;
@@ -120,13 +129,13 @@ void vasyakin::cmdAddItem(
     throw std::runtime_error("Invalid add-item args");
   }
 
-  if (!state.warehouses_.has(warehouse))
+  if (!state.warehouses_.count(warehouse))
   {
     out << "<ERROR: WAREHOUSE NOT FOUND>" << '\n';
     return;
   }
 
-  auto& wh = state.warehouses_.at(warehouse);
+  vasyakin::WarehouseState& wh = state.warehouses_.at(warehouse);
   if (wh.used_capacity_ + count > wh.capacity_)
   {
     out << "<ERROR: WAREHOUSE CAPACITY EXCEEDED>" << '\n';
@@ -134,7 +143,7 @@ void vasyakin::cmdAddItem(
   }
 
   std::string key = model + "|" + color + "|" + std::to_string(size);
-  if (wh.items_.has(key))
+  if (wh.items_.count(key))
   {
     wh.items_.at(key).addCount(count);
   }
@@ -176,21 +185,21 @@ void vasyakin::cmdRemoveItem(
     throw std::runtime_error("Invalid remove-item args");
   }
 
-  if (!state.warehouses_.has(warehouse))
+  if (!state.warehouses_.count(warehouse))
   {
     out << "<ERROR: WAREHOUSE NOT FOUND>" << '\n';
     return;
   }
 
   std::string key = model + "|" + color + "|" + std::to_string(size);
-  auto& wh = state.warehouses_.at(warehouse);
-  if (!wh.items_.has(key))
+  vasyakin::WarehouseState& wh = state.warehouses_.at(warehouse);
+  if (!wh.items_.count(key))
   {
     out << "<ERROR: NOT ENOUGH ITEMS>" << '\n';
     return;
   }
 
-  auto& item = wh.items_.at(key);
+  vasyakin::Item& item = wh.items_.at(key);
   if (!item.removeCount(count))
   {
     out << "<ERROR: NOT ENOUGH ITEMS>" << '\n';
@@ -202,7 +211,7 @@ void vasyakin::cmdRemoveItem(
 
   if (item.getCount() == 0)
   {
-    wh.items_.remove(key);
+    wh.items_.erase(key);
   }
 
   ++state.op_counter_;
@@ -237,7 +246,7 @@ void vasyakin::cmdShip(
   vasyakin::Date departure = Date::fromString(date);
   state.current_date_ = departure;
 
-  if (!state.warehouses_.has(from) || !state.warehouses_.has(to))
+  if (!state.warehouses_.count(from) || !state.warehouses_.count(to))
   {
     out << "<ERROR: WAREHOUSE NOT FOUND>" << '\n';
     return;
@@ -245,8 +254,8 @@ void vasyakin::cmdShip(
 
   std::string key = model + "|" + color + "|" + std::to_string(size);
 
-  auto& wh_from = state.warehouses_.at(from);
-  if (!wh_from.items_.has(key) || wh_from.items_.at(key).getCount() < count)
+  vasyakin::WarehouseState& wh_from = state.warehouses_.at(from);
+  if (!wh_from.items_.count(key) || wh_from.items_.at(key).getCount() < count)
   {
     out << "<ERROR: NOT ENOUGH ITEMS>" << '\n';
     return;
@@ -257,14 +266,14 @@ void vasyakin::cmdShip(
 
   vasyakin::Date arrival = departure + travel_days;
 
-  auto& wh_to = state.warehouses_.at(to);
+  vasyakin::WarehouseState& wh_to = state.warehouses_.at(to);
   if (wh_to.used_capacity_ + count > wh_to.capacity_)
   {
     out << "<ERROR: NOT ENOUGH CAPACITY AT DESTINATION>" << '\n';
     return;
   }
 
-  auto& item = wh_from.items_.at(key);
+  vasyakin::Item& item = wh_from.items_.at(key);
   size_t price = item.getPrice();
 
   item.removeCount(count);
@@ -273,7 +282,7 @@ void vasyakin::cmdShip(
 
   if (item.getCount() == 0)
   {
-    wh_from.items_.remove(key);
+    wh_from.items_.erase(key);
   }
 
   ++state.transfer_counter_;
@@ -311,7 +320,7 @@ void vasyakin::cmdShowWarehouse(
   const vasyakin::Date date = readDate(in);
   state.current_date_ = date;
 
-  if (!state.warehouses_.has(name))
+  if (!state.warehouses_.count(name))
   {
     out << "<ERROR: WAREHOUSE NOT FOUND>" << '\n';
     return;
@@ -319,13 +328,13 @@ void vasyakin::cmdShowWarehouse(
 
   out << "<WAREHOUSE: " << name << " (Date: " << date.toString() << ")>" << '\n';
 
-  const auto& wh = state.warehouses_.at(name);
+  const vasyakin::WarehouseState& wh = state.warehouses_.at(name);
   size_t total_items = 0;
 
   for (auto cit = wh.items_.cbegin(); cit != wh.items_.cend(); ++cit)
   {
-    out << "> " << (*cit).second.toString() << '\n';
-    total_items += (*cit).second.getCount();
+    out << "> " << cit->second.toString() << '\n';
+    total_items += cit->second.getCount();
   }
 
   out << "TOTAL: " << total_items << " pcs | USED CAPACITY: "
@@ -347,7 +356,7 @@ void vasyakin::cmdShowTransfers(
 
   for (auto cit = state.transfers_.cbegin(); cit != state.transfers_.cend(); ++cit)
   {
-    const auto& tr = (*cit).second;
+    const vasyakin::Transfer& tr = cit->second;
 
     if (tr.active_ && tr.departure_ <= date && tr.arrival_ > date)
     {
@@ -383,7 +392,7 @@ void vasyakin::cmdShowItem(
 
   for (auto cit = state.log_.cbegin(); cit != state.log_.cend(); ++cit)
   {
-    const auto& log = (*cit).second;
+    const vasyakin::LogEntry& log = cit->second;
 
     if (log.details_.find(search_log) != std::string::npos)
     {
@@ -397,10 +406,10 @@ void vasyakin::cmdShowItem(
   bool found = false;
   for (auto cit = state.warehouses_.cbegin(); cit != state.warehouses_.cend(); ++cit)
   {
-    const auto& wh1 = (*cit).first;
-    const auto& wh2 = (*cit).second;
+    const std::string& wh1 = cit->first;
+    const vasyakin::WarehouseState& wh2 = cit->second;
 
-    if (wh2.items_.has(key_items))
+    if (wh2.items_.count(key_items))
     {
       if (found)
       {
@@ -456,7 +465,7 @@ void vasyakin::cmdShowLog(
   {
     if (count >= start)
     {
-      const auto& log = (*cit).second;
+      const vasyakin::LogEntry& log = cit->second;
 
       out << "> #" << log.id_ << " [" << log.date_.toString()
         << "] " << log.details_ << '\n';
@@ -480,17 +489,17 @@ void vasyakin::cmdShowStateAt(
 
   for (auto cit = state.warehouses_.cbegin(); cit != state.warehouses_.cend(); ++cit)
   {
-    const auto& wh = (*cit).second;
+    const vasyakin::WarehouseState& wh = cit->second;
 
     for (auto ccit = wh.items_.cbegin(); ccit != wh.items_.cend(); ++ccit)
     {
-      total += (*ccit).second.getCount();
+      total += ccit->second.getCount();
     }
   }
 
   for (auto cit = state.transfers_.cbegin(); cit != state.transfers_.cend(); ++cit)
   {
-    const auto& tr = (*cit).second;
+    const vasyakin::Transfer& tr = cit->second;
 
     if (tr.departure_ <= date && tr.arrival_ > date)
     {
@@ -536,17 +545,17 @@ void vasyakin::cmdStats(
 
     for (auto cit = state.warehouses_.cbegin(); cit != state.warehouses_.cend(); ++cit)
     {
-      const auto& wh = (*cit).second;
+      const vasyakin::WarehouseState& wh = cit->second;
 
       for (auto ccit = wh.items_.cbegin(); ccit != wh.items_.cend(); ++ccit)
       {
-        total_items += (*ccit).second.getCount();
+        total_items += ccit->second.getCount();
       }
     }
 
     for (auto cit = state.transfers_.cbegin(); cit != state.transfers_.cend(); ++cit)
     {
-      if ((*cit).second.arrival_ <= state.current_date_)
+      if (cit->second.arrival_ <= state.current_date_)
       {
         ++completed;
       }
@@ -562,16 +571,16 @@ void vasyakin::cmdStats(
   }
   else
   {
-    if (!state.warehouses_.has(warehouse))
+    if (!state.warehouses_.count(warehouse))
     {
       out << "<ERROR: WAREHOUSE NOT FOUND>" << '\n';
       return;
     }
 
-    const auto& wh = state.warehouses_.at(warehouse);
+    const vasyakin::WarehouseState& wh = state.warehouses_.at(warehouse);
     for (auto cit = wh.items_.cbegin(); cit != wh.items_.cend(); ++cit)
     {
-      total_items += (*cit).second.getCount();
+      total_items += cit->second.getCount();
     }
 
     out << "<WAREHOUSE STATS: " << warehouse << ">" << '\n';
@@ -602,15 +611,15 @@ void vasyakin::cmdCalculateCenterCapacity(
   size_t peak_load = 0;
   vasyakin::Date peak_date = from;
 
-  for (auto curr = from; curr <= to; curr = curr + 1)
+  for (vasyakin::Date curr = from; curr <= to; curr = curr + 1)
   {
     size_t daily_load = 0;
 
     for (auto cit = state.transfers_.cbegin(); cit != state.transfers_.cend(); ++cit)
     {
-      const auto& tr = (*cit).second;
+      const vasyakin::Transfer& tr = cit->second;
 
-      if (!state.warehouses_.has(tr.from_) || !state.warehouses_.has(tr.to_))
+      if (!state.warehouses_.count(tr.from_) || !state.warehouses_.count(tr.to_))
       {
         continue;
       }
@@ -682,8 +691,8 @@ void vasyakin::cmdSave(
 
   for (auto cit = state.warehouses_.cbegin(); cit != state.warehouses_.cend(); ++cit)
   {
-    const std::string& wh_name = (*cit).first;
-    const auto& wh = (*cit).second;
+    const std::string& wh_name = cit->first;
+    const vasyakin::WarehouseState& wh = cit->second;
 
     file << "WH " << wh_name << ' ' << wh.capacity_ << ' '
       << wh.days_to_center_ << ' ' << wh.used_capacity_ << ' '
@@ -692,7 +701,7 @@ void vasyakin::cmdSave(
 
     for (auto ccit = wh.items_.cbegin(); ccit != wh.items_.cend(); ++ccit)
     {
-      const auto& item = (*ccit).second;
+      const vasyakin::Item& item = ccit->second;
 
       file << "IT " << wh_name << ' '
         << escapeSpaces(item.getModel()) << ' '
@@ -705,7 +714,7 @@ void vasyakin::cmdSave(
 
   for (auto cit = state.transfers_.cbegin(); cit != state.transfers_.cend(); ++cit)
   {
-    const auto& tr = (*cit).second;
+    const vasyakin::Transfer& tr = cit->second;
 
     file << "TR " << tr.id_ << ' '
       << escapeSpaces(tr.from_) << ' '
@@ -719,7 +728,7 @@ void vasyakin::cmdSave(
 
   for (auto cit = state.log_.cbegin(); cit != state.log_.cend(); ++cit)
   {
-    const auto& log = (*cit).second;
+    const vasyakin::LogEntry& log = cit->second;
 
     file << "LOG " << log.id_ << ' '
       << log.date_.toString() << ' ' << log.details_ << '\n';
@@ -777,7 +786,7 @@ void vasyakin::cmdLoad(
       file >> name >> cap >> days >> used >> sent >> recv >> val;
 
       state.warehouses_.insert(name, WarehouseState(name, cap, days));
-      auto& wh = state.warehouses_.at(name);
+      vasyakin::WarehouseState& wh = state.warehouses_.at(name);
 
       wh.used_capacity_ = used;
       wh.items_sent_ = sent;
@@ -791,7 +800,7 @@ void vasyakin::cmdLoad(
 
       file >> wh_name >> model_raw >> color_raw >> size >> count >> price;
 
-      if (state.warehouses_.has(wh_name))
+      if (state.warehouses_.count(wh_name))
       {
         std::string model = unescapeSpaces(model_raw);
         std::string color = unescapeSpaces(color_raw);

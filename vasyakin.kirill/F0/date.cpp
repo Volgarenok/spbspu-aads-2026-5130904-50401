@@ -1,5 +1,20 @@
 #include "date.hpp"
 
+namespace
+{
+  size_t toDays(const vasyakin::Date& date) noexcept
+  {
+    size_t days = date.getYear() * 365 + date.getDay();
+    for (size_t m = 1; m < date.getMonth(); ++m)
+    {
+      days += vasyakin::Date::getDaysInMonth(m, date.getYear());
+    }
+
+    days += date.getYear() / 4 - date.getYear() / 100 + date.getYear() / 400;
+    return days;
+  }
+}
+
 vasyakin::Date::Date() noexcept:
   day_(1),
   month_(1),
@@ -39,23 +54,12 @@ vasyakin::Date vasyakin::Date::operator+(size_t days) const noexcept
 
 size_t vasyakin::Date::daysDiff(const Date& other) const noexcept
 {
-  auto toDays = [](const Date& date) -> size_t
-  {
-    size_t days = date.year_ * 365 + date.day_;
-    for (size_t m = 1; m < date.month_; ++m)
-    {
-      days += getDaysInMonth(m, date.year_);
-    }
-    days += date.year_ / 4 - date.year_ / 100 + date.year_ / 400;
-    return days;
-  };
-
-  return toDays(*this) - toDays(other);
+  return ::toDays(*this) - ::toDays(other);
 }
 
 bool vasyakin::Date::isValid() const noexcept
 {
-  return day_ >= 1 && day_ <= getDaysInMonth(month_, year_)
+  return day_ >= 1 && day_ <= Date::getDaysInMonth(month_, year_)
     && year_ >= 2020 && year_ <= 2100 && month_ >= 1 && month_ <= 12;
 }
 
@@ -145,9 +149,9 @@ size_t vasyakin::Date::getDaysInMonth(size_t month, size_t year) noexcept
 
 void vasyakin::Date::normalize() noexcept
 {
-  while (day_ > getDaysInMonth(month_, year_))
+  while (day_ > Date::getDaysInMonth(month_, year_))
   {
-    day_ -= getDaysInMonth(month_, year_);
+    day_ -= Date::getDaysInMonth(month_, year_);
     month_++;
 
     if (month_ > 12)

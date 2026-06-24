@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <functional>
 #include <algorithm>
-#include <memory>
 #include "node.hpp"
 #include "treeIters.hpp"
 
@@ -24,10 +23,10 @@ namespace vasyakin
     AVLTree& operator=(const AVLTree& other);
     AVLTree& operator=(AVLTree&& other) noexcept;
 
-    template< class K, class V >
-    void insert(K&& key, V&& value);
+    std::pair< iterator, bool > insert(const Key& key, const Value& value);
+    std::pair< iterator, bool > insert(Key&& key, Value&& value);
 
-    bool remove(const Key& key);
+    size_t erase(const Key& key);
     void clear() noexcept;
 
     iterator find(const Key& key) noexcept;
@@ -35,10 +34,11 @@ namespace vasyakin
 
     Value& at(const Key& key);
     const Value& at(const Key& key) const;
-    bool has(const Key& key) const noexcept;
+    size_t count(const Key& key) const noexcept;
 
     size_t size() const noexcept;
     bool empty() const noexcept;
+    void swap(AVLTree& other) noexcept;
 
     iterator lower_bound(const Key& key) noexcept;
     const_iterator lower_bound(const Key& key) const noexcept;
@@ -61,6 +61,9 @@ namespace vasyakin
     size_t size_;
     Compare cmp_;
 
+    template< class K, class V >
+    std::pair< iterator, bool > insertImpl(K&& key, V&& value);
+
     int getHeight(const Node* node) const noexcept;
     int getBalance(const Node* node) const noexcept;
     void updateHeight(Node* node) noexcept;
@@ -74,7 +77,6 @@ namespace vasyakin
     void rebalanceUp(Node* from) noexcept;
 
     Node* cloneNode(const Node* src, Node* parent) const;
-    void swap(AVLTree& other) noexcept;
     Node* fallLeft(Node* node) const noexcept;
     const Node* findNode(const Key& key) const noexcept;
     static void destroyTree(Node* node) noexcept;
@@ -137,14 +139,14 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::Node*
-  AVLTree< Key, Value, Compare >::cloneNode(const Node* src, Node* parent) const
+    AVLTree< Key, Value, Compare >::cloneNode(const Node* src, Node* parent) const
   {
     if (src == nullptr)
     {
       return nullptr;
     }
 
-    Node* new_node = new Node(src->key_, src->value_);
+    Node* new_node = new Node(src->value_.first, src->value_.second);
 
     try
     {
@@ -195,7 +197,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::Node*
-  AVLTree< Key, Value, Compare >::fallLeft(Node* node) const noexcept
+    AVLTree< Key, Value, Compare >::fallLeft(Node* node) const noexcept
   {
     while (node && node->left_)
     {
@@ -207,16 +209,16 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   const typename AVLTree< Key, Value, Compare >::Node*
-  AVLTree< Key, Value, Compare >::findNode(const Key& key) const noexcept
+    AVLTree< Key, Value, Compare >::findNode(const Key& key) const noexcept
   {
     const Node* curr = root_;
     while (curr)
     {
-      if (cmp_(key, curr->key_))
+      if (cmp_(key, curr->value_.first))
       {
         curr = curr->left_;
       }
-      else if (cmp_(curr->key_, key))
+      else if (cmp_(curr->value_.first, key))
       {
         curr = curr->right_;
       }
@@ -231,14 +233,14 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::iterator
-  AVLTree< Key, Value, Compare >::find(const Key& key) noexcept
+    AVLTree< Key, Value, Compare >::find(const Key& key) noexcept
   {
     return iterator(const_cast< Node* >(findNode(key)));
   }
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::const_iterator
-  AVLTree< Key, Value, Compare >::find(const Key& key) const noexcept
+    AVLTree< Key, Value, Compare >::find(const Key& key) const noexcept
   {
     return const_iterator(findNode(key));
   }
@@ -246,13 +248,7 @@ namespace vasyakin
   template< class Key, class Value, class Compare >
   Value& AVLTree< Key, Value, Compare >::at(const Key& key)
   {
-    Node* node = const_cast< Node* >(findNode(key));
-    if (!node)
-    {
-      throw std::out_of_range("AVLTree::at: key not found");
-    }
-
-    return node->value_;
+    return const_cast< Value& >(static_cast< const AVLTree* >(this)->at(key));
   }
 
   template< class Key, class Value, class Compare >
@@ -264,13 +260,13 @@ namespace vasyakin
       throw std::out_of_range("AVLTree::at: key not found");
     }
 
-    return node->value_;
+    return node->value_.second;
   }
 
   template< class Key, class Value, class Compare >
-  bool AVLTree< Key, Value, Compare >::has(const Key& key) const noexcept
+  size_t AVLTree< Key, Value, Compare >::count(const Key& key) const noexcept
   {
-    return findNode(key) != nullptr;
+    return findNode(key) != nullptr ? 1 : 0;
   }
 
   template< class Key, class Value, class Compare >
@@ -287,14 +283,14 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::iterator
-  AVLTree< Key, Value, Compare >::lower_bound(const Key& key) noexcept
+    AVLTree< Key, Value, Compare >::lower_bound(const Key& key) noexcept
   {
     Node* curr = root_;
     Node* candidate = nullptr;
 
     while (curr)
     {
-      if (cmp_(curr->key_, key))
+      if (cmp_(curr->value_.first, key))
       {
         curr = curr->right_;
       }
@@ -310,21 +306,21 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::const_iterator
-  AVLTree< Key, Value, Compare >::lower_bound(const Key& key) const noexcept
+    AVLTree< Key, Value, Compare >::lower_bound(const Key& key) const noexcept
   {
     return const_cast< AVLTree* >(this)->lower_bound(key);
   }
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::iterator
-  AVLTree< Key, Value, Compare >::upper_bound(const Key& key) noexcept
+    AVLTree< Key, Value, Compare >::upper_bound(const Key& key) noexcept
   {
     Node* curr = root_;
     Node* candidate = nullptr;
 
     while (curr)
     {
-      if (!cmp_(key, curr->key_))
+      if (!cmp_(key, curr->value_.first))
       {
         curr = curr->right_;
       }
@@ -340,7 +336,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::const_iterator
-  AVLTree< Key, Value, Compare >::upper_bound(const Key& key) const noexcept
+    AVLTree< Key, Value, Compare >::upper_bound(const Key& key) const noexcept
   {
     return const_cast< AVLTree* >(this)->upper_bound(key);
   }
@@ -385,7 +381,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::Node*
-  AVLTree< Key, Value, Compare >::rotateLeft(Node* node) noexcept
+    AVLTree< Key, Value, Compare >::rotateLeft(Node* node) noexcept
   {
     if (!node)
     {
@@ -425,7 +421,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::Node*
-  AVLTree< Key, Value, Compare >::rotateLargeLeft(Node* node) noexcept
+    AVLTree< Key, Value, Compare >::rotateLargeLeft(Node* node) noexcept
   {
     if (!node)
     {
@@ -438,7 +434,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::Node*
-  AVLTree< Key, Value, Compare >::rotateRight(Node* node) noexcept
+    AVLTree< Key, Value, Compare >::rotateRight(Node* node) noexcept
   {
     if (!node)
     {
@@ -478,7 +474,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::Node*
-  AVLTree< Key, Value, Compare >::rotateLargeRight(Node* node) noexcept
+    AVLTree< Key, Value, Compare >::rotateLargeRight(Node* node) noexcept
   {
     if (!node)
     {
@@ -491,7 +487,7 @@ namespace vasyakin
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::Node*
-  AVLTree< Key, Value, Compare >::balance(Node* node) noexcept
+    AVLTree< Key, Value, Compare >::balance(Node* node) noexcept
   {
     if (!node)
     {
@@ -568,8 +564,23 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Compare >
+  std::pair< typename AVLTree< Key, Value, Compare >::iterator, bool >
+    AVLTree< Key, Value, Compare >::insert(const Key& key, const Value& value)
+  {
+    return insertImpl(key, value);
+  }
+
+  template< class Key, class Value, class Compare >
+  std::pair< typename AVLTree< Key, Value, Compare >::iterator, bool >
+    AVLTree< Key, Value, Compare >::insert(Key&& key, Value&& value)
+  {
+    return insertImpl(std::forward< Key >(key), std::forward< Value >(value));
+  }
+
+  template< class Key, class Value, class Compare >
   template< class K, class V >
-  void AVLTree< Key, Value, Compare >::insert(K&& key, V&& value)
+  std::pair< typename AVLTree< Key, Value, Compare >::iterator, bool >
+    AVLTree< Key, Value, Compare >::insertImpl(K&& key, V&& value)
   {
     Node* curr = root_;
     Node* parent = nullptr;
@@ -579,20 +590,19 @@ namespace vasyakin
     {
       parent = curr;
 
-      if (cmp_(key, curr->key_))
+      if (cmp_(key, curr->value_.first))
       {
         curr = curr->left_;
         go_left = true;
       }
-      else if (cmp_(curr->key_, key))
+      else if (cmp_(curr->value_.first, key))
       {
         curr = curr->right_;
         go_left = false;
       }
       else
       {
-        curr->value_ = std::forward< V >(value);
-        return;
+        return {iterator(curr), false};
       }
     }
 
@@ -617,10 +627,12 @@ namespace vasyakin
     }
 
     rebalanceUp(new_node);
+
+    return {iterator(new_node), true};
   }
 
   template< class Key, class Value, class Compare >
-  bool AVLTree< Key, Value, Compare >::remove(const Key& key)
+  size_t AVLTree< Key, Value, Compare >::erase(const Key& key)
   {
     Node* curr = root_;
     Node* rebalance_from = nullptr;
@@ -628,7 +640,7 @@ namespace vasyakin
 
     while (curr != nullptr)
     {
-      if (!cmp_(key, curr->key_) && !cmp_(curr->key_, key))
+      if (!cmp_(key, curr->value_.first) && !cmp_(curr->value_.first, key))
       {
         found = true;
 
@@ -705,8 +717,9 @@ namespace vasyakin
             min_in_right = min_in_right->left_;
           }
 
-          curr->key_ = std::move(min_in_right->key_);
-          curr->value_ = std::move(min_in_right->value_);
+          const_cast< Key& >(curr->value_.first) = std::move(
+            const_cast< Key& >(min_in_right->value_.first));
+          curr->value_.second = std::move(min_in_right->value_.second);
 
           if (min_in_right->right_ != nullptr)
           {
@@ -734,7 +747,7 @@ namespace vasyakin
         break;
       }
 
-      if (cmp_(key, curr->key_))
+      if (cmp_(key, curr->value_.first))
       {
         curr = curr->left_;
       }
@@ -746,52 +759,52 @@ namespace vasyakin
 
     if (!found)
     {
-      return false;
+      return 0;
     }
 
     rebalanceUp(rebalance_from);
 
-    return true;
+    return 1;
   }
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::iterator
-  AVLTree< Key, Value, Compare >::begin() noexcept
+    AVLTree< Key, Value, Compare >::begin() noexcept
   {
     return iterator(fallLeft(root_));
   }
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::iterator
-  AVLTree< Key, Value, Compare >::end() noexcept
+    AVLTree< Key, Value, Compare >::end() noexcept
   {
     return iterator();
   }
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::const_iterator
-  AVLTree< Key, Value, Compare >::begin() const noexcept
+    AVLTree< Key, Value, Compare >::begin() const noexcept
   {
     return const_iterator(fallLeft(root_));
   }
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::const_iterator
-  AVLTree< Key, Value, Compare >::end() const noexcept
+    AVLTree< Key, Value, Compare >::end() const noexcept
   {
     return const_iterator();
   }
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::const_iterator
-  AVLTree< Key, Value, Compare >::cbegin() const noexcept
+    AVLTree< Key, Value, Compare >::cbegin() const noexcept
   {
     return begin();
   }
 
   template< class Key, class Value, class Compare >
   typename AVLTree< Key, Value, Compare >::const_iterator
-  AVLTree< Key, Value, Compare >::cend() const noexcept
+    AVLTree< Key, Value, Compare >::cend() const noexcept
   {
     return end();
   }

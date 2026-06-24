@@ -9,11 +9,13 @@ namespace vasyakin
   {
   public:
     Date() noexcept;
-    Date(size_t date, size_t month, size_t year);
+    Date(size_t day, size_t month, size_t year);
 
     size_t getDay() const noexcept;
     size_t getMonth() const noexcept;
     size_t getYear() const noexcept;
+
+    static size_t getDaysInMonth(size_t month, size_t year) noexcept;
 
     Date operator+(size_t days) const noexcept;
     size_t daysDiff(const Date& other) const noexcept;
@@ -35,7 +37,6 @@ namespace vasyakin
 
     void normalize() noexcept;
     static bool isLeapYear(size_t year) noexcept;
-    static size_t getDaysInMonth(size_t month, size_t year) noexcept;
   };
 }
 

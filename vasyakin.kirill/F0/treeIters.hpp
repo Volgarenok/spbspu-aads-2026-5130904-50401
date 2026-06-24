@@ -1,23 +1,25 @@
 #ifndef TREEITERS_HPP
 #define TREEITERS_HPP
 #include <cassert>
+#include <memory>
 #include "node.hpp"
 
 namespace vasyakin
 {
-  template< class Key, class Value, class Compare >
-  class AVLTree;
+  template< class Key, class Value >
+  class AVLConstIterator;
 
   template< class Key, class Value >
   class AVLIterator
   {
+  public:
     using Node = vasyakin::detail::Node< Key, Value >;
 
-  public:
     AVLIterator() noexcept;
     explicit AVLIterator(Node* node) noexcept;
 
-    std::pair< Key, Value > operator*() const;
+    std::pair< const Key, Value >& operator*() const;
+    std::pair< const Key, Value >* operator->() const;
 
     AVLIterator& operator++() noexcept;
     AVLIterator operator++(int) noexcept;
@@ -34,21 +36,19 @@ namespace vasyakin
 
     void findNext() noexcept;
     void findPrev() noexcept;
-
-    template< class K, class V, class C >
-    friend class AVLTree;
   };
 
   template< class Key, class Value >
   class AVLConstIterator
   {
+  public:
     using Node = vasyakin::detail::Node< Key, Value >;
 
-  public:
     AVLConstIterator() noexcept;
     explicit AVLConstIterator(const Node* node) noexcept;
 
-    std::pair< Key, Value > operator*() const;
+    const std::pair< const Key, Value >& operator*() const;
+    const std::pair< const Key, Value >* operator->() const;
 
     AVLConstIterator& operator++() noexcept;
     AVLConstIterator operator++(int) noexcept;
@@ -63,9 +63,6 @@ namespace vasyakin
 
     void findNext() noexcept;
     void findPrev() noexcept;
-
-    template< class K, class V, class C >
-    friend class AVLTree;
   };
 
   template< class Key, class Value >
@@ -79,68 +76,29 @@ namespace vasyakin
   {}
 
   template< class Key, class Value >
-  std::pair< Key, Value > AVLIterator< Key, Value >::operator*() const
+  std::pair< const Key, Value >& AVLIterator< Key, Value >::operator*() const
   {
-    assert(node_ != nullptr && "Dereferencing end() iterator");
-    return {node_->key_, node_->value_};
+    assert(node_ != nullptr);
+    return node_->value_;
+  }
+
+  template< class Key, class Value >
+  std::pair< const Key, Value >* AVLIterator< Key, Value >::operator->() const
+  {
+    assert(node_ != nullptr);
+    return std::addressof(node_->value_);
   }
 
   template< class Key, class Value >
   void AVLIterator< Key, Value >::findNext() noexcept
   {
-    if (!node_)
-    {
-      return;
-    }
-
-    if (node_->right_)
-    {
-      node_ = node_->right_;
-      while (node_->left_)
-      {
-        node_ = node_->left_;
-      }
-    }
-    else
-    {
-      Node* parent = node_->parent_;
-      while (parent && node_ == parent->right_)
-      {
-        node_ = parent;
-        parent = parent->parent_;
-      }
-
-      node_ = parent;
-    }
+    return vasyakin::detail::findNextNode(node_);
   }
 
   template< class Key, class Value >
   void AVLIterator< Key, Value >::findPrev() noexcept
   {
-    if (!node_)
-    {
-      return;
-    }
-
-    if (node_->left_)
-    {
-      node_ = node_->left_;
-      while (node_->right_)
-      {
-        node_ = node_->right_;
-      }
-    }
-    else
-    {
-      Node* parent = node_->parent_;
-      while (parent && node_ == parent->left_)
-      {
-        node_ = parent;
-        parent = parent->parent_;
-      }
-
-      node_ = parent;
-    }
+    return vasyakin::detail::findPrevNode(node_);
   }
 
   template< class Key, class Value >
@@ -202,68 +160,29 @@ namespace vasyakin
   {}
 
   template< class Key, class Value >
-  std::pair< Key, Value > AVLConstIterator< Key, Value >::operator*() const
+  const std::pair< const Key, Value >& AVLConstIterator< Key, Value >::operator*() const
   {
-    assert(node_ != nullptr && "Dereferencing end() iterator");
-    return {node_->key_, node_->value_};
+    assert(node_ != nullptr);
+    return node_->value_;
+  }
+
+  template< class Key, class Value >
+  const std::pair< const Key, Value >* AVLConstIterator< Key, Value >::operator->() const
+  {
+    assert(node_ != nullptr);
+    return std::addressof(node_->value_);
   }
 
   template< class Key, class Value >
   void AVLConstIterator< Key, Value >::findNext() noexcept
   {
-    if (!node_)
-    {
-      return;
-    }
-
-    if (node_->right_)
-    {
-      node_ = node_->right_;
-      while (node_->left_)
-      {
-        node_ = node_->left_;
-      }
-    }
-    else
-    {
-      const Node* parent = node_->parent_;
-      while (parent && node_ == parent->right_)
-      {
-        node_ = parent;
-        parent = parent->parent_;
-      }
-
-      node_ = parent;
-    }
+    return vasyakin::detail::findNextNode(node_);
   }
 
   template< class Key, class Value >
   void AVLConstIterator< Key, Value >::findPrev() noexcept
   {
-    if (!node_)
-    {
-      return;
-    }
-
-    if (node_->left_)
-    {
-      node_ = node_->left_;
-      while (node_->right_)
-      {
-        node_ = node_->right_;
-      }
-    }
-    else
-    {
-      const Node* parent = node_->parent_;
-      while (parent && node_ == parent->left_)
-      {
-        node_ = parent;
-        parent = parent->parent_;
-      }
-
-      node_ = parent;
-    }
+    vasyakin::detail::findPrevNode(node_);
   }
 
   template< class Key, class Value >

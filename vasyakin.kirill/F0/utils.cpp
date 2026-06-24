@@ -30,20 +30,19 @@ void vasyakin::SystemState::completeTransfers()
 {
   for (auto it = transfers_.begin(); it != transfers_.end(); ++it)
   {
-    auto key = (*it).first;
-    auto& tr = transfers_.at(key);
+    vasyakin::Transfer& tr = (*it).second;
 
     if (tr.active_ && tr.arrival_ <= current_date_)
     {
       tr.active_ = false;
 
-      auto& wh_to = warehouses_.at(tr.to_);
-      auto& wh_from = warehouses_.at(tr.from_);
+      vasyakin::WarehouseState& wh_to = warehouses_.at(tr.to_);
+      vasyakin::WarehouseState& wh_from = warehouses_.at(tr.from_);
 
       wh_to.items_received_ += tr.count_;
       wh_from.items_sent_ += tr.count_;
 
-      if (wh_to.items_.has(tr.item_key_))
+      if (wh_to.items_.count(tr.item_key_))
       {
         wh_to.items_.at(tr.item_key_).addCount(tr.count_);
       }

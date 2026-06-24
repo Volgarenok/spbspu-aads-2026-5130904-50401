@@ -34,44 +34,44 @@ BOOST_AUTO_TEST_CASE(copy_and_move_semantics)
   vasyakin::AVLTree< int, std::string > yatree(tree);
 
   BOOST_CHECK_EQUAL(yatree.size(), tree.size());
-  BOOST_CHECK(yatree.has(10));
+  BOOST_CHECK(yatree.count(10));
 
-  BOOST_CHECK(yatree.has(20));
-  BOOST_CHECK(yatree.has(5));
+  BOOST_CHECK(yatree.count(20));
+  BOOST_CHECK(yatree.count(5));
 
-  yatree.remove(10);
+  yatree.erase(10);
 
   BOOST_CHECK_EQUAL(yatree.size(), 2u);
-  BOOST_CHECK(yatree.has(20));
-  BOOST_CHECK(yatree.has(5));
+  BOOST_CHECK(yatree.count(20));
+  BOOST_CHECK(yatree.count(5));
 
   BOOST_CHECK_EQUAL(tree.size(), 3u);
-  BOOST_CHECK(tree.has(10));
+  BOOST_CHECK(tree.count(10));
 
   vasyakin::AVLTree< int, std::string > assigned;
   assigned = tree;
 
   BOOST_CHECK_EQUAL(assigned.size(), tree.size());
 
-  BOOST_CHECK(assigned.has(10));
-  BOOST_CHECK(assigned.has(20));
-  BOOST_CHECK(assigned.has(5));
+  BOOST_CHECK(assigned.count(10));
+  BOOST_CHECK(assigned.count(20));
+  BOOST_CHECK(assigned.count(5));
 
-  assigned.remove(5);
+  assigned.erase(5);
 
   BOOST_CHECK_EQUAL(assigned.size(), 2u);
   BOOST_CHECK_EQUAL(tree.size(), 3u);
-  BOOST_CHECK(tree.has(5));
+  BOOST_CHECK(tree.count(5));
 
   vasyakin::AVLTree< int, std::string > moved(std::move(tree));
 
   BOOST_CHECK_EQUAL(moved.size(), 3u);
   BOOST_CHECK_EQUAL(tree.size(), 0u);
 
-  BOOST_CHECK(moved.has(10));
-  BOOST_CHECK(moved.has(20));
+  BOOST_CHECK(moved.count(10));
+  BOOST_CHECK(moved.count(20));
 
-  BOOST_CHECK(moved.has(5));
+  BOOST_CHECK(moved.count(5));
   BOOST_CHECK(tree.empty());
 
   vasyakin::AVLTree< int, std::string > move_assigned;
@@ -80,10 +80,10 @@ BOOST_AUTO_TEST_CASE(copy_and_move_semantics)
   BOOST_CHECK_EQUAL(move_assigned.size(), 3u);
   BOOST_CHECK_EQUAL(moved.size(), 0u);
 
-  BOOST_CHECK(move_assigned.has(10));
-  BOOST_CHECK(move_assigned.has(20));
+  BOOST_CHECK(move_assigned.count(10));
+  BOOST_CHECK(move_assigned.count(20));
 
-  BOOST_CHECK(move_assigned.has(5));
+  BOOST_CHECK(move_assigned.count(5));
   BOOST_CHECK(moved.empty());
 }
 
@@ -97,8 +97,8 @@ BOOST_AUTO_TEST_CASE(self_assignment_safety)
   tree = tree;
 
   BOOST_CHECK_EQUAL(tree.size(), 2u);
-  BOOST_CHECK(tree.has(1));
-  BOOST_CHECK(tree.has(2));
+  BOOST_CHECK(tree.count(1));
+  BOOST_CHECK(tree.count(2));
 }
 
 BOOST_AUTO_TEST_CASE(destructor_and_clear_safety)
@@ -141,13 +141,13 @@ BOOST_AUTO_TEST_CASE(insert_basic_and_duplicates)
   tree.insert(20, "twenty");
 
   BOOST_CHECK_EQUAL(tree.size(), 3u);
-  BOOST_CHECK(tree.has(10));
-  BOOST_CHECK(!tree.has(15));
+  BOOST_CHECK(tree.count(10));
+  BOOST_CHECK(!tree.count(15));
 
   tree.insert(10, "six_seven");
 
   BOOST_CHECK_EQUAL(tree.size(), 3u);
-  BOOST_CHECK_EQUAL(tree.at(10), "six_seven");
+  BOOST_CHECK_EQUAL(tree.at(10), "ten");
 }
 
 BOOST_AUTO_TEST_CASE(inorder_traversal_random_insertion)
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(inorder_traversal_random_insertion)
   std::vector< int > sorted;
   for (auto it = tree.begin(); it != tree.end(); ++it)
   {
-    sorted.push_back((*it).first);
+    sorted.push_back(it->first);
   }
 
   std::vector< int > expected = {10, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80};
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(inorder_traversal_random_insertion)
     expected.begin(), expected.end());
 }
 
-BOOST_AUTO_TEST_CASE(remove_leaf_and_one_child)
+BOOST_AUTO_TEST_CASE(erase_leaf_and_one_child)
 {
   vasyakin::AVLTree< int, std::string > tree;
 
@@ -181,18 +181,18 @@ BOOST_AUTO_TEST_CASE(remove_leaf_and_one_child)
   tree.insert(7, "right_leaf");
   tree.insert(3, "left_leaf");
 
-  BOOST_CHECK(tree.remove(3));
+  BOOST_CHECK(tree.erase(3));
   BOOST_CHECK_EQUAL(tree.size(), 4u);
-  BOOST_CHECK(!tree.has(3));
+  BOOST_CHECK(!tree.count(3));
 
-  BOOST_CHECK(tree.remove(5));
+  BOOST_CHECK(tree.erase(5));
   BOOST_CHECK_EQUAL(tree.size(), 3u);
 
-  BOOST_CHECK(!tree.has(5));
-  BOOST_CHECK(tree.has(7));
+  BOOST_CHECK(!tree.count(5));
+  BOOST_CHECK(tree.count(7));
 }
 
-BOOST_AUTO_TEST_CASE(remove_two_children)
+BOOST_AUTO_TEST_CASE(erase_two_children)
 {
   vasyakin::AVLTree< int, std::string > tree;
 
@@ -202,20 +202,20 @@ BOOST_AUTO_TEST_CASE(remove_two_children)
   tree.insert(7, "right_leaf");
   tree.insert(3, "left_leaf");
 
-  BOOST_CHECK(tree.remove(5));
+  BOOST_CHECK(tree.erase(5));
   BOOST_CHECK_EQUAL(tree.size(), 4u);
 
-  BOOST_CHECK(!tree.has(5));
-  BOOST_CHECK(tree.has(3));
-  BOOST_CHECK(tree.has(7));
+  BOOST_CHECK(!tree.count(5));
+  BOOST_CHECK(tree.count(3));
+  BOOST_CHECK(tree.count(7));
 }
 
-BOOST_AUTO_TEST_CASE(remove_nonexistent_returns_false)
+BOOST_AUTO_TEST_CASE(erase_nonexistent_returns_false)
 {
   vasyakin::AVLTree< int, int > tree;
   tree.insert(52, 52);
 
-  BOOST_CHECK(!tree.remove(67));
+  BOOST_CHECK(!tree.erase(67));
   BOOST_CHECK_EQUAL(tree.size(), 1u);
 }
 
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(empty_tree_edge_cases)
   BOOST_CHECK(empty.cbegin() == empty.cend());
 
   BOOST_CHECK_THROW(empty.at(100), std::out_of_range);
-  BOOST_CHECK(!empty.remove(42));
+  BOOST_CHECK(!empty.erase(42));
   BOOST_CHECK_NO_THROW(empty.clear());
 }
 
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(stress_removal)
 
   for (int i = 99; i >= 0; --i)
   {
-    BOOST_CHECK(tree.remove(i));
+    BOOST_CHECK(tree.erase(i));
     BOOST_CHECK_EQUAL(tree.size(), static_cast< size_t >(i));
   }
 
@@ -265,8 +265,8 @@ BOOST_AUTO_TEST_CASE(find_method_and_const_correctness)
   auto it_found = tree.find(10);
   BOOST_REQUIRE(it_found != tree.end());
 
-  BOOST_CHECK_EQUAL((*it_found).first, 10);
-  BOOST_CHECK_EQUAL((*it_found).second, "ten");
+  BOOST_CHECK_EQUAL(it_found->first, 10);
+  BOOST_CHECK_EQUAL(it_found->second, "ten");
 
   auto it_not_found = tree.find(67);
   BOOST_CHECK(it_not_found == tree.end());
@@ -276,8 +276,8 @@ BOOST_AUTO_TEST_CASE(find_method_and_const_correctness)
   auto const_it_found = const_ref.find(10);
   BOOST_REQUIRE(const_it_found != const_ref.cend());
 
-  BOOST_CHECK_EQUAL((*const_it_found).first, 10);
-  BOOST_CHECK_EQUAL((*const_it_found).second, "ten");
+  BOOST_CHECK_EQUAL(const_it_found->first, 10);
+  BOOST_CHECK_EQUAL(const_it_found->second, "ten");
 
   auto const_it_not_found = const_ref.find(50);
   BOOST_CHECK(const_it_not_found == const_ref.cend());
@@ -306,19 +306,19 @@ BOOST_AUTO_TEST_CASE(iterator_increment_decrement)
   tree.insert(30, 30);
 
   auto it = tree.begin();
-  BOOST_CHECK_EQUAL((*it).first, 10);
+  BOOST_CHECK_EQUAL(it->first, 10);
 
   ++it;
-  BOOST_CHECK_EQUAL((*it).first, 20);
+  BOOST_CHECK_EQUAL(it->first, 20);
 
   ++it;
-  BOOST_CHECK_EQUAL((*it).first, 30);
+  BOOST_CHECK_EQUAL(it->first, 30);
 
   --it;
-  BOOST_CHECK_EQUAL((*it).first, 20);
+  BOOST_CHECK_EQUAL(it->first, 20);
 
   --it;
-  BOOST_CHECK_EQUAL((*it).first, 10);
+  BOOST_CHECK_EQUAL(it->first, 10);
 }
 
 BOOST_AUTO_TEST_CASE(move_only_types)
@@ -331,7 +331,7 @@ BOOST_AUTO_TEST_CASE(move_only_types)
   BOOST_CHECK_EQUAL(*tree.at(1), 100);
   BOOST_CHECK_EQUAL(*tree.at(2), 200);
 
-  BOOST_CHECK(tree.remove(1));
+  BOOST_CHECK(tree.erase(1));
   BOOST_CHECK_EQUAL(tree.size(), 1u);
   BOOST_CHECK_EQUAL(*tree.at(2), 200);
 }
@@ -347,15 +347,15 @@ BOOST_AUTO_TEST_CASE(left_rotate)
 
   BOOST_CHECK_EQUAL(tree.size(), 4u);
 
-  BOOST_CHECK(tree.has(10));
-  BOOST_CHECK(tree.has(20));
-  BOOST_CHECK(tree.has(30));
-  BOOST_CHECK(tree.has(40));
+  BOOST_CHECK(tree.count(10));
+  BOOST_CHECK(tree.count(20));
+  BOOST_CHECK(tree.count(30));
+  BOOST_CHECK(tree.count(40));
 
   std::vector< int > keys;
   for (auto it = tree.begin(); it != tree.end(); ++it)
   {
-    keys.push_back((*it).first);
+    keys.push_back(it->first);
   }
 
   std::vector< int > expected = {10, 20, 30, 40};
@@ -375,15 +375,15 @@ BOOST_AUTO_TEST_CASE(right_rotate)
 
   BOOST_CHECK_EQUAL(tree.size(), 4u);
 
-  BOOST_CHECK(tree.has(10));
-  BOOST_CHECK(tree.has(9));
-  BOOST_CHECK(tree.has(8));
-  BOOST_CHECK(tree.has(7));
+  BOOST_CHECK(tree.count(10));
+  BOOST_CHECK(tree.count(9));
+  BOOST_CHECK(tree.count(8));
+  BOOST_CHECK(tree.count(7));
 
   std::vector< int > keys;
   for (auto it = tree.begin(); it != tree.end(); ++it)
   {
-    keys.push_back((*it).first);
+    keys.push_back(it->first);
   }
 
   std::vector< int > expected = {7, 8, 9, 10};
@@ -402,14 +402,14 @@ BOOST_AUTO_TEST_CASE(left_large_rotate)
 
   BOOST_CHECK_EQUAL(tree.size(), 3u);
 
-  BOOST_CHECK(tree.has(10));
-  BOOST_CHECK(tree.has(8));
-  BOOST_CHECK(tree.has(9));
+  BOOST_CHECK(tree.count(10));
+  BOOST_CHECK(tree.count(8));
+  BOOST_CHECK(tree.count(9));
 
   std::vector< int > keys;
   for (auto it = tree.begin(); it != tree.end(); ++it)
   {
-    keys.push_back((*it).first);
+    keys.push_back(it->first);
   }
 
   std::vector< int > expected = {8, 9, 10};
@@ -428,14 +428,14 @@ BOOST_AUTO_TEST_CASE(right_large_rotate)
 
   BOOST_CHECK_EQUAL(tree.size(), 3u);
 
-  BOOST_CHECK(tree.has(10));
-  BOOST_CHECK(tree.has(20));
-  BOOST_CHECK(tree.has(15));
+  BOOST_CHECK(tree.count(10));
+  BOOST_CHECK(tree.count(20));
+  BOOST_CHECK(tree.count(15));
 
   std::vector< int > keys;
   for (auto it = tree.begin(); it != tree.end(); ++it)
   {
-    keys.push_back((*it).first);
+    keys.push_back(it->first);
   }
 
   std::vector< int > expected = {10, 15, 20};
@@ -458,7 +458,7 @@ BOOST_AUTO_TEST_CASE(rotations_maintain_balance_under_load)
   std::vector< int > keys;
   for (auto it = tree.begin(); it != tree.end(); ++it)
   {
-    keys.push_back((*it).first);
+    keys.push_back(it->first);
   }
 
   std::vector< int > expected(100);
@@ -472,7 +472,7 @@ BOOST_AUTO_TEST_CASE(rotations_maintain_balance_under_load)
 
   for (int i = 0; i < 100; ++i)
   {
-    BOOST_CHECK(tree.has(i));
+    BOOST_CHECK(tree.count(i));
   }
 }
 
@@ -488,23 +488,23 @@ BOOST_AUTO_TEST_CASE(lower_bound)
 
   auto lb1 = tree.lower_bound(20);
   BOOST_REQUIRE(lb1 != tree.end());
-  BOOST_CHECK_EQUAL((*lb1).first, 20);
-  BOOST_CHECK_EQUAL((*lb1).second, "twenty");
+  BOOST_CHECK_EQUAL(lb1->first, 20);
+  BOOST_CHECK_EQUAL(lb1->second, "twenty");
 
   auto lb2 = tree.lower_bound(25);
   BOOST_REQUIRE(lb2 != tree.end());
-  BOOST_CHECK_EQUAL((*lb2).first, 30);
-  BOOST_CHECK_EQUAL((*lb2).second, "thirty");
+  BOOST_CHECK_EQUAL(lb2->first, 30);
+  BOOST_CHECK_EQUAL(lb2->second, "thirty");
 
   auto lb3 = tree.lower_bound(5);
   BOOST_REQUIRE(lb3 != tree.end());
-  BOOST_CHECK_EQUAL((*lb3).first, 10);
-  BOOST_CHECK_EQUAL((*lb3).second, "ten");
+  BOOST_CHECK_EQUAL(lb3->first, 10);
+  BOOST_CHECK_EQUAL(lb3->second, "ten");
 
   auto lb4 = tree.lower_bound(50);
   BOOST_REQUIRE(lb4 != tree.end());
-  BOOST_CHECK_EQUAL((*lb4).first, 50);
-  BOOST_CHECK_EQUAL((*lb4).second, "fifty");
+  BOOST_CHECK_EQUAL(lb4->first, 50);
+  BOOST_CHECK_EQUAL(lb4->second, "fifty");
 
   BOOST_CHECK(tree.lower_bound(52) == tree.end());
 }
@@ -521,18 +521,18 @@ BOOST_AUTO_TEST_CASE(upper_bound)
 
   auto ub1 = tree.upper_bound(10);
   BOOST_REQUIRE(ub1 != tree.end());
-  BOOST_CHECK_EQUAL((*ub1).first, 20);
-  BOOST_CHECK_EQUAL((*ub1).second, "twenty");
+  BOOST_CHECK_EQUAL(ub1->first, 20);
+  BOOST_CHECK_EQUAL(ub1->second, "twenty");
 
   auto ub2 = tree.upper_bound(15);
   BOOST_REQUIRE(ub2 != tree.end());
-  BOOST_CHECK_EQUAL((*ub2).first, 20);
-  BOOST_CHECK_EQUAL((*ub2).second, "twenty");
+  BOOST_CHECK_EQUAL(ub2->first, 20);
+  BOOST_CHECK_EQUAL(ub2->second, "twenty");
 
   auto ub3 = tree.upper_bound(5);
   BOOST_REQUIRE(ub3 != tree.end());
-  BOOST_CHECK_EQUAL((*ub3).first, 10);
-  BOOST_CHECK_EQUAL((*ub3).second, "ten");
+  BOOST_CHECK_EQUAL(ub3->first, 10);
+  BOOST_CHECK_EQUAL(ub3->second, "ten");
 
   BOOST_CHECK(tree.upper_bound(50) == tree.end());
 }
@@ -576,14 +576,14 @@ BOOST_AUTO_TEST_CASE(bounds_single_element)
 
   auto lb = tree.lower_bound(100);
   BOOST_REQUIRE(lb != tree.end());
-  BOOST_CHECK_EQUAL((*lb).first, 100);
+  BOOST_CHECK_EQUAL(lb->first, 100);
 
   auto ub = tree.upper_bound(100);
   BOOST_CHECK(ub == tree.end());
 
   auto range = tree.equal_range(100);
   BOOST_REQUIRE(range.first != tree.end());
-  BOOST_CHECK_EQUAL((*range.first).first, 100);
+  BOOST_CHECK_EQUAL(range.first->first, 100);
   BOOST_CHECK(range.second == tree.end());
 }
 

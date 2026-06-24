@@ -13,15 +13,15 @@ BOOST_AUTO_TEST_CASE(basic_insert_and_find)
   auto ok1 = result1.second;
 
   BOOST_CHECK(ok1);
-  BOOST_CHECK_EQUAL((*it1).first, 1);
-  BOOST_CHECK_EQUAL((*it1).second, "one");
+  BOOST_CHECK_EQUAL(it1->first, 1);
+  BOOST_CHECK_EQUAL(it1->second, "one");
 
   auto result2 = map.insert({1, "uno"});
   auto it2 = result2.first;
   auto ok2 = result2.second;
 
   BOOST_CHECK(!ok2);
-  BOOST_CHECK_EQUAL((*it2).second, "one");
+  BOOST_CHECK_EQUAL(it2->second, "one");
 
   BOOST_CHECK_EQUAL(map.size(), 1u);
   BOOST_CHECK_EQUAL(map.count(1), 1u);
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(erase_and_clear)
   BOOST_CHECK_EQUAL(map.erase(2), 1u);
   BOOST_CHECK_EQUAL(map.erase(999), 0u);
   BOOST_CHECK_EQUAL(map.size(), 2u);
-  BOOST_CHECK(!map.has(2));
+  BOOST_CHECK(!map.count(2));
 
   map.clear();
   BOOST_CHECK(map.empty());
@@ -72,14 +72,14 @@ BOOST_AUTO_TEST_CASE(bounds_and_equal_range)
   map.insert({40, "forty"});
 
   auto lb = map.lower_bound(20);
-  BOOST_CHECK_EQUAL((*lb).first, 20);
+  BOOST_CHECK_EQUAL(lb->first, 20);
 
   auto ub = map.upper_bound(20);
-  BOOST_CHECK_EQUAL((*ub).first, 30);
+  BOOST_CHECK_EQUAL(ub->first, 30);
 
   auto range = map.equal_range(25);
-  BOOST_CHECK_EQUAL((*range.first).first, 30);
-  BOOST_CHECK_EQUAL((*range.second).first, 30);
+  BOOST_CHECK_EQUAL(range.first->first, 30);
+  BOOST_CHECK_EQUAL(range.second->first, 30);
 }
 
 BOOST_AUTO_TEST_CASE(iteration_order)
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(iteration_order)
   std::vector< int > keys;
   for (auto it = map.begin(); it != map.end(); ++it)
   {
-    keys.push_back((*it).first);
+    keys.push_back(it->first);
   }
 
   std::vector< int > expected = {1, 2, 3, 4, 5};
@@ -164,10 +164,10 @@ BOOST_AUTO_TEST_CASE(const_correctness)
 
   auto it = cmap.find(1);
   BOOST_CHECK(it != cmap.end());
-  BOOST_CHECK_EQUAL((*it).second, 100);
+  BOOST_CHECK_EQUAL(it->second, 100);
 
   auto range = cmap.equal_range(1);
-  BOOST_CHECK_EQUAL((*range.first).first, 1);
+  BOOST_CHECK_EQUAL(range.first->first, 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -183,14 +183,14 @@ BOOST_AUTO_TEST_CASE(basic_insert_and_find)
   auto ok1 = result1.second;
 
   BOOST_CHECK(ok1);
-  BOOST_CHECK_EQUAL((*it1).first, 10);
+  BOOST_CHECK_EQUAL(it1->first, 10);
 
   auto result2 = set.insert(10);
   auto it2 = result2.first;
   auto ok2 = result2.second;
 
   BOOST_CHECK(!ok2);
-  BOOST_CHECK_EQUAL((*it2).first, 10);
+  BOOST_CHECK_EQUAL(it2->first, 10);
   BOOST_CHECK(it1 == it2);
 
   BOOST_CHECK_EQUAL(set.size(), 1u);
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(iteration_sorted)
   std::vector< int > keys;
   for (auto it = set.begin(); it != set.end(); ++it)
   {
-    keys.push_back((*it).first);
+    keys.push_back(it->first);
   }
 
   std::vector< int > expected = {1, 2, 3, 4, 5};
@@ -249,28 +249,28 @@ BOOST_AUTO_TEST_CASE(const_correctness)
   BOOST_CHECK_EQUAL(cset.size(), 3u);
   BOOST_CHECK(!cset.empty());
   BOOST_CHECK_EQUAL(cset.count(10), 1u);
-  BOOST_CHECK(cset.has(20));
-  BOOST_CHECK(!cset.has(99));
+  BOOST_CHECK(cset.count(20));
+  BOOST_CHECK(!cset.count(99));
 
   auto it = cset.find(20);
   BOOST_REQUIRE(it != cset.end());
-  BOOST_CHECK_EQUAL((*it).first, 20);
+  BOOST_CHECK_EQUAL(it->first, 20);
 
   auto lb = cset.lower_bound(15);
   BOOST_REQUIRE(lb != cset.end());
-  BOOST_CHECK_EQUAL((*lb).first, 20);
+  BOOST_CHECK_EQUAL(lb->first, 20);
 
   auto ub = cset.upper_bound(20);
   BOOST_REQUIRE(ub != cset.end());
-  BOOST_CHECK_EQUAL((*ub).first, 30);
+  BOOST_CHECK_EQUAL(ub->first, 30);
 
   auto range = cset.equal_range(20);
-  BOOST_CHECK_EQUAL((*range.first).first, 20);
-  BOOST_CHECK_EQUAL((*range.second).first, 30);
+  BOOST_CHECK_EQUAL(range.first->first, 20);
+  BOOST_CHECK_EQUAL(range.second->first, 30);
 
   auto begin_it = cset.begin();
   BOOST_REQUIRE(begin_it != cset.end());
-  BOOST_CHECK_EQUAL((*begin_it).first, 10);
+  BOOST_CHECK_EQUAL(begin_it->first, 10);
 }
 
 BOOST_AUTO_TEST_CASE(bounds)
@@ -282,10 +282,10 @@ BOOST_AUTO_TEST_CASE(bounds)
   set.insert(30);
 
   auto lb = set.lower_bound(15);
-  BOOST_CHECK_EQUAL((*lb).first, 20);
+  BOOST_CHECK_EQUAL(lb->first, 20);
 
   auto ub = set.upper_bound(20);
-  BOOST_CHECK_EQUAL((*ub).first, 30);
+  BOOST_CHECK_EQUAL(ub->first, 30);
 }
 
 BOOST_AUTO_TEST_CASE(initializer_list)
@@ -319,7 +319,7 @@ BOOST_AUTO_TEST_CASE(insert_returns_iterator)
 
   auto it = multimap.insert({10, 100});
   BOOST_CHECK(it != multimap.end());
-  BOOST_CHECK_EQUAL((*it).first, 10);
+  BOOST_CHECK_EQUAL(it->first, 10);
 }
 
 BOOST_AUTO_TEST_CASE(erase_removes_all)
@@ -346,7 +346,7 @@ BOOST_AUTO_TEST_CASE(values_stored_in_vector)
   auto it = multimap.find(1);
   BOOST_REQUIRE(it != multimap.end());
 
-  const auto& vec = (*it).second;
+  const auto& vec = it->second;
   BOOST_CHECK_EQUAL(vec.getSize(), 3u);
   BOOST_CHECK_EQUAL(vec[0], "a");
   BOOST_CHECK_EQUAL(vec[1], "b");
@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE(multimap_empty)
   BOOST_CHECK_EQUAL(multimap.size(), 0u);
 
   BOOST_CHECK_EQUAL(multimap.count(42), 0u);
-  BOOST_CHECK(!multimap.has(42));
+  BOOST_CHECK(!multimap.count(42));
 
   BOOST_CHECK_EQUAL(multimap.erase(42), 0u);
   BOOST_CHECK(multimap.begin() == multimap.end());
@@ -377,13 +377,13 @@ BOOST_AUTO_TEST_CASE(multimap_const_correctness)
 
   const auto& cmultimap = multimap;
   BOOST_CHECK_EQUAL(cmultimap.count(1), 2u);
-  BOOST_CHECK(cmultimap.has(1));
-  BOOST_CHECK(!cmultimap.has(99));
+  BOOST_CHECK(cmultimap.count(1));
+  BOOST_CHECK(!cmultimap.count(99));
 
   auto it = cmultimap.find(1);
   BOOST_REQUIRE(it != cmultimap.end());
-  BOOST_CHECK_EQUAL((*it).first, 1);
-  BOOST_CHECK_EQUAL((*it).second.getSize(), 2u);
+  BOOST_CHECK_EQUAL(it->first, 1);
+  BOOST_CHECK_EQUAL(it->second.getSize(), 2u);
 }
 
 BOOST_AUTO_TEST_CASE(bounds_and_equal_range)
@@ -395,14 +395,14 @@ BOOST_AUTO_TEST_CASE(bounds_and_equal_range)
   multimap.insert({30, 3});
 
   auto lb = multimap.lower_bound(15);
-  BOOST_CHECK_EQUAL((*lb).first, 20);
+  BOOST_CHECK_EQUAL(lb->first, 20);
 
   auto ub = multimap.upper_bound(20);
-  BOOST_CHECK_EQUAL((*ub).first, 30);
+  BOOST_CHECK_EQUAL(ub->first, 30);
 
   auto range = multimap.equal_range(20);
-  BOOST_CHECK_EQUAL((*range.first).first, 20);
-  BOOST_CHECK_EQUAL((*range.second).first, 30);
+  BOOST_CHECK_EQUAL(range.first->first, 20);
+  BOOST_CHECK_EQUAL(range.second->first, 30);
 }
 
 BOOST_AUTO_TEST_CASE(initializer_list)
@@ -444,7 +444,7 @@ BOOST_AUTO_TEST_CASE(values_in_vector)
   auto it = multiset.find(5);
   BOOST_REQUIRE(it != multiset.end());
 
-  const auto& vec = (*it).second;
+  const auto& vec = it->second;
   BOOST_CHECK_EQUAL(vec.getSize(), 3u);
   BOOST_CHECK_EQUAL(vec[0], 5);
   BOOST_CHECK_EQUAL(vec[1], 5);
@@ -473,11 +473,11 @@ BOOST_AUTO_TEST_CASE(multiset_const_correctness)
 
   const auto& cmultiset = multiset;
   BOOST_CHECK_EQUAL(cmultiset.count(10), 2u);
-  BOOST_CHECK(cmultiset.has(10));
+  BOOST_CHECK(cmultiset.count(10));
 
   auto it = cmultiset.find(10);
   BOOST_REQUIRE(it != cmultiset.end());
-  BOOST_CHECK_EQUAL((*it).first, 10);
+  BOOST_CHECK_EQUAL(it->first, 10);
 }
 
 BOOST_AUTO_TEST_CASE(sorted_iteration)
@@ -492,7 +492,7 @@ BOOST_AUTO_TEST_CASE(sorted_iteration)
   std::vector< int > keys;
   for (auto it = multiset.begin(); it != multiset.end(); ++it)
   {
-    keys.push_back((*it).first);
+    keys.push_back(it->first);
   }
 
   std::vector< int > expected = {10, 20, 30};
@@ -509,7 +509,7 @@ BOOST_AUTO_TEST_CASE(multiset_empty)
   BOOST_CHECK_EQUAL(multiset.size(), 0u);
 
   BOOST_CHECK_EQUAL(multiset.count(42), 0u);
-  BOOST_CHECK(!multiset.has(42));
+  BOOST_CHECK(!multiset.count(42));
 
   BOOST_CHECK_EQUAL(multiset.erase(42), 0u);
   BOOST_CHECK(multiset.begin() == multiset.end());
@@ -525,15 +525,15 @@ BOOST_AUTO_TEST_CASE(multiset_bounds)
 
   auto lb = multiset.lower_bound(15);
   BOOST_REQUIRE(lb != multiset.end());
-  BOOST_CHECK_EQUAL((*lb).first, 20);
+  BOOST_CHECK_EQUAL(lb->first, 20);
 
   auto ub = multiset.upper_bound(20);
   BOOST_REQUIRE(ub != multiset.end());
-  BOOST_CHECK_EQUAL((*ub).first, 30);
+  BOOST_CHECK_EQUAL(ub->first, 30);
 
   auto range = multiset.equal_range(20);
-  BOOST_CHECK_EQUAL((*range.first).first, 20);
-  BOOST_CHECK_EQUAL((*range.second).first, 30);
+  BOOST_CHECK_EQUAL(range.first->first, 20);
+  BOOST_CHECK_EQUAL(range.second->first, 30);
 }
 
 BOOST_AUTO_TEST_CASE(initializer_list)
