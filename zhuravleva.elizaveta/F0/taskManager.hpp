@@ -1,0 +1,66 @@
+#ifndef TASK_MANAGER_HPP
+#define TASK_MANAGER_HPP
+
+#include <string>
+#include <iosfwd>
+#include "../common/cuckooHashTable.hpp"
+#include "task.hpp"
+#include "taskList.hpp"
+
+namespace zhuravleva
+{
+  class TaskManager
+  {
+  public:
+    TaskManager();
+
+    bool hasTask(const std::string& taskId) const;
+    bool hasList(const std::string& listName) const;
+    void createList(const std::string& listName, size_t maxLabor);
+    void deleteList(const std::string& listName);
+    void addTaskGlobal(const std::string& taskId, size_t labor);
+    void removeTaskGlobal(const std::string& taskId);
+    void addTaskToList(const std::string& listName,
+        const std::string& taskId, size_t priority);
+    void removeTaskFromList(const std::string& listName, const std::string& taskId);
+    void showList(const std::string& listName, std::ostream& out) const;
+    void highPriority(const std::string& listName, size_t count, std::ostream& out) const;
+    size_t getCurrentLabor(const std::string& listName) const;
+    bool canAddTask(const std::string& listName, const std::string& taskId) const;
+    void checkAdd(const std::string& listName, const std::string& taskId, std::ostream& out) const;
+    void markDone(const std::string& listName, const std::string& taskId, const std::string& date);
+    size_t countCompleted(const std::string& listName,
+        const std::string& from, const std::string& to) const;
+    void setDeadline(const std::string& listName,
+        const std::string& taskId, const std::string& deadline);
+    void showExpired(const std::string& listName,
+        const std::string& date, std::ostream& out) const;
+    void suggestRemoveOne(const std::string& listName,
+        const std::string& taskId, std::ostream& out) const;
+    size_t getFreeLabor(const std::string& listName) const;
+    void showCapacity(const std::string& listName, std::ostream& out) const;
+    bool hasTaskInList(const std::string& listName, const std::string& taskId) const;
+    void suggestRemove(const std::string& listName, const std::string& taskId,
+        size_t maxRemove, std::ostream& out) const;
+    void optimize(const std::string& newListName, const std::string& listName, size_t maxLabor);
+    void save(std::ostream& out) const;
+    void load(std::istream& in);
+    void swap(TaskManager& other) noexcept;
+
+  private:
+    CuckooHashTable< std::string, Task > globalTasks_;
+    CuckooHashTable< std::string, TaskList > lists_;
+
+    void suggestRemoveRecursive(LCIter< TaskInList > current,
+        LCIter< TaskInList > end, size_t maxRemove, size_t required,
+        size_t currentSum, List< std::string >& selected, bool& found, std::ostream& out) const;
+
+    size_t getPriorityScore(const TaskInList& task) const;
+
+    void optimizeRecursive(LCIter< TaskInList > current,
+        LCIter< TaskInList > end, size_t maxLabor, size_t currentLabor, size_t currentScore,
+        List< TaskInList >& currentList, size_t& bestScore, List< TaskInList >& bestList) const;
+  };
+}
+
+#endif
