@@ -1,41 +1,41 @@
+#include "commands.hpp"
+#include "bstree.hpp"
 #include <iostream>
 #include <fstream>
-#include "commands.hpp"
-
+#include <sstream>
 int main(int argc, char* argv[])
 {
-  using namespace levkin;
   if (argc < 2) {
-    std::cerr << "No filename in arguments\n";
+    std::cerr << "Error: filename parameter is required.\n";
     return 1;
   }
-  DatasetMap datasets;
-  using cmd_t = void (*)(std::istream&, std::ostream&, DatasetMap&);
-  hvostov::BSTree< std::string, cmd_t > cmds;
-
-  try {
-    std::ifstream file(argv[1]);
-    if (!file.is_open()) {
-      std::cerr << "Cant open file\n";
-      return 1;
+  levkin::DatasetStore datasets;
+  if (!levkin::loadDictionaries(argv[1], datasets)) {
+    std::cerr << "Error: could not open file " << argv[1] << "\n";
+    return 1;
+  }
+  levkin::BSTree< std::string, levkin::cmd_t > cmds;
+  cmds.push("print", levkin::cmdPrint);
+  cmds.push("complement", levkin::cmdComplement);
+  cmds.push("intersect", levkin::cmdIntersect);
+  cmds.push("union", levkin::cmdUnion);
+  std::string line;
+  while (std::getline(std::cin, line)) {
+    if (line.empty())
+      continue;
+    std::stringstream ss(line);
+    std::string cmd_name;
+    ss >> cmd_name;
+    if (cmds.has(cmd_name)) {
+      auto func = cmds.get(cmd_name);
+      func(ss, std::cout, datasets);
+      if (ss.fail()) {
+        std::cout << "<error>\n";
+        std::cin.clear();
+      }
+    } else {
+      std::cout << "<error>\n";
     }
-    loadDatasets(file, datasets);
-  } catch (const std::exception& e) {
-    std::cerr << "Error loading datasets: " << e.what() << "\n";
-    return 1;
-  }
-  std::string cmd;
-  while (std::cin >> cmd) {
-    try {
-      cmd_t func = cmds.get(cmd);
-      func(std::cin, std::cout, datasets);
-    } catch (...) {
-      handleError(std::cout, std::cin);
-    }
-  }
-  if (!std::cin.eof()) {
-    std::cerr << "Bad input!\n";
-    return 1;
   }
   return 0;
 }
