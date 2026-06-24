@@ -121,6 +121,7 @@ namespace stuff {
     size_t getCapacity() const noexcept;
 
     void pushBack(const T& v);
+    void pushBack(T&& v);
     void popBack();
     void insert(size_t i, const T& v);
     void insertBefore(VIter< T > it, const T&& v);
@@ -361,6 +362,12 @@ template < class T > void stuff::Vector< T >::pushBack(const T& val)
   stuff::construct< T >(&data_[size_++], val);
 }
 
+template < class T > void stuff::Vector< T >::pushBack(T&& val)
+{
+  expandIfFull();
+  stuff::construct< T >(&data_[size_++], std::move(val));
+}
+
 template < class T > size_t stuff::Vector< T >::getSize() const noexcept
 {
   return size_;
@@ -427,9 +434,10 @@ template < class T > void stuff::Vector< T >::erase(size_t index)
   }
 
   for (size_t i = index; i < size_ - 1; ++i) {
-    data_[i] = data_[i + 1];
+    data_[i] = std::move(data_[i + 1]);
   }
   size_--;
+  stuff::destroy(&data_[size_]);
 }
 
 template < class T > void stuff::Vector< T >::erase(stuff::VIter< T > it)
@@ -492,4 +500,5 @@ std::ostream& stuff::operator<<(std::ostream& os, const Vector< T >& v)
   return os;
 }
 
+namespace stf = stuff;
 #endif
