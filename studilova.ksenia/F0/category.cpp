@@ -22,6 +22,11 @@ studilova::Category* studilova::Category::getParent() const noexcept
   return parent_;
 }
 
+void studilova::Category::addChild(Category* child)
+{
+  children_.pushBack(child);
+}
+
 const studilova::Vector< studilova::Category* >& studilova::Category::getChildren() const noexcept
 {
   return children_;
