@@ -5,36 +5,39 @@
 #include "scheduler.hpp"
 #include "commands.hpp"
 
-sedov::Vector< std::string > parseCommandLine(const std::string & line)
+namespace
 {
-  sedov::Vector< std::string > args;
-  std::string current;
-  bool inQuotes = false;
-  for (size_t i = 0; i < line.size(); ++i)
+  sedov::Vector< std::string > parseCommandLine(const std::string & line)
   {
-    char c = line[i];
-    if (c == '"')
+    sedov::Vector< std::string > args;
+    std::string current;
+    bool inQuotes = false;
+    for (size_t i = 0; i < line.size(); ++i)
     {
-      inQuotes = !inQuotes;
-    }
-    else if (c == ' ' && !inQuotes)
-    {
-      if (!current.empty())
+      char c = line[i];
+      if (c == '"')
       {
-        args.pushBack(current);
-        current.clear();
+        inQuotes = !inQuotes;
+      }
+      else if (c == ' ' && !inQuotes)
+      {
+        if (!current.empty())
+        {
+          args.pushBack(current);
+          current.clear();
+        }
+      }
+      else
+      {
+        current += c;
       }
     }
-    else
+    if (!current.empty())
     {
-      current += c;
+      args.pushBack(current);
     }
+    return args;
   }
-  if (!current.empty())
-  {
-    args.pushBack(current);
-  }
-  return args;
 }
 
 int main()

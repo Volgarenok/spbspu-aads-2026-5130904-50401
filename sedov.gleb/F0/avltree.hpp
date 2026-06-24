@@ -216,7 +216,7 @@ namespace sedov
   template < class Key, class Value, class Compare >
   bool AVLTree< Key, Value, Compare >::insert(const Key & k, const Value & v)
   {
-    auto res = insertNode(root_, k, v);
+    std::pair< AVLTreeNode< Key, Value > *, bool > res = insertNode(root_, k, v);
     root_ = res.first;
     if (root_)
     {
@@ -228,7 +228,7 @@ namespace sedov
   template < class Key, class Value, class Compare >
   bool AVLTree< Key, Value, Compare >::insert(Key && k, Value && v)
   {
-    auto res = insertNode(root_, std::move(k), std::move(v));
+    std::pair< AVLTreeNode< Key, Value > *, bool > res = insertNode(root_, std::move(k), std::move(v));
     root_ = res.first;
     if (root_)
     {
@@ -288,7 +288,7 @@ namespace sedov
   template< class Key, class Value, class Compare >
   void AVLTree< Key, Value, Compare >::push(Key && k, Value && v)
   {
-    insert(std::move(k), std::move(v));
+    insert(std::forward< Key >(k), std::forward< Value >(v));
   }
 
   template < class Key, class Value, class Compare >
@@ -544,7 +544,7 @@ namespace sedov
     }
     if (comp_(k, node->key_))
     {
-      auto res = insertNode(node->left_, k, v);
+      std::pair< AVLTreeNode< Key, Value > *, bool > res = insertNode(node->left_, k, v);
       node->left_ = res.first;
       if (node->left_)
       {
@@ -553,7 +553,7 @@ namespace sedov
     }
     else if (comp_(node->key_, k))
     {
-      auto res = insertNode(node->right_, k, v);
+      std::pair< AVLTreeNode< Key, Value > *, bool > res = insertNode(node->right_, k, v);
       node->right_ = res.first;
       if (node->right_)
       {
@@ -579,7 +579,8 @@ namespace sedov
     }
     if (comp_(k, node->key_))
     {
-      auto res = insertNode(node->left_, std::move(k), std::move(v));
+      std::pair< AVLTreeNode< Key, Value > *, bool > res = insertNode(node->left_, std::forward< Key >(k),
+        std::forward< Value >(v));
       node->left_ = res.first;
       if (node->left_)
       {
@@ -588,7 +589,8 @@ namespace sedov
     }
     else if (comp_(node->key_, k))
     {
-      auto res = insertNode(node->right_, std::move(k), std::move(v));
+      std::pair< AVLTreeNode< Key, Value > *, bool > res = insertNode(node->right_, std::forward< Key >(k),
+        std::forward< Value >(v));
       node->right_ = res.first;
       if (node->right_)
       {
