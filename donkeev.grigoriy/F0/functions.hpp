@@ -4,6 +4,7 @@
 namespace donkeev
 {
   void showBanner();
+  void showNavigation();
 }
 
 #endif
