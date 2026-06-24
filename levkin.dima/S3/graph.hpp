@@ -2,30 +2,48 @@
 #define GRAPH_HPP
 
 #include <cstddef>
-#include <iostream>
+#include <iosfwd>
 #include <string>
 #include <utility>
 
 #include "hasher.hpp"
 #include "hashtable.hpp"
 #include "vector.hpp"
-
 namespace levkin {
-
-  struct KeyComp {
+  struct PairKey
+  {
+    std::string from;
+    std::string to;
+    bool operator==(const PairKey& other) const
+    {
+      return from == other.from && to == other.to;
+    }
+  };
+  struct PairKeyHasher
+  {
+    size_t operator()(const PairKey& key) const
+    {
+      Sha1Hasher< std::string > stringHasher;
+      return stringHasher(key.from) ^ (stringHasher(key.to) << 1);
+    }
+  };
+  struct KeyComp
+  {
     bool operator()(const std::string& p1, const std::string& p2) const
     {
       return p1 == p2;
     }
   };
-
-  template < class T > struct Comp {
-    bool operator()(const T& p1, const T& p2) { return p1 < p2; }
+  template < class T >
+  struct Comp
+  {
+    bool operator()(const T& p1, const T& p2) const { return p1 < p2; }
   };
-
-  template < class F, class S > struct PairComp {
+  template < class F, class S >
+  struct PairComp
+  {
     using pair_t = std::pair< F, S >;
-    bool operator()(const pair_t& p1, const pair_t& p2)
+    bool operator()(const pair_t& p1, const pair_t& p2) const
     {
       if (p1.first != p2.first) {
         return p1.first < p2.first;
@@ -33,91 +51,67 @@ namespace levkin {
       return p1.second < p2.second;
     }
   };
-
-  template < class T, class Cmp > void sort(stuff::Vector< T >& v, Cmp cmp);
-
-  struct Edges {
-    HashTable<
-        std::string,
-        stuff::Vector< size_t >,
-        Sha1Hasher< std::string >,
-        KeyComp >
-        edges_;
-
-    Edges();
-    stuff::Vector< std::pair< std::string, size_t > > getEdges() const;
-    void addEdge(std::string vertex, size_t weight);
-    void cutEdge(std::string vertex, size_t weight);
-  };
-
-  struct Graph {
+  template < class T, class Cmp >
+  void sort(stuff::Vector< T >& v, Cmp cmp);
+  struct Graph
+  {
     std::string name_;
-    HashTable< std::string, Edges, Sha1Hasher< std::string >, KeyComp >
-        incoming_;
-    HashTable< std::string, Edges, Sha1Hasher< std::string >, KeyComp >
-        outgoing_;
-
+    HashTable< PairKey, stuff::Vector< size_t >, PairKeyHasher > edges_;
+    HashTable< std::string, bool, Sha1Hasher< std::string >, KeyComp >
+        vertices_;
     Graph() = default;
-    Graph(std::string name);
-    void addVertex(std::string vertex);
-    void
-    addEdge(std::string start_vertex, std::string end_vertex, size_t weight);
-    void
-    cutEdge(std::string start_vertex, std::string end_vertex, size_t weight);
+    explicit Graph(std::string name);
+    void addVertex(const std::string& vertex);
+    void addEdge(const std::string& startVertex,
+                 const std::string& endVertex,
+                 size_t weight);
+    void cutEdge(const std::string& startVertex,
+                 const std::string& endVertex,
+                 size_t weight);
     stuff::Vector< std::string > getVertexes() const;
     stuff::Vector< std::pair< std::string, size_t > >
-    getOutbound(std::string vertex) const;
+    getOutbound(const std::string& vertex) const;
     stuff::Vector< std::pair< std::string, size_t > >
-    getInbound(std::string vertex) const;
+    getInbound(const std::string& vertex) const;
   };
-
-  struct DB {
-    DB();
+  struct DB
+  {
     HashTable< std::string, Graph, Sha1Hasher< std::string >, KeyComp > graphs_;
-
-    void
-    addVertex(std::string graph_name, std::string vertex, std::ostream& output);
-    void createGraphUnsafe(std::string graph_name);
-    void createGraph(std::string graph_name);
+    DB();
+    void showGraphs(std::ostream& output) const;
+    void showGraphVertexes(const std::string& graphName,
+                           std::ostream& output) const;
+    void showGraphOutbound(const std::string& graphName,
+                           const std::string& vertex,
+                           std::ostream& output) const;
+    void showGraphInbound(const std::string& graphName,
+                          const std::string& vertex,
+                          std::ostream& output) const;
+    void addVertex(const std::string& graphName,
+                   const std::string& vertex,
+                   std::ostream& output);
+    void bindGraphVertexes(const std::string& graphName,
+                           const std::string& vertexA,
+                           const std::string& vertexB,
+                           size_t weight,
+                           std::ostream& output);
+    void cutGraphEdge(const std::string& graphName,
+                      const std::string& vertexA,
+                      const std::string& vertexB,
+                      size_t weight,
+                      std::ostream& output);
+    void mergeGraphs(const std::string& newGraph,
+                     const std::string& oldGraph1,
+                     const std::string& oldGraph2,
+                     std::ostream& output);
+    void extractGraphs(const std::string& newGraph,
+                       const std::string& oldGraph,
+                       size_t countK,
+                       stuff::Vector< std::string >& vertexes,
+                       std::ostream& output);
+    void createGraphUnsafe(const std::string& graphName);
+    void createGraph(const std::string& graphName);
     bool hasGraph(const std::string& name) const;
-    void addEdge(
-        std::string graph_name,
-        std::string start_vertex,
-        std::string end_vertex,
-        size_t weight);
-    void showGraphs(std::ostream& output);
-    void showGraphVertexes(std::string graph_name, std::ostream& output);
-    void showGraphEdges(
-        stuff::Vector< std::pair< std::string, size_t > >& edges,
-        std::ostream& output);
-    void showGraphOutbound(
-        std::string graph_name, std::string vertex, std::ostream& output);
-    void showGraphInbound(
-        std::string graph_name, std::string vertex, std::ostream& output);
-    void bindGraphVertexes(
-        std::string graph_name,
-        std::string vertex_a,
-        std::string vertex_b,
-        size_t weight,
-        std::ostream& output);
-    void cutGraphEdge(
-        std::string graph_name,
-        std::string vertex_a,
-        std::string vertex_b,
-        size_t weight,
-        std::ostream& output);
-    void mergeGraphs(
-        std::string new_graph,
-        std::string old_graph1,
-        std::string old_graph2,
-        std::ostream& output);
-    void extractGraphs(
-        std::string new_graph,
-        std::string old_graph,
-        size_t count_k,
-        stuff::Vector< std::string >& vertexes,
-        std::ostream& output);
   };
 }
-
 #endif
