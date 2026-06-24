@@ -1,5 +1,5 @@
 #ifndef HASHER_HPP
-#define HASHER_HPP 
+#define HASHER_HPP
 #include <boost/uuid/detail/sha1.hpp>
 #include <cstddef>
 #include <string>
