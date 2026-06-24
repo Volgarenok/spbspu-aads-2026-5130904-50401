@@ -2,6 +2,7 @@
 #define BUDGET_MANAGER_HPP
 
 #include <string>
+#include <stdexcept>
 
 #include <hash_table.hpp>
 #include <hmac_hash.hpp>
@@ -57,7 +58,7 @@ bool studilova::BudgetManager::hasBudget(const std::string& name) const
     budgets_.get(name);
     return true;
   }
-  catch ( const std::out_of_range&)
+  catch (const std::out_of_range&)
   {
     return false;
   }
