@@ -96,8 +96,8 @@ namespace vasyakin
 
     explicit HashTable(size_t slots);
 
-    template< class T >
-    std::pair< Iterator, bool > insert(T&& value);
+    std::pair< Iterator, bool > insert(const PairType& value);
+    std::pair< Iterator, bool > insert(PairType&& value);
 
     size_t erase(const Key& key) noexcept;
 
@@ -122,6 +122,9 @@ namespace vasyakin
     size_t size_;
     Hash hasher_;
     Equal equal_;
+
+    template< class T >
+    std::pair< Iterator, bool > insertImpl(T&& value);
 
     std::pair< bool, vasyakin::detail::Node< PairType >* > find_node(size_t ind, const Key& key) const;
 
@@ -216,14 +219,14 @@ namespace vasyakin
 
   template< class Key, class Value, class Hash, class Equal >
   typename HashIter< Key, Value, Hash, Equal >::PairType&
-  HashIter< Key, Value, Hash, Equal >::operator*() noexcept
+    HashIter< Key, Value, Hash, Equal >::operator*() noexcept
   {
     return *list_it_;
   }
 
   template< class Key, class Value, class Hash, class Equal >
   typename HashIter< Key, Value, Hash, Equal >::PairType*
-  HashIter< Key, Value, Hash, Equal >::operator->() noexcept
+    HashIter< Key, Value, Hash, Equal >::operator->() noexcept
   {
     return std::addressof(*list_it_);
   }
@@ -382,9 +385,23 @@ namespace vasyakin
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  std::pair< typename HashTable< Key, Value, Hash, Equal >::Iterator, bool >
+    HashTable< Key, Value, Hash, Equal >::insert(const PairType& value)
+  {
+    return insertImpl(value);
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  std::pair< typename HashTable< Key, Value, Hash, Equal >::Iterator, bool >
+    HashTable< Key, Value, Hash, Equal >::insert(PairType&& value)
+  {
+    return insertImpl(std::forward< PairType >(value));
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
   template< class T >
   std::pair< typename HashTable< Key, Value, Hash, Equal >::Iterator, bool >
-  HashTable< Key, Value, Hash, Equal >::insert(T&& value)
+    HashTable< Key, Value, Hash, Equal >::insertImpl(T&& value)
   {
     size_t idx = hasher_(value.first) % buckets_.getSize();
     auto res = find_node(idx, value.first);
@@ -467,14 +484,14 @@ namespace vasyakin
 
   template< class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::Iterator
-  HashTable< Key, Value, Hash, Equal >::find(const Key& key)
+    HashTable< Key, Value, Hash, Equal >::find(const Key& key)
   {
     return Iterator(static_cast< const HashTable* >(this)->find(key));
   }
 
   template< class Key, class Value, class Hash, class Equal >
   typename HashTable< Key, Value, Hash, Equal >::ConstIterator
-  HashTable< Key, Value, Hash, Equal >::find(const Key& key) const
+    HashTable< Key, Value, Hash, Equal >::find(const Key& key) const
   {
     size_t idx = hasher_(key) % buckets_.getSize();
     auto res = find_node(idx, key);
