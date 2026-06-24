@@ -14,7 +14,7 @@ int main()
 
   using command_table_t = studilova::HashTable< std::string, studilova::cmd_t, studilova::HMACHash, std::equal_to< std::string > >;
 
-  command_table_t commands;
+  command_table_t commands(32, studilova::HMACHash{}, std::equal_to< std::string >{});
 
   commands.add("create-budget", studilova::createBudget);
   commands.add("create-category", studilova::createCategory);
