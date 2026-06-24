@@ -57,26 +57,36 @@ void levkin::cmdCreate(std::istream& input, std::ostream& output, DB& graphs)
 {
   std::string graph_name;
   if (!(input >> graph_name)) {
-    input.setstate(std::ios::failbit);
+    output << "<INVALID COMMAND>\n";
     return;
   }
   size_t count;
   if (!(input >> count)) {
-    input.setstate(std::ios::failbit);
+    output << "<INVALID COMMAND>\n";
+    if (input.fail() && !input.bad()) {
+      input.clear();
+    }
+    return;
+  }
+  if (graphs.hasGraph(graph_name)) {
+    output << "<INVALID COMMAND>\n";
+    std::string dummy;
+    for (size_t i = 0; i < count; ++i) {
+      input >> dummy;
+    }
     return;
   }
   stuff::Vector< std::string > verts;
   std::string vertex;
   for (size_t i = 0; i < count; ++i) {
     if (!(input >> vertex)) {
-      input.setstate(std::ios::failbit);
+      output << "<INVALID COMMAND>\n";
+      if (input.fail() && !input.bad()) {
+        input.clear();
+      }
       return;
     }
     verts.pushBack(vertex);
-  }
-  if (graphs.hasGraph(graph_name)) {
-    output << "<INVALID COMMAND>\n";
-    return;
   }
   graphs.createGraphUnsafe(graph_name);
   for (size_t i = 0; i < count; ++i) {
