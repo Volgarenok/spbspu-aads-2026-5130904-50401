@@ -15,13 +15,20 @@ namespace levkin {
     Key key_;
     Value value_;
     bool is_valid_;
-    NodeHashTable() : is_valid_(false) {}
-    NodeHashTable(const Key& k, const Value& v, bool valid) :
-      key_(k), value_(v), is_valid_(valid)
+    NodeHashTable():
+      is_valid_(false)
     {
     }
-    NodeHashTable(Key&& k, Value&& v, bool valid) :
-      key_(std::move(k)), value_(std::move(v)), is_valid_(valid)
+    NodeHashTable(const Key& k, const Value& v, bool valid):
+      key_(k),
+      value_(v),
+      is_valid_(valid)
+    {
+    }
+    NodeHashTable(Key&& k, Value&& v, bool valid):
+      key_(std::move(k)),
+      value_(std::move(v)),
+      is_valid_(valid)
     {
     }
   };
@@ -50,13 +57,15 @@ namespace levkin {
         typename std::conditional< IsConst,
                                    LCIter< NodeHashTable< Key, Value > >,
                                    LIter< NodeHashTable< Key, Value > > >::type;
-    HashTableIterator() noexcept :
-      table_(nullptr), index_(0), overflow_it_(nullptr)
+    HashTableIterator() noexcept:
+      table_(nullptr),
+      index_(0),
+      overflow_it_(nullptr)
     {
     }
     HashTableIterator(const HashTable< Key, Value, Hash, EqualTo >* table,
                       size_t index,
-                      list_iterator overflow_it = nullptr) noexcept :
+                      list_iterator overflow_it = nullptr) noexcept:
       table_(const_cast< HashTable< Key, Value, Hash, EqualTo >* >(table)),
       index_(index),
       overflow_it_(overflow_it)
@@ -66,7 +75,7 @@ namespace levkin {
     HashTableIterator(
         const HashTableIterator< Key, Value, Hash, EqualTo, OtherConst >& other,
         typename std::enable_if< IsConst
-                                 && !OtherConst >::type* = nullptr) noexcept :
+                                 && !OtherConst >::type* = nullptr) noexcept:
       table_(other.table_),
       index_(other.index_),
       overflow_it_(other.overflow_it_)
@@ -173,14 +182,17 @@ namespace levkin {
   public:
     using iterator = HashTableIterator< Key, Value, Hash, EqualTo, false >;
     using const_iterator = HashTableIterator< Key, Value, Hash, EqualTo, true >;
-    HashTable() : HashTable(11, 4) {}
-    HashTable(size_t num_buckets, size_t bucket_capacity = 4) :
+    HashTable():
+      HashTable(11, 4)
+    {
+    }
+    HashTable(size_t num_buckets, size_t bucket_capacity = 4):
       num_buckets_(num_buckets == 0 ? 11 : num_buckets),
       bucket_capacity_(bucket_capacity == 0 ? 4 : bucket_capacity),
       count_valid_(0)
     {
     }
-    HashTable(const HashTable& other) :
+    HashTable(const HashTable& other):
       pool_(other.pool_),
       overflow_(other.overflow_),
       num_buckets_(other.num_buckets_),
@@ -188,8 +200,10 @@ namespace levkin {
       count_valid_(other.count_valid_)
     {
     }
-    HashTable(HashTable&& other) noexcept :
-      num_buckets_(0), bucket_capacity_(0), count_valid_(0)
+    HashTable(HashTable&& other) noexcept:
+      num_buckets_(0),
+      bucket_capacity_(0),
+      count_valid_(0)
     {
       swap(other);
     }
