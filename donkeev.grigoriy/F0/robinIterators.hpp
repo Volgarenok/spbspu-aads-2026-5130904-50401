@@ -21,7 +21,7 @@ namespace donkeev
   public:
     RobinIter();
     
-    Node& operator*() const;
+    Node& operator*() const noexcept;
     Node* operator->() const noexcept;
 
     RobinIter& operator++();
@@ -45,6 +45,17 @@ namespace donkeev
     index_(0),
     table_(nullptr)
   {}
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinNode< Key, Value >& RobinIter< Key, Value, Hash, Equal >::operator*() const noexcept
+  {
+    return table_->slots_[index_];
+  }
   
+  template< class Key, class Value, class Hash, class Equal >
+  RobinNode< Key, Value >* RobinIter< Key, Value, Hash, Equal >::operator->() const noexcept
+  {
+    return std::addressof(operator*());
+  }
 }
 #endif
