@@ -441,9 +441,7 @@ size_t lukashevich::HashTable< Key, Value, Hash, Equal >::overflowSize() const n
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void lukashevich::HashTable< Key, Value, Hash, Equal >::add(
-    const Key & key,
-    const Value & value)
+void lukashevich::HashTable< Key, Value, Hash, Equal >::add(const Key & key, const Value & value)
 {
   insertImpl(key, value);
 }
