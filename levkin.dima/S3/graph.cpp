@@ -45,6 +45,9 @@ void levkin::Edges::cutEdge(std::string vertex, size_t weight)
     std::swap(bundle[pos], bundle[bundle.getSize() - 1]);
   }
   bundle.popBack();
+  if (bundle.getSize() == 0) {
+    edges_.drop(vertex);
+  }
 }
 stuff::Vector< std::pair< std::string, size_t > >
 levkin::Edges::getEdges() const
@@ -190,6 +193,7 @@ void levkin::DB::showGraphs(std::ostream& output)
   }
   size_t len = keys.getSize();
   if (len == 0) {
+    output << "\n";
     return;
   }
   sort(keys, Comp< std::string >{});
@@ -217,7 +221,6 @@ void levkin::DB::showGraphEdges(
 {
   size_t total = edges.getSize();
   if (total == 0) {
-    output << "\n";
     return;
   }
   sort(edges, PairComp< std::string, size_t >{});
@@ -238,6 +241,9 @@ void levkin::DB::showGraphOutbound(std::string graph_name,
 {
   stuff::Vector< std::pair< std::string, size_t > > paths
       = graphs_.at(graph_name).getOutbound(vertex);
+  if (paths.getSize() == 0) {
+    output << "\n";
+  }
   showGraphEdges(paths, output);
 }
 void levkin::DB::showGraphInbound(std::string graph_name,
@@ -246,6 +252,10 @@ void levkin::DB::showGraphInbound(std::string graph_name,
 {
   stuff::Vector< std::pair< std::string, size_t > > paths
       = graphs_.at(graph_name).getInbound(vertex);
+  if (paths.getSize() == 0) {
+    output << "\n";
+    return;
+  }
   showGraphEdges(paths, output);
 }
 void levkin::DB::bindGraphVertexes(std::string graph_name,

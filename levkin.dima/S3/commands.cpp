@@ -75,7 +75,8 @@ void levkin::cmdCreate(std::istream& input, std::ostream& output, DB& graphs)
     verts.pushBack(vertex);
   }
   if (graphs.hasGraph(graph_name)) {
-    throw std::out_of_range("Graph already exists");
+    output << "<INVALID COMMAND>\n";
+    return;
   }
   graphs.createGraphUnsafe(graph_name);
   for (size_t i = 0; i < count; ++i) {
