@@ -18,7 +18,10 @@ void levkin::sort(stuff::Vector< T >& v, Cmp cmp)
     }
   }
 }
-levkin::Edges::Edges() : edges_(64, 4) {}
+levkin::Edges::Edges():
+  edges_(64, 4)
+{
+}
 void levkin::Edges::addEdge(std::string vertex, size_t weight)
 {
   if (!edges_.has(vertex)) {
@@ -64,8 +67,10 @@ levkin::Edges::getEdges() const
   }
   return pipeline;
 }
-levkin::Graph::Graph(std::string name) :
-  name_(name), incoming_(64, 4), outgoing_(64, 4)
+levkin::Graph::Graph(std::string name):
+  name_(name),
+  incoming_(64, 4),
+  outgoing_(64, 4)
 {
 }
 void levkin::Graph::addVertex(std::string vertex)
@@ -78,34 +83,21 @@ void levkin::Graph::addEdge(std::string start_vertex,
                             std::string end_vertex,
                             size_t weight)
 {
-  bool added_incoming_node = false;
-  bool added_outgoing_node = false;
   if (!incoming_.has(end_vertex)) {
     incoming_.add(end_vertex, Edges());
-    added_incoming_node = true;
   }
   if (!outgoing_.has(start_vertex)) {
     outgoing_.add(start_vertex, Edges());
-    added_outgoing_node = true;
   }
-  try {
-    incoming_.at(end_vertex).addEdge(start_vertex, weight);
-    outgoing_.at(start_vertex).addEdge(end_vertex, weight);
-  } catch (...) {
-    if (added_incoming_node) {
-      incoming_.drop(end_vertex);
-    }
-    if (added_outgoing_node) {
-      outgoing_.drop(start_vertex);
-    }
-    if (!added_incoming_node) {
-      try {
-        incoming_.at(end_vertex).cutEdge(start_vertex, weight);
-      } catch (...) {
-      }
-    }
-    throw;
-  }
+
+  Edges tmp_incoming = incoming_.at(end_vertex);
+  Edges tmp_outgoing = outgoing_.at(start_vertex);
+
+  tmp_incoming.addEdge(start_vertex, weight);
+  tmp_outgoing.addEdge(end_vertex, weight);
+
+  incoming_.at(end_vertex) = std::move(tmp_incoming);
+  outgoing_.at(start_vertex) = std::move(tmp_outgoing);
 }
 void levkin::Graph::cutEdge(std::string start_vertex,
                             std::string end_vertex,
@@ -152,7 +144,10 @@ levkin::Graph::getInbound(std::string vertex) const
   return in_check ? incoming_.at(vertex).getEdges()
                   : stuff::Vector< std::pair< std::string, size_t > >();
 }
-levkin::DB::DB() : graphs_(64, 4) {}
+levkin::DB::DB():
+  graphs_(64, 4)
+{
+}
 void levkin::DB::addVertex(std::string graph_name,
                            std::string vertex,
                            std::ostream&)
