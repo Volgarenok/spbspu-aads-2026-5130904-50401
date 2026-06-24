@@ -299,18 +299,18 @@ void levkin::DB::extractGraphs(std::string new_graph,
   }
   const Graph& source_ref = graphs_.at(old_graph);
   size_t boundary = count_k < vertexes.getSize() ? count_k : vertexes.getSize();
-  auto all_v = source_ref.getVertexes();
+  levkin::HashTable< std::string, bool > valid_verts(64, 4);
   for (size_t i = 0; i < boundary; ++i) {
-    bool exists = false;
-    for (size_t j = 0; j < all_v.getSize(); ++j) {
-      if (all_v[j] == vertexes[i]) {
-        exists = true;
-        break;
+    try {
+      source_ref.getOutbound(vertexes[i]);
+    } catch (const std::out_of_range&) {
+      try {
+        source_ref.getInbound(vertexes[i]);
+      } catch (const std::out_of_range&) {
+        throw std::out_of_range("vertex not in graph");
       }
     }
-    if (!exists) {
-      throw std::out_of_range("vertex not in graph");
-    }
+    valid_verts.add(vertexes[i], true);
   }
   Graph subsection(new_graph);
   for (size_t i = 0; i < boundary; ++i) {
@@ -322,11 +322,8 @@ void levkin::DB::extractGraphs(std::string new_graph,
       auto tracks = source_ref.getOutbound(start_pt);
       for (size_t j = 0; j < tracks.getSize(); ++j) {
         const std::string& destination_pt = tracks[j].first;
-        for (size_t c = 0; c < boundary; ++c) {
-          if (destination_pt == vertexes[c]) {
-            subsection.addEdge(start_pt, destination_pt, tracks[j].second);
-            break;
-          }
+        if (valid_verts.has(destination_pt)) {
+          subsection.addEdge(start_pt, destination_pt, tracks[j].second);
         }
       }
     } catch (const std::out_of_range&) {

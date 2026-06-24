@@ -1,5 +1,5 @@
 #ifndef HASHTABLE_HPP
-#define HASHTABLE_HPP
+#define HASHTABLE_HPP 
 #include <algorithm>
 #include <cstddef>
 #include <functional>
@@ -37,7 +37,6 @@ namespace levkin {
     friend class HashTable;
     template < class K, class V, class H, class E, bool C >
     friend class HashTableIterator;
-
   public:
     using iterator_category = std::forward_iterator_tag;
     using value_type = NodeHashTable< Key, Value >;
@@ -158,7 +157,6 @@ namespace levkin {
     {
       return !(*this == rhs);
     }
-
   private:
     HashTable< Key, Value, Hash, EqualTo >* table_;
     size_t index_;
@@ -169,7 +167,6 @@ namespace levkin {
   {
     template < class K, class V, class H, class E, bool C >
     friend class HashTableIterator;
-
   public:
     using iterator = HashTableIterator< Key, Value, Hash, EqualTo, false >;
     using const_iterator = HashTableIterator< Key, Value, Hash, EqualTo, true >;
@@ -514,7 +511,6 @@ namespace levkin {
     }
     const_iterator cbegin() const noexcept { return begin(); }
     const_iterator cend() const noexcept { return end(); }
-
   private:
     size_t findNextValidInPool(size_t index) const noexcept
     {
