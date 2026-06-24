@@ -36,7 +36,7 @@ namespace donkeev
     
     void insert(const Key&, const Value&);
     Value remove(const Key&);
-    void rehash(ssize_t);
+    void rehash(size_t);
     
     size_t size() const;
     size_t capacity() const;
@@ -121,6 +121,35 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  Value& RobinTable<Key, Value, Hash, Equal>::at(const Key& key)
+  {
+    auto result = findNode(key);
+    if (result.second)
+    {
+      return result.second->value_;
+    }
+
+    throw std::out_of_range("No such elemnt");
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  const Value& RobinTable<Key, Value, Hash, Equal>::at(const Key& key) const
+  {
+    auto result = findNode(key);
+    if (result.second)
+    {
+      return result.second->value_;
+    }
+    throw std::out_of_range("No such elemnt");
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool RobinTable<Key, Value, Hash, Equal>::contains(const Key& key) const
+  {
+    return findNode(key).second != nullptr;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
   void RobinTable<Key, Value, Hash, Equal>::insert(const Key& key, const Value& value)
   {
     if (static_cast<double>(size_) / slots_.size() >= 0.75)
@@ -190,36 +219,63 @@ namespace donkeev
     size_--;
     
     return saved;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void RobinTable<Key, Value, Hash, Equal>::rehash(size_t newCapacity)
+  {
+    RobinTable tmp(newCapacity);
+    
+    size_t cap = slots_.size();
+    for (size_t i = 0; i < cap; ++i)
+    {
+      if (slots_[i].isOccupied_)
+      {
+        tmp.insert(slots_[i].key_, slots_[i].value_);
+      }
+    }
+    
+    swap(tmp);
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  size_t RobinTable<Key, Value, Hash, Equal>::size() const
+  {
+    return size_;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  size_t RobinTable<Key, Value, Hash, Equal>::capacity() const
+  {
+    return slots_.size();
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool RobinTable<Key, Value, Hash, Equal>::empty() const
+  {
+    return size_ == 0;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void RobinTable<Key, Value, Hash, Equal>::clear()
+  {
+    for (size_t i = 0; i < slots_.size(); ++i)
+    {
+      slots_[i] = Node{};
+    }
+    
+    size_ = 0;
+  }
+
+template< class Key, class Value, class Hash, class Equal >
+void
+RobinTable<Key, Value, Hash, Equal>::swap(RobinTable& other) noexcept
+{
+    std::swap(slots_, other.slots_);
+    std::swap(size_, other.size_);
+    std::swap(hasher_, other.hasher_);
+    std::swap(equal_, other.equal_);
 }
-
-  template< class Key, class Value, class Hash, class Equal >
-  Value& RobinTable<Key, Value, Hash, Equal>::at(const Key& key)
-  {
-    auto result = findNode(key);
-    if (result.second)
-    {
-      return result.second->value_;
-    }
-
-    throw std::out_of_range("No such elemnt");
-  }
-
-  template< class Key, class Value, class Hash, class Equal >
-  const Value& RobinTable<Key, Value, Hash, Equal>::at(const Key& key) const
-  {
-    auto result = findNode(key);
-    if (result.second)
-    {
-      return result.second->value_;
-    }
-    throw std::out_of_range("No such elemnt");
-  }
-
-  template< class Key, class Value, class Hash, class Equal >
-  bool RobinTable<Key, Value, Hash, Equal>::contains(const Key& key) const
-  {
-    return findNode(key).second != nullptr;
-  }
 
   template< class Key, class Value, class Hash, class Equal >
   std::pair<size_t, typename RobinTable<Key, Value, Hash, Equal>::Node*>
