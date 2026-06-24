@@ -256,3 +256,41 @@ void studilova::save(std::istream& in, std::ostream& out, BudgetManager& state)
 
   out << "<OK>\n";
 }
+
+void studilova::findExpenses(std::istream& in, std::ostream& out, BudgetManager& state)
+{
+  std::string budgetName;
+  int min = 0;
+  int max = 0;
+
+  in >> budgetName >> min >> max;
+
+  if (!in || min > max || !state.hasBudget(budgetName))
+  {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  const Budget& budget = state.getBudget(budgetName);
+  const Vector< Operation >& operations = budget.getOperations();
+
+  bool first = true;
+
+  for (size_t i = 0; i < operations.getSize(); ++i)
+  {
+    const Operation& operation = operations[i];
+
+    if (operation.getType() == OperationType::Expense && operation.getAmount() >= min && operation.getAmount() <= max)
+    {
+      if (!first)
+      {
+        out << ", ";
+      }
+
+      out << operation.getCategory() << ": " << operation.getAmount();
+      first = false;
+    }
+  }
+
+  out << '\n';
+}

@@ -13,12 +13,13 @@ namespace studilova
 
   void showBudgets(std::istream& in, std::ostream& out, BudgetManager& state);
   void showCategories(std::istream& in, std::ostream& out, BudgetManager& state);
-
   void showBalance(std::istream&, std::ostream&, BudgetManager&);
   void showExpenses(std::istream&, std::ostream&, BudgetManager&);
 
   void loadOperations(std::istream&, std::ostream&, BudgetManager&);
   void save(std::istream&, std::ostream&, BudgetManager&);
+
+  void findExpenses(std::istream&, std::ostream&, BudgetManager&);
 }
 
 #endif
