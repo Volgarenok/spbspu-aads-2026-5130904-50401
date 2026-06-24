@@ -296,6 +296,9 @@ namespace levkin {
         overflow_.pushBack(NodeHashTable< Key, Value >{key, value, true});
         count_valid_++;
       }
+      if (count_valid_ >= pool_.getSize()) {
+          rehash(num_buckets_ * 2, bucket_capacity_);
+      }
     }
     void add(const Key& key, Value&& value)
     {
@@ -342,6 +345,9 @@ namespace levkin {
         overflow_.pushBack(
             NodeHashTable< Key, Value >{key, std::move(value), true});
         count_valid_++;
+      }
+      if (count_valid_ >= pool_.getSize()) {
+          rehash(num_buckets_ * 2, bucket_capacity_);
       }
     }
     Value drop(const Key& key)

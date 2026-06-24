@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(ht_drop_test)
   int removed = ht.drop("test");
   BOOST_CHECK_EQUAL(removed, 42);
   BOOST_CHECK(!ht.has("test"));
-  BOOST_CHECK_THROW(ht.drop("unknown"), std::runtime_error);
+  BOOST_CHECK_THROW(ht.drop("unknown"), std::out_of_range);
 }
 BOOST_AUTO_TEST_CASE(ht_drop_from_overflow_test)
 {
