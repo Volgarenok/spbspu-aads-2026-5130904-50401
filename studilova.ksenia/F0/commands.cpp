@@ -579,31 +579,48 @@ void studilova::showCategoryDiagram(std::istream& in, std::ostream& out, BudgetM
     return;
   }
 
+  size_t visibleIndex = 0;
   for (size_t i = 0; i < categories.getSize(); ++i)
   {
-    out << categories[i]->getName() << ' ' << symbols[i % 9] << '\n';
-  }
+    if (sums[i] == 0)
+    {
+      continue;
+    }
+    out << categories[i]->getName() << ' ';
+    out << symbols[visibleIndex % 9] << '\n';
 
+    ++visibleIndex;
+  }
   out << '[';
 
+  visibleIndex = 0;
+  bool first = true;
+
   for (size_t i = 0; i < categories.getSize(); ++i)
   {
-    int count = static_cast< int >((sums[i] * maxWidth) / total);
+    if (sums[i] == 0)
+    {
+      continue;
+    }
 
-    if (sums[i] > 0 && count == 0)
+    int count = static_cast< int >((sums[i] * maxWidth) / total);
+    if (count == 0)
     {
       count = 1;
     }
 
-    if (i != 0)
+    if (!first)
     {
       out << ' ';
     }
 
     for (int j = 0; j < count; ++j)
     {
-      out << symbols[i % 9];
+      out << symbols[visibleIndex % 9];
     }
+
+    first = false;
+    ++visibleIndex;
   }
 
   out << "]\n";
