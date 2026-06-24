@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
-#include <limits>
+#include <sstream>
 #include <stdexcept>
 
 void ulanova::sortStrings(Vector< std::string >& values)
@@ -72,26 +72,28 @@ ulanova::CommandProcessor::CommandProcessor(GraphStorage& storage):
 
 void ulanova::CommandProcessor::run(std::istream& input, std::ostream& output)
 {
-  std::string cmd;
-  while (input >> cmd)
+  std::string line;
+  while (std::getline(input, line))
   {
+    std::istringstream iss(line);
+    std::string cmd;
+    if (!(iss >> cmd))
+    {
+      continue;
+    }
     Handler* it = handlers_.find(cmd);
     if (it == nullptr)
     {
-      std::string rest;
-      std::getline(input, rest);
       printInvalid(output);
       continue;
     }
     try
     {
       Handler handler = *it;
-      (this->*handler)(input, output);
+      (this->*handler)(iss, output);
     }
     catch (...)
     {
-      input.clear();
-      input.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
       printInvalid(output);
     }
   }
@@ -218,8 +220,6 @@ void ulanova::CommandProcessor::handleCreate(std::istream& input, std::ostream& 
   }
   if (storage_.hasGraph(graphName))
   {
-    std::string rest;
-    std::getline(input, rest);
     printInvalid(output);
     return;
   }
