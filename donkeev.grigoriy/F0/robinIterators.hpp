@@ -30,14 +30,44 @@ namespace donkeev
     RobinIter& operator--() noexcept;
     RobinIter operator--(int) noexcept;
 
-    bool operator==(const RobinIter& rhs) const noexcept;
-    bool operator!=(const RobinIter& rhs) const noexcept;
+    bool operator==(const RobinIter&) const noexcept;
+    bool operator!=(const RobinIter&) const noexcept;
     
   private:
     size_t index_ = 0;
     Table* table_ = nullptr;
 
     RobinIter(size_t, Table*);
+  };
+
+  template< class Key, class Value, class Hash, class Equal >
+  class RobinCIter
+  {
+    friend class RobinTable<Key, Value, Hash, Equal>;
+
+    using Table = RobinTable<Key, Value, Hash, Equal>;
+    using Node = RobinNode<Key, Value>;
+    
+  public:
+    RobinCIter();
+    
+    const Node& operator*() const noexcept;
+    const Node* operator->() const noexcept;
+
+    RobinCIter& operator++() noexcept;
+    RobinCIter operator++(int) noexcept;
+
+    RobinCIter& operator--() noexcept;
+    RobinCIter operator--(int) noexcept;
+
+    bool operator==(const RobinCIter&) const noexcept;
+    bool operator!=(const RobinCIter&) const noexcept;
+    
+  private:
+    size_t index_ = 0;
+    const Table* table_ = nullptr;
+
+    RobinCIter(size_t, const Table*);
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -67,7 +97,7 @@ namespace donkeev
       ++index_;
       while (index_ < cap && !table_->slots_[index_].isOccupied_)
       {
-        ++index;
+        ++index_;
       }
     }
 
@@ -90,7 +120,7 @@ namespace donkeev
     {
       while (index_ > 0)
       {
-        --index;
+        --index_;
         if (table_->slots_[index_].isOccupied_)
         {
           break;
