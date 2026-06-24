@@ -1,5 +1,5 @@
-#ifndef HASH
-#define HASH
+#ifndef HASHTABLE_HPP
+#define HASHTABLE_HPP
 
 #include "hasher.hpp"
 #include "list.hpp"
@@ -70,8 +70,8 @@ namespace levkin {
   template < class Key, class Value, class Hash, class EqualTo, bool IsConst >
   class HashTableIterator
   {
-    template < class K, class V, class H, class E >
-    friend class HashTable;
+    friend class HashTable< Key, Value, Hash, EqualTo >;
+
     template < class K, class V, class H, class E, bool C >
     friend class HashTableIterator;
 
