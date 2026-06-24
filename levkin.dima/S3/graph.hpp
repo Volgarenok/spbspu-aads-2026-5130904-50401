@@ -1,5 +1,5 @@
 #ifndef GRAPH_HPP
-#define GRAPH_HPP 
+#define GRAPH_HPP
 #include <cstddef>
 #include <iostream>
 #include <string>

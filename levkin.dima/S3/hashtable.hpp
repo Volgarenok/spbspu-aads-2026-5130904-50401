@@ -1,5 +1,5 @@
 #ifndef HASHTABLE_HPP
-#define HASHTABLE_HPP 
+#define HASHTABLE_HPP
 #include <algorithm>
 #include <cstddef>
 #include <functional>
