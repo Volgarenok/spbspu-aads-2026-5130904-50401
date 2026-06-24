@@ -34,6 +34,7 @@ namespace donkeev
     const Value& at(const Key&) const;
 
     bool contains(const Key&) const;
+    Value* find(const Key&);
     
     void insert(const Key&, const Value&);
     Value remove(const Key&);
@@ -148,6 +149,18 @@ namespace donkeev
   bool RobinTable<Key, Value, Hash, Equal>::contains(const Key& key) const
   {
     return findNode(key).second != nullptr;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  Value* RobinTable<Key, Value, Hash, Equal>::find(const Key& key)
+  {
+    std::pair< size_t, Node* > pair = findNode(key);
+    if (pair.second == nullptr)
+    {
+      return nullptr;
+    }
+
+    return &(pair.second->value_);
   }
 
   template< class Key, class Value, class Hash, class Equal >
