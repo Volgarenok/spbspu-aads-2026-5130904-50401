@@ -1,5 +1,5 @@
-#ifndef HASH
-#define HASH
+#ifndef HASHTABLE_HPP
+#define HASHTABLE_HPP
 
 #include "hasher.hpp"
 #include "list.hpp"
