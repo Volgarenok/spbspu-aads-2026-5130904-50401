@@ -27,11 +27,6 @@ namespace lukashevich {
   bool cmdCreate(std::istream & in, GraphTable & graphs, std::ostream & out);
   bool cmdMerge(std::istream & in, GraphTable & graphs, std::ostream & out);
   bool cmdExtract(std::istream & in, GraphTable & graphs, std::ostream & out);
-
-  void processCommands(std::istream & in,
-      std::ostream & out,
-      GraphTable & graphs,
-      const CommandTable & commands);
 }
 
 #endif

@@ -6,8 +6,7 @@
 #include "input.hpp"
 
 namespace {
-  const char * INVALID_COMMAND = "<INVALID COMMAND>";
-
+  void checkNoExtraArguments(std::istream & in)
   {
     std::string extra;
 
@@ -71,6 +70,8 @@ void lukashevich::printGraphNames(lukashevich::Vector< std::string > & names,
 bool lukashevich::cmdGraphs(std::istream & in,
   lukashevich::GraphTable & graphs, std::ostream & out)
 {
+  checkNoExtraArguments(in);
+
   Vector< std::string > names;
 
   for (GraphTable::const_iterator it = graphs.cbegin(); it != graphs.cend(); ++it) {
@@ -90,6 +91,7 @@ bool lukashevich::cmdVertexes(std::istream & in,
     throw std::logic_error("bad vertexes command");
   }
 
+  checkNoExtraArguments(in);
   graphs.at(graphName).printVertexes(out);
   return true;
 }
@@ -104,7 +106,9 @@ bool lukashevich::cmdOutbound(std::istream & in,
     throw std::logic_error("bad outbound command");
   }
 
+  checkNoExtraArguments(in);
   graphs.at(graphName).printOutbound(vertex, out);
+  return true;
 }
 
 bool lukashevich::cmdInbound(std::istream & in,
@@ -117,6 +121,7 @@ bool lukashevich::cmdInbound(std::istream & in,
     throw std::logic_error("bad inbound command");
   }
 
+  checkNoExtraArguments(in);
   graphs.at(graphName).printInbound(vertex, out);
   return true;
 }
@@ -133,6 +138,7 @@ bool lukashevich::cmdBind(std::istream & in,
     throw std::logic_error("bad bind command");
   }
 
+  checkNoExtraArguments(in);
   graphs.at(graphName).bind(from, to, weight);
   return true;
 }
@@ -149,6 +155,7 @@ bool lukashevich::cmdCut(std::istream & in,
     throw std::logic_error("bad cut command");
   }
 
+  checkNoExtraArguments(in);
   graphs.at(graphName).cut(from, to, weight);
   return true;
 }
@@ -184,8 +191,9 @@ bool lukashevich::cmdCreate(std::istream & in,
     graph.addVertex(vertex);
   }
 
+  checkNoExtraArguments(in);
   graphs.add(graphName, graph);
-  return true;
+  return false;
 }
 
 bool lukashevich::cmdMerge(std::istream & in,
@@ -200,6 +208,8 @@ bool lukashevich::cmdMerge(std::istream & in,
     throw std::logic_error("bad merge command");
   }
 
+  checkNoExtraArguments(in);
+
   Graph result;
 
   copyVertexes(graphs.at(firstName), result);
@@ -208,7 +218,7 @@ bool lukashevich::cmdMerge(std::istream & in,
   copyEdges(graphs.at(secondName), result);
 
   graphs.add(newName, result);
-  return true;
+  return false;
 }
 
 bool lukashevich::cmdExtract(std::istream & in,
@@ -235,6 +245,8 @@ bool lukashevich::cmdExtract(std::istream & in,
     result.addVertex(vertex);
   }
 
+  checkNoExtraArguments(in);
+
   for (Graph::EdgeTable::const_iterator it = source.getEdges().cbegin();
       it != source.getEdges().cend(); ++it) {
     if (result.hasVertex(it->first.first) && result.hasVertex(it->first.second)) {
@@ -245,7 +257,7 @@ bool lukashevich::cmdExtract(std::istream & in,
   }
 
   graphs.add(newName, result);
-  return true;
+  return false;
 }
 
 
