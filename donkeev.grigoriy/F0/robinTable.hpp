@@ -15,6 +15,8 @@ namespace donkeev
   {
     using Node = RobinNode<Key, Value>;
     using Table = RobinTable<Key, Value, Hash, Equal>;
+    using Iterator = RobinIter<Key, Value, Hash, Equal>;
+    using ConstIterator = RobinCIter<Key, Value, Hash, Equal>;
       
   public:
     RobinTable() = delete;
@@ -29,6 +31,11 @@ namespace donkeev
     RobinTable& operator=(const RobinTable&);
     RobinTable& operator=(RobinTable&&) noexcept;
     Value& operator[](const Key&);
+
+    Iterator begin();
+    ConstIterator begin() const;
+    Iterator end();
+    ConstIterator end() const;
 
     Value& at(const Key&);
     const Value& at(const Key&) const;
@@ -123,6 +130,46 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Hash, class Equal >
+  RobinIter<Key, Value, Hash, Equal> RobinTable< Key, Value, Hash, Equal >::begin()
+  { 
+    size_t cap = capacity();
+    for (size_t i = 0; i < cap; ++i)
+    {
+      if (slots_[i].isOccupied_)
+      {
+        return Iterator(i, this);
+      }
+    }
+    return end();
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinIter<Key, Value, Hash, Equal> RobinTable< Key, Value, Hash, Equal >::end()
+  {
+    return Iterator(capacity(), this);
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinCIter<Key, Value, Hash, Equal> RobinTable< Key, Value, Hash, Equal >::begin() const
+  {
+    size_t cap = capacity();
+    for (size_t i = 0; i < cap; ++i)
+    {
+      if (slots_[i].isOccupied_)
+      {
+        return ConstIterator(i, this);
+      }
+    }
+    return cend();
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  RobinCIter<Key, Value, Hash, Equal> RobinTable< Key, Value, Hash, Equal >::end() const
+  {
+    return ConstIterator(capacity(), this);
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
   Value& RobinTable<Key, Value, Hash, Equal>::at(const Key& key)
   {
     auto result = findNode(key);
@@ -166,15 +213,15 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   void RobinTable<Key, Value, Hash, Equal>::insert(const Key& key, const Value& value)
   {
-    if (static_cast<double>(size_) / slots_.size() >= 0.75)
+    if (static_cast<double>(size_) / slots_.getSize() >= 0.75)
     {
-      rehash(slots_.size() * 2);
+      rehash(slots_.getSize() * 2);
     }
     
-    size_t cap = slots_.size();
+    size_t cap = slots_.getSize();
     size_t index = hasher_(key) % cap;
     
-    Node toAdd{key, value, true, 0};
+    Node toAdd{key, value, 0} ;
     
     for (size_t i = 0; i < cap; ++i)
     {
@@ -240,7 +287,7 @@ namespace donkeev
   {
     RobinTable tmp(newCapacity);
     
-    size_t cap = slots_.size();
+    size_t cap = slots_.getSize();
     for (size_t i = 0; i < cap; ++i)
     {
       if (slots_[i].isOccupied_)
