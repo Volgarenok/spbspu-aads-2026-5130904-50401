@@ -93,7 +93,7 @@ namespace donkeev
   {
     if (table_)
     {
-      size_t cap = table_->slots_.getsize();
+      size_t cap = table_->slots_.getSize();
       ++index_;
       while (index_ < cap && !table_->slots_[index_].isOccupied_)
       {

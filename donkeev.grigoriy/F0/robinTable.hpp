@@ -17,7 +17,9 @@ namespace donkeev
     using Table = RobinTable<Key, Value, Hash, Equal>;
     using Iterator = RobinIter<Key, Value, Hash, Equal>;
     using ConstIterator = RobinCIter<Key, Value, Hash, Equal>;
-      
+    
+    friend class RobinIter<Key, Value, Hash, Equal>;
+    friend class RobinCIter<Key, Value, Hash, Equal>;
   public:
     RobinTable() = delete;
 
@@ -160,7 +162,7 @@ namespace donkeev
         return ConstIterator(i, this);
       }
     }
-    return cend();
+    return end();
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -308,7 +310,7 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   size_t RobinTable<Key, Value, Hash, Equal>::capacity() const
   {
-    return slots_.size();
+    return slots_.getSize();
   }
 
   template< class Key, class Value, class Hash, class Equal >
