@@ -19,7 +19,7 @@ void donkeev::showNavigation()
   std::cout << "    \033[32mmake\033[0m          — Создать объявление\n";
   std::cout << "    \033[32mbuy\033[0m           — Купить автомобиль по ID\n";
   std::cout << "    \033[32mdelete\033[0m        — Удалить объявление по ID\n";
-  std::cout << "    \033[32mshowHistory\033[0m   — Показать историю объявлений\n";
+  std::cout << "    \033[32mshow-istory\033[0m   — Показать историю объявлений\n";
   std::cout << "    \033[32mquit\033[0m          — Выйти из программы\n";
   std::cout << "\n";
 }

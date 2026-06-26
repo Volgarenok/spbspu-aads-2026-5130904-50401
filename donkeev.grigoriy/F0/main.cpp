@@ -41,6 +41,7 @@ int main()
     if (handler)
     { 
       (*handler)(cars, ads, parametrs);
+      donkeev::showNavigation();
     }
     else
     {

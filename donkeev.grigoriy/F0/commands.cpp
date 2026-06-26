@@ -92,31 +92,38 @@ void donkeev::handleScroll(CarTable&, AdTable& ads, const std::string&)
 {
   std::cout << "\n\033[1;33m=== ЛЕНТА ОБЪЯВЛЕНИЙ ===\033[0m\n";
   
-  bool found = false;
-  int count = 0;
+  if (ads.empty())
+  {
+    std::cout << "  \033[90mНет активных объявлений.\033[0m\n\n";
+    return;
+  }
   
-  for (AdIterator it = ads.begin(); it != ads.end(); ++it)
+  int count = 0;
+  for (auto it = ads.begin(); it != ads.end(); ++it)
   {
     if (it->value_.isActive())
     {
       ++count;
-      std::cout << "  \033[36m" << count << ".\033[0m ";
-      printCar(it->value_.getCar());
-      found = true;
+      std::cout << "\n  \033[36m━━━ " << count << ". ━━━\033[0m\n";
+      
+      const Ad& ad = it->value_;
+      const Car& car = ad.getCar();
+      std::cout << "  ID: " << ad.getId() << "\n";
+      std::cout << "  VIN: " << car.vin << "\n";
+      std::cout << "  Марка: " << car.brand << "\n";
+      std::cout << "  Модель: " << car.model << "\n";
+      std::cout << "  Год: " << car.model << "\n";
+      std::cout << "  Цвет: " << car.color << "\n";
+      std::cout << "  Цена: " << ad.getPrice() << " руб.\n";
+      std::cout << "  Пробег: " << ad.getMileage() << " км\n";
+      std::cout << "  Владельцев: " << ad.getOwnerCount() << "\n";
+      std::cout << "  Статус: \033[32mАктивно\033[0m\n";
     }
   }
   
-  if (!found)
-  {
-    std::cout << "  \033[90mНет активных объявлений.\033[0m\n";
-  }
-  else
-  {
-    std::cout << "\n  \033[90mВсего активных объявлений: " << count << "\033[0m\n";
-  }
-
-  std::cout << "\n";
+  std::cout << "\n  \033[90mВсего активных объявлений: " << count << "\033[0m\n\n";
 }
+
 void donkeev::handleMake(CarTable& cars, AdTable& ads, const std::string&)
 {
   const std::string CARS_FILE = "cars.txt";
@@ -173,9 +180,46 @@ void donkeev::handleMake(CarTable& cars, AdTable& ads, const std::string&)
   
   std::cout << "\033[32m  ✓ Объявление создано! ID: " << ad.getId() << "\033[0m\n\n";
 }
-void donkeev::handleBuy(CarTable& , AdTable&, const std::string&)
+void donkeev::handleBuy(CarTable&, AdTable& ads, const std::string&)
 {
+  const std::string HISTORY_FILE = "history.txt";
+  
+  std::cout << "\033[31m  Укажите ID\033[0m\n\n";
 
+  std::string idStr;
+  std::getline(std::cin, idStr);
+  
+  if (idStr.empty())
+  {
+    std::cout << "\033[31m  Ошибка\033[0m\n\n";
+    return;
+  }
+  
+  while (!idStr.empty() && idStr[0] == '0')
+  {
+    idStr.erase(0, 1);
+  }
+  
+  size_t id = std::stoull(idStr);
+  
+  Ad* ad = ads.find(id);
+  
+  if (!ad)
+  {
+    std::cout << "\033[31m  Объявление не найдено.\033[0m\n\n";
+    return;
+  }
+  
+  if (!ad->isActive())
+  {
+    std::cout << "\033[31m  Это объявление уже продано.\033[0m\n\n";
+    return;
+  }
+  
+  saveAdToHistory(*ad);
+  ads.remove(id);
+  
+  std::cout << "\033[32m  ✓ Поздравляем с покупкой!\033[0m\n";
 }
 void donkeev::handleDelete(CarTable& , AdTable& , const std::string&)
 {
