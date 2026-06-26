@@ -258,4 +258,45 @@ void donkeev::handleDelete(CarTable&, AdTable& ads, const std::string&)
   ads.remove(id);
   std::cout << "\033[32m  ✓ Объявление " << idStr << " удалено.\033[0m\n\n";
 }
-
+void donkeev::handleShowHistory(CarTable&, AdTable&, const std::string&)
+{
+  const std::string HISTORY_FILE = "history.txt";
+  
+  std::cout << "\n\033[1;33m=== ИСТОРИЯ ПРОДАННЫХ АВТО ===\033[0m\n";
+  
+  std::ifstream file(HISTORY_FILE);
+  if (!file.is_open())
+  {
+    std::cout << "  \033[90mИстория пуста.\033[0m\n\n";
+    return;
+  }
+  
+  std::string line;
+  bool found = false;
+  int count = 0;
+  
+  while (std::getline(file, line))
+  {
+    if (line.empty())
+    {
+      continue;
+    }
+      
+    if (line.find("ID:") != std::string::npos)
+    {
+      ++count;
+      std::cout << "\n  \033[36m━━━ " << count << ". ━━━\033[0m\n";
+    }
+      
+    std::cout << "  " << line << "\n";
+    found = true;
+  }
+  
+  if (!found)
+  {
+    std::cout << "  \033[90mИстория пуста.\033[0m\n";
+  }
+  
+  file.close();
+  std::cout << "\n";
+}
