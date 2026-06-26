@@ -221,11 +221,41 @@ void donkeev::handleBuy(CarTable&, AdTable& ads, const std::string&)
   
   std::cout << "\033[32m  ✓ Поздравляем с покупкой!\033[0m\n";
 }
-void donkeev::handleDelete(CarTable& , AdTable& , const std::string&)
+void donkeev::handleDelete(CarTable&, AdTable& ads, const std::string&)
 {
-
+  std::cout << "\n  \033[33mВведите ID объявления для удаления: \033[0m";
+  
+  std::string idStr;
+  std::getline(std::cin, idStr);
+  
+  if (idStr.empty())
+  {
+    std::cout << "\033[31m  Ошибка: ID не может быть пустым.\033[0m\n\n";
+    return;
+  }
+  
+  while (!idStr.empty() && idStr[0] == '0')
+  {
+    idStr.erase(0, 1);
+  }
+  
+  size_t id = std::stoull(idStr);
+  
+  Ad* ad = ads.find(id);
+  
+  if (!ad)
+  {
+    std::cout << "\033[31m  Объявление не найдено.\033[0m\n\n";
+    return;
+  }
+  
+  if (!ad->isActive())
+  {
+    std::cout << "\033[31m  Это объявление уже продано. Удаление невозможно.\033[0m\n\n";
+    return;
+  }
+  
+  ads.remove(id);
+  std::cout << "\033[32m  ✓ Объявление " << idStr << " удалено.\033[0m\n\n";
 }
-void donkeev::handleShowHistory(CarTable& , AdTable& , const std::string&)
-{
 
-}
