@@ -388,7 +388,7 @@ RobinTable<Key, Value, Hash, Equal>::swap(RobinTable& other) noexcept
       return {0, nullptr};
     }
     
-    size_t cap = slots_.size();
+    size_t cap = slots_.getSize();
     size_t index = hasher_(key) % cap;
     int cur_psl = 0;
     

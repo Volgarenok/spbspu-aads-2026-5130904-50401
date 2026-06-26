@@ -3,6 +3,7 @@
 
 #include "robinTable.hpp"
 #include "Ad.hpp"
+#include "helpedFunc.hpp"
 #include "robinTableStructs.hpp"
 
 namespace donkeev
@@ -14,6 +15,10 @@ namespace donkeev
 
   void printCar(const Car& car);
   void printAd(const Ad& ad);
+  void saveCarToDataBase(const Car&, const std::string&);
+  size_t getHistorySize();
+  size_t generateNextAdId(AdTable&, size_t);
+  void saveAdToHistory(const Ad&);
 
   void handleScroll(CarTable& cars, AdTable& ads, const std::string& parametrs);
   void handleMake(CarTable& cars, AdTable& ads, const std::string& parametrs);

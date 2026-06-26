@@ -6,7 +6,6 @@ donkeev::Ad::Ad():
   price_(0),
   mileage_(0),
   ownerCount_(0),
-  postedDate_(""),
   isActive_(false)
 {}
 
@@ -19,13 +18,17 @@ donkeev::Ad::Ad(Car* car, const std::string& line)
   price_ = std::stoull(nextWord(line, pos));
   mileage_ = std::stoull(nextWord(line, pos));
   ownerCount_ = std::stoull(nextWord(line, pos));
-  postedDate_ = nextWord(line, pos);
   isActive_ = true;
 }
 
 std::string donkeev::Ad::getId() const
 {
   return formatId(id_);
+}
+
+size_t donkeev::Ad::getIdNumber() const
+{
+  return id_;
 }
 
 const donkeev::Car& donkeev::Ad::getCar() const
@@ -48,10 +51,6 @@ size_t donkeev::Ad::getOwnerCount() const
   return ownerCount_;
 }
 
-std::string donkeev::Ad::getPostedDate() const
-{
-  return postedDate_;
-}
 
 bool donkeev::Ad::isActive() const
 {
@@ -83,10 +82,6 @@ void donkeev::Ad::setOwnerCount(size_t count)
   ownerCount_ = count;
 }
 
-void donkeev::Ad::setPostedDate(const std::string& date)
-{
-  postedDate_ = date;
-}
 
 void donkeev::Ad::setActive(bool active)
 {

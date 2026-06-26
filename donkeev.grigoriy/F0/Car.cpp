@@ -22,6 +22,4 @@ donkeev::Car::Car(const std::string& parametrs)
   
   color = nextWord(parametrs, pos);
   bodyType = nextWord(parametrs, pos);
-  
-  std::string volumeStr = nextWord(parametrs, pos);
 }

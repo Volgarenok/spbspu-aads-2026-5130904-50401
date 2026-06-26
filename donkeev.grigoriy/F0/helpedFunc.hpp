@@ -6,23 +6,16 @@
 #include <limits>
 #include <fstream>
 
-#include "Ad.hpp"
 #include "robinTable.hpp"
 #include "robinTableStructs.hpp"
 
 namespace donkeev
 {
-  using AdTable = donkeev::RobinTable<size_t, Ad, SizeTHash, SizeTEqual>;
 
-  std::string nextWord(const std::string&, size_t&);
+  std::string nextWord(const std::string& str, size_t& pos);
   int inputInt(const std::string&);
   std::string inputString(const std::string&);
   size_t inputSize_t(const std::string&);
-
-  void saveCarToDataBase(const Car&, const std::string&);
-  size_t getHistroySize();
-  size_t generateNextAdId(AdTable&, size_t);
-  void saveAdToHistory(const Ad&);
 }
 
 #endif
