@@ -142,4 +142,80 @@ BOOST_AUTO_TEST_CASE(test_hmac_determinism)
   BOOST_CHECK(h1 != hasher("another_string"));
 }
 
+BOOST_AUTO_TEST_CASE(test_load_factor_values)
+{
+  TestMap table(10);
+  BOOST_CHECK_CLOSE(table.load_factor(), 0.0f, 0.001f);
+
+  table.insert(std::make_pair("a", 1));
+  table.insert(std::make_pair("b", 2));
+  BOOST_CHECK_CLOSE(table.load_factor(), 0.2f, 0.001f);
+
+  for (int i = 0; i < 8; ++i)
+  {
+    table.insert(std::make_pair("c" + std::to_string(i), i));
+  }
+
+  BOOST_CHECK_CLOSE(table.load_factor(), 1.0f, 0.001f);
+}
+
+BOOST_AUTO_TEST_CASE(test_max_chain_count_values)
+{
+  TestMap table(2);
+  BOOST_CHECK_EQUAL(table.max_chain_count(), 0);
+
+  table.insert(std::make_pair("x", 1));
+  table.insert(std::make_pair("y", 2));
+  BOOST_CHECK_GE(table.max_chain_count(), 1);
+
+  table.insert(std::make_pair("z", 3));
+  table.insert(std::make_pair("w", 4));
+
+  BOOST_CHECK_GE(table.max_chain_count(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_auto_rehash_on_load_factor)
+{
+  TestMap table(4);
+  table.max_load_factor(0.25f);
+
+  table.insert(std::make_pair("k1", 1));
+  BOOST_CHECK_CLOSE(table.load_factor(), 0.25f, 0.001f);
+
+  table.insert(std::make_pair("k2", 2));
+  BOOST_CHECK_CLOSE(table.load_factor(), 0.5f, 0.001f);
+
+  table.insert(std::make_pair("k3", 3));
+  BOOST_CHECK_CLOSE(table.load_factor(), 0.375f, 0.001f);
+}
+
+BOOST_AUTO_TEST_CASE(test_custom_growth_policy)
+{
+  TestMap table(10);
+
+  table.insert(std::make_pair("init", 0));
+  table.max_load_factor(0.05f);
+
+  table.set_growth_policy([](size_t current)
+  {
+    return current + 5;
+  });
+
+  table.insert(std::make_pair("next", 1));
+  BOOST_CHECK_CLOSE(table.load_factor(), 2.0f / 15.0f, 0.001f);
+}
+
+BOOST_AUTO_TEST_CASE(test_chain_length_limit_disabled_when_zero)
+{
+  TestMap table(4);
+  table.max_chain_length_limit(0);
+
+  for (int i = 0; i < 20; ++i)
+  {
+    table.insert(std::make_pair("item" + std::to_string(i), i));
+  }
+
+  BOOST_CHECK(table.contains("item19"));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

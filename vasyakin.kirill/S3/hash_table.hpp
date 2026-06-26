@@ -5,6 +5,7 @@
 #include <utility>
 #include <cstddef>
 #include <memory>
+#include <functional>
 #include "vector.hpp"
 #include "list.hpp"
 
@@ -110,6 +111,14 @@ namespace vasyakin
     Iterator find(const Key& key);
     ConstIterator find(const Key& key) const;
 
+    float load_factor() const noexcept;
+
+    size_t max_chain_count() const noexcept;
+
+    void max_load_factor(float ml) noexcept;
+    void max_chain_length_limit(size_t mcl) noexcept;
+    void set_growth_policy(std::function< size_t(size_t) > policy) noexcept;
+
     Iterator begin() noexcept;
     Iterator end() noexcept;
     ConstIterator begin() const noexcept;
@@ -122,6 +131,14 @@ namespace vasyakin
     size_t size_;
     Hash hasher_;
     Equal equal_;
+
+    float max_load_factor_ = 1.0f;
+    size_t max_chain_length_ = 0;
+
+    std::function< size_t(size_t) > growth_policy_ = [](size_t current)
+    {
+      return current == 0 ? 1 : current * 2;
+    };
 
     template< class T >
     std::pair< Iterator, bool > insertImpl(T&& value);
@@ -403,6 +420,24 @@ namespace vasyakin
   std::pair< typename HashTable< Key, Value, Hash, Equal >::Iterator, bool >
     HashTable< Key, Value, Hash, Equal >::insertImpl(T&& value)
   {
+    bool need_rehash = false;
+
+    if (load_factor() > max_load_factor_)
+    {
+      need_rehash = true;
+    }
+
+    if (max_chain_length_ > 0 && max_chain_count() >= max_chain_length_)
+    {
+      need_rehash = true;
+    }
+
+    if (need_rehash)
+    {
+      size_t new_slots = growth_policy_(buckets_.getSize());
+      rehash(new_slots);
+    }
+
     size_t idx = hasher_(value.first) % buckets_.getSize();
     auto res = find_node(idx, value.first);
 
@@ -524,6 +559,59 @@ namespace vasyakin
     }
 
     return {false, nullptr};
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  float HashTable< Key, Value, Hash, Equal >::load_factor() const noexcept
+  {
+    if (buckets_.getSize() == 0)
+    {
+      return 0.0f;
+    }
+
+    return static_cast< float >(size_) / buckets_.getSize();
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  size_t HashTable< Key, Value, Hash, Equal >::max_chain_count() const noexcept
+  {
+    size_t max_len = 0;
+
+    for (size_t i = 0; i < buckets_.getSize(); ++i)
+    {
+      size_t curr_len = 0;
+
+      for (auto it = buckets_[i].cbegin(); it != buckets_[i].cend(); ++it)
+      {
+        ++curr_len;
+      }
+
+      if (max_len < curr_len)
+      {
+        max_len = curr_len;
+      }
+    }
+
+    return max_len;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void HashTable< Key, Value, Hash, Equal >::max_load_factor(float ml) noexcept
+  {
+    max_load_factor_ = ml > 0.0f ? ml : 1.0f;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void HashTable< Key, Value, Hash, Equal >::max_chain_length_limit(size_t mcl) noexcept
+  {
+    max_chain_length_ = mcl;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  void HashTable< Key, Value, Hash, Equal >::set_growth_policy(
+    std::function< size_t(size_t) > policy) noexcept 
+  { 
+    growth_policy_ = policy;
   }
 
   template< class Key, class Value, class Hash, class Equal >
