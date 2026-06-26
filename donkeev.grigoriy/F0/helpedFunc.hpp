@@ -22,6 +22,7 @@ namespace donkeev
   void saveCarToDataBase(const Car&, const std::string&);
   size_t getHistroySize();
   size_t generateNextAdId(AdTable&, size_t);
+  void saveAdToHistory(const Ad&);
 }
 
 #endif
