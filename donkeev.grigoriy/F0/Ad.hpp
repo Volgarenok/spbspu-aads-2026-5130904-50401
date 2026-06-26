@@ -16,7 +16,7 @@ namespace donkeev
   public:
     Ad();
     explicit Ad(Car* car, const std::string& line);
-    
+
     std::string getId() const;
     size_t getIdNumber() const;
     const Car& getCar() const;
@@ -24,14 +24,14 @@ namespace donkeev
     size_t getMileage() const;
     size_t getOwnerCount() const;
     bool isActive() const;
-    
+
     void setId(size_t);
     void setCar(Car*);
     void setPrice(size_t);
     void setMileage(size_t);
     void setOwnerCount(size_t);
     void setActive(bool);
-      
+
   private:
     size_t id_;
     Car* car_;

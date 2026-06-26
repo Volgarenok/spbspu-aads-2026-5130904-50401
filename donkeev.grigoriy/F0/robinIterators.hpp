@@ -17,10 +17,10 @@ namespace donkeev
 
     using Table = RobinTable<Key, Value, Hash, Equal>;
     using Node = RobinNode< Key, Value >;
-    
+
   public:
     RobinIter();
-    
+
     Node& operator*() const noexcept;
     Node* operator->() const noexcept;
 
@@ -32,7 +32,7 @@ namespace donkeev
 
     bool operator==(const RobinIter&) const noexcept;
     bool operator!=(const RobinIter&) const noexcept;
-    
+
   private:
     size_t index_ = 0;
     Table* table_ = nullptr;
@@ -47,10 +47,10 @@ namespace donkeev
 
     using Table = RobinTable<Key, Value, Hash, Equal>;
     using Node = RobinNode<Key, Value>;
-    
+
   public:
     RobinCIter();
-    
+
     const Node& operator*() const noexcept;
     const Node* operator->() const noexcept;
 
@@ -62,7 +62,7 @@ namespace donkeev
 
     bool operator==(const RobinCIter&) const noexcept;
     bool operator!=(const RobinCIter&) const noexcept;
-    
+
   private:
     size_t index_ = 0;
     const Table* table_ = nullptr;
@@ -81,7 +81,7 @@ namespace donkeev
   {
     return table_->slots_[index_];
   }
-  
+
   template< class Key, class Value, class Hash, class Equal >
   RobinNode< Key, Value >* RobinIter< Key, Value, Hash, Equal >::operator->() const noexcept
   {

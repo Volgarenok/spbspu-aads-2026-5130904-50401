@@ -17,7 +17,7 @@ struct Car
     int year;
     std::string color;
     std::string bodyType;
-    
+
     Car();
 
     explicit Car(const std::string&);

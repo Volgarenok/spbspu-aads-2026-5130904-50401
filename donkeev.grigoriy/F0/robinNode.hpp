@@ -12,16 +12,16 @@ namespace donkeev
     Value value_;
     bool isOccupied_;
     int psl_;
-    
+
     RobinNode();
 
     RobinNode(const RobinNode&);
     RobinNode(RobinNode&&) noexcept;
-    
+
     RobinNode(const Key&, const Value&, int);
 
     RobinNode& operator=(const RobinNode&);
-  
+
     void swap(RobinNode&);
   };
 
@@ -36,17 +36,17 @@ namespace donkeev
   template< class Key, class Value >
   RobinNode< Key, Value >::RobinNode(const RobinNode& other):
     key_(other.key_),
-    value_(other.value_), 
+    value_(other.value_),
     isOccupied_(other.isOccupied_),
     psl_(other.psl_)
   {}
 
   template< class Key, class Value >
   RobinNode< Key, Value >::RobinNode(RobinNode&& other) noexcept:
-    key_(std::move(other.key_)), 
+    key_(std::move(other.key_)),
     value_(std::move(other.value_)),
-    isOccupied_(other.isOccupied_), 
-    psl_(other.psl_) 
+    isOccupied_(other.isOccupied_),
+    psl_(other.psl_)
   {
     other.isOccupied_ = false;
     other.psl_ = -1;

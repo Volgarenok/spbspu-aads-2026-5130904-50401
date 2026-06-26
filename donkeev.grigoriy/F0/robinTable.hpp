@@ -17,7 +17,7 @@ namespace donkeev
     using Table = RobinTable<Key, Value, Hash, Equal>;
     using Iterator = RobinIter<Key, Value, Hash, Equal>;
     using ConstIterator = RobinCIter<Key, Value, Hash, Equal>;
-    
+
     friend class RobinIter<Key, Value, Hash, Equal>;
     friend class RobinCIter<Key, Value, Hash, Equal>;
   public:
@@ -44,11 +44,11 @@ namespace donkeev
 
     bool contains(const Key&) const;
     Value* find(const Key&);
-    
+
     void insert(const Key&, const Value&);
     Value remove(const Key&);
     void rehash(size_t);
-    
+
     size_t size() const;
     size_t capacity() const;
     bool empty() const;
@@ -126,14 +126,14 @@ namespace donkeev
     {
       return result.second->value_;
     }
-    
+
     insert(key, Value{});
     return findNode(key).second->value_;
   }
 
   template< class Key, class Value, class Hash, class Equal >
   RobinIter<Key, Value, Hash, Equal> RobinTable< Key, Value, Hash, Equal >::begin()
-  { 
+  {
     size_t cap = capacity();
     for (size_t i = 0; i < cap; ++i)
     {
@@ -219,12 +219,12 @@ namespace donkeev
     {
       rehash(slots_.getSize() * 2);
     }
-    
+
     size_t cap = slots_.getSize();
     size_t index = hasher_(key) % cap;
-    
+
     Node toAdd{key, value, 0} ;
-    
+
     for (size_t i = 0; i < cap; ++i)
     {
       if (!slots_[index].isOccupied_)
@@ -233,22 +233,22 @@ namespace donkeev
         size_++;
         return;
       }
-        
+
       if (equal_(slots_[index].key_, key))
       {
         slots_[index].value_ = value;
         return;
       }
-        
+
       if (toAdd.psl_ > slots_[index].psl_)
       {
         std::swap(toAdd, slots_[index]);
       }
-        
+
       toAdd.psl_++;
       index = (index + 1) % cap;
     }
-    
+
     throw std::runtime_error("Overflow");
   }
 
@@ -258,29 +258,29 @@ namespace donkeev
     std::pair< size_t, Node* > result = findNode(key);
     Node* toDel = result.second;
     size_t currId = result.first;
-    
+
     if (!toDel)
     {
       throw std::out_of_range("Invalid key");
     }
-    
+
     Value saved = std::move(toDel->value_);
-    
+
     size_t cap = slots_.getSize();
     size_t nextId = (currId + 1) % cap;
-    
+
     while (slots_[nextId].isOccupied_ && slots_[nextId].psl_ != 0)
     {
       slots_[currId] = slots_[nextId];
       slots_[currId].psl_--;
-      
+
       currId = nextId;
       nextId = (nextId + 1) % cap;
     }
-    
+
     slots_[currId] = Node{};
     size_--;
-    
+
     return saved;
   }
 
@@ -288,7 +288,7 @@ namespace donkeev
   void RobinTable<Key, Value, Hash, Equal>::rehash(size_t newCapacity)
   {
     RobinTable tmp(newCapacity);
-    
+
     size_t cap = slots_.getSize();
     for (size_t i = 0; i < cap; ++i)
     {
@@ -297,7 +297,7 @@ namespace donkeev
         tmp.insert(slots_[i].key_, slots_[i].value_);
       }
     }
-    
+
     swap(tmp);
   }
 
@@ -348,34 +348,34 @@ RobinTable<Key, Value, Hash, Equal>::swap(RobinTable& other) noexcept
     {
       return {0, nullptr};
     }
-    
+
     size_t cap = slots_.getSize();
     size_t index = hasher_(key) % cap;
     int currPsl = 0;
-    
+
     for (size_t i = 0; i < cap; ++i)
     {
       Node& node = slots_[index];
-      
+
       if (!node.isOccupied_)
       {
         return {index, nullptr};
       }
-      
+
       if (currPsl > node.psl_)
       {
         return {index, nullptr};
       }
-      
+
       if (equal_(key, node.key_))
       {
         return {index, &slots_[index]};
       }
-      
+
       index = (index + 1) % cap;
       currPsl++;
     }
-    
+
     return {cap, nullptr};
   }
 
@@ -387,37 +387,37 @@ RobinTable<Key, Value, Hash, Equal>::swap(RobinTable& other) noexcept
     {
       return {0, nullptr};
     }
-    
+
     size_t cap = slots_.getSize();
     size_t index = hasher_(key) % cap;
     int cur_psl = 0;
-    
+
     for (size_t i = 0; i < cap; ++i)
     {
       const Node& node = slots_[index];
-      
+
       if (!node.isOccupied_)
       {
         return {index, nullptr};
       }
-      
+
       if (cur_psl > node.psl_)
       {
         return {index, nullptr};
       }
-      
+
       if (equal_(key, node.key_))
       {
         return {index, &slots_[index]};
       }
-      
+
       index = (index + 1) % cap;
       cur_psl++;
     }
-    
+
     return {cap, nullptr};
   }
-  
+
 }
 
 #endif

@@ -23,7 +23,7 @@ int main()
   cmds.insert("buy", donkeev::handleBuy);
   cmds.insert("delete", donkeev::handleDelete);
   cmds.insert("show-history", donkeev::handleShowHistory);
-  
+
   std::string input;
   while (true)
   {
@@ -39,7 +39,7 @@ int main()
 
     CommandHandler* handler = cmds.find(command);
     if (handler)
-    { 
+    {
       (*handler)(cars, ads, parametrs);
       donkeev::showNavigation();
     }

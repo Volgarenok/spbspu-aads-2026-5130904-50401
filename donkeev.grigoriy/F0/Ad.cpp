@@ -12,7 +12,7 @@ donkeev::Ad::Ad():
 donkeev::Ad::Ad(Car* car, const std::string& line)
 {
   size_t pos = 0;
-  
+
   id_ = std::stoull(nextWord(line, pos));
   car_ = car;
   price_ = std::stoull(nextWord(line, pos));
