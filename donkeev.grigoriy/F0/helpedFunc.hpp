@@ -11,11 +11,12 @@
 
 namespace donkeev
 {
-
-  std::string nextWord(const std::string& str, size_t& pos);
+  std::string nextWord(const std::string&, size_t&);
   int inputInt(const std::string&);
   std::string inputString(const std::string&);
   size_t inputSize_t(const std::string&);
+  bool isDigit(const std::string&);
+  bool isAlpha(const std::string&);
 }
 
 #endif

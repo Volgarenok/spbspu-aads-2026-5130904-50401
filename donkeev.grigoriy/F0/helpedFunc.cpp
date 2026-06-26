@@ -46,3 +46,39 @@ size_t donkeev::inputSize_t(const std::string& prompt)
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   return value;
 }
+
+bool donkeev::isDigit(const std::string& str)
+{
+  if (str.empty())
+  {
+      return false;
+  }
+    
+  for (char c : str)
+  {
+    if (!std::isdigit(static_cast<unsigned char>(c)))
+    {
+      return false;
+    }
+  }
+    
+  return true;
+}
+
+bool donkeev::isAlpha(const std::string& str)
+{
+  if (str.empty())
+  {
+    return false;
+  }
+    
+  for (char c : str)
+  {
+    if (!std::isalpha(static_cast<unsigned char>(c)))
+    {
+      return false;
+    }
+  }
+    
+  return true;
+}

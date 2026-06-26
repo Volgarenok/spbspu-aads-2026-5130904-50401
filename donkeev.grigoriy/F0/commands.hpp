@@ -14,16 +14,15 @@ namespace donkeev
   using AdConstIterator = RobinCIter<size_t, Ad, SizeTHash, SizeTEqual>;
 
   void printCar(const Car& car);
-  void printAd(const Ad& ad);
   void saveCarToDataBase(const Car&, const std::string&);
   size_t getHistorySize();
   size_t generateNextAdId(AdTable&, size_t);
   void saveAdToHistory(const Ad&);
 
-  void handleScroll(CarTable& cars, AdTable& ads, const std::string& parametrs);
-  void handleMake(CarTable& cars, AdTable& ads, const std::string& parametrs);
-  void handleBuy(CarTable& cars, AdTable& ads, const std::string& parametrs);
-  void handleDelete(CarTable& cars, AdTable& ads, const std::string& parametrs);
-  void handleShowHistory(CarTable& cars, AdTable& ads, const std::string& parametrs);
+  void handleScroll(CarTable& cars, AdTable& ads);
+  void handleMake(CarTable& cars, AdTable& ads);
+  void handleBuy(CarTable& cars, AdTable& ads);
+  void handleDelete(CarTable& cars, AdTable& ads);
+  void handleShowHistory(CarTable& cars, AdTable& ads);
 }
 #endif

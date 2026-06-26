@@ -5,9 +5,13 @@
 
 int main()
 {
+
+  std::ofstream("cars.txt", std::ios::trunc).close();
+  std::ofstream("history.txt", std::ios::trunc).close();
+
   using CarTable = donkeev::RobinTable<std::string, donkeev::Car, donkeev::StringHash, donkeev::StringEqual>;
   using AdTable = donkeev::RobinTable<size_t, donkeev::Ad, donkeev::SizeTHash, donkeev::SizeTEqual>;
-  using CommandHandler = void(*)(CarTable&, AdTable&, const std::string&);
+  using CommandHandler = void(*)(CarTable&, AdTable&);
 
   CarTable cars(16);
   AdTable ads(16);
@@ -15,7 +19,7 @@ int main()
   donkeev::showBanner();
   donkeev::showNavigation();
 
-  donkeev::RobinTable< std::string, void(*)(CarTable&, AdTable&, const std::string&),
+  donkeev::RobinTable< std::string, CommandHandler,
     donkeev::StringHash, donkeev::StringEqual > cmds(16);
 
   cmds.insert("scroll", donkeev::handleScroll);
@@ -35,22 +39,21 @@ int main()
 
     size_t pos = 0;
     std::string command = donkeev::nextWord(input, pos);
-    std::string parametrs = input.substr(pos);
+
+    if (command == "quit")
+    {
+      break;
+    }
 
     CommandHandler* handler = cmds.find(command);
     if (handler)
     {
-      (*handler)(cars, ads, parametrs);
+      (*handler)(cars, ads);
       donkeev::showNavigation();
     }
     else
     {
       std::cout << "\033[31m  Неизвестная команда.\033[0m\n\n";
-    }
-
-    if (command == "quit")
-    {
-      break;
     }
   }
 

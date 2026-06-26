@@ -88,7 +88,7 @@ void donkeev::saveAdToHistory(const Ad& ad)
   file.close();
 }
 
-void donkeev::handleScroll(CarTable&, AdTable& ads, const std::string&)
+void donkeev::handleScroll(CarTable&, AdTable& ads)
 {
   std::cout << "\n\033[1;33m=== ЛЕНТА ОБЪЯВЛЕНИЙ ===\033[0m\n";
 
@@ -124,13 +124,19 @@ void donkeev::handleScroll(CarTable&, AdTable& ads, const std::string&)
   std::cout << "\n  \033[90mВсего активных объявлений: " << count << "\033[0m\n\n";
 }
 
-void donkeev::handleMake(CarTable& cars, AdTable& ads, const std::string&)
+void donkeev::handleMake(CarTable& cars, AdTable& ads)
 {
   const std::string CARS_FILE = "cars.txt";
 
   std::cout << "\n\033[1;33m=== СОЗДАНИЕ ОБЪЯВЛЕНИЯ ===\033[0m\n";
 
   std::string vin = inputString("  VIN машины: ");
+
+  if (!donkeev::isDigit(vin))
+  {
+    std::cout << "Неверный vin\n";
+    return;
+  }
 
   Car* car = cars.find(vin);
 
@@ -141,10 +147,18 @@ void donkeev::handleMake(CarTable& cars, AdTable& ads, const std::string&)
 
     std::string brand = inputString("    Марка: ");
     std::string model = inputString("    Модель: ");
-    int year = inputInt("    Год выпуска: ");
+    std::string yearStr = inputString("    Год выпуска: ");
     std::string color = inputString("    Цвет: ");
     std::string bodyType = inputString("    Тип кузова: ");
 
+    if (!donkeev::isDigit(yearStr) || !donkeev::isAlpha(color) ||
+      !donkeev::isAlpha(bodyType))
+    {
+      std::cout << "Неверные параметры\n";
+      return;
+    }
+
+    size_t year = std::stoull(yearStr);
     Car newCar;
     newCar.vin = vin;
     newCar.brand = brand;
@@ -180,7 +194,7 @@ void donkeev::handleMake(CarTable& cars, AdTable& ads, const std::string&)
 
   std::cout << "\033[32m  ✓ Объявление создано! ID: " << ad.getId() << "\033[0m\n\n";
 }
-void donkeev::handleBuy(CarTable&, AdTable& ads, const std::string&)
+void donkeev::handleBuy(CarTable&, AdTable& ads)
 {
   const std::string HISTORY_FILE = "history.txt";
 
@@ -221,7 +235,7 @@ void donkeev::handleBuy(CarTable&, AdTable& ads, const std::string&)
 
   std::cout << "\033[32m  ✓ Поздравляем с покупкой!\033[0m\n";
 }
-void donkeev::handleDelete(CarTable&, AdTable& ads, const std::string&)
+void donkeev::handleDelete(CarTable&, AdTable& ads)
 {
   std::cout << "\n  \033[33mВведите ID объявления для удаления: \033[0m";
 
@@ -258,7 +272,7 @@ void donkeev::handleDelete(CarTable&, AdTable& ads, const std::string&)
   ads.remove(id);
   std::cout << "\033[32m  ✓ Объявление " << idStr << " удалено.\033[0m\n\n";
 }
-void donkeev::handleShowHistory(CarTable&, AdTable&, const std::string&)
+void donkeev::handleShowHistory(CarTable&, AdTable&)
 {
   const std::string HISTORY_FILE = "history.txt";
 
