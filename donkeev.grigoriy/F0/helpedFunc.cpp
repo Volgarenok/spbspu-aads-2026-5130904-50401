@@ -38,6 +38,15 @@ std::string donkeev::inputString(const std::string& prompt)
   return value;
 }
 
+int inputSize_t(const std::string& prompt)
+{
+  size_t value;
+  std::cout << prompt;
+  std::cin >> value;
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+  return value;
+}
+
 void donkeev::saveCarToDataBase(const Car& car, const std::string& filename)
 {
   std::ofstream file(filename, std::ios::app);
@@ -52,3 +61,17 @@ void donkeev::saveCarToDataBase(const Car& car, const std::string& filename)
   file << line << "\n";
   file.close();
 }
+
+size_t donkeev::generateNextAdId(AdTable& ads, size_t histroySize)
+{
+  size_t candidate = ads.size() + histroySize + 1;
+  
+  while (ads.contains(candidate))
+  {
+    ++candidate;
+  }
+  
+  return candidate;
+}
+
+
