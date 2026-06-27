@@ -86,3 +86,32 @@ void levkin::cmdComplement(std::istream& in,
   }
   datasets.push(resName, std::move(result));
 }
+
+
+void levkin::cmdIntersect(std::istream& in, std::ostream& out, DatasetStore& datasets)
+{
+  std::string res_name, left_name, right_name;
+  if (!(in >> res_name >> left_name >> right_name)) {
+    throw std::invalid_argument("Invalid arguments");
+  }
+
+  if (!datasets.has(left_name) || !datasets.has(right_name)) {
+    out << "<error>\n";
+    return;
+  }
+
+  const SubTree& left = datasets.get(left_name);
+  const SubTree& right = datasets.get(right_name);
+  SubTree result;
+
+  for (auto it = left.cbegin(); it != left.cend(); ++it) {
+    if (right.has(it->key)) {
+      result.push(it->key, it->value);
+    }
+  }
+
+  if (datasets.has(res_name)) {
+    datasets.drop(res_name);
+  }
+  datasets.push(res_name, std::move(result));
+}
