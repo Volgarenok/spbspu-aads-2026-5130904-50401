@@ -22,38 +22,38 @@ BOOST_AUTO_TEST_CASE(empty_table)
 
   BOOST_CHECK(table.isEmpty());
   BOOST_CHECK_EQUAL(table.size(), 0);
-  BOOST_CHECK(!table.has("a"));
+  BOOST_CHECK(!table.contains("a"));
 
-  BOOST_CHECK_THROW(table.get("a"), std::out_of_range);
-  BOOST_CHECK_THROW(table.drop("a"), std::out_of_range);
+  BOOST_CHECK_THROW(table.at("a"), std::out_of_range);
+  BOOST_CHECK_EQUAL(table.erase("a"), 0);
 }
 
-BOOST_AUTO_TEST_CASE(add_and_has)
+BOOST_AUTO_TEST_CASE(insert_and_contains)
 {
   TestTable table(16);
 
-  table.add("a", 10);
-  table.add("b", 20);
-  table.add("c", 30);
+  table.insert("a", 10);
+  table.insert("b", 20);
+  table.insert("c", 30);
 
-  BOOST_CHECK(table.has("a"));
-  BOOST_CHECK(table.has("b"));
-  BOOST_CHECK(table.has("c"));
-  BOOST_CHECK(!table.has("d"));
+  BOOST_CHECK(table.contains("a"));
+  BOOST_CHECK(table.contains("b"));
+  BOOST_CHECK(table.contains("c"));
+  BOOST_CHECK(!table.contains("d"));
 
   BOOST_CHECK_EQUAL(table.size(), 3);
 }
 
-BOOST_AUTO_TEST_CASE(get_and_replace)
+BOOST_AUTO_TEST_CASE(at_and_replace)
 {
   TestTable table(16);
 
-  table.add("key", 1);
-  BOOST_CHECK_EQUAL(table.get("key"), 1);
+  table.insert("key", 1);
+  BOOST_CHECK_EQUAL(table.at("key"), 1);
 
-  table.add("key", 100);
+  table.insert("key", 100);
 
-  BOOST_CHECK_EQUAL(table.get("key"), 100);
+  BOOST_CHECK_EQUAL(table.at("key"), 100);
   BOOST_CHECK_EQUAL(table.size(), 1);
 }
 
@@ -61,13 +61,13 @@ BOOST_AUTO_TEST_CASE(erase_element)
 {
   TestTable table(16);
 
-  table.add("a", 10);
-  table.add("b", 20);
+  table.insert("a", 10);
+  table.insert("b", 20);
 
-  BOOST_CHECK(table.erase("a"));
+  BOOST_CHECK_EQUAL(table.erase("a"), 1);
 
-  BOOST_CHECK(!table.has("a"));
-  BOOST_CHECK(table.has("b"));
+  BOOST_CHECK(!table.contains("a"));
+  BOOST_CHECK(table.contains("b"));
 
   BOOST_CHECK_EQUAL(table.size(), 1);
 }
@@ -76,48 +76,47 @@ BOOST_AUTO_TEST_CASE(erase_missing_element)
 {
   TestTable table(16);
 
-  table.add("a", 10);
+  table.insert("a", 10);
 
-  BOOST_CHECK(!table.erase("b"));
+  BOOST_CHECK_EQUAL(table.erase("b"), 1);
   BOOST_CHECK_EQUAL(table.size(), 1);
 }
 
-BOOST_AUTO_TEST_CASE(drop_element)
+BOOST_AUTO_TEST_CASE(erase_twice)
 {
   TestTable table(16);
 
-  table.add("a", 42);
+  table.insert("a", 42);
 
-  BOOST_CHECK_EQUAL(table.drop("a"), 42);
-  BOOST_CHECK(!table.has("a"));
-
-  BOOST_CHECK_THROW(table.drop("a"), std::out_of_range);
+  BOOST_CHECK_EQUAL(table.erase("a"), 1);
+  BOOST_CHECK(!table.contains("a"));
+  BOOST_CHECK_EQUAL(table.erase("a"), 0);
 }
 
 BOOST_AUTO_TEST_CASE(rehash_preserves_values)
 {
   TestTable table(8);
 
-  table.add("a", 10);
-  table.add("b", 20);
-  table.add("c", 30);
+  table.insert("a", 10);
+  table.insert("b", 20);
+  table.insert("c", 30);
 
   table.rehash(31);
 
   BOOST_CHECK_EQUAL(table.capacity(), 31);
 
-  BOOST_CHECK_EQUAL(table.get("a"), 10);
-  BOOST_CHECK_EQUAL(table.get("b"), 20);
-  BOOST_CHECK_EQUAL(table.get("c"), 30);
+  BOOST_CHECK_EQUAL(table.at("a"), 10);
+  BOOST_CHECK_EQUAL(table.at("b"), 20);
+  BOOST_CHECK_EQUAL(table.at("c"), 30);
 }
 
 BOOST_AUTO_TEST_CASE(iterator_visits_all_elements)
 {
   TestTable table(16);
 
-  table.add("a", 1);
-  table.add("b", 2);
-  table.add("c", 3);
+  table.insert("a", 1);
+  table.insert("b", 2);
+  table.insert("c", 3);
 
   int sum = 0;
   size_t count = 0;
@@ -138,8 +137,8 @@ BOOST_AUTO_TEST_CASE(const_iterator_works)
 {
   TestTable table(16);
 
-  table.add("x", 10);
-  table.add("y", 20);
+  table.insert("x", 10);
+  table.insert("y", 20);
 
   const TestTable& constTable = table;
 
