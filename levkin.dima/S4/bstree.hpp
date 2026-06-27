@@ -251,7 +251,56 @@ namespace levkin {
       delete z;
       return val;
     }
- 
+    const_iterator rotateLeft(const_iterator it)
+    {
+      Node< Key, Value >* x = it.node;
+      Node< Key, Value >* p = x->parent;
+      if (p == header || p->right != x)
+        throw std::invalid_argument("Invalid left rotation");
+      p->right = x->left;
+      if (x->left != nil)
+        x->left->parent = p;
+      x->parent = p->parent;
+      if (p->parent == header)
+        header->left = x;
+      else if (p == p->parent->left)
+        p->parent->left = x;
+      else
+        p->parent->right = x;
+      x->left = p;
+      p->parent = x;
+      return const_iterator(x, nil);
+    }
+    const_iterator rotateRight(const_iterator it)
+    {
+      Node< Key, Value >* x = it.node;
+      Node< Key, Value >* p = x->parent;
+      if (p == header || p->left != x)
+        throw std::invalid_argument("Invalid right rotation");
+      p->left = x->right;
+      if (x->right != nil)
+        x->right->parent = p;
+      x->parent = p->parent;
+      if (p->parent == header)
+        header->left = x;
+      else if (p == p->parent->right)
+        p->parent->right = x;
+      else
+        p->parent->left = x;
+      x->right = p;
+      p->parent = x;
+      return const_iterator(x, nil);
+    }
+    const_iterator rotateLargeLeft(const_iterator it)
+    {
+      rotateRight(it);
+      return rotateLeft(it);
+    }
+    const_iterator rotateLargeRight(const_iterator it)
+    {
+      rotateLeft(it);
+      return rotateRight(it);
+    }
     size_t height(const_iterator it) const { return heightInternal(it.node); }
     size_t height() const { return heightInternal(header->left); }
   };
