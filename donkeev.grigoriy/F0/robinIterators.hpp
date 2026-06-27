@@ -168,7 +168,7 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   const Value& RobinCIter<Key, Value, Hash, Equal>::operator*() const noexcept
   {
-    Node& node = table_->slots_[index_];
+    const Node& node = table_->slots_[index_];
     return node.value_;
   }
 

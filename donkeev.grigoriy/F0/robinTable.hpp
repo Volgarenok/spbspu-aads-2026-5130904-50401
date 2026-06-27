@@ -121,7 +121,7 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   Value& RobinTable<Key, Value, Hash, Equal>::operator[](const Key& key)
   {
-    std::pair< size_t, Node > result = findNode(key);
+    std::pair< size_t, Node* > result = findNode(key);
     if (result.second)
     {
       return result.second->value_;
@@ -322,7 +322,7 @@ namespace donkeev
   template< class Key, class Value, class Hash, class Equal >
   void RobinTable<Key, Value, Hash, Equal>::clear()
   {
-    for (size_t i = 0; i < slots_.size(); ++i)
+    for (size_t i = 0; i < slots_.getSize(); ++i)
     {
       slots_[i] = Node{};
     }
