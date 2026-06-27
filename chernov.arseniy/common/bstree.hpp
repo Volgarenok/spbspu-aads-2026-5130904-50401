@@ -34,6 +34,12 @@ namespace chernov {
         key_value_(k, v)
       {}
     };
+
+    template< class Key, class Value >
+    std::pair< const Key, Value > & getKeyValue(NodeBase * node)
+    {
+      return static_cast< detail::Node< Key, Value > * >(node)->key_value_;
+    }
   }
 
   template< class Key, class Value, bool IsConst >
@@ -185,7 +191,7 @@ namespace chernov {
     Stack< std::pair< detail::NodeBase *, detail::NodeBase * > > stack;
 
     detail::NodeBase * src_root = other.fake_root_->left;
-    const std::pair< const Key, Value > & root_kv = static_cast< detail::Node< Key, Value > * >(src_root)->key_value_;
+    const std::pair< const Key, Value > & root_kv = detail::getKeyValue< Key, Value >(src_root);
     detail::NodeBase * dst_root = new detail::Node< Key, Value >(
       root_kv.first, root_kv.second, temp.fake_root_, temp.fake_leaf_, temp.fake_leaf_, src_root->height);
     temp.fake_root_->left = dst_root;
@@ -198,7 +204,7 @@ namespace chernov {
       stack.pop();
 
       if (src->left != other.fake_leaf_) {
-        const std::pair< const Key, Value > & l_kv = static_cast< detail::Node< Key, Value > * >(src->left)->key_value_;
+        const std::pair< const Key, Value > & l_kv = detail::getKeyValue< Key, Value >(src->left);
         detail::NodeBase * new_left =
           new detail::Node< Key, Value >(l_kv.first, l_kv.second, dst, temp.fake_leaf_, temp.fake_leaf_, src->height);
         dst->left = new_left;
@@ -209,8 +215,7 @@ namespace chernov {
       }
 
       if (src->right != other.fake_leaf_) {
-        const std::pair< const Key, Value > & r_kv =
-          static_cast< detail::Node< Key, Value > * >(src->right)->key_value_;
+        const std::pair< const Key, Value > & r_kv = detail::getKeyValue< Key, Value >(src->right);
         detail::NodeBase * new_right =
           new detail::Node< Key, Value >(r_kv.first, r_kv.second, dst, temp.fake_leaf_, temp.fake_leaf_, src->height);
         dst->right = new_right;
@@ -484,7 +489,7 @@ namespace chernov {
   template< class Key, class Value, class Compare >
   const Value & BSTree< Key, Value, Compare >::at(const Key & k) const
   {
-    return static_cast< detail::Node< Key, Value > * >(findNode(k))->key_value_.second;
+    return detail::getKeyValue< Key, Value >(findNode(k)).second;
   }
 
   template< class Key, class Value, class Compare >
@@ -632,7 +637,7 @@ namespace chernov {
   {
     detail::NodeBase * node = fake_root_->left;
     while (node != fake_leaf_) {
-      const Key & node_key = static_cast< detail::Node< Key, Value > * >(node)->key_value_.first;
+      const Key & node_key = detail::getKeyValue< Key, Value >(node).first;
       if (cmp_(k, node_key)) {
         node = node->left;
       } else if (cmp_(node_key, k)) {
@@ -652,13 +657,13 @@ namespace chernov {
     detail::NodeBase * curr = parent->left;
     while (curr != fake_leaf_) {
       parent = curr;
-      const Key & curr_key = static_cast< detail::Node< Key, Value > * >(curr)->key_value_.first;
+      const Key & curr_key = detail::getKeyValue< Key, Value >(curr).first;
       if (cmp_(k, curr_key)) {
         curr = curr->left;
       } else if (cmp_(curr_key, k)) {
         curr = curr->right;
       } else {
-        static_cast< detail::Node< Key, Value > * >(curr)->key_value_.second = std::forward< U >(v);
+        detail::getKeyValue< Key, Value >(curr).second = std::forward< U >(v);
         return;
       }
     }
@@ -669,7 +674,7 @@ namespace chernov {
     if (parent == fake_root_) {
       fake_root_->left = new_node;
       fake_root_->right = new_node;
-    } else if (cmp_(k, static_cast< detail::Node< Key, Value > * >(parent)->key_value_.first)) {
+    } else if (cmp_(k, detail::getKeyValue< Key, Value >(parent).first)) {
       parent->left = new_node;
     } else {
       parent->right = new_node;
@@ -691,13 +696,13 @@ namespace chernov {
   template< class Key, class Value, bool IsConst >
   typename BSTIterator< Key, Value, IsConst >::reference BSTIterator< Key, Value, IsConst >::operator*()
   {
-    return static_cast< detail::Node< Key, Value > * >(node_)->key_value_;
+    return detail::getKeyValue< Key, Value >(node_);
   }
 
   template< class Key, class Value, bool IsConst >
   typename BSTIterator< Key, Value, IsConst >::pointer BSTIterator< Key, Value, IsConst >::operator->()
   {
-    return std::addressof(static_cast< detail::Node< Key, Value > * >(node_)->key_value_);
+    return std::addressof(detail::getKeyValue< Key, Value >(node_));
   }
 
   template< class Key, class Value, bool IsConst >
