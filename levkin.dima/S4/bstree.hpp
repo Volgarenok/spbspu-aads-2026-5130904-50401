@@ -1,5 +1,5 @@
 #ifndef BSTREE_HPP
-#define BSTREE_HPP 
+#define BSTREE_HPP
 #include <stdexcept>
 #include <functional>
 #include <utility>
@@ -134,6 +134,7 @@ namespace levkin {
       size_t r = heightInternal(n->right);
       return 1 + (l > r ? l : r);
     }
+
   public:
     using const_iterator = BSTConstIterator< Key, Value >;
     using iterator = BSTIterator< Key, Value >;
