@@ -314,6 +314,7 @@ namespace vasyakin
       }
       ++bucket_idx_;
     }
+
     buckets_ = nullptr;
     list_it_ = LCIter< PairType >();
     list_end_ = LCIter< PairType >();
@@ -609,8 +610,8 @@ namespace vasyakin
 
   template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::set_growth_policy(
-    std::function< size_t(size_t) > policy) noexcept 
-  { 
+    std::function< size_t(size_t) > policy) noexcept
+  {
     growth_policy_ = policy;
   }
 
