@@ -143,7 +143,7 @@ void donkeev::handleSort(CarTable&, AdTable& ads)
     std::cout << "\n  \033[33mВведите марку\033[0m\n";
     std::string brand;
     std::getline(std::cin, brand);
-    
+
     AdIterator begin = ads.begin();
     AdIterator end = ads.end();
     size_t count = 0;
@@ -155,7 +155,7 @@ void donkeev::handleSort(CarTable&, AdTable& ads)
       }
       ++begin;
     }
-    
+
     if (count == 0)
     {
       std::cout << "\n\033[33mНет подходящих объвлений\033[0m\n\n";
@@ -187,7 +187,7 @@ void donkeev::handleSort(CarTable&, AdTable& ads)
       }
       ++begin;
     }
-    
+
     if (count == 0)
     {
       std::cout << "\n\033[33mНет подходящих объвлений\033[0m\n\n";
@@ -208,7 +208,7 @@ void donkeev::handleSort(CarTable&, AdTable& ads)
     {
       Ad* key = activeAds[i];
       size_t j = i;
-      
+
       while (j > 0 && activeAds[j - 1]->getPrice() > key->getPrice())
       {
         activeAds[j] = activeAds[j - 1];
@@ -230,7 +230,7 @@ void donkeev::handleSort(CarTable&, AdTable& ads)
     std::cout << "\033[31m  Неверная команда\033[0m\n\n";
     return;
   }
-  
+
 }
 
 void donkeev::handleMake(CarTable& cars, AdTable& ads)
@@ -427,7 +427,7 @@ void donkeev::handleShowHistory(CarTable&, AdTable&)
 void donkeev::handleChoozeBest(CarTable&, AdTable& ads)
 {
   using PriceTable = donkeev::RobinTable< std::string, size_t, StringHash, StringEqual >;
-  
+
   PriceTable prices(16);
   prices.insert("bmw m5", 8500);
   prices.insert("audi rs6", 6700);
@@ -463,14 +463,14 @@ void donkeev::handleChoozeBest(CarTable&, AdTable& ads)
 
   size_t* profits = new size_t[ads.size()];
   double* efficiency = new double[ads.size()];
-    
+
   for (size_t i = 0; i < ads.size(); ++i)
   {
     const Car& car = activeAds[i]->getCar();
     std::string priceKey = std::string(car.brand_) + " " + std::string(car.model_);
     size_t marketPrice = prices.at(priceKey);
     size_t adPrice = activeAds[i]->getPrice();
-    
+
     profits[i] = (marketPrice > adPrice) ? (marketPrice - adPrice) : 0;
     efficiency[i] = (adPrice > 0) ? static_cast<double>(profits[i]) / adPrice : 0;
   }
@@ -480,7 +480,7 @@ void donkeev::handleChoozeBest(CarTable&, AdTable& ads)
     Ad* keyAd = activeAds[i];
     size_t keyProfit = profits[i];
     double keyEff = efficiency[i];
-    
+
     size_t j = i;
     while (j > 0 && efficiency[j - 1] < keyEff)
     {
@@ -497,17 +497,17 @@ void donkeev::handleChoozeBest(CarTable&, AdTable& ads)
   size_t totalSpent = 0;
   size_t totalProfit = 0;
   size_t selectedCount = 0;
-  
+
   std::cout << "\n  \033[1;33mВыбранные автомобили:\033[0m\n";
   for (size_t i = 0; i < ads.size(); ++i)
   {
     size_t price = activeAds[i]->getPrice();
-    
+
     if (totalSpent + price <= budget)
     {
       totalSpent += price;
       totalProfit += profits[i];
-      
+
       printAd(*(activeAds[i]), selectedCount);
     }
   }

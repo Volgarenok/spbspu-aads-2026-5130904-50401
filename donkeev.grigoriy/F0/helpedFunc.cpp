@@ -53,7 +53,7 @@ bool donkeev::isDigit(const std::string& str)
   {
       return false;
   }
-    
+
   for (char c : str)
   {
     if (!std::isdigit(static_cast<unsigned char>(c)))
@@ -61,7 +61,7 @@ bool donkeev::isDigit(const std::string& str)
       return false;
     }
   }
-    
+
   return true;
 }
 
@@ -71,7 +71,7 @@ bool donkeev::isAlpha(const std::string& str)
   {
     return false;
   }
-    
+
   for (char c : str)
   {
     if (!std::isalpha(static_cast<unsigned char>(c)))
@@ -79,6 +79,6 @@ bool donkeev::isAlpha(const std::string& str)
       return false;
     }
   }
-    
+
   return true;
 }
