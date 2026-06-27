@@ -5,20 +5,22 @@
 #include <stdexcept>
 #include <string>
 using namespace levkin;
-struct SimpleStringHash {
+struct SimpleStringHash
+{
   size_t operator()(const std::string& s) const
   {
     return std::hash< std::string >{}(s);
   }
 };
-struct SimpleStringEqual {
+struct SimpleStringEqual
+{
   bool operator()(const std::string& a, const std::string& b) const
   {
     return a == b;
   }
 };
-using TestTable =
-    HashTable< std::string, int, SimpleStringHash, SimpleStringEqual >;
+using TestTable
+    = HashTable< std::string, int, SimpleStringHash, SimpleStringEqual >;
 BOOST_AUTO_TEST_CASE(ht_constructor_test)
 {
   TestTable ht(8);
@@ -44,11 +46,12 @@ BOOST_AUTO_TEST_CASE(ht_update_value_test)
 }
 BOOST_AUTO_TEST_CASE(ht_overflow_bucket_test)
 {
-  struct CollisionHash {
+  struct CollisionHash
+  {
     size_t operator()(const std::string&) const { return 0; }
   };
-  using CollisionTable =
-      HashTable< std::string, int, CollisionHash, SimpleStringEqual >;
+  using CollisionTable
+      = HashTable< std::string, int, CollisionHash, SimpleStringEqual >;
   CollisionTable ht(4);
   ht.add("one", 1);
   ht.add("two", 2);
@@ -67,15 +70,16 @@ BOOST_AUTO_TEST_CASE(ht_drop_test)
   int removed = ht.drop("test");
   BOOST_CHECK_EQUAL(removed, 42);
   BOOST_CHECK(!ht.has("test"));
-  BOOST_CHECK_THROW(ht.drop("unknown"), std::runtime_error);
+  BOOST_CHECK_THROW(ht.drop("unknown"), std::out_of_range);
 }
 BOOST_AUTO_TEST_CASE(ht_drop_from_overflow_test)
 {
-  struct CollisionHash {
+  struct CollisionHash
+  {
     size_t operator()(const std::string&) const { return 0; }
   };
-  using CollisionTable =
-      HashTable< std::string, int, CollisionHash, SimpleStringEqual >;
+  using CollisionTable
+      = HashTable< std::string, int, CollisionHash, SimpleStringEqual >;
   CollisionTable ht(4);
   ht.add("a", 1);
   ht.add("b", 2);
