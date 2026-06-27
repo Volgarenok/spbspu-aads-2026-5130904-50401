@@ -971,7 +971,6 @@ Value ulanova::BSTree< Key, Value, Compare >::drop(const Key& key)
   }
 
   Value result = as_node(node)->data.second;
-  detail::NodeBase * height_start = node->parent;
 
   if (node->left == fake_leaf_)
   {
@@ -986,17 +985,12 @@ Value ulanova::BSTree< Key, Value, Compare >::drop(const Key& key)
   else
   {
     detail::NodeBase * next = min_node(node->right);
-    height_start = next->parent;
 
     if (next->parent != node)
     {
       replace_node(next, next->right);
       next->right = node->right;
       next->right->parent = next;
-    }
-    else
-    {
-      height_start = next;
     }
 
     replace_node(node, next);
