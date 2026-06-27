@@ -6,7 +6,7 @@
 
 namespace madieva {
   template<typename T>
-  bool read_token(std::istream& in, std::ostream& out, T& value) {
+  bool read_token(std::istream & in, std::ostream& out, T & value) {
     if (!(in >> value)) {
       out << "<INVALID COMMAND>\n";
       in.clear();

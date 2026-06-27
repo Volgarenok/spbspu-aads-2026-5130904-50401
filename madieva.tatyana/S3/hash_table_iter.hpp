@@ -2,7 +2,7 @@
 #define MADIEVA_HASH_TABLE_ITER_HPP
 
 
-#include "../common/list.hpp"
+#include <list.hpp>
 #include "hash_table.hpp"
 
 namespace madieva {
@@ -12,18 +12,18 @@ namespace madieva {
   template< class Key, class Value, class Hash, class Equal >
   class HTIter {
     using ht = HashTable< Key, Value, Hash, Equal >;
-    using Pair = std::pair<Key, Value>;
+    using Pair = std::pair< Key, Value >;
     size_t bucket_index_;
     LIter< Pair > node_iter_;
     const Vector< List< Pair > > * buckets_;
     void next();
   public:
     HTIter(size_t idx, LIter< Pair > it,
-      const Vector< List< Pair > >* buckets);
+      const Vector< List< Pair > > * buckets);
     HTIter & operator++();
-    std::pair<const Key&, Value&> operator*();
-    bool operator==(const HTIter& other) const;
-    bool operator!=(const HTIter& other) const;
+    std::pair< const Key &, Value & > operator*();
+    bool operator==(const HTIter & other) const;
+    bool operator!=(const HTIter & other) const;
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -39,7 +39,7 @@ namespace madieva {
         }
         ++bucket_index_;
       }
-      node_iter_ = LIter<Pair>(nullptr);
+      node_iter_ = LIter< Pair >(nullptr);
     }
   }
 
@@ -58,8 +58,8 @@ namespace madieva {
     return *this;
   }
 
-  template<class Key, class Value, class Hash, class Equal>
-  std::pair<const Key&, Value&> HTIter<Key, Value, Hash, Equal>::operator*()
+  template< class Key, class Value, class Hash, class Equal >
+  std::pair< const Key &, Value & > HTIter< Key, Value, Hash, Equal >::operator*()
   {
     Pair & pair = *node_iter_;
     return {pair.first, pair.second};
@@ -73,8 +73,8 @@ namespace madieva {
       buckets_ == other.buckets_;
   }
 
-  template<class Key, class Value, class Hash, class Equal>
-  bool HTIter<Key, Value, Hash, Equal>::operator!=(const HTIter& other) const
+  template< class Key, class Value, class Hash, class Equal >
+  bool HTIter< Key, Value, Hash, Equal >::operator!=(const HTIter& other) const
   {
     return !(*this == other);
   }

@@ -10,7 +10,7 @@
 
 namespace madieva {
   class GraphStorage {
-    List<std::string> order_;
+    List< std::string > order_;
     HashTable< std::string, Graph, XXHash64, StringEqual > graphs_;
   public:
     GraphStorage() = default;
@@ -18,7 +18,7 @@ namespace madieva {
     bool hasGraph(const std::string & name) const;
     Graph & getGraph(const std::string & name);
     const Graph & getGraph(const std::string & name) const;
-    List<std::string> getAllNames() const;
+    List< std::string > getAllNames() const;
     void removeGraph(const std::string & name);
     size_t size() const;
     bool empty() const;
@@ -47,7 +47,7 @@ namespace madieva {
     return graphs_.get(name);
   }
 
-  List<std::string> GraphStorage::getAllNames() const {
+  List< std::string > GraphStorage::getAllNames() const {
     return order_;
   }
 

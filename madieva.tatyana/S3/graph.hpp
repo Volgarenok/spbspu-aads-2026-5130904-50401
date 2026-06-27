@@ -9,7 +9,7 @@
 namespace madieva {
   class Graph {
     std::string name_graph;
-    using key = std::pair<std::string, std::string>;
+    using key = std::pair< std::string, std::string >;
     using val = List< size_t >;
     HashTable< key, val, XXHash64, PairEqual > edge_;
     List< std::string > vertex_;

@@ -1,6 +1,6 @@
+#include <string>
 #include <boost/test/unit_test.hpp>
 #include "hash_table.hpp"
-#include <string>
 BOOST_AUTO_TEST_SUITE(HashTableTest)
 
 BOOST_AUTO_TEST_CASE(default_constructor)
