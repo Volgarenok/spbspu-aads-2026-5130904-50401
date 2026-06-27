@@ -30,28 +30,59 @@ bool levkin::loadDictionaries(const std::string& filename,
   return true;
 }
 
-
-void levkin::cmdPrint(std::istream& in, std::ostream& out, DatasetStore& datasets)
+void levkin::cmdPrint(std::istream& in,
+                      std::ostream& out,
+                      DatasetStore& datasets)
 {
-  std::string dict_name;
-  if (!(in >> dict_name)) {
+  std::string dictName;
+  if (!(in >> dictName)) {
     throw std::invalid_argument("Invalid arguments");
   }
 
-  if (!datasets.has(dict_name)) {
+  if (!datasets.has(dictName)) {
     out << "<INVALID COMMAND>\n";
     return;
   }
 
-  const SubTree& dict = datasets.get(dict_name);
+  const SubTree& dict = datasets.get(dictName);
   if (dict.cbegin() == dict.cend()) {
     out << "<EMPTY>\n";
     return;
   }
 
-  out << dict_name;
+  out << dictName;
   for (auto it = dict.cbegin(); it != dict.cend(); ++it) {
     out << " " << it->key << " " << it->value;
   }
   out << "\n";
+}
+
+void levkin::cmdComplement(std::istream& in,
+                           std::ostream& out,
+                           DatasetStore& datasets)
+{
+  std::string resName, leftName, rightName;
+  if (!(in >> resName >> leftName >> rightName)) {
+    throw std::invalid_argument("Invalid arguments");
+  }
+
+  if (!datasets.has(leftName) || !datasets.has(rightName)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  const SubTree& left = datasets.get(leftName);
+  const SubTree& right = datasets.get(rightName);
+  SubTree result;
+
+  for (auto it = left.cbegin(); it != left.cend(); ++it) {
+    if (!right.has(it->key)) {
+      result.push(it->key, it->value);
+    }
+  }
+
+  if (datasets.has(resName)) {
+    datasets.drop(resName);
+  }
+  datasets.push(resName, std::move(result));
 }
