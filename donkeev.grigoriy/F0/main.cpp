@@ -34,6 +34,10 @@ int main()
   while (true)
   {
     std::getline(std::cin, input);
+    if (std::cin.eof())
+    {
+      return 0;
+    }
     if (input.empty())
     {
       continue;
