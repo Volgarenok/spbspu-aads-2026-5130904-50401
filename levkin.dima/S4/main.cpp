@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     std::cerr << "Error: could not open file " << argv[1] << "\n";
     return 1;
   }
-  levkin::BSTree< std::string, levkin::cmd_t > cmds;
+  levkin::CmdStore cmds;
   cmds.push("print", levkin::cmdPrint);
   cmds.push("complement", levkin::cmdComplement);
   cmds.push("intersect", levkin::cmdIntersect);
