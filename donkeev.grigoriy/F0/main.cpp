@@ -28,6 +28,7 @@ int main()
   cmds.insert("buy", donkeev::handleBuy);
   cmds.insert("delete", donkeev::handleDelete);
   cmds.insert("show-history", donkeev::handleShowHistory);
+  cmds.insert("choose-best", donkeev::handleChoozeBest);
 
   std::string input;
   while (true)

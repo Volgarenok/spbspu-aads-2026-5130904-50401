@@ -423,3 +423,102 @@ void donkeev::handleShowHistory(CarTable&, AdTable&)
   file.close();
   std::cout << "\n";
 }
+
+void donkeev::handleChoozeBest(CarTable&, AdTable& ads)
+{
+  using PriceTable = donkeev::RobinTable< std::string, size_t, StringHash, StringEqual >;
+  
+  PriceTable prices(16);
+  prices.insert("bmw m5", 8500);
+  prices.insert("audi rs6", 6700);
+  prices.insert("mersedes s-class", 7000);
+  prices.insert("toyota camry", 4000);
+  prices.insert("mersedes e-class", 3700);
+  prices.insert("kia sorento", 3400);
+  prices.insert("nissan x-trail", 2700);
+  prices.insert("mini cooper", 1600);
+  prices.insert("kia rio", 1000);
+  prices.insert("vaz 2105", 300);
+
+  std::cout << "\n  \033[33mВведите бюджет\033[0m\n";
+  std::string budgetStr;
+  std::getline(std::cin, budgetStr);
+  if (!isDigit(budgetStr))
+  {
+    std::cout << "\033[31m  Неверный бюджет\033[0m\n\n";
+    return;
+  }
+
+  size_t budget = std::stoull(budgetStr);
+
+  Ad** activeAds = new Ad*[ads.size()];
+  size_t index = 0;
+  for (AdIterator it = ads.begin(); it != ads.end(); ++it)
+  {
+    if (it->isActive())
+    {
+      activeAds[index++] = &(*it);
+    }
+  }
+
+  size_t* profits = new size_t[ads.size()];
+  double* efficiency = new double[ads.size()];
+    
+  for (size_t i = 0; i < ads.size(); ++i)
+  {
+    const Car& car = activeAds[i]->getCar();
+    std::string priceKey = std::string(car.brand_) + " " + std::string(car.model_);
+    size_t marketPrice = prices.at(priceKey);
+    size_t adPrice = activeAds[i]->getPrice();
+    
+    profits[i] = (marketPrice > adPrice) ? (marketPrice - adPrice) : 0;
+    efficiency[i] = (adPrice > 0) ? static_cast<double>(profits[i]) / adPrice : 0;
+  }
+
+  for (size_t i = 1; i < ads.size(); ++i)
+  {
+    Ad* keyAd = activeAds[i];
+    size_t keyProfit = profits[i];
+    double keyEff = efficiency[i];
+    
+    size_t j = i;
+    while (j > 0 && efficiency[j - 1] < keyEff)
+    {
+      activeAds[j] = activeAds[j - 1];
+      profits[j] = profits[j - 1];
+      efficiency[j] = efficiency[j - 1];
+      --j;
+    }
+    activeAds[j] = keyAd;
+    profits[j] = keyProfit;
+    efficiency[j] = keyEff;
+  }
+
+  size_t totalSpent = 0;
+  size_t totalProfit = 0;
+  size_t selectedCount = 0;
+  
+  std::cout << "\n  \033[1;33mВыбранные автомобили:\033[0m\n";
+  for (size_t i = 0; i < ads.size(); ++i)
+  {
+    size_t price = activeAds[i]->getPrice();
+    
+    if (totalSpent + price <= budget)
+    {
+      totalSpent += price;
+      totalProfit += profits[i];
+      
+      printAd(*(activeAds[i]), selectedCount);
+    }
+  }
+
+  std::cout << "\n  \033[1;33m=== РЕЗУЛЬТАТ ПОДБОРА ===\033[0m\n";
+  std::cout << "  Бюджет: " << budget << " тыс. руб.\n";
+  std::cout << "  Потрачено: " << totalSpent << " тыс. руб.\n";
+  std::cout << "  Куплено: " << selectedCount << " авто\n";
+  std::cout << "  Общая прибыль: " << totalProfit << " тыс. руб.\n";
+
+  delete[] activeAds;
+  delete[] profits;
+  delete[] efficiency;
+}

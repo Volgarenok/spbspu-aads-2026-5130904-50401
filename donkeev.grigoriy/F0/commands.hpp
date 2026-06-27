@@ -26,5 +26,6 @@ namespace donkeev
   void handleBuy(CarTable&, AdTable&);
   void handleDelete(CarTable&, AdTable&);
   void handleShowHistory(CarTable&, AdTable&);
+  void handleChoozeBest(CarTable&, AdTable&);
 }
 #endif

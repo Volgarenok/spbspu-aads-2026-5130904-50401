@@ -25,5 +25,7 @@ void donkeev::showNavigation()
   std::cout << "   — Показать историю объявлений\n";
   std::cout << "\033[32mquit\033[0m";
   std::cout << "          — Выйти из программы\n";
+  std::cout << "\033[32mchoose-best\033[0m";
+  std::cout << "          — Выбрать лучшие авто\n";
   std::cout << "\n";
 }
