@@ -27,8 +27,6 @@ namespace studilova
     std::equal_to< std::string >
   >;
 
-
-
   void initCommands(CommandsMap& commands);
 
   void graphs(std::istream& in, std::ostream& out, GraphsMap& graphs);

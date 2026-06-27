@@ -46,15 +46,15 @@ void studilova::Graph::bind(const std::string& from, const std::string& to, size
   tmp.addVertex(to);
 
   EdgeKey key(from, to);
-  if (tmp.edges_.has(key))
+  if (tmp.edges_.contains(key))
   {
-    Weights weights = tmp.edges_.get(key);
+    Weights weights = tmp.edges_.at(key);
     weights.pushBack(weight);
-    tmp.edges_.add(key, weights);
+    tmp.edges_.insert(key, weights);
   } else {
     Weights weights;
     weights.pushBack(weight);
-    tmp.edges_.add(key, weights);
+    tmp.edges_.insert(key, weights);
   }
 
   swap(tmp);
@@ -68,13 +68,13 @@ bool studilova::Graph::cut(const std::string& from, const std::string& to, size_
   }
 
   EdgeKey key(from, to);
-  if (!edges_.has(key))
+  if (!edges_.contains(key))
   {
     return false;
   }
 
   Graph tmp(*this);
-  Weights weights = tmp.edges_.get(key);
+  Weights weights = tmp.edges_.at(key);
   bool removed = false;
 
   for (size_t i = 0; i < weights.getSize(); ++i)
@@ -96,7 +96,7 @@ bool studilova::Graph::cut(const std::string& from, const std::string& to, size_
   {
     tmp.edges_.erase(key);
   } else {
-    tmp.edges_.add(key, weights);
+    tmp.edges_.insert(key, weights);
   }
 
   swap(tmp);

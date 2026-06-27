@@ -37,15 +37,15 @@ namespace
 
 void studilova::initCommands(CommandsMap& commands)
 {
-  commands.add("graphs", graphs);
-  commands.add("vertexes", vertexes);
-  commands.add("outbound", outbound);
-  commands.add("inbound", inbound);
-  commands.add("bind", bind);
-  commands.add("cut", cut);
-  commands.add("create", create);
-  commands.add("merge", merge);
-  commands.add("extract", extract);
+  commands.insert("graphs", graphs);
+  commands.insert("vertexes", vertexes);
+  commands.insert("outbound", outbound);
+  commands.insert("inbound", inbound);
+  commands.insert("bind", bind);
+  commands.insert("cut", cut);
+  commands.insert("create", create);
+  commands.insert("merge", merge);
+  commands.insert("extract", extract);
 }
 
 void studilova::graphs(std::istream&, std::ostream& out, GraphsMap& graphs)
@@ -77,13 +77,13 @@ void studilova::vertexes(std::istream& in, std::ostream& out, GraphsMap& graphs)
   std::string graphName;
   in >> graphName;
 
-  if (!in || !graphs.has(graphName))
+  if (!in || !graphs.contains(graphName))
   {
     out << "<INVALID COMMAND>\n";
     return;
   }
 
-  Vector< std::string > vertices = graphs.get(graphName).getVertices();
+  Vector< std::string > vertices = graphs.at(graphName).getVertices();
 
   if (vertices.isEmpty())
   {
@@ -106,7 +106,7 @@ void studilova::outbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   in >> graphName >> vertex;
 
-  if (!in || !graphs.has(graphName))
+  if (!in || !graphs.contains(graphName))
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -114,7 +114,7 @@ void studilova::outbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   try
   {
-    Graph::Connections connections = graphs.get(graphName).getOutbound(vertex);
+    Graph::Connections connections = graphs.at(graphName).getOutbound(vertex);
 
     if (connections.isEmpty())
     {
@@ -153,7 +153,7 @@ void studilova::inbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   in >> graphName >> vertex;
 
-  if (!in || !graphs.has(graphName))
+  if (!in || !graphs.contains(graphName))
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -161,7 +161,7 @@ void studilova::inbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   try
   {
-    Graph::Connections connections = graphs.get(graphName).getInbound(vertex);
+    Graph::Connections connections = graphs.at(graphName).getInbound(vertex);
 
     if (connections.isEmpty())
     {
@@ -202,7 +202,7 @@ void studilova::bind(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   in >> graphName >> from >> to >> weight;
 
-  if (!in || !graphs.has(graphName))
+  if (!in || !graphs.contains(graphName))
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -210,7 +210,7 @@ void studilova::bind(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   try
   {
-    graphs.get(graphName).bind(from, to, weight);
+    graphs.at(graphName).bind(from, to, weight);
   }
   catch (...)
   {
@@ -227,13 +227,13 @@ void studilova::cut(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   in >> graphName >> from >> to >> weight;
 
-  if (!in || !graphs.has(graphName))
+  if (!in || !graphs.contains(graphName))
   {
     out << "<INVALID COMMAND>\n";
     return;
   }
 
-  if (!graphs.get(graphName).cut(from, to, weight))
+  if (!graphs.at(graphName).cut(from, to, weight))
   {
     out << "<INVALID COMMAND>\n";
   }
@@ -255,7 +255,7 @@ void studilova::create(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   in >> count;
 
-  if (!in || graphs.has(graphName))
+  if (!in || graphs.contains(graphName))
   {
     out << "<INVALID COMMAND>\n";
     in.clear();
@@ -280,7 +280,7 @@ void studilova::create(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   try
   {
-    graphs.add(graphName, graph);
+    graphs.insert(graphName, graph);
   }
   catch (...)
   {
@@ -298,9 +298,9 @@ void studilova::merge(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   if (
     !in ||
-    graphs.has(newGraphName) ||
-    !graphs.has(firstGraphName) ||
-    !graphs.has(secondGraphName)
+    graphs.contains(newGraphName) ||
+    !graphs.contains(firstGraphName) ||
+    !graphs.contains(secondGraphName)
   )
   {
     out << "<INVALID COMMAND>\n";
@@ -309,8 +309,8 @@ void studilova::merge(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   try
   {
-    const Graph& firstGraph = graphs.get(firstGraphName);
-    const Graph& secondGraph = graphs.get(secondGraphName);
+    const Graph& firstGraph = graphs.at(firstGraphName);
+    const Graph& secondGraph = graphs.at(secondGraphName);
 
     Graph newGraph(firstGraph.getEdges().size() + secondGraph.getEdges().size() + 64);
 
@@ -348,7 +348,7 @@ void studilova::merge(std::istream& in, std::ostream& out, GraphsMap& graphs)
       }
     }
 
-    graphs.add(newGraphName, newGraph);
+    graphs.insert(newGraphName, newGraph);
   }
   catch (...)
   {
@@ -364,7 +364,7 @@ void studilova::extract(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   in >> newGraphName >> oldGraphName >> count;
 
-  if (!in || graphs.has(newGraphName) || !graphs.has(oldGraphName))
+  if (!in || graphs.contains(newGraphName) || !graphs.contains(oldGraphName))
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -372,7 +372,7 @@ void studilova::extract(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   try
   {
-    const Graph& oldGraph = graphs.get(oldGraphName);
+    const Graph& oldGraph = graphs.at(oldGraphName);
 
     Graph newGraph(oldGraph.getEdges().size() + 64);
 
@@ -405,7 +405,7 @@ void studilova::extract(std::istream& in, std::ostream& out, GraphsMap& graphs)
       }
     }
 
-    graphs.add(newGraphName, newGraph);
+    graphs.insert(newGraphName, newGraph);
   }
   catch (...)
   {

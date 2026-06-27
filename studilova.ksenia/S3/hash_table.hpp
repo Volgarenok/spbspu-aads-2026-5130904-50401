@@ -85,15 +85,14 @@ namespace studilova
       size_t capacity() const noexcept;
       bool isEmpty() const noexcept;
 
-      bool has(const Key& key) const;
+      bool contains(const Key& key) const noexcept;
 
-      void add(const Key& key, const Value& value);
+      void insert(const Key& key, const Value& value);
 
-      Value& get(const Key& key);
-      const Value& get(const Key& key) const;
+      Value& at(const Key& key);
+      const Value& at(const Key& key) const;
 
-      bool erase(const Key& key);
-      Value drop(const Key& key);
+      size_t erase(const Key& key) noexcept;
 
       void swap(HashTable& other) noexcept;
       void rehash(size_t newCapacity);
@@ -324,14 +323,14 @@ bool studilova::HashTable< Key, Value, Hash, Equal >::isEmpty() const noexcept
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool studilova::HashTable< Key, Value, Hash, Equal >::has(const Key& key) const
+bool studilova::HashTable< Key, Value, Hash, Equal >::contains(const Key& key) const noexcept
 {
   size_t dummy = 0;
   return findEntry(key, dummy);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void studilova::HashTable< Key, Value, Hash, Equal >::add(const Key& key, const Value& value)
+void studilova::HashTable< Key, Value, Hash, Equal >::insert(const Key& key, const Value& value)
 {
   size_t index = 0;
   if (findEntry(key, index))
@@ -352,7 +351,7 @@ void studilova::HashTable< Key, Value, Hash, Equal >::add(const Key& key, const 
 }
 
 template< class Key, class Value, class Hash, class Equal >
-Value& studilova::HashTable< Key, Value, Hash, Equal >::get(const Key& key)
+Value& studilova::HashTable< Key, Value, Hash, Equal >::at(const Key& key)
 {
   size_t index = 0;
   if (!findEntry(key, index))
@@ -363,7 +362,7 @@ Value& studilova::HashTable< Key, Value, Hash, Equal >::get(const Key& key)
 }
 
 template< class Key, class Value, class Hash, class Equal >
-const Value& studilova::HashTable< Key, Value, Hash, Equal >::get(const Key& key) const
+const Value& studilova::HashTable< Key, Value, Hash, Equal >::at(const Key& key) const
 {
   size_t index = 0;
   if (!findEntry(key, index))
@@ -374,32 +373,17 @@ const Value& studilova::HashTable< Key, Value, Hash, Equal >::get(const Key& key
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool studilova::HashTable< Key, Value, Hash, Equal >::erase(const Key& key)
+size_t studilova::HashTable< Key, Value, Hash, Equal >::erase(const Key& key) noexcept
 {
   size_t index = 0;
   if (!findEntry(key, index))
   {
-    return false;
+    return 0;
   }
 
   table_[index].state = State::TOMBSTONE;
   --size_;
-  return true;
-}
-
-template< class Key, class Value, class Hash, class Equal >
-Value studilova::HashTable< Key, Value, Hash, Equal >::drop(const Key& key)
-{
-  size_t index = 0;
-  if (!findEntry(key, index))
-  {
-    throw std::out_of_range("Key not found");
-  }
-
-  Value result = table_[index].value;
-  table_[index].state = State::TOMBSTONE;
-  --size_;
-  return result;
+  return 1;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -424,7 +408,7 @@ void studilova::HashTable< Key, Value, Hash, Equal >::rehash(size_t newCapacity)
   {
     if (table_[i].state == State::OCCUPIED)
     {
-      tmp.add(table_[i].key, table_[i].value);
+      tmp.insert(table_[i].key, table_[i].value);
     }
   }
   swap(tmp);

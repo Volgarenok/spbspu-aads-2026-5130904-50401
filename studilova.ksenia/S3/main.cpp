@@ -47,7 +47,7 @@ int main(int argc, char** argv)
         graph.bind(from, to, weight);
       }
 
-      graphs.add(graphName, graph);
+      graphs.insert(graphName, graph);
     }
   }
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
 
   while (std::cin >> commandName)
   {
-    if (!commands.has(commandName))
+    if (!commands.contains(commandName))
     {
       std::cout << "<INVALID COMMAND>\n";
 
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 
     try
     {
-      commands.get(commandName)(std::cin, std::cout, graphs);
+      commands.at(commandName)(std::cin, std::cout, graphs);
     }
     catch (...)
     {
