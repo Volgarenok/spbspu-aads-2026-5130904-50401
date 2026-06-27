@@ -2,6 +2,8 @@
 #define HASHTABLE_HPP
 
 #include <cstddef>
+#include <functional>
+#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <utility>
@@ -47,6 +49,12 @@ namespace chernov {
     void rehash(size_t slots);
     void rehash(size_t num_buckets, size_t bucket_cap, size_t overflow_cap);
 
+    void setMaxOverflowSize(size_t size) noexcept;
+    void setMaxAverageNumberOfItems(double average) noexcept;
+
+    void setUpdBuckets(std::function< size_t(size_t) > func);
+    void setUpdBucketSize(std::function< size_t(size_t) > func);
+
     Value & at(const Key & k);
     const Value & at(const Key & k) const;
 
@@ -71,8 +79,14 @@ namespace chernov {
     size_t overflow_size_;
     size_t overflow_cap_;
 
+    size_t max_overflow_size_;
+    double max_average_number_of_items_;
+
     Hash hasher_;
     Equal equal_;
+
+    std::function< size_t(size_t) > upd_buckets_func_;
+    std::function< size_t(size_t) > upd_bucket_size_func_;
 
     size_t getElementIndex(const Key & k) const;
     void removeElementByIndex(size_t index);
@@ -96,6 +110,8 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable():
   bucket_cap_(0),
   overflow_size_(0),
   overflow_cap_(0),
+  max_overflow_size_(std::numeric_limits< size_t >::max()),
+  max_average_number_of_items_(std::numeric_limits< double >::max()),
   hasher_(Hash{}),
   equal_(Equal{})
 {}
@@ -106,6 +122,10 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable & ht):
 {
   hasher_ = ht.hasher_;
   equal_ = ht.equal_;
+  max_overflow_size_ = ht.max_overflow_size_;
+  max_average_number_of_items_ = ht.max_average_number_of_items_;
+  upd_buckets_func_ = ht.upd_buckets_func_;
+  upd_bucket_size_func_ = ht.upd_bucket_size_func_;
 
   try {
     for (size_t i = 0; i < num_buckets_; ++i) {
@@ -137,8 +157,12 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable && ht) noexce
   bucket_cap_(std::exchange(ht.bucket_cap_, 0)),
   overflow_size_(std::exchange(ht.overflow_size_, 0)),
   overflow_cap_(std::exchange(ht.overflow_cap_, 0)),
+  max_overflow_size_(std::exchange(ht.max_overflow_size_, std::numeric_limits< size_t >::max())),
+  max_average_number_of_items_(std::exchange(ht.max_average_number_of_items_, std::numeric_limits< double >::max())),
   hasher_(ht.hasher_),
-  equal_(ht.equal_)
+  equal_(ht.equal_),
+  upd_buckets_func_(std::move(ht.upd_buckets_func_)),
+  upd_bucket_size_func_(std::move(ht.upd_bucket_size_func_))
 {}
 
 template< class Key, class Value, class Hash, class Equal >
@@ -150,6 +174,8 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
   bucket_cap_(0),
   overflow_size_(0),
   overflow_cap_(0),
+  max_overflow_size_(std::numeric_limits< size_t >::max()),
+  max_average_number_of_items_(std::numeric_limits< double >::max()),
   hasher_(Hash{}),
   equal_(Equal{})
 {
@@ -174,6 +200,8 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t num_buckets, siz
   bucket_cap_(bucket_cap),
   overflow_size_(0),
   overflow_cap_(overflow_cap),
+  max_overflow_size_(std::numeric_limits< size_t >::max()),
+  max_average_number_of_items_(std::numeric_limits< double >::max()),
   hasher_(Hash{}),
   equal_(Equal{})
 {
@@ -229,8 +257,12 @@ void chernov::HashTable< Key, Value, Hash, Equal >::swap(HashTable & ht) noexcep
   std::swap(bucket_cap_, ht.bucket_cap_);
   std::swap(overflow_size_, ht.overflow_size_);
   std::swap(overflow_cap_, ht.overflow_cap_);
+  std::swap(max_overflow_size_, ht.max_overflow_size_);
+  std::swap(max_average_number_of_items_, ht.max_average_number_of_items_);
   std::swap(hasher_, ht.hasher_);
   std::swap(equal_, ht.equal_);
+  std::swap(upd_buckets_func_, ht.upd_buckets_func_);
+  std::swap(upd_bucket_size_func_, ht.upd_bucket_size_func_);
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -266,7 +298,7 @@ size_t chernov::HashTable< Key, Value, Hash, Equal >::getOverflowSize() const no
 template< class Key, class Value, class Hash, class Equal >
 double chernov::HashTable< Key, Value, Hash, Equal >::getAverageNumberOfItems() const noexcept
 {
-  return total_size_ / num_buckets_;
+  return num_buckets_ ? total_size_ / num_buckets_ : 0.0;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -288,13 +320,56 @@ void chernov::HashTable< Key, Value, Hash, Equal >::clear() noexcept
 template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::add(const Key & k, const Value & v)
 {
-  HashTable< Key, Value, Hash, Equal > new_ht{*this};
+  HashTable new_ht(*this);
 
   try {
     size_t index = new_ht.getElementIndex(k);
     new_ht.data_[index].second = v;
-  } catch (const std::out_of_range & e) {
+  } catch (const std::out_of_range &) {
     new_ht.unsafeAddWithoutCheckingExisting(k, v);
+
+    bool need_rehash = false;
+    if (new_ht.overflow_size_ > new_ht.max_overflow_size_) {
+      need_rehash = true;
+    }
+    if (!need_rehash && new_ht.getAverageNumberOfItems() > new_ht.max_average_number_of_items_) {
+      need_rehash = true;
+    }
+
+    while (need_rehash) {
+      if (!new_ht.upd_buckets_func_ || !new_ht.upd_bucket_size_func_) {
+        throw std::logic_error("auto rehash required but update functions are not set");
+      }
+
+      size_t new_buckets = new_ht.upd_buckets_func_(new_ht.num_buckets_);
+      size_t new_bucket_cap = new_ht.upd_bucket_size_func_(new_ht.bucket_cap_);
+
+      if (new_buckets == 0) {
+        new_buckets = 1;
+      }
+      if (new_bucket_cap == 0) {
+        new_bucket_cap = 1;
+      }
+
+      size_t old_buckets = new_ht.num_buckets_;
+      size_t old_bucket_cap = new_ht.bucket_cap_;
+
+      new_ht.rehash(new_buckets, new_bucket_cap, new_ht.overflow_cap_);
+
+      need_rehash = false;
+      if (new_ht.overflow_size_ > new_ht.max_overflow_size_) {
+        need_rehash = true;
+      }
+      if (!need_rehash && new_ht.getAverageNumberOfItems() > new_ht.max_average_number_of_items_) {
+        need_rehash = true;
+      }
+
+      if (need_rehash) {
+        if (new_ht.num_buckets_ <= old_buckets && new_ht.bucket_cap_ <= old_bucket_cap) {
+          throw std::runtime_error("cannot satisfy limits after rehash");
+        }
+      }
+    }
   }
 
   swap(new_ht);
@@ -303,11 +378,9 @@ void chernov::HashTable< Key, Value, Hash, Equal >::add(const Key & k, const Val
 template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::remove(const Key & k)
 {
-  HashTable< Key, Value, Hash, Equal > new_ht{*this};
-
+  HashTable new_ht(*this);
   size_t index = new_ht.getElementIndex(k);
   new_ht.removeElementByIndex(index);
-
   swap(new_ht);
 }
 
@@ -316,7 +389,7 @@ bool chernov::HashTable< Key, Value, Hash, Equal >::has(const Key & k) const
 {
   try {
     getElementIndex(k);
-  } catch (const std::out_of_range & e) {
+  } catch (const std::out_of_range &) {
     return false;
   }
   return true;
@@ -333,9 +406,13 @@ void chernov::HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
 template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::rehash(size_t num_buckets, size_t bucket_cap, size_t overflow_cap)
 {
-  HashTable< Key, Value, Hash, Equal > new_ht{num_buckets, bucket_cap, overflow_cap};
+  HashTable new_ht(num_buckets, bucket_cap, overflow_cap);
   new_ht.hasher_ = hasher_;
   new_ht.equal_ = equal_;
+  new_ht.max_overflow_size_ = max_overflow_size_;
+  new_ht.max_average_number_of_items_ = max_average_number_of_items_;
+  new_ht.upd_buckets_func_ = upd_buckets_func_;
+  new_ht.upd_bucket_size_func_ = upd_bucket_size_func_;
 
   for (size_t i = 0; i < num_buckets_; ++i) {
     for (size_t j = 0; j < bucket_sizes_[i]; ++j) {
@@ -353,6 +430,30 @@ void chernov::HashTable< Key, Value, Hash, Equal >::rehash(size_t num_buckets, s
 }
 
 template< class Key, class Value, class Hash, class Equal >
+void chernov::HashTable< Key, Value, Hash, Equal >::setMaxOverflowSize(size_t size) noexcept
+{
+  max_overflow_size_ = size;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void chernov::HashTable< Key, Value, Hash, Equal >::setMaxAverageNumberOfItems(double average) noexcept
+{
+  max_average_number_of_items_ = average;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void chernov::HashTable< Key, Value, Hash, Equal >::setUpdBuckets(std::function< size_t(size_t) > func)
+{
+  upd_buckets_func_ = std::move(func);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void chernov::HashTable< Key, Value, Hash, Equal >::setUpdBucketSize(std::function< size_t(size_t) > func)
+{
+  upd_bucket_size_func_ = std::move(func);
+}
+
+template< class Key, class Value, class Hash, class Equal >
 Value & chernov::HashTable< Key, Value, Hash, Equal >::at(const Key & k)
 {
   return operator[](k);
@@ -367,7 +468,7 @@ const Value & chernov::HashTable< Key, Value, Hash, Equal >::at(const Key & k) c
 template< class Key, class Value, class Hash, class Equal >
 Value & chernov::HashTable< Key, Value, Hash, Equal >::operator[](const Key & k)
 {
-  const HashTable< Key, Value, Hash, Equal > * cthis = this;
+  const HashTable * cthis = this;
   return const_cast< Value & >(cthis->operator[](k));
 }
 
