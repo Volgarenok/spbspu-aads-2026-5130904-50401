@@ -57,7 +57,7 @@ namespace chernov {
 
     void push(const Key & k, const Value & v);
     void push(const Key & k, Value && v);
-    void remove(const Key & k);
+    size_t remove(const Key & k);
 
     void clear() noexcept;
 
@@ -289,7 +289,7 @@ namespace chernov {
   }
 
   template< class Key, class Value, class Compare >
-  void BSTree< Key, Value, Compare >::remove(const Key & k)
+  size_t BSTree< Key, Value, Compare >::remove(const Key & k)
   {
     detail::NodeBase * node = findNode(k);
 
@@ -324,7 +324,7 @@ namespace chernov {
       delete node;
       --size_;
       updateHeights(parent_for_height);
-      return;
+      return 1;
     }
 
     detail::NodeBase * node_left = node->left;
@@ -342,16 +342,19 @@ namespace chernov {
     }
 
     moved_node->left = node_left;
-    if (node_left != fake_leaf_)
+    if (node_left != fake_leaf_) {
       node_left->parent = moved_node;
+    }
 
     moved_node->right = node_right;
-    if (node_right != fake_leaf_)
+    if (node_right != fake_leaf_) {
       node_right->parent = moved_node;
+    }
 
     delete node;
     --size_;
     updateHeights(moved_node);
+    return 1;
   }
 
   template< class Key, class Value, class Compare >
