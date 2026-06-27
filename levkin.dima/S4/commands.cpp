@@ -87,21 +87,22 @@ void levkin::cmdComplement(std::istream& in,
   datasets.push(resName, std::move(result));
 }
 
-
-void levkin::cmdIntersect(std::istream& in, std::ostream& out, DatasetStore& datasets)
+void levkin::cmdIntersect(std::istream& in,
+                          std::ostream& out,
+                          DatasetStore& datasets)
 {
-  std::string res_name, left_name, right_name;
-  if (!(in >> res_name >> left_name >> right_name)) {
+  std::string resName, leftName, rightName;
+  if (!(in >> resName >> leftName >> rightName)) {
     throw std::invalid_argument("Invalid arguments");
   }
 
-  if (!datasets.has(left_name) || !datasets.has(right_name)) {
-    out << "<error>\n";
+  if (!datasets.has(leftName) || !datasets.has(rightName)) {
+    out << "<INVALID COMMAND>\n";
     return;
   }
 
-  const SubTree& left = datasets.get(left_name);
-  const SubTree& right = datasets.get(right_name);
+  const SubTree& left = datasets.get(leftName);
+  const SubTree& right = datasets.get(rightName);
   SubTree result;
 
   for (auto it = left.cbegin(); it != left.cend(); ++it) {
@@ -110,26 +111,29 @@ void levkin::cmdIntersect(std::istream& in, std::ostream& out, DatasetStore& dat
     }
   }
 
-  if (datasets.has(res_name)) {
-    datasets.drop(res_name);
+  if (datasets.has(resName)) {
+    datasets.drop(resName);
   }
-  datasets.push(res_name, std::move(result));
+  datasets.push(resName, std::move(result));
 }
 
-void levkin::cmdUnion(std::istream& in, std::ostream& out, DatasetStore& datasets)
+void levkin::cmdUnion(std::istream& in,
+                      std::ostream& out,
+                      DatasetStore& datasets)
 {
-  std::string res_name, left_name, right_name;
-  if (!(in >> res_name >> left_name >> right_name)) {
+  std::string resName, leftName, rightName;
+  if (!(in >> resName >> leftName >> rightName)) {
     throw std::invalid_argument("Invalid arguments");
   }
 
-  if (!datasets.has(left_name) || !datasets.has(right_name)) {
-    out << "<error>\n";
+  if (!datasets.has(leftName) || !datasets.has(rightName)) {
+    out << "<INVALID COMMAND>\n";
+
     return;
   }
 
-  const SubTree& left = datasets.get(left_name);
-  const SubTree& right = datasets.get(right_name);
+  const SubTree& left = datasets.get(leftName);
+  const SubTree& right = datasets.get(rightName);
   SubTree result;
 
   for (auto it = left.cbegin(); it != left.cend(); ++it) {
@@ -139,8 +143,8 @@ void levkin::cmdUnion(std::istream& in, std::ostream& out, DatasetStore& dataset
     result.push(it->key, it->value);
   }
 
-  if (datasets.has(res_name)) {
-    datasets.drop(res_name);
+  if (datasets.has(resName)) {
+    datasets.drop(resName);
   }
-  datasets.push(res_name, std::move(result));
+  datasets.push(resName, std::move(result));
 }
