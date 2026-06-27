@@ -1,35 +1,35 @@
 #ifndef BSTREE_HPP
-#define BSTREE_HPP 
+#define BSTREE_HPP
 #include <stdexcept>
 #include <functional>
 #include <utility>
 namespace levkin {
   template < class Key, class Value >
-  struct Node
+  struct BSTNode
   {
     Key key;
     Value value;
-    Node* left;
-    Node* right;
-    Node* parent;
+    BSTNode* left;
+    BSTNode* right;
+    BSTNode* parent;
   };
   template < class Key, class Value >
   class BSTConstIterator
   {
   public:
-    Node< Key, Value >* node;
-    Node< Key, Value >* nil;
-    Node< Key, Value >* header;
-    BSTConstIterator(Node< Key, Value >* n,
-                     Node< Key, Value >* nil_ptr,
-                     Node< Key, Value >* header_ptr):
+    BSTNode< Key, Value >* node;
+    BSTNode< Key, Value >* nil;
+    BSTNode< Key, Value >* header;
+    BSTConstIterator(BSTNode< Key, Value >* n,
+                     BSTNode< Key, Value >* nil_ptr,
+                     BSTNode< Key, Value >* header_ptr):
       node(n),
       nil(nil_ptr),
       header(header_ptr)
     {
     }
-    const Node< Key, Value >* operator->() const { return node; }
-    const Node< Key, Value >& operator*() const { return *node; }
+    const BSTNode< Key, Value >* operator->() const { return node; }
+    const BSTNode< Key, Value >& operator*() const { return *node; }
     BSTConstIterator& operator++()
     {
       if (node == header) {
@@ -41,7 +41,7 @@ namespace levkin {
           node = node->left;
         }
       } else {
-        Node< Key, Value >* p = node->parent;
+        BSTNode< Key, Value >* p = node->parent;
         while (p != header && node == p->right) {
           node = p;
           p = p->parent;
@@ -63,14 +63,14 @@ namespace levkin {
   class BSTIterator : public BSTConstIterator< Key, Value >
   {
   public:
-    BSTIterator(Node< Key, Value >* n,
-                Node< Key, Value >* nil_ptr,
-                Node< Key, Value >* header_ptr):
+    BSTIterator(BSTNode< Key, Value >* n,
+                BSTNode< Key, Value >* nil_ptr,
+                BSTNode< Key, Value >* header_ptr):
       BSTConstIterator< Key, Value >(n, nil_ptr, header_ptr)
     {
     }
-    Node< Key, Value >* operator->() { return this->node; }
-    Node< Key, Value >& operator*() { return *(this->node); }
+    BSTNode< Key, Value >* operator->() { return this->node; }
+    BSTNode< Key, Value >& operator*() { return *(this->node); }
     BSTIterator& operator++()
     {
       BSTConstIterator< Key, Value >::operator++();
@@ -81,16 +81,17 @@ namespace levkin {
   class BSTree
   {
   private:
-    Node< Key, Value >* header;
-    Node< Key, Value >* nil;
+    BSTNode< Key, Value >* header;
+    BSTNode< Key, Value >* nil;
     Compare comp;
     void init()
     {
-      nil = new Node< Key, Value >{Key(), Value(), nullptr, nullptr, nullptr};
+      nil = new BSTNode< Key, Value >{
+          Key(), Value(), nullptr, nullptr, nullptr};
       nil->left = nil->right = nil->parent = nil;
-      header = new Node< Key, Value >{Key(), Value(), nil, nil, nil};
+      header = new BSTNode< Key, Value >{Key(), Value(), nil, nil, nil};
     }
-    void clear(Node< Key, Value >* node)
+    void clear(BSTNode< Key, Value >* node)
     {
       if (node != nil) {
         clear(node->left);
@@ -98,20 +99,20 @@ namespace levkin {
         delete node;
       }
     }
-    Node< Key, Value >* copyTree(Node< Key, Value >* otherNode,
-                                 Node< Key, Value >* parent,
-                                 Node< Key, Value >* otherNil)
+    BSTNode< Key, Value >* copyTree(BSTNode< Key, Value >* otherNode,
+                                    BSTNode< Key, Value >* parent,
+                                    BSTNode< Key, Value >* otherNil)
     {
       if (otherNode == otherNil) {
         return nil;
       }
-      Node< Key, Value >* newNode = new Node< Key, Value >{
+      BSTNode< Key, Value >* newNode = new BSTNode< Key, Value >{
           otherNode->key, otherNode->value, nil, nil, parent};
       newNode->left = copyTree(otherNode->left, newNode, otherNil);
       newNode->right = copyTree(otherNode->right, newNode, otherNil);
       return newNode;
     }
-    void transplant(Node< Key, Value >* u, Node< Key, Value >* v)
+    void transplant(BSTNode< Key, Value >* u, BSTNode< Key, Value >* v)
     {
       if (u->parent == header) {
         header->left = v;
@@ -124,7 +125,7 @@ namespace levkin {
         v->parent = u->parent;
       }
     }
-    size_t heightInternal(Node< Key, Value >* n) const
+    size_t heightInternal(BSTNode< Key, Value >* n) const
     {
       if (n == nil) {
         return 0;
@@ -133,6 +134,7 @@ namespace levkin {
       size_t r = heightInternal(n->right);
       return 1 + (l > r ? l : r);
     }
+
   public:
     using const_iterator = BSTConstIterator< Key, Value >;
     using iterator = BSTIterator< Key, Value >;
@@ -171,7 +173,7 @@ namespace levkin {
     }
     const_iterator cbegin() const
     {
-      Node< Key, Value >* curr = header->left;
+      BSTNode< Key, Value >* curr = header->left;
       if (curr == nil) {
         return const_iterator(header, nil, header);
       }
@@ -183,7 +185,7 @@ namespace levkin {
     const_iterator cend() const { return const_iterator(header, nil, header); }
     bool has(Key k) const
     {
-      Node< Key, Value >* z = header->left;
+      BSTNode< Key, Value >* z = header->left;
       while (z != nil) {
         if (comp(k, z->key)) {
           z = z->left;
@@ -197,9 +199,9 @@ namespace levkin {
     }
     void push(Key k, Value v)
     {
-      Node< Key, Value >* z = new Node< Key, Value >{k, v, nil, nil, nil};
-      Node< Key, Value >* y = header;
-      Node< Key, Value >* x = header->left;
+      BSTNode< Key, Value >* z = new BSTNode< Key, Value >{k, v, nil, nil, nil};
+      BSTNode< Key, Value >* y = header;
+      BSTNode< Key, Value >* x = header->left;
       while (x != nil) {
         y = x;
         if (comp(k, x->key)) {
@@ -223,7 +225,7 @@ namespace levkin {
     }
     Value get(Key k) const
     {
-      Node< Key, Value >* z = header->left;
+      BSTNode< Key, Value >* z = header->left;
       while (z != nil) {
         if (comp(k, z->key)) {
           z = z->left;
@@ -237,7 +239,7 @@ namespace levkin {
     }
     Value drop(Key k)
     {
-      Node< Key, Value >* z = header->left;
+      BSTNode< Key, Value >* z = header->left;
       while (z != nil) {
         if (comp(k, z->key)) {
           z = z->left;
@@ -256,7 +258,7 @@ namespace levkin {
       } else if (z->right == nil) {
         transplant(z, z->left);
       } else {
-        Node< Key, Value >* y = z->right;
+        BSTNode< Key, Value >* y = z->right;
         while (y->left != nil) {
           y = y->left;
         }
@@ -278,11 +280,11 @@ namespace levkin {
     }
     const_iterator rotateLeft(const_iterator it)
     {
-      Node< Key, Value >* x = it.node;
+      BSTNode< Key, Value >* x = it.node;
       if (x == nil || x == header) {
         throw std::invalid_argument("Invalid node for rotation");
       }
-      Node< Key, Value >* p = x->parent;
+      BSTNode< Key, Value >* p = x->parent;
       if (p == header || p->right != x) {
         throw std::invalid_argument("Invalid left rotation context");
       }
@@ -304,11 +306,11 @@ namespace levkin {
     }
     const_iterator rotateRight(const_iterator it)
     {
-      Node< Key, Value >* x = it.node;
+      BSTNode< Key, Value >* x = it.node;
       if (x == nil || x == header) {
         throw std::invalid_argument("Invalid node for rotation");
       }
-      Node< Key, Value >* p = x->parent;
+      BSTNode< Key, Value >* p = x->parent;
       if (p == header || p->left != x) {
         throw std::invalid_argument("Invalid right rotation context");
       }
