@@ -1,8 +1,8 @@
 #ifndef BSTREE_HPP
-#define BSTREE_HPP
-#include <iostream>
+#define BSTREE_HPP 
 #include <stdexcept>
 #include <functional>
+#include <utility>
 namespace levkin {
   template < class Key, class Value >
   struct Node
@@ -19,22 +19,30 @@ namespace levkin {
   public:
     Node< Key, Value >* node;
     Node< Key, Value >* nil;
-    BSTConstIterator(Node< Key, Value >* n, Node< Key, Value >* nil_ptr):
+    Node< Key, Value >* header;
+    BSTConstIterator(Node< Key, Value >* n,
+                     Node< Key, Value >* nil_ptr,
+                     Node< Key, Value >* header_ptr):
       node(n),
-      nil(nil_ptr)
+      nil(nil_ptr),
+      header(header_ptr)
     {
     }
     const Node< Key, Value >* operator->() const { return node; }
     const Node< Key, Value >& operator*() const { return *node; }
     BSTConstIterator& operator++()
     {
+      if (node == header) {
+        return *this;
+      }
       if (node->right != nil) {
         node = node->right;
-        while (node->left != nil)
+        while (node->left != nil) {
           node = node->left;
+        }
       } else {
         Node< Key, Value >* p = node->parent;
-        while (p != nullptr && p->left != nil && node == p->right) {
+        while (p != header && node == p->right) {
           node = p;
           p = p->parent;
         }
@@ -55,8 +63,10 @@ namespace levkin {
   class BSTIterator : public BSTConstIterator< Key, Value >
   {
   public:
-    BSTIterator(Node< Key, Value >* n, Node< Key, Value >* nil_ptr):
-      BSTConstIterator< Key, Value >(n, nil_ptr)
+    BSTIterator(Node< Key, Value >* n,
+                Node< Key, Value >* nil_ptr,
+                Node< Key, Value >* header_ptr):
+      BSTConstIterator< Key, Value >(n, nil_ptr, header_ptr)
     {
     }
     Node< Key, Value >* operator->() { return this->node; }
@@ -77,8 +87,8 @@ namespace levkin {
     void init()
     {
       nil = new Node< Key, Value >{Key(), Value(), nullptr, nullptr, nullptr};
-      header = new Node< Key, Value >{Key(), Value(), nil, nil, nil};
       nil->left = nil->right = nil->parent = nil;
+      header = new Node< Key, Value >{Key(), Value(), nil, nil, nil};
     }
     void clear(Node< Key, Value >* node)
     {
@@ -92,8 +102,9 @@ namespace levkin {
                                  Node< Key, Value >* parent,
                                  Node< Key, Value >* otherNil)
     {
-      if (otherNode == otherNil)
+      if (otherNode == otherNil) {
         return nil;
+      }
       Node< Key, Value >* newNode = new Node< Key, Value >{
           otherNode->key, otherNode->value, nil, nil, parent};
       newNode->left = copyTree(otherNode->left, newNode, otherNil);
@@ -102,24 +113,26 @@ namespace levkin {
     }
     void transplant(Node< Key, Value >* u, Node< Key, Value >* v)
     {
-      if (u->parent == header)
+      if (u->parent == header) {
         header->left = v;
-      else if (u == u->parent->left)
+      } else if (u == u->parent->left) {
         u->parent->left = v;
-      else
+      } else {
         u->parent->right = v;
-      if (v != nil)
+      }
+      if (v != nil) {
         v->parent = u->parent;
+      }
     }
     size_t heightInternal(Node< Key, Value >* n) const
     {
-      if (n == nil)
+      if (n == nil) {
         return 0;
+      }
       size_t l = heightInternal(n->left);
       size_t r = heightInternal(n->right);
       return 1 + (l > r ? l : r);
     }
-
   public:
     using const_iterator = BSTConstIterator< Key, Value >;
     using iterator = BSTIterator< Key, Value >;
@@ -130,8 +143,9 @@ namespace levkin {
         clear(header->left);
         delete header;
       }
-      if (nil)
+      if (nil) {
         delete nil;
+      }
     }
     BSTree(const BSTree& other):
       comp(other.comp)
@@ -146,8 +160,7 @@ namespace levkin {
       nil(other.nil),
       comp(std::move(other.comp))
     {
-      other.header = nullptr;
-      other.nil = nullptr;
+      other.init();
     }
     BSTree& operator=(BSTree other)
     {
@@ -159,23 +172,26 @@ namespace levkin {
     const_iterator cbegin() const
     {
       Node< Key, Value >* curr = header->left;
-      if (curr == nil)
-        return const_iterator(header, nil);
-      while (curr->left != nil)
+      if (curr == nil) {
+        return const_iterator(header, nil, header);
+      }
+      while (curr->left != nil) {
         curr = curr->left;
-      return const_iterator(curr, nil);
+      }
+      return const_iterator(curr, nil, header);
     }
-    const_iterator cend() const { return const_iterator(header, nil); }
+    const_iterator cend() const { return const_iterator(header, nil, header); }
     bool has(Key k) const
     {
       Node< Key, Value >* z = header->left;
       while (z != nil) {
-        if (comp(k, z->key))
+        if (comp(k, z->key)) {
           z = z->left;
-        else if (comp(z->key, k))
+        } else if (comp(z->key, k)) {
           z = z->right;
-        else
+        } else {
           return true;
+        }
       }
       return false;
     }
@@ -186,34 +202,36 @@ namespace levkin {
       Node< Key, Value >* x = header->left;
       while (x != nil) {
         y = x;
-        if (comp(k, x->key))
+        if (comp(k, x->key)) {
           x = x->left;
-        else if (comp(x->key, k))
+        } else if (comp(x->key, k)) {
           x = x->right;
-        else {
+        } else {
           x->value = v;
           delete z;
           return;
         }
       }
       z->parent = y;
-      if (y == header)
+      if (y == header) {
         header->left = z;
-      else if (comp(z->key, y->key))
+      } else if (comp(z->key, y->key)) {
         y->left = z;
-      else
+      } else {
         y->right = z;
+      }
     }
     Value get(Key k) const
     {
       Node< Key, Value >* z = header->left;
       while (z != nil) {
-        if (comp(k, z->key))
+        if (comp(k, z->key)) {
           z = z->left;
-        else if (comp(z->key, k))
+        } else if (comp(z->key, k)) {
           z = z->right;
-        else
+        } else {
           return z->value;
+        }
       }
       throw std::out_of_range("Key not found");
     }
@@ -221,32 +239,39 @@ namespace levkin {
     {
       Node< Key, Value >* z = header->left;
       while (z != nil) {
-        if (comp(k, z->key))
+        if (comp(k, z->key)) {
           z = z->left;
-        else if (comp(z->key, k))
+        } else if (comp(z->key, k)) {
           z = z->right;
-        else
+        } else {
           break;
+        }
       }
-      if (z == nil)
+      if (z == nil) {
         throw std::out_of_range("Key not found");
+      }
       Value val = z->value;
-      if (z->left == nil)
+      if (z->left == nil) {
         transplant(z, z->right);
-      else if (z->right == nil)
+      } else if (z->right == nil) {
         transplant(z, z->left);
-      else {
+      } else {
         Node< Key, Value >* y = z->right;
-        while (y->left != nil)
+        while (y->left != nil) {
           y = y->left;
+        }
         if (y->parent != z) {
           transplant(y, y->right);
           y->right = z->right;
-          y->right->parent = y;
+          if (y->right != nil) {
+            y->right->parent = y;
+          }
         }
         transplant(z, y);
         y->left = z->left;
-        y->left->parent = y;
+        if (y->left != nil) {
+          y->left->parent = y;
+        }
       }
       delete z;
       return val;
@@ -254,42 +279,54 @@ namespace levkin {
     const_iterator rotateLeft(const_iterator it)
     {
       Node< Key, Value >* x = it.node;
+      if (x == nil || x == header) {
+        throw std::invalid_argument("Invalid node for rotation");
+      }
       Node< Key, Value >* p = x->parent;
-      if (p == header || p->right != x)
-        throw std::invalid_argument("Invalid left rotation");
+      if (p == header || p->right != x) {
+        throw std::invalid_argument("Invalid left rotation context");
+      }
       p->right = x->left;
-      if (x->left != nil)
+      if (x->left != nil) {
         x->left->parent = p;
+      }
       x->parent = p->parent;
-      if (p->parent == header)
+      if (p->parent == header) {
         header->left = x;
-      else if (p == p->parent->left)
+      } else if (p == p->parent->left) {
         p->parent->left = x;
-      else
+      } else {
         p->parent->right = x;
+      }
       x->left = p;
       p->parent = x;
-      return const_iterator(x, nil);
+      return const_iterator(x, nil, header);
     }
     const_iterator rotateRight(const_iterator it)
     {
       Node< Key, Value >* x = it.node;
+      if (x == nil || x == header) {
+        throw std::invalid_argument("Invalid node for rotation");
+      }
       Node< Key, Value >* p = x->parent;
-      if (p == header || p->left != x)
-        throw std::invalid_argument("Invalid right rotation");
+      if (p == header || p->left != x) {
+        throw std::invalid_argument("Invalid right rotation context");
+      }
       p->left = x->right;
-      if (x->right != nil)
+      if (x->right != nil) {
         x->right->parent = p;
+      }
       x->parent = p->parent;
-      if (p->parent == header)
+      if (p->parent == header) {
         header->left = x;
-      else if (p == p->parent->right)
+      } else if (p == p->parent->right) {
         p->parent->right = x;
-      else
+      } else {
         p->parent->left = x;
+      }
       x->right = p;
       p->parent = x;
-      return const_iterator(x, nil);
+      return const_iterator(x, nil, header);
     }
     const_iterator rotateLargeLeft(const_iterator it)
     {
