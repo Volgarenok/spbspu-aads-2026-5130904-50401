@@ -3,8 +3,7 @@
 ulanova::detail::NodeBase::NodeBase():
   parent(nullptr),
   left(nullptr),
-  right(nullptr),
-  height(0)
+  right(nullptr)
 {}
 
 ulanova::detail::NodeBase::NodeBase(
@@ -14,8 +13,7 @@ ulanova::detail::NodeBase::NodeBase(
 ):
   parent(parent_node),
   left(left_node),
-  right(right_node),
-  height(0)
+  right(right_node)
 {}
 
 ulanova::detail::NodeBase::~NodeBase() = default;

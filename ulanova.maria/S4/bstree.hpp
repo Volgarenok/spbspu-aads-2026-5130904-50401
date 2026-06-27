@@ -94,7 +94,6 @@ namespace ulanova
     void clear_from(detail::NodeBase* node) noexcept;
 
     node_t * as_node(detail::NodeBase* node) const noexcept;
-    void update_height(detail::NodeBase* node) noexcept;
     size_t get_height(detail::NodeBase* node) const noexcept;
 
     detail::NodeBase * find_node(const Key & key) const noexcept;
@@ -167,7 +166,7 @@ namespace ulanova
     detail::NodeBase * fake_leaf_;
 
     BSTreeIterator(detail::NodeBase * node, detail::NodeBase * fake_leaf);
-    detail::Node< Key, Value > * as_node() const noexcept
+    detail::Node< Key, Value > * as_node() const noexcept;
 
     template< class K, class V, class C >
     friend class BSTree;
@@ -183,9 +182,7 @@ ulanova::detail::Node< Key, Value >::Node(
 ):
   ulanova::detail::NodeBase(parent_node, fake_leaf, fake_leaf),
   data(key, value)
-{
-  height = 1;
-}
+{}
 
 template< class Key, class Value >
 ulanova::detail::Node< Key, Value >::Node(
@@ -196,9 +193,7 @@ ulanova::detail::Node< Key, Value >::Node(
 ):
   ulanova::detail::NodeBase(parent_node, fake_leaf, fake_leaf),
   data(key, std::move(value))
-{
-  height = 1;
-}
+{}
 
 template< class Key, class Value, class Compare >
 ulanova::BSTree< Key, Value, Compare >::BSTree():
@@ -317,12 +312,6 @@ void ulanova::BSTree< Key, Value, Compare >::push(const Key & key, const Value &
   }
 
   ++size_;
-
-  while (parent != nullptr)
-  {
-    update_height(parent);
-    parent = parent->parent;
-  }
 }
 
 template< class Key, class Value, class Compare >
@@ -371,12 +360,6 @@ void ulanova::BSTree< Key, Value, Compare >::push(const Key& key, Value&& value)
   }
 
   ++size_;
-
-  while (parent != nullptr)
-  {
-    update_height(parent);
-    parent = parent->parent;
-  }
 }
 
 template< class Key, class Value, class Compare >
@@ -393,23 +376,9 @@ std::size_t ulanova::BSTree< Key, Value, Compare >::get_height(detail::NodeBase 
   {
     return 0;
   }
-  return node->height;
-}
-
-template< class Key, class Value, class Compare >
-void ulanova::BSTree< Key, Value, Compare >::update_height(detail::NodeBase * node) noexcept
-{
-  const std::size_t left_height = get_height(node->left);
-  const std::size_t right_height = get_height(node->right);
-
-  if (left_height > right_height)
-  {
-    node->height = left_height + 1;
-  }
-  else
-  {
-    node->height = right_height + 1;
-  }
+  const size_t left = get_height(node->left);
+  const size_t right = get_height(node->right);
+  return (left > right ? left : right) + 1;
 }
 
 template< class Key, class Value, class Compare >
@@ -536,7 +505,7 @@ template< class Key, class Value >
 ulanova::detail::Node< Key, Value > *
 ulanova::BSTreeIterator< Key, Value >::as_node() const noexcept
 {
-  return static_cast< const detail::Node< Key, Value > * >(node_);
+  return static_cast< detail::Node< Key, Value > * >(node_);
 }
 
 template< class Key, class Value, class Compare >
@@ -846,9 +815,6 @@ void ulanova::BSTree< Key, Value, Compare >::rotate_left_node(detail::NodeBase *
 
   new_root->left = node;
   node->parent = new_root;
-
-  update_height(node);
-  update_height(new_root);
 }
 
 template< class Key, class Value, class Compare >
@@ -879,9 +845,6 @@ void ulanova::BSTree< Key, Value, Compare >::rotate_right_node(detail::NodeBase 
 
   new_root->right = node;
   node->parent = new_root;
-
-  update_height(node);
-  update_height(new_root);
 }
 
 template< class Key, class Value, class Compare >
@@ -1039,18 +1002,11 @@ Value ulanova::BSTree< Key, Value, Compare >::drop(const Key& key)
     replace_node(node, next);
     next->left = node->left;
     next->left->parent = next;
-    next->height = node->height;
 
     delete node;
   }
 
   --size_;
-
-  while (height_start != nullptr)
-  {
-    update_height(height_start);
-    height_start = height_start->parent;
-  }
 
   return result;
 }
