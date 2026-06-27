@@ -35,10 +35,10 @@ int main(int argc, char* argv[])
           std::cin.clear();
         }
       } catch (...) {
-        std::cout << "<INVALID COMAND>\n";
+        std::cout << "<INVALID COMMAND>\n";
       }
     } else {
-      std::cout << "<INVALID COMAND>\n";
+      std::cout << "<INVALID COMMAND>\n";
     }
   }
   return 0;
