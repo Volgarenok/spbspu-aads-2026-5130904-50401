@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(constEndMethod)
   table.insert("first", 1);
   const Table other(table);
   ConstIterator it = other.end();
-  
+
   while (it != other.end())
   {
     BOOST_CHECK(*it == 1);
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(capcityMethod)
 {
   Table table(16);
   BOOST_CHECK(table.capacity() == 16);
-  
+
 
   table.rehash(20);
   BOOST_CHECK(table.capacity() == 20);
