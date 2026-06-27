@@ -248,6 +248,40 @@ BOOST_AUTO_TEST_CASE(test_max_capacity)
   BOOST_CHECK_EQUAL(ht.maxCapacity(), 72);
 }
 
+BOOST_AUTO_TEST_CASE(test_get_overflow_capacity)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(4, 4, 8);
+  BOOST_CHECK_EQUAL(ht.getOverflowCapacity(), 8);
+}
+
+BOOST_AUTO_TEST_CASE(test_get_overflow_size)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(1, 1, 3);
+  BOOST_CHECK_EQUAL(ht.getOverflowSize(), 0);
+
+  ht.add(1, 10);
+  BOOST_CHECK_EQUAL(ht.getOverflowSize(), 0);
+
+  ht.add(2, 20);
+  BOOST_CHECK_EQUAL(ht.getOverflowSize(), 1);
+
+  ht.add(3, 30);
+  BOOST_CHECK_EQUAL(ht.getOverflowSize(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(test_get_average_number_of_items)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(4, 2, 0);
+  ht.add(1, 10);
+  ht.add(2, 20);
+  ht.add(3, 30);
+  ht.add(4, 40);
+  ht.add(5, 50);
+  ht.add(6, 60);
+  double avg = ht.getAverageNumberOfItems();
+  BOOST_CHECK_CLOSE(avg, 1.5, 0.001);
+}
+
 BOOST_AUTO_TEST_CASE(test_has)
 {
   chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(64);
@@ -408,6 +442,104 @@ BOOST_AUTO_TEST_CASE(test_rehash_with_params)
   BOOST_CHECK_THROW(ht.rehash(0, 0, 3), std::logic_error);
   BOOST_CHECK_THROW(ht.rehash(1, 2, 0), std::length_error);
   BOOST_CHECK_EQUAL(ht.maxCapacity(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(test_setMaxOverflowSize)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(1, 2, 4);
+  ht.setUpdBuckets(
+    [](size_t current)
+    {
+      return current * 2;
+    });
+  ht.setUpdBucketSize(
+    [](size_t current)
+    {
+      return current + 1;
+    });
+  ht.setMaxOverflowSize(0);
+
+  ht.add(1, 10);
+  ht.add(2, 20);
+  ht.add(3, 30);
+
+  BOOST_CHECK(ht.size() == 3);
+  BOOST_CHECK(ht.has(1));
+  BOOST_CHECK(ht.has(2));
+  BOOST_CHECK(ht.has(3));
+  BOOST_CHECK(ht.getOverflowSize() == 0);
+  BOOST_CHECK(ht.maxCapacity() > 6);
+}
+
+BOOST_AUTO_TEST_CASE(test_setMaxAverageNumberOfItems)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(4, 4, 4);
+  ht.setUpdBuckets(
+    [](size_t current)
+    {
+      return current * 2;
+    });
+  ht.setUpdBucketSize(
+    [](size_t current)
+    {
+      return current;
+    });
+  ht.setMaxAverageNumberOfItems(0.5);
+
+  ht.add(1, 1);
+  ht.add(2, 2);
+  BOOST_CHECK_EQUAL(ht.size(), 2);
+  ht.add(3, 3);
+  BOOST_CHECK(ht.size() == 3);
+  double avg = ht.getAverageNumberOfItems();
+  BOOST_CHECK(avg <= 0.5 + 0.001);
+}
+
+BOOST_AUTO_TEST_CASE(test_setUpdBuckets)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(1, 2, 1);
+  ht.setUpdBuckets(
+    [](size_t)
+    {
+      return 5;
+    });
+  ht.setUpdBucketSize(
+    [](size_t)
+    {
+      return 2;
+    });
+  ht.setMaxOverflowSize(0);
+
+  ht.add(1, 10);
+  ht.add(2, 20);
+  ht.add(3, 30);
+  BOOST_CHECK_CLOSE(ht.getAverageNumberOfItems(), 0.6, 0.001);
+  BOOST_CHECK_EQUAL(ht.size(), 3);
+  BOOST_CHECK(ht.has(1) && ht.has(2) && ht.has(3));
+}
+
+BOOST_AUTO_TEST_CASE(test_setUpdBucketSize)
+{
+  chernov::HashTable< int, int, std::hash< int >, std::equal_to< int > > ht(2, 2, 2);
+  ht.setUpdBucketSize(
+    [](size_t)
+    {
+      return 5;
+    });
+  ht.setUpdBuckets(
+    [](size_t)
+    {
+      return 2;
+    });
+  ht.setMaxOverflowSize(0);
+
+  for (int i = 1; i <= 4; ++i) {
+    ht.add(i, i * 10);
+  }
+  ht.add(5, 50);
+  BOOST_CHECK_EQUAL(ht.maxCapacity(), 12);
+  BOOST_CHECK_EQUAL(ht.size(), 5);
+  BOOST_CHECK(ht.has(5));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
