@@ -13,6 +13,8 @@ void donkeev::showNavigation()
   std::cout << "\n";
   std::cout << "\033[32mscroll\033[0m";
   std::cout << "        — Показать ленту объявлений\n";
+  std::cout << "\033[32msort\033[0m";
+  std::cout << "        — Сортировать\n";
   std::cout << "\033[32mmake\033[0m";
   std::cout << "          — Создать объявление\n";
   std::cout << "\033[32mbuy\033[0m";

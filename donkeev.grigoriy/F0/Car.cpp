@@ -1,25 +1,25 @@
 #include "Car.hpp"
 
 donkeev::Car::Car():
-    vin(""),
-    brand(""),
-    model(""),
-    year(0),
-    color(""),
-    bodyType("")
+    vin_(""),
+    brand_(""),
+    model_(""),
+    year_(0),
+    color_(""),
+    bodyType_("")
 {}
 
 donkeev::Car::Car(const std::string& parametrs)
 {
   size_t pos = 0;
 
-  vin = nextWord(parametrs, pos);
-  brand = nextWord(parametrs, pos);
-  model = nextWord(parametrs, pos);
+  vin_ = nextWord(parametrs, pos);
+  brand_ = nextWord(parametrs, pos);
+  model_ = nextWord(parametrs, pos);
 
   std::string yearStr = nextWord(parametrs, pos);
-  year = std::stoi(yearStr);
+  year_ = std::stoi(yearStr);
 
-  color = nextWord(parametrs, pos);
-  bodyType = nextWord(parametrs, pos);
+  color_ = nextWord(parametrs, pos);
+  bodyType_ = nextWord(parametrs, pos);
 }

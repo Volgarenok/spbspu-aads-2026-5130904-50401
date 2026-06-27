@@ -7,7 +7,6 @@
 #include <iomanip>
 
 #include "Car.hpp"
-//#include "helpedFunc.hpp"
 
 namespace donkeev
 {

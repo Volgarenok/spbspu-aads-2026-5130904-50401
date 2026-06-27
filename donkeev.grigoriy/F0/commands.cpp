@@ -2,10 +2,10 @@
 
 void donkeev::printCar(const Car& car)
 {
-  std::cout << car.brand << " " << car.model
-  << " (" << car.year << ") | VIN: " << car.vin
-  << " | " << car.color
-  << " | " << car.bodyType<< "\n";
+  std::cout << car.brand_ << " " << car.model_
+  << " (" << car.year_ << ") | VIN: " << car.vin_
+  << " | " << car.color_
+  << " | " << car.bodyType_<< "\n";
 }
 
 void donkeev::saveCarToDataBase(const Car& car, const std::string& filename)
@@ -17,7 +17,7 @@ void donkeev::saveCarToDataBase(const Car& car, const std::string& filename)
     return;
   }
 
-  std::string line = car.vin + " " + car.brand + " " + car.model;
+  std::string line = car.vin_ + " " + car.brand_ + " " + car.model_;
 
   file << line << "\n";
   file.close();
@@ -73,12 +73,12 @@ void donkeev::saveAdToHistory(const Ad& ad)
   std::string result;
 
   result += "ID: " + ad.getId() + "\n";
-  result += "VIN: " + ad.getCar().vin + "\n";
-  result += "Марка: " + ad.getCar().brand + "\n";
-  result += "Модель: " + ad.getCar().model + "\n";
-  result += "Год: " + std::to_string(ad.getCar().year) + "\n";
-  result += "Цвет: " + ad.getCar().color + "\n";
-  result += "Тип кузова: " + ad.getCar().bodyType + "\n";
+  result += "VIN: " + ad.getCar().vin_ + "\n";
+  result += "Марка: " + ad.getCar().brand_ + "\n";
+  result += "Модель: " + ad.getCar().model_ + "\n";
+  result += "Год: " + std::to_string(ad.getCar().year_) + "\n";
+  result += "Цвет: " + ad.getCar().color_ + "\n";
+  result += "Тип кузова: " + ad.getCar().bodyType_ + "\n";
   result += "Цена: " + std::to_string(ad.getPrice()) + "\n";
   result += "Пробег: " + std::to_string(ad.getMileage()) + "\n";
   result += "Владельцев: " + std::to_string(ad.getOwnerCount()) + "\n";
@@ -86,6 +86,24 @@ void donkeev::saveAdToHistory(const Ad& ad)
 
   file << result << "\n";
   file.close();
+}
+
+void donkeev::printAd(const Ad& ad, size_t& count)
+{
+  ++count;
+  std::cout << "\n  \033[36m━━━ " << count << ". ━━━\033[0m\n";
+
+  const Car& car = ad.getCar();
+  std::cout << "  ID: " << ad.getId() << "\n";
+  std::cout << "  VIN: " << car.vin_ << "\n";
+  std::cout << "  Марка: " << car.brand_ << "\n";
+  std::cout << "  Модель: " << car.model_ << "\n";
+  std::cout << "  Год: " << car.model_ << "\n";
+  std::cout << "  Цвет: " << car.color_ << "\n";
+  std::cout << "  Цена: " << ad.getPrice() << " руб.\n";
+  std::cout << "  Пробег: " << ad.getMileage() << " км\n";
+  std::cout << "  Владельцев: " << ad.getOwnerCount() << "\n";
+  std::cout << "  Статус: \033[32mАктивно\033[0m\n";
 }
 
 void donkeev::handleScroll(CarTable&, AdTable& ads)
@@ -98,30 +116,91 @@ void donkeev::handleScroll(CarTable&, AdTable& ads)
     return;
   }
 
-  int count = 0;
-  for (auto it = ads.begin(); it != ads.end(); ++it)
+  size_t count = 0;
+  for (AdIterator it = ads.begin(); it != ads.end(); ++it)
   {
-    if (it->value_.isActive())
+    if ((*it).isActive())
     {
-      ++count;
-      std::cout << "\n  \033[36m━━━ " << count << ". ━━━\033[0m\n";
-
-      const Ad& ad = it->value_;
-      const Car& car = ad.getCar();
-      std::cout << "  ID: " << ad.getId() << "\n";
-      std::cout << "  VIN: " << car.vin << "\n";
-      std::cout << "  Марка: " << car.brand << "\n";
-      std::cout << "  Модель: " << car.model << "\n";
-      std::cout << "  Год: " << car.model << "\n";
-      std::cout << "  Цвет: " << car.color << "\n";
-      std::cout << "  Цена: " << ad.getPrice() << " руб.\n";
-      std::cout << "  Пробег: " << ad.getMileage() << " км\n";
-      std::cout << "  Владельцев: " << ad.getOwnerCount() << "\n";
-      std::cout << "  Статус: \033[32mАктивно\033[0m\n";
+      printAd((*it), count);
     }
   }
 
   std::cout << "\n  \033[90mВсего активных объявлений: " << count << "\033[0m\n\n";
+}
+
+void donkeev::handleSort(CarTable&, AdTable& ads)
+{
+  std::cout << "\n  \033[33mВыберите параметр сортировки:\033[0m\n";
+  std::cout << "    \033[32mbrand\033[0m       — по марке\n";
+  std::cout << "    \033[32mbrand-model\033[0m — по марке и модели\n";
+  std::cout << "    \033[32mprice\033[0m       — по цене\n";
+
+  std::string type;
+  std::getline(std::cin, type);
+
+  if (type == "brand")
+  {
+    std::cout << "\n  \033[33mВведите марку\033[0m\n";
+    std::string brand;
+    std::getline(std::cin, brand);
+    
+    AdIterator begin = ads.begin();
+    AdIterator end = ads.end();
+    size_t count = 0;
+    while (begin != end)
+    {
+      if ((*begin).getCar().brand_ == brand)
+      {
+        printAd((*begin), count);
+      }
+      ++begin;
+    }
+    
+    if (count == 0)
+    {
+      std::cout << "\n\033[33mНет подходящих объвлений\033[0m\n\n";
+    }
+
+    return;
+  }
+  else if (type == "brand-model")
+  {
+    std::cout << "\n  \033[33mВведите марку и модель через пробел\033[0m\n";
+    std::string line;
+    std::getline(std::cin, line);
+
+    std::string brand;
+    std::string model;
+    size_t pos = 0;
+    brand = nextWord(line, pos);
+    model = nextWord(line, pos);
+
+    AdIterator begin = ads.begin();
+    AdIterator end = ads.end();
+    size_t count = 0;
+    while (begin != end)
+    {
+      const Car& car = (*begin).getCar();
+      if (car.brand_ == brand && car.model_ == model)
+      {
+        printAd((*begin), count);
+      }
+      ++begin;
+    }
+    
+    if (count == 0)
+    {
+      std::cout << "\n\033[33mНет подходящих объвлений\033[0m\n\n";
+    }
+
+    return;
+  }
+  else
+  {
+    std::cout << "\033[31m  Неверная команда\033[0m\n\n";
+    return;
+  }
+  
 }
 
 void donkeev::handleMake(CarTable& cars, AdTable& ads)
@@ -160,12 +239,12 @@ void donkeev::handleMake(CarTable& cars, AdTable& ads)
 
     size_t year = std::stoull(yearStr);
     Car newCar;
-    newCar.vin = vin;
-    newCar.brand = brand;
-    newCar.model = model;
-    newCar.year = year;
-    newCar.color = color;
-    newCar.bodyType = bodyType;
+    newCar.vin_ = vin;
+    newCar.brand_ = brand;
+    newCar.model_ = model;
+    newCar.year_ = year;
+    newCar.color_ = color;
+    newCar.bodyType_ = bodyType;
     cars.insert(vin, newCar);
 
     saveCarToDataBase(newCar, CARS_FILE);

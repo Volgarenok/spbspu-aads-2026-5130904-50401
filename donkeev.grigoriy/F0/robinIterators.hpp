@@ -21,8 +21,8 @@ namespace donkeev
   public:
     RobinIter();
 
-    Node& operator*() const noexcept;
-    Node* operator->() const noexcept;
+    Value& operator*() const noexcept;
+    Value* operator->() const noexcept;
 
     RobinIter& operator++() noexcept;
     RobinIter operator++(int) noexcept;
@@ -51,8 +51,8 @@ namespace donkeev
   public:
     RobinCIter();
 
-    const Node& operator*() const noexcept;
-    const Node* operator->() const noexcept;
+    const Value& operator*() const noexcept;
+    const Value* operator->() const noexcept;
 
     RobinCIter& operator++() noexcept;
     RobinCIter operator++(int) noexcept;
@@ -77,13 +77,14 @@ namespace donkeev
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinNode< Key, Value >& RobinIter< Key, Value, Hash, Equal >::operator*() const noexcept
+  Value& RobinIter< Key, Value, Hash, Equal >::operator*() const noexcept
   {
-    return table_->slots_[index_];
+    Node& node = table_->slots_[index_];
+    return node.value_;
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  RobinNode< Key, Value >* RobinIter< Key, Value, Hash, Equal >::operator->() const noexcept
+  Value* RobinIter< Key, Value, Hash, Equal >::operator->() const noexcept
   {
     return std::addressof(operator*());
   }
@@ -165,13 +166,14 @@ namespace donkeev
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  const RobinNode<Key, Value>& RobinCIter<Key, Value, Hash, Equal>::operator*() const noexcept
+  const Value& RobinCIter<Key, Value, Hash, Equal>::operator*() const noexcept
   {
-    return table_->slots_[index_];
+    Node& node = table_->slots_[index_];
+    return node.value_;
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  const RobinNode<Key, Value>* RobinCIter<Key, Value, Hash, Equal>::operator->() const noexcept
+  const Value* RobinCIter<Key, Value, Hash, Equal>::operator->() const noexcept
   {
     return std::addressof(operator*());
   }

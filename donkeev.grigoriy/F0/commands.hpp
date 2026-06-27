@@ -18,11 +18,13 @@ namespace donkeev
   size_t getHistorySize();
   size_t generateNextAdId(AdTable&, size_t);
   void saveAdToHistory(const Ad&);
+  void printAd(const Ad&, size_t&);
 
-  void handleScroll(CarTable& cars, AdTable& ads);
-  void handleMake(CarTable& cars, AdTable& ads);
-  void handleBuy(CarTable& cars, AdTable& ads);
-  void handleDelete(CarTable& cars, AdTable& ads);
-  void handleShowHistory(CarTable& cars, AdTable& ads);
+  void handleScroll(CarTable&, AdTable&);
+  void handleSort(CarTable&, AdTable&);
+  void handleMake(CarTable&, AdTable&);
+  void handleBuy(CarTable&, AdTable&);
+  void handleDelete(CarTable&, AdTable&);
+  void handleShowHistory(CarTable&, AdTable&);
 }
 #endif

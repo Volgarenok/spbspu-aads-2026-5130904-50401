@@ -11,12 +11,12 @@ namespace donkeev
 {
 struct Car
 {
-    std::string vin;
-    std::string brand;
-    std::string model;
-    int year;
-    std::string color;
-    std::string bodyType;
+    std::string vin_;
+    std::string brand_;
+    std::string model_;
+    int year_;
+    std::string color_;
+    std::string bodyType_;
 
     Car();
 

@@ -23,6 +23,7 @@ int main()
     donkeev::StringHash, donkeev::StringEqual > cmds(16);
 
   cmds.insert("scroll", donkeev::handleScroll);
+  cmds.insert("sort", donkeev::handleSort);
   cmds.insert("make", donkeev::handleMake);
   cmds.insert("buy", donkeev::handleBuy);
   cmds.insert("delete", donkeev::handleDelete);
