@@ -298,7 +298,7 @@ size_t chernov::HashTable< Key, Value, Hash, Equal >::getOverflowSize() const no
 template< class Key, class Value, class Hash, class Equal >
 double chernov::HashTable< Key, Value, Hash, Equal >::getAverageNumberOfItems() const noexcept
 {
-  return num_buckets_ ? total_size_ / num_buckets_ : 0.0;
+  return num_buckets_ ? total_size_ * 1.0 / num_buckets_ : 0.0;
 }
 
 template< class Key, class Value, class Hash, class Equal >
