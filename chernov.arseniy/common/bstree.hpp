@@ -116,8 +116,8 @@ namespace chernov {
 
     BSTIterator() = delete;
 
-    reference operator*() const;
-    pointer operator->() const;
+    reference operator*();
+    pointer operator->();
 
     BSTIterator & operator++();
     BSTIterator operator++(int);
@@ -689,13 +689,13 @@ namespace chernov {
   {}
 
   template< class Key, class Value, bool IsConst >
-  typename BSTIterator< Key, Value, IsConst >::reference BSTIterator< Key, Value, IsConst >::operator*() const
+  typename BSTIterator< Key, Value, IsConst >::reference BSTIterator< Key, Value, IsConst >::operator*()
   {
     return static_cast< detail::Node< Key, Value > * >(node_)->key_value_;
   }
 
   template< class Key, class Value, bool IsConst >
-  typename BSTIterator< Key, Value, IsConst >::pointer BSTIterator< Key, Value, IsConst >::operator->() const
+  typename BSTIterator< Key, Value, IsConst >::pointer BSTIterator< Key, Value, IsConst >::operator->()
   {
     return std::addressof(static_cast< detail::Node< Key, Value > * >(node_)->key_value_);
   }
