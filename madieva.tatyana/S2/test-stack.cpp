@@ -91,20 +91,6 @@ BOOST_AUTO_TEST_CASE(pop_when_the_stack_is_empty)
   BOOST_CHECK(s.size() == 0);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 BOOST_AUTO_TEST_CASE(clear_stack)
 {
   madieva::Stack< int > s;
@@ -126,7 +112,7 @@ BOOST_AUTO_TEST_CASE(clear_empty_stack)
 
 BOOST_AUTO_TEST_CASE(size_after_operations)
 {
-  madieva::Stack<int> s;
+  madieva::Stack< int > s;
   BOOST_CHECK(s.size() == 0);
   s.push(10);
   BOOST_CHECK(s.size() == 1);
@@ -140,9 +126,9 @@ BOOST_AUTO_TEST_CASE(size_after_operations)
 
 BOOST_AUTO_TEST_CASE(empty_on_const_stack)
 {
-  madieva::Stack<int> s;
+  madieva::Stack< int > s;
   s.push(1);
-  const madieva::Stack<int>& cs = s;
+  const madieva::Stack< int > & cs = s;
   BOOST_CHECK(!cs.empty());
   BOOST_CHECK(s.top() == 1);
   BOOST_CHECK(cs.top() == 1);
@@ -150,10 +136,10 @@ BOOST_AUTO_TEST_CASE(empty_on_const_stack)
 
 BOOST_AUTO_TEST_CASE(copy_constructor)
 {
-  madieva::Stack<int> s1;
+  madieva::Stack< int > s1;
   s1.push(1);
   s1.push(2);
-  madieva::Stack<int> s2(s1);
+  madieva::Stack< int > s2(s1);
   BOOST_CHECK(s2.size() == 2);
   BOOST_CHECK(s2.top() == 2);
   s2.pop();
@@ -163,15 +149,33 @@ BOOST_AUTO_TEST_CASE(copy_constructor)
 
 BOOST_AUTO_TEST_CASE(assignment_operator)
 {
-  madieva::Stack<int> s1;
+  madieva::Stack< int > s1;
   s1.push(1);
   s1.push(2);
-  madieva::Stack<int> s2;
+  madieva::Stack< int > s2;
   s2 = s1;
   BOOST_CHECK(s2.size() == 2);
   BOOST_CHECK(s2.top() == 2);
   BOOST_CHECK(s1.size() == 2);
   BOOST_CHECK(s1.top() == 2);
+}
+
+BOOST_AUTO_TEST_CASE(stack_emplace_test)
+{
+  madieva::Stack< std::pair<int, double> > stack;
+
+  stack.emplace(1, 1.5);
+  stack.emplace(2, 2.5);
+  stack.emplace(3, 3.5);
+
+  BOOST_CHECK(stack.top().first == 3);
+  BOOST_CHECK(stack.top().second == 3.5);
+  stack.pop();
+  BOOST_CHECK(stack.top().first == 2);
+  BOOST_CHECK(stack.top().second == 2.5);
+  stack.pop();
+  BOOST_CHECK(stack.top().first == 1);
+  BOOST_CHECK(stack.top().second == 1.5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
