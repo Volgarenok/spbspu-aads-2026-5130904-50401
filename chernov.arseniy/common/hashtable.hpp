@@ -8,10 +8,10 @@
 #include <htiter.hpp>
 
 namespace chernov {
-  template < class Key, class Value, class Hash, class Equal >
+  template< class Key, class Value, class Hash, class Equal >
   class HashTable {
   public:
-    template < class K, class V, class H, class E, bool IC >
+    template< class K, class V, class H, class E, bool IC >
     friend class HTIter;
 
     using slot = std::pair< const Key, Value >;
@@ -35,6 +35,7 @@ namespace chernov {
     bool empty() const noexcept;
     size_t size() const noexcept;
     size_t maxCapacity() const noexcept;
+    size_t getOverflowCapacity() const noexcept;
 
     void clear() noexcept;
 
@@ -84,7 +85,7 @@ namespace chernov {
   };
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal >::HashTable():
   data_(nullptr),
   bucket_sizes_(nullptr),
@@ -97,7 +98,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable():
   equal_(Equal{})
 {}
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable & ht):
   HashTable(ht.num_buckets_, ht.bucket_cap_, ht.overflow_cap_)
 {
@@ -125,7 +126,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(const HashTable & ht):
   }
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable && ht) noexcept:
   data_(std::exchange(ht.data_, nullptr)),
   bucket_sizes_(std::exchange(ht.bucket_sizes_, nullptr)),
@@ -138,7 +139,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable && ht) noexce
   equal_(ht.equal_)
 {}
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
   data_(nullptr),
   bucket_sizes_(nullptr),
@@ -162,7 +163,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t slots):
   }
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t num_buckets, size_t bucket_cap, size_t overflow_cap):
   data_(nullptr),
   bucket_sizes_(nullptr),
@@ -184,7 +185,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::HashTable(size_t num_buckets, siz
   }
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal >::~HashTable()
 {
   clear();
@@ -192,7 +193,7 @@ chernov::HashTable< Key, Value, Hash, Equal >::~HashTable()
   delete[] bucket_sizes_;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal > &
   chernov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable & ht)
 {
@@ -204,7 +205,7 @@ chernov::HashTable< Key, Value, Hash, Equal > &
   return *this;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 chernov::HashTable< Key, Value, Hash, Equal > &
   chernov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable && ht) noexcept
 {
@@ -216,7 +217,7 @@ chernov::HashTable< Key, Value, Hash, Equal > &
   return *this;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::swap(HashTable & ht) noexcept
 {
   std::swap(data_, ht.data_);
@@ -230,25 +231,31 @@ void chernov::HashTable< Key, Value, Hash, Equal >::swap(HashTable & ht) noexcep
   std::swap(equal_, ht.equal_);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 bool chernov::HashTable< Key, Value, Hash, Equal >::empty() const noexcept
 {
   return total_size_ == 0;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::size() const noexcept
 {
   return total_size_;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::maxCapacity() const noexcept
 {
   return num_buckets_ * bucket_cap_ + overflow_cap_;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
+size_t chernov::HashTable< Key, Value, Hash, Equal >::getOverflowCapacity() const noexcept
+{
+  return overflow_cap_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::clear() noexcept
 {
   for (size_t i = 0; i < num_buckets_; ++i) {
@@ -264,7 +271,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::clear() noexcept
   total_size_ = 0;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::add(const Key & k, const Value & v)
 {
   HashTable< Key, Value, Hash, Equal > new_ht{*this};
@@ -279,7 +286,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::add(const Key & k, const Val
   swap(new_ht);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::remove(const Key & k)
 {
   HashTable< Key, Value, Hash, Equal > new_ht{*this};
@@ -290,7 +297,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::remove(const Key & k)
   swap(new_ht);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 bool chernov::HashTable< Key, Value, Hash, Equal >::has(const Key & k) const
 {
   try {
@@ -301,7 +308,7 @@ bool chernov::HashTable< Key, Value, Hash, Equal >::has(const Key & k) const
   return true;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
 {
   size_t new_num_buckets, new_bucket_cap, new_overflow_cap;
@@ -309,7 +316,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::rehash(size_t slots)
   rehash(new_num_buckets, new_bucket_cap, new_overflow_cap);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::rehash(size_t num_buckets, size_t bucket_cap, size_t overflow_cap)
 {
   HashTable< Key, Value, Hash, Equal > new_ht{num_buckets, bucket_cap, overflow_cap};
@@ -331,73 +338,73 @@ void chernov::HashTable< Key, Value, Hash, Equal >::rehash(size_t num_buckets, s
   swap(new_ht);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 Value & chernov::HashTable< Key, Value, Hash, Equal >::at(const Key & k)
 {
   return operator[](k);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 const Value & chernov::HashTable< Key, Value, Hash, Equal >::at(const Key & k) const
 {
   return operator[](k);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 Value & chernov::HashTable< Key, Value, Hash, Equal >::operator[](const Key & k)
 {
   const HashTable< Key, Value, Hash, Equal > * cthis = this;
   return const_cast< Value & >(cthis->operator[](k));
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 const Value & chernov::HashTable< Key, Value, Hash, Equal >::operator[](const Key & k) const
 {
   size_t index = getElementIndex(k);
   return data_[index].second;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename chernov::HashTable< Key, Value, Hash, Equal >::iterator chernov::HashTable< Key, Value, Hash, Equal >::begin()
 {
   return iterator(this, getFirstValidIndex());
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename chernov::HashTable< Key, Value, Hash, Equal >::const_iterator
   chernov::HashTable< Key, Value, Hash, Equal >::begin() const
 {
   return const_iterator(this, getFirstValidIndex());
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename chernov::HashTable< Key, Value, Hash, Equal >::const_iterator
   chernov::HashTable< Key, Value, Hash, Equal >::cbegin() const
 {
   return begin();
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename chernov::HashTable< Key, Value, Hash, Equal >::iterator chernov::HashTable< Key, Value, Hash, Equal >::end()
 {
   return iterator(this, getEndIndex());
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename chernov::HashTable< Key, Value, Hash, Equal >::const_iterator
   chernov::HashTable< Key, Value, Hash, Equal >::end() const
 {
   return const_iterator(this, getEndIndex());
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 typename chernov::HashTable< Key, Value, Hash, Equal >::const_iterator
   chernov::HashTable< Key, Value, Hash, Equal >::cend() const
 {
   return end();
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::getElementIndex(const Key & k) const
 {
   if (num_buckets_) {
@@ -418,7 +425,7 @@ size_t chernov::HashTable< Key, Value, Hash, Equal >::getElementIndex(const Key 
   throw std::out_of_range("Element not found");
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::removeElementByIndex(size_t index)
 {
   if (bucket_cap_ == 0) {
@@ -446,7 +453,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::removeElementByIndex(size_t 
   --total_size_;
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::unsafeAddWithoutCheckingExisting(Key k, Value v)
 {
   size_t hash = hasher_(k);
@@ -464,7 +471,7 @@ void chernov::HashTable< Key, Value, Hash, Equal >::unsafeAddWithoutCheckingExis
   }
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::calculateParamsFromSlots(size_t slots,
   size_t & new_num_buckets,
   size_t & new_bucket_cap,
@@ -488,13 +495,13 @@ void chernov::HashTable< Key, Value, Hash, Equal >::calculateParamsFromSlots(siz
   }
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 void chernov::HashTable< Key, Value, Hash, Equal >::setParamsByCountSlots(size_t slots) noexcept
 {
   calculateParamsFromSlots(slots, num_buckets_, bucket_cap_, overflow_cap_);
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::getFirstValidIndex() const noexcept
 {
   for (size_t i = 0; i < num_buckets_; ++i) {
@@ -508,7 +515,7 @@ size_t chernov::HashTable< Key, Value, Hash, Equal >::getFirstValidIndex() const
   return getEndIndex();
 }
 
-template < class Key, class Value, class Hash, class Equal >
+template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::getEndIndex() const noexcept
 {
   return num_buckets_ * bucket_cap_ + overflow_cap_;
