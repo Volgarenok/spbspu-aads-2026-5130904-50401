@@ -29,3 +29,29 @@ bool levkin::loadDictionaries(const std::string& filename,
   }
   return true;
 }
+
+
+void levkin::cmdPrint(std::istream& in, std::ostream& out, DatasetStore& datasets)
+{
+  std::string dict_name;
+  if (!(in >> dict_name)) {
+    throw std::invalid_argument("Invalid arguments");
+  }
+
+  if (!datasets.has(dict_name)) {
+    out << "<INVALID COMMAND>\n";
+    return;
+  }
+
+  const SubTree& dict = datasets.get(dict_name);
+  if (dict.cbegin() == dict.cend()) {
+    out << "<EMPTY>\n";
+    return;
+  }
+
+  out << dict_name;
+  for (auto it = dict.cbegin(); it != dict.cend(); ++it) {
+    out << " " << it->key << " " << it->value;
+  }
+  out << "\n";
+}
