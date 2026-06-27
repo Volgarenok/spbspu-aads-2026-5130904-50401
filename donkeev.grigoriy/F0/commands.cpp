@@ -195,6 +195,36 @@ void donkeev::handleSort(CarTable&, AdTable& ads)
 
     return;
   }
+  else if (type == "price")
+  {
+    Ad** activeAds = new Ad*[ads.size()];
+    size_t index = 0;
+    for (AdIterator it = ads.begin(); it != ads.end(); ++it)
+    {
+      activeAds[index++] = &(*it);
+    }
+
+    for (size_t i = 1; i < ads.size(); ++i)
+    {
+      Ad* key = activeAds[i];
+      size_t j = i;
+      
+      while (j > 0 && activeAds[j - 1]->getPrice() > key->getPrice())
+      {
+        activeAds[j] = activeAds[j - 1];
+        --j;
+      }
+      activeAds[j] = key;
+    }
+
+    for (size_t i = 0; i < ads.size();)
+    {
+      printAd(*(activeAds[i]), i);
+    }
+
+    delete [] activeAds;
+    return;
+  }
   else
   {
     std::cout << "\033[31m  Неверная команда\033[0m\n\n";

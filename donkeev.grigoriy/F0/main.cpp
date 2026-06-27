@@ -55,6 +55,7 @@ int main()
     else
     {
       std::cout << "\033[31m  Неизвестная команда.\033[0m\n\n";
+      donkeev::showNavigation();
     }
   }
 
