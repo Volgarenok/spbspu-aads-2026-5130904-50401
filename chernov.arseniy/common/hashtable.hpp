@@ -36,6 +36,7 @@ namespace chernov {
     size_t size() const noexcept;
     size_t maxCapacity() const noexcept;
     size_t getOverflowCapacity() const noexcept;
+    size_t getOverflowSize() const noexcept;
     double getAverageNumberOfItems() const noexcept;
 
     void clear() noexcept;
@@ -254,6 +255,12 @@ template< class Key, class Value, class Hash, class Equal >
 size_t chernov::HashTable< Key, Value, Hash, Equal >::getOverflowCapacity() const noexcept
 {
   return overflow_cap_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t chernov::HashTable< Key, Value, Hash, Equal >::getOverflowSize() const noexcept
+{
+  return overflow_size_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
