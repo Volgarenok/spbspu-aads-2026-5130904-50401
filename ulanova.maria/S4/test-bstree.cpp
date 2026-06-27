@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructorTest)
 
   BOOST_TEST(tree.empty());
   BOOST_TEST(tree.size() == 0);
-  BOOST_TEST(tree.height() == 0);
+  BOOST_TEST(tree.height() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(pushAndGetTest)
@@ -37,9 +37,9 @@ BOOST_AUTO_TEST_CASE(pushAndGetTest)
 
   BOOST_TEST(!tree.empty());
   BOOST_TEST(tree.size() == 3);
-  BOOST_TEST(tree.get(1) == 10);
-  BOOST_TEST(tree.get(2) == 20);
-  BOOST_TEST(tree.get(3) == 30);
+  BOOST_TEST(tree.at(1) == 10);
+  BOOST_TEST(tree.at(2) == 20);
+  BOOST_TEST(tree.at(3) == 30);
 }
 
 BOOST_AUTO_TEST_CASE(pushUpdatesExistingKeyTest)
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(pushUpdatesExistingKeyTest)
   tree.push(1, 15);
 
   BOOST_TEST(tree.size() == 1);
-  BOOST_TEST(tree.get(1) == 15);
+  BOOST_TEST(tree.at(1) == 15);
 }
 
 BOOST_AUTO_TEST_CASE(iteratorOrderTest)
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(dropLeafTest)
 
   BOOST_TEST(tree.drop(1) == 10);
   BOOST_TEST(tree.size() == 2);
-  BOOST_CHECK_THROW(tree.get(1), std::out_of_range);
+  BOOST_CHECK_THROW(tree.at(1), std::out_of_range);
 }
 
 BOOST_AUTO_TEST_CASE(dropNodeWithOneChildTest)
@@ -94,8 +94,8 @@ BOOST_AUTO_TEST_CASE(dropNodeWithOneChildTest)
 
   BOOST_TEST(tree.drop(1) == 10);
   BOOST_TEST(tree.size() == 2);
-  BOOST_TEST(tree.get(0) == 0);
-  BOOST_TEST(tree.get(2) == 20);
+  BOOST_TEST(tree.at(0) == 0);
+  BOOST_TEST(tree.at(2) == 20);
 }
 
 BOOST_AUTO_TEST_CASE(dropNodeWithTwoChildrenTest)

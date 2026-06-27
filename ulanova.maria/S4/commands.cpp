@@ -62,7 +62,7 @@ void ulanova::print(std::ostream & out, std::istream & in, Storage & storage)
 
   if (dict.empty())
   {
-    out << "<EMPTY>\n";
+    out << "<EMPTY>";
     return;
   }
 

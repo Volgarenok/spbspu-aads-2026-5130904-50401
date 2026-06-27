@@ -43,6 +43,7 @@ int main(int argc, char ** argv)
         throw std::runtime_error("invalid command");
       }
       it->second(std::cout, std::cin, storage);
+      std::cout << '\n';
     }
     catch (...)
     {
