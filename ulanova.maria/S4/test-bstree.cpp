@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructorTest)
 
   BOOST_TEST(tree.empty());
   BOOST_TEST(tree.size() == 0);
-  BOOST_TEST(tree.height() == 1);
+  BOOST_TEST(tree.height() == 0);
 }
 
 BOOST_AUTO_TEST_CASE(pushAndGetTest)
