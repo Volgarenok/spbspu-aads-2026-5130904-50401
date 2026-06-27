@@ -5,12 +5,14 @@
 #include <list.hpp>
 #include "hash_table.hpp"
 
-namespace madieva {
+namespace madieva
+{
   template< class Key, class Value, class Hash, class Equal >
   class HashTable;
 
   template< class Key, class Value, class Hash, class Equal >
-  class HTCIter {
+  class HTCIter
+  {
     using ht = HashTable< Key, Value, Hash, Equal >;
     using Pair = std::pair< Key, Value >;
     size_t bucket_index_;
@@ -45,14 +47,14 @@ namespace madieva {
 
   template< class Key, class Value, class Hash, class Equal >
   HTCIter< Key, Value, Hash, Equal >::HTCIter(size_t idx, LCIter< Pair > it,
-    const Vector< List< Pair > >* buckets) :
+    const Vector< List< Pair > >* buckets):
     bucket_index_(idx),
     node_iter_(it),
     buckets_(buckets)
   {}
 
   template< class Key, class Value, class Hash, class Equal >
-  HTCIter< Key, Value, Hash, Equal >& HTCIter< Key, Value, Hash, Equal >::operator++()
+  HTCIter< Key, Value, Hash, Equal > & HTCIter< Key, Value, Hash, Equal >::operator++()
   {
     next();
     return *this;
@@ -66,7 +68,7 @@ namespace madieva {
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  bool HTCIter< Key, Value, Hash, Equal >::operator==(const HTCIter& other) const
+  bool HTCIter< Key, Value, Hash, Equal >::operator==(const HTCIter & other) const
   {
     return bucket_index_ == other.bucket_index_ &&
       node_iter_ == other.node_iter_ &&
@@ -74,7 +76,7 @@ namespace madieva {
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  bool HTCIter< Key, Value, Hash, Equal >::operator!=(const HTCIter& other) const
+  bool HTCIter< Key, Value, Hash, Equal >::operator!=(const HTCIter & other) const
   {
     return !(*this == other);
   }

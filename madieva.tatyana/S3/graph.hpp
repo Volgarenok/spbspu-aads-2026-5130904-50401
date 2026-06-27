@@ -6,8 +6,10 @@
 #include "hash_table.hpp"
 #include "xxhash.hpp"
 
-namespace madieva {
-  class Graph {
+namespace madieva
+{
+  class Graph
+  {
     std::string name_graph;
     using key = std::pair< std::string, std::string >;
     using val = List< size_t >;
@@ -26,7 +28,7 @@ namespace madieva {
 
   };
 
-  Graph::Graph(const std::string & name) :
+  Graph::Graph(const std::string & name):
     name_graph(name)
   {}
 
@@ -87,7 +89,6 @@ namespace madieva {
     addVertex(a.first);
     addVertex(a.second);
   }
-
 
 }
 

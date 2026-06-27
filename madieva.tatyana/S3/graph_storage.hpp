@@ -8,8 +8,10 @@
 #include "graph.hpp"
 #include "xxhash.hpp"
 
-namespace madieva {
-  class GraphStorage {
+namespace madieva
+{
+  class GraphStorage
+  {
     List< std::string > order_;
     HashTable< std::string, Graph, XXHash64, StringEqual > graphs_;
   public:
@@ -34,24 +36,28 @@ namespace madieva {
     }
   }
 
-  bool GraphStorage::hasGraph(const std::string& name) const
+  bool GraphStorage::hasGraph(const std::string & name) const
   {
     return graphs_.has(name);
   }
 
-  Graph& GraphStorage::getGraph(const std::string& name) {
+  Graph & GraphStorage::getGraph(const std::string & name)
+  {
     return graphs_.get(name);
   }
 
-  const Graph& GraphStorage::getGraph(const std::string& name) const {
+  const Graph & GraphStorage::getGraph(const std::string & name) const
+  {
     return graphs_.get(name);
   }
 
-  List< std::string > GraphStorage::getAllNames() const {
+  List< std::string > GraphStorage::getAllNames() const
+  {
     return order_;
   }
 
-  void GraphStorage::removeGraph(const std::string& name) {
+  void GraphStorage::removeGraph(const std::string & name)
+  {
     graphs_.drop(name);
     LIter< std::string > it = order_.begin();
     for (size_t i = 0; i < order_.size(); ++i) {
@@ -67,12 +73,12 @@ namespace madieva {
   {
     return graphs_.size();
   }
+
   bool GraphStorage::empty() const
   {
     return graphs_.empty();
   }
 
 }
-
 
 #endif

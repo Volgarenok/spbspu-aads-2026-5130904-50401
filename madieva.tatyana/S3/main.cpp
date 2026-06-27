@@ -6,8 +6,9 @@
 #include "graph_storage.hpp"
 #include "commands.hpp"
 
-namespace madieva {
-  bool readGraphs(std::istream & file, GraphStorage& storage)
+namespace madieva
+{
+  bool readGraphs(std::istream & file, GraphStorage & storage)
   {
     std::string graph_name;
     while (file >> graph_name) {

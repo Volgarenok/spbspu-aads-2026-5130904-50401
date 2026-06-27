@@ -4,8 +4,9 @@
 #include "graph_storage.hpp"
 #include <limits>
 
-namespace madieva {
-  template<typename T>
+namespace madieva
+{
+  template< typename T >
   bool read_token(std::istream & in, std::ostream& out, T & value) {
     if (!(in >> value)) {
       out << "<INVALID COMMAND>\n";

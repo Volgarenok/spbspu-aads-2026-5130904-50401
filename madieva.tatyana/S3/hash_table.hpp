@@ -21,22 +21,23 @@ namespace madieva {
     h_it end();
     hc_it begin() const;
     hc_it end() const;
-    void add(Key k, Value v);
-    bool has(Key k) const;
-    Value & get(Key k);
-    const Value & get(Key k) const;
-    Value drop(Key k);
+    template< class K, class V >
+    void add(K && k, V && v);
+    bool has(const Key & k) const;
+    Value & get(const Key & k);
+    const Value & get(const Key & k) const;
+    Value drop(const Key & k);
     void rehash(size_t slots);
     size_t size() const noexcept;
     size_t capacity() const noexcept;
     bool empty() const noexcept;
-    using Pair = std::pair< Key, Value >;
+    using pair = std::pair< Key, Value >;
     using h_it = HTIter< Key, Value, Hash, Equal >;
     using hc_it = HTCIter< Key, Value, Hash, Equal >;
   private:
     friend class HTIter< Key, Value, Hash, Equal >;
     friend class HTCIter< Key, Value, Hash, Equal >;
-    Vector< List< Pair > > buckets_;
+    Vector< List< pair > > buckets_;
     Hash hasher_;
     Equal comparer_;
     size_t count_;
@@ -44,7 +45,8 @@ namespace madieva {
   };
 
   template< class Key, class Value, class Hash, class Equal >
-  size_t HashTable< Key, Value, Hash, Equal >::getIndex(const Key & k) const {
+  size_t HashTable< Key, Value, Hash, Equal >::getIndex(const Key & k) const
+  {
     size_t size = buckets_.getSize();
     if (size == 0) {
       return 0;
@@ -66,7 +68,7 @@ namespace madieva {
   template< class Key, class Value, class Hash, class Equal >
   HTIter< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::end()
   {
-    return h_it(buckets_.getSize(), LIter< Pair >(nullptr), & buckets_);
+    return h_it(buckets_.getSize(), LIter< pair >(nullptr), & buckets_);
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -83,25 +85,27 @@ namespace madieva {
   template< class Key, class Value, class Hash, class Equal >
   HTCIter< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::end() const
   {
-    return hc_it(buckets_.getSize(), LCIter< Pair >(nullptr), &buckets_);
+    return hc_it(buckets_.getSize(), LCIter< pair >(nullptr), &buckets_);
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  HashTable< Key, Value, Hash, Equal >::HashTable(size_t count) :
-    buckets_(), count_(0)
+  HashTable< Key, Value, Hash, Equal >::HashTable(size_t count):
+    buckets_(),
+    count_(0)
   {
     buckets_.reserve(count);
-    for(size_t i = 0; i < count; ++i) {
-      buckets_.pushBack(List< Pair >());
+    for (size_t i = 0; i < count; ++i) {
+      buckets_.pushBack(List< pair >());
     }
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  void HashTable< Key, Value, Hash, Equal >::add(Key k, Value v)
+  template< class K, class V >
+  void HashTable< Key, Value, Hash, Equal >::add(K && k, V && v)
   {
     size_t index = getIndex(k);
-    List< Pair > & bucket = buckets_[index];
-    LIter< Pair > it = bucket.begin();
+    List< pair > & bucket = buckets_[index];
+    LIter< pair > it = bucket.begin();
     for (size_t i = 0; i < bucket.size(); ++i) {
       if (comparer_((*it).first, k)) {
         (*it).second = v;
@@ -109,16 +113,16 @@ namespace madieva {
       }
       ++it;
     }
-    bucket.push_back(std::make_pair(k, v));
+    bucket.push_back(std::make_pair(std::forward< K >(k), std::forward< V >(v)));
     ++count_;
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  bool HashTable< Key, Value, Hash, Equal >::has(Key k) const
+  bool HashTable< Key, Value, Hash, Equal >::has(const Key & k) const
   {
     size_t index = getIndex(k);
-    const List< Pair > & bucket = buckets_[index];
-    LCIter< Pair > it = bucket.begin();
+    const List< pair > & bucket = buckets_[index];
+    LCIter< pair > it = bucket.begin();
     for (size_t i = 0; i < bucket.size(); ++i) {
       if (comparer_((*it).first, k)) {
         return true;
@@ -129,11 +133,11 @@ namespace madieva {
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value & HashTable< Key, Value, Hash, Equal >::get(Key k)
+  Value & HashTable< Key, Value, Hash, Equal >::get(const Key & k)
   {
     size_t index = getIndex(k);
-    List< Pair > & bucket = buckets_[index];
-    LIter< Pair > it = bucket.begin();
+    List< pair > & bucket = buckets_[index];
+    LIter< pair > it = bucket.begin();
     for (size_t i = 0; i < bucket.size(); ++i) {
       if (comparer_((*it).first, k)) {
         return (*it).second;
@@ -144,11 +148,11 @@ namespace madieva {
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  const Value & HashTable< Key, Value, Hash, Equal >::get(Key k) const
+  const Value & HashTable< Key, Value, Hash, Equal >::get(const Key & k) const
   {
     size_t index = getIndex(k);
-    const List< Pair > & bucket = buckets_[index];
-    LCIter< Pair > it = bucket.begin();
+    const List< pair > & bucket = buckets_[index];
+    LCIter< pair > it = bucket.begin();
     for (size_t i = 0; i < bucket.size(); ++i) {
       if (comparer_((*it).first, k)) {
         return (*it).second;
@@ -160,11 +164,11 @@ namespace madieva {
 
 
   template< class Key, class Value, class Hash, class Equal >
-  Value HashTable< Key, Value, Hash, Equal >::drop(Key k)
+  Value HashTable< Key, Value, Hash, Equal >::drop(const Key & k)
   {
     size_t index = getIndex(k);
-    List< Pair > & bucket = buckets_[index];
-    LIter< Pair > it = bucket.begin();
+    List< pair > & bucket = buckets_[index];
+    LIter< pair > it = bucket.begin();
     for (size_t i = 0; i < bucket.size(); ++i) {
       if (comparer_((*it).first, k)) {
         Value temp = (*it).second;
@@ -180,14 +184,14 @@ namespace madieva {
   template< class Key, class Value, class Hash, class Equal >
   void HashTable< Key, Value, Hash, Equal >::rehash(size_t new_slots)
   {
-    Vector< List< Pair > > new_buckets;
+    Vector< List< pair > > new_buckets;
     new_buckets.reserve(new_slots);
-    for(size_t i = 0; i < new_slots; ++i) {
-      new_buckets.pushBack(List< Pair >());
+    for (size_t i = 0; i < new_slots; ++i) {
+      new_buckets.pushBack(List< pair >());
     }
     for (size_t i = 0; i < buckets_.getSize(); ++i) {
-      List< Pair > & bucket = buckets_[i];
-      LIter< Pair > it = bucket.begin();
+      List< pair > & bucket = buckets_[i];
+      LIter< pair > it = bucket.begin();
       for (size_t j = 0; j < bucket.size(); ++j) {
         size_t index = hasher_((*it).first) % new_slots;
         new_buckets[index].push_back(std::make_pair((*it).first, (*it).second));
