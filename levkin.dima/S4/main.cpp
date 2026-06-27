@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
         auto func = cmds.get(cmd_name);
         func(ss, std::cout, datasets);
         if (ss.fail()) {
-          std::cout << "<INVALID COMAND>\n";
+          std::cout << "<INVALID COMMAND>\n";
           std::cin.clear();
         }
       } catch (...) {
