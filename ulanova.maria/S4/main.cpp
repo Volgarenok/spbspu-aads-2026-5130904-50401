@@ -1,50 +1,10 @@
-#include "commands.hpp"
-
+#include <fstream>
 #include <iostream>
-#include <sstream>
+#include <limits>
 #include <stdexcept>
 #include <string>
 
-namespace
-{
-  void processLine(ulanova::Storage & storage, const std::string & line)
-  {
-    std::istringstream input(line);
-
-    std::string command;
-    if (!(input >> command))
-    {
-      return;
-    }
-
-    if (command == "print")
-    {
-      ulanova::print(std::cout, input, storage);
-    }
-    else if (command == "complement")
-    {
-      ulanova::complement(std::cout, input, storage);
-    }
-    else if (command == "intersect")
-    {
-      ulanova::intersect(std::cout, input, storage);
-    }
-    else if (command == "union")
-    {
-      ulanova::unionDicts(std::cout, input, storage);
-    }
-    else
-    {
-      throw std::runtime_error("invalid command");
-    }
-
-    std::string extra;
-    if (input >> extra)
-    {
-      throw std::runtime_error("invalid command");
-    }
-  }
-}
+#include "commands.hpp"
 
 int main(int argc, char ** argv)
 {
@@ -54,29 +14,41 @@ int main(int argc, char ** argv)
     return 1;
   }
 
-  ulanova::Storage storage;
-
-  try
+  std::ifstream input(argv[1]);
+  if (!input)
   {
-    ulanova::loadStorage(storage, argv[1]);
-
-    std::string line;
-    while (std::getline(std::cin, line))
-    {
-      try
-      {
-        processLine(storage, line);
-      }
-      catch (...)
-      {
-        std::cout << "<INVALID COMMAND>\n";
-      }
-    }
-  }
-  catch (const std::exception & error)
-  {
-    std::cerr << error.what() << '\n';
+    std::cerr << "file open error\n";
     return 1;
+  }
+
+  ulanova::Storage storage;
+  ulanova::loadStorage(storage, input);
+
+  using CommandFunc = void(*)(std::ostream &, std::istream &, ulanova::Storage &);
+  ulanova::BSTree< std::string, CommandFunc, std::less< std::string > > commands;
+
+  commands.push("print", ulanova::print);
+  commands.push("complement", ulanova::complement);
+  commands.push("intersect", ulanova::intersect);
+  commands.push("union", ulanova::unionDicts);
+
+  std::string command;
+  while (std::cin >> command)
+  {
+    try
+    {
+      auto it = commands.find(command);
+      if (it == commands.cend())
+      {
+        throw std::runtime_error("invalid command");
+      }
+      it->second(std::cout, std::cin, storage);
+    }
+    catch (...)
+    {
+      std::cout << "<INVALID COMMAND>\n";
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    }
   }
 
   return 0;
