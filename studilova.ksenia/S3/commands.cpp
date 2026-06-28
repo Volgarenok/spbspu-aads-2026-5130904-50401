@@ -33,6 +33,20 @@ namespace
   {
     return lhs.first < rhs.first;
   }
+
+  template< class T >
+  void printVectorLines(std::ostream& out, const studilova::Vector< T >& values)
+  {
+    for (size_t i = 0; i < values.getSize(); ++i)
+    {
+      out << values[i];
+
+      if (i + 1 != values.getSize())
+      {
+        out << "\n";
+      }
+    }
+  }
 }
 
 void studilova::graphs(std::istream&, std::ostream& out, GraphsMap& graphs)
@@ -49,14 +63,10 @@ void studilova::graphs(std::istream&, std::ostream& out, GraphsMap& graphs)
 
   if (names.isEmpty())
   {
-    out << "\n";
     return;
   }
 
-  for (size_t i = 0; i < names.getSize(); ++i)
-  {
-    out << names[i] << "\n";
-  }
+  printVectorLines(out, names);
 }
 
 void studilova::vertexes(std::istream& in, std::ostream& out, GraphsMap& graphs)
@@ -74,16 +84,11 @@ void studilova::vertexes(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   if (vertices.isEmpty())
   {
-    out << "\n";
     return;
   }
 
   sortVector(vertices, compareStrings);
-
-  for (size_t i = 0; i < vertices.getSize(); ++i)
-  {
-    out << vertices[i] << "\n";
-  }
+  printVectorLines(out, vertices);
 }
 
 void studilova::outbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
@@ -105,7 +110,6 @@ void studilova::outbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
     if (connections.isEmpty())
     {
-      out << "\n";
       return;
     }
 
@@ -114,7 +118,6 @@ void studilova::outbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
     for (size_t i = 0; i < connections.getSize(); ++i)
     {
       Graph::Weights weights = connections[i].second;
-
       sortVector(weights, compareWeights);
 
       out << connections[i].first;
@@ -124,12 +127,15 @@ void studilova::outbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
         out << " " << weights[j];
       }
 
-      out << "\n";
+      if (i + 1 != connections.getSize())
+      {
+        out << "\n";
+      }
     }
   }
   catch (...)
   {
-    out << "<INVALID COMMAND>\n";
+    out << "<INVALID COMMAND>";
   }
 }
 
@@ -152,7 +158,6 @@ void studilova::inbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
     if (connections.isEmpty())
     {
-      out << "\n";
       return;
     }
 
@@ -161,7 +166,6 @@ void studilova::inbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
     for (size_t i = 0; i < connections.getSize(); ++i)
     {
       Graph::Weights weights = connections[i].second;
-
       sortVector(weights, compareWeights);
 
       out << connections[i].first;
@@ -171,12 +175,15 @@ void studilova::inbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
         out << " " << weights[j];
       }
 
-      out << "\n";
+      if (i + 1 != connections.getSize())
+      {
+        out << "\n";
+      }
     }
   }
   catch (...)
   {
-    out << "<INVALID COMMAND>\n";
+    out << "<INVALID COMMAND>";
   }
 }
 
