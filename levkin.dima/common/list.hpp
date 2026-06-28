@@ -5,13 +5,77 @@
 #include <stdexcept>
 #include <utility>
 namespace levkin {
-  template < class T > class List;
-  template < class T > class LIter;
-  template < class T > class LCIter;
-  namespace detail {
-    struct NodeBase {
-      NodeBase* prev;
-      NodeBase* next;
+  template < class T >
+  class List;
+
+  template < class T >
+  class LIter;
+
+  template < class T >
+  class LCIter;
+
+  struct NodeBase
+  {
+    NodeBase* prev;
+    NodeBase* next;
+
+    virtual ~NodeBase() = default;
+  };
+
+  template < class T >
+  struct Node: public NodeBase
+  {
+    T val;
+  };
+
+  template < class T >
+    class List
+    {
+      friend class LIter< T >;
+      friend class LCIter< T >;
+
+    public:
+      List() noexcept;
+      explicit List(const T& val);
+      List(const List< T >& a);
+      List(List< T >&& a) noexcept;
+      ~List() = default;
+
+      List< T >& operator=(List< T > a) noexcept;
+
+      void swap(List< T >& a) noexcept;
+
+      LIter< T > begin() noexcept;
+      LCIter< T > begin() const noexcept;
+      LCIter< T > cbegin() const noexcept;
+
+      LIter< T > end() noexcept;
+      LCIter< T > end() const noexcept;
+      LCIter< T > cend() const noexcept;
+
+      void pushFront(const T& val);
+      void pushBack(const T& val);
+      void popFront() noexcept;
+      void popBack() noexcept;
+
+      LIter< T > insertAfter(LIter< T > it, const T& val);
+      LIter< T > erase(LIter< T > pos) noexcept;
+      void erase(LIter< T > from, LIter< T > to) noexcept;
+      void clearAndInit(size_t size, const T& val);
+      void clear() noexcept;
+      size_t size() const noexcept;
+
+    private:
+      NodeBase* pseudo_;
+
+      explicit List(NodeBase* pseudoNode) noexcept;
+
+      static Node< T >* castNode(NodeBase* node) noexcept
+      {
+        return dynamic_cast< Node< T >* >(node);
+      }
+
+      LIter< T > eraseFast(LIter< T > pos) noexcept;
     };
     template < class T > struct Node: public NodeBase {
       T val;
