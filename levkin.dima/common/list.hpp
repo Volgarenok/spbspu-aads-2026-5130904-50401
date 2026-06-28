@@ -16,73 +16,81 @@ namespace levkin {
   template < class T >
   class LCIter;
 
-  struct NodeBase
-  {
-    NodeBase* prev;
-    NodeBase* next;
-
-    virtual ~NodeBase() = default;
-  };
-
-  template < class T >
-  struct Node: public NodeBase
-  {
-    T val;
-    ~Node() override = default;
-  };
-
-  template < class T >
-    class List
+  namespace detail {
+    struct NodeBase
     {
-      friend class LIter< T >;
-      friend class LCIter< T >;
+      NodeBase* prev;
+      NodeBase* next;
 
-    public:
-      List() noexcept;
-      explicit List(const T& val);
-      List(const List< T >& a);
-      List(List< T >&& a) noexcept;
-      ~List() = default;
-
-      List< T >& operator=(List< T > a) noexcept;
-
-      void swap(List< T >& a) noexcept;
-
-      LIter< T > begin() noexcept;
-      LCIter< T > begin() const noexcept;
-      LCIter< T > cbegin() const noexcept;
-
-      LIter< T > end() noexcept;
-      LCIter< T > end() const noexcept;
-      LCIter< T > cend() const noexcept;
-
-      void pushFront(const T& val);
-      void pushBack(const T& val);
-      void popFront() noexcept;
-      void popBack() noexcept;
-
-      LIter< T > insertAfter(LIter< T > it, const T& val);
-      LIter< T > erase(LIter< T > pos) noexcept;
-      void erase(LIter< T > from, LIter< T > to) noexcept;
-      void clearAndInit(size_t size, const T& val);
-      void clear() noexcept;
-      size_t size() const noexcept;
-
-    private:
-      NodeBase* pseudo_;
-
-      explicit List(NodeBase* pseudoNode) noexcept;
-
-      static Node< T >* castNode(NodeBase* node) noexcept
-      {
-        return dynamic_cast< Node< T >* >(node);
-      }
-
-      LIter< T > eraseFast(LIter< T > pos) noexcept;
+      virtual ~NodeBase() = default;
     };
+
+    template < class T >
+    struct Node: public NodeBase
+    {
+      T val;
+      ~Node() override = default;
+    };
+  }
+
+  template < class T >
+  class List
+  {
+    friend class LIter< T >;
+    friend class LCIter< T >;
+
+  public:
+    List() noexcept;
+    explicit List(const T& val);
+    List(const List< T >& a);
+    List(List< T >&& a) noexcept;
+    ~List() = default;
+
+    List< T >& operator=(List< T > a) noexcept;
+
+    void swap(List< T >& a) noexcept;
+
+    LIter< T > begin() noexcept;
+    LCIter< T > begin() const noexcept;
+    LCIter< T > cbegin() const noexcept;
+
+    LIter< T > end() noexcept;
+    LCIter< T > end() const noexcept;
+    LCIter< T > cend() const noexcept;
+
+    void pushFront(const T& val);
+    void pushBack(const T& val);
+    void popFront() noexcept;
+    void popBack() noexcept;
+
+    LIter< T > insertAfter(LIter< T > it, const T& val);
+    LIter< T > erase(LIter< T > pos) noexcept;
+    void erase(LIter< T > from, LIter< T > to) noexcept;
+    void clearAndInit(size_t size, const T& val);
+    void clear() noexcept;
+    size_t size() const noexcept;
+
+  private:
+    detail::NodeBase* pseudo_;
+
+    explicit List(detail::NodeBase* pseudoNode) noexcept;
+
+    static detail::Node< T >* castNode(detail::NodeBase* node) noexcept
+    {
+      return dynamic_cast< detail::Node< T >* >(node);
+    }
+
+    static const detail::Node< T >* castNode(const detail::NodeBase* node) noexcept
+    {
+      return dynamic_cast< const detail::Node< T >* >(node);
+    }
+
+    LIter< T > eraseFast(LIter< T > pos) noexcept;
+  };
+
   template < class T >
   List< T >::List() noexcept:
-    pseudo_(new NodeBase())
+    pseudo_(new detail::NodeBase())
   {
     pseudo_->next = pseudo_;
     pseudo_->prev = pseudo_;
@@ -198,7 +206,7 @@ namespace levkin {
     if (it.curr_ == nullptr) {
       throw std::out_of_range("out of bounds or null");
     }
-    Node< T >* newNode = new Node< T >();
+    detail::Node< T >* newNode = new detail::Node< T >();
     newNode->val = val;
     newNode->prev = it.curr_;
     newNode->next = it.curr_->next;
@@ -257,18 +265,18 @@ namespace levkin {
   }
 
   template < class T >
-  List< T >::List(NodeBase* pseudoNode) noexcept:
+  List< T >::List(detail::NodeBase* pseudoNode) noexcept:
     pseudo_(pseudoNode)
   {}
 
   template < class T >
   LIter< T > List< T >::eraseFast(LIter< T > pos) noexcept
   {
-    NodeBase* toDelete = pos.curr_;
+    detail::NodeBase* toDelete = pos.curr_;
     toDelete->prev->next = toDelete->next;
     toDelete->next->prev = toDelete->prev;
 
-    NodeBase* nxt = toDelete->next;
+    detail::NodeBase* nxt = toDelete->next;
     delete castNode(toDelete);
     return LIter< T >(nxt);
   }
@@ -284,17 +292,13 @@ namespace levkin {
       curr_(nullptr)
     {}
 
-    explicit LCIter(const NodeBase* node) noexcept:
-      curr_(node)
-    {}
-
     LCIter(LIter< T > it) noexcept:
       curr_(it.curr_)
     {}
 
     const T& operator*() const noexcept
     {
-      return List< T >::castNode(const_cast< NodeBase* >(curr_))->val;
+      return List< T >::castNode(curr_)->val;
     }
 
     LCIter& operator++() noexcept
@@ -325,7 +329,7 @@ namespace levkin {
 
     const T* operator->() const noexcept
     {
-      return std::addressof(List< T >::castNode(const_cast< NodeBase* >(curr_))->val);
+      return std::addressof(List< T >::castNode(curr_)->val);
     }
 
     bool operator==(const LCIter& other) const noexcept
@@ -338,8 +342,22 @@ namespace levkin {
       return !(*this == other);
     }
 
+    bool operator==(const LIter< T >& other) const noexcept
+    {
+      return curr_ == other.curr_;
+    }
+
+    bool operator!=(const LIter< T >& other) const noexcept
+    {
+      return curr_ != other.curr_;
+    }
+
   private:
-    const NodeBase* curr_;
+    const detail::NodeBase* curr_;
+
+    explicit LCIter(const detail::NodeBase* node) noexcept:
+      curr_(node)
+    {}
   };
 
   template < class T >
@@ -349,8 +367,8 @@ namespace levkin {
     friend class LCIter< T >;
 
   public:
-    explicit LIter(NodeBase* node) noexcept:
-      curr_(node)
+    LIter() noexcept:
+      curr_(nullptr)
     {}
 
     T& operator*() noexcept
@@ -410,7 +428,11 @@ namespace levkin {
     }
 
   private:
-    NodeBase* curr_ = nullptr;
+    detail::NodeBase* curr_;
+
+    explicit LIter(detail::NodeBase* node) noexcept:
+      curr_(node)
+    {}
   };
 }
 
