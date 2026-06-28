@@ -24,31 +24,31 @@ namespace donkeev
   template< class Key, class Value >
   class BSTIterator
   {
-    template<class K, class V, class C>
-    friend class BSTree;
-
   public:
-    BSTIterator();
+    BSTIterator() = default;
 
-    BSTIterator(const BSTIterator< Key, Value >&);
-    BSTIterator(BSTIterator< Key, Value >&&);
-
-    BSTIterator(detail::BSTNode< Key, Value >*);
+    BSTIterator(const BSTIterator< Key, Value >&) = default;
+    BSTIterator(BSTIterator< Key, Value >&&) = default;
 
     ~BSTIterator() = default;
 
-    BSTIterator< Key, Value >& operator=(const BSTIterator< Key, Value >&);
-    BSTIterator< Key, Value >& operator=(BSTIterator< Key, Value >&&);
+    BSTIterator< Key, Value >& operator=(const BSTIterator< Key, Value >&) = default;
+    BSTIterator< Key, Value >& operator=(BSTIterator< Key, Value >&&) = default;
 
-    std::pair< Key, Value >& operator*() const;
-    std::pair< Key, Value >* operator->() const;
+    std::pair< Key, Value >& operator*();
+    std::pair< Key, Value >* operator->();
     BSTIterator< Key, Value >& operator++();
     BSTIterator< Key, Value >& operator--();
 
     bool operator==(const BSTIterator< Key, Value >&) const noexcept;
     bool operator!=(const BSTIterator< Key, Value >&) const noexcept;
   private:
+    template< class K, class V, class C >
+    friend class BSTree;
+
     detail::BSTNode< Key, Value >* node_;
+
+    BSTIterator(detail::BSTNode< Key, Value >*);
 
     detail::BSTNode< Key, Value >* getNode();
   };
@@ -57,17 +57,15 @@ namespace donkeev
   class BSTCIterator
   {
   public:
-    BSTCIterator();
+    BSTCIterator() = default;
 
-    BSTCIterator(const BSTCIterator< Key, Value >&);
-    BSTCIterator(BSTCIterator< Key, Value >&&);
-
-    BSTCIterator(const detail::BSTNode< Key, Value >*);
+    BSTCIterator(const BSTCIterator< Key, Value >&) = default;
+    BSTCIterator(BSTCIterator< Key, Value >&&) = default;
 
     ~BSTCIterator() = default;
 
-    BSTCIterator< Key, Value >& operator=(const BSTCIterator< Key, Value >&);
-    BSTCIterator< Key, Value >& operator=(BSTCIterator< Key, Value >&&);
+    BSTCIterator< Key, Value >& operator=(const BSTCIterator< Key, Value >&) = default;
+    BSTCIterator< Key, Value >& operator=(BSTCIterator< Key, Value >&&) = default;
 
     const std::pair< Key, Value >& operator*() const;
     const std::pair< Key, Value >* operator->() const;
@@ -79,30 +77,10 @@ namespace donkeev
   private:
     const detail::BSTNode< Key, Value >* node_;
 
+    BSTCIterator(const detail::BSTNode< Key, Value >*);
+
     const detail::BSTNode< Key, Value >* getNode();
   };
-
-  template< class Key, class Value >
-  BSTIterator< Key, Value >::BSTIterator():
-    node_(nullptr)
-  {}
-
-  template< class Key, class Value >
-  BSTIterator< Key, Value >::BSTIterator(const BSTIterator< Key, Value >& other):
-    node_(other.node_)
-  {}
-
-  template< class Key, class Value >
-  BSTIterator< Key, Value >::BSTIterator(BSTIterator< Key, Value >&& other):
-    node_(other.node_)
-  {
-    other.node_ = nullptr;
-  }
-
-  template< class Key, class Value >
-  BSTIterator< Key, Value >::BSTIterator(detail::BSTNode< Key, Value >* nodePtr):
-    node_(nodePtr)
-  {}
 
   template< class Key, class Value >
   BSTIterator< Key, Value >& BSTIterator< Key, Value >::operator=(const BSTIterator< Key, Value >& other)
@@ -120,15 +98,15 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  std::pair< Key, Value >& BSTIterator< Key, Value >::operator*() const
+  std::pair< Key, Value >& BSTIterator< Key, Value >::operator*()
   {
     return node_->data_;
   }
 
   template< class Key, class Value >
-  std::pair< Key, Value >* BSTIterator< Key, Value >::operator->() const
+  std::pair< Key, Value >* BSTIterator< Key, Value >::operator->()
   {
-    return &(node_->data_);
+    return std::addressof(node_->data_);
   }
 
   template< class Key, class Value >
@@ -186,46 +164,14 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  detail::BSTNode< Key, Value>* BSTIterator< Key, Value >::getNode()
-  {
-    return node_;
-  }
-
-  template< class Key, class Value >
-  BSTCIterator< Key, Value >::BSTCIterator():
-    node_(nullptr)
-  {}
-
-  template< class Key, class Value >
-  BSTCIterator< Key, Value >::BSTCIterator(const BSTCIterator< Key, Value >& other):
-    node_(other.node_)
-  {}
-
-  template< class Key, class Value >
-  BSTCIterator< Key, Value >::BSTCIterator(BSTCIterator< Key, Value >&& other):
-    node_(other.node_)
-  {
-    other.node_ = nullptr;
-  }
-
-  template< class Key, class Value >
-  BSTCIterator< Key, Value >::BSTCIterator(const detail::BSTNode< Key, Value >* nodePtr):
+  BSTIterator< Key, Value >::BSTIterator(detail::BSTNode< Key, Value >* nodePtr):
     node_(nodePtr)
   {}
 
   template< class Key, class Value >
-  BSTCIterator< Key, Value >& BSTCIterator< Key, Value >::operator=(const BSTCIterator< Key, Value >& other)
+  detail::BSTNode< Key, Value>* BSTIterator< Key, Value >::getNode()
   {
-    node_ = other.node_;
-    return *this;
-  }
-
-  template< class Key, class Value >
-  BSTCIterator< Key, Value >& BSTCIterator< Key, Value >::operator=(BSTCIterator< Key, Value >&& other)
-  {
-    node_ = other.node_;
-    other.node_ = nullptr;
-    return *this;
+    return node_;
   }
 
   template< class Key, class Value >
@@ -237,7 +183,7 @@ namespace donkeev
   template< class Key, class Value >
   const std::pair< Key, Value >* BSTCIterator< Key, Value >::operator->() const
   {
-    return &(node_->data_);
+    return std::addressof(node_->data_);
   }
 
   template< class Key, class Value >
@@ -293,6 +239,11 @@ namespace donkeev
   {
     return node_ != other.node_;
   }
+
+  template< class Key, class Value >
+  BSTCIterator< Key, Value >::BSTCIterator(const detail::BSTNode< Key, Value >* nodePtr):
+    node_(nodePtr)
+  {}
 
   template< class Key, class Value >
   const detail::BSTNode< Key, Value>* BSTCIterator< Key, Value >::getNode()

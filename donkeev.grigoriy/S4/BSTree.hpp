@@ -16,13 +16,14 @@ namespace donkeev
   template< class T >
   bool Comp< T >::operator()(const T& lhs, const T& rhs) const
   {
-    return lhs < rhs;
+    return std::less<>(lhs, rhs);
   }
 
   template< class Key, class Value, class Compare >
   class BSTree
   {
   public:
+    using tree = BSTree< class Key, class Value, class Compare >;
     using iterator = BSTIterator< Key, Value >;
     using constIterator = BSTCIterator< Key, Value >;
 
@@ -31,8 +32,8 @@ namespace donkeev
     BSTree(const BSTree< Key, Value, Compare >&);
     BSTree(BSTree< Key, Value, Compare >&&);
 
-    BSTree(const Key, const Value&);
-    BSTree(const Key, Value&&);
+    BSTree(const Key&, const Value&);
+    BSTree(const Key&&, Value&&);
 
     ~BSTree();
 
@@ -48,8 +49,8 @@ namespace donkeev
     iterator rotateLeft(iterator);
     iterator largeRotateRight(iterator);
     iterator largeRotateLeft(iterator);
-    void push(Key, const Value&);
-    void push(Key, Value&&);
+    std::pair< iterator, bool > insert(const Key&, const Value&);
+    std::pair< constIterator, bool > insert(Key&&, Value&&);
     Value& get(const Key);
     iterator find(const Key&);
     constIterator find(const Key&) const;
@@ -109,7 +110,7 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Compare >
-  BSTree< Key, Value, Compare >::BSTree(const Key key, const Value& value):
+  BSTree< Key, Value, Compare >::BSTree(const Key& key, const Value& value):
     root_(nullptr),
     size_(0),
     compareFunc_()
@@ -124,13 +125,13 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Compare >
-  BSTree< Key, Value, Compare >::BSTree(const Key key, Value&& value):
+  BSTree< Key, Value, Compare >::BSTree(const Key&& key, Value&& value):
     root_(nullptr),
     size_(0),
     compareFunc_()
   {
     root_ = new detail::BSTNode< Key, Value >{
-      {key, std::move(value)},
+      {std::move(key), std::move(value)},
       nullptr,
       nullptr,
       nullptr
@@ -307,7 +308,8 @@ namespace donkeev
   }
 
   template< class Key, class Value, class Compare >
-  void BSTree< Key, Value, Compare >::push(Key key, const Value& value)
+  std::pair< BSTIterator< Key, Value >, bool >  BSTree< Key, Value, Compare >::insert(
+    const Key& key, const Value& value)
   {
     if (!root_)
     {
@@ -318,7 +320,7 @@ namespace donkeev
         nullptr
       };
       ++size_;
-      return;
+      return {iterator(root_), true};
     }
 
     detail::BSTNode<Key, Value>* curr = root_;
@@ -338,7 +340,7 @@ namespace donkeev
       }
       else
       {
-        throw std::runtime_error("Key already exists");
+        return {iterator(curr), false};
       }
     }
 
@@ -359,10 +361,12 @@ namespace donkeev
     }
 
     ++size_;
+    return {iterator(new_node), true};
   }
 
   template< class Key, class Value, class Compare >
-  void BSTree< Key, Value, Compare >::push(Key key, Value&& value)
+  std::pair< BSTCIterator< Key, Value >, bool > BSTree< Key, Value, Compare >::insert(
+    Key&& key, Value&& value)
   {
     if (!root_)
     {
@@ -373,7 +377,7 @@ namespace donkeev
         nullptr
       };
       ++size_;
-      return;
+      return {constIterator(root_), true};
     }
 
     detail::BSTNode<Key, Value>* curr = root_;
@@ -393,7 +397,7 @@ namespace donkeev
       }
       else
       {
-        throw std::runtime_error("Invalid key");
+        return {iterator(curr), false};
       }
     }
 
@@ -414,6 +418,7 @@ namespace donkeev
     }
 
     ++size_;
+    return {iterator(new_node), true};
   }
 
   template< class Key, class Value, class Compare >
