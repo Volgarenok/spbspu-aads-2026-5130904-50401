@@ -29,10 +29,9 @@ namespace levkin {
   long long reminder(long long a, long long b);
 
   void applyOp(Stack< long long >&, Stack< Operation >&);
-  void processOps(
-      Stack< long long >& nums,
-      Stack< Operation >& ops,
-      Stack< char >& symbols,
-      char currentOp = '\0');
+  void processOps(Stack< long long >& nums,
+                  Stack< Operation >& ops,
+                  Stack< char >& symbols,
+                  char currentOp = '\0');
 }
 #endif

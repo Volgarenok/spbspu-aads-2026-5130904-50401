@@ -5,7 +5,6 @@
 
 using namespace levkin;
 
-
 BOOST_AUTO_TEST_CASE(queue_basic_operations)
 {
   Queue< long long > q;
@@ -41,4 +40,3 @@ BOOST_AUTO_TEST_CASE(queue_move_semantics)
   BOOST_CHECK_EQUAL(q.front(), "heavy_object");
   BOOST_CHECK(s.empty());
 }
-

@@ -6,7 +6,8 @@
 #include "list.hpp"
 
 namespace levkin {
-  template < typename T > class Stack
+  template < typename T >
+  class Stack
   {
 
   private:
@@ -25,14 +26,20 @@ namespace levkin {
     bool empty() const;
   };
 
-  template < class T > bool Stack< T >::empty() const { return size() == 0; }
+  template < class T >
+  bool Stack< T >::empty() const
+  {
+    return size() == 0;
+  }
 
-  template < class T > void Stack< T >::push(T&& v)
+  template < class T >
+  void Stack< T >::push(T&& v)
   {
     list_.pushFront(std::move(v));
   }
 
-  template < class T > T Stack< T >::drop()
+  template < class T >
+  T Stack< T >::drop()
   {
     if (empty()) {
       throw std::out_of_range("stack is empty!");
@@ -41,14 +48,16 @@ namespace levkin {
     list_.popFront();
     return val;
   }
-  template < class T > void Stack< T >::pop()
+  template < class T >
+  void Stack< T >::pop()
   {
     if (!empty()) {
       list_.popFront();
     }
   }
 
-  template < class T > const T& Stack< T >::top() const
+  template < class T >
+  const T& Stack< T >::top() const
   {
     if (empty()) {
       throw std::out_of_range("stack is empty!");
@@ -56,7 +65,8 @@ namespace levkin {
     return *list_.cbegin();
   }
 
-  template < class T > T& Stack< T >::top()
+  template < class T >
+  T& Stack< T >::top()
   {
     if (empty()) {
       throw std::out_of_range("stack is empty!");
@@ -64,9 +74,17 @@ namespace levkin {
     return *list_.begin();
   }
 
-  template < class T > size_t Stack< T >::size() const { return list_.size(); }
+  template < class T >
+  size_t Stack< T >::size() const
+  {
+    return list_.size();
+  }
 
-  template < class T > void Stack< T >::push(const T& v) { list_.pushFront(v); }
+  template < class T >
+  void Stack< T >::push(const T& v)
+  {
+    list_.pushFront(v);
+  }
 
 }
 

@@ -13,17 +13,23 @@ namespace levkin {
   long long subtract(long long a, long long b)
   {
     if ((b > 0 && a < MIN + b) || (b < 0 && a > MAX + b)) {
-        throw std::overflow_error("subtraction overflow");
+      throw std::overflow_error("subtraction overflow");
     }
     return a - b;
   }
 
-  long long multiply(long long a, long long b) {
-    if (a == 0 || b == 0) return 0;
-    if (a > 0 && b > 0 && a > MAX / b) throw std::overflow_error("overflow");
-    if (a < 0 && b < 0 && a < MAX / b) throw std::overflow_error("overflow");
-    if (a > 0 && b < 0 && b < MIN / a) throw std::overflow_error("underflow");
-    if (a < 0 && b > 0 && a < MIN / b) throw std::overflow_error("underflow");
+  long long multiply(long long a, long long b)
+  {
+    if (a == 0 || b == 0)
+      return 0;
+    if (a > 0 && b > 0 && a > MAX / b)
+      throw std::overflow_error("overflow");
+    if (a < 0 && b < 0 && a < MAX / b)
+      throw std::overflow_error("overflow");
+    if (a > 0 && b < 0 && b < MIN / a)
+      throw std::overflow_error("underflow");
+    if (a < 0 && b > 0 && a < MIN / b)
+      throw std::overflow_error("underflow");
     return a * b;
   }
 
@@ -39,19 +45,19 @@ namespace levkin {
 
   long long reminder(long long a, long long b)
   {
-      if (b == 0) throw std::logic_error("division by zero");
-      long long res = a % b;
-      if (res < 0) {
-          res += std::abs(b);
-      }
-      return res;
+    if (b == 0)
+      throw std::logic_error("division by zero");
+    long long res = a % b;
+    if (res < 0) {
+      res += std::abs(b);
+    }
+    return res;
   }
 
-  void processOps(
-      Stack< long long >& nums,
-      Stack< Operation >& ops,
-      Stack< char >& symbols,
-      char currentOp)
+  void processOps(Stack< long long >& nums,
+                  Stack< Operation >& ops,
+                  Stack< char >& symbols,
+                  char currentOp)
   {
     while (!symbols.empty() && symbols.top() != '(') {
       if (currentOp != '\0' && priority(symbols.top()) < priority(currentOp)) {
@@ -168,8 +174,8 @@ namespace levkin {
             opSymbols.pop();
           } else {
 
-            if (next_pos - pos == 2 && line[pos] == '*' &&
-                line[pos + 1] == '*') {
+            if (next_pos - pos == 2 && line[pos] == '*'
+                && line[pos + 1] == '*') {
               currentSymbol = '^';
             }
             processOps(numbers, operators, opSymbols, currentSymbol);

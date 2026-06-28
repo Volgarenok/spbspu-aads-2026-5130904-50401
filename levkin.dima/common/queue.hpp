@@ -6,7 +6,8 @@
 #include <utility>
 
 namespace levkin {
-  template < typename T > class Queue
+  template < typename T >
+  class Queue
   {
   private:
     levkin::List< T > list_;
@@ -26,14 +27,20 @@ namespace levkin {
     T drop();
   };
 
-  template < class T > bool Queue< T >::empty() const
+  template < class T >
+  bool Queue< T >::empty() const
   {
     return list_.size() == 0;
   }
 
-  template < class T > size_t Queue< T >::size() const { return list_.size(); }
+  template < class T >
+  size_t Queue< T >::size() const
+  {
+    return list_.size();
+  }
 
-  template < class T > T& Queue< T >::front()
+  template < class T >
+  T& Queue< T >::front()
   {
     if (empty()) {
       throw std::out_of_range("Queue is empty!");
@@ -41,7 +48,8 @@ namespace levkin {
     return *list_.begin();
   }
 
-  template < class T > const T& Queue< T >::front() const
+  template < class T >
+  const T& Queue< T >::front() const
   {
     if (empty()) {
       throw std::out_of_range("Queue is empty!");
@@ -49,21 +57,28 @@ namespace levkin {
     return *list_.cbegin();
   }
 
-  template < class T > void Queue< T >::push(const T& v) { list_.pushBack(v); }
+  template < class T >
+  void Queue< T >::push(const T& v)
+  {
+    list_.pushBack(v);
+  }
 
-  template < class T > void Queue< T >::push(T&& v)
+  template < class T >
+  void Queue< T >::push(T&& v)
   {
     list_.pushBack(std::move(v));
   }
 
-  template < class T > void Queue< T >::pop()
+  template < class T >
+  void Queue< T >::pop()
   {
     if (!empty()) {
       list_.popFront();
     }
   }
 
-  template < class T > T Queue< T >::drop()
+  template < class T >
+  T Queue< T >::drop()
   {
     if (empty()) {
       throw std::out_of_range("queue is empty!");
