@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <stdexcept>
 #include <utility>
+#include <memory>
 
 namespace studilova
 {
@@ -18,8 +19,8 @@ namespace studilova
     public:
       Iterator();
 
-      std::pair< Key&, Value& > operator*() const;
-      std::pair< Key&, Value& >* operator->() const;
+      std::pair< Key, Value >& operator*() const;
+      std::pair< Key, Value >* operator->() const;
 
       Iterator& operator++();
       Iterator operator++(int);
@@ -44,8 +45,8 @@ namespace studilova
       ConstIterator();
       ConstIterator(const Iterator< Key, Value, Hash, Equal >& other);
 
-      std::pair< const Key&, const Value& > operator*() const;
-      std::pair< const Key&, const Value& >* operator->() const;
+      const std::pair< Key, Value >& operator*() const;
+      const std::pair< Key, Value >* operator->() const;
 
       ConstIterator& operator++();
       ConstIterator operator++(int);
@@ -106,8 +107,7 @@ namespace studilova
 
       struct Entry
       {
-        Key key;
-        Value value;
+        std::pair< Key, Value > data;
         State state;
 
         Entry();
@@ -129,8 +129,7 @@ namespace studilova
 
 template< class Key, class Value, class Hash, class Equal >
 studilova::HashTable< Key, Value, Hash, Equal >::Entry::Entry():
-  key(),
-  value(),
+  data(),
   state(State::EMPTY)
 {}
 
@@ -158,10 +157,16 @@ studilova::Iterator< Key, Value, Hash, Equal >::Iterator(HashTable< Key, Value, 
 }
 
 template< class Key, class Value, class Hash, class Equal >
-std::pair< Key&, Value& > studilova::Iterator< Key, Value, Hash, Equal >::operator*() const
+std::pair< Key, Value >& studilova::Iterator< Key, Value, Hash, Equal >::operator*() const
 {
   typename HashTable< Key, Value, Hash, Equal >::Entry& entry = hashTable_->table_[index_];
-  return std::pair< Key&, Value& >(entry.key, entry.value);
+  return entry.data;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+std::pair< Key, Value >* studilova::Iterator< Key, Value, Hash, Equal >::operator->() const
+{
+  return std::addressof(operator*());
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -222,10 +227,16 @@ studilova::ConstIterator< Key, Value, Hash, Equal >::ConstIterator(const HashTab
 }
 
 template< class Key, class Value, class Hash, class Equal >
-std::pair< const Key&, const Value& > studilova::ConstIterator< Key, Value, Hash, Equal >::operator*() const
+const std::pair< Key, Value >& studilova::ConstIterator< Key, Value, Hash, Equal >::operator*() const
 {
   const typename studilova::HashTable< Key, Value, Hash, Equal >::Entry& entry = hashTable_->table_[index_];
-  return std::pair< const Key&, const Value& >(entry.key, entry.value);
+  return entry.data;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+const std::pair< Key, Value >* studilova::ConstIterator< Key, Value, Hash, Equal >::operator->() const
+{
+  return std::addressof(operator*());
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -285,7 +296,7 @@ bool studilova::HashTable< Key, Value, Hash, Equal >::findEntry(const Key& key, 
     {
       return false;
     }
-    if (table_[index].state == State::OCCUPIED && equal_(table_[index].key, key))
+    if (table_[index].state == State::OCCUPIED && equal_(table_[index].data.first, key))
     {
       outIndex = index;
       return true;
@@ -355,7 +366,7 @@ void studilova::HashTable< Key, Value, Hash, Equal >::insert(const Key& key, con
   size_t index = 0;
   if (findEntry(key, index))
   {
-    table_[index].value = value;
+    table_[index].data.second = value;
     return;
   }
 
@@ -364,8 +375,8 @@ void studilova::HashTable< Key, Value, Hash, Equal >::insert(const Key& key, con
     throw std::overflow_error("HashTable is full");
   }
 
-  table_[index].key = key;
-  table_[index].value = value;
+  table_[index].data.first = key;
+  table_[index].data.second = value;
   table_[index].state = State::OCCUPIED;
   ++size_;
 }
@@ -378,7 +389,7 @@ Value& studilova::HashTable< Key, Value, Hash, Equal >::at(const Key& key)
   {
     throw std::out_of_range("Key not found");
   }
-  return table_[index].value;
+  return table_[index].data.second;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -389,7 +400,7 @@ const Value& studilova::HashTable< Key, Value, Hash, Equal >::at(const Key& key)
   {
     throw std::out_of_range("Key not found");
   }
-  return table_[index].value;
+  return table_[index].data.second;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -428,7 +439,7 @@ void studilova::HashTable< Key, Value, Hash, Equal >::rehash(size_t newCapacity)
   {
     if (table_[i].state == State::OCCUPIED)
     {
-      tmp.insert(table_[i].key, table_[i].value);
+      tmp.insert(table_[i].key, table_[i].data.second);
     }
   }
   swap(tmp);
