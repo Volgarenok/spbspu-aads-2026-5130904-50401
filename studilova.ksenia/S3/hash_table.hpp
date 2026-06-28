@@ -1,7 +1,7 @@
 #ifndef HASH_TABLE
 #define HASH_TABLE
 
-#include "../common/vector.hpp"
+#include <vector.hpp>
 
 #include <cstddef>
 #include <stdexcept>
@@ -10,76 +10,63 @@
 namespace studilova
 {
   template< class Key, class Value, class Hash, class Equal >
+  class HashTable;
+
+  template< class Key, class Value, class Hash, class Equal >
+  class Iterator
+  {
+    public:
+      Iterator();
+
+      std::pair< Key&, Value& > operator*() const;
+
+      Iterator& operator++();
+
+      bool operator==(const Iterator& other) const;
+      bool operator!=(const Iterator& other) const;
+
+    private:
+      HashTable< Key, Value, Hash, Equal >* hashTable_;
+      size_t index_;
+
+      void skipEmpty();
+      Iterator(HashTable< Key, Value, Hash, Equal >* table, size_t index);
+
+      friend class HashTable< Key, Value, Hash, Equal >;
+  };
+
+  template< class Key, class Value, class Hash, class Equal >
+  class ConstIterator
+  {
+    public:
+      ConstIterator();
+      ConstIterator(const Iterator< Key, Value, Hash, Equal >& other);
+
+      std::pair< const Key&, const Value& > operator*() const;
+
+      ConstIterator& operator++();
+
+      bool operator==(const ConstIterator& other) const;
+      bool operator!=(const ConstIterator& other) const;
+
+    private:
+      const HashTable< Key, Value, Hash, Equal >* hashTable_;
+      size_t index_;
+
+      void skipEmpty();
+      ConstIterator(const HashTable< Key, Value, Hash, Equal >* table, size_t index);
+
+      friend class HashTable< Key, Value, Hash, Equal >;
+  };
+
+  template< class Key, class Value, class Hash, class Equal >
   class HashTable
   {
-    enum class State
-    {
-      EMPTY,
-      OCCUPIED,
-      TOMBSTONE
-    };
-
-    struct Entry
-    {
-      Key key;
-      Value value;
-      State state;
-
-      Entry();
-    };
-
     public:
-      class Iterator
-      {
-        public:
-          Iterator();
+      using It = Iterator< Key, Value, Hash, Equal >;
+      using CIt = ConstIterator< Key, Value, Hash, Equal >;
 
-          std::pair< Key&, Value& > operator*() const;
-
-          Iterator& operator++();
-
-          bool operator==(const Iterator& other) const;
-          bool operator!=(const Iterator& other) const;
-
-        private:
-          friend class HashTable;
-
-          HashTable* hashTable_;
-          size_t index_;
-
-          void skipEmpty();
-          Iterator(HashTable* table, size_t index);
-      };
-
-      class ConstIterator
-      {
-        public:
-          ConstIterator();
-          ConstIterator(const Iterator& other);
-
-          std::pair< const Key&, const Value& > operator*() const;
-
-          ConstIterator& operator++();
-
-          bool operator==(const ConstIterator& other) const;
-          bool operator!=(const ConstIterator& other) const;
-
-        private:
-          friend class HashTable;
-
-          const HashTable* hashTable_;
-          size_t index_;
-
-          void skipEmpty();
-          ConstIterator(const HashTable* table, size_t index);
-      };
-
-      explicit HashTable
-      (
-        size_t capacity = 16,
-        Hash hash = Hash{},
-        Equal equal = Equal{}
-      );
+      explicit HashTable(size_t capacity = 16, Hash hash = Hash{}, Equal equal = Equal{});
 
       size_t size() const noexcept;
       size_t capacity() const noexcept;
@@ -97,15 +84,31 @@ namespace studilova
       void swap(HashTable& other) noexcept;
       void rehash(size_t newCapacity);
 
-      Iterator begin();
-      Iterator end();
+      It begin();
+      It end();
 
-      ConstIterator begin() const;
-      ConstIterator end() const;
-      ConstIterator cbegin() const;
-      ConstIterator cend() const;
+      CIt begin() const;
+      CIt end() const;
+      CIt cbegin() const;
+      CIt cend() const;
 
     private:
+      enum class State
+      {
+        EMPTY,
+        OCCUPIED,
+        TOMBSTONE
+      };
+
+      struct Entry
+      {
+        Key key;
+        Value value;
+        State state;
+
+        Entry();
+      };
+
       studilova::Vector< Entry > table_;
       size_t size_;
       Hash hash_;
@@ -114,33 +117,36 @@ namespace studilova
       size_t probeIndex(const Key& key, size_t attempt) const;
       bool findEntry(const Key& key, size_t& outIndex) const;
       bool findPlace(const Key& key, size_t& outIndex) const;
+
+      friend class Iterator< Key, Value, Hash, Equal >;
+      friend class ConstIterator< Key, Value, Hash, Equal >;
   };
 }
 
 template< class Key, class Value, class Hash, class Equal >
-studilova::HashTable< Key, Value, Hash, Equal >::Entry::Entry() :
+studilova::HashTable< Key, Value, Hash, Equal >::Entry::Entry():
   key(),
   value(),
   state(State::EMPTY)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
-studilova::HashTable< Key, Value, Hash, Equal >::Iterator::Iterator() :
+studilova::Iterator< Key, Value, Hash, Equal >::Iterator():
   hashTable_(nullptr),
   index_(0)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
-void studilova::HashTable< Key, Value, Hash, Equal >::Iterator::skipEmpty()
+void studilova::Iterator< Key, Value, Hash, Equal >::skipEmpty()
 {
-  while (hashTable_ && index_ < hashTable_->table_.getSize() && hashTable_->table_[index_].state != State::OCCUPIED)
+  while (hashTable_ && index_ < hashTable_->table_.getSize() && hashTable_->table_[index_].state != HashTable< Key, Value, Hash, Equal >::State::OCCUPIED)
   {
     ++index_;
   }
 }
 
 template< class Key, class Value, class Hash, class Equal >
-studilova::HashTable< Key, Value, Hash, Equal >::Iterator::Iterator(HashTable* table, size_t index) :
+studilova::Iterator< Key, Value, Hash, Equal >::Iterator(HashTable< Key, Value, Hash, Equal >* table, size_t index):
   hashTable_(table),
   index_(index)
 {
@@ -148,15 +154,14 @@ studilova::HashTable< Key, Value, Hash, Equal >::Iterator::Iterator(HashTable* t
 }
 
 template< class Key, class Value, class Hash, class Equal >
-std::pair< Key&, Value& > studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator*() const
+std::pair< Key&, Value& > studilova::Iterator< Key, Value, Hash, Equal >::operator*() const
 {
-  Entry& entry = hashTable_->table_[index_];
+  typename HashTable< Key, Value, Hash, Equal >::Entry& entry = hashTable_->table_[index_];
   return std::pair< Key&, Value& >(entry.key, entry.value);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename studilova::HashTable< Key, Value, Hash, Equal >::Iterator&
-studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator++()
+studilova::Iterator< Key, Value, Hash, Equal >& studilova::Iterator< Key, Value, Hash, Equal >::operator++()
 {
   ++index_;
   skipEmpty();
@@ -164,40 +169,40 @@ studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator++()
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator==(const Iterator& other) const
+bool studilova::Iterator< Key, Value, Hash, Equal >::operator==(const Iterator& other) const
 {
   return hashTable_ == other.hashTable_ && index_ == other.index_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool studilova::HashTable< Key, Value, Hash, Equal >::Iterator::operator!=(const Iterator& other) const
+bool studilova::Iterator< Key, Value, Hash, Equal >::operator!=(const Iterator& other) const
 {
   return !(*this == other);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::ConstIterator() :
+studilova::ConstIterator< Key, Value, Hash, Equal >::ConstIterator():
   hashTable_(nullptr),
   index_(0)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
-studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::ConstIterator(const Iterator& other) :
+studilova::ConstIterator< Key, Value, Hash, Equal >::ConstIterator(const Iterator< Key, Value, Hash, Equal >& other):
   hashTable_(other.hashTable_),
   index_(other.index_)
 {}
 
 template< class Key, class Value, class Hash, class Equal >
-void studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::skipEmpty()
+void studilova::ConstIterator< Key, Value, Hash, Equal >::skipEmpty()
 {
-  while (hashTable_ && index_ < hashTable_->table_.getSize() && hashTable_->table_[index_].state != State::OCCUPIED)
+  while (hashTable_ && index_ < hashTable_->table_.getSize() && hashTable_->table_[index_].state != HashTable< Key, Value, Hash, Equal >::State::OCCUPIED)
   {
     ++index_;
   }
 }
 
 template< class Key, class Value, class Hash, class Equal >
-studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::ConstIterator(const HashTable* table, size_t index) :
+studilova::ConstIterator< Key, Value, Hash, Equal >::ConstIterator(const HashTable< Key, Value, Hash, Equal >* table, size_t index):
   hashTable_(table),
   index_(index)
 {
@@ -205,15 +210,14 @@ studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::ConstIterator(co
 }
 
 template< class Key, class Value, class Hash, class Equal >
-std::pair< const Key&, const Value& > studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::operator*() const
+std::pair< const Key&, const Value& > studilova::ConstIterator< Key, Value, Hash, Equal >::operator*() const
 {
-  const Entry& entry = hashTable_->table_[index_];
+  const typename studilova::HashTable< Key, Value, Hash, Equal >::Entry& entry = hashTable_->table_[index_];
   return std::pair< const Key&, const Value& >(entry.key, entry.value);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator&
-studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::operator++()
+studilova::ConstIterator< Key, Value, Hash, Equal >& studilova::ConstIterator< Key, Value, Hash, Equal >::operator++()
 {
   ++index_;
   skipEmpty();
@@ -221,23 +225,19 @@ studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::operator++()
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::operator==(const ConstIterator& other) const
+bool studilova::ConstIterator< Key, Value, Hash, Equal >::operator==(const ConstIterator& other) const
 {
   return hashTable_ == other.hashTable_ && index_ == other.index_;
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator::operator!=(const ConstIterator& other) const
+bool studilova::ConstIterator< Key, Value, Hash, Equal >::operator!=(const ConstIterator& other) const
 {
   return !(*this == other);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-studilova::HashTable< Key, Value, Hash, Equal >::HashTable(
-  size_t capacity,
-  Hash hash,
-  Equal equal
-):
+studilova::HashTable< Key, Value, Hash, Equal >::HashTable(size_t capacity, Hash hash, Equal equal):
   table_(capacity, Entry{}),
   size_(0),
   hash_(std::move(hash)),
@@ -415,42 +415,42 @@ void studilova::HashTable< Key, Value, Hash, Equal >::rehash(size_t newCapacity)
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename studilova::HashTable< Key, Value, Hash, Equal >::Iterator
+typename studilova::HashTable< Key, Value, Hash, Equal >::It
 studilova::HashTable< Key, Value, Hash, Equal >::begin()
 {
-  return Iterator(this, 0);
+  return It(this, 0);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename studilova::HashTable< Key, Value, Hash, Equal >::Iterator
+typename studilova::HashTable< Key, Value, Hash, Equal >::It
 studilova::HashTable< Key, Value, Hash, Equal >::end()
 {
-  return Iterator(this, table_.getSize());
+  return It(this, table_.getSize());
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator
+typename studilova::HashTable< Key, Value, Hash, Equal >::CIt
 studilova::HashTable< Key, Value, Hash, Equal >::begin() const
 {
-  return ConstIterator(this, 0);
+  return CIt(this, 0);
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator
+typename studilova::HashTable< Key, Value, Hash, Equal >::CIt
 studilova::HashTable< Key, Value, Hash, Equal >::end() const
 {
-  return ConstIterator(this, table_.getSize());
+  return CIt(this, table_.getSize());
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator
+typename studilova::HashTable< Key, Value, Hash, Equal >::CIt
 studilova::HashTable< Key, Value, Hash, Equal >::cbegin() const
 {
   return begin();
 }
 
 template< class Key, class Value, class Hash, class Equal >
-typename studilova::HashTable< Key, Value, Hash, Equal >::ConstIterator
+typename studilova::HashTable< Key, Value, Hash, Equal >::CIt
 studilova::HashTable< Key, Value, Hash, Equal >::cend() const
 {
   return end();
