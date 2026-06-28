@@ -81,6 +81,9 @@ namespace studilova
 
       bool contains(const Key& key) const noexcept;
 
+      It find(const Key& key) noexcept;
+      CIt find(const Key& key) const noexcept;
+
       std::pair< It, bool > insert(const std::pair< Key, Value >& value);
       std::pair< It, bool > insert(std::pair< Key, Value >&& value);
 
@@ -364,6 +367,34 @@ bool studilova::HashTable< Key, Value, Hash, Equal >::contains(const Key& key) c
 {
   size_t dummy = 0;
   return findEntry(key, dummy);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename studilova::HashTable< Key, Value, Hash, Equal >::It
+studilova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) noexcept
+{
+  size_t index = 0;
+
+  if (!findEntry(key, index))
+  {
+    return end();
+  }
+
+  return It(this, index);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+typename studilova::HashTable< Key, Value, Hash, Equal >::CIt
+studilova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) const noexcept
+{
+  size_t index = 0;
+
+  if (!findEntry(key, index))
+  {
+    return cend();
+  }
+
+  return CIt(this, index);
 }
 
 template< class Key, class Value, class Hash, class Equal >
