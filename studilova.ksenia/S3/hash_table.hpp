@@ -365,8 +365,7 @@ bool studilova::HashTable< Key, Value, Hash, Equal >::empty() const noexcept
 template< class Key, class Value, class Hash, class Equal >
 bool studilova::HashTable< Key, Value, Hash, Equal >::contains(const Key& key) const noexcept
 {
-  size_t dummy = 0;
-  return findEntry(key, dummy);
+  return find(key) != cend();
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -439,23 +438,23 @@ studilova::HashTable< Key, Value, Hash, Equal >::insert(std::pair< Key, Value >&
 template< class Key, class Value, class Hash, class Equal >
 Value& studilova::HashTable< Key, Value, Hash, Equal >::at(const Key& key)
 {
-  size_t index = 0;
-  if (!findEntry(key, index))
+  It it = find(key);
+  if (it == end())
   {
     throw std::out_of_range("Key not found");
   }
-  return table_[index].data.second;
+  return it->second;
 }
 
 template< class Key, class Value, class Hash, class Equal >
 const Value& studilova::HashTable< Key, Value, Hash, Equal >::at(const Key& key) const
 {
-  size_t index = 0;
-  if (!findEntry(key, index))
+  CIt it = find(key);
+  if (it == cend())
   {
     throw std::out_of_range("Key not found");
   }
-  return table_[index].data.second;
+  return it->second;
 }
 
 template< class Key, class Value, class Hash, class Equal >
