@@ -7,6 +7,21 @@
 namespace donkeev
 {
   template< class Key, class Value >
+  detail::BSTNode< Key, Value >* fallLeft(detail::BSTNode< Key, Value >*);
+
+  template< class Key, class Value >
+  const detail::BSTNode< Key, Value >* fallLeft(const detail::BSTNode< Key, Value >*);
+
+  template< class Key, class Value >
+  detail::BSTNode< Key, Value >* fallRight(detail::BSTNode< Key, Value >*);
+
+  template< class Key, class Value >
+  detail::BSTNode< Key, Value >* getNextParent(detail::BSTNode< Key, Value >*);
+
+  template< class Key, class Value >
+  const detail::BSTNode< Key, Value >* getNextParent(const detail::BSTNode< Key, Value >*);
+
+  template< class Key, class Value >
   class BSTIterator
   {
     template<class K, class V, class C>
@@ -18,7 +33,7 @@ namespace donkeev
     BSTIterator(const BSTIterator< Key, Value >&);
     BSTIterator(BSTIterator< Key, Value >&&);
 
-    BSTIterator(BSTNode< Key, Value >*);
+    BSTIterator(detail::BSTNode< Key, Value >*);
 
     ~BSTIterator() = default;
 
@@ -33,9 +48,9 @@ namespace donkeev
     bool operator==(const BSTIterator< Key, Value >&) const noexcept;
     bool operator!=(const BSTIterator< Key, Value >&) const noexcept;
   private:
-    BSTNode< Key, Value >* node_;
+    detail::BSTNode< Key, Value >* node_;
 
-    BSTNode< Key, Value >* getNode();
+    detail::BSTNode< Key, Value >* getNode();
   };
 
   template< class Key, class Value >
@@ -47,7 +62,7 @@ namespace donkeev
     BSTCIterator(const BSTCIterator< Key, Value >&);
     BSTCIterator(BSTCIterator< Key, Value >&&);
 
-    BSTCIterator(const BSTNode< Key, Value >*);
+    BSTCIterator(const detail::BSTNode< Key, Value >*);
 
     ~BSTCIterator() = default;
 
@@ -62,9 +77,9 @@ namespace donkeev
     bool operator==(const BSTCIterator< Key, Value >&) const noexcept;
     bool operator!=(const BSTCIterator< Key, Value >&) const noexcept;
   private:
-    const BSTNode< Key, Value >* node_;
+    const detail::BSTNode< Key, Value >* node_;
 
-    const BSTNode< Key, Value >* getNode();
+    const detail::BSTNode< Key, Value >* getNode();
   };
 
   template< class Key, class Value >
@@ -85,7 +100,7 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  BSTIterator< Key, Value >::BSTIterator(BSTNode< Key, Value >* nodePtr):
+  BSTIterator< Key, Value >::BSTIterator(detail::BSTNode< Key, Value >* nodePtr):
     node_(nodePtr)
   {}
 
@@ -171,7 +186,7 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  BSTNode< Key, Value>* BSTIterator< Key, Value >::getNode()
+  detail::BSTNode< Key, Value>* BSTIterator< Key, Value >::getNode()
   {
     return node_;
   }
@@ -194,7 +209,7 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  BSTCIterator< Key, Value >::BSTCIterator(const BSTNode< Key, Value >* nodePtr):
+  BSTCIterator< Key, Value >::BSTCIterator(const detail::BSTNode< Key, Value >* nodePtr):
     node_(nodePtr)
   {}
 
@@ -280,13 +295,13 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  const BSTNode< Key, Value>* BSTCIterator< Key, Value >::getNode()
+  const detail::BSTNode< Key, Value>* BSTCIterator< Key, Value >::getNode()
   {
     return node_;
   }
 
   template< class Key, class Value >
-  BSTNode< Key, Value >* fallLeft(BSTNode< Key, Value >* nodePtr)
+  detail::BSTNode< Key, Value >* fallLeft(detail::BSTNode< Key, Value >* nodePtr)
   {
     if (!nodePtr)
     {
@@ -302,7 +317,7 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  const BSTNode< Key, Value >* fallLeft(const BSTNode< Key, Value >* nodePtr)
+  const detail::BSTNode< Key, Value >* fallLeft(const detail::BSTNode< Key, Value >* nodePtr)
   {
     if (!nodePtr)
     {
@@ -318,7 +333,7 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  BSTNode< Key, Value >* fallRight(BSTNode< Key, Value >* nodePtr)
+  detail::BSTNode< Key, Value >* fallRight(detail::BSTNode< Key, Value >* nodePtr)
   {
     if (!nodePtr)
     {
@@ -334,7 +349,7 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  BSTNode< Key, Value >* getNextParent(BSTNode< Key, Value >* nodePtr)
+  detail::BSTNode< Key, Value >* getNextParent(detail::BSTNode< Key, Value >* nodePtr)
   {
     while (nodePtr->parent_ && nodePtr == nodePtr->parent_->right_)
     {
@@ -346,7 +361,7 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  const BSTNode< Key, Value >* getNextParent(const BSTNode< Key, Value >* nodePtr)
+  const detail::BSTNode< Key, Value >* getNextParent(const detail::BSTNode< Key, Value >* nodePtr)
   {
     while (nodePtr->parent_ && nodePtr == nodePtr->parent_->right_)
     {
@@ -358,7 +373,7 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  BSTNode< Key, Value >* getPrevParent(BSTNode< Key, Value >* nodePtr)
+  detail::BSTNode< Key, Value >* getPrevParent(detail::BSTNode< Key, Value >* nodePtr)
   {
     while (nodePtr->parent_ && nodePtr == nodePtr->parent_->left_)
     {
@@ -370,7 +385,7 @@ namespace donkeev
   }
 
   template< class Key, class Value >
-  const BSTNode< Key, Value >* getPrevParent(const BSTNode< Key, Value >* nodePtr)
+  const detail::BSTNode< Key, Value >* getPrevParent(const detail::BSTNode< Key, Value >* nodePtr)
   {
     while (nodePtr->parent_ && nodePtr == nodePtr->parent_->left_)
     {

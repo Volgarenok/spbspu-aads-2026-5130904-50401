@@ -5,15 +5,18 @@
 
 namespace donkeev
 {
-  template< class Key, class Value >
-  struct BSTNode
+  namespace detail
   {
-    std::pair< Key, Value > data_;
+    template< class Key, class Value >
+    struct BSTNode
+    {
+      std::pair< Key, Value > data_;
 
-    BSTNode< Key, Value >* left_;
-    BSTNode< Key, Value >* right_;
-    BSTNode< Key, Value >* parent_;
-  };
+      BSTNode< Key, Value >* left_;
+      BSTNode< Key, Value >* right_;
+      BSTNode< Key, Value >* parent_;
+    };
+  }
 }
 
 #endif

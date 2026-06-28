@@ -62,15 +62,16 @@ namespace donkeev
     size_t height(constIterator) const;
 
   private:
-    BSTNode< Key, Value >* root_;
+    detail::BSTNode< Key, Value >* root_;
     size_t size_;
     Compare compareFunc_;
 
-    BSTNode< Key, Value >* cloneRecursive(const BSTNode< Key, Value >*, BSTNode< Key, Value >*);
-    void removeNode(BSTNode< Key, Value >*);
-    void clearRecursive(BSTNode< Key, Value >*);
-    BSTNode< Key, Value >* findNode(const Key) const;
-    size_t heightRecursive(const BSTNode<Key, Value>*) const;
+    detail::BSTNode< Key, Value >* cloneRecursive(
+      const detail::BSTNode< Key, Value >*, detail::BSTNode< Key, Value >*);
+    void removeNode(detail::BSTNode< Key, Value >*);
+    void clearRecursive(detail::BSTNode< Key, Value >*);
+    detail::BSTNode< Key, Value >* findNode(const Key) const;
+    size_t heightRecursive(const detail::BSTNode<Key, Value>*) const;
   };
 
   template< class Key, class Value, class Compare >
@@ -91,7 +92,7 @@ namespace donkeev
       return;
     }
 
-    BSTNode< Key, Value >* curr = cloneRecursive(other.root_, nullptr);
+    detail::BSTNode< Key, Value >* curr = cloneRecursive(other.root_, nullptr);
     root_ = curr;
     size_ = other.size_;
     compareFunc_ = other.compareFunc_;
@@ -113,7 +114,7 @@ namespace donkeev
     size_(0),
     compareFunc_()
   {
-    root_ = new BSTNode< Key, Value >{
+    root_ = new detail::BSTNode< Key, Value >{
       {key, value},
       nullptr,
       nullptr,
@@ -128,7 +129,7 @@ namespace donkeev
     size_(0),
     compareFunc_()
   {
-    root_ = new BSTNode< Key, Value >{
+    root_ = new detail::BSTNode< Key, Value >{
       {key, std::move(value)},
       nullptr,
       nullptr,
@@ -194,15 +195,15 @@ namespace donkeev
   template<class Key, class Value, class Compare>
   typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::rotateRight(iterator it)
   {
-    BSTNode<Key, Value>* parent = it.getNode();
+    detail::BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->left_)
     {
       return it;
     }
 
-    BSTNode<Key, Value>* leftChild = parent->left_;
-    BSTNode<Key, Value>* rightGrandSon = leftChild->right_;
-    BSTNode<Key, Value>* grandFather = parent->parent_;
+    detail::BSTNode<Key, Value>* leftChild = parent->left_;
+    detail::BSTNode<Key, Value>* rightGrandSon = leftChild->right_;
+    detail::BSTNode<Key, Value>* grandFather = parent->parent_;
 
     leftChild->parent_ = grandFather;
     if (grandFather)
@@ -236,15 +237,15 @@ namespace donkeev
   template<class Key, class Value, class Compare>
   typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::rotateLeft(iterator it)
   {
-    BSTNode<Key, Value>* parent = it.getNode();
+    detail::BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->right_)
     {
       return it;
     }
 
-    BSTNode<Key, Value>* rightChild = parent->right_;
-    BSTNode<Key, Value>* leftGrandSon = rightChild->left_;
-    BSTNode<Key, Value>* grandFather = parent->parent_;
+    detail::BSTNode<Key, Value>* rightChild = parent->right_;
+    detail::BSTNode<Key, Value>* leftGrandSon = rightChild->left_;
+    detail::BSTNode<Key, Value>* grandFather = parent->parent_;
 
     rightChild->parent_ = grandFather;
     if (grandFather)
@@ -278,7 +279,7 @@ namespace donkeev
   template<class Key, class Value, class Compare>
   typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::largeRotateRight(iterator it)
   {
-    BSTNode<Key, Value>* parent = it.getNode();
+    detail::BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->left_)
     {
       return it;
@@ -293,7 +294,7 @@ namespace donkeev
   template<class Key, class Value, class Compare>
   typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::largeRotateLeft(iterator it)
   {
-    BSTNode<Key, Value>* parent = it.getNode();
+    detail::BSTNode<Key, Value>* parent = it.getNode();
     if (!parent || !parent->right_)
     {
       return it;
@@ -310,7 +311,7 @@ namespace donkeev
   {
     if (!root_)
     {
-      root_ = new BSTNode<Key, Value>{
+      root_ = new detail::BSTNode<Key, Value>{
         {key, value},
         nullptr,
         nullptr,
@@ -320,8 +321,8 @@ namespace donkeev
       return;
     }
 
-    BSTNode<Key, Value>* curr = root_;
-    BSTNode<Key, Value>* parent = nullptr;
+    detail::BSTNode<Key, Value>* curr = root_;
+    detail::BSTNode<Key, Value>* parent = nullptr;
 
     while (curr)
     {
@@ -341,7 +342,7 @@ namespace donkeev
       }
     }
 
-    BSTNode<Key, Value>* new_node = new BSTNode<Key, Value>{
+    detail::BSTNode<Key, Value>* new_node = new detail::BSTNode<Key, Value>{
         {key, value},
         nullptr,
         nullptr,
@@ -365,7 +366,7 @@ namespace donkeev
   {
     if (!root_)
     {
-      root_ = new BSTNode<Key, Value>{
+      root_ = new detail::BSTNode<Key, Value>{
         {key, std::move(value)},
         nullptr,
         nullptr,
@@ -375,8 +376,8 @@ namespace donkeev
       return;
     }
 
-    BSTNode<Key, Value>* curr = root_;
-    BSTNode<Key, Value>* parent = nullptr;
+    detail::BSTNode<Key, Value>* curr = root_;
+    detail::BSTNode<Key, Value>* parent = nullptr;
 
     while (curr)
     {
@@ -396,7 +397,7 @@ namespace donkeev
       }
     }
 
-    BSTNode<Key, Value>* new_node = new BSTNode<Key, Value>{
+    detail::BSTNode<Key, Value>* new_node = new detail::BSTNode<Key, Value>{
         {key, std::move(value)},
         nullptr,
         nullptr,
@@ -418,7 +419,7 @@ namespace donkeev
   template< class Key, class Value, class Compare >
   Value& BSTree< Key, Value, Compare >::get(const Key key)
   {
-    BSTNode< Key, Value >* curr = root_;
+    detail::BSTNode< Key, Value >* curr = root_;
     while (curr)
     {
       if (compareFunc_(key, curr->data_.first))
@@ -441,21 +442,21 @@ namespace donkeev
   template<class Key, class Value, class Compare>
   typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::find(const Key& key)
   {
-    BSTNode<Key, Value>* node = findNode(key);
+    detail::BSTNode<Key, Value>* node = findNode(key);
     return iterator(node);
   }
 
   template<class Key, class Value, class Compare>
   typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::find(const Key& key) const
   {
-    BSTNode<Key, Value>* node = findNode(key);
+    detail::BSTNode<Key, Value>* node = findNode(key);
     return constIterator(node);
   }
 
   template<class Key, class Value, class Compare>
   Value BSTree<Key, Value, Compare>::drop(const Key key)
   {
-    BSTNode<Key, Value>* node = findNode(key);
+    detail::BSTNode<Key, Value>* node = findNode(key);
     if (!node)
     {
       throw std::runtime_error("No such element");
@@ -505,19 +506,20 @@ namespace donkeev
   template<class Key, class Value, class Compare>
   size_t BSTree<Key, Value, Compare>::height(constIterator it) const
   {
-    BSTNode<Key, Value>* node = it.getNode();
+    detail::BSTNode<Key, Value>* node = it.getNode();
     return heightRecursive(node);
   }
 
   template< class Key, class Value, class Compare >
-  BSTNode< Key, Value >* BSTree< Key, Value, Compare >::cloneRecursive(const BSTNode< Key, Value >* node, BSTNode< Key, Value >* parent)
+  detail::BSTNode< Key, Value >* BSTree< Key, Value, Compare >::cloneRecursive(
+    const detail::BSTNode< Key, Value >* node, detail::BSTNode< Key, Value >* parent)
   {
     if (!node)
     {
       return nullptr;
     }
 
-    BSTNode< Key, Value >* new_node = new BSTNode< Key, Value >{
+    detail::BSTNode< Key, Value >* new_node = new detail::BSTNode< Key, Value >{
       {node->data_.first, node->data_.second},
       nullptr,
       nullptr,
@@ -531,7 +533,7 @@ namespace donkeev
   }
 
   template<class Key, class Value, class Compare>
-  void BSTree<Key, Value, Compare>::removeNode(BSTNode<Key, Value>* node)
+  void BSTree<Key, Value, Compare>::removeNode(detail::BSTNode<Key, Value>* node)
   {
     if (!node)
     {
@@ -560,7 +562,7 @@ namespace donkeev
     }
     else if (!node->left_)
     {
-      BSTNode<Key, Value>* child = node->right_;
+      detail::BSTNode<Key, Value>* child = node->right_;
       child->parent_ = node->parent_;
 
       if (node->parent_)
@@ -583,7 +585,7 @@ namespace donkeev
     }
     else if (!node->right_)
     {
-      BSTNode<Key, Value>* child = node->left_;
+      detail::BSTNode<Key, Value>* child = node->left_;
       child->parent_ = node->parent_;
 
       if (node->parent_)
@@ -606,7 +608,7 @@ namespace donkeev
     }
     else
     {
-      BSTNode<Key, Value>* minNode = node->right_;
+      detail::BSTNode<Key, Value>* minNode = node->right_;
       while (minNode->left_)
       {
         minNode = minNode->left_;
@@ -657,7 +659,7 @@ namespace donkeev
   }
 
   template<class Key, class Value, class Compare>
-  void BSTree<Key, Value, Compare>::clearRecursive(BSTNode< Key, Value >* node)
+  void BSTree<Key, Value, Compare>::clearRecursive(detail::BSTNode< Key, Value >* node)
   {
     if (!node)
     {
@@ -671,9 +673,9 @@ namespace donkeev
   }
 
   template<class Key, class Value, class Compare>
-  BSTNode<Key, Value>* BSTree<Key, Value, Compare>::findNode(const Key key) const
+  detail::BSTNode<Key, Value>* BSTree<Key, Value, Compare>::findNode(const Key key) const
   {
-    BSTNode<Key, Value>* current = root_;
+    detail::BSTNode<Key, Value>* current = root_;
 
     while (current)
     {
@@ -695,7 +697,7 @@ namespace donkeev
   }
 
   template<class Key, class Value, class Compare>
-  size_t BSTree<Key, Value, Compare>::heightRecursive(const BSTNode<Key, Value>* node) const
+  size_t BSTree<Key, Value, Compare>::heightRecursive(const detail::BSTNode<Key, Value>* node) const
   {
     if (!node)
     {
