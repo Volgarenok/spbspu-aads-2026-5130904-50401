@@ -1,14 +1,12 @@
 #include "graph.hpp"
 
-bool studilova::PairEqual::operator()(
-  const std::pair< std::string, std::string>& lhs,
-  const std::pair< std::string, std::string >& rhs
-) const
+bool studilova::PairEqual::operator()(const std::pair< std::string, std::string>& lhs,
+  const std::pair< std::string, std::string >& rhs) const
 {
   return lhs.first == rhs.first && lhs.second == rhs.second;
 }
 
-studilova::Graph::Graph(size_t edgeCapacity) :
+studilova::Graph::Graph(size_t edgeCapacity):
   vertices_(),
   edges_(edgeCapacity)
 {}
@@ -51,7 +49,9 @@ void studilova::Graph::bind(const std::string& from, const std::string& to, size
     Weights weights = tmp.edges_.at(key);
     weights.pushBack(weight);
     tmp.edges_.insert(std::pair< EdgeKey, Weights >(key, weights));
-  } else {
+  }
+  else
+  {
     Weights weights;
     weights.pushBack(weight);
     tmp.edges_.insert(std::pair< EdgeKey, Weights >(key, weights));
@@ -95,7 +95,9 @@ bool studilova::Graph::cut(const std::string& from, const std::string& to, size_
   if (weights.isEmpty())
   {
     tmp.edges_.erase(key);
-  } else {
+  }
+  else
+  {
     tmp.edges_.insert(std::pair< EdgeKey, Weights >(key, weights));
   }
 

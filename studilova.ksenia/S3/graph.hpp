@@ -1,29 +1,28 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 
-#include "hash_table.hpp"
-#include "hmac_hash.hpp"
-#include "../common/vector.hpp"
-
 #include <cstddef>
 #include <string>
 #include <utility>
+
+#include <vector.hpp>
+
+#include "hash_table.hpp"
+#include "hmac_hash.hpp"
 
 namespace studilova
 {
   struct PairEqual
   {
-    bool operator()(
-      const std::pair< std::string, std::string>& lhs,
-      const std::pair< std::string, std::string>& rhs
-    ) const;
+    bool operator()(const std::pair< std::string, std::string >& lhs,
+      const std::pair< std::string, std::string >& rhs) const;
   };
 
   class Graph
   {
     public:
       using EdgeKey = std::pair< std::string, std::string >;
-      using Weights = studilova::Vector< size_t >;
+      using Weights = Vector< size_t >;
       using EdgeTable = HashTable< EdgeKey, Weights, HMACHash, PairEqual >;
       using Connection = std::pair< std::string, Weights >;
       using Connections = Vector< Connection >;
@@ -45,7 +44,7 @@ namespace studilova
       Connections getInbound(const std::string& vertex) const;
 
     private:
-      studilova::Vector< std::string> vertices_;
+      studilova::Vector< std::string > vertices_;
       EdgeTable edges_;
   };
 }
