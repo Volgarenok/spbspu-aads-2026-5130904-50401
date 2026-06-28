@@ -16,14 +16,14 @@ namespace donkeev
   template< class T >
   bool Comp< T >::operator()(const T& lhs, const T& rhs) const
   {
-    return std::less<>(lhs, rhs);
+    return std::less<T>{}(lhs, rhs);
   }
 
   template< class Key, class Value, class Compare >
   class BSTree
   {
   public:
-    using tree = BSTree< class Key, class Value, class Compare >;
+    using tree = BSTree< Key, Value, Compare >;
     using iterator = BSTIterator< Key, Value >;
     using constIterator = BSTCIterator< Key, Value >;
 
@@ -39,6 +39,11 @@ namespace donkeev
 
     BSTree< Key, Value, Compare >& operator=(const BSTree< Key, Value, Compare >&);
     BSTree< Key, Value, Compare >& operator=(BSTree< Key, Value, Compare >&&);
+    Value& operator[](const Key&);
+    Value& operator[](Key&&);
+
+    Value& at(const Key&);
+    const Value& at(const Key&) const;
 
     iterator begin();
     iterator end();
@@ -167,6 +172,44 @@ namespace donkeev
     }
 
     return *this;
+  }
+
+  template< class Key, class Value, class Compare >
+  Value& BSTree< Key, Value, Compare >::operator[](const Key& key)
+  {
+    std::pair< iterator, bool > result = insert(key, Value{});
+
+    return result.first->second;
+  }
+
+  template< class Key, class Value, class Compare >
+  Value& BSTree< Key, Value, Compare >::operator[](Key&& key)
+  {
+    std::pair< iterator, bool > result = insert(std::move(key), Value{});
+
+    return result.first->second;
+  }
+
+  template< class Key, class Value, class Compare >
+  Value& BSTree<Key, Value, Compare>::at(const Key& key)
+  {
+    detail::BSTNode<Key, Value>* node = findNode(key);
+    if (!node)
+    {
+      throw std::out_of_range("No such element");
+    }
+    return node->data_.second;
+  }
+
+  template< class Key, class Value, class Compare >
+  const Value& BSTree<Key, Value, Compare>::at(const Key& key) const
+  {
+    detail::BSTNode<Key, Value>* node = findNode(key);
+    if (!node)
+    {
+      throw std::out_of_range("No such element");
+    }
+    return node->data_.second;
   }
 
   template< class Key, class Value, class Compare >
@@ -397,7 +440,7 @@ namespace donkeev
       }
       else
       {
-        return {iterator(curr), false};
+        return {constIterator(curr), false};
       }
     }
 
@@ -418,7 +461,7 @@ namespace donkeev
     }
 
     ++size_;
-    return {iterator(new_node), true};
+    return {constIterator(new_node), true};
   }
 
   template< class Key, class Value, class Compare >

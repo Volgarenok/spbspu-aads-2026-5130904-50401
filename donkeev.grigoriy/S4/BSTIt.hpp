@@ -42,6 +42,8 @@ namespace donkeev
 
     bool operator==(const BSTIterator< Key, Value >&) const noexcept;
     bool operator!=(const BSTIterator< Key, Value >&) const noexcept;
+    bool operator==(std::nullptr_t) const noexcept;
+    bool operator!=(std::nullptr_t) const noexcept;
   private:
     template< class K, class V, class C >
     friend class BSTree;
@@ -74,28 +76,17 @@ namespace donkeev
 
     bool operator==(const BSTCIterator< Key, Value >&) const noexcept;
     bool operator!=(const BSTCIterator< Key, Value >&) const noexcept;
+    bool operator==(std::nullptr_t) const noexcept;
+    bool operator!=(std::nullptr_t) const noexcept;
   private:
+    template< class K, class V, class C >
+    friend class BSTree;
     const detail::BSTNode< Key, Value >* node_;
 
     BSTCIterator(const detail::BSTNode< Key, Value >*);
 
     const detail::BSTNode< Key, Value >* getNode();
   };
-
-  template< class Key, class Value >
-  BSTIterator< Key, Value >& BSTIterator< Key, Value >::operator=(const BSTIterator< Key, Value >& other)
-  {
-    node_ = other.node_;
-    return *this;
-  }
-
-  template< class Key, class Value >
-  BSTIterator< Key, Value >& BSTIterator< Key, Value >::operator=(BSTIterator< Key, Value >&& other)
-  {
-    node_ = other.node_;
-    other.node_ = nullptr;
-    return *this;
-  }
 
   template< class Key, class Value >
   std::pair< Key, Value >& BSTIterator< Key, Value >::operator*()
@@ -161,6 +152,18 @@ namespace donkeev
   bool BSTIterator< Key, Value >::operator!=(const BSTIterator< Key, Value >& other) const noexcept
   {
     return node_ != other.node_;
+  }
+
+  template< class Key, class Value >
+  bool BSTIterator< Key, Value >::operator==(std::nullptr_t) const noexcept
+  {
+    return node_ == nullptr;
+  }
+
+  template< class Key, class Value >
+  bool BSTIterator< Key, Value >::operator!=(std::nullptr_t) const noexcept
+  {
+    return node_ != nullptr;
   }
 
   template< class Key, class Value >
@@ -238,6 +241,18 @@ namespace donkeev
   bool BSTCIterator< Key, Value >::operator!=(const BSTCIterator< Key, Value >& other) const noexcept
   {
     return node_ != other.node_;
+  }
+
+  template< class Key, class Value >
+  bool BSTCIterator< Key, Value >::operator==(std::nullptr_t) const noexcept
+  {
+    return node_ == nullptr;
+  }
+
+  template< class Key, class Value >
+  bool BSTCIterator< Key, Value >::operator!=(std::nullptr_t) const noexcept
+  {
+    return node_ != nullptr;
   }
 
   template< class Key, class Value >

@@ -31,12 +31,12 @@ int main(int argc, char* argv[])
     std::string value;
     while (file >> key >> value)
     {
-      dict.push(key, value);
+      dict.insert(key, value);
     }
 
     file.clear();
 
-    allDicts.push(dictName, std::move(dict));
+    allDicts.insert(dictName, std::move(dict));
   }
 
   file.close();
@@ -44,10 +44,10 @@ int main(int argc, char* argv[])
   using cmd_t = void(*)(std::istream&, std::ostream&, donkeev::Datasets&);
   donkeev::BSTree< std::string, cmd_t, donkeev::Comp< std::string > > commands;
 
-  commands.push("print", donkeev::printDicts);
-  commands.push("complement", donkeev::complementDicts);
-  commands.push("intersect", donkeev::intersectDicts);
-  commands.push("union", donkeev::uniteDicts);
+  commands.insert("print", donkeev::printDicts);
+  commands.insert("complement", donkeev::complementDicts);
+  commands.insert("intersect", donkeev::intersectDicts);
+  commands.insert("union", donkeev::uniteDicts);
 
   std::string command;
   while (std::cin >> command)

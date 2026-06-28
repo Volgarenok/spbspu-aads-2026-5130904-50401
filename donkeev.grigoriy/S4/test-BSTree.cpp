@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(defaultConstructor)
 BOOST_AUTO_TEST_CASE(copyConstructor)
 {
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree;
-  tree.push(1, "a");
+  tree.insert(1, "a");
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > other(tree);
   BOOST_CHECK(other.size() == 1);
 }
@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(copyConstructor)
 BOOST_AUTO_TEST_CASE(movementConstructor)
 {
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree;
-  tree.push(1, "a");
+  tree.insert(1, "a");
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > other(std::move(tree));
   BOOST_CHECK(other.size() == 1);
   BOOST_CHECK(tree.empty());
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(movementEqualOperator)
 BOOST_AUTO_TEST_CASE(beginMetod)
 {
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree(1, "a");
-  tree.push(2, "b");
+  tree.insert(2, "b");
   donkeev::BSTree< int, std::string, donkeev::Comp< int > >::iterator begin = tree.begin();
   BOOST_CHECK((*begin).second == "a");
 }
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(beginMetod)
 BOOST_AUTO_TEST_CASE(endMetod)
 {
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree(1, "a");
-  tree.push(2, "b");
+  tree.insert(2, "b");
   donkeev::BSTree< int, std::string, donkeev::Comp< int > >::iterator end = tree.end();
   BOOST_CHECK(end == nullptr);
 }
@@ -105,10 +105,10 @@ BOOST_AUTO_TEST_CASE(constEndMetod)
 BOOST_AUTO_TEST_CASE(rotateLeft)
 {
   donkeev::BSTree<int, std::string, donkeev::Comp<int> > tree;
-  tree.push(10, "10");
-  tree.push(20, "20");
-  tree.push(30, "30");
-  tree.push(35, "35");
+  tree.insert(10, "10");
+  tree.insert(20, "20");
+  tree.insert(30, "30");
+  tree.insert(35, "35");
 
   BOOST_CHECK_EQUAL(tree.height(), 4);
 
@@ -129,10 +129,10 @@ BOOST_AUTO_TEST_CASE(rotateLeft)
 BOOST_AUTO_TEST_CASE(rotateRight)
 {
   donkeev::BSTree<int, std::string, donkeev::Comp<int> > tree;
-  tree.push(35, "35");
-  tree.push(30, "30");
-  tree.push(20, "20");
-  tree.push(10, "10");
+  tree.insert(35, "35");
+  tree.insert(30, "30");
+  tree.insert(20, "20");
+  tree.insert(10, "10");
 
   BOOST_CHECK_EQUAL(tree.height(), 4);
 
@@ -153,11 +153,11 @@ BOOST_AUTO_TEST_CASE(rotateRight)
 BOOST_AUTO_TEST_CASE(largeRotateLeft)
 {
     donkeev::BSTree<int, std::string, donkeev::Comp<int> > tree;
-    tree.push(10, "10");
-    tree.push(30, "30");
-    tree.push(20, "20");
-    tree.push(15, "15");
-    tree.push(25, "25");
+    tree.insert(10, "10");
+    tree.insert(30, "30");
+    tree.insert(20, "20");
+    tree.insert(15, "15");
+    tree.insert(25, "25");
 
 
     BOOST_CHECK_EQUAL(tree.height(), 4);
@@ -181,11 +181,11 @@ BOOST_AUTO_TEST_CASE(largeRotateLeft)
 BOOST_AUTO_TEST_CASE(largeRotateRight)
 {
     donkeev::BSTree<int, std::string, donkeev::Comp<int> > tree;
-    tree.push(30, "30");
-    tree.push(10, "10");
-    tree.push(20, "20");
-    tree.push(15, "15");
-    tree.push(25, "25");
+    tree.insert(30, "30");
+    tree.insert(10, "10");
+    tree.insert(20, "20");
+    tree.insert(15, "15");
+    tree.insert(25, "25");
 
     BOOST_CHECK_EQUAL(tree.height(), 4);
 
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(movementPush)
 {
   std::string str("a");
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree;
-  tree.push(1, std::move(str));
+  tree.insert(1, std::move(str));
   BOOST_CHECK((*tree.begin()).second == "a");
 }
 
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(dropMethod)
 BOOST_AUTO_TEST_CASE(clearMethod)
 {
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree(1, "a");
-  tree.push(2, "b");
+  tree.insert(2, "b");
   tree.clear();
   BOOST_CHECK(tree.empty());
 }

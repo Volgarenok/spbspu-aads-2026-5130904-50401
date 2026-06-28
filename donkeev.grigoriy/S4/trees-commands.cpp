@@ -68,7 +68,7 @@ void donkeev::complementDicts(std::istream& input, std::ostream&, donkeev::Datas
     Dataset::constIterator found = dict2.find(key);
     if (found == dict2.end())
     {
-      result.push(key, value);
+      result.insert(key, value);
     }
 
     ++begin;
@@ -80,7 +80,7 @@ void donkeev::complementDicts(std::istream& input, std::ostream&, donkeev::Datas
     dicts.drop(newName);
   }
 
-  dicts.push(newName, std::move(result));
+  dicts.insert(newName, std::move(result));
 }
 
 void donkeev::intersectDicts(std::istream& input, std::ostream&, donkeev::Datasets& dicts)
@@ -114,7 +114,7 @@ void donkeev::intersectDicts(std::istream& input, std::ostream&, donkeev::Datase
     Dataset::constIterator found = dict2.find(key);
     if (found != dict2.end())
     {
-      result.push(key, value);
+      result.insert(key, value);
     }
 
     ++begin1;
@@ -126,7 +126,7 @@ void donkeev::intersectDicts(std::istream& input, std::ostream&, donkeev::Datase
     dicts.drop(newName);
   }
 
-  dicts.push(newName, std::move(result));
+  dicts.insert(newName, std::move(result));
 }
 
 void donkeev::uniteDicts(std::istream& input, std::ostream&, donkeev::Datasets& dicts)
@@ -156,7 +156,7 @@ void donkeev::uniteDicts(std::istream& input, std::ostream&, donkeev::Datasets& 
   {
     int key = begin1->first;
     const std::string& value = begin1->second;
-    result.push(key, value);
+    result.insert(key, value);
     ++begin1;
   }
 
@@ -171,7 +171,7 @@ void donkeev::uniteDicts(std::istream& input, std::ostream&, donkeev::Datasets& 
     Dataset::iterator found = result.find(key);
     if (found == result.end())
     {
-      result.push(key, value);
+      result.insert(key, value);
     }
 
     ++begin2;
@@ -183,5 +183,5 @@ void donkeev::uniteDicts(std::istream& input, std::ostream&, donkeev::Datasets& 
     dicts.drop(newName);
   }
 
-  dicts.push(newName, std::move(result));
+  dicts.insert(newName, std::move(result));
 }
