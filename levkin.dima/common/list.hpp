@@ -28,6 +28,7 @@ namespace levkin {
   struct Node: public NodeBase
   {
     T val;
+    ~Node() override = default;
   };
 
   template < class T >
