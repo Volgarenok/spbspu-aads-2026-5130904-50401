@@ -1,0 +1,42 @@
+
+mkdir test_folder
+cd test_folder
+touch file1.txt
+write file1.txt "Hello World!"
+touch file2.txt
+write file2.txt "Test content"
+mkdir subfolder
+cd subfolder
+touch nested.txt
+write nested.txt "Nested file"
+cd ..
+cd ..
+
+
+tree test_folder
+
+
+archive my_archive.zip test_folder
+ls
+
+
+cd test_folder
+cd subfolder
+rm nested.txt
+cd ..
+rmdir subfolder
+rm file1.txt
+rm file2.txt
+cd ..
+rmdir test_folder
+
+
+ls
+
+
+extract my_archive.zip
+
+
+tree test_folder
+cat test_folder/file1.txt
+cat test_folder/subfolder/nested.txt

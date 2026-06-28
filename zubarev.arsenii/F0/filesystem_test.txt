@@ -1,0 +1,134 @@
+mkdir project
+
+cd project
+
+mkdir src
+mkdir include
+mkdir docs
+
+
+touch README.md
+write README.md "This is virtual filesystem test"
+
+
+touch main.cpp
+write main.cpp "#include <iostream> int main(){ std::cout << \"Hello FS\"; return 0; }"
+
+
+touch utils.cpp
+write utils.cpp "void hello(){ std::cout << \"utils\"; }"
+
+
+
+cd src
+
+
+touch app.cpp
+write app.cpp "int app(){ return 10; }"
+
+
+touch config.cfg
+write config.cfg "debug=true version=1"
+
+
+
+cd ..
+
+
+cd include
+
+
+touch header.hpp
+write header.hpp "#ifndef HEADER_HPP #define HEADER_HPP #endif"
+
+
+
+cd ..
+
+
+cd docs
+
+
+touch manual.txt
+write manual.txt "Filesystem documentation test file"
+
+
+
+cd ..
+
+
+
+tree
+
+
+ls
+
+
+
+cat README.md
+
+
+cat src/app.cpp
+
+
+
+append README.md " Additional line"
+
+
+cat README.md
+
+
+
+mkdir backup
+
+
+cp README.md backup
+
+
+mv src/app.cpp main.cpp
+
+
+
+search cpp
+
+
+
+tree
+
+
+
+save-state test.state
+
+
+
+rm docs/manual.txt
+
+
+rmdir docs
+
+
+
+tree
+
+
+
+start-state test.state
+
+
+
+tree
+
+
+
+archive project_backup.arc project
+
+
+
+mkdir extracted
+
+
+extract project_backup.arc extracted
+
+
+
+tree extracted

@@ -1,0 +1,124 @@
+pwd
+
+mkdir project
+cd project
+
+touch main.cpp
+write main.cpp "int main(){return 0;}"
+
+append main.cpp "\nHello from append"
+
+cat main.cpp
+
+touch README.txt
+write README.txt "Project description"
+
+mkdir src
+cd src
+
+touch app.cpp
+write app.cpp "void run(){}"
+
+mkdir include
+cd include
+
+touch header.hpp
+write header.hpp "#pragma once"
+
+pwd
+
+cd ..
+cd ..
+cd ..
+
+tree project
+
+ls project
+
+cp project/main.cpp project/copy.cpp
+
+cat project/copy.cpp
+
+mv project/copy.cpp project/src
+
+tree project
+
+cd project/src
+
+ls
+
+cd ..
+
+search cpp
+
+cd ..
+
+save project
+
+load project
+
+tree
+
+archive backup.zip project
+
+ls
+
+rm project/README.txt
+
+cd project
+
+rm main.cpp
+
+rmdir src
+
+tree
+
+cd ..
+
+extract backup.zip
+
+cd ..
+
+tree project
+
+cat project/main.cpp
+
+cat project/src/app.cpp
+
+cat project/src/include/header.hpp
+
+export project/main.cpp exported_main.cpp
+
+import exported_main.cpp imported.cpp
+
+cat imported.cpp
+
+mv imported.cpp project/imported.cpp
+
+tree project
+
+rm project/imported.cpp
+
+rm project/main.cpp
+
+rm project/README.txt
+
+cd project/src/include
+
+rm header.hpp
+
+cd ..
+
+rmdir include
+
+rm app.cpp
+
+cd ..
+
+rmdir src
+
+cd ..
+
+rmdir project
+
+ls

@@ -1,0 +1,27 @@
+mkdir project
+cd project
+touch document.txt
+write document.txt "Main document content"
+touch documentation.txt
+write documentation.txt "Extended documentation"
+touch data.csv
+write data.csv "id,name,value"
+touch image.png
+write image.png "PNG binary data"
+mkdir config
+cd config
+touch config.cfg
+write config.cfg "setting=default"
+touch config_backup.cfg
+write config_backup.cfg "setting=old_value"
+cd ..
+mkdir logs
+cd logs
+touch log.txt
+write log.txt "2026-06-21 start"
+touch error_log.txt
+write error_log.txt "ERROR: something failed"
+cd ..
+cd ..
+
+tree project
