@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <utility>
 
 int main(int argc, char** argv)
 {
@@ -52,7 +53,16 @@ int main(int argc, char** argv)
   }
 
   studilova::CommandsMap commands(32);
-  studilova::initCommands(commands);
+
+  commands.insert(std::pair< std::string, studilova::Command >("graphs", studilova::graphs));
+  commands.insert(std::pair< std::string, studilova::Command >("vertexes", studilova::vertexes));
+  commands.insert(std::pair< std::string, studilova::Command >("outbound", studilova::outbound));
+  commands.insert(std::pair< std::string, studilova::Command >("inbound", studilova::inbound));
+  commands.insert(std::pair< std::string, studilova::Command >("bind", studilova::bind));
+  commands.insert(std::pair< std::string, studilova::Command >("cut", studilova::cut));
+  commands.insert(std::pair< std::string, studilova::Command >("create", studilova::create));
+  commands.insert(std::pair< std::string, studilova::Command >("merge", studilova::merge));
+  commands.insert(std::pair< std::string, studilova::Command >("extract", studilova::extract));
 
   std::string commandName;
 

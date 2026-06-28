@@ -11,23 +11,11 @@
 
 namespace studilova
 {
-  using GraphsMap = HashTable<
-    std::string,
-    Graph,
-    HMACHash,
-    std::equal_to< std::string >
-  >;
+  using GraphsMap = HashTable< std::string, Graph, HMACHash, std::equal_to< std::string > >;
 
   using Command = void (*)(std::istream&, std::ostream&, GraphsMap&);
 
-  using CommandsMap = HashTable<
-    std::string,
-    Command,
-    HMACHash,
-    std::equal_to< std::string >
-  >;
-
-  void initCommands(CommandsMap& commands);
+  using CommandsMap = HashTable< std::string, Command, HMACHash, std::equal_to< std::string > >;
 
   void graphs(std::istream& in, std::ostream& out, GraphsMap& graphs);
   void vertexes(std::istream& in, std::ostream& out, GraphsMap& graphs);

@@ -35,19 +35,6 @@ namespace
   }
 }
 
-void studilova::initCommands(CommandsMap& commands)
-{
-  commands.insert(std::pair< std::string, Command >("graphs", graphs));
-  commands.insert(std::pair< std::string, Command >("vertexes", vertexes));
-  commands.insert(std::pair< std::string, Command >("outbound", outbound));
-  commands.insert(std::pair< std::string, Command >("inbound", inbound));
-  commands.insert(std::pair< std::string, Command >("bind", bind));
-  commands.insert(std::pair< std::string, Command >("cut", cut));
-  commands.insert(std::pair< std::string, Command >("create", create));
-  commands.insert(std::pair< std::string, Command >("merge", merge));
-  commands.insert(std::pair< std::string, Command >("extract", extract));
-}
-
 void studilova::graphs(std::istream&, std::ostream& out, GraphsMap& graphs)
 {
   Vector< std::string > names;
