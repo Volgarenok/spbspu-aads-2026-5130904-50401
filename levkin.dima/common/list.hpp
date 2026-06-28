@@ -359,128 +359,143 @@ namespace levkin {
     return LIter< T >(nxt);
   }
   template < class T >
-  LCIter< T >::LCIter(detail::NodeBase* node) noexcept : curr(node)
+  class LCIter
   {
-  }
+    friend class List< T >;
+    friend class LIter< T >;
+
+  public:
+    LCIter() noexcept:
+      curr_(nullptr)
+    {}
+
+    explicit LCIter(const NodeBase* node) noexcept:
+      curr_(node)
+    {}
+
+    LCIter(LIter< T > it) noexcept:
+      curr_(it.curr_)
+    {}
+
+    const T& operator*() const noexcept
+    {
+      return List< T >::castNode(const_cast< NodeBase* >(curr_))->val;
+    }
+
+    LCIter& operator++() noexcept
+    {
+      curr_ = curr_->next;
+      return *this;
+    }
+
+    LCIter operator++(int) noexcept
+    {
+      LCIter temp = *this;
+      ++(*this);
+      return temp;
+    }
+
+    LCIter& operator--() noexcept
+    {
+      curr_ = curr_->prev;
+      return *this;
+    }
+
+    LCIter operator--(int) noexcept
+    {
+      LCIter temp = *this;
+      --(*this);
+      return temp;
+    }
+
+    const T* operator->() const noexcept
+    {
+      return std::addressof(List< T >::castNode(const_cast< NodeBase* >(curr_))->val);
+    }
+
+    bool operator==(const LCIter& other) const noexcept
+    {
+      return curr_ == other.curr_;
+    }
+
+    bool operator!=(const LCIter& other) const noexcept
+    {
+      return !(*this == other);
+    }
+
+  private:
+    const NodeBase* curr_;
+  };
+
   template < class T >
   LCIter< T >::LCIter(LIter< T > it) noexcept : curr(it.curr)
   {
-  }
-  template < class T >
-  const T& LCIter< T >::operator*() const noexcept
-  {
-    return static_cast< detail::Node< T >* >(curr)->val;
-  }
-  template < class T >
-  LCIter< T >& LCIter< T >::operator++() noexcept
-  {
-    curr = curr->next;
-    return *this;
-  }
-  template < class T >
-  LCIter< T > LCIter< T >::operator++(int) noexcept
-  {
-    LCIter temp = *this;
-    ++(*this);
-    return temp;
-  }
-  template < class T >
-  LCIter< T >& LCIter< T >::operator--() noexcept
-  {
-    curr = curr->prev;
-    return *this;
-  }
-  template < class T >
-  LCIter< T > LCIter< T >::operator--(int) noexcept
-  {
-    LCIter temp = *this;
-    --(*this);
-    return temp;
-  }
-  template < class T >
-  T const* LCIter< T >::operator->() const noexcept
-  {
-    return &static_cast< detail::Node< T >* >(curr)->val;
-  }
-  template < class T >
-  bool LCIter< T >::operator==(const LCIter& other) const noexcept
-  {
-    return curr == other.curr;
-  }
-  template < class T >
-  bool LCIter< T >::operator!=(const LCIter& other) const noexcept
-  {
-    return !(*this == other);
-  }
-  template < class T >
-  bool LCIter< T >::operator==(const LIter< T >& other) const noexcept
-  {
-    return curr == other.curr;
-  }
-  template < class T >
-  bool LCIter< T >::operator!=(const LIter< T >& other) const noexcept
-  {
-    return curr != other.curr;
-  }
-  template < class T >
-  LIter< T >::LIter(detail::NodeBase* node) noexcept : curr(node)
-  {
-  }
-  template < class T >
-  T& LIter< T >::operator*() noexcept
-  {
-    return static_cast< detail::Node< T >* >(curr)->val;
-  }
-  template < class T >
-  LIter< T >& LIter< T >::operator++() noexcept
-  {
-    curr = curr->next;
-    return *this;
-  }
-  template < class T >
-  LIter< T > LIter< T >::operator++(int) noexcept
-  {
-    LIter temp = *this;
-    ++(*this);
-    return temp;
-  }
-  template < class T >
-  LIter< T >& LIter< T >::operator--() noexcept
-  {
-    curr = curr->prev;
-    return *this;
-  }
-  template < class T >
-  LIter< T > LIter< T >::operator--(int) noexcept
-  {
-    LIter temp = *this;
-    --(*this);
-    return temp;
-  }
-  template < class T >
-  T* LIter< T >::operator->() noexcept
-  {
-    return &(static_cast< detail::Node< T >* >(curr)->val);
-  }
-  template < class T >
-  bool LIter< T >::operator==(const LIter& other) const noexcept
-  {
-    return curr == other.curr;
-  }
-  template < class T >
-  bool LIter< T >::operator!=(const LIter& other) const noexcept
-  {
-    return !(*this == other);
-  }
-  template < class T >
-  bool LIter< T >::operator==(const LCIter< T >& other) const noexcept
-  {
-    return curr == other.curr;
-  }
-  template < class T >
-  bool LIter< T >::operator!=(const LCIter< T >& other) const noexcept
-  {
-    return curr != other.curr;
-  }
+    friend class List< T >;
+    friend class LCIter< T >;
+
+  public:
+    explicit LIter(NodeBase* node) noexcept:
+      curr_(node)
+    {}
+
+    T& operator*() noexcept
+    {
+      return List< T >::castNode(curr_)->val;
+    }
+
+    LIter& operator++() noexcept
+    {
+      curr_ = curr_->next;
+      return *this;
+    }
+
+    LIter operator++(int) noexcept
+    {
+      LIter temp = *this;
+      ++(*this);
+      return temp;
+    }
+
+    LIter& operator--() noexcept
+    {
+      curr_ = curr_->prev;
+      return *this;
+    }
+
+    LIter operator--(int) noexcept
+    {
+      LIter temp = *this;
+      --(*this);
+      return temp;
+    }
+
+    T* operator->() noexcept
+    {
+      return std::addressof(List< T >::castNode(curr_)->val);
+    }
+
+    bool operator==(const LIter& other) const noexcept
+    {
+      return curr_ == other.curr_;
+    }
+
+    bool operator!=(const LIter& other) const noexcept
+    {
+      return !(*this == other);
+    }
+
+    bool operator==(const LCIter< T >& other) const noexcept
+    {
+      return curr_ == other.curr_;
+    }
+
+    bool operator!=(const LCIter< T >& other) const noexcept
+    {
+      return curr_ != other.curr_;
+    }
+
+  private:
+    NodeBase* curr_ = nullptr;
+  };
 }
 #endif
