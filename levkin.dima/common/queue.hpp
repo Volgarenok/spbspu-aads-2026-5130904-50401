@@ -1,61 +1,29 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 
-#include "list.hpp"
 #include <stdexcept>
 #include <utility>
+#include "list.hpp"
 
 namespace levkin {
   template < typename T >
   class Queue
   {
-  private:
-    levkin::List< T > list_;
-
   public:
     Queue() = default;
-
-    T& front();
-    const T& front() const;
-
-    bool empty() const;
-    size_t size() const;
 
     void push(const T& v);
     void push(T&& v);
     void pop();
-    T drop();
+
+    T& front();
+    const T& front() const;
+    bool empty() const;
+    size_t size() const;
+
+  private:
+    levkin::List< T > list_;
   };
-
-  template < class T >
-  bool Queue< T >::empty() const
-  {
-    return list_.size() == 0;
-  }
-
-  template < class T >
-  size_t Queue< T >::size() const
-  {
-    return list_.size();
-  }
-
-  template < class T >
-  T& Queue< T >::front()
-  {
-    if (empty()) {
-      throw std::out_of_range("Queue is empty!");
-    }
-    return *list_.begin();
-  }
-
-  template < class T >
-  const T& Queue< T >::front() const
-  {
-    if (empty()) {
-      throw std::out_of_range("Queue is empty!");
-    }
-    return *list_.cbegin();
-  }
 
   template < class T >
   void Queue< T >::push(const T& v)
@@ -78,14 +46,33 @@ namespace levkin {
   }
 
   template < class T >
-  T Queue< T >::drop()
+  T& Queue< T >::front()
   {
     if (empty()) {
-      throw std::out_of_range("queue is empty!");
+      throw std::out_of_range("Queue is empty!");
     }
-    T val = std::move(front());
-    list_.popFront();
-    return val;
+    return *list_.begin();
+  }
+
+  template < class T >
+  const T& Queue< T >::front() const
+  {
+    if (empty()) {
+      throw std::out_of_range("Queue is empty!");
+    }
+    return *list_.cbegin();
+  }
+
+  template < class T >
+  bool Queue< T >::empty() const
+  {
+    return list_.size() == 0;
+  }
+
+  template < class T >
+  size_t Queue< T >::size() const
+  {
+    return list_.size();
   }
 }
 
