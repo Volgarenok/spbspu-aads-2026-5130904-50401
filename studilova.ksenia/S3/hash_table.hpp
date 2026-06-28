@@ -81,7 +81,8 @@ namespace studilova
 
       bool contains(const Key& key) const noexcept;
 
-      void insert(const Key& key, const Value& value);
+      std::pair< It, bool > insert(const std::pair< Key, Value >& value);
+      std::pair< It, bool > insert(std::pair< Key, Value >&& value);
 
       Value& at(const Key& key);
       const Value& at(const Key& key) const;
@@ -123,6 +124,9 @@ namespace studilova
       size_t probeIndex(const Key& key, size_t attempt) const;
       bool findEntry(const Key& key, size_t& outIndex) const;
       bool findPlace(const Key& key, size_t& outIndex) const;
+
+      template< class T >
+      std::pair< It, bool > insertImpl(T&& value);
 
       friend class Iterator< Key, Value, Hash, Equal >;
       friend class ConstIterator< Key, Value, Hash, Equal >;
@@ -363,24 +367,42 @@ bool studilova::HashTable< Key, Value, Hash, Equal >::contains(const Key& key) c
 }
 
 template< class Key, class Value, class Hash, class Equal >
-void studilova::HashTable< Key, Value, Hash, Equal >::insert(const Key& key, const Value& value)
+template< class T >
+std::pair< typename studilova::HashTable< Key, Value, Hash, Equal >::It, bool >
+studilova::HashTable< Key, Value, Hash, Equal >::insertImpl(T&& value)
 {
   size_t index = 0;
-  if (findEntry(key, index))
+
+  if (findEntry(value.first, index))
   {
-    table_[index].data.second = value;
-    return;
+    table_[index].data.second = std::forward< T >(value).second;
+    return std::pair< It, bool >(It(this, index), false);
   }
 
-  if (!findPlace(key, index))
+  if (!findPlace(value.first, index))
   {
     throw std::overflow_error("HashTable is full");
   }
 
-  table_[index].data.first = key;
-  table_[index].data.second = value;
+  table_[index].data = std::forward< T >(value);
   table_[index].state = State::OCCUPIED;
   ++size_;
+
+  return std::pair< It, bool >(It(this, index), true);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+std::pair< typename studilova::HashTable< Key, Value, Hash, Equal >::It, bool >
+studilova::HashTable< Key, Value, Hash, Equal >::insert(const std::pair< Key, Value >& value)
+{
+  return insertImpl(value);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+std::pair< typename studilova::HashTable< Key, Value, Hash, Equal >::It, bool >
+studilova::HashTable< Key, Value, Hash, Equal >::insert(std::pair< Key, Value >&& value)
+{
+  return insertImpl(std::forward< std::pair< Key, Value > >(value));
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -441,7 +463,7 @@ void studilova::HashTable< Key, Value, Hash, Equal >::rehash(size_t newCapacity)
   {
     if (table_[i].state == State::OCCUPIED)
     {
-      tmp.insert(table_[i].key, table_[i].data.second);
+      tmp.insert(table_[i].data);
     }
   }
   swap(tmp);

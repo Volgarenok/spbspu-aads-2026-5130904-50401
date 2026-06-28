@@ -37,15 +37,15 @@ namespace
 
 void studilova::initCommands(CommandsMap& commands)
 {
-  commands.insert("graphs", graphs);
-  commands.insert("vertexes", vertexes);
-  commands.insert("outbound", outbound);
-  commands.insert("inbound", inbound);
-  commands.insert("bind", bind);
-  commands.insert("cut", cut);
-  commands.insert("create", create);
-  commands.insert("merge", merge);
-  commands.insert("extract", extract);
+  commands.insert(std::pair< std::string, Command >("graphs", graphs));
+  commands.insert(std::pair< std::string, Command >("vertexes", vertexes));
+  commands.insert(std::pair< std::string, Command >("outbound", outbound));
+  commands.insert(std::pair< std::string, Command >("inbound", inbound));
+  commands.insert(std::pair< std::string, Command >("bind", bind));
+  commands.insert(std::pair< std::string, Command >("cut", cut));
+  commands.insert(std::pair< std::string, Command >("create", create));
+  commands.insert(std::pair< std::string, Command >("merge", merge));
+  commands.insert(std::pair< std::string, Command >("extract", extract));
 }
 
 void studilova::graphs(std::istream&, std::ostream& out, GraphsMap& graphs)
@@ -280,7 +280,7 @@ void studilova::create(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   try
   {
-    graphs.insert(graphName, graph);
+    graphs.insert(std::pair< std::string, Graph >(graphName, graph));
   }
   catch (...)
   {
@@ -296,12 +296,7 @@ void studilova::merge(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   in >> newGraphName >> firstGraphName >> secondGraphName;
 
-  if (
-    !in ||
-    graphs.contains(newGraphName) ||
-    !graphs.contains(firstGraphName) ||
-    !graphs.contains(secondGraphName)
-  )
+  if (!in || graphs.contains(newGraphName) || !graphs.contains(firstGraphName) || !graphs.contains(secondGraphName))
   {
     out << "<INVALID COMMAND>\n";
     return;
@@ -348,7 +343,7 @@ void studilova::merge(std::istream& in, std::ostream& out, GraphsMap& graphs)
       }
     }
 
-    graphs.insert(newGraphName, newGraph);
+    graphs.insert(std::pair< std::string, Graph >(newGraphName, newGraph));
   }
   catch (...)
   {
@@ -405,7 +400,7 @@ void studilova::extract(std::istream& in, std::ostream& out, GraphsMap& graphs)
       }
     }
 
-    graphs.insert(newGraphName, newGraph);
+    graphs.insert(std::pair< std::string, Graph >(newGraphName, newGraph));
   }
   catch (...)
   {

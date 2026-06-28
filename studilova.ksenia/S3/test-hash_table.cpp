@@ -32,9 +32,9 @@ BOOST_AUTO_TEST_CASE(insert_and_contains)
 {
   TestTable table(16);
 
-  table.insert("a", 10);
-  table.insert("b", 20);
-  table.insert("c", 30);
+  table.insert(std::pair< std::string, int >("a", 10));
+  table.insert(std::pair< std::string, int >("b", 20));
+  table.insert(std::pair< std::string, int >("c", 30));
 
   BOOST_CHECK(table.contains("a"));
   BOOST_CHECK(table.contains("b"));
@@ -48,10 +48,10 @@ BOOST_AUTO_TEST_CASE(at_and_replace)
 {
   TestTable table(16);
 
-  table.insert("key", 1);
+  table.insert(std::pair< std::string, int >("key", 1));
   BOOST_CHECK_EQUAL(table.at("key"), 1);
 
-  table.insert("key", 100);
+  table.insert(std::pair< std::string, int >("key", 100));
 
   BOOST_CHECK_EQUAL(table.at("key"), 100);
   BOOST_CHECK_EQUAL(table.size(), 1);
@@ -61,8 +61,8 @@ BOOST_AUTO_TEST_CASE(erase_element)
 {
   TestTable table(16);
 
-  table.insert("a", 10);
-  table.insert("b", 20);
+  table.insert(std::pair< std::string, int >("a", 10));
+  table.insert(std::pair< std::string, int >("b", 20));
 
   BOOST_CHECK_EQUAL(table.erase("a"), 1);
 
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(erase_missing_element)
 {
   TestTable table(16);
 
-  table.insert("a", 10);
+  table.insert(std::pair< std::string, int >("a", 10));
 
   BOOST_CHECK_EQUAL(table.erase("b"), 1);
   BOOST_CHECK_EQUAL(table.size(), 1);
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(erase_twice)
 {
   TestTable table(16);
 
-  table.insert("a", 42);
+  table.insert(std::pair< std::string, int >("a", 42));
 
   BOOST_CHECK_EQUAL(table.erase("a"), 1);
   BOOST_CHECK(!table.contains("a"));
@@ -97,9 +97,9 @@ BOOST_AUTO_TEST_CASE(rehash_preserves_values)
 {
   TestTable table(8);
 
-  table.insert("a", 10);
-  table.insert("b", 20);
-  table.insert("c", 30);
+  table.insert(std::pair< std::string, int >("a", 10));
+  table.insert(std::pair< std::string, int >("b", 20));
+  table.insert(std::pair< std::string, int >("c", 30));
 
   table.rehash(31);
 
@@ -114,9 +114,9 @@ BOOST_AUTO_TEST_CASE(iterator_visits_all_elements)
 {
   TestTable table(16);
 
-  table.insert("a", 1);
-  table.insert("b", 2);
-  table.insert("c", 3);
+  table.insert(std::pair< std::string, int >("a", 1));
+  table.insert(std::pair< std::string, int >("b", 2));
+  table.insert(std::pair< std::string, int >("c", 3));
 
   int sum = 0;
   size_t count = 0;
@@ -137,8 +137,8 @@ BOOST_AUTO_TEST_CASE(const_iterator_works)
 {
   TestTable table(16);
 
-  table.insert("x", 10);
-  table.insert("y", 20);
+  table.insert(std::pair< std::string, int >("x", 10));
+  table.insert(std::pair< std::string, int >("y", 20));
 
   const TestTable& constTable = table;
 

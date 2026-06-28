@@ -50,11 +50,11 @@ void studilova::Graph::bind(const std::string& from, const std::string& to, size
   {
     Weights weights = tmp.edges_.at(key);
     weights.pushBack(weight);
-    tmp.edges_.insert(key, weights);
+    tmp.edges_.insert(std::pair< EdgeKey, Weights >(key, weights));
   } else {
     Weights weights;
     weights.pushBack(weight);
-    tmp.edges_.insert(key, weights);
+    tmp.edges_.insert(std::pair< EdgeKey, Weights >(key, weights));
   }
 
   swap(tmp);
@@ -96,7 +96,7 @@ bool studilova::Graph::cut(const std::string& from, const std::string& to, size_
   {
     tmp.edges_.erase(key);
   } else {
-    tmp.edges_.insert(key, weights);
+    tmp.edges_.insert(std::pair< EdgeKey, Weights >(key, weights));
   }
 
   swap(tmp);

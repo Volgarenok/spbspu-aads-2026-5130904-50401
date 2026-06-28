@@ -47,7 +47,7 @@ int main(int argc, char** argv)
         graph.bind(from, to, weight);
       }
 
-      graphs.insert(graphName, graph);
+      graphs.insert(std::pair< std::string, studilova::Graph >(graphName, graph));
     }
   }
 
