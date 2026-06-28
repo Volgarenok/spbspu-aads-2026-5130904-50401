@@ -1,9 +1,10 @@
-#ifndef MY_STACK
-#define MY_STACK
+#ifndef STACK_HPP
+#define STACK_HPP
+
+#include "list.hpp"
 
 #include <stdexcept>
 #include <utility>
-#include "list.hpp"
 
 namespace levkin {
   template < typename T >

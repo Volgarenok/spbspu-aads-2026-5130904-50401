@@ -1,5 +1,5 @@
-#ifndef MY_QUEUE
-#define MY_QUEUE
+#ifndef QUEUE_HPP
+#define QUEUE_HPP
 
 #include "list.hpp"
 #include <stdexcept>
