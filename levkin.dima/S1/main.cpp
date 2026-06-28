@@ -2,9 +2,10 @@
 #include <iostream>
 #include <stdexcept>
 #include "io.hpp"
-using namespace levkin;
+
 int main()
 {
+  using namespace levkin;
   try {
     Data data;
     readData(std::cin, data);
@@ -16,7 +17,7 @@ int main()
     } else {
       std::cout << "0\n";
     }
-  } catch (const std::exception &e) {
+  } catch (const std::exception& e) {
     std::cerr << e.what() << "\n";
     return 1;
   }
