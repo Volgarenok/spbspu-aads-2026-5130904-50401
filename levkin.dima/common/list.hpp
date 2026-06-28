@@ -171,6 +171,68 @@ namespace levkin {
     pseudo->next = pseudo;
     pseudo->prev = pseudo;
   }
+
+  template < class T >
+  void List< T >::popBack() noexcept
+  {
+    if (begin() != end()) {
+      erase(LIter< T >(pseudo_->prev));
+    }
+  }
+
+  template < class T >
+  LIter< T > List< T >::insertAfter(LIter< T > it, const T& val)
+  {
+    if (it.curr_ == nullptr) {
+      throw std::out_of_range("out of bounds or null");
+    }
+    Node< T >* newNode = new Node< T >();
+    newNode->val = val;
+    newNode->prev = it.curr_;
+    newNode->next = it.curr_->next;
+
+    newNode->next->prev = newNode;
+    it.curr_->next = newNode;
+    return LIter< T >(newNode);
+  }
+
+  template < class T >
+  LIter< T > List< T >::erase(LIter< T > pos) noexcept
+  {
+    if (pos == end()) {
+      return pos;
+    }
+    return eraseFast(pos);
+  }
+
+  template < class T >
+  void List< T >::erase(LIter< T > from, LIter< T > to) noexcept
+  {
+    while (from != to) {
+      erase(from++);
+    }
+  }
+
+  template < class T >
+  void List< T >::clearAndInit(size_t size, const T& val)
+  {
+    clear();
+    for (size_t i = 0; i < size; ++i) {
+      this->pushBack(val);
+    }
+  }
+
+  template < class T >
+  void List< T >::clear() noexcept
+  {
+    if (pseudo_ == nullptr) {
+      return;
+    }
+    while (pseudo_->next != pseudo_) {
+      eraseFast(LIter< T >(pseudo_->next));
+    }
+  }
+
   template < class T >
   size_t List< T >::size() const noexcept
   {
