@@ -1,6 +1,12 @@
 #include "utils.hpp"
+#include <stdexcept>
+#include <limits>
+#include <cmath>
 #include "stack.hpp"
+
 namespace levkin {
+  const long long MAX = std::numeric_limits< long long >::max();
+  const long long MIN = std::numeric_limits< long long >::min();
 
   long long add(long long a, long long b)
   {
@@ -20,16 +26,21 @@ namespace levkin {
 
   long long multiply(long long a, long long b)
   {
-    if (a == 0 || b == 0)
+    if (a == 0 || b == 0) {
       return 0;
-    if (a > 0 && b > 0 && a > MAX / b)
+    }
+    if (a > 0 && b > 0 && a > MAX / b) {
       throw std::overflow_error("overflow");
-    if (a < 0 && b < 0 && a < MAX / b)
+    }
+    if (a < 0 && b < 0 && a < MAX / b) {
       throw std::overflow_error("overflow");
-    if (a > 0 && b < 0 && b < MIN / a)
+    }
+    if (a > 0 && b < 0 && b < MIN / a) {
       throw std::overflow_error("underflow");
-    if (a < 0 && b > 0 && a < MIN / b)
+    }
+    if (a < 0 && b > 0 && a < MIN / b) {
       throw std::overflow_error("underflow");
+    }
     return a * b;
   }
 
@@ -38,15 +49,17 @@ namespace levkin {
     if (a == MIN && b == -1) {
       throw std::overflow_error("division overflow");
     }
-    if (b == 0)
+    if (b == 0) {
       throw std::logic_error("Division by zero");
+    }
     return a / b;
   }
 
   long long reminder(long long a, long long b)
   {
-    if (b == 0)
+    if (b == 0) {
       throw std::logic_error("division by zero");
+    }
     long long res = a % b;
     if (res < 0) {
       res += std::abs(b);
@@ -54,10 +67,29 @@ namespace levkin {
     return res;
   }
 
-  void processOps(Stack< long long >& nums,
-                  Stack< Operation >& ops,
-                  Stack< char >& symbols,
-                  char currentOp)
+  long long exponent(long long base, long long exp)
+  {
+    if (exp < 0) {
+      throw std::runtime_error("Negative exponent not supported for integers");
+    }
+    if (base == 0 && exp == 0) {
+      return 1;
+    }
+    if (base == 0) {
+      return 0;
+    }
+    long long result = 1;
+    for (long long i = 0; i < exp; ++i) {
+      result = multiply(result, base);
+    }
+    return result;
+  }
+
+  void processOps(
+      Stack< long long >& nums,
+      Stack< Operation >& ops,
+      Stack< char >& symbols,
+      char currentOp)
   {
     while (!symbols.empty() && symbols.top() != '(') {
       if (currentOp != '\0' && priority(symbols.top()) < priority(currentOp)) {
@@ -68,31 +100,17 @@ namespace levkin {
     }
   }
 
-  long long exponent(long long base, long long exp)
-  {
-    if (exp < 0) {
-      throw std::runtime_error("Negative exponent not supported for integers");
-    }
-    if (base == 0 && exp == 0)
-      return 1;
-    if (base == 0)
-      return 0;
-
-    long long result = 1;
-    for (long long i = 0; i < exp; ++i) {
-      result = multiply(result, base);
-    }
-    return result;
-  }
-
   void applyOp(Stack< long long >& nums, Stack< Operation >& ops)
   {
     if (nums.size() < 2) {
       throw std::runtime_error("bad input\n");
     }
-    long long rhs = nums.drop();
-    long long lhs = nums.drop();
-    Operation op = ops.drop();
+    long long rhs = nums.top();
+    nums.pop();
+    long long lhs = nums.top();
+    nums.pop();
+    Operation op = ops.top();
+    ops.pop();
 
     nums.push(op(lhs, rhs));
   }
@@ -112,22 +130,6 @@ namespace levkin {
     return weight;
   }
 
-  long long toDigit(std::string& s, size_t start, size_t end, bool& isdigit)
-  {
-    size_t result = 0;
-    for (size_t i = 0; start + i < end; ++i) {
-      char c = s[start + i] - '0';
-      if (c >= 0 && c <= 9) {
-        result = result * 10 + c;
-      } else {
-        isdigit = false;
-        return 0;
-      }
-    }
-    isdigit = true;
-    return result;
-  }
-
   size_t getNextWord(const std::string& s, size_t start)
   {
     size_t shift = 0;
@@ -137,77 +139,13 @@ namespace levkin {
     return shift + start;
   }
 
-  Stack< long long > parse(std::istream& in)
+  Operation encodeOpOrThrow(const std::string& token)
   {
-    Stack< long long > finalResults;
-
-    std::string line;
-    while (std::getline(in, line)) {
-      if (line.empty())
-        continue;
-      Stack< long long > numbers;
-      Stack< Operation > operators;
-      Stack< char > opSymbols;
-
-      size_t pos = 0;
-      while (pos < line.size()) {
-        if (line[pos] == ' ') {
-          pos++;
-          continue;
-        }
-        size_t next_pos = getNextWord(line, pos);
-
-        bool isDigit;
-        size_t digit = toDigit(line, pos, next_pos, isDigit);
-
-        if (isDigit) {
-          numbers.push(digit);
-        } else {
-          char currentSymbol = line[pos];
-
-          if (currentSymbol == '(') {
-            opSymbols.push('(');
-          } else if (currentSymbol == ')') {
-            processOps(numbers, operators, opSymbols);
-            if (opSymbols.empty())
-              throw std::runtime_error("bad parenthesis\n");
-            opSymbols.pop();
-          } else {
-
-            if (next_pos - pos == 2 && line[pos] == '*'
-                && line[pos + 1] == '*') {
-              currentSymbol = '^';
-            }
-            processOps(numbers, operators, opSymbols, currentSymbol);
-            opSymbols.push(currentSymbol);
-            Operation op = encodeOpOrThrow(line, pos, next_pos);
-            operators.push(op);
-          }
-        }
-        pos = next_pos;
-      }
-      while (!operators.empty()) {
-        if (opSymbols.top() == '(')
-          throw std::runtime_error("Mismatched parenthesis");
-        applyOp(numbers, operators);
-        opSymbols.pop();
-      }
-
-      if (numbers.size() != 1)
-        throw std::runtime_error("Invalid expression");
-      finalResults.push(numbers.top());
-    }
-
-    return finalResults;
-  }
-
-  Operation encodeOpOrThrow(std::string& s, size_t start, size_t end)
-  {
-    char c;
-    if (end - start == 2 && '*' == s[start] && '*' == s[start + 1]) {
+    char c = '\0';
+    if (token == "**") {
       c = '^';
-    } else if (end - start == 1) {
-      c = s[start];
+    } else if (token.size() == 1) {
+      c = token[0];
     } else {
       throw std::runtime_error("don't know this operation\n");
     }
@@ -230,4 +168,71 @@ namespace levkin {
     }
   }
 
+  Stack< long long > parse(std::istream& in)
+  {
+    Stack< long long > finalResults;
+    std::string line;
+
+    while (std::getline(in, line)) {
+      if (line.empty()) {
+        continue;
+      }
+      Stack< long long > numbers;
+      Stack< Operation > operators;
+      Stack< char > opSymbols;
+
+      size_t pos = 0;
+      while (pos < line.size()) {
+        if (line[pos] == ' ') {
+          pos++;
+          continue;
+        }
+        size_t nextPos = getNextWord(line, pos);
+        std::string token = line.substr(pos, nextPos - pos);
+
+        try {
+          size_t processedChars = 0;
+          long long digit = std::stoll(token, &processedChars);
+          if (processedChars == token.size()) {
+            numbers.push(digit);
+          } else {
+            throw std::invalid_argument("not completely a number");
+          }
+        } catch (const std::invalid_argument&) {
+          if (token == "(") {
+            opSymbols.push('(');
+          } else if (token == ")") {
+            processOps(numbers, operators, opSymbols);
+            if (opSymbols.empty()) {
+              throw std::runtime_error("bad parenthesis\n");
+            }
+            opSymbols.pop();
+          } else {
+            char currentSymbol = (token == "**") ? '^' : token[0];
+            processOps(numbers, operators, opSymbols, currentSymbol);
+            opSymbols.push(currentSymbol);
+            Operation op = encodeOpOrThrow(token);
+            operators.push(op);
+          }
+        } catch (const std::out_of_range&) {
+          throw std::overflow_error("number container overflow");
+        }
+        pos = nextPos;
+      }
+
+      while (!operators.empty()) {
+        if (opSymbols.top() == '(') {
+          throw std::runtime_error("Mismatched parenthesis");
+        }
+        applyOp(numbers, operators);
+        opSymbols.pop();
+      }
+
+      if (numbers.size() != 1) {
+        throw std::runtime_error("Invalid expression");
+      }
+      finalResults.push(numbers.top());
+    }
+    return finalResults;
+  }
 }
