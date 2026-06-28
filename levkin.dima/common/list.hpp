@@ -77,80 +77,54 @@ namespace levkin {
 
       LIter< T > eraseFast(LIter< T > pos) noexcept;
     };
-    template < class T > struct Node: public NodeBase {
-      T val;
-    };
+  template < class T >
+  List< T >::List() noexcept:
+    pseudo_(new NodeBase())
+  {
+    pseudo_->next = pseudo_;
+    pseudo_->prev = pseudo_;
   }
-  template < class T > class List
+
+  template < class T >
+  List< T >::List(const T& val):
+    List()
   {
-  public:
-    LIter< T > begin() noexcept;
-    LCIter< T > begin() const noexcept;
-    LCIter< T > cbegin() const noexcept;
-    LIter< T > end() noexcept;
-    LCIter< T > end() const noexcept;
-    LCIter< T > cend() const noexcept;
-    void pushFront(T val);
-    void pushBack(T val);
-    List();
-    size_t size() const noexcept;
-    void clearAndInit(size_t size, T val);
-    void erase(LIter< T > from, LIter< T > to);
-    LIter< T > erase(LIter< T > pos);
-    void popFront();
-    void popBack();
-    LIter< T > insertAfter(LIter< T > it, const T& val);
-    void clear() noexcept;
-    List(T val);
-    ~List();
-    List(const List< T >& a);
-    List(List< T >&& a) noexcept;
-    List< T >& operator=(List< T > a) noexcept;
-  private:
-    void swap(List< T >& a) noexcept;
-    List(detail::NodeBase* pseudo_node);
-    LIter< T > __eraseFast(LIter< T > pos) noexcept;
-    detail::NodeBase* pseudo;
-  };
-  template < class T > class LCIter
+    pushBack(val);
+  }
+
+  template < class T >
+  List< T >::List(const List< T >& a):
+    List()
   {
-    friend class List< T >;
-    friend class LIter< T >;
-  public:
-    LCIter(detail::NodeBase* node = nullptr) noexcept;
-    LCIter(LIter< T > it) noexcept;
-    const T& operator*() const noexcept;
-    T const* operator->() const noexcept;
-    LCIter& operator++() noexcept;
-    LCIter operator++(int) noexcept;
-    LCIter& operator--() noexcept;
-    LCIter operator--(int) noexcept;
-    bool operator==(const LCIter& other) const noexcept;
-    bool operator!=(const LCIter& other) const noexcept;
-    bool operator==(const LIter< T >& other) const noexcept;
-    bool operator!=(const LIter< T >& other) const noexcept;
-  private:
-    detail::NodeBase* curr = nullptr;
-  };
-  template < class T > class LIter
+    try {
+      for (LCIter< T > i = a.cbegin(); i != a.cend(); ++i) {
+        pushBack(*i);
+      }
+    } catch (...) {
+      clear();
+      delete pseudo_;
+      throw;
+    }
+  }
+
+  template < class T >
+  List< T >::List(List< T >&& a) noexcept:
+    pseudo_(std::exchange(a.pseudo_, nullptr))
+  {}
+
+  template < class T >
+  List< T >& List< T >::operator=(List< T > a) noexcept
   {
-    friend class List< T >;
-    friend class LCIter< T >;
-  public:
-    LIter(detail::NodeBase* node) noexcept;
-    T& operator*() noexcept;
-    T* operator->() noexcept;
-    LIter& operator++() noexcept;
-    LIter operator++(int) noexcept;
-    LIter& operator--() noexcept;
-    LIter operator--(int) noexcept;
-    bool operator==(const LIter& other) const noexcept;
-    bool operator!=(const LIter& other) const noexcept;
-    bool operator==(const LCIter< T >& other) const noexcept;
-    bool operator!=(const LCIter< T >& other) const noexcept;
-  private:
-    detail::NodeBase* curr = nullptr;
-  };
+    swap(a);
+    return *this;
+  }
+
+  template < class T >
+  void List< T >::swap(List< T >& a) noexcept
+  {
+    std::swap(a.pseudo_, this->pseudo_);
+  }
+
   template < class T >
   LIter< T > List< T >::begin() noexcept
   {
