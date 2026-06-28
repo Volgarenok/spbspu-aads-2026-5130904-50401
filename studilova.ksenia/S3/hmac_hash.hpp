@@ -27,15 +27,15 @@ namespace studilova
   };
 }
 
-studilova::HMACHash::HMACHash():
+inline studilova::HMACHash::HMACHash():
   key_("s3")
 {}
 
-explicit studilova::HMACHash::HMACHash(std::string key):
+inline studilova::HMACHash::HMACHash(std::string key):
   key_(std::move(key))
 {}
 
-size_t studilova::HMACHash::operator()(const std::string& value) const
+inline size_t studilova::HMACHash::operator()(const std::string& value) const
 {
   boost::hash2::hmac< boost::hash2::sha2_256 > hmac(reinterpret_cast< const unsigned char* >(key_.data()),
     static_cast< int >(key_.size())
@@ -44,7 +44,7 @@ size_t studilova::HMACHash::operator()(const std::string& value) const
   return boost::hash2::get_integral_result< size_t >(hmac);
 }
 
-size_t studilova::HMACHash::operator()(const std::pair< std::string, std::string >& value) const
+inline size_t studilova::HMACHash::operator()(const std::pair< std::string, std::string >& value) const
 {
   boost::hash2::hmac< boost::hash2::sha2_256 > hmac(reinterpret_cast< const unsigned char* >(key_.data()),
     static_cast< int >(key_.size())

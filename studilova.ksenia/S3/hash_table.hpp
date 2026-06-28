@@ -19,8 +19,8 @@ namespace studilova
     public:
       Iterator();
 
-      std::pair< Key, Value >& operator*() const;
-      std::pair< Key, Value >* operator->() const;
+      std::pair< Key, Value >& operator*();
+      std::pair< Key, Value >* operator->();
 
       Iterator& operator++();
       Iterator operator++(int);
@@ -32,8 +32,9 @@ namespace studilova
       HashTable< Key, Value, Hash, Equal >* hashTable_;
       size_t index_;
 
-      void skipEmpty();
       Iterator(HashTable< Key, Value, Hash, Equal >* table, size_t index);
+
+      void skipEmpty();
 
       friend class HashTable< Key, Value, Hash, Equal >;
   };
@@ -58,8 +59,9 @@ namespace studilova
       const HashTable< Key, Value, Hash, Equal >* hashTable_;
       size_t index_;
 
-      void skipEmpty();
       ConstIterator(const HashTable< Key, Value, Hash, Equal >* table, size_t index);
+
+      void skipEmpty();
 
       friend class HashTable< Key, Value, Hash, Equal >;
   };
@@ -75,7 +77,7 @@ namespace studilova
 
       size_t size() const noexcept;
       size_t capacity() const noexcept;
-      bool isEmpty() const noexcept;
+      bool empty() const noexcept;
 
       bool contains(const Key& key) const noexcept;
 
@@ -157,14 +159,14 @@ studilova::Iterator< Key, Value, Hash, Equal >::Iterator(HashTable< Key, Value, 
 }
 
 template< class Key, class Value, class Hash, class Equal >
-std::pair< Key, Value >& studilova::Iterator< Key, Value, Hash, Equal >::operator*() const
+std::pair< Key, Value >& studilova::Iterator< Key, Value, Hash, Equal >::operator*()
 {
   typename HashTable< Key, Value, Hash, Equal >::Entry& entry = hashTable_->table_[index_];
   return entry.data;
 }
 
 template< class Key, class Value, class Hash, class Equal >
-std::pair< Key, Value >* studilova::Iterator< Key, Value, Hash, Equal >::operator->() const
+std::pair< Key, Value >* studilova::Iterator< Key, Value, Hash, Equal >::operator->()
 {
   return std::addressof(operator*());
 }
@@ -348,7 +350,7 @@ size_t studilova::HashTable< Key, Value, Hash, Equal >::capacity() const noexcep
 }
 
 template< class Key, class Value, class Hash, class Equal >
-bool studilova::HashTable< Key, Value, Hash, Equal >::isEmpty() const noexcept
+bool studilova::HashTable< Key, Value, Hash, Equal >::empty() const noexcept
 {
   return size_ == 0;
 }

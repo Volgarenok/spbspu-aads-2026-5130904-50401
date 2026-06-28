@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(empty_table)
 {
   TestTable table(16);
 
-  BOOST_CHECK(table.isEmpty());
+  BOOST_CHECK(table.empty());
   BOOST_CHECK_EQUAL(table.size(), 0);
   BOOST_CHECK(!table.contains("a"));
 
