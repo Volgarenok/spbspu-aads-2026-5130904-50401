@@ -1,6 +1,5 @@
 #include <exception>
 #include <iostream>
-#include <stdexcept>
 #include "io.hpp"
 
 int main()
