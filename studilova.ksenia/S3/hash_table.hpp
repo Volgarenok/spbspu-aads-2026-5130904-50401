@@ -370,7 +370,7 @@ bool studilova::HashTable< Key, Value, Hash, Equal >::contains(const Key& key) c
 
 template< class Key, class Value, class Hash, class Equal >
 typename studilova::HashTable< Key, Value, Hash, Equal >::It
-studilova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) noexcept
+  studilova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) noexcept
 {
   size_t index = 0;
 
@@ -384,7 +384,7 @@ studilova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) noexcept
 
 template< class Key, class Value, class Hash, class Equal >
 typename studilova::HashTable< Key, Value, Hash, Equal >::CIt
-studilova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) const noexcept
+  studilova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) const noexcept
 {
   size_t index = 0;
 
@@ -399,7 +399,7 @@ studilova::HashTable< Key, Value, Hash, Equal >::find(const Key& key) const noex
 template< class Key, class Value, class Hash, class Equal >
 template< class T >
 std::pair< typename studilova::HashTable< Key, Value, Hash, Equal >::It, bool >
-studilova::HashTable< Key, Value, Hash, Equal >::insertImpl(T&& value)
+  studilova::HashTable< Key, Value, Hash, Equal >::insertImpl(T&& value)
 {
   size_t index = 0;
 
@@ -423,14 +423,14 @@ studilova::HashTable< Key, Value, Hash, Equal >::insertImpl(T&& value)
 
 template< class Key, class Value, class Hash, class Equal >
 std::pair< typename studilova::HashTable< Key, Value, Hash, Equal >::It, bool >
-studilova::HashTable< Key, Value, Hash, Equal >::insert(const std::pair< Key, Value >& value)
+  studilova::HashTable< Key, Value, Hash, Equal >::insert(const std::pair< Key, Value >& value)
 {
   return insertImpl(value);
 }
 
 template< class Key, class Value, class Hash, class Equal >
 std::pair< typename studilova::HashTable< Key, Value, Hash, Equal >::It, bool >
-studilova::HashTable< Key, Value, Hash, Equal >::insert(std::pair< Key, Value >&& value)
+  studilova::HashTable< Key, Value, Hash, Equal >::insert(std::pair< Key, Value >&& value)
 {
   return insertImpl(std::forward< std::pair< Key, Value > >(value));
 }
@@ -501,42 +501,42 @@ void studilova::HashTable< Key, Value, Hash, Equal >::rehash(size_t newCapacity)
 
 template< class Key, class Value, class Hash, class Equal >
 typename studilova::HashTable< Key, Value, Hash, Equal >::It
-studilova::HashTable< Key, Value, Hash, Equal >::begin()
+  studilova::HashTable< Key, Value, Hash, Equal >::begin()
 {
   return It(this, 0);
 }
 
 template< class Key, class Value, class Hash, class Equal >
 typename studilova::HashTable< Key, Value, Hash, Equal >::It
-studilova::HashTable< Key, Value, Hash, Equal >::end()
+  studilova::HashTable< Key, Value, Hash, Equal >::end()
 {
   return It(this, table_.getSize());
 }
 
 template< class Key, class Value, class Hash, class Equal >
 typename studilova::HashTable< Key, Value, Hash, Equal >::CIt
-studilova::HashTable< Key, Value, Hash, Equal >::begin() const
+  studilova::HashTable< Key, Value, Hash, Equal >::begin() const
 {
   return CIt(this, 0);
 }
 
 template< class Key, class Value, class Hash, class Equal >
 typename studilova::HashTable< Key, Value, Hash, Equal >::CIt
-studilova::HashTable< Key, Value, Hash, Equal >::end() const
+  studilova::HashTable< Key, Value, Hash, Equal >::end() const
 {
   return CIt(this, table_.getSize());
 }
 
 template< class Key, class Value, class Hash, class Equal >
 typename studilova::HashTable< Key, Value, Hash, Equal >::CIt
-studilova::HashTable< Key, Value, Hash, Equal >::cbegin() const
+  studilova::HashTable< Key, Value, Hash, Equal >::cbegin() const
 {
   return begin();
 }
 
 template< class Key, class Value, class Hash, class Equal >
 typename studilova::HashTable< Key, Value, Hash, Equal >::CIt
-studilova::HashTable< Key, Value, Hash, Equal >::cend() const
+  studilova::HashTable< Key, Value, Hash, Equal >::cend() const
 {
   return end();
 }
