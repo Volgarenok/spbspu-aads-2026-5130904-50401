@@ -55,6 +55,10 @@ int main(int argc, char* argv[])
     try
     {
       commands.at(command)(std::cin, std::cout, allDicts);
+      if (command == "print")
+      {
+        std::cout << '\n';
+      }
     }
     catch (...)
     {

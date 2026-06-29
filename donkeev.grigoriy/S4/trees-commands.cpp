@@ -1,7 +1,7 @@
+#include "trees-commands.hpp"
+
 #include <iostream>
 #include <stdexcept>
-
-#include "trees-commands.hpp"
 
 void donkeev::printDicts(std::istream& input, std::ostream& output, donkeev::Datasets& dicts)
 {
@@ -17,13 +17,13 @@ void donkeev::printDicts(std::istream& input, std::ostream& output, donkeev::Dat
     throw std::runtime_error("No such dictionary");
   }
 
-  Dataset& tree = it->second;
+  const Dataset& tree = it->second;
 
   if (!tree.empty())
   {
     output << datasetName;
   }
-  for (Dataset::iterator begin = tree.begin(); begin != tree.end(); ++begin)
+  for (Dataset::constIterator begin = tree.begin(); begin != tree.end(); ++begin)
   {
     output << " " << begin->first << " " << begin->second;
   }
@@ -31,10 +31,6 @@ void donkeev::printDicts(std::istream& input, std::ostream& output, donkeev::Dat
   if (tree.empty())
   {
     output << "<EMPTY>\n";
-  }
-  else
-  {
-    output << "\n";
   }
 }
 

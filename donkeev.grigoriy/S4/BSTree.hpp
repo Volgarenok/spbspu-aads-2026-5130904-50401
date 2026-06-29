@@ -541,15 +541,24 @@ namespace donkeev
       return nullptr;
     }
 
-    detail::BSTNode< Key, Value >* new_node = new detail::BSTNode< Key, Value >{
-      {node->data_.first, node->data_.second},
-      nullptr,
-      nullptr,
-      nullptr
-    };
-    new_node->parent_ = parent;
-    new_node->left_ = cloneRecursive(node->left_, new_node);
-    new_node->right_ = cloneRecursive(node->right_, new_node);
+    detail::BSTNode< Key, Value >* new_node = nullptr;
+    try
+    {
+      new_node = new detail::BSTNode< Key, Value >{
+        {node->data_.first, node->data_.second},
+        nullptr,
+        nullptr,
+        nullptr
+      };
+      new_node->parent_ = parent;
+      new_node->left_ = cloneRecursive(node->left_, new_node);
+      new_node->right_ = cloneRecursive(node->right_, new_node);
+    }
+    catch (...)
+    {
+      clearRecursive(new_node);
+      return nullptr;
+    }
 
     return new_node;
   }
