@@ -151,7 +151,8 @@ studilova::Iterator< Key, Value, Hash, Equal >::Iterator():
 template< class Key, class Value, class Hash, class Equal >
 void studilova::Iterator< Key, Value, Hash, Equal >::skipEmpty()
 {
-  while (hashTable_ && index_ < hashTable_->table_.getSize() && hashTable_->table_[index_].state != HashTable< Key, Value, Hash, Equal >::State::OCCUPIED)
+  while (hashTable_ && index_ < hashTable_->table_.getSize() && hashTable_->table_[index_].state
+    != HashTable< Key, Value, Hash, Equal >::State::OCCUPIED)
   {
     ++index_;
   }
@@ -221,7 +222,8 @@ studilova::ConstIterator< Key, Value, Hash, Equal >::ConstIterator(const Iterato
 template< class Key, class Value, class Hash, class Equal >
 void studilova::ConstIterator< Key, Value, Hash, Equal >::skipEmpty()
 {
-  while (hashTable_ && index_ < hashTable_->table_.getSize() && hashTable_->table_[index_].state != HashTable< Key, Value, Hash, Equal >::State::OCCUPIED)
+  while (hashTable_ && index_ < hashTable_->table_.getSize() && hashTable_->table_[index_].state
+    != HashTable< Key, Value, Hash, Equal >::State::OCCUPIED)
   {
     ++index_;
   }
