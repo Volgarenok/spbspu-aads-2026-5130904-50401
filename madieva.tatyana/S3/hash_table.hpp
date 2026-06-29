@@ -219,7 +219,7 @@ namespace madieva
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  HTCIter< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::find(const Key& k) const
+  HTCIter< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::find(const Key & k) const
   {
     size_t index = getIndex(k);
     const List< pair > & bucket = buckets_[index];

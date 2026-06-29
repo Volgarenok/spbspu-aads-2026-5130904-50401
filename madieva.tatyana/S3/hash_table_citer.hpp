@@ -1,6 +1,5 @@
-#ifndef MADIEVA_HASH_TABLE_CITER_HPP
-#define MADIEVA_HASH_TABLE_CITER_HPP
-
+#ifndef HASH_TABLE_CITER_HPP
+#define HASH_TABLE_CITER_HPP
 
 #include <list.hpp>
 #include "hash_table.hpp"
@@ -13,19 +12,23 @@ namespace madieva
   template< class Key, class Value, class Hash, class Equal >
   class HTCIter
   {
-    using ht = HashTable< Key, Value, Hash, Equal >;
-    using Pair = std::pair< Key, Value >;
-    size_t bucket_index_;
-    LCIter< Pair > node_iter_;
-    const Vector< List< Pair > >* buckets_;
-    void next();
   public:
-    HTCIter(size_t idx, LCIter< Pair > it,
-      const Vector< List< Pair > >* buckets);
-    HTCIter& operator++();
-    std::pair< const Key &, const Value & > operator*() const;
-    bool operator==(const HTCIter& other) const;
-    bool operator!=(const HTCIter& other) const;
+    using ht = HashTable< Key, Value, Hash, Equal >;
+    using pair = std::pair< Key, Value >;
+    HTCIter & operator++();
+    HTCIter operator++(int);
+    const pair & operator*() const;
+    const pair* operator->() const;
+    bool operator==(const HTCIter & other) const;
+    bool operator!=(const HTCIter & other) const;
+  private:
+    HTCIter(size_t idx, LCIter< pair > it,
+      const Vector< List< pair > > * buckets);
+    friend class HashTable< Key, Value, Hash, Equal >;
+    size_t bucket_index_;
+    LCIter< pair > node_iter_;
+    const Vector< List< pair > >* buckets_;
+    void next();
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -41,13 +44,13 @@ namespace madieva
         }
         ++bucket_index_;
       }
-      node_iter_ = LCIter< Pair >(nullptr);
+      node_iter_ = LCIter< pair >(nullptr, nullptr);
     }
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  HTCIter< Key, Value, Hash, Equal >::HTCIter(size_t idx, LCIter< Pair > it,
-    const Vector< List< Pair > >* buckets):
+  HTCIter< Key, Value, Hash, Equal >::HTCIter(size_t idx, LCIter< pair > it,
+    const Vector< List< pair > >* buckets):
     bucket_index_(idx),
     node_iter_(it),
     buckets_(buckets)
@@ -61,10 +64,25 @@ namespace madieva
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  std::pair< const Key &, const Value & > HTCIter< Key, Value, Hash, Equal >::operator*() const
+  HTCIter< Key, Value, Hash, Equal > HTCIter< Key, Value, Hash, Equal >::operator++(int)
   {
-    const Pair & pair = *node_iter_;
-    return {pair.first, pair.second};
+    HTCIter old = *this;
+    next();
+    return old;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  const HTCIter< Key, Value, Hash, Equal >::pair &
+    HTCIter< Key, Value, Hash, Equal >::operator*() const
+  {
+    return *node_iter_;
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  const typename HTCIter< Key, Value, Hash, Equal >::pair *
+    HTCIter< Key, Value, Hash, Equal >::operator->() const
+  {
+    return &(*node_iter_);
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -81,6 +99,5 @@ namespace madieva
     return !(*this == other);
   }
 }
-
 
 #endif
