@@ -180,7 +180,7 @@ namespace madieva {
   }
 
   template< class T >
-  LCIter< T >::LCIter(const detail::node_t< T > * a,  detail::node_t< T > * h) noexcept:
+  LCIter< T >::LCIter(const detail::node_t< T > * a, detail::node_t< T > * h) noexcept:
     it_(a),
     head_(h)
   {}
@@ -366,13 +366,21 @@ namespace madieva {
   template< class T >
   void List< T >::pushFront(const T & a)
   {
+    detail::node_t< T > * temp = new detail::node_t< T >();
+    try {
+      new (&temp->val_) T(a);
+    } catch (...) {
+      delete temp;
+      throw;
+    }
     if (!head_) {
-      head_ = new detail::node_t< T >{a, nullptr, nullptr};
+      head_ = temp;
       head_->next_ = head_;
       head_->prev_ = head_;
       size_ = 1;
     } else {
-      detail::node_t< T > * temp = new detail::node_t< T >{a, head_, head_->prev_};
+      temp->next_ = head_;
+      temp->prev_ = head_->prev_;
       head_->prev_->next_ = temp;
       head_->prev_ = temp;
       head_ = temp;
@@ -383,13 +391,21 @@ namespace madieva {
   template< class T >
   void List< T >::pushFront(T && a)
   {
+    detail::node_t< T > * temp = new detail::node_t< T >();
+    try {
+      new (&temp->val_) T(std::forward< T >(a));
+    } catch (...) {
+      delete temp;
+      throw;
+    }
     if (!head_) {
-      head_ = new detail::node_t< T >{std::forward<T>(a), nullptr, nullptr};
+      head_ = temp;
       head_->next_ = head_;
       head_->prev_ = head_;
       size_ = 1;
     } else {
-      detail::node_t< T > * temp = new detail::node_t< T >{std::forward<T>(a), head_, head_->prev_};
+      temp->next_ = head_;
+      temp->prev_ = head_->prev_;
       head_->prev_->next_ = temp;
       head_->prev_ = temp;
       head_ = temp;
@@ -400,13 +416,21 @@ namespace madieva {
   template< class T >
   void List< T >::pushBack(const T & a)
   {
+    detail::node_t< T > * temp = new detail::node_t< T >();
+    try {
+      new (&temp->val_) T(a);
+    } catch (...) {
+      delete temp;
+      throw;
+    }
     if (!head_) {
-      head_ = new detail::node_t< T >{a, nullptr, nullptr};
+      head_ = temp;
       head_->next_ = head_;
       head_->prev_ = head_;
       size_ = 1;
     } else {
-      detail::node_t< T > * temp = new detail::node_t< T >{a, head_, head_->prev_};
+      temp->next_ = head_;
+      temp->prev_ = head_->prev_;
       head_->prev_->next_ = temp;
       head_->prev_ = temp;
       size_++;
@@ -416,13 +440,21 @@ namespace madieva {
   template< class T >
   void List< T >::pushBack(T && a)
   {
+    detail::node_t< T > * temp = new detail::node_t< T >();
+    try {
+      new (&temp->val_) T(std::forward< T >(a));
+    } catch (...) {
+      delete temp;
+      throw;
+    }
     if (!head_) {
-      head_ = new detail::node_t< T >{std::forward<T>(a), nullptr, nullptr};
+      head_ = temp;
       head_->next_ = head_;
       head_->prev_ = head_;
       size_ = 1;
     } else {
-      detail::node_t< T > * temp = new detail::node_t< T >{std::forward<T>(a), head_, head_->prev_};
+      temp->next_ = head_;
+      temp->prev_ = head_->prev_;
       head_->prev_->next_ = temp;
       head_->prev_ = temp;
       size_++;
@@ -495,7 +527,12 @@ namespace madieva {
   T & List< T >::emplace_back(Args &&... args)
   {
     detail::node_t< T > * node = new detail::node_t< T >();
-    new (&node->val_) T(std::forward< Args >(args)...);
+    try {
+      new (&node->val_) T(std::forward< Args >(args)...);
+    } catch (...) {
+      delete node;
+      throw;
+    }
     if (!head_) {
       head_ = node;
       head_->next_ = head_;
@@ -531,7 +568,12 @@ namespace madieva {
       return emplace_front(std::forward< Args >(args)...);
     }
     detail::node_t< T > * node = new detail::node_t< T >();
-    new (&node->val_) T(std::forward< Args >(args)...);
+    try {
+        new (&node->val_) T(std::forward< Args >(args)...);
+    } catch (...) {
+        delete node;
+        throw;
+    }
 
     node->prev_ = pos.it_->prev_;
     node->next_ = pos.it_;
