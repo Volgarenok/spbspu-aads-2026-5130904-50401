@@ -1,6 +1,7 @@
 #include "commands.hpp"
 
 #include <utility>
+#include <stdexcept>
 
 namespace
 {
@@ -61,12 +62,10 @@ void studilova::graphs(std::istream&, std::ostream& out, GraphsMap& graphs)
 
   sortVector(names, compareStrings);
 
-  if (names.isEmpty())
+  if (!names.isEmpty())
   {
-    return;
+    printVectorLines(out, names);
   }
-
-  printVectorLines(out, names);
 }
 
 void studilova::vertexes(std::istream& in, std::ostream& out, GraphsMap& graphs)
@@ -76,19 +75,16 @@ void studilova::vertexes(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   if (!in || !graphs.contains(graphName))
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("Invalid command");
   }
 
   Vector< std::string > vertices = graphs.at(graphName).getVertices();
-
-  if (vertices.isEmpty())
-  {
-    return;
-  }
-
   sortVector(vertices, compareStrings);
-  printVectorLines(out, vertices);
+
+  if (!vertices.isEmpty())
+  {
+    printVectorLines(out, vertices);
+  }
 }
 
 void studilova::outbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
@@ -100,42 +96,34 @@ void studilova::outbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   if (!in || !graphs.contains(graphName))
   {
-    out << "<INVALID COMMAND>\n";
+    throw std::invalid_argument("Invalid command");
+  }
+
+  Graph::Connections connections = graphs.at(graphName).getOutbound(vertex);
+
+  if (connections.isEmpty())
+  {
     return;
   }
 
-  try
-  {
-    Graph::Connections connections = graphs.at(graphName).getOutbound(vertex);
+  sortVector(connections, compareConnections);
 
-    if (connections.isEmpty())
+  for (size_t i = 0; i < connections.getSize(); ++i)
+  {
+    Graph::Weights weights = connections[i].second;
+    sortVector(weights, compareWeights);
+
+    out << connections[i].first;
+
+    for (size_t j = 0; j < weights.getSize(); ++j)
     {
-      return;
+      out << " " << weights[j];
     }
 
-    sortVector(connections, compareConnections);
-
-    for (size_t i = 0; i < connections.getSize(); ++i)
+    if (i + 1 != connections.getSize())
     {
-      Graph::Weights weights = connections[i].second;
-      sortVector(weights, compareWeights);
-
-      out << connections[i].first;
-
-      for (size_t j = 0; j < weights.getSize(); ++j)
-      {
-        out << " " << weights[j];
-      }
-
-      if (i + 1 != connections.getSize())
-      {
-        out << "\n";
-      }
+      out << "\n";
     }
-  }
-  catch (...)
-  {
-    out << "<INVALID COMMAND>";
   }
 }
 
@@ -148,46 +136,38 @@ void studilova::inbound(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   if (!in || !graphs.contains(graphName))
   {
-    out << "<INVALID COMMAND>\n";
+    throw std::invalid_argument("Invalid command");
+  }
+
+  Graph::Connections connections = graphs.at(graphName).getInbound(vertex);
+
+  if (connections.isEmpty())
+  {
     return;
   }
 
-  try
-  {
-    Graph::Connections connections = graphs.at(graphName).getInbound(vertex);
+  sortVector(connections, compareConnections);
 
-    if (connections.isEmpty())
+  for (size_t i = 0; i < connections.getSize(); ++i)
+  {
+    Graph::Weights weights = connections[i].second;
+    sortVector(weights, compareWeights);
+
+    out << connections[i].first;
+
+    for (size_t j = 0; j < weights.getSize(); ++j)
     {
-      return;
+      out << " " << weights[j];
     }
 
-    sortVector(connections, compareConnections);
-
-    for (size_t i = 0; i < connections.getSize(); ++i)
+    if (i + 1 != connections.getSize())
     {
-      Graph::Weights weights = connections[i].second;
-      sortVector(weights, compareWeights);
-
-      out << connections[i].first;
-
-      for (size_t j = 0; j < weights.getSize(); ++j)
-      {
-        out << " " << weights[j];
-      }
-
-      if (i + 1 != connections.getSize())
-      {
-        out << "\n";
-      }
+      out << "\n";
     }
-  }
-  catch (...)
-  {
-    out << "<INVALID COMMAND>";
   }
 }
 
-void studilova::bind(std::istream& in, std::ostream& out, GraphsMap& graphs)
+void studilova::bind(std::istream& in, std::ostream&, GraphsMap& graphs)
 {
   std::string graphName;
   std::string from;
@@ -198,21 +178,13 @@ void studilova::bind(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   if (!in || !graphs.contains(graphName))
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("Invalid command");
   }
 
-  try
-  {
-    graphs.at(graphName).bind(from, to, weight);
-  }
-  catch (...)
-  {
-    out << "<INVALID COMMAND>\n";
-  }
+  graphs.at(graphName).bind(from, to, weight);
 }
 
-void studilova::cut(std::istream& in, std::ostream& out, GraphsMap& graphs)
+void studilova::cut(std::istream& in, std::ostream&, GraphsMap& graphs)
 {
   std::string graphName;
   std::string from;
@@ -223,37 +195,25 @@ void studilova::cut(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   if (!in || !graphs.contains(graphName))
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("Invalid command");
   }
 
   if (!graphs.at(graphName).cut(from, to, weight))
   {
-    out << "<INVALID COMMAND>\n";
+    throw std::invalid_argument("Invalid command");
   }
 }
 
-void studilova::create(std::istream& in, std::ostream& out, GraphsMap& graphs)
+void studilova::create(std::istream& in, std::ostream&, GraphsMap& graphs)
 {
   std::string graphName;
   size_t count = 0;
 
-  in >> graphName;
-
-  if (!in)
-  {
-    out << "<INVALID COMMAND>\n";
-    in.clear();
-    return;
-  }
-
-  in >> count;
+  in >> graphName >> count;
 
   if (!in || graphs.contains(graphName))
   {
-    out << "<INVALID COMMAND>\n";
-    in.clear();
-    return;
+    throw std::invalid_argument("Invalid command");
   }
 
   Graph graph;
@@ -265,24 +225,15 @@ void studilova::create(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
     if (!in)
     {
-      out << "<INVALID COMMAND>\n";
-      in.clear();
-      return;
+      throw std::invalid_argument("Invalid command");
     }
     graph.addVertex(vertex);
   }
 
-  try
-  {
-    graphs.insert(std::pair< std::string, Graph >(graphName, graph));
-  }
-  catch (...)
-  {
-    out << "<INVALID COMMAND>\n";
-  }
+  graphs.insert(std::pair< std::string, Graph >(graphName, graph));
 }
 
-void studilova::merge(std::istream& in, std::ostream& out, GraphsMap& graphs)
+void studilova::merge(std::istream& in, std::ostream&, GraphsMap& graphs)
 {
   std::string newGraphName;
   std::string firstGraphName;
@@ -292,60 +243,52 @@ void studilova::merge(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   if (!in || graphs.contains(newGraphName) || !graphs.contains(firstGraphName) || !graphs.contains(secondGraphName))
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("Invalid command");
   }
 
-  try
+  const Graph& firstGraph = graphs.at(firstGraphName);
+  const Graph& secondGraph = graphs.at(secondGraphName);
+
+  Graph newGraph(firstGraph.getEdges().size() + secondGraph.getEdges().size() + 64);
+
+  for (size_t i = 0; i < firstGraph.getVertices().getSize(); ++i)
   {
-    const Graph& firstGraph = graphs.at(firstGraphName);
-    const Graph& secondGraph = graphs.at(secondGraphName);
-
-    Graph newGraph(firstGraph.getEdges().size() + secondGraph.getEdges().size() + 64);
-
-    for (size_t i = 0; i < firstGraph.getVertices().getSize(); ++i)
-    {
-      newGraph.addVertex(firstGraph.getVertices()[i]);
-    }
-
-    for (size_t i = 0; i < secondGraph.getVertices().getSize(); ++i)
-    {
-      newGraph.addVertex(secondGraph.getVertices()[i]);
-    }
-
-    for (auto it = firstGraph.getEdges().begin(); it != firstGraph.getEdges().end(); ++it)
-    {
-      auto edge = *it;
-      const Graph::EdgeKey& key = edge.first;
-      const Graph::Weights& weights = edge.second;
-
-      for (size_t i = 0; i < weights.getSize(); ++i)
-      {
-        newGraph.bind(key.first, key.second, weights[i]);
-      }
-    }
-
-    for (auto it = secondGraph.getEdges().begin(); it != secondGraph.getEdges().end(); ++it)
-    {
-      auto edge = *it;
-      const Graph::EdgeKey& key = edge.first;
-      const Graph::Weights& weights = edge.second;
-
-      for (size_t i = 0; i < weights.getSize(); ++i)
-      {
-        newGraph.bind(key.first, key.second, weights[i]);
-      }
-    }
-
-    graphs.insert(std::pair< std::string, Graph >(newGraphName, newGraph));
+    newGraph.addVertex(firstGraph.getVertices()[i]);
   }
-  catch (...)
+
+  for (size_t i = 0; i < secondGraph.getVertices().getSize(); ++i)
   {
-    out << "<INVALID COMMAND>\n";
+    newGraph.addVertex(secondGraph.getVertices()[i]);
   }
+
+  for (auto it = firstGraph.getEdges().begin(); it != firstGraph.getEdges().end(); ++it)
+  {
+    auto edge = *it;
+    const Graph::EdgeKey& key = edge.first;
+    const Graph::Weights& weights = edge.second;
+
+    for (size_t i = 0; i < weights.getSize(); ++i)
+    {
+      newGraph.bind(key.first, key.second, weights[i]);
+    }
+  }
+
+  for (auto it = secondGraph.getEdges().begin(); it != secondGraph.getEdges().end(); ++it)
+  {
+    auto edge = *it;
+    const Graph::EdgeKey& key = edge.first;
+    const Graph::Weights& weights = edge.second;
+
+    for (size_t i = 0; i < weights.getSize(); ++i)
+    {
+      newGraph.bind(key.first, key.second, weights[i]);
+    }
+  }
+
+  graphs.insert(std::pair< std::string, Graph >(newGraphName, newGraph));
 }
 
-void studilova::extract(std::istream& in, std::ostream& out, GraphsMap& graphs)
+void studilova::extract(std::istream& in, std::ostream&, GraphsMap& graphs)
 {
   std::string newGraphName;
   std::string oldGraphName;
@@ -355,49 +298,39 @@ void studilova::extract(std::istream& in, std::ostream& out, GraphsMap& graphs)
 
   if (!in || graphs.contains(newGraphName) || !graphs.contains(oldGraphName))
   {
-    out << "<INVALID COMMAND>\n";
-    return;
+    throw std::invalid_argument("Invalid command");
   }
 
-  try
+  const Graph& oldGraph = graphs.at(oldGraphName);
+  Graph newGraph(oldGraph.getEdges().size() + 64);
+
+  for (size_t i = 0; i < count; ++i)
   {
-    const Graph& oldGraph = graphs.at(oldGraphName);
+    std::string vertex;
+    in >> vertex;
 
-    Graph newGraph(oldGraph.getEdges().size() + 64);
-
-    for (size_t i = 0; i < count; ++i)
+    if (!in || !oldGraph.hasVertex(vertex))
     {
-      std::string vertex;
-      in >> vertex;
-
-      if (!in || !oldGraph.hasVertex(vertex))
-      {
-        out << "<INVALID COMMAND>\n";
-        return;
-      }
-
-      newGraph.addVertex(vertex);
+      throw std::invalid_argument("Invalid command");
     }
 
-    for (auto it = oldGraph.getEdges().begin(); it != oldGraph.getEdges().end(); ++it)
-    {
-      auto edge = *it;
-      const Graph::EdgeKey& key = edge.first;
-      const Graph::Weights& weights = edge.second;
+    newGraph.addVertex(vertex);
+  }
 
-      if (newGraph.hasVertex(key.first) && newGraph.hasVertex(key.second))
+  for (auto it = oldGraph.getEdges().begin(); it != oldGraph.getEdges().end(); ++it)
+  {
+    auto edge = *it;
+    const Graph::EdgeKey& key = edge.first;
+    const Graph::Weights& weights = edge.second;
+
+    if (newGraph.hasVertex(key.first) && newGraph.hasVertex(key.second))
+    {
+      for (size_t i = 0; i < weights.getSize(); ++i)
       {
-        for (size_t i = 0; i < weights.getSize(); ++i)
-        {
-          newGraph.bind(key.first, key.second, weights[i]);
-        }
+        newGraph.bind(key.first, key.second, weights[i]);
       }
     }
+  }
 
-    graphs.insert(std::pair< std::string, Graph >(newGraphName, newGraph));
-  }
-  catch (...)
-  {
-    out << "<INVALID COMMAND>\n";
-  }
+  graphs.insert(std::pair< std::string, Graph >(newGraphName, newGraph));
 }

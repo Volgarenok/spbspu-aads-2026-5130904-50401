@@ -17,15 +17,15 @@ namespace studilova
 
   using CommandsMap = HashTable< std::string, Command, HMACHash, std::equal_to< std::string > >;
 
-  void graphs(std::istream& in, std::ostream& out, GraphsMap& graphs);
-  void vertexes(std::istream& in, std::ostream& out, GraphsMap& graphs);
-  void outbound(std::istream& in, std::ostream& out, GraphsMap& graphs);
-  void inbound(std::istream& in, std::ostream& out, GraphsMap& graphs);
-  void bind(std::istream& in, std::ostream& out, GraphsMap& graphs);
-  void cut(std::istream& in, std::ostream& out, GraphsMap& graphs);
-  void create(std::istream& in, std::ostream& out, GraphsMap& graphs);
-  void merge(std::istream& in, std::ostream& out, GraphsMap& graphs);
-  void extract(std::istream& in, std::ostream& out, GraphsMap& graphs);
+  void graphs(std::istream&, std::ostream&, GraphsMap&);
+  void vertexes(std::istream&, std::ostream&, GraphsMap&);
+  void outbound(std::istream&, std::ostream&, GraphsMap&);
+  void inbound(std::istream&, std::ostream&, GraphsMap&);
+  void bind(std::istream&, std::ostream&, GraphsMap&);
+  void cut(std::istream&, std::ostream&, GraphsMap&);
+  void create(std::istream&, std::ostream&, GraphsMap&);
+  void merge(std::istream&, std::ostream&, GraphsMap&);
+  void extract(std::istream&, std::ostream&, GraphsMap&);
 }
 
 #endif

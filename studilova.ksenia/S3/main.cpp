@@ -1,9 +1,11 @@
-#include "commands.hpp"
-
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <utility>
+#include <limits>
+#include <stdexcept>
+
+#include "commands.hpp"
 
 int main(int argc, char** argv)
 {
@@ -17,39 +19,40 @@ int main(int argc, char** argv)
 
   std::ifstream input(argv[1]);
 
-  if (input)
+  if (!input)
   {
-    std::string graphName;
+    std::cerr << "Cannot open file\n";
+    return 1;
+  }
 
-    while (input >> graphName)
+  std::string graphName;
+
+  while (input >> graphName)
+  {
+    size_t edgesCount = 0;
+
+    if (!(input >> edgesCount))
     {
-      size_t edgesCount = 0;
+      return 0;
+    }
 
-      if (!(input >> edgesCount))
+    studilova::Graph graph(edgesCount * 2 + 16);
+
+    for (size_t i = 0; i < edgesCount; ++i)
+    {
+      std::string from;
+      std::string to;
+      size_t weight = 0;
+
+      input >> from >> to >> weight;
+
+      if (!input)
       {
         return 0;
       }
-
-      studilova::Graph graph(edgesCount * 2 + 16);
-
-      for (size_t i = 0; i < edgesCount; ++i)
-      {
-        std::string from;
-        std::string to;
-        size_t weight = 0;
-
-        input >> from >> to >> weight;
-
-        if (!input)
-        {
-          return 0;
-        }
-
-        graph.bind(from, to, weight);
-      }
-
-      graphs.insert(std::pair< std::string, studilova::Graph >(graphName, graph));
+      graph.bind(from, to, weight);
     }
+    graphs.insert(std::pair< std::string, studilova::Graph >(graphName, graph));
   }
 
   studilova::CommandsMap commands(32);
@@ -68,25 +71,24 @@ int main(int argc, char** argv)
 
   while (std::cin >> commandName)
   {
-    if (!commands.contains(commandName))
-    {
-      std::cout << "<INVALID COMMAND>\n";
-
-      std::string line;
-      std::getline(std::cin, line);
-
-      continue;
-    }
-
     try
     {
+      if (!commands.contains(commandName))
+      {
+        throw std::invalid_argument("Unknown command");
+      }
       commands.at(commandName)(std::cin, std::cout, graphs);
     }
     catch (...)
     {
       std::cout << "<INVALID COMMAND>\n";
     }
-  }
 
+    if (std::cin.fail())
+    {
+      std::cin.clear();
+    }
+    std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+  }
   return 0;
 }
