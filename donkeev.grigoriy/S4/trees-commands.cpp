@@ -30,7 +30,7 @@ void donkeev::printDicts(std::istream& input, std::ostream& output, donkeev::Dat
 
   if (tree.empty())
   {
-    output << "<EMPTY>\n";
+    output << "<EMPTY>";
   }
 }
 
