@@ -44,6 +44,8 @@ namespace donkeev
 
     Value& at(const Key&);
     const Value& at(const Key&) const;
+    iterator find(const Key&);
+    constIterator find(const Key&) const;
 
     iterator begin();
     iterator end();
@@ -55,11 +57,8 @@ namespace donkeev
     iterator largeRotateRight(iterator);
     iterator largeRotateLeft(iterator);
     std::pair< iterator, bool > insert(const Key&, const Value&);
-    std::pair< constIterator, bool > insert(Key&&, Value&&);
-    Value& get(const Key);
-    iterator find(const Key&);
-    constIterator find(const Key&) const;
-    Value drop(const Key);
+    std::pair< iterator, bool > insert(Key&&, Value&&);
+    bool erase(const Key&);
     void clear();
     void swap(BSTree< Key, Value, Compare >&);
     bool empty() const;
@@ -210,6 +209,20 @@ namespace donkeev
       throw std::out_of_range("No such element");
     }
     return node->data_.second;
+  }
+
+  template<class Key, class Value, class Compare>
+  typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::find(const Key& key)
+  {
+    detail::BSTNode<Key, Value>* node = findNode(key);
+    return iterator(node);
+  }
+
+  template<class Key, class Value, class Compare>
+  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::find(const Key& key) const
+  {
+    detail::BSTNode<Key, Value>* node = findNode(key);
+    return constIterator(node);
   }
 
   template< class Key, class Value, class Compare >
@@ -363,7 +376,7 @@ namespace donkeev
         nullptr
       };
       ++size_;
-      return {iterator(root_), true};
+      return std::make_pair(iterator(root_), true);
     }
 
     detail::BSTNode<Key, Value>* curr = root_;
@@ -383,7 +396,7 @@ namespace donkeev
       }
       else
       {
-        return {iterator(curr), false};
+        return std::make_pair(iterator(curr), false);
       }
     }
 
@@ -404,11 +417,11 @@ namespace donkeev
     }
 
     ++size_;
-    return {iterator(new_node), true};
+    return std::make_pair(iterator(new_node), true);
   }
 
   template< class Key, class Value, class Compare >
-  std::pair< BSTCIterator< Key, Value >, bool > BSTree< Key, Value, Compare >::insert(
+  std::pair< BSTIterator< Key, Value >, bool > BSTree< Key, Value, Compare >::insert(
     Key&& key, Value&& value)
   {
     if (!root_)
@@ -420,7 +433,7 @@ namespace donkeev
         nullptr
       };
       ++size_;
-      return {constIterator(root_), true};
+      return std::make_pair(iterator(root_), true);
     }
 
     detail::BSTNode<Key, Value>* curr = root_;
@@ -440,7 +453,7 @@ namespace donkeev
       }
       else
       {
-        return {constIterator(curr), false};
+        return std::make_pair(iterator(curr), false);
       }
     }
 
@@ -461,61 +474,22 @@ namespace donkeev
     }
 
     ++size_;
-    return {constIterator(new_node), true};
-  }
-
-  template< class Key, class Value, class Compare >
-  Value& BSTree< Key, Value, Compare >::get(const Key key)
-  {
-    detail::BSTNode< Key, Value >* curr = root_;
-    while (curr)
-    {
-      if (compareFunc_(key, curr->data_.first))
-      {
-        curr = curr->left_;
-      }
-      else if (compareFunc_(curr->data_.first, key))
-      {
-        curr = curr->right_;
-      }
-      else
-      {
-        return curr->data_.second;
-      }
-    }
-
-    throw std::runtime_error("No such element");
+    return std::make_pair(iterator(new_node), true);
   }
 
   template<class Key, class Value, class Compare>
-  typename BSTree<Key, Value, Compare>::iterator BSTree<Key, Value, Compare>::find(const Key& key)
-  {
-    detail::BSTNode<Key, Value>* node = findNode(key);
-    return iterator(node);
-  }
-
-  template<class Key, class Value, class Compare>
-  typename BSTree<Key, Value, Compare>::constIterator BSTree<Key, Value, Compare>::find(const Key& key) const
-  {
-    detail::BSTNode<Key, Value>* node = findNode(key);
-    return constIterator(node);
-  }
-
-  template<class Key, class Value, class Compare>
-  Value BSTree<Key, Value, Compare>::drop(const Key key)
+  bool BSTree<Key, Value, Compare>::erase(const Key& key)
   {
     detail::BSTNode<Key, Value>* node = findNode(key);
     if (!node)
     {
-      throw std::runtime_error("No such element");
+      return false;
     }
-
-    Value result = std::move(node->data_.second);
 
     removeNode(node);
     --size_;
 
-    return result;
+    return true;
   }
 
   template< class Key, class Value, class Compare >

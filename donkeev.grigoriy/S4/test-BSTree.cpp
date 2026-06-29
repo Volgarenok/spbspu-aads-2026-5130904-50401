@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(userConstructor)
 {
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree(1, "a");
   BOOST_CHECK(tree.size() == 1);
-  BOOST_CHECK(tree.get(1) == "a");
+  BOOST_CHECK(tree[1] == "a");
 }
 
 BOOST_AUTO_TEST_CASE(movementUserConstructor)
@@ -40,14 +40,14 @@ BOOST_AUTO_TEST_CASE(movementUserConstructor)
   std::string str("a");
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree(1, std::move(str));
   BOOST_CHECK(tree.size() == 1);
-  BOOST_CHECK(tree.get(1) == "a");
+  BOOST_CHECK(tree[1] == "a");
 }
 
 BOOST_AUTO_TEST_CASE(destructor)
 {
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree(1, "a");
   BOOST_CHECK(tree.size() == 1);
-  BOOST_CHECK(tree.get(1) == "a");
+  BOOST_CHECK(tree[1] == "a");
 
   tree.clear();
   BOOST_CHECK(tree.empty());
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(equalOperator)
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > other(2, "b");
   other = tree;
   BOOST_CHECK(other.size() == 1);
-  BOOST_CHECK(other.get(1) == "a");
+  BOOST_CHECK(other[1] == "a");
 }
 
 BOOST_AUTO_TEST_CASE(movementEqualOperator)
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(movementEqualOperator)
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > other(2, "b");
   other = std::move(tree);
   BOOST_CHECK(other.size() == 1);
-  BOOST_CHECK(other.get(1) == "a");
+  BOOST_CHECK(other[1] == "a");
   BOOST_CHECK(tree.empty());
 }
 
@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(movementPush)
 BOOST_AUTO_TEST_CASE(getMethod)
 {
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree(1, "a");
-  BOOST_CHECK(tree.get(1) == "a");
+  BOOST_CHECK(tree[1] == "a");
 }
 
 BOOST_AUTO_TEST_CASE(findMethod)
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(findMethod)
 BOOST_AUTO_TEST_CASE(dropMethod)
 {
   donkeev::BSTree< int, std::string, donkeev::Comp< int > > tree(1, "a");
-  tree.drop(1);
+  tree.erase(1);
   BOOST_CHECK(tree.empty());
 }
 

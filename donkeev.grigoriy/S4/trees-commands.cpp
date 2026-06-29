@@ -77,7 +77,7 @@ void donkeev::complementDicts(std::istream& input, std::ostream&, donkeev::Datas
   Datasets::iterator existing = dicts.find(newName);
   if (existing != dicts.end())
   {
-    dicts.drop(newName);
+    dicts.erase(newName);
   }
 
   dicts.insert(newName, std::move(result));
@@ -123,7 +123,7 @@ void donkeev::intersectDicts(std::istream& input, std::ostream&, donkeev::Datase
   Datasets::iterator existing = dicts.find(newName);
   if (existing != dicts.end())
   {
-    dicts.drop(newName);
+    dicts.erase(newName);
   }
 
   dicts.insert(newName, std::move(result));
@@ -180,7 +180,7 @@ void donkeev::uniteDicts(std::istream& input, std::ostream&, donkeev::Datasets& 
   Datasets::iterator existing = dicts.find(newName);
   if (existing != dicts.end())
   {
-    dicts.drop(newName);
+    dicts.erase(newName);
   }
 
   dicts.insert(newName, std::move(result));
