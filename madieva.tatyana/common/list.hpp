@@ -71,6 +71,7 @@ namespace madieva {
     void pushBack(T && a);
     void popFront() noexcept;
     void popBack() noexcept;
+    LIter< T > erase(LIter< T > pos) noexcept;
     template< class... Args >
     T & emplace_back(Args &&... args);
     template< class... Args >
@@ -211,7 +212,7 @@ namespace madieva {
   template< class T >
   LCIter< T > LCIter< T >::operator++(int) noexcept
   {
-    assert(it_ != head_);
+    assert(it_ != nullptr);
     LCIter< T > temp = *this;
     ++(*this);
     return temp;
@@ -445,6 +446,30 @@ namespace madieva {
         size_--;
       }
     }
+  }
+
+  template< class T >
+  LIter< T > List< T >::erase(LIter< T > pos) noexcept
+  {
+    assert(pos.it_ != nullptr);
+    assert(size_ > 0);
+    detail::node_t< T > * node = pos.it_;
+    detail::node_t< T > * next_node = node->next_;
+    detail::node_t< T > * prev_node = node->prev_;
+    if (size_ == 1) {
+      delete node;
+      head_ = nullptr;
+      size_ = 0;
+      return LIter< T >(nullptr, nullptr);
+    }
+    prev_node->next_ = next_node;
+    next_node->prev_ = prev_node;
+    if (node == head_) {
+      head_ = next_node;
+    }
+    delete node;
+    size_--;
+    return LIter< T >(next_node, head_);
   }
 
   template< class T >
