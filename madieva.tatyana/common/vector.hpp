@@ -19,8 +19,8 @@ namespace madieva {
     explicit Vector(size_t size, const T & init);
     ~Vector();
 
-    Vector& operator=(const Vector &);
-    Vector& operator=(Vector &&);
+    Vector & operator=(const Vector &);
+    Vector & operator=(Vector &&);
 
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
@@ -44,7 +44,7 @@ namespace madieva {
     void erase(size_t start, size_t end);
 
     explicit Vector(std::initializer_list< T > il);
-    void unsafePushback(const T&);
+    void unsafePushback(const T &);
     void reserve(size_t required);
     void shrinkToFit();
     template< class IT >
@@ -58,7 +58,7 @@ namespace madieva {
   private:
     T * data_;
     size_t size_, capacity_;
-    void pushBackCount(size_t k, const T& v);
+    void pushBackCount(size_t k, const T & v);
     explicit Vector(size_t size);
   };
 
@@ -68,27 +68,26 @@ namespace madieva {
   template< class T >
   struct Iter {
     explicit Iter(T * a);
-    Iter& operator++() noexcept;
-    Iter& operator--() noexcept;
+    Iter & operator++() noexcept;
+    Iter & operator--() noexcept;
     bool operator==(const Iter< T > & a) const noexcept;
     bool operator!=(const Iter< T > & a) const noexcept;
-    T& operator*() noexcept;
+    T & operator*() noexcept;
   private:
     friend class Vector< T >;
     T * it;
   };
 }
 
-
 template< class T >
-madieva::Vector< T >::Vector() :
+madieva::Vector< T >::Vector():
   data_(nullptr),
   size_(0),
   capacity_(0)
 {}
 
 template< class T >
-madieva::Vector< T >::Vector(const Vector< T >& rhs) :
+madieva::Vector< T >::Vector(const Vector< T > & rhs):
   data_(nullptr),
   size_(rhs.getSize()),
   capacity_(rhs.getSize())
@@ -126,7 +125,7 @@ madieva::Vector< T >::Vector(Vector< T > && rhs) noexcept:
 }
 
 template< class T >
-madieva::Vector< T >::Vector(size_t size, const T& init) :
+madieva::Vector< T >::Vector(size_t size, const T & init):
   Vector(size)
 {
   size_t i = 0;
@@ -157,7 +156,7 @@ madieva::Vector< T >::~Vector()
 }
 
 template< class T >
-madieva::Vector< T >& madieva::Vector< T >::operator=(const Vector< T > & rhs)
+madieva::Vector< T > & madieva::Vector< T >::operator=(const Vector< T > & rhs)
 {
   Vector< T > cpy = rhs;
   swap(cpy);
@@ -165,7 +164,7 @@ madieva::Vector< T >& madieva::Vector< T >::operator=(const Vector< T > & rhs)
 }
 
 template< class T >
-madieva::Vector< T >& madieva::Vector< T >::operator=(Vector< T > && rhs)
+madieva::Vector< T > & madieva::Vector< T >::operator=(Vector< T > && rhs)
 {
   if (this == std::addressof(rhs)) {
     return * this;
@@ -197,7 +196,7 @@ template< class T >
 void madieva::Vector< T >::pushBack(const T & v)
 {
   if (size_ < capacity_) {
-    new (& data_[size_]) T(v);
+    new (&data_[size_]) T(v);
     size_++;
   } else {
     size_t new_cap = 2 * capacity_ + 1;
@@ -205,10 +204,10 @@ void madieva::Vector< T >::pushBack(const T & v)
     size_t i = 0;
     try {
       for (size_t j = 0; j < size_; ++j) {
-        new (& new_data[j]) T(data_[j]);
+        new (&new_data[j]) T(data_[j]);
         i++;
       }
-      new (& new_data[i]) T(v);
+      new (&new_data[i]) T(v);
       i++;
       for (size_t j = 0; j < size_; ++j) {
         data_[j].~T();
@@ -295,15 +294,15 @@ void madieva::Vector< T >::insert(size_t i, const T& v)
   size_t j = 0;
   try {
     while (j < i) {
-      new (& new_data[j]) T(data_[j]);
+      new (&new_data[j]) T(data_[j]);
       j++;
       count++;
     }
-    new (& new_data[i]) T(copy);
+    new (&new_data[i]) T(copy);
     j++;
     count++;
     while (j < size_) {
-      new (& new_data[j + 1]) T(data_[j]);
+      new (&new_data[j + 1]) T(data_[j]);
       count++;
       j++;
     }
@@ -332,7 +331,7 @@ madieva::Iter< T > madieva::Vector< T >::insert(Iter< T > i, const T & v)
 }
 
 template< class T >
-void madieva::Vector< T >::insert(size_t i, const Vector< T >& rhs, size_t start, size_t end)
+void madieva::Vector< T >::insert(size_t i, const Vector< T > & rhs, size_t start, size_t end)
 {
   size_t delta = (end - start);
   if (delta == 0) {
@@ -498,7 +497,7 @@ madieva::Vector< T >::Vector(std::initializer_list< T > il) :
   }
 }
 
-template< class T>
+template< class T >
 void madieva::Vector< T >::unsafePushback(const T & v)
 {
   assert(size_ < capacity_);
@@ -506,17 +505,17 @@ void madieva::Vector< T >::unsafePushback(const T & v)
   size_++;
 }
 
-template< class T>
+template< class T >
 void madieva::Vector< T >::reserve(size_t required)
 {
   if (required <= capacity_) {
     return;
   }
-  T* new_data = static_cast< T * >(::operator new(sizeof(T) * required));
+  T * new_data = static_cast< T * >(::operator new(sizeof(T) * required));
   size_t count = 0;
   try {
     for (size_t i = 0; i < size_; ++i) {
-      new (& new_data[i]) T(data_[i]);
+      new (&new_data[i]) T(data_[i]);
       count++;
     }
     for(size_t i = 0; i < size_; ++i) {
@@ -534,7 +533,7 @@ void madieva::Vector< T >::reserve(size_t required)
   }
 }
 
-template< class T>
+template< class T >
 void madieva::Vector< T >::shrinkToFit()
 {
   if (size_ == capacity_) {
@@ -576,7 +575,7 @@ void madieva::Vector< T >::pushbackRange(IT b, size_t c)
     return;
   }
   size_t new_cap = size_ + c;
-  T* new_data = static_cast<T*>(::operator new(sizeof(T) * new_cap));
+  T * new_data = static_cast< T * >(::operator new(sizeof(T) * new_cap));
   size_t count = 0;
   try {
     for (size_t i = 0; i < size_; ++i) {
@@ -618,23 +617,23 @@ madieva::Iter< T > madieva::Vector< T >::end() noexcept
 template< class T >
 madieva::Iter< const T > madieva::Vector< T >::begin() const noexcept
 {
-  return Iter< const T>(data_);
+  return Iter< const T >(data_);
 }
 
 template< class T >
 madieva::Iter< const T > madieva::Vector< T >::end() const noexcept
 {
-  return Iter<const T>(data_ + size_);
+  return Iter< const T >(data_ + size_);
 }
 
 template< class T >
-void madieva::Vector< T >::pushBackCount(size_t k, const T& val)
+void madieva::Vector< T >::pushBackCount(size_t k, const T & val)
 {
   if (k == 0) {
     return;
   }
   size_t new_cap = size_ + k;
-  T* new_data = static_cast<T*>(::operator new(sizeof(T) * new_cap));
+  T * new_data = static_cast< T * >(::operator new(sizeof(T) * new_cap));
   size_t count = 0;
   try {
     for (size_t i = 0; i < size_; ++i) {
@@ -662,7 +661,7 @@ void madieva::Vector< T >::pushBackCount(size_t k, const T& val)
 }
 
 template< class T >
-madieva::Vector< T >::Vector(size_t size) :
+madieva::Vector< T >::Vector(size_t size):
   data_(nullptr),
   size_(0),
   capacity_(0)
@@ -684,7 +683,7 @@ bool madieva::operator==(const Vector< T > & lhs, const Vector< T > & rhs)
 }
 
 template< class T >
-madieva::Iter< T >::Iter(T * a) :
+madieva::Iter< T >::Iter(T * a):
  it(a)
 {}
 
@@ -703,19 +702,19 @@ madieva::Iter< T > & madieva::Iter< T >::operator--() noexcept
 }
 
 template< class T >
-bool madieva::Iter< T >::operator==(const Iter& other) const noexcept
+bool madieva::Iter< T >::operator==(const Iter & other) const noexcept
 {
   return it == other.it;
 }
 
 template< class T >
-bool madieva::Iter< T >::operator!=(const Iter& other) const noexcept
+bool madieva::Iter< T >::operator!=(const Iter & other) const noexcept
 {
   return it != other.it;
 }
 
 template< class T >
-T& madieva::Iter< T >::operator*() noexcept
+T & madieva::Iter< T >::operator*() noexcept
 {
   return *it;
 }
