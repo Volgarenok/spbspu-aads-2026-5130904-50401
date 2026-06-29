@@ -1,0 +1,22 @@
+#ifndef BSTNODE_HPP
+#define BSTNODE_HPP
+
+#include <utility>
+
+namespace donkeev
+{
+  namespace detail
+  {
+    template< class Key, class Value >
+    struct BSTNode
+    {
+      std::pair< Key, Value > data_;
+
+      BSTNode< Key, Value >* left_;
+      BSTNode< Key, Value >* right_;
+      BSTNode< Key, Value >* parent_;
+    };
+  }
+}
+
+#endif
