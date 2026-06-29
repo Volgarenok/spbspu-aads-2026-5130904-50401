@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   {
     try
     {
-      commands[command](std::cin, std::cout, allDicts);
+      commands.at(command)(std::cin, std::cout, allDicts);
     }
     catch (...)
     {
