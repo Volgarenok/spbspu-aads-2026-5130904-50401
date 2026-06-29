@@ -2,10 +2,14 @@
 #define HASH_TABLE_HPP
 
 #include <stdexcept>
+#include <memory>
 #include <vector.hpp>
 #include <list.hpp>
+#include "hash_table_iter.hpp"
+#include "hash_table_citer.hpp"
 
-namespace madieva {
+namespace madieva
+{
 
   template< class Key, class Value, class Hash, class Equal >
   class HTIter;
@@ -14,26 +18,28 @@ namespace madieva {
   class HTCIter;
 
   template< class Key, class Value, class Hash, class Equal >
-  class HashTable {
+  class HashTable
+  {
   public:
+    using pair = std::pair< Key, Value >;
+    using h_it = HTIter< Key, Value, Hash, Equal >;
+    using hc_it = HTCIter< Key, Value, Hash, Equal >;
     explicit HashTable(size_t count = 16);
-    h_it begin();
-    h_it end();
-    hc_it begin() const;
-    hc_it end() const;
     template< class K, class V >
     void add(K && k, V && v);
-    bool has(const Key & k) const;
-    Value & get(const Key & k);
-    const Value & get(const Key & k) const;
-    Value drop(const Key & k);
+    bool contains(const Key & k) const;
+    Value & at(const Key & k);
+    const Value & at(const Key & k) const;
+    Value & operator[](const Key & k);
+    bool erase(const Key & k);
     void rehash(size_t slots);
     size_t size() const noexcept;
     size_t capacity() const noexcept;
     bool empty() const noexcept;
-    using pair = std::pair< Key, Value >;
-    using h_it = HTIter< Key, Value, Hash, Equal >;
-    using hc_it = HTCIter< Key, Value, Hash, Equal >;
+    h_it begin();
+    h_it end();
+    hc_it begin() const;
+    hc_it end() const;
   private:
     friend class HTIter< Key, Value, Hash, Equal >;
     friend class HTCIter< Key, Value, Hash, Equal >;
@@ -41,7 +47,7 @@ namespace madieva {
     Hash hasher_;
     Equal comparer_;
     size_t count_;
-    size_t getIndex(const Key& k) const;
+    size_t getIndex(const Key & k) const;
   };
 
   template< class Key, class Value, class Hash, class Equal >
@@ -59,7 +65,7 @@ namespace madieva {
   {
     for (size_t i = 0; i < buckets_.getSize(); ++i) {
       if (buckets_[i].size() > 0) {
-        return h_it(i, buckets_[i].begin(), &buckets_);
+        return h_it(i, buckets_[i].begin(), std::addressof(buckets_));
       }
     }
     return end();
@@ -68,7 +74,7 @@ namespace madieva {
   template< class Key, class Value, class Hash, class Equal >
   HTIter< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::end()
   {
-    return h_it(buckets_.getSize(), LIter< pair >(nullptr), & buckets_);
+    return h_it(buckets_.getSize(), LIter< pair >(nullptr), std::addressof(buckets_));
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -76,7 +82,7 @@ namespace madieva {
   {
     for (size_t i = 0; i < buckets_.getSize(); ++i) {
       if (buckets_[i].size() > 0) {
-        return hc_it(i, buckets_[i].begin(), &buckets_);
+        return hc_it(i, buckets_[i].begin(), std::addressof(buckets_));
       }
     }
     return end();
@@ -85,7 +91,7 @@ namespace madieva {
   template< class Key, class Value, class Hash, class Equal >
   HTCIter< Key, Value, Hash, Equal > HashTable< Key, Value, Hash, Equal >::end() const
   {
-    return hc_it(buckets_.getSize(), LCIter< pair >(nullptr), &buckets_);
+    return hc_it(buckets_.getSize(), LCIter< pair >(nullptr), std::addressof(buckets_));
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -108,7 +114,7 @@ namespace madieva {
     LIter< pair > it = bucket.begin();
     for (size_t i = 0; i < bucket.size(); ++i) {
       if (comparer_((*it).first, k)) {
-        (*it).second = v;
+        (*it).second = std::forward< V >(v);
         return;
       }
       ++it;
@@ -118,7 +124,7 @@ namespace madieva {
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  bool HashTable< Key, Value, Hash, Equal >::has(const Key & k) const
+  bool HashTable< Key, Value, Hash, Equal >::contains(const Key & k) const
   {
     size_t index = getIndex(k);
     const List< pair > & bucket = buckets_[index];
@@ -133,7 +139,7 @@ namespace madieva {
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  Value & HashTable< Key, Value, Hash, Equal >::get(const Key & k)
+  Value & HashTable< Key, Value, Hash, Equal >::at(const Key & k)
   {
     size_t index = getIndex(k);
     List< pair > & bucket = buckets_[index];
@@ -148,7 +154,7 @@ namespace madieva {
   }
 
   template< class Key, class Value, class Hash, class Equal >
-  const Value & HashTable< Key, Value, Hash, Equal >::get(const Key & k) const
+  const Value & HashTable< Key, Value, Hash, Equal >::at(const Key & k) const
   {
     size_t index = getIndex(k);
     const List< pair > & bucket = buckets_[index];
@@ -162,23 +168,46 @@ namespace madieva {
     throw std::out_of_range("no such key\n");
   }
 
-
   template< class Key, class Value, class Hash, class Equal >
-  Value HashTable< Key, Value, Hash, Equal >::drop(const Key & k)
+  Value & HashTable< Key, Value, Hash, Equal >::operator[](const Key & k)
   {
     size_t index = getIndex(k);
     List< pair > & bucket = buckets_[index];
     LIter< pair > it = bucket.begin();
     for (size_t i = 0; i < bucket.size(); ++i) {
       if (comparer_((*it).first, k)) {
-        Value temp = (*it).second;
-        bucket.erase(it);
-        count_--;
-        return temp;
+        return (*it).second;
       }
       ++it;
     }
-    throw std::out_of_range("no element\n");
+    Value default_value = Value();
+    bucket.push_back(std::make_pair(k, default_value));
+    ++count_;
+
+    LIter< pair > it2 = bucket.begin();
+    for (size_t i = 0; i < bucket.size(); ++i) {
+      if (comparer_((*it2).first, k)) {
+        return (*it2).second;
+      }
+      ++it2;
+    }
+    throw std::runtime_error("unreachable");
+  }
+
+  template< class Key, class Value, class Hash, class Equal >
+  bool HashTable< Key, Value, Hash, Equal >::erase(const Key & k)
+  {
+    size_t index = getIndex(k);
+    List< pair > & bucket = buckets_[index];
+    LIter< pair > it = bucket.begin();
+    for (size_t i = 0; it != bucket.end(); ++it) {
+      if (comparer_((*it).first, k)) {
+        bucket.erase(it);
+        count_--;
+        return true;
+      }
+    }
+    return false;
   }
 
   template< class Key, class Value, class Hash, class Equal >
@@ -219,8 +248,5 @@ namespace madieva {
     return count_ == 0;
   }
 }
-
-#include "hash_table_iter.hpp"
-#include "hash_table_citer.hpp"
 
 #endif
