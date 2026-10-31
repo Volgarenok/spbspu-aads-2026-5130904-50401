@@ -32,15 +32,20 @@ namespace khasnulin
     bool operator!=(const HIter &rhs) const;
 
   private:
+    using Bucket = typename HashTable< Key, Value, Hasher, Equal >::Bucket;
+    using OverflowValue = typename HashTable< Key, Value, Hasher, Equal >::value_type;
     HIter(HashTable< Key, Value, Hasher, Equal > &hashTable, bool isEnd);
+
+    HIter(HashTable< Key, Value, Hasher, Equal > &hashTable, RAIter< Bucket > bucket, size_t slot,
+          LIter< OverflowValue > overflow);
 
     void moveToValid();
 
     size_t curr_elem_;
-    RAIter< typename HashTable< Key, Value, Hasher, Equal >::Bucket > bucket_elem_;
-    RAIter< typename HashTable< Key, Value, Hasher, Equal >::Bucket > bucket_end_;
-    LIter< typename HashTable< Key, Value, Hasher, Equal >::value_type > overflow_elem_;
-    LIter< typename HashTable< Key, Value, Hasher, Equal >::value_type > overflow_end_;
+    RAIter< Bucket > bucket_elem_;
+    RAIter< Bucket > bucket_end_;
+    LIter< OverflowValue > overflow_elem_;
+    LIter< OverflowValue > overflow_end_;
   };
 
   template < class Key, class Value, class Hasher, class Equal > class CHIter
@@ -81,6 +86,19 @@ namespace khasnulin
       bucket_elem_(isEnd ? hashTable.buckets_.end() : hashTable.buckets_.begin()),
       bucket_end_(hashTable.buckets_.end()),
       overflow_elem_(isEnd ? hashTable.overflow_.end() : hashTable.overflow_.begin()),
+      overflow_end_(hashTable.overflow_.end())
+  {
+    moveToValid();
+  }
+
+  template < class Key, class Value, class Hasher, class Equal >
+  HIter< Key, Value, Hasher, Equal >::HIter(HashTable< Key, Value, Hasher, Equal > &hashTable,
+                                            RAIter< Bucket > bucket, size_t slot,
+                                            LIter< OverflowValue > overflow):
+      curr_elem_(slot),
+      bucket_elem_(bucket),
+      bucket_end_(hashTable.buckets_.end()),
+      overflow_elem_(overflow),
       overflow_end_(hashTable.overflow_.end())
   {
     moveToValid();

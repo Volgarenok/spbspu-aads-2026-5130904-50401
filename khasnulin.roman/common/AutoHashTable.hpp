@@ -151,13 +151,15 @@ namespace khasnulin
   template < class Key, class Value, class Hash, class Equal >
   Value *AutoHashTable< Key, Value, Hash, Equal >::find(const Key &key)
   {
-    return hashTable_.find(key);
+    iterator it = hashTable_.find(key);
+    return it == hashTable_.end() ? nullptr : &(*it).second;
   }
 
   template < class Key, class Value, class Hash, class Equal >
   const Value *AutoHashTable< Key, Value, Hash, Equal >::find(const Key &key) const
   {
-    return hashTable_.find(key);
+    const_iterator it = hashTable_.find(key);
+    return it == hashTable_.end() ? nullptr : &(*it).second;
   }
 
   template < class Key, class Value, class Hash, class Equal >

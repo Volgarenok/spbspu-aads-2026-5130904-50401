@@ -1,0 +1,15 @@
+show-user-info dmitry-sokolov
+recommend dmitry-sokolov
+recommend dmitry-sokolov advanced
+recommend giulia-conti
+recommend giulia-conti ml
+recommend lucas-martin web beginner
+similar "Gradient Descent and Its Variants"
+similar "Virtual Memory and Page Tables"
+show-user-info olga-ivanova
+recommend olga-ivanova
+recommend carlos-lopez
+rate-article olga-ivanova "AVL versus Red-Black Trees" 10
+show-user-info olga-ivanova
+recommend olga-ivanova
+recommend dmitry-sokolov databases

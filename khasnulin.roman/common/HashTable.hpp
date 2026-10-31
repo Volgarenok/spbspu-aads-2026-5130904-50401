@@ -5,6 +5,8 @@
 #include "LIter.hpp"
 #include "List.hpp"
 #include "Vector.hpp"
+#include "VectorRandomIter.hpp"
+#include <cassert>
 #include <functional>
 #include <stdexcept>
 #include <utility>
@@ -55,13 +57,14 @@ namespace khasnulin
     template < class V > void add(const Key &key, V &&value);
 
     // Удалить значение K
-    Value drop(const Key &key);
+    size_type drop(const Key &key) noexcept;
+    iterator drop(const_iterator it) noexcept;
 
     // Проверить, если ли по ключу K значение
     bool has(const Key &key) const;
 
-    Value *find(const Key &key);
-    const Value *find(const Key &key) const;
+    iterator find(const Key &key);
+    const_iterator find(const Key &key) const;
 
     // Перехэшировать таблицу с новым числом слотов
     void rehash(size_type buckets);
@@ -120,9 +123,8 @@ namespace khasnulin
     // swap метод для copy and swap идиомы.
     void swap(HashTable &rhs) noexcept;
 
-    // вспомогательная функция для поиска значения с ключом внутри бакета и в overflow
-    const value_type *findInBucketOrOverflow(const Bucket &bucket, const Key &key) const;
-    value_type *findInBucketOrOverflow(Bucket &bucket, const Key &key);
+    iterator locate(size_type bucketIndex, const Key &key) const;
+    size_type bucketIndex(const Key &key) const;
 
     template < class V > value_type &insertIntoBucketOrOverflow(Bucket &bucket, const Key &key, V &&value);
 
@@ -264,146 +266,114 @@ namespace khasnulin
   template < class V >
   void HashTable< Key, Value, Hasher, Equal >::add(const Key &key, V &&value)
   {
-    // вычисляем номер бакета с хэш функцией
-    size_t bucket_i = (hasher_(key) % buckets_.getSize());
-    Bucket &currBucket = buckets_[bucket_i];
-    // Ищем в нужном бакете наш элемент, если бакет переполнен и мы не нашли, идем искать в overflow
-    value_type *existedValue = findInBucketOrOverflow(currBucket, key);
-    if (existedValue)
+    size_type bucketI = bucketIndex(key);
+    iterator it = locate(bucketI, key);
+    if (it != end())
     {
-      // элемент найден, нужно обновить его value
-      existedValue->second = std::forward< V >(value);
+      it->second = std::forward< V >(value);
     }
     else
     {
-      // элемент не найден, нужно понять, где мы должны его вставить
-      insertIntoBucketOrOverflow(currBucket, key, std::forward< V >(value));
+      insertIntoBucketOrOverflow(buckets_[bucketI], key, std::forward< V >(value));
     }
   }
 
-  // Метод has
-  // Проверяет, есть ли такой ключ в hashTable
-  // 1) Считаем хэш с помощью хэшера и определяем индекс бакета при текущем количестве бакетов
-  // 2) Проходимся в цикле до bucket.count элемента и проверяем, есть ли совпадения с ключом.
-  // 3) Если совпадение есть -> true
-  // 4) Совпадений нет и bucket.count == BUCKET CAPACITY -> идем искать совпадения с ключом в overflow
-  // 5) Нашли в overflow -> true
-  // 6) Во всех остальных случаях -> false
   template < class Key, class Value, class Hasher, class Equal >
-  bool HashTable< Key, Value, Hasher, Equal >::has(const Key &key) const
+  typename HashTable< Key, Value, Hasher, Equal >::size_type
+  HashTable< Key, Value, Hasher, Equal >::bucketIndex(const Key &key) const
   {
-    size_t bucket_i = (hasher_(key) % buckets_.getSize());
-    const Bucket &currBucket = buckets_[bucket_i];
-    return findInBucketOrOverflow(currBucket, key) != nullptr;
+    return (hasher_(key) % buckets_.getSize());
   }
 
-  // Впомогательный приватный метод findInBucketOrOverflow
-  // Ищет в уже переданном бакете элемент, если находит, то возвращает указатель на него
-  // Если не находит и бакет заполнен, идет искать в overflow, если находит, возвращает указатель
-  // Иначе возврат nullptr
   template < class Key, class Value, class Hasher, class Equal >
-  const typename HashTable< Key, Value, Hasher, Equal >::value_type *
-  HashTable< Key, Value, Hasher, Equal >::findInBucketOrOverflow(const Bucket &bucket, const Key &key) const
+  typename HashTable< Key, Value, Hasher, Equal >::iterator
+  HashTable< Key, Value, Hasher, Equal >::locate(size_type bucketIndex, const Key &key) const
   {
-    size_type bucket_size = bucket.count;
+    assert(bucketIndex < buckets_.getSize());
+    HashTable &self = const_cast< HashTable & >(*this);
+    size_type bucket_size = buckets_[bucketIndex].count;
+    const Bucket &bucket = buckets_[bucketIndex];
     for (size_type i = 0; i < bucket_size; ++i)
     {
       if (equal_(bucket.data[i].first, key))
       {
-        return bucket.data + i;
+        return iterator(self, self.buckets_.begin() + bucketIndex, i, self.overflow_.begin());
       }
     }
 
-    // тут специально в любом случае будем искать в overflow, так как элемент с ключом в бакете может
-    // удалиться, размер бакета уменьшится, а элементы с таким же хэшом в overflow так и останутся в overflow,
-    // мы их должны там найти
-    for (const value_type &item : overflow_)
+    auto list_it = self.overflow_.begin();
+    auto list_end = self.overflow_.end();
+    for (; list_it != list_end; ++list_it)
     {
-      if (equal_(item.first, key))
+      if (equal_(list_it->first, key))
       {
-        return (&item);
+        return iterator(self, self.buckets_.end(), 0, list_it);
       }
     }
-    return nullptr;
+    return self.end();
   }
 
   template < class Key, class Value, class Hasher, class Equal >
-  typename HashTable< Key, Value, Hasher, Equal >::value_type *
-  HashTable< Key, Value, Hasher, Equal >::findInBucketOrOverflow(Bucket &bucket, const Key &key)
+  bool HashTable< Key, Value, Hasher, Equal >::has(const Key &key) const
   {
-    return const_cast< value_type * >(
-        static_cast< const HashTable * >(this)->findInBucketOrOverflow(bucket, key));
+    return find(key) != end();
   }
 
   template < class Key, class Value, class Hasher, class Equal >
-  Value *HashTable< Key, Value, Hasher, Equal >::find(const Key &key)
+  typename HashTable< Key, Value, Hasher, Equal >::iterator
+  HashTable< Key, Value, Hasher, Equal >::find(const Key &key)
   {
-    return const_cast< Value * >(static_cast< const HashTable * >(this)->find(key));
+    return locate(bucketIndex(key), key);
   }
 
   template < class Key, class Value, class Hasher, class Equal >
-  const Value *HashTable< Key, Value, Hasher, Equal >::find(const Key &key) const
+  typename HashTable< Key, Value, Hasher, Equal >::const_iterator
+  HashTable< Key, Value, Hasher, Equal >::find(const Key &key) const
   {
-    size_t bucket_i = (hasher_(key) % buckets_.getSize());
-    const Bucket &currBucket = buckets_[bucket_i];
-    const value_type *existedValue = findInBucketOrOverflow(currBucket, key);
-    const Value *result = nullptr;
-    if (existedValue)
+    return locate(bucketIndex(key), key);
+  }
+
+  template < class Key, class Value, class Hasher, class Equal >
+  typename HashTable< Key, Value, Hasher, Equal >::size_type
+  HashTable< Key, Value, Hasher, Equal >::drop(const Key &key) noexcept
+  {
+    iterator it = locate(bucketIndex(key), key);
+    if (it == end())
     {
-      result = &(existedValue->second);
+      return 0;
     }
-    return result;
+    drop(it);
+    return 1;
   }
 
-  // Метод drop
-  // Удаляет элемент с ключом key, если он есть, возвращает
-  // Если мы нашли элемент с ключем key, то нам важно понять, где именно он находится
-  // 1) если он в bucket, то необходимо его удалить с его позиции, сдвинуть все остальные элементы, уменьшить
-  // count 2) если он в overflow, то необходимо сделать erase по его позиции
-  // если элемента нет, бросаем исключение на попытку удалить несуществующий ключ
   template < class Key, class Value, class Hasher, class Equal >
-  Value HashTable< Key, Value, Hasher, Equal >::drop(const Key &key)
+  typename HashTable< Key, Value, Hasher, Equal >::iterator
+  HashTable< Key, Value, Hasher, Equal >::drop(const_iterator iter) noexcept
   {
-    size_t bucket_i = (hasher_(key) % buckets_.getSize());
-    Bucket &currBucket = buckets_[bucket_i];
-    value_type *existedValue = findInBucketOrOverflow(currBucket, key);
-    // ищем key в бакете и в overflow
-    if (existedValue)
+    iterator &it = iter.iter_;
+    if (it == end())
     {
-      // нужно определить где именно хранится наш ключ, в bucket или в overflow
-      if ((existedValue >= currBucket.data) && existedValue < (currBucket.data + BUCKET_CAPACITY))
-      {
-        // если адрес нашего value находится между нижней границей массива bucket и верхней границей, то
-        // гарантированно в bucket. Вычисляем индекс по арифметике указателей
-        size_type val_i = existedValue - currBucket.data;
+      return end();
+    }
 
-        // копируем с move семантикой, чтобы сразу на этом этапе все потенциальные исключения пробросились, а
-        // дальше exception safety
-        Value cp = std::move(existedValue->second);
+    if (it.bucket_elem_ != it.bucket_end_)
+    {
+      size_type index = it.curr_elem_;
+      Bucket &currBucket = *it.bucket_elem_;
 
-        for (size_type i = val_i; i < currBucket.count - 1; ++i)
-        {
-          // Ставим на место нашего key все остальные элементы дальше нашего. Наш элемент уносим в конец.
-          std::swap(currBucket.data[i], currBucket.data[i + 1]);
-        }
-        // исключения не пробросились -> можем декрементировать счетчик и вернуть value
-        --currBucket.count;
-        --elements_count_;
-        return cp;
-      }
-      // ключ не в бакете, а в overflow, значит ищем там.
-      LIter< value_type > iter = overflow_.begin();
-      while (!equal_(key, iter->first))
+      if (index < currBucket.count - 1)
       {
-        ++iter;
+        std::swap(currBucket.data[index], currBucket.data[currBucket.count - 1]);
       }
-      // нашли iter на наш key, нужно убрать элемент из списка и вернуть копию значения
-      Value cp = std::move(iter->second);
-      overflow_.erase(iter);
+
+      --currBucket.count;
       --elements_count_;
-      return cp;
+      return iterator(*this, it.bucket_elem_, index, overflow_.begin());
     }
-    throw std::out_of_range("can't drop element from hash map: such key not found");
+
+    auto new_it = overflow_.erase(it.overflow_elem_);
+    --elements_count_;
+    return iterator(*this, buckets_.end(), 0, new_it);
   }
 
   // Метод rehash
@@ -443,18 +413,13 @@ namespace khasnulin
   template < class Key, class Value, class Hasher, class Equal >
   Value &HashTable< Key, Value, Hasher, Equal >::operator[](const Key &key)
   {
-    // вычисляем номер бакета с хэш функцией
-    size_t bucket_i = (hasher_(key) % buckets_.getSize());
-    Bucket &currBucket = buckets_[bucket_i];
-    // Ищем в нужном бакете наш элемент
-    value_type *existedValue = findInBucketOrOverflow(currBucket, key);
-    if (existedValue)
+    size_type bucketI = bucketIndex(key);
+    iterator it = locate(bucketI, key);
+    if (it != end())
     {
-      // элемент найден, нужно вернуть second
-      return existedValue->second;
+      return it->second;
     }
-    // элемент не найден, нужно понять, где мы должны его вставить и вернуть его second
-    return insertIntoBucketOrOverflow(currBucket, key, Value{}).second;
+    return insertIntoBucketOrOverflow(buckets_[bucketI], key, Value{}).second;
   }
 
   template < class Key, class Value, class Hasher, class Equal >

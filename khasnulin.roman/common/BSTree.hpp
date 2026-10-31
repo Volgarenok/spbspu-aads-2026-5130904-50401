@@ -633,44 +633,27 @@ namespace khasnulin
     return iter(newRoot);
   }
 
+  // Что сделано: большие повороты теперь выражены через малые
   template < class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::iter BSTree< Key, Value, Compare >::rotateLargeLeft(const_iter it)
   {
-    if (!it.node_ || !it.node_->parent || !it.node_->right || !it.node_->right->left)
+    if (!it.node_)
     {
-      throw std::logic_error("large left rotate: can't make rotate, some nodes doesn't exists");
+      throw std::logic_error("large left rotate: invalid iterator");
     }
-    Node< Key, Value > *oldRoot =
-        static_cast< Node< Key, Value > * >(const_cast< NodeBase< Key, Value > * >(it.node_));
-    NodeBase< Key, Value > *parent = oldRoot->parent;
-    Node< Key, Value > *rightChild = oldRoot->right;
-    Node< Key, Value > *newRoot = rightChild->left;
-    replaceChild(parent, oldRoot, newRoot);
-    setRight(oldRoot, newRoot->left);
-    setLeft(rightChild, newRoot->right);
-    setLeft(newRoot, oldRoot);
-    setRight(newRoot, rightChild);
-    return iter(newRoot);
+    rotateRight(const_iter(it.node_->right));
+    return rotateLeft(it);
   }
 
   template < class Key, class Value, class Compare >
   typename BSTree< Key, Value, Compare >::iter BSTree< Key, Value, Compare >::rotateLargeRight(const_iter it)
   {
-    if (!it.node_ || !it.node_->parent || !it.node_->left || !it.node_->left->right)
+    if (!it.node_)
     {
-      throw std::logic_error("large right rotate: can't make rotate, some nodes doesn't exists");
+      throw std::logic_error("large right rotate: invalid iterator");
     }
-    Node< Key, Value > *oldRoot =
-        static_cast< Node< Key, Value > * >(const_cast< NodeBase< Key, Value > * >(it.node_));
-    NodeBase< Key, Value > *parent = oldRoot->parent;
-    Node< Key, Value > *leftChild = oldRoot->left;
-    Node< Key, Value > *newRoot = leftChild->right;
-    replaceChild(parent, oldRoot, newRoot);
-    setLeft(oldRoot, newRoot->right);
-    setRight(leftChild, newRoot->left);
-    setLeft(newRoot, leftChild);
-    setRight(newRoot, oldRoot);
-    return iter(newRoot);
+    rotateLeft(const_iter(it.node_->left));
+    return rotateRight(it);
   }
 
   template < class Key, class Value, class Compare >
